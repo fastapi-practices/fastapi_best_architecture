@@ -1,0 +1,8 @@
+__pycache__/
+.idea/
+.env
+venv/
+.mypy_cache/
+backend/app/log/
+backend/app/alembic/versions/
+backend/app/static/media/
