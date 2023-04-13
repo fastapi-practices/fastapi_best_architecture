@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "fba_server"
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./backend:/fba/backend
+      - ./docker_conf.py:/fba/backend/app/core/conf.py
+      - fba_static:/fba/backend/app/static
+    networks:
+      - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s mysql:3306 -s redis:6379 -t 300
+        supervisord -c supervisor.conf
+
+  mysql:
+    image: mysql:8.0.29
+    ports:
+      - "3306:3306"
+    container_name: "mysql"
+    restart: always
+    environment:
+      MYSQL_DATABASE: fba
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - /var/lib/mysql
+    networks:
+      - fba_network
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --lower_case_table_names=1
+
+  redis:
+    image: redis:6.2.7
+    ports:
+      - "6379:6379"
+    container_name: "redis"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /var/lib/redis
+    networks:
+      - fba_network
+
+  nginx:
+    image: nginx
+    ports:
+      - "8000:80"
+    container_name: "nginx"
+    restart: always
+    depends_on:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - fba_static:/www/fba/backend/app/static
+    networks:
+      - fba_network
+
+
+networks:
+  fba_network:
+
+volumes:
+  fba_static:
