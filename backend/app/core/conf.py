@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     REDOCS_URL: Optional[str] = None
     OPENAPI_URL: Optional[str] = '/v1/openapi'
 
+    # Uvicorn
+    UVICORN_HOST: str = '127.0.0.1'
+    UVICORN_PORT: int = 8000
+    UVICORN_RELOAD: bool = True
+
     # Static Server
     STATIC_FILES: bool = False
 
