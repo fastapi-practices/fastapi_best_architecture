@@ -18,9 +18,9 @@ class Settings(BaseSettings):
     # Static Server
     STATIC_FILES: bool = False
 
-    # DB
+    # MySQL
     DB_ECHO: bool = False
-    DB_HOST: str = 'mysql'
+    DB_HOST: str = '127.0.0.1'
     DB_PORT: int = 3306
     DB_USER: str = 'root'
     DB_PASSWORD: str = '123456'
