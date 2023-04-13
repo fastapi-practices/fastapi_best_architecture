@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import math
-from typing import TypeVar, Generic, Sequence
+from typing import TypeVar, Generic, Sequence, Dict
 
 from fastapi import Query
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
+from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel
 
 T = TypeVar("T")
@@ -34,7 +35,7 @@ class Page(AbstractPage[T], Generic[T]):
     page: int  # 第n页
     size: int  # 每页数量
     total_pages: int  # 总页数
-    links: dict  # 跳转链接
+    links: Dict[str, str]  # 跳转链接
 
     __params_type__ = Params  # 使用自定义的Params
 
@@ -48,12 +49,15 @@ class Page(AbstractPage[T], Generic[T]):
         page = params.page
         size = params.size
         total_pages = math.ceil(total / params.size)
-        links = {
-            "first": f"?page=1$size={size}",
-            "last": f"?page={math.ceil(total / params.size)}&size={size}" if total > 0 else 1,
-            "next": f"?page={page + 1}&size={size}" if (page + 1) <= total_pages else "null",
-            "prev": f"?page={page - 1}&size={size}" if (page - 1) >= 1 else "null",
-        }
+        links = create_links(
+            **{
+                "first": {"page": 1, "size": f"{size}"},
+                "last": {"page": f"{math.ceil(total / params.size)}", "size": f"{size}"} if total > 0 else None,
+                "next": {"page": f"{page + 1}", "size": f"{size}"} if (page + 1) <= total_pages else None,
+                "prev": {"page": f"{page - 1}", "size": f"{size}"} if (page - 1) >= 1 else None
+            }
+        ).dict()
+
         return cls(
             data=data,
             total=total,
