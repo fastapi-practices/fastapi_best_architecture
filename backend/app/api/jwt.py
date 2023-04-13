@@ -13,7 +13,7 @@ from typing_extensions import Annotated
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
-from backend.app.database.db_mysql import DependsSession
+from backend.app.database.db_mysql import CurrentSession
 from backend.app.models import User
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -59,7 +59,7 @@ def create_access_token(data: Union[int, Any], expires_delta: Union[timedelta, N
     return encoded_jwt
 
 
-async def get_current_user(db: DependsSession, token: str = Depends(oauth2_schema)) -> User:
+async def get_current_user(db: CurrentSession, token: str = Depends(oauth2_schema)) -> User:
     """
     Get the current user through tokens
 

@@ -45,7 +45,7 @@ async def get_db() -> AsyncSession:
 
 
 # Session 依赖注入
-DependsSession = Annotated[AsyncSession, Depends(get_db)]
+CurrentSession = Annotated[AsyncSession, Depends(get_db)]
 
 
 async def create_table():
