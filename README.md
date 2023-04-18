@@ -33,7 +33,7 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 
 2. Create a database `fba`, choose utf8mb4 encode
 3. Install and start Redis
-4. View `backend/app/core/conf.py`, update database configuration information
+4. Copy .env.example to .env and view `backend/app/core/conf.py`, update database configuration information
 5. Perform a database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
     ```shell
     cd backend/app/
