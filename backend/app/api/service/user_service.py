@@ -193,7 +193,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
         if user.avatar is not None:
             user.avatar = cut_path(AvatarPath + user.avatar)[1]
-            return user
+        return user
 
     @staticmethod
     async def update(*, username: str, current_user: User, obj: UpdateUser):
