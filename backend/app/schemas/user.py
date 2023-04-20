@@ -3,20 +3,12 @@
 import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class Auth(BaseModel):
     username: str
     password: str
-
-
-class ELCode(BaseModel):
-    email: EmailStr
-
-
-class Auth2(ELCode):
-    code: str
 
 
 class CreateUser(Auth):
@@ -27,10 +19,10 @@ class UpdateUser(BaseModel):
     username: str
     email: str
     mobile_number: Optional[str] = None
-    wechat: Optional[str] = None
-    qq: Optional[str] = None
-    blog_address: Optional[str] = None
-    introduction: Optional[str] = None
+
+
+class Avatar(BaseModel):
+    url: HttpUrl = Field(..., description='头像地址')
 
 
 class GetUserInfo(UpdateUser):
@@ -47,6 +39,6 @@ class GetUserInfo(UpdateUser):
 
 
 class ResetPassword(BaseModel):
-    code: str
+    id: int = Field(..., example='1', description='用户ID')
     password1: str
     password2: str
