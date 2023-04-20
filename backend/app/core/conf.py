@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import lru_cache
+from typing import Optional
 
 from pydantic import BaseSettings, root_validator
 
@@ -9,19 +10,16 @@ class Settings(BaseSettings):
     ENVIRONMENT: str
     # FastAPI
     TITLE: str = 'FastAPI'
-    VERSION: str = 'v1'
+    VERSION: str = 'v0.0.1'
     DESCRIPTION: str = "FastAPI Best Architecture"
-    DOCS_URL: str = None
-    REDOCS_URL: str = None
-    OPENAPI_URL: str = None
+    DOCS_URL: Optional[str] = '/v1/docs'
+    REDOCS_URL: Optional[str] = '/v1/redocs'
+    OPENAPI_URL: Optional[str] = '/v1/openapi'
 
     @root_validator
     def validator_api_url(cls, values):
-        # 开发环境和测试环境才显示文档
-        if values["ENVIRONMENT"] in ("development", "testing"):
-            values["DOCS_URL"] = f'/{values["VERSION"]}/docs'
-            values["REDOCS_URL"] = f'/{values["VERSION"]}/redocs'
-            values["OPENAPI_URL"] = f'/{values["VERSION"]}/openapi'
+        if values['ENVIRONMENT'] == 'pro':
+            values['OPENAPI_URL'] = None
         return values
 
     # Uvicorn
