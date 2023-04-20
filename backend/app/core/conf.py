@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
+    TOKEN_URL: str = '/v1/users/login'
 
     # Email
     EMAIL_DESCRIPTION: str = 'fastapi_sqlalchemy_mysql'  # 默认发件说明
