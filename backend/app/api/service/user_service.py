@@ -6,13 +6,11 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 
 from backend.app.api import jwt
 from backend.app.common.exception import errors
-from backend.app.core.path_conf import AvatarPath
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
 from backend.app.utils import re_verify
-from backend.app.utils.format_string import cut_path
 
 
 class UserService:
@@ -79,8 +77,6 @@ class UserService:
             user = await UserDao.get_user_by_username(db, username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-        if user.avatar is not None:
-            user.avatar = cut_path(AvatarPath + user.avatar)[1]
         return user
 
     @staticmethod
