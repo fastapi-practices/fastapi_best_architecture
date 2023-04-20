@@ -40,7 +40,7 @@ async def password_reset(obj: ResetPassword):
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
 async def userinfo(username: str):
-    current_user = await UserService.get_user_info(username)
+    current_user = await UserService.get_userinfo(username)
     return response_base.response_200(data=current_user, exclude={'password'})
 
 
