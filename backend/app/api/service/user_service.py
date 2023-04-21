@@ -72,12 +72,12 @@ class UserService:
             await UserDao.reset_password(db, obj.id, obj.password2)
 
     @staticmethod
-    async def get_user_info(username: str):
+    async def get_userinfo(username: str):
         async with async_db_session() as db:
             user = await UserDao.get_user_by_username(db, username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-        return user
+            return user
 
     @staticmethod
     async def update(*, username: str, current_user: User, obj: UpdateUser):
