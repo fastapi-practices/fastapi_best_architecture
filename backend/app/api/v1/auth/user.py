@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends, Request, Response, UploadFile
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.app.api.jwt import CurrentUser, DependsUser, DependsSuperUser
@@ -8,7 +8,7 @@ from backend.app.api.service.user_service import UserService
 from backend.app.common.pagination import Page
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import Token
-from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, Auth2, ELCode, UpdateUser
+from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
 
 router = APIRouter()
 
@@ -26,43 +26,15 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
 #     return Token(access_token=token, is_superuser=is_super)
 
 
-@router.post('/login/email/captcha', summary='发送邮箱登录验证码')
-async def user_login_email_captcha(request: Request, obj: ELCode):
-    await UserService.send_login_email_captcha(request, obj)
-    return response_base.response_200()
-
-
-@router.post('/login/email', summary='邮箱登录', description='邮箱登录', response_model=Token)
-async def user_login_email(request: Request, obj: Auth2):
-    token, is_super = await UserService.login_email(request=request, obj=obj)
-    return Token(access_token=token, is_superuser=is_super)
-
-
-@router.post('/logout', summary='用户退出', dependencies=[DependsUser])
-async def logout():
-    return response_base.response_200()
-
-
 @router.post('/register', summary='用户注册')
 async def user_register(obj: CreateUser):
     await UserService.register(obj)
     return response_base.response_200()
 
 
-@router.post('/password/reset/code', summary='发送密码重置验证码', description='可以通过用户名或者邮箱重置密码')
-async def password_reset_captcha(username_or_email: str, response: Response):
-    await UserService.get_pwd_rest_captcha(username_or_email=username_or_email, response=response)
-    return response_base.response_200()
-
-
-@router.post('/password/reset', summary='密码重置请求')
-async def password_reset(obj: ResetPassword, request: Request, response: Response):
-    await UserService.pwd_reset(obj=obj, request=request, response=response)
-    return response_base.response_200()
-
-
-@router.get('/password/reset/done', summary='重置密码完成')
-def password_reset_done():
+@router.post('/password/reset', summary='密码重置')
+async def password_reset(obj: ResetPassword):
+    await UserService.pwd_reset(obj)
     return response_base.response_200()
 
 
@@ -81,16 +53,8 @@ async def update_userinfo(username: str, obj: UpdateUser, current_user: CurrentU
 
 
 @router.put('/{username}/avatar', summary='更新头像')
-async def update_avatar(username: str, avatar: UploadFile, current_user: CurrentUser):
+async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser):
     count = await UserService.update_avatar(username=username, current_user=current_user, avatar=avatar)
-    if count > 0:
-        return response_base.response_200()
-    return response_base.fail()
-
-
-@router.delete('/{username}/avatar', summary='删除头像文件')
-async def delete_avatar(username: str, current_user: CurrentUser):
-    count = await UserService.delete_avatar(username=username, current_user=current_user)
     if count > 0:
         return response_base.response_200()
     return response_base.fail()

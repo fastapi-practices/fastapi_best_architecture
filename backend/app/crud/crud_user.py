@@ -9,7 +9,7 @@ from sqlalchemy.sql import Select
 from backend.app.api import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import User
-from backend.app.schemas.user import CreateUser, UpdateUser
+from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
 
 
 class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
@@ -28,18 +28,6 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def get_email_by_username(self, db: AsyncSession, username: str) -> str:
-        user = await self.get_user_by_username(db, username)
-        return user.email
-
-    async def get_username_by_email(self, db: AsyncSession, email: str) -> str:
-        user = await db.execute(select(self.model).where(self.model.email == email))
-        return user.scalars().first().username
-
-    async def get_avatar_by_username(self, db: AsyncSession, username: str) -> str:
-        user = await self.get_user_by_username(db, username)
-        return user.avatar
-
     async def create_user(self, db: AsyncSession, create: CreateUser) -> NoReturn:
         create.password = jwt.get_hash_password(create.password)
         new_user = self.model(**create.dict())
@@ -53,7 +41,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def update_avatar(self, db: AsyncSession, current_user: User, avatar: str) -> int:
+    async def update_avatar(self, db: AsyncSession, current_user: User, avatar: Avatar) -> int:
         user = await db.execute(
             update(self.model)
             .where(self.model.id == current_user.id)
@@ -68,18 +56,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         mail = await db.execute(select(self.model).where(self.model.email == email))
         return mail.scalars().first()
 
-    async def delete_avatar(self, db: AsyncSession, user_id: int) -> int:
+    async def reset_password(self, db: AsyncSession, pk: int, password: str) -> int:
         user = await db.execute(
             update(self.model)
-            .where(self.model.id == user_id)
-            .values(avatar=None)
-        )
-        return user.rowcount
-
-    async def reset_password(self, db: AsyncSession, username: str, password: str) -> int:
-        user = await db.execute(
-            update(self.model)
-            .where(self.model.username == username)
+            .where(self.model.id == pk)
             .values(password=jwt.get_hash_password(password))
         )
         return user.rowcount
