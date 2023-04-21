@@ -18,7 +18,7 @@ from backend.app.models import User
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl='/v1/users/login')
+oauth2_schema = OAuth2PasswordBearer(tokenUrl=settings.TOKEN_URL)
 
 
 def get_hash_password(password: str) -> str:

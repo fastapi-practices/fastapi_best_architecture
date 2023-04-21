@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TypeVar, Generic, Sequence, Dict
+from typing import TypeVar, Generic, Sequence, Dict, Union
 
 from fastapi import Query
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
@@ -35,7 +35,7 @@ class Page(AbstractPage[T], Generic[T]):
     page: int  # 第n页
     size: int  # 每页数量
     total_pages: int  # 总页数
-    links: Dict[str, str]  # 跳转链接
+    links: Dict[str, Union[str, None]]  # 跳转链接
 
     __params_type__ = Params  # 使用自定义的Params
 
