@@ -93,7 +93,9 @@ class Settings(BaseSettings):
     MIDDLEWARE_ACCESS: bool = False
 
     class Config:
-        env_file = '.env'
+        # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
+        env_file = '.env', '.env.example'
+        env_file_encoding = 'utf-8'
 
 
 @lru_cache
