@@ -7,7 +7,7 @@ from faker import Faker
 
 from backend.app.api.jwt import get_hash_password
 from backend.app.common.log import log
-from backend.app.database.db_mysql import async_db_session
+from backend.app.database.db_mysql import async_session_maker
 from backend.app.models import User
 
 
@@ -39,7 +39,7 @@ class InitData:
             email=email,
             is_superuser=True,
         )
-        async with async_db_session.begin() as db:
+        async with async_session_maker.begin() as db:
             db.add(user_obj)
         log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
 
@@ -54,7 +54,7 @@ class InitData:
             email=email,
             is_superuser=False,
         )
-        async with async_db_session.begin() as db:
+        async with async_session_maker.begin() as db:
             db.add(user_obj)
         log.info(f"普通用户创建成功，账号：{username}，密码：{password}")
 
@@ -70,7 +70,7 @@ class InitData:
             is_active=False,
             is_superuser=False,
         )
-        async with async_db_session.begin() as db:
+        async with async_session_maker.begin() as db:
             db.add(user_obj)
         log.info(f"普通锁定用户创建成功，账号：{username}，密码：{password}")
 
@@ -85,7 +85,7 @@ class InitData:
             email=email,
             is_superuser=True,
         )
-        async with async_db_session.begin() as db:
+        async with async_session_maker.begin() as db:
             db.add(user_obj)
         log.info(f"管理员用户创建成功，账号：{username}，密码：{password}")
 
@@ -101,7 +101,7 @@ class InitData:
             is_active=False,
             is_superuser=True,
         )
-        async with async_db_session.begin() as db:
+        async with async_session_maker.begin() as db:
             db.add(user_obj)
         log.info(f"管理员锁定用户创建成功，账号：{username}，密码：{password}")
 

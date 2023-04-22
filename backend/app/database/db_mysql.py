@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from typing import TypeVar
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
@@ -25,16 +26,16 @@ except Exception as e:
     log.error('❌ 数据库链接失败 {}', e)
     sys.exit()
 else:
-    async_db_session = async_sessionmaker(bind=async_engine, autoflush=False, expire_on_commit=False)
+    async_session_maker = async_sessionmaker(bind=async_engine, autoflush=False, expire_on_commit=False)
 
 
-async def get_db() -> AsyncSession:
+async def _get_db() -> AsyncSession:
     """
     session 生成器
 
     :return:
     """
-    session = async_db_session()
+    session = async_session_maker()
     try:
         yield session
     except Exception as se:
@@ -45,7 +46,40 @@ async def get_db() -> AsyncSession:
 
 
 # Session 依赖注入
-CurrentSession = Annotated[AsyncSession, Depends(get_db)]
+CurrentSession = Annotated[AsyncSession, Depends(_get_db)]
+
+# Session 装饰器 db 参数类型
+AsyncSessionNotInput = TypeVar('AsyncSessionNotInput', bound=AsyncSession)
+
+
+def async_session(func):
+    """
+    session 装饰器
+
+    :param func:
+    :return:
+    """
+
+    async def wrapper(*args, **kwargs):
+        async with async_session_maker() as db:
+            return await func(db, *args, **kwargs)
+
+    return wrapper
+
+
+def async_session_transaction(func):
+    """
+    session 事务装饰器
+
+    :param func:
+    :return:
+    """
+
+    async def wrapper(*args, **kwargs):
+        async with async_session_maker.begin() as db:
+            return await func(db, *args, **kwargs)
+
+    return wrapper
 
 
 async def create_table():
