@@ -15,32 +15,32 @@ router = APIRouter()
 
 @router.post('/login', summary='表单登录', response_model=Token, description='form 格式登录支持直接在 api 文档调试接口')
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
-    token, is_super = await UserService.login(form_data)
+    token, is_super = await UserService.login(form_data=form_data)
     return Token(access_token=token, is_superuser=is_super)
 
 
 # @router.post('/login', summary='用户登录', response_model=Token,
-#            description='json 格式登录, 不支持api文档接口调试, 需使用第三方api工具, 例如: postman')
+#              description='json 格式登录, 不支持api文档接口调试, 需使用第三方api工具, 例如: postman')
 # async def user_login(obj: Auth):
-#     token, is_super = await UserService.login(obj)
+#     token, is_super = await UserService.login(obj=obj)
 #     return Token(access_token=token, is_superuser=is_super)
 
 
 @router.post('/register', summary='用户注册')
 async def user_register(obj: CreateUser):
-    await UserService.register(obj)
+    await UserService.register(obj=obj)
     return response_base.response_200()
 
 
 @router.post('/password/reset', summary='密码重置')
 async def password_reset(obj: ResetPassword):
-    await UserService.pwd_reset(obj)
+    await UserService.pwd_reset(obj=obj)
     return response_base.response_200()
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
 async def userinfo(username: str):
-    current_user = await UserService.get_userinfo(username)
+    current_user = await UserService.get_userinfo(username=username)
     return response_base.response_200(data=current_user, exclude={'password'})
 
 
@@ -67,7 +67,7 @@ async def get_all_users() -> Page[GetUserInfo]:
 
 @router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsSuperUser])
 async def super_set(pk: int):
-    count = await UserService.update_permission(pk)
+    count = await UserService.update_permission(pk=pk)
     if count > 0:
         return response_base.response_200()
     return response_base.fail()
@@ -75,7 +75,7 @@ async def super_set(pk: int):
 
 @router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsSuperUser])
 async def active_set(pk: int):
-    count = await UserService.update_active(pk)
+    count = await UserService.update_active(pk=pk)
     if count > 0:
         return response_base.response_200()
     return response_base.fail()

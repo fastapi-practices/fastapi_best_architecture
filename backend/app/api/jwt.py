@@ -96,6 +96,7 @@ async def get_current_is_superuser(user: User = Depends(get_current_user)):
 # User dependency injection
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentSuperUser = Annotated[bool, Depends(get_current_is_superuser)]
+
 # Permission dependency injection
 DependsUser = Depends(get_current_user)
 DependsSuperUser = Depends(get_current_is_superuser)
