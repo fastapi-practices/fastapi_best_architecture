@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from functools import wraps
 from typing import TypeVar
 
 from fastapi import Depends
@@ -60,6 +61,7 @@ def async_session(func):
     :return:
     """
 
+    @wraps(func)
     async def wrapper(*args, **kwargs):
         async with async_session_maker() as db:
             return await func(db, *args, **kwargs)
@@ -75,6 +77,7 @@ def async_session_transaction(func):
     :return:
     """
 
+    @wraps(func)
     async def wrapper(*args, **kwargs):
         async with async_session_maker.begin() as db:
             return await func(db, *args, **kwargs)
