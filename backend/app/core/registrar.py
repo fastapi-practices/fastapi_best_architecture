@@ -3,9 +3,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi_pagination import add_pagination
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi_pagination import add_pagination
 
 from backend.app.api.routers import v1
 from backend.app.common.exception.exception_handler import register_exception
