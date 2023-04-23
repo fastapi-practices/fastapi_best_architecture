@@ -25,3 +25,4 @@ cryptography==39.0.1
 gunicorn==20.1.0
 supervisor==4.2.5
 wait-for-it==2.2.1
+ruff==0.0.262

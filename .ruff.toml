@@ -1,0 +1,2 @@
+ignore = ["F401"]
+line-length = 120
