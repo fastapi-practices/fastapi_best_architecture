@@ -1,2 +1,24 @@
 ignore = ["F401"]
 line-length = 120
+format = "grouped"
+target-version = "py38"
+cache-dir = "./.ruff_cache"
+
+[flake8-pytest-style]
+mark-parentheses = false
+parametrize-names-type = "list"
+parametrize-values-row-type = "list"
+parametrize-values-type = "tuple"
+
+[flake8-quotes]
+avoid-escape = false
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[flake8-unused-arguments]
+ignore-variadic-names = true
+
+[isort]
+lines-between-types = 1
+order-by-type = true

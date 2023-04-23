@@ -6,3 +6,4 @@ venv/
 backend/app/log/
 backend/app/alembic/versions/
 backend/app/static/media/
+.ruff_cache/

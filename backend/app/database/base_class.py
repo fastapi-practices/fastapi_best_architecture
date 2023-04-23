@@ -48,7 +48,7 @@ class DataClassBase(MappedAsDataclass, MappedBase):
     声明性数据类基类, 它将带有数据类集成, 允许使用更高级配置, 但你必须注意它的一些特性, 尤其是和 DeclarativeBase 一起使用时
 
     `MappedAsDataclass <https://docs.sqlalchemy.org/en/20/orm/dataclasses.html#orm-declarative-native-dataclasses>`__
-    """
+    """  # noqa: E501
 
     __abstract__ = True
 
@@ -56,7 +56,7 @@ class DataClassBase(MappedAsDataclass, MappedBase):
 class Base(DataClassBase, _BaseMixin):
     """
     声明性 Mixin 数据类基类, 带有数据类集成, 并包含 MiXin 数据类基础表结构, 你可以简单的理解它为含有基础表结构的数据类基类
-    """
+    """  # noqa: E501
 
     __abstract__ = True
 
