@@ -63,4 +63,3 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 ## Init the test data
 
 Execute the `backend/app/init_test_data.py` file
-
