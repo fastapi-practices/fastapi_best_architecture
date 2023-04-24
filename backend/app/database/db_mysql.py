@@ -14,8 +14,10 @@ from backend.app.database.base_class import MappedBase
 说明：SqlAlchemy
 """
 
-SQLALCHEMY_DATABASE_URL = f'mysql+asyncmy://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:' \
-                          f'{settings.DB_PORT}/{settings.DB_DATABASE}?charset={settings.DB_CHARSET}'
+SQLALCHEMY_DATABASE_URL = (
+    f'mysql+asyncmy://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:'
+    f'{settings.DB_PORT}/{settings.DB_DATABASE}?charset={settings.DB_CHARSET}'
+)
 
 try:
     # 数据库引擎

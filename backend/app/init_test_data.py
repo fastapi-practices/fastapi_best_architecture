@@ -12,14 +12,14 @@ from backend.app.models import User
 
 
 class InitData:
-    """ 初始化数据 """
+    """初始化数据"""
 
     def __init__(self):
         self.fake = Faker('zh_CN')
 
     @staticmethod
     async def create_superuser_by_yourself():
-        """ 手动创建管理员账户 """
+        """手动创建管理员账户"""
         print('请输入用户名:')
         username = input()
         print('请输入密码:')
@@ -44,7 +44,7 @@ class InitData:
         log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
 
     async def fake_user(self):
-        """ 自动创建普通用户 """
+        """自动创建普通用户"""
         username = self.fake.user_name()
         password = self.fake.password()
         email = self.fake.email()
@@ -59,7 +59,7 @@ class InitData:
         log.info(f"普通用户创建成功，账号：{username}，密码：{password}")
 
     async def fake_no_active_user(self):
-        """ 自动创建锁定普通用户 """
+        """自动创建锁定普通用户"""
         username = self.fake.user_name()
         password = self.fake.password()
         email = self.fake.email()
@@ -75,7 +75,7 @@ class InitData:
         log.info(f"普通锁定用户创建成功，账号：{username}，密码：{password}")
 
     async def fake_superuser(self):
-        """ 自动创建管理员用户 """
+        """自动创建管理员用户"""
         username = self.fake.user_name()
         password = self.fake.password()
         email = self.fake.email()
@@ -90,7 +90,7 @@ class InitData:
         log.info(f"管理员用户创建成功，账号：{username}，密码：{password}")
 
     async def fake_no_active_superuser(self):
-        """ 自动创建锁定管理员用户 """
+        """自动创建锁定管理员用户"""
         username = self.fake.user_name()
         password = self.fake.password()
         email = self.fake.email()
@@ -106,7 +106,7 @@ class InitData:
         log.info(f"管理员锁定用户创建成功，账号：{username}，密码：{password}")
 
     async def init_data(self):
-        """ 自动创建数据 """
+        """自动创建数据"""
         log.info('⏳ 开始初始化数据')
         await self.create_superuser_by_yourself()
         await self.fake_user()

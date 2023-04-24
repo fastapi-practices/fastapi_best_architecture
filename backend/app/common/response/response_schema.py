@@ -8,41 +8,32 @@ from pydantic import validate_arguments, BaseModel
 
 _JsonEncoder = Union[Set[Union[int, str]], Dict[Union[int, str], Any]]
 
-__all__ = [
-    'ResponseModel',
-    'response_base'
-]
+__all__ = ['ResponseModel', 'response_base']
 
 
 class ResponseModel(BaseModel):
     """
     统一返回模型, 可在 FastAPI 接口请求中指定 response_model 及更多操作
     """
+
     code: int = 200
     msg: str = 'Success'
     data: Optional[Any] = None
 
     class Config:
-        json_encoders = {
-            datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")
-        }
+        json_encoders = {datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")}
 
 
 class ResponseBase:
-
     @staticmethod
     def __encode_json(data: Any):
-        return jsonable_encoder(
-            data,
-            custom_encoder={
-                datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")
-            }
-        )
+        return jsonable_encoder(data, custom_encoder={datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")})
 
     @staticmethod
     @validate_arguments
-    def success(*, code: int = 200, msg: str = 'Success', data: Optional[Any] = None,
-                exclude: Optional[_JsonEncoder] = None):
+    def success(
+        *, code: int = 200, msg: str = 'Success', data: Optional[Any] = None, exclude: Optional[_JsonEncoder] = None
+    ):
         """
         请求成功返回通用方法
 

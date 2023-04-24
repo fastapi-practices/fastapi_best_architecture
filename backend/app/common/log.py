@@ -11,7 +11,6 @@ from backend.app.core import path_conf
 
 
 class Logger:
-
     @staticmethod
     def log() -> loguru.Logger:
         if not os.path.exists(path_conf.LogPath):

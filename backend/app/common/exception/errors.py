@@ -55,7 +55,6 @@ class GatewayError(BaseExceptionMixin):
 
 
 class CodeError(BaseExceptionMixin):
-
     def __init__(self, *, error: CodeEnum, data: Any = None):
         self.code = error.code
         super().__init__(msg=error.msg, data=data)

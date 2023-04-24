@@ -41,10 +41,10 @@ class Page(AbstractPage[T], Generic[T]):
 
     @classmethod
     def create(
-            cls,
-            data: Sequence[T],
-            total: int,
-            params: Params,
+        cls,
+        data: Sequence[T],
+        total: int,
+        params: Params,
     ) -> Page[T]:
         page = params.page
         size = params.size
@@ -54,15 +54,8 @@ class Page(AbstractPage[T], Generic[T]):
                 "first": {"page": 1, "size": f"{size}"},
                 "last": {"page": f"{math.ceil(total / params.size)}", "size": f"{size}"} if total > 0 else None,
                 "next": {"page": f"{page + 1}", "size": f"{size}"} if (page + 1) <= total_pages else None,
-                "prev": {"page": f"{page - 1}", "size": f"{size}"} if (page - 1) >= 1 else None
+                "prev": {"page": f"{page - 1}", "size": f"{size}"} if (page - 1) >= 1 else None,
             }
         ).dict()
 
-        return cls(
-            data=data,
-            total=total,
-            page=params.page,
-            size=params.size,
-            total_pages=total_pages,
-            links=links
-        )
+        return cls(data=data, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)

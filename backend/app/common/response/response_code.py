@@ -7,6 +7,7 @@ class CodeEnum(Enum):
     """
     错误码
     """
+
     CAPTCHA_ERROR = (40001, '图形验证码错误')
 
     @property

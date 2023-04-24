@@ -26,8 +26,9 @@ class _BaseMixin(MappedAsDataclass):
     create_user: Mapped[int] = mapped_column(sort_order=9999, comment='创建者')
     update_user: Mapped[Optional[int]] = mapped_column(init=False, default=None, sort_order=9999, comment='修改者')
     created_time: Mapped[datetime] = mapped_column(init=False, default=func.now(), sort_order=9999, comment='创建时间')
-    updated_time: Mapped[Optional[datetime]] = mapped_column(init=False, onupdate=func.now(), sort_order=9999,
-                                                             comment='更新时间')
+    updated_time: Mapped[Optional[datetime]] = mapped_column(
+        init=False, onupdate=func.now(), sort_order=9999, comment='更新时间'
+    )
 
 
 class MappedBase(DeclarativeBase):

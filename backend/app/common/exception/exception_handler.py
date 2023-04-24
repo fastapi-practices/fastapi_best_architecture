@@ -47,7 +47,7 @@ def register_exception(app: FastAPI):
         return JSONResponse(
             status_code=_get_exception_code(exc.status_code),
             content=response_base.fail(code=exc.status_code, msg=exc.detail),
-            headers=exc.headers
+            headers=exc.headers,
         )
 
     @app.exception_handler(Exception)
@@ -81,24 +81,21 @@ def register_exception(app: FastAPI):
                 status_code=422,
                 content=response_base.fail(
                     msg='请求参数非法' if len(message) == 0 else f'请求参数非法:{message[:-1]}',
-                    data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None
-                )
+                    data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
+                ),
             )
 
         # 自定义
         if isinstance(exc, BaseExceptionMixin):
             return JSONResponse(
                 status_code=_get_exception_code(exc.code),
-                content=response_base.fail(
-                    code=exc.code,
-                    msg=str(exc.msg),
-                    data=exc.data if exc.data else None
-                )
+                content=response_base.fail(code=exc.code, msg=str(exc.msg), data=exc.data if exc.data else None),
             )
 
         else:
             return JSONResponse(
                 status_code=500,
-                content=response_base.fail(code=500, msg=str(exc)) if settings.UVICORN_RELOAD else
-                response_base.fail(code=500, msg='Internal Server Error')
+                content=response_base.fail(code=500, msg=str(exc))
+                if settings.UVICORN_RELOAD
+                else response_base.fail(code=500, msg='Internal Server Error'),
             )

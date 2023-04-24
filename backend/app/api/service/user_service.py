@@ -14,7 +14,6 @@ from backend.app.utils import re_verify
 
 
 class UserService:
-
     @staticmethod
     async def login(form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:

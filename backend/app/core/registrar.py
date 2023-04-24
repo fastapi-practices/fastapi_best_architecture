@@ -47,7 +47,7 @@ def register_app():
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOCS_URL,
         openapi_url=settings.OPENAPI_URL,
-        lifespan=register_init
+        lifespan=register_init,
     )
 
     if settings.STATIC_FILES:
@@ -78,6 +78,7 @@ def register_static_file(app: FastAPI):
     """
     import os
     from fastapi.staticfiles import StaticFiles
+
     if not os.path.exists("./static"):
         os.mkdir("./static")
     app.mount("/static", StaticFiles(directory="static"), name="static")

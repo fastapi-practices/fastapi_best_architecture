@@ -22,31 +22,28 @@ async def task_demo_async():
 async def task_demo_get():
     tasks = []
     for job in scheduler.get_jobs():
-        tasks.append({
-            "id": job.id,
-            "func_name": job.func_ref,
-            "trigger": str(job.trigger),
-            "executor": job.executor,
-            # "args": str(job.args),
-            # "kwargs": job.kwargs,
-            "name": job.name,
-            "misfire_grace_time": job.misfire_grace_time,
-            "coalesce": job.coalesce,
-            "max_instances": job.max_instances,
-            "next_run_time": job.next_run_time,
-        })
+        tasks.append(
+            {
+                "id": job.id,
+                "func_name": job.func_ref,
+                "trigger": str(job.trigger),
+                "executor": job.executor,
+                # "args": str(job.args),
+                # "kwargs": job.kwargs,
+                "name": job.name,
+                "misfire_grace_time": job.misfire_grace_time,
+                "coalesce": job.coalesce,
+                "max_instances": job.max_instances,
+                "next_run_time": job.next_run_time,
+            }
+        )
     return {'msg': 'success', 'data': tasks}
 
 
 @router.post('', summary='添加同步任务')
 async def task_demo_add():
     scheduler.add_job(
-        task_demo,
-        'interval',
-        seconds=1,
-        id='task_demo',
-        replace_existing=True,
-        start_date=datetime.datetime.now()
+        task_demo, 'interval', seconds=1, id='task_demo', replace_existing=True, start_date=datetime.datetime.now()
     )
 
     return {'msg': 'success'}
@@ -60,7 +57,7 @@ async def task_demo_add_async():
         seconds=1,
         id='task_demo_async',
         replace_existing=True,
-        start_date=datetime.datetime.now()
+        start_date=datetime.datetime.now(),
     )
 
     return {'msg': 'success'}

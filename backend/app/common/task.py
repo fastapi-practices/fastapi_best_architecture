@@ -20,14 +20,12 @@ def _scheduler_conf() -> dict:
         'port': settings.APS_REDIS_PORT,
         'password': settings.APS_REDIS_PASSWORD,
         'db': settings.APS_REDIS_DATABASE,
-        'socket_timeout': settings.APS_REDIS_TIMEOUT
+        'socket_timeout': settings.APS_REDIS_TIMEOUT,
     }
 
     end_conf = {
         # 配置存储器
-        "jobstores": {
-            'default': RedisJobStore(**redis_conf)
-        },
+        "jobstores": {'default': RedisJobStore(**redis_conf)},
         # 配置执行器
         "executors": {
             'default': AsyncIOExecutor(),
@@ -39,14 +37,13 @@ def _scheduler_conf() -> dict:
             "misfire_grace_time": settings.APS_MISFIRE_GRACE_TIME,
         },
         # 时区
-        "timezone": str(tzlocal.get_localzone())
+        "timezone": str(tzlocal.get_localzone()),
     }
 
     return end_conf
 
 
 class Scheduler(AsyncIOScheduler):
-
     def start(self, paused: bool = False):
         try:
             super().start(paused)

@@ -10,7 +10,8 @@ from backend.app.database.base_class import use_uuid, id_key, DataClassBase
 
 
 class User(DataClassBase):
-    """ 用户表 """
+    """用户表"""
+
     __tablename__ = 'sys_user'
 
     id: Mapped[id_key] = mapped_column(init=False)

@@ -73,7 +73,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings():
-    """ 读取配置优化写法 """
+    """读取配置优化写法"""
     return Settings()
 
 

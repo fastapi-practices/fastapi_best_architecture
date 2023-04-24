@@ -44,8 +44,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.add(db_obj)
 
     async def update(
-            self, db: AsyncSession, pk: int, obj_in: Union[UpdateSchemaType, Dict[str, Any]],
-            user_id: Optional[int] = None
+        self, db: AsyncSession, pk: int, obj_in: Union[UpdateSchemaType, Dict[str, Any]], user_id: Optional[int] = None
     ) -> int:
         """
         通过主键 id 更新一条数据
@@ -62,11 +61,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             update_data = obj_in.dict(exclude_unset=True)
         if user_id:
             update_data.update({'update_user': user_id})
-        model = await db.execute(
-            update(self.model)
-            .where(self.model.id == pk)
-            .values(**update_data)
-        )
+        model = await db.execute(update(self.model).where(self.model.id == pk).values(**update_data))
         return model.rowcount
 
     async def delete(self, db: AsyncSession, pk: int) -> int:

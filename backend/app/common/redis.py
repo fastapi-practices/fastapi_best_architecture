@@ -9,7 +9,6 @@ from backend.app.core.conf import settings
 
 
 class RedisCli(Redis):
-
     def __init__(self):
         super(RedisCli, self).__init__(
             host=settings.REDIS_HOST,
@@ -17,7 +16,7 @@ class RedisCli(Redis):
             password=settings.REDIS_PASSWORD,
             db=settings.REDIS_DATABASE,
             socket_timeout=settings.REDIS_TIMEOUT,
-            decode_responses=True  # 转码 utf-8
+            decode_responses=True,  # 转码 utf-8
         )
 
     async def open(self):
