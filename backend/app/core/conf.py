@@ -31,10 +31,6 @@ class Settings(BaseSettings):
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
 
-    # Env Email
-    EMAIL_USER: str
-    EMAIL_PASSWORD: str  # 授权密码，非邮箱密码
-
     # FastAPI
     TITLE: str = 'FastAPI'
     VERSION: str = '0.0.1'
@@ -77,12 +73,6 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
     TOKEN_URL: str = '/v1/users/login'
-
-    # Email
-    EMAIL_DESCRIPTION: str = 'fastapi_sqlalchemy_mysql'  # 默认发件说明
-    EMAIL_SERVER: str = 'smtp.qq.com'
-    EMAIL_PORT: int = 465
-    EMAIL_SSL: bool = True
 
     # Cookies
     COOKIES_MAX_AGE: int = 60 * 5  # cookies 时效 60 * 5 = 5 分钟
