@@ -25,19 +25,19 @@ def _scheduler_conf() -> dict:
 
     end_conf = {
         # 配置存储器
-        "jobstores": {'default': RedisJobStore(**redis_conf)},
+        'jobstores': {'default': RedisJobStore(**redis_conf)},
         # 配置执行器
-        "executors": {
+        'executors': {
             'default': AsyncIOExecutor(),
         },
         # 创建task时的默认参数
-        "job_defaults": {
+        'job_defaults': {
             'coalesce': settings.APS_COALESCE,
             'max_instances': settings.APS_MAX_INSTANCES,
-            "misfire_grace_time": settings.APS_MISFIRE_GRACE_TIME,
+            'misfire_grace_time': settings.APS_MISFIRE_GRACE_TIME,
         },
         # 时区
-        "timezone": str(tzlocal.get_localzone()),
+        'timezone': str(tzlocal.get_localzone()),
     }
 
     return end_conf

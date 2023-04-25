@@ -27,7 +27,7 @@ def _get_exception_code(status_code):
     """
     try:
         STATUS_PHRASES[status_code]
-    except Exception:  # noqa
+    except Exception:
         code = 400
     else:
         code = status_code
@@ -36,7 +36,7 @@ def _get_exception_code(status_code):
 
 def register_exception(app: FastAPI):
     @app.exception_handler(HTTPException)
-    def http_exception_handler(request: Request, exc: HTTPException):  # noqa
+    def http_exception_handler(request: Request, exc: HTTPException):
         """
         全局HTTP异常处理
 
@@ -51,7 +51,7 @@ def register_exception(app: FastAPI):
         )
 
     @app.exception_handler(Exception)
-    def all_exception_handler(request: Request, exc):  # noqa
+    def all_exception_handler(request: Request, exc):
         """
         全局异常处理
 

@@ -56,7 +56,7 @@ class InitData:
         )
         async with async_db_session.begin() as db:
             db.add(user_obj)
-        log.info(f"普通用户创建成功，账号：{username}，密码：{password}")
+        log.info(f'普通用户创建成功，账号：{username}，密码：{password}')
 
     async def fake_no_active_user(self):
         """自动创建锁定普通用户"""
@@ -72,7 +72,7 @@ class InitData:
         )
         async with async_db_session.begin() as db:
             db.add(user_obj)
-        log.info(f"普通锁定用户创建成功，账号：{username}，密码：{password}")
+        log.info(f'普通锁定用户创建成功，账号：{username}，密码：{password}')
 
     async def fake_superuser(self):
         """自动创建管理员用户"""
@@ -87,7 +87,7 @@ class InitData:
         )
         async with async_db_session.begin() as db:
             db.add(user_obj)
-        log.info(f"管理员用户创建成功，账号：{username}，密码：{password}")
+        log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
 
     async def fake_no_active_superuser(self):
         """自动创建锁定管理员用户"""
@@ -103,7 +103,7 @@ class InitData:
         )
         async with async_db_session.begin() as db:
             db.add(user_obj)
-        log.info(f"管理员锁定用户创建成功，账号：{username}，密码：{password}")
+        log.info(f'管理员锁定用户创建成功，账号：{username}，密码：{password}')
 
     async def init_data(self):
         """自动创建数据"""

@@ -24,17 +24,17 @@ async def task_demo_get():
     for job in scheduler.get_jobs():
         tasks.append(
             {
-                "id": job.id,
-                "func_name": job.func_ref,
-                "trigger": str(job.trigger),
-                "executor": job.executor,
+                'id': job.id,
+                'func_name': job.func_ref,
+                'trigger': str(job.trigger),
+                'executor': job.executor,
                 # "args": str(job.args),
                 # "kwargs": job.kwargs,
-                "name": job.name,
-                "misfire_grace_time": job.misfire_grace_time,
-                "coalesce": job.coalesce,
-                "max_instances": job.max_instances,
-                "next_run_time": job.next_run_time,
+                'name': job.name,
+                'misfire_grace_time': job.misfire_grace_time,
+                'coalesce': job.coalesce,
+                'max_instances': job.max_instances,
+                'next_run_time': job.next_run_time,
             }
         )
     return {'msg': 'success', 'data': tasks}

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 sys.path.append('../../')
 
-from backend.app.core import path_conf  # noqa
+from backend.app.core import path_conf  # noqa: E402
 
 if not os.path.exists(path_conf.Versions):
     os.makedirs(path_conf.Versions)
@@ -26,12 +26,12 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from backend.app.models import MappedBase  # noqa
+from backend.app.models import MappedBase  # noqa: E402
 
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-from backend.app.database.db_mysql import SQLALCHEMY_DATABASE_URL  # noqa
+from backend.app.database.db_mysql import SQLALCHEMY_DATABASE_URL  # noqa: E402
 
 config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
 
@@ -48,12 +48,12 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -77,7 +77,7 @@ async def run_migrations_online():
     connectable = AsyncEngine(
         engine_from_config(
             config.get_section(config.config_ini_section),
-            prefix="sqlalchemy.",
+            prefix='sqlalchemy.',
             poolclass=pool.NullPool,
             future=True,
         )
