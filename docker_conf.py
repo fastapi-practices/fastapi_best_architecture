@@ -51,17 +51,6 @@ class Settings(BaseSettings):
     TOKEN_SECRET_KEY: str = '1VkVF75nsNABBjK_7-qz7GtzNy3AMvktc9TCPwKczCk'  # 密钥 secrets.token_urlsafe(32))
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
 
-    # Email
-    EMAIL_DESCRIPTION: str = 'fastapi_sqlalchemy_mysql'  # 默认发件说明
-    EMAIL_SERVER: str = 'smtp.qq.com'
-    EMAIL_PORT: int = 465
-    EMAIL_USER: str = 'xxxx-nav@qq.com'
-    EMAIL_PASSWORD: str = ''  # 授权密码，非邮箱密码
-    EMAIL_SSL: bool = True  # 是否使用ssl
-
-    # 邮箱登录验证码过期时间
-    EMAIL_LOGIN_CODE_MAX_AGE: int = 60 * 2  # 时效 60 * 2 = 2 分钟
-
     # Cookies
     COOKIES_MAX_AGE: int = 60 * 5  # cookies 时效 60 * 5 = 5 分钟
 
