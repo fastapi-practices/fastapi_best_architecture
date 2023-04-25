@@ -74,8 +74,8 @@ class Settings(BaseSettings):
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
     TOKEN_URL: str = '/v1/users/login'
 
-    # Cookies
-    COOKIES_MAX_AGE: int = 60 * 5  # cookies 时效 60 * 5 = 5 分钟
+    # Log
+    LOG_FILE_NAME: str = 'fba.log'
 
     # Middleware
     MIDDLEWARE_CORS: bool = True
