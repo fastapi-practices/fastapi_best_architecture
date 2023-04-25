@@ -84,7 +84,7 @@ class Settings(BaseSettings):
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
-        env_file = '.env',
+        env_file = '.env'
         env_file_encoding = 'utf-8'
 
 
