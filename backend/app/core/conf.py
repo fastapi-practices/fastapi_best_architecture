@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     # FastAPI
     TITLE: str = 'FastAPI'
     VERSION: str = '0.0.1'
-    DESCRIPTION: str = "FastAPI Best Architecture"
+    DESCRIPTION: str = 'FastAPI Best Architecture'
     DOCS_URL: Optional[str] = '/v1/docs'
     REDOCS_URL: Optional[str] = '/v1/redocs'
     OPENAPI_URL: Optional[str] = '/v1/openapi'

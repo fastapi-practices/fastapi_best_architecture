@@ -28,10 +28,10 @@ class RedisCli(Redis):
         try:
             await self.ping()
         except TimeoutError:
-            log.error("❌ 数据库 redis 连接超时")
+            log.error('❌ 数据库 redis 连接超时')
             sys.exit()
         except AuthenticationError:
-            log.error("❌ 数据库 redis 连接认证失败")
+            log.error('❌ 数据库 redis 连接认证失败')
             sys.exit()
         except Exception as e:
             log.error('❌ 数据库 redis 连接异常 {}', e)

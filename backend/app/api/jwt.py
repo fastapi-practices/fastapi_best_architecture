@@ -5,7 +5,7 @@ from typing import Any, Union
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt  # noqa
+from jose import jwt
 from passlib.context import CryptContext
 from pydantic import ValidationError
 from typing_extensions import Annotated
@@ -54,7 +54,7 @@ def create_access_token(data: Union[int, Any], expires_delta: Union[timedelta, N
         expires = datetime.utcnow() + expires_delta
     else:
         expires = datetime.utcnow() + timedelta(settings.TOKEN_EXPIRE_MINUTES)
-    to_encode = {"exp": expires, "sub": str(data)}
+    to_encode = {'exp': expires, 'sub': str(data)}
     encoded_jwt = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     return encoded_jwt
 

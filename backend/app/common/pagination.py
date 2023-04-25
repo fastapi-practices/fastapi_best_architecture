@@ -10,7 +10,7 @@ from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 """
 重写分页库：fastapi-pagination 
@@ -19,8 +19,8 @@ T = TypeVar("T")
 
 
 class Params(BaseModel, AbstractParams):
-    page: int = Query(1, ge=1, description="Page number")
-    size: int = Query(20, gt=0, le=100, description="Page size")  # 默认 20 条记录
+    page: int = Query(1, ge=1, description='Page number')
+    size: int = Query(20, gt=0, le=100, description='Page size')  # 默认 20 条记录
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
@@ -51,10 +51,10 @@ class Page(AbstractPage[T], Generic[T]):
         total_pages = math.ceil(total / params.size)
         links = create_links(
             **{
-                "first": {"page": 1, "size": f"{size}"},
-                "last": {"page": f"{math.ceil(total / params.size)}", "size": f"{size}"} if total > 0 else None,
-                "next": {"page": f"{page + 1}", "size": f"{size}"} if (page + 1) <= total_pages else None,
-                "prev": {"page": f"{page - 1}", "size": f"{size}"} if (page - 1) >= 1 else None,
+                'first': {'page': 1, 'size': f'{size}'},
+                'last': {'page': f'{math.ceil(total / params.size)}', 'size': f'{size}'} if total > 0 else None,
+                'next': {'page': f'{page + 1}', 'size': f'{size}'} if (page + 1) <= total_pages else None,
+                'prev': {'page': f'{page - 1}', 'size': f'{size}'} if (page - 1) >= 1 else None,
             }
         ).dict()
 

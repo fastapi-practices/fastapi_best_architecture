@@ -21,13 +21,13 @@ class ResponseModel(BaseModel):
     data: Optional[Any] = None
 
     class Config:
-        json_encoders = {datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")}
+        json_encoders = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
 
 
 class ResponseBase:
     @staticmethod
     def __encode_json(data: Any):
-        return jsonable_encoder(data, custom_encoder={datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")})
+        return jsonable_encoder(data, custom_encoder={datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')})
 
     @staticmethod
     @validate_arguments

@@ -79,9 +79,9 @@ def register_static_file(app: FastAPI):
     import os
     from fastapi.staticfiles import StaticFiles
 
-    if not os.path.exists("./static"):
-        os.mkdir("./static")
-    app.mount("/static", StaticFiles(directory="static"), name="static")
+    if not os.path.exists('./static'):
+        os.mkdir('./static')
+    app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
 def register_middleware(app: FastAPI):
@@ -89,10 +89,10 @@ def register_middleware(app: FastAPI):
     if settings.MIDDLEWARE_CORS:
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
+            allow_origins=['*'],
             allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
+            allow_methods=['*'],
+            allow_headers=['*'],
         )
     # Gzip
     if settings.MIDDLEWARE_GZIP:
