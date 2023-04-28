@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import BaseSettings, root_validator
 
@@ -35,9 +36,9 @@ class Settings(BaseSettings):
     TITLE: str = 'FastAPI'
     VERSION: str = '0.0.1'
     DESCRIPTION: str = 'FastAPI Best Architecture'
-    DOCS_URL: Optional[str] = '/v1/docs'
-    REDOCS_URL: Optional[str] = '/v1/redocs'
-    OPENAPI_URL: Optional[str] = '/v1/openapi'
+    DOCS_URL: str | None = '/v1/docs'
+    REDOCS_URL: str | None = '/v1/redocs'
+    OPENAPI_URL: str | None = '/v1/openapi'
 
     @root_validator
     def validator_api_url(cls, values):

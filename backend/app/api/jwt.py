@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -13,7 +15,7 @@ from typing_extensions import Annotated
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
-from backend.app.database.db_mysql import CurrentSession
+from backend.app.database.db_mysql import CurrentSession  # noqa: TCH001
 from backend.app.models import User
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -42,7 +44,7 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: Union[int, Any], expires_delta: Union[timedelta, None] = None) -> str:
+def create_access_token(data: int | Any, expires_delta: timedelta | None = None) -> str:
     """
     Generate encryption token
 

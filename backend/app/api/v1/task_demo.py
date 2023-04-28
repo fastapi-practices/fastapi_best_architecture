@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, Query
-from typing_extensions import Annotated
 
 from backend.app.common.task import scheduler
 

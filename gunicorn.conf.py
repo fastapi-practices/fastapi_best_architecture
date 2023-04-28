@@ -1,4 +1,6 @@
 # 监听内网端口
+from __future__ import annotations
+
 bind = '0.0.0.0:8001'
 
 # 工作目录

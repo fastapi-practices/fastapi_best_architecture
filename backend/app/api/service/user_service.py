@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from email_validator import validate_email, EmailNotValidError
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from backend.app.api import jwt
 from backend.app.common.exception import errors
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.models import User
-from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
 from backend.app.utils import re_verify
+
+if TYPE_CHECKING:
+    from fastapi.security import OAuth2PasswordRequestForm
+    from backend.app.models import User
+    from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
 
 
 class UserService:

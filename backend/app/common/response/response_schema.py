@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 from datetime import datetime
 from typing import Optional, Any, Union, Set, Dict
 
@@ -18,7 +19,7 @@ class ResponseModel(BaseModel):
 
     code: int = 200
     msg: str = 'Success'
-    data: Optional[Any] = None
+    data: Any | None = None
 
     class Config:
         json_encoders = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
@@ -31,9 +32,7 @@ class ResponseBase:
 
     @staticmethod
     @validate_arguments
-    def success(
-        *, code: int = 200, msg: str = 'Success', data: Optional[Any] = None, exclude: Optional[_JsonEncoder] = None
-    ):
+    def success(*, code: int = 200, msg: str = 'Success', data: Any | None = None, exclude: _JsonEncoder | None = None):
         """
         请求成功返回通用方法
 
@@ -48,13 +47,13 @@ class ResponseBase:
 
     @staticmethod
     @validate_arguments
-    def fail(*, code: int = 400, msg: str = 'Bad Request', data: Any = None, exclude: Optional[_JsonEncoder] = None):
+    def fail(*, code: int = 400, msg: str = 'Bad Request', data: Any = None, exclude: _JsonEncoder | None = None):
         data = data if data is None else ResponseBase.__encode_json(data)
         return ResponseModel(code=code, msg=msg, data=data).dict(exclude={'data': exclude})
 
     @staticmethod
     @validate_arguments
-    def response_200(*, msg: str = 'Success', data: Optional[Any] = None, exclude: Optional[_JsonEncoder] = None):
+    def response_200(*, msg: str = 'Success', data: Any | None = None, exclude: _JsonEncoder | None = None):
         data = data if data is None else ResponseBase.__encode_json(data)
         return ResponseModel(code=200, msg=msg, data=data).dict(exclude={'data': exclude})
 

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
+from __future__ import annotations
+from typing import Any, TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from backend.app.common.response.response_code import CodeEnum
+if TYPE_CHECKING:
+    from backend.app.common.response.response_code import CodeEnum
 
 
 class BaseExceptionMixin(Exception):

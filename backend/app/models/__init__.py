@@ -4,5 +4,6 @@
 # 导入所有模型，并将 Base 放在最前面， 以便 Base 拥有它们
 # imported by Alembic
 """
+from __future__ import annotations
 from backend.app.database.base_class import MappedBase
 from backend.app.models.user import User

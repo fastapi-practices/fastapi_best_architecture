@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 from functools import lru_cache
 from typing import Optional
 
@@ -11,9 +12,9 @@ class Settings(BaseSettings):
     TITLE: str = 'FastAPI'
     VERSION: str = 'v0.0.1'
     DESCRIPTION: str = 'FastAPI Best Architecture'
-    DOCS_URL: Optional[str] = '/v1/docs'
-    REDOCS_URL: Optional[str] = None
-    OPENAPI_URL: Optional[str] = '/v1/openapi'
+    DOCS_URL: str | None = '/v1/docs'
+    REDOCS_URL: str | None = None
+    OPENAPI_URL: str | None = '/v1/openapi'
 
     # Static Server
     STATIC_FILES: bool = False

@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, Generic, Type, TypeVar, Union, Optional, NoReturn
+from __future__ import annotations
+
+from typing import Any, Dict, Generic, Type, TypeVar, NoReturn, TYPE_CHECKING
 
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.database.base_class import MappedBase
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 ModelType = TypeVar('ModelType', bound=MappedBase)
 CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
@@ -17,7 +21,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
-    async def get(self, db: AsyncSession, pk: int) -> Optional[ModelType]:
+    async def get(self, db: AsyncSession, pk: int) -> ModelType | None:
         """
         通过主键 id 获取一条数据
 
@@ -28,7 +32,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         model = await db.execute(select(self.model).where(self.model.id == pk))
         return model.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateSchemaType, user_id: Optional[int] = None) -> NoReturn:
+    async def create(self, db: AsyncSession, obj_in: CreateSchemaType, user_id: int | None = None) -> NoReturn:
         """
         新增一条数据
 
@@ -44,7 +48,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.add(db_obj)
 
     async def update(
-        self, db: AsyncSession, pk: int, obj_in: Union[UpdateSchemaType, Dict[str, Any]], user_id: Optional[int] = None
+        self, db: AsyncSession, pk: int, obj_in: UpdateSchemaType | Dict[str, Any], user_id: int | None = None
     ) -> int:
         """
         通过主键 id 更新一条数据

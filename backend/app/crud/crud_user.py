@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Optional, NoReturn
+from __future__ import annotations
+from typing import Optional, NoReturn, TYPE_CHECKING
 
 from sqlalchemy import func, select, update, desc
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import Select
 
 from backend.app.api import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import User
 from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
 
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from sqlalchemy.sql import Select
+
 
 class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
-    async def get_user_by_id(self, db: AsyncSession, user_id: int) -> Optional[User]:
+    async def get_user_by_id(self, db: AsyncSession, user_id: int) -> User | None:
         return await self.get(db, user_id)
 
-    async def get_user_by_username(self, db: AsyncSession, username: str) -> Optional[User]:
+    async def get_user_by_username(self, db: AsyncSession, username: str) -> User | None:
         user = await db.execute(select(self.model).where(self.model.username == username))
         return user.scalars().first()
 

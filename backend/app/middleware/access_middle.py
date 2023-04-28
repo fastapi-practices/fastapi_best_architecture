@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.app.common.log import log
+
+if TYPE_CHECKING:
+    from fastapi import Request, Response
 
 
 class AccessMiddleware(BaseHTTPMiddleware):

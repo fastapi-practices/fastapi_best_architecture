@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 from fastapi import APIRouter
 
 from backend.app.api.v1.auth import router as auth_router

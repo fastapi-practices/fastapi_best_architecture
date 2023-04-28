@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 import json
+from typing import TYPE_CHECKING
 
-from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
 from pydantic import ValidationError
 from starlette.responses import JSONResponse
@@ -11,6 +12,9 @@ from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI, Request
 
 
 def _get_exception_code(status_code):
