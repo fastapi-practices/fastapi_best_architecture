@@ -42,7 +42,7 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: Union[int, Any], expires_delta: Union[timedelta, None] = None) -> str:
+def create_access_token(data: int | Any, expires_delta: timedelta | None = None) -> str:
     """
     Generate encryption token
 

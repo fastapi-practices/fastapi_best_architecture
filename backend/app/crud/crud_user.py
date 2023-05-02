@@ -13,10 +13,10 @@ from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
 
 
 class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
-    async def get_user_by_id(self, db: AsyncSession, user_id: int) -> Optional[User]:
+    async def get_user_by_id(self, db: AsyncSession, user_id: int) -> User | None:
         return await self.get(db, user_id)
 
-    async def get_user_by_username(self, db: AsyncSession, username: str) -> Optional[User]:
+    async def get_user_by_username(self, db: AsyncSession, username: str) -> User | None:
         user = await db.execute(select(self.model).where(self.model.username == username))
         return user.scalars().first()
 

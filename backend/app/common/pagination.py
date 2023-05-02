@@ -35,7 +35,7 @@ class Page(AbstractPage[T], Generic[T]):
     page: int  # 第n页
     size: int  # 每页数量
     total_pages: int  # 总页数
-    links: Dict[str, Union[str, None]]  # 跳转链接
+    links: Dict[str, str | None]  # 跳转链接
 
     __params_type__ = Params  # 使用自定义的Params
 
