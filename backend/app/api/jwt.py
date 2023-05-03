@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -42,7 +42,7 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: Union[int, Any], expires_delta: Union[timedelta, None] = None) -> str:
+def create_access_token(data: int | Any, expires_delta: timedelta | None = None) -> str:
     """
     Generate encryption token
 

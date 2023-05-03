@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr, MappedAsDataclass
@@ -24,9 +23,9 @@ class _BaseMixin(MappedAsDataclass):
     """
 
     create_user: Mapped[int] = mapped_column(sort_order=9999, comment='创建者')
-    update_user: Mapped[Optional[int]] = mapped_column(init=False, default=None, sort_order=9999, comment='修改者')
+    update_user: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=9999, comment='修改者')
     created_time: Mapped[datetime] = mapped_column(init=False, default=func.now(), sort_order=9999, comment='创建时间')
-    updated_time: Mapped[Optional[datetime]] = mapped_column(
+    updated_time: Mapped[datetime | None] = mapped_column(
         init=False, onupdate=func.now(), sort_order=9999, comment='更新时间'
     )
 

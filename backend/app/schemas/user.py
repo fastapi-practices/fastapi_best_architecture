@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -18,7 +17,7 @@ class CreateUser(Auth):
 class UpdateUser(BaseModel):
     username: str
     email: str
-    mobile_number: Optional[str] = None
+    mobile_number: str | None = None
 
 
 class Avatar(BaseModel):
@@ -28,9 +27,9 @@ class Avatar(BaseModel):
 class GetUserInfo(UpdateUser):
     id: int
     uid: str
-    avatar: Optional[str] = None
+    avatar: str | None = None
     time_joined: datetime.datetime = None
-    last_login: Optional[datetime.datetime] = None
+    last_login: datetime.datetime | None = None
     is_superuser: bool
     is_active: bool
 
