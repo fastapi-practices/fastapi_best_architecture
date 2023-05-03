@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr, MappedAsDataclass

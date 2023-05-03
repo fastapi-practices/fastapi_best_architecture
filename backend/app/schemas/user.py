@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 

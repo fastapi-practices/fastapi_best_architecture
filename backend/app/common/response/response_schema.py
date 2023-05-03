@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Optional, Any, Union, Set, Dict
+from typing import Any, Union, Set, Dict
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import validate_arguments, BaseModel

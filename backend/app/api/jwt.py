@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer

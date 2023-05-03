@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import BaseSettings, root_validator
 

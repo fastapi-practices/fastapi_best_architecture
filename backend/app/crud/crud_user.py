@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Optional, NoReturn
+from typing import NoReturn
 
 from sqlalchemy import func, select, update, desc
 from sqlalchemy.ext.asyncio import AsyncSession

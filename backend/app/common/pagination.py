@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TypeVar, Generic, Sequence, Dict, Union
+from typing import TypeVar, Generic, Sequence, Dict
 
 from fastapi import Query
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams

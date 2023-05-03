@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, Generic, Type, TypeVar, Union, Optional, NoReturn
+from typing import Any, Dict, Generic, Type, TypeVar, NoReturn
 
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete
