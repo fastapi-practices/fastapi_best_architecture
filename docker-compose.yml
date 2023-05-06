@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.10"
 
 services:
   app:
@@ -12,7 +12,7 @@ services:
       - redis
     volumes:
       - ./backend:/fba/backend
-      - ./docker_conf.py:/fba/backend/app/core/conf.py
+      - .env.docker:/fba/backend/app/.env
       - fba_static:/fba/backend/app/static
     networks:
       - fba_network

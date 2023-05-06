@@ -35,8 +35,13 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 
 2. Create a database `fba`, choose utf8mb4 encode
 3. Install and start Redis
-4. Copy .env.example to .env and view `backend/app/core/conf.py`, update database configuration information
-5. Perform a database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+4. create a `.env` file in the `backend/app/` directory
+    ```shell
+    cd backend/app/
+    touch .env
+    ```
+5. Copy .env.example to .env and view `backend/app/core/conf.py`, update database configuration information
+6. Perform a database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
     ```shell
     cd backend/app/
     
@@ -46,8 +51,8 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
     # Perform the migration
     alembic upgrade head
     ```
-6. Execute the backend/app/main.py file startup service
-7. Browser access: http://127.0.0.1:8000/v1/docs
+7. Execute the backend/app/main.py file startup service
+8. Browser access: http://127.0.0.1:8000/v1/docs
 
 ---
 
