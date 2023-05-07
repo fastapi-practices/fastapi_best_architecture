@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
-import loguru
 from loguru import logger
 
 from backend.app.core import path_conf
 from backend.app.core.conf import settings
+
+if TYPE_CHECKING:
+    import loguru
 
 
 class Logger:
