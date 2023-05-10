@@ -70,3 +70,19 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 ## Init the test data
 
 Execute the `backend/app/init_test_data.py` file
+
+## Test
+
+Perform tests via pytest
+
+1. First, go to the app directory
+
+   ```shell
+   cd backend/app/
+   ```
+
+2. Execute the test command
+
+   ```shell
+   pytest -vs --disable-warnings
+   ```
