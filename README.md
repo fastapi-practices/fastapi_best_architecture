@@ -75,6 +75,8 @@ Execute the `backend/app/init_test_data.py` file
 
 Perform tests via pytest
 
+**Tip**: Before the test starts, please execute init the test data first, also, the fastapi service needs to be started
+
 1. First, go to the app directory
 
    ```shell
