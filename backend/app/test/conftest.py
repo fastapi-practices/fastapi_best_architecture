@@ -7,8 +7,8 @@ from httpx import AsyncClient
 
 sys.path.append('../../')
 
-from backend.app.common.redis import redis_client  # noqa
-from backend.app.core.conf import settings  # noqa
+from backend.app.common.redis import redis_client  # noqa: E402
+from backend.app.core.conf import settings  # noqa: E402
 
 
 @pytest.fixture(scope='session')
@@ -20,14 +20,8 @@ def anyio_backend():
 async def function_fixture(anyio_backend):
     auth_data = {
         'url': f'http://{settings.UVICORN_HOST}:{settings.UVICORN_PORT}{settings.TOKEN_URL}',
-        'headers': {
-            'accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        'data': {
-            'username': 'test',
-            'password': 'test'
-        }
+        'headers': {'accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'},
+        'data': {'username': 'test', 'password': 'test'},
     }
     async with AsyncClient() as client:
         response = await client.post(**auth_data)
