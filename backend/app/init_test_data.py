@@ -18,6 +18,22 @@ class InitData:
         self.fake = Faker('zh_CN')
 
     @staticmethod
+    async def create_test_user():
+        """创建测试用户"""
+        username = 'test'
+        password = 'test'
+        email = 'test@gmail.com'
+        user_obj = User(
+            username=username,
+            password=get_hash_password(password),
+            email=email,
+            is_superuser=True,
+        )
+        async with async_db_session.begin() as db:
+            db.add(user_obj)
+        log.info(f'测试用户创建成功，账号：{username}，密码：{password}')
+
+    @staticmethod
     async def create_superuser_by_yourself():
         """手动创建管理员账户"""
         print('请输入用户名:')
@@ -108,6 +124,7 @@ class InitData:
     async def init_data(self):
         """自动创建数据"""
         log.info('⏳ 开始初始化数据')
+        await self.create_test_user()
         await self.create_superuser_by_yourself()
         await self.fake_user()
         await self.fake_no_active_user()
