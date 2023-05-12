@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime
 
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -28,10 +28,10 @@ class GetUserInfo(UpdateUser):
     id: int
     uid: str
     avatar: str | None = None
-    time_joined: datetime.datetime = None
-    last_login: datetime.datetime | None = None
-    is_superuser: bool
     is_active: bool
+    is_superuser: bool
+    time_joined: datetime = None
+    last_login: datetime | None = None
 
     class Config:
         orm_mode = True

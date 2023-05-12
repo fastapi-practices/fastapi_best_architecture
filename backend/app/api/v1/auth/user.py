@@ -13,17 +13,18 @@ from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, Upd
 router = APIRouter()
 
 
-@router.post('/login', summary='表单登录', response_model=Token, description='form 格式登录支持直接在 api 文档调试接口')
+@router.post('/login', summary='表单登录', description='form 格式登录，支持直接在 api 文档调试接口')
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
-    token, is_super = await UserService.login(form_data)
-    return Token(access_token=token, is_superuser=is_super)
+    token, user = await UserService.login(form_data)
+    data = Token(access_token=token, user=user)
+    return response_base.response_200(data=data)
 
 
-# @router.post('/login', summary='用户登录', response_model=Token,
-#            description='json 格式登录, 不支持api文档接口调试, 需使用第三方api工具, 例如: postman')
+# @router.post('/login', summary='用户登录', description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman')
 # async def user_login(obj: Auth):
-#     token, is_super = await UserService.login(obj)
-#     return Token(access_token=token, is_superuser=is_super)
+#     token, user = await UserService.login(obj)
+#     data = Token(access_token=token, user=user)
+#     return response_base.response_200(data=data)
 
 
 @router.post('/register', summary='用户注册')
