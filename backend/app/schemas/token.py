@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from pydantic import BaseModel
+
+from backend.app.schemas.user import GetUserInfo
 
 
 class Token(BaseModel):
-    code: int = 200
-    msg: str = 'Success'
     access_token: str
     token_type: str = 'Bearer'
-    is_superuser: bool | None = None
+    user: GetUserInfo

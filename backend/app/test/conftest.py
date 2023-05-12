@@ -25,7 +25,7 @@ async def function_fixture(anyio_backend):
     }
     async with AsyncClient() as client:
         response = await client.post(**auth_data)
-        token = response.json()['access_token']
+        token = response.json()['data']['access_token']
         test_token = await redis_client.get('test_token')
         if not test_token:
             await redis_client.set('test_token', token, ex=86400)

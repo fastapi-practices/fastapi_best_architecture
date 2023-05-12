@@ -50,8 +50,48 @@ def register_exception(app: FastAPI):
             headers=exc.headers,
         )
 
+    @app.exception_handler(RequestValidationError)
+    def validation_exception_handler(request: Request, exc: RequestValidationError):
+        """
+        数据验证异常处理
+
+        :param request:
+        :param exc:
+        :return:
+        """
+        message = ''
+        data = {}
+        for raw_error in exc.raw_errors:
+            if isinstance(raw_error.exc, ValidationError):
+                exc = raw_error.exc
+                if hasattr(exc, 'model'):
+                    fields = exc.model.__dict__.get('__fields__')
+                    for field_key in fields.keys():
+                        field_title = fields.get(field_key).field_info.title
+                        data[field_key] = field_title if field_title else field_key
+                errors_len = len(exc.errors())
+                for error in exc.errors():
+                    field = str(error.get('loc')[-1])
+                    _msg = error.get('msg')
+                    errors_len = errors_len - 1
+                    message += (
+                        f'{data.get(field, field)} {_msg}' + ', '
+                        if errors_len > 0
+                        else f'{data.get(field, field)} {_msg}'
+                    )
+            elif isinstance(raw_error.exc, json.JSONDecodeError):
+                message += 'json解析失败'
+        return JSONResponse(
+            status_code=422,
+            content=response_base.fail(
+                code=422,
+                msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message[:-1]}',
+                data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
+            ),
+        )
+
     @app.exception_handler(Exception)
-    def all_exception_handler(request: Request, exc):
+    def all_exception_handler(request: Request, exc: Exception):
         """
         全局异常处理
 
@@ -59,33 +99,6 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        # 常规
-        if isinstance(exc, RequestValidationError):
-            message = ''
-            data = {}
-            for raw_error in exc.raw_errors:
-                if isinstance(raw_error.exc, ValidationError):
-                    exc = raw_error.exc
-                    if hasattr(exc, 'model'):
-                        fields = exc.model.__dict__.get('__fields__')
-                        for field_key in fields.keys():
-                            field_title = fields.get(field_key).field_info.title
-                            data[field_key] = field_title if field_title else field_key
-                    for error in exc.errors():
-                        field = str(error.get('loc')[-1])
-                        _msg = error.get('msg')
-                        message += f'{data.get(field, field)} {_msg},'
-                elif isinstance(raw_error.exc, json.JSONDecodeError):
-                    message += 'json解析失败'
-            return JSONResponse(
-                status_code=422,
-                content=response_base.fail(
-                    msg='请求参数非法' if len(message) == 0 else f'请求参数非法:{message[:-1]}',
-                    data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
-                ),
-            )
-
-        # 自定义
         if isinstance(exc, BaseExceptionMixin):
             return JSONResponse(
                 status_code=_get_exception_code(exc.code),

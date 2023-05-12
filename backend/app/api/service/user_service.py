@@ -26,9 +26,11 @@ class UserService:
                 raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
             # 更新登陆时间
             await UserDao.update_user_login_time(db, form_data.username)
+            # 获取最新用户信息
+            user = await UserDao.get_user_by_id(db, current_user.id)
             # 创建token
-            access_token = jwt.create_access_token(current_user.id)
-            return access_token, current_user.is_superuser
+            access_token = jwt.create_access_token(user.id)
+            return access_token, user
 
     # @staticmethod
     # async def login(obj: Auth):
@@ -42,9 +44,11 @@ class UserService:
     #             raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
     #         # 更新登陆时间
     #         await UserDao.update_user_login_time(db, obj.username)
+    #         # 获取最新用户信息
+    #         user = await UserDao.get_user_by_id(db, current_user.id)
     #         # 创建token
-    #         access_token = jwt.create_access_token(current_user.id)
-    #         return access_token, current_user.is_superuser
+    #         access_token = jwt.create_access_token(user.id)
+    #         return access_token, user
 
     @staticmethod
     async def register(obj: CreateUser):

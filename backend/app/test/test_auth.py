@@ -31,7 +31,7 @@ class TestAuth:
                 url=f'{self.users_api_base_url}/login', data={'username': '1', 'password': '1'}
             )
         assert response.status_code == 200
-        assert response.json()['token_type'] == 'Bearer'
+        assert response.json()['data']['token_type'] == 'Bearer'
 
     async def test_register(self):
         async with AsyncClient(
