@@ -47,7 +47,7 @@ class UserService:
     #         # 获取最新用户信息
     #         user = await UserDao.get_user_by_id(db, current_user.id)
     #         # 创建token
-    #         access_token = jwt.create_access_token(current_user.id)
+    #         access_token = jwt.create_access_token(user.id)
     #         return access_token, user
 
     @staticmethod
