@@ -19,6 +19,10 @@ class Role(Base):
     data_scope: Mapped[int | None] = mapped_column(default=2, comment='数据范围（1：全部数据权限 2：自定数据权限）')
     del_flag: Mapped[bool] = mapped_column(default=True, comment='删除标志（0删除 1存在）')
     # 角色用户多对多
-    users: Mapped[list['User']] = relationship(init=False, secondary=sys_user_role, back_populates='roles')
+    users: Mapped[list['User']] = relationship(  # noqa: F821
+        init=False, secondary=sys_user_role, back_populates='roles'
+    )
     # 角色菜单多对多
-    menus: Mapped[list['Menu']] = relationship(init=False, secondary=sys_role_menu, back_populates='roles')
+    menus: Mapped[list['Menu']] = relationship(  # noqa: F821
+        init=False, secondary=sys_role_menu, back_populates='roles'
+    )

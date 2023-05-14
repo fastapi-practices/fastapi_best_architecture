@@ -13,7 +13,6 @@ from backend.app.models.sys_casbin_rule import CasbinRule
 
 
 class RBAC:
-
     def __init__(self):
         self._Casbin_DATABASE_URL = f'mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_DATABASE}?charset={settings.DB_CHARSET}'
 

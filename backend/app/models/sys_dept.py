@@ -22,4 +22,4 @@ class Dept(Base):
     status: Mapped[bool] = mapped_column(default=True, comment='部门状态(0停用 1正常)')
     del_flag: Mapped[bool] = mapped_column(default=True, comment='删除标志（0删除 1存在）')
     # 部门用户多对一
-    users: Mapped['User'] = relationship(init=False, back_populates='dept')
+    users: Mapped['User'] = relationship(init=False, back_populates='dept')  # noqa: F821

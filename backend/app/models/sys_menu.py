@@ -24,5 +24,6 @@ class Menu(Base):
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     del_flag: Mapped[bool] = mapped_column(default=True, comment='删除标志（0删除 1存在）')
     # 菜单角色多对多
-    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')
-
+    roles: Mapped[list['Role']] = relationship(  # noqa: F821
+        init=False, secondary=sys_role_menu, back_populates='menus'
+    )

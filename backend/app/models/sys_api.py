@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Optional
 
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -10,7 +9,8 @@ from backend.app.database.base_class import Base, id_key
 
 
 class API(Base):
-    """ 系统api """
+    """系统api"""
+
     __tablename__ = 'sys_api'
 
     api_id: Mapped[id_key] = mapped_column(init=False)

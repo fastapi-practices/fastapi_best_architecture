@@ -12,6 +12,7 @@ class CasbinRule(MappedBase):
     """
     重写 casbin_sqlalchemy_adapter 中的 casbinRule model类, 使用自定义 MappedBase, 避免产生 alembic 迁移问题
     """
+
     __tablename__ = 'sys_casbin_rule'
 
     id: Mapped[id_key]

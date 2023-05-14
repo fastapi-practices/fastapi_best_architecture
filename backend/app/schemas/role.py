@@ -11,7 +11,7 @@ from backend.app.schemas.menu import GetAllMenu
 class RoleBase(BaseModel):
     role_name: str
     sort: int = Field(default=0, ge=0, description='排序')
-    data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')
+    data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
     del_flag: bool
 
     @validator('data_scope')
@@ -19,6 +19,7 @@ class RoleBase(BaseModel):
         if v not in RoleDataScope.get_member_values():
             raise ValueError('数据范围只能是1或2')
         return v
+
 
 class CreateRole(RoleBase):
     menu_id: list[int]
