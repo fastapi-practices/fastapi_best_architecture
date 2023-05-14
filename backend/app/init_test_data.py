@@ -49,6 +49,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'测试用户创建成功，账号：{username}，密码：{password}')
 
@@ -78,6 +79,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'自定义管理员用户创建成功，账号：{username}，密码：{password}')
 
@@ -95,6 +97,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'普通用户创建成功，账号：{username}，密码：{password}')
 
@@ -113,6 +116,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'普通锁定用户创建成功，账号：{username}，密码：{password}')
 
@@ -130,6 +134,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
 
@@ -148,6 +153,7 @@ class InitTestData:
             dept_id=1,
         )
         async with async_db_session.begin() as db:
+            user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'管理员锁定用户创建成功，账号：{username}，密码：{password}')
 
