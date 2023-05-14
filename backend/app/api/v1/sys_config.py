@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
-from backend.app.api.jwt import DependsSuperUser
+from backend.app.common.jwt import DependsSuperUser
 from backend.app.common.response.response_schema import ResponseModel
 from backend.app.core.conf import settings
 

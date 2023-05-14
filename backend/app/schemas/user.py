@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, HttpUrl, Field
+
+from backend.app.schemas.role import GetAllRole
 
 
 class Auth(BaseModel):
@@ -11,33 +13,43 @@ class Auth(BaseModel):
 
 
 class CreateUser(Auth):
+    dept_id: int
+    nickname: str
+    role_id: list[int]
     email: str = Field(..., example='user@example.com')
 
 
-class UpdateUser(BaseModel):
+class _UserInfoBase(BaseModel):
+    dept_id: int
     username: str
+    nickname: str
     email: str
-    mobile_number: str | None = None
+    phone: str | None = None
+
+
+class UpdateUser(_UserInfoBase):
+    role_id: list[int]
 
 
 class Avatar(BaseModel):
-    url: HttpUrl = Field(..., description='头像地址')
+    url: HttpUrl = Field(..., description='头像 http 地址')
 
 
-class GetUserInfo(UpdateUser):
-    id: int
-    uid: str
+class GetUserInfo(_UserInfoBase):
+    user_id: int
+    user_uuid: str
     avatar: str | None = None
     is_active: bool
     is_superuser: bool
     time_joined: datetime = None
     last_login: datetime | None = None
+    roles: list[GetAllRole]
 
     class Config:
         orm_mode = True
 
 
 class ResetPassword(BaseModel):
-    id: int = Field(..., example='1', description='用户ID')
+    user_id: int
     password1: str
     password2: str

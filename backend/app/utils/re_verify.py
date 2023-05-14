@@ -33,7 +33,7 @@ def match_string(pattern, text) -> bool:
         return False
 
 
-def is_mobile(text: str) -> bool:
+def is_phone(text: str) -> bool:
     """
     检查手机号码
 

@@ -14,6 +14,8 @@ from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
 from backend.app.middleware.access_middle import AccessMiddleware
+from backend.app.utils.openapi import simplify_operation_ids
+from backend.app.utils.route_name import ensure_unique_route_names
 
 
 @asynccontextmanager
@@ -110,6 +112,10 @@ def register_router(app: FastAPI):
     :return:
     """
     app.include_router(v1)
+
+    # extra
+    ensure_unique_route_names(app)
+    simplify_operation_ids(app)
 
 
 def register_page(app: FastAPI):
