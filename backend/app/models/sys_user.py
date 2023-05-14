@@ -18,7 +18,7 @@ class User(DataClassBase):
     id: Mapped[id_key] = mapped_column(init=False)
     user_uuid: Mapped[str] = mapped_column(String(50), init=False, insert_default=use_uuid, unique=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='用户名')
-    nickname: Mapped[str] = mapped_column(String(20), comment='昵称')
+    nickname: Mapped[str] = mapped_column(String(20), unique=True, comment='昵称')
     password: Mapped[str] = mapped_column(String(255), comment='密码')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
