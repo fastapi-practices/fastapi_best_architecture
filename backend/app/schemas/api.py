@@ -9,7 +9,7 @@ from backend.app.common.enums import MethodType
 
 
 class ApiBase(BaseModel):
-    path: str
+    name: str
     method: str = Field(default=MethodType.GET, description='请求方法')
     path: str = Field(..., description='api路径')
     remark: str | None = None
@@ -33,7 +33,7 @@ class UpdateApi(ApiBase):
 
 
 class GetAllApi(ApiBase):
-    api_id: int
+    id: int
     create_user: int
     update_user: int = None
     created_time: datetime

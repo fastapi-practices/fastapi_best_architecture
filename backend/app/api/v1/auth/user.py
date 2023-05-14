@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.app.common.jwt import CurrentUser, DependsUser, DependsSuperUser
-from backend.app.api.service.user_service import UserService
 from backend.app.common.pagination import Page
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import Token
 from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
+from backend.app.services.user_service import UserService
 
 router = APIRouter()
 

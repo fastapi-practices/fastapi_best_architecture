@@ -11,8 +11,8 @@ class Dept(Base):
 
     __tablename__ = 'sys_dept'
 
-    dept_id: Mapped[id_key] = mapped_column(init=False)
-    dept_name: Mapped[str] = mapped_column(String(50), comment='部门名称')
+    id: Mapped[id_key] = mapped_column(init=False)
+    name: Mapped[str] = mapped_column(String(50), comment='部门名称')
     parent_id: Mapped[int] = mapped_column(default=0, comment='父部门ID')
     level: Mapped[int] = mapped_column(default=0, comment='部门层级')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')

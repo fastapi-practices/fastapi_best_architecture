@@ -9,7 +9,7 @@ from backend.app.schemas.menu import GetAllMenu
 
 
 class RoleBase(BaseModel):
-    role_name: str
+    name: str
     sort: int = Field(default=0, ge=0, description='排序')
     data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
     del_flag: bool
@@ -22,15 +22,15 @@ class RoleBase(BaseModel):
 
 
 class CreateRole(RoleBase):
-    menu_id: list[int]
+    menu_ids: list[int]
 
 
 class UpdateRole(RoleBase):
-    menu_id: list[int]
+    menu_ids: list[int]
 
 
 class GetAllRole(RoleBase):
-    role_id: int
+    id: int
     create_user: int
     update_user: int = None
     created_time: datetime

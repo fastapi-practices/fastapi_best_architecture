@@ -26,10 +26,12 @@ class UserService:
                 raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
             # 更新登陆时间
             await UserDao.update_user_login_time(db, form_data.username)
+            # 查询用户角色
+            user_roles = await UserDao.get_user_role(db, current_user.id)
             # 获取最新用户信息
-            user = await UserDao.get_user_by_id(db, current_user.user_id)
+            user = await UserDao.get_user_by_id(db, current_user.id)
             # 创建token
-            access_token = jwt.create_access_token(user.user_id)
+            access_token = jwt.create_access_token([user.id, user_roles])
             return access_token, user
 
     # @staticmethod
@@ -45,9 +47,9 @@ class UserService:
     #         # 更新登陆时间
     #         await UserDao.update_user_login_time(db, obj.username)
     #         # 获取最新用户信息
-    #         user = await UserDao.get_user_by_id(db, current_user.user_id)
+    #         user = await UserDao.get_user_by_id(db, current_user.id)
     #         # 创建token
-    #         access_token = jwt.create_access_token(user.user_id)
+    #         access_token = jwt.create_access_token(user.id)
     #         return access_token, user
 
     @staticmethod
@@ -72,7 +74,7 @@ class UserService:
             pwd2 = obj.password2
             if pwd1 != pwd2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            await UserDao.reset_password(db, obj.user_id, obj.password2)
+            await UserDao.reset_password(db, obj.id, obj.password2)
 
     @staticmethod
     async def get_userinfo(username: str):
@@ -154,5 +156,5 @@ class UserService:
             input_user = await UserDao.get_user_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            count = await UserDao.delete_user(db, input_user.user_id)
+            count = await UserDao.delete_user(db, input_user.id)
             return count

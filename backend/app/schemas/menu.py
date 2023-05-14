@@ -8,7 +8,7 @@ from backend.app.common.enums import MenuType
 
 
 class MenuBase(BaseModel):
-    menu_name: str
+    name: str
     parent_id: int = Field(default=0, ge=0, description='菜单父级ID')
     level: int = Field(default=0, ge=0, description='菜单层级')
     sort: int = Field(default=0, ge=0, description='排序')
@@ -34,7 +34,7 @@ class UpdateMenu(MenuBase):
 
 
 class GetAllMenu(MenuBase):
-    menu_id: int
+    id: int
     create_user: int
     update_user: int = None
     created_time: datetime

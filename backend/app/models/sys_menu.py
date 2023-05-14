@@ -13,8 +13,8 @@ class Menu(Base):
 
     __tablename__ = 'sys_menu'
 
-    menu_id: Mapped[id_key] = mapped_column(init=False)
-    menu_name: Mapped[str] = mapped_column(String(50), unique=True, comment='菜单名称')
+    id: Mapped[id_key] = mapped_column(init=False)
+    name: Mapped[str] = mapped_column(String(50), unique=True, comment='菜单名称')
     parent_id: Mapped[int] = mapped_column(default=0, comment='父菜单ID')
     level: Mapped[int] = mapped_column(default=0, comment='菜单层级')
     sort: Mapped[int] = mapped_column(default=0, comment='显示顺序')

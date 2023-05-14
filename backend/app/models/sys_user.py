@@ -15,7 +15,7 @@ class User(DataClassBase):
 
     __tablename__ = 'sys_user'
 
-    user_id: Mapped[id_key] = mapped_column(init=False)
+    id: Mapped[id_key] = mapped_column(init=False)
     user_uuid: Mapped[str] = mapped_column(String(50), init=False, insert_default=use_uuid, unique=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='用户名')
     nickname: Mapped[str] = mapped_column(String(20), comment='昵称')
@@ -28,7 +28,7 @@ class User(DataClassBase):
     time_joined: Mapped[datetime] = mapped_column(init=False, default=func.now(), comment='注册时间')
     last_login: Mapped[datetime | None] = mapped_column(init=False, onupdate=func.now(), comment='上次登录')
     # 部门用户多对一
-    dept_id: Mapped[int | None] = mapped_column(ForeignKey('sys_dept.dept_id'), default=None, comment='部门关联ID')
+    dept_id: Mapped[int | None] = mapped_column(ForeignKey('sys_dept.id'), default=None, comment='部门关联ID')
     dept: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='users')  # noqa: F821
     # 用户角色多对多
     roles: Mapped[list['Role']] = relationship(  # noqa: F821

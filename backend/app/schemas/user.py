@@ -28,7 +28,7 @@ class _UserInfoBase(BaseModel):
 
 
 class UpdateUser(_UserInfoBase):
-    role_id: list[int]
+    role_ids: list[int]
 
 
 class Avatar(BaseModel):
@@ -36,7 +36,7 @@ class Avatar(BaseModel):
 
 
 class GetUserInfo(_UserInfoBase):
-    user_id: int
+    id: int
     user_uuid: str
     avatar: str | None = None
     is_active: bool
@@ -49,7 +49,20 @@ class GetUserInfo(_UserInfoBase):
         orm_mode = True
 
 
+class GetUserInfoNoRelation(_UserInfoBase):
+    id: int
+    user_uuid: str
+    avatar: str | None = None
+    is_active: bool
+    is_superuser: bool
+    time_joined: datetime = None
+    last_login: datetime | None = None
+
+    class Config:
+        orm_mode = True
+
+
 class ResetPassword(BaseModel):
-    user_id: int
+    id: int
     password1: str
     password2: str

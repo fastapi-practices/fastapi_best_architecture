@@ -27,7 +27,7 @@ class UpdateDept(DeptBase):
 
 
 class GetAllDept(DeptBase):
-    dept_id: int
+    id: int
     create_user: int
     update_user: int = None
     created_time: datetime

@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     STATIC_FILES: bool = False
 
     # MySQL
-    DB_ECHO: bool = False
+    DB_ECHO: bool = True
     DB_DATABASE: str = 'fba'
     DB_CHARSET: str = 'utf8mb4'
 
