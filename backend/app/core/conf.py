@@ -68,9 +68,6 @@ class Settings(BaseSettings):
     APS_MAX_INSTANCES: int = 3  # 最大实例数
     APS_MISFIRE_GRACE_TIME: int = 60  # 任务错过执行时间后，最大容错时间，过期后不再执行，单位：秒
 
-    # Casbin
-    CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
-
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
@@ -83,6 +80,14 @@ class Settings(BaseSettings):
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
+
+    # Casbin
+    CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
+    CASBIN_EXCLUDE: list[dict[str, str], dict[str, str]] = [
+        {'method': 'POST', 'path': '/api/v1/auth/users/login'},
+        {'method': 'POST', 'path': '/api/v1/auth/users/register'},
+        {'method': 'POST', 'path': '/api/v1/auth/users/password/reset'},
+    ]
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
