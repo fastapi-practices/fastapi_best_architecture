@@ -15,7 +15,7 @@ from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
 from backend.app.middleware.access_middle import AccessMiddleware
 from backend.app.utils.openapi import simplify_operation_ids
-from backend.app.utils.route_name import ensure_unique_route_names
+from backend.app.utils.health_check import ensure_unique_route_names
 
 
 @asynccontextmanager

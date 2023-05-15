@@ -3,13 +3,13 @@
 from fastapi import APIRouter
 
 from backend.app.api.v1.auth import router as auth_router
+from backend.app.api.v1.user import router as user_router
 from backend.app.api.v1.task_demo import router as task_demo_router
-from backend.app.api.v1.sys_config import router as sys_config_router
+from backend.app.api.v1.config import router as config_router
 
 v1 = APIRouter(prefix='/v1')
 
 v1.include_router(auth_router)
-
+v1.include_router(user_router, prefix='/users', tags=['用户管理'])
+v1.include_router(config_router, prefix='/configs', tags=['系统配置'])
 v1.include_router(task_demo_router, prefix='/tasks', tags=['任务管理'])
-
-v1.include_router(sys_config_router, prefix='/configs', tags=['系统配置'])

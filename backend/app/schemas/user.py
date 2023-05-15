@@ -35,20 +35,6 @@ class Avatar(BaseModel):
     url: HttpUrl = Field(..., description='头像 http 地址')
 
 
-class GetUserInfo(_UserInfoBase):
-    id: int
-    user_uuid: str
-    avatar: str | None = None
-    is_active: bool
-    is_superuser: bool
-    time_joined: datetime = None
-    last_login: datetime | None = None
-    roles: list[GetAllRole]
-
-    class Config:
-        orm_mode = True
-
-
 class GetUserInfoNoRelation(_UserInfoBase):
     id: int
     user_uuid: str
@@ -57,6 +43,13 @@ class GetUserInfoNoRelation(_UserInfoBase):
     is_superuser: bool
     time_joined: datetime = None
     last_login: datetime | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class GetUserInfo(GetUserInfoNoRelation):
+    roles: list[GetAllRole]
 
     class Config:
         orm_mode = True
