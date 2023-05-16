@@ -1,29 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter
 
-from backend.app.api.jwt import CurrentUser, DependsUser, DependsSuperUser
-from backend.app.api.service.user_service import UserService
+from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
 from backend.app.common.pagination import Page
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.token import Token
-from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar, Auth
+from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
+from backend.app.services.user_service import UserService
 
 router = APIRouter()
-
-
-@router.post('/swagger_login', summary='swagger 表单登录', description='form 格式登录，仅用于 swagger 文档调试接口')
-async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    token, user = await UserService.swagger_login(form_data)
-    return Token(access_token=token, user=user)
-
-
-@router.post('/login', summary='用户登录', description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman')
-async def user_login(obj: Auth):
-    token, user = await UserService.login(obj)
-    data = Token(access_token=token, user=user)
-    return response_base.response_200(data=data)
 
 
 @router.post('/register', summary='用户注册')
