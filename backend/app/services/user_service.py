@@ -27,11 +27,11 @@ class UserService:
             # 更新登陆时间
             await UserDao.update_user_login_time(db, form_data.username)
             # 查询用户角色
-            user_roles = await UserDao.get_user_role(db, current_user.id)
+            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
             # 获取最新用户信息
             user = await UserDao.get_user_by_id(db, current_user.id)
             # 创建token
-            access_token = jwt.create_access_token([user.id, user_roles])
+            access_token = jwt.create_access_token([user.id, user_role_ids])
             return access_token, user
 
     @staticmethod
@@ -44,12 +44,10 @@ class UserService:
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
-            # 更新登陆时间
             await UserDao.update_user_login_time(db, obj.username)
-            # 获取最新用户信息
+            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
             user = await UserDao.get_user_by_id(db, current_user.id)
-            # 创建token
-            access_token = jwt.create_access_token(user.id)
+            access_token = jwt.create_access_token([user.id, user_role_ids])
             return access_token, user
 
     @staticmethod

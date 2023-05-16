@@ -84,6 +84,7 @@ class Settings(BaseSettings):
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
     CASBIN_EXCLUDE: list[dict[str, str], dict[str, str]] = [
+        {'method': 'POST', 'path': '/api/v1/auth/users/swagger_login'},
         {'method': 'POST', 'path': '/api/v1/auth/users/login'},
         {'method': 'POST', 'path': '/api/v1/auth/users/register'},
         {'method': 'POST', 'path': '/api/v1/auth/users/password/reset'},

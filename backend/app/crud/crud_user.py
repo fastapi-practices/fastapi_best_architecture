@@ -9,7 +9,7 @@ from sqlalchemy.sql import Select
 
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
-from backend.app.models import User
+from backend.app.models import User, Role
 from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
 
 
@@ -76,12 +76,21 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def get_user_role(self, db: AsyncSession, user_id: int) -> list[int]:
+    async def get_user_role_ids(self, db: AsyncSession, user_id: int) -> list[int]:
         user = await db.execute(
             select(self.model).where(self.model.id == user_id).options(selectinload(self.model.roles))
         )
         roles_id = [role.id for role in user.scalars().first().roles]
         return roles_id
+
+    async def get_user_with_relation_by_id(self, db: AsyncSession, user_id: int) -> User:
+        user = await db.execute(
+            select(self.model)
+            .where(self.model.id == user_id)
+            .options(selectinload(self.model.dept))
+            .options(selectinload(self.model.roles).selectinload(Role.menus))
+        )
+        return user.scalars().first()
 
 
 UserDao: CRUDUser = CRUDUser(User)

@@ -28,7 +28,7 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, user: CurrentUser):
+    async def rbac_verify(self, request: Request, user: CurrentUser) -> None:
         """
         权限校验，超级用户跳过校验，默认拥有所有权限
 
@@ -39,18 +39,19 @@ class RBAC:
         user_uuid = user.user_uuid
         user_roles = user.roles
         role_data_scope = [role.data_scope for role in user_roles]
+        super_user = user.is_superuser
         path = request.url.path
         method = request.method
 
-        if user.is_superuser:
-            ...
+        if super_user:
+            return
 
         for ce in settings.CASBIN_EXCLUDE:
             if ce['method'] == method and ce['path'] == path:
-                ...
+                return
 
         if 1 in set(role_data_scope):
-            ...
+            return
 
         enforcer = self.get_casbin_enforcer()
         if not enforcer.enforce(user_uuid, path, method):

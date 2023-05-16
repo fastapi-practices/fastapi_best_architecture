@@ -75,7 +75,7 @@ async def get_current_user(db: CurrentSession, token: str = Depends(oauth2_schem
             raise TokenError
     except (jwt.JWTError, ValidationError):
         raise TokenError
-    user = await UserDao.get_user_by_id(db, user_id)
+    user = await UserDao.get_user_with_relation_by_id(db, user_id)
     if not user:
         raise TokenError
     return user

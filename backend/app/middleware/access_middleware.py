@@ -9,9 +9,7 @@ from backend.app.common.log import log
 
 
 class AccessMiddleware(BaseHTTPMiddleware):
-    """
-    记录请求日志
-    """
+    """记录请求日志中间件"""
 
     async def dispatch(self, request: Request, call_next) -> Response:
         start_time = datetime.now()
