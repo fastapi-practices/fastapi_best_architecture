@@ -9,13 +9,13 @@ from backend.app.common.exception import errors
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
+from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
 from backend.app.utils import re_verify
 
 
 class UserService:
     @staticmethod
-    async def login(form_data: OAuth2PasswordRequestForm):
+    async def swagger_login(form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:
             current_user = await UserDao.get_user_by_username(db, form_data.username)
             if not current_user:
@@ -34,23 +34,23 @@ class UserService:
             access_token = jwt.create_access_token([user.id, user_roles])
             return access_token, user
 
-    # @staticmethod
-    # async def login(obj: Auth):
-    #     async with async_db_session() as db:
-    #         current_user = await UserDao.get_user_by_username(db, obj.username)
-    #         if not current_user:
-    #             raise errors.NotFoundError(msg='用户名不存在')
-    #         elif not jwt.password_verify(obj.password, current_user.password):
-    #             raise errors.AuthorizationError(msg='密码错误')
-    #         elif not current_user.is_active:
-    #             raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
-    #         # 更新登陆时间
-    #         await UserDao.update_user_login_time(db, obj.username)
-    #         # 获取最新用户信息
-    #         user = await UserDao.get_user_by_id(db, current_user.id)
-    #         # 创建token
-    #         access_token = jwt.create_access_token(user.id)
-    #         return access_token, user
+    @staticmethod
+    async def login(obj: Auth):
+        async with async_db_session() as db:
+            current_user = await UserDao.get_user_by_username(db, obj.username)
+            if not current_user:
+                raise errors.NotFoundError(msg='用户名不存在')
+            elif not jwt.password_verify(obj.password, current_user.password):
+                raise errors.AuthorizationError(msg='密码错误')
+            elif not current_user.is_active:
+                raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
+            # 更新登陆时间
+            await UserDao.update_user_login_time(db, obj.username)
+            # 获取最新用户信息
+            user = await UserDao.get_user_by_id(db, current_user.id)
+            # 创建token
+            access_token = jwt.create_access_token(user.id)
+            return access_token, user
 
     @staticmethod
     async def register(obj: CreateUser):

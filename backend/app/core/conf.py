@@ -71,7 +71,7 @@ class Settings(BaseSettings):
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
-    TOKEN_URL: str = '/v1/auth/users/login'
+    TOKEN_URL_SWAGGER: str = '/v1/auth/users/swagger_login'
 
     # Log
     LOG_FILE_NAME: str = 'fba.log'
