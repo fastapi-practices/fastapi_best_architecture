@@ -19,9 +19,9 @@ def anyio_backend():
 @pytest.fixture(scope='package', autouse=True)
 async def function_fixture(anyio_backend):
     auth_data = {
-        'url': f'http://{settings.UVICORN_HOST}:{settings.UVICORN_PORT}{settings.TOKEN_URL}',
-        'headers': {'accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'},
-        'data': {'username': 'test', 'password': 'test'},
+        'url': f'http://{settings.UVICORN_HOST}:{settings.UVICORN_PORT}/v1/auth/users/login',
+        'headers': {'accept': 'application/json', 'Content-Type': 'application/json'},
+        'json': {'username': 'test', 'password': 'test'},
     }
     async with AsyncClient() as client:
         response = await client.post(**auth_data)

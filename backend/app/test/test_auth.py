@@ -25,10 +25,10 @@ class TestAuth:
 
     async def test_login(self):
         async with AsyncClient(
-            app=app, headers={'accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'}
+            app=app, headers={'accept': 'application/json', 'Content-Type': 'application/json'}
         ) as client:
             response = await client.post(
-                url=f'{self.users_api_base_url}/login', data={'username': '1', 'password': '1'}
+                url=f'{self.users_api_base_url}/login', json={'username': 'test', 'password': 'test'}
             )
         assert response.status_code == 200
         assert response.json()['data']['token_type'] == 'Bearer'
