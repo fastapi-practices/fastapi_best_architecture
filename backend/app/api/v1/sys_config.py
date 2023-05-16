@@ -42,7 +42,7 @@ async def get_sys_config() -> ResponseModel:
             'aps_misfire_grace_time': settings.APS_MISFIRE_GRACE_TIME,
             'token_algorithm': settings.TOKEN_ALGORITHM,
             'token_expire_minutes': settings.TOKEN_EXPIRE_MINUTES,
-            'token_url': settings.TOKEN_URL,
+            'token_url': settings.TOKEN_URL_SWAGGER,
             'log_file_name': settings.LOG_FILE_NAME,
             'middleware_cors': settings.MIDDLEWARE_CORS,
             'middleware_gzip': settings.MIDDLEWARE_GZIP,
