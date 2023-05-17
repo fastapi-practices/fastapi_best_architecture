@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
 from backend.app.common.pagination import Page
 from backend.app.common.response.response_schema import response_base
+from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
 from backend.app.services.user_service import UserService
+from backend.app.utils.serializers import select_to_json
 
 router = APIRouter()
 
@@ -26,7 +29,8 @@ async def password_reset(obj: ResetPassword):
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
 async def userinfo(username: str):
     current_user = await UserService.get_userinfo(username)
-    return response_base.response_200(data=current_user, exclude={'password'})
+    data = GetUserInfo(**select_to_json(current_user))
+    return response_base.response_200(data=data, exclude={'password'})
 
 
 @router.put('/{username}', summary='更新用户信息')
@@ -46,8 +50,9 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 
 
 @router.get('', summary='获取所有用户', dependencies=[DependsUser])
-async def get_all_users() -> Page[GetUserInfo]:
-    return await UserService.get_user_list()
+async def get_all_users(db: CurrentSession) -> Page[GetUserInfo]:
+    user_list = await UserService.get_user_list()
+    return await paginate(db, user_list)
 
 
 @router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsSuperUser])

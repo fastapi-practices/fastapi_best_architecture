@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.routing import APIRoute
 
-from backend.app.common.jwt import DependsSuperUser
-from backend.app.common.response.response_schema import ResponseModel
+from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
 
 router = APIRouter()
 
 
-@router.get('', summary='获取系统配置', dependencies=[DependsSuperUser])
-async def get_sys_config() -> ResponseModel:
-    return ResponseModel(
+@router.get('', summary='获取系统配置', dependencies=[DependsRBAC])
+async def get_sys_config():
+    return response_base.success(
         data={
             'title': settings.TITLE,
             'version': settings.VERSION,
@@ -49,3 +50,12 @@ async def get_sys_config() -> ResponseModel:
             'middleware_access': settings.MIDDLEWARE_ACCESS,
         }
     )
+
+
+@router.get('/routers', summary='获取所有路由', dependencies=[DependsRBAC])
+async def get_all_route(request: Request):
+    data = []
+    for route in request.app.routes:
+        if isinstance(route, APIRoute):
+            data.append({'path': route.path, 'name': route.name, 'summary': route.summary, 'methods': route.methods})
+    return response_base.success(data={'route_list': data})

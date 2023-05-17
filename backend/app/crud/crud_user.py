@@ -27,11 +27,25 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
 
     async def create_user(self, db: AsyncSession, create: CreateUser) -> NoReturn:
         create.password = jwt.get_hash_password(create.password)
-        new_user = self.model(**create.dict())
+        new_user = self.model(**create.dict(exclude={'roles'}))
+        role_list = []
+        for role_id in create.roles:
+            role_list.append(await db.get(Role, role_id))
+        new_user.roles.append(*role_list)
         db.add(new_user)
 
-    async def update_userinfo(self, db: AsyncSession, current_user: User, obj: UpdateUser) -> int:
-        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(**obj.dict()))
+    async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
+        user = await db.execute(
+            update(self.model).where(self.model.id == input_user.id).values(**obj.dict(exclude={'roles'}))
+        )
+        # 删除用户所有角色
+        for i in list(input_user.roles):
+            input_user.roles.remove(i)
+        # 添加用户角色
+        role_list = []
+        for role_id in obj.roles:
+            role_list.append(await db.get(Role, role_id))
+        input_user.roles.append(*role_list)
         return user.rowcount
 
     async def update_avatar(self, db: AsyncSession, current_user: User, avatar: Avatar) -> int:
@@ -52,7 +66,11 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         return user.rowcount
 
     def get_users(self) -> Select:
-        return select(self.model).order_by(desc(self.model.time_joined))
+        return (
+            select(self.model)
+            .options(selectinload(self.model.roles).selectinload(Role.menus))
+            .order_by(desc(self.model.time_joined))
+        )
 
     async def get_user_is_super(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get_user_by_id(db, user_id)
@@ -83,12 +101,17 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         roles_id = [role.id for role in user.scalars().first().roles]
         return roles_id
 
-    async def get_user_with_relation_by_id(self, db: AsyncSession, user_id: int) -> User:
+    async def get_user_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User:
+        where = 'condition'
+        if user_id:
+            where = 'self.model.id == user_id'
+        if username:
+            where = 'self.model.username == username'
         user = await db.execute(
             select(self.model)
-            .where(self.model.id == user_id)
+            .where(eval(where))
             .options(selectinload(self.model.dept))
-            .options(selectinload(self.model.roles).selectinload(Role.menus))
+            .options(selectinload(self.model.roles).joinedload(Role.menus))
         )
         return user.scalars().first()
 

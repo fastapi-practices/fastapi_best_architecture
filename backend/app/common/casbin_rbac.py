@@ -53,6 +53,7 @@ class RBAC:
         if 1 in set(role_data_scope):
             return
 
+        # TODO: 通过 redis 做鉴权查询优化，减少数据库查询
         enforcer = self.get_casbin_enforcer()
         if not enforcer.enforce(user_uuid, path, method):
             raise AuthorizationError
@@ -60,4 +61,4 @@ class RBAC:
 
 rbac = RBAC()
 # RBAC 依赖注入
-CurrentRBAC = Depends(rbac.rbac_verify)
+DependsRBAC = Depends(rbac.rbac_verify)

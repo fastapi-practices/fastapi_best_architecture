@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, HttpUrl, Field
 
+from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
 
 
@@ -14,8 +15,8 @@ class Auth(BaseModel):
 
 class CreateUser(Auth):
     dept_id: int
+    roles: list[int]
     nickname: str
-    role_id: list[int]
     email: str = Field(..., example='user@example.com')
 
 
@@ -23,12 +24,12 @@ class _UserInfoBase(BaseModel):
     dept_id: int
     username: str
     nickname: str
-    email: str
+    email: str = Field(..., example='user@example.com')
     phone: str | None = None
 
 
 class UpdateUser(_UserInfoBase):
-    role_ids: list[int]
+    roles: list[int]
 
 
 class Avatar(BaseModel):
@@ -49,6 +50,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
 
 
 class GetUserInfo(GetUserInfoNoRelation):
+    dept: GetAllDept | None = None
     roles: list[GetAllRole]
 
     class Config:

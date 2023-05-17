@@ -9,7 +9,6 @@ class DeptBase(BaseModel):
     name: str
     parent_id: int = Field(default=0, ge=0, description='菜单父级ID')
     level: int = Field(default=0, ge=0, description='菜单层级')
-    dept_name: str
     sort: int = Field(default=0, ge=0, description='排序')
     leader: str | None = None
     phone: str | None = None

@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from email_validator import validate_email, EmailNotValidError
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_pagination.ext.sqlalchemy import paginate
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
+from backend.app.crud.crud_dept import DeptDao
+from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
@@ -63,6 +64,13 @@ class UserService:
                 validate_email(obj.email, check_deliverability=False).email
             except EmailNotValidError:
                 raise errors.ForbiddenError(msg='邮箱格式错误')
+            dept = await DeptDao.get_dept_by_id(db, obj.dept_id)
+            if not dept:
+                raise errors.NotFoundError(msg='部门不存在')
+            for role_id in obj.roles:
+                role = await RoleDao.get_role_by_id(db, role_id)
+                if not role:
+                    raise errors.NotFoundError(msg='角色不存在')
             await UserDao.create_user(db, obj)
 
     @staticmethod
@@ -77,7 +85,7 @@ class UserService:
     @staticmethod
     async def get_userinfo(username: str):
         async with async_db_session() as db:
-            user = await UserDao.get_user_by_username(db, username)
+            user = await UserDao.get_user_with_relation(db, username=username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             return user
@@ -88,7 +96,7 @@ class UserService:
             if not current_user.is_superuser:
                 if not username == current_user.username:
                     raise errors.AuthorizationError
-            input_user = await UserDao.get_user_by_username(db, username)
+            input_user = await UserDao.get_user_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             if input_user.username != obj.username:
@@ -106,6 +114,13 @@ class UserService:
             if obj.phone is not None:
                 if not re_verify.is_phone(obj.phone):
                     raise errors.ForbiddenError(msg='手机号码输入有误')
+            dept = await DeptDao.get_dept_by_id(db, obj.dept_id)
+            if not dept:
+                raise errors.NotFoundError(msg='部门不存在')
+            for role_id in obj.roles:
+                role = await RoleDao.get_role_by_id(db, role_id)
+                if not role:
+                    raise errors.NotFoundError(msg='角色不存在')
             count = await UserDao.update_userinfo(db, input_user, obj)
             return count
 
@@ -123,9 +138,7 @@ class UserService:
 
     @staticmethod
     async def get_user_list():
-        async with async_db_session() as db:
-            user_select = UserDao.get_users()
-            return await paginate(db, user_select)
+        return UserDao.get_users()
 
     @staticmethod
     async def update_permission(pk: int):
