@@ -54,7 +54,7 @@ def create_access_token(data: int | Any, expires_delta: timedelta | None = None)
         expires = datetime.utcnow() + expires_delta
     else:
         expires = datetime.utcnow() + timedelta(settings.TOKEN_EXPIRE_MINUTES)
-    to_encode = {'exp': expires, 'sub': str(data)}
+    to_encode = {'exp': expires, 'sub': str(data[0]), 'role_ids': str(data[1])}
     encoded_jwt = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     return encoded_jwt
 
@@ -70,11 +70,12 @@ async def get_current_user(db: CurrentSession, token: str = Depends(oauth2_schem
     try:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = payload.get('sub')
-        if not user_id:
+        user_role = payload.get('role_ids')
+        if not user_id or not user_role:
             raise TokenError
     except (jwt.JWTError, ValidationError):
         raise TokenError
-    user = await UserDao.get_user_by_id(db, user_id)
+    user = await UserDao.get_user_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError
     return user
@@ -93,7 +94,7 @@ async def get_current_is_superuser(user: User = Depends(get_current_user)):
     return is_superuser
 
 
-# User dependency injection
+# User Annotated
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentSuperUser = Annotated[bool, Depends(get_current_is_superuser)]
 # Permission dependency injection

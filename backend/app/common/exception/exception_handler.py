@@ -77,7 +77,7 @@ def register_exception(app: FastAPI):
                     message += (
                         f'{data.get(field, field)} {_msg}' + ', '
                         if errors_len > 0
-                        else f'{data.get(field, field)} {_msg}'
+                        else f'{data.get(field, field)} {_msg}' + '.'
                     )
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'
@@ -85,7 +85,7 @@ def register_exception(app: FastAPI):
             status_code=422,
             content=response_base.fail(
                 code=422,
-                msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message[:-1]}',
+                msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
                 data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
             ),
         )
