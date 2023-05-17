@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from backend.app.database.base_class import Base, id_key
 
 
-class API(Base):
+class Api(Base):
     """系统api"""
 
     __tablename__ = 'sys_api'

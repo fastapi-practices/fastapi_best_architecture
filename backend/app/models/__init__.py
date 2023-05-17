@@ -5,7 +5,7 @@
 # imported by Alembic
 """
 from backend.app.database.base_class import MappedBase  # F401
-from backend.app.models.sys_api import API
+from backend.app.models.sys_api import Api
 from backend.app.models.sys_casbin_rule import CasbinRule
 from backend.app.models.sys_dept import Dept
 from backend.app.models.sys_menu import Menu

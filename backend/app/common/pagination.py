@@ -30,7 +30,7 @@ class Params(BaseModel, AbstractParams):
 
 
 class Page(AbstractPage[T], Generic[T]):
-    data: Sequence[T]  # 数据
+    items: Sequence[T]  # 数据
     total: int  # 总数据数
     page: int  # 第n页
     size: int  # 每页数量
@@ -42,7 +42,7 @@ class Page(AbstractPage[T], Generic[T]):
     @classmethod
     def create(
         cls,
-        data: Sequence[T],
+        items: Sequence[T],
         total: int,
         params: Params,
     ) -> Page[T]:
@@ -58,4 +58,4 @@ class Page(AbstractPage[T], Generic[T]):
             }
         ).dict()
 
-        return cls(data=data, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)
+        return cls(items=items, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)

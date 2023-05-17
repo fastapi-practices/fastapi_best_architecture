@@ -21,10 +21,12 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
 @router.post('/login', summary='用户登录', description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman')
 async def user_login(obj: Auth):
     token, user = await UserService.login(obj)
+    # TODO: token 存储
     data = Token(access_token=token, user=user)
     return response_base.response_200(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsUser])
 async def user_logout():
+    # TODO: 加入 token 黑名单
     return response_base.response_200()
