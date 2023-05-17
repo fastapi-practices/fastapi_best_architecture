@@ -3,22 +3,26 @@
 from __future__ import annotations
 
 import math
-from typing import TypeVar, Generic, Sequence, Dict
+from typing import TypeVar, Generic, Sequence, Dict, TYPE_CHECKING
 
-from fastapi import Query
+from fastapi import Query, Depends
+from fastapi_pagination import pagination_ctx
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
+from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
+
+if TYPE_CHECKING:
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 T = TypeVar('T')
-
-"""
-重写分页库：fastapi-pagination 
-使用方法：example link: https://github.com/uriyyo/fastapi-pagination/tree/main/examples
-"""
+DataT = TypeVar('DataT')
+SchemaT = TypeVar('SchemaT')
 
 
-class Params(BaseModel, AbstractParams):
+class _Params(BaseModel, AbstractParams):
     page: int = Query(1, ge=1, description='Page number')
     size: int = Query(20, gt=0, le=100, description='Page size')  # 默认 20 条记录
 
@@ -29,7 +33,7 @@ class Params(BaseModel, AbstractParams):
         )
 
 
-class Page(AbstractPage[T], Generic[T]):
+class _Page(AbstractPage[T], Generic[T]):
     items: Sequence[T]  # 数据
     total: int  # 总数据数
     page: int  # 第n页
@@ -37,15 +41,15 @@ class Page(AbstractPage[T], Generic[T]):
     total_pages: int  # 总页数
     links: Dict[str, str | None]  # 跳转链接
 
-    __params_type__ = Params  # 使用自定义的Params
+    __params_type__ = _Params  # 使用自定义的Params
 
     @classmethod
     def create(
         cls,
         items: Sequence[T],
         total: int,
-        params: Params,
-    ) -> Page[T]:
+        params: _Params,
+    ) -> _Page[T]:
         page = params.page
         size = params.size
         total_pages = math.ceil(total / params.size)
@@ -59,3 +63,25 @@ class Page(AbstractPage[T], Generic[T]):
         ).dict()
 
         return cls(items=items, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)
+
+
+class _PageData(GenericModel, Generic[DataT]):
+    page_data: DataT | None = None
+
+
+async def paging_data(db: AsyncSession, select: Select, page_data_schema: SchemaT) -> dict:
+    """
+    基于 SQLAlchemy 创建分页数据
+
+    :param db:
+    :param select:
+    :param page_data_schema:
+    :return:
+    """
+    _paginate = await paginate(db, select)
+    page_data = _PageData[_Page[page_data_schema]](page_data=_paginate).dict()['page_data']
+    return page_data
+
+
+# 分页依赖注入
+PageDepends = Depends(pagination_ctx(_Page))

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
-from fastapi_pagination.ext.sqlalchemy import paginate
 
 from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
-from backend.app.common.pagination import Page
+from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
@@ -49,10 +48,11 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
     return response_base.fail()
 
 
-@router.get('', summary='获取所有用户', dependencies=[DependsUser])
-async def get_all_users(db: CurrentSession) -> Page[GetUserInfo]:
+@router.get('', summary='获取所有用户', dependencies=[DependsUser, PageDepends])
+async def get_all_users(db: CurrentSession):
     user_list = await UserService.get_user_list()
-    return await paginate(db, user_list)
+    page_data = await paging_data(db, user_list, GetUserInfo)
+    return response_base.response_200(data=page_data)
 
 
 @router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsSuperUser])

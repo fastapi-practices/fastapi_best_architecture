@@ -46,7 +46,7 @@ async def get_db() -> AsyncSession:
         await session.close()
 
 
-# Session 依赖注入
+# Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]
 
 
