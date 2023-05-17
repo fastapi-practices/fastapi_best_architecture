@@ -11,7 +11,7 @@ from backend.app.core.conf import settings  # noqa: E402
 from backend.app.main import app  # noqa: E402
 
 
-class TestUser:
+class TestAuth:
     pytestmark = pytest.mark.anyio
 
     async def test_login(self):
