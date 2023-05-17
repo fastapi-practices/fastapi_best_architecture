@@ -6,7 +6,6 @@ from backend.app.schemas.dept import CreateDept, UpdateDept
 
 
 class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
-
     async def get_dept_by_id(self, db, dept_id):
         return await self.get(db, dept_id)
 

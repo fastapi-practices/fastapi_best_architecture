@@ -10,5 +10,4 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
     pass
 
 
-
 MenuDao: CRUDMenu = CRUDMenu(Menu)
