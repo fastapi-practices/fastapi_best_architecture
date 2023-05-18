@@ -21,7 +21,7 @@ SQLALCHEMY_DATABASE_URL = (
 
 try:
     # 数据库引擎
-    async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=settings.DB_ECHO, future=True)
+    async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=settings.DB_ECHO, future=True, pool_pre_ping=True)
     # log.success('数据库连接成功')
 except Exception as e:
     log.error('❌ 数据库链接失败 {}', e)
@@ -46,7 +46,7 @@ async def get_db() -> AsyncSession:
         await session.close()
 
 
-# Session 依赖注入
+# Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]
 
 

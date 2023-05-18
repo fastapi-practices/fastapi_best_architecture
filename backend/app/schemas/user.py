@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, HttpUrl, Field
+
+from backend.app.schemas.dept import GetAllDept
+from backend.app.schemas.role import GetAllRole
 
 
 class Auth(BaseModel):
@@ -11,33 +14,50 @@ class Auth(BaseModel):
 
 
 class CreateUser(Auth):
+    dept_id: int
+    roles: list[int]
+    nickname: str
     email: str = Field(..., example='user@example.com')
 
 
-class UpdateUser(BaseModel):
+class _UserInfoBase(BaseModel):
+    dept_id: int
     username: str
-    email: str
-    mobile_number: str | None = None
+    nickname: str
+    email: str = Field(..., example='user@example.com')
+    phone: str | None = None
+
+
+class UpdateUser(_UserInfoBase):
+    roles: list[int]
 
 
 class Avatar(BaseModel):
-    url: HttpUrl = Field(..., description='头像地址')
+    url: HttpUrl = Field(..., description='头像 http 地址')
 
 
-class GetUserInfo(UpdateUser):
+class GetUserInfoNoRelation(_UserInfoBase):
     id: int
-    uid: str
+    user_uuid: str
     avatar: str | None = None
-    time_joined: datetime.datetime = None
-    last_login: datetime.datetime | None = None
-    is_superuser: bool
     is_active: bool
+    is_superuser: bool
+    time_joined: datetime = None
+    last_login: datetime | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class GetUserInfo(GetUserInfoNoRelation):
+    dept: GetAllDept | None = None
+    roles: list[GetAllRole]
 
     class Config:
         orm_mode = True
 
 
 class ResetPassword(BaseModel):
-    id: int = Field(..., example='1', description='用户ID')
+    id: int
     password1: str
     password2: str

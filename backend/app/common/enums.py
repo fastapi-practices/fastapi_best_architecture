@@ -23,3 +23,28 @@ class StrEnum(str, EnumBase):
     """字符串枚举"""
 
     pass
+
+
+class MenuType(IntEnum):
+    """菜单类型"""
+
+    directory = 0
+    menu = 1
+    button = 2
+
+
+class RoleDataScope(IntEnum):
+    """数据范围"""
+
+    all = 1
+    custom = 2
+
+
+class MethodType(StrEnum):
+    """请求方法"""
+
+    GET = 'GET'
+    POST = 'POST'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
+    PATCH = 'PATCH'

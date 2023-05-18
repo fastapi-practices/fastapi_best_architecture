@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     STATIC_FILES: bool = False
 
     # MySQL
-    DB_ECHO: bool = False
+    DB_ECHO: bool = True
     DB_DATABASE: str = 'fba'
     DB_CHARSET: str = 'utf8mb4'
 
@@ -71,7 +71,7 @@ class Settings(BaseSettings):
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
-    TOKEN_URL: str = '/v1/users/login'
+    TOKEN_URL_SWAGGER: str = '/v1/auth/users/swagger_login'
 
     # Log
     LOG_FILE_NAME: str = 'fba.log'
@@ -80,6 +80,15 @@ class Settings(BaseSettings):
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
+
+    # Casbin
+    CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
+    CASBIN_EXCLUDE: list[dict[str, str], dict[str, str]] = [
+        {'method': 'POST', 'path': '/api/v1/auth/users/swagger_login'},
+        {'method': 'POST', 'path': '/api/v1/auth/users/login'},
+        {'method': 'POST', 'path': '/api/v1/auth/users/register'},
+        {'method': 'POST', 'path': '/api/v1/auth/users/password/reset'},
+    ]
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
