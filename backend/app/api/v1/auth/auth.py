@@ -23,10 +23,10 @@ async def user_login(obj: Auth):
     token, user = await UserService.login(obj)
     # TODO: token 存储
     data = Token(access_token=token, user=user)
-    return response_base.response_200(data=data)
+    return response_base.success(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsUser])
 async def user_logout():
     # TODO: 加入 token 黑名单
-    return response_base.response_200()
+    return response_base.success()
