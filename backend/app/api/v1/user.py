@@ -16,27 +16,27 @@ router = APIRouter()
 @router.post('/register', summary='用户注册')
 async def user_register(obj: CreateUser):
     await UserService.register(obj)
-    return response_base.response_200()
+    return response_base.success()
 
 
 @router.post('/password/reset', summary='密码重置')
 async def password_reset(obj: ResetPassword):
     await UserService.pwd_reset(obj)
-    return response_base.response_200()
+    return response_base.success()
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
 async def userinfo(username: str):
     current_user = await UserService.get_userinfo(username)
     data = GetUserInfo(**select_to_json(current_user))
-    return response_base.response_200(data=data, exclude={'password'})
+    return response_base.success(data=data, exclude={'password'})
 
 
 @router.put('/{username}', summary='更新用户信息')
 async def update_userinfo(username: str, obj: UpdateUser, current_user: CurrentUser):
     count = await UserService.update(username=username, current_user=current_user, obj=obj)
     if count > 0:
-        return response_base.response_200()
+        return response_base.success()
     return response_base.fail()
 
 
@@ -44,7 +44,7 @@ async def update_userinfo(username: str, obj: UpdateUser, current_user: CurrentU
 async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser):
     count = await UserService.update_avatar(username=username, current_user=current_user, avatar=avatar)
     if count > 0:
-        return response_base.response_200()
+        return response_base.success()
     return response_base.fail()
 
 
@@ -52,14 +52,14 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 async def get_all_users(db: CurrentSession):
     user_list = await UserService.get_user_list()
     page_data = await paging_data(db, user_list, GetUserInfo)
-    return response_base.response_200(data=page_data)
+    return response_base.success(data=page_data)
 
 
 @router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsSuperUser])
 async def super_set(pk: int):
     count = await UserService.update_permission(pk)
     if count > 0:
-        return response_base.response_200()
+        return response_base.success()
     return response_base.fail()
 
 
@@ -67,7 +67,7 @@ async def super_set(pk: int):
 async def active_set(pk: int):
     count = await UserService.update_active(pk)
     if count > 0:
-        return response_base.response_200()
+        return response_base.success()
     return response_base.fail()
 
 
@@ -75,5 +75,5 @@ async def active_set(pk: int):
 async def delete_user(username: str, current_user: CurrentUser):
     count = await UserService.delete(username=username, current_user=current_user)
     if count > 0:
-        return response_base.response_200()
+        return response_base.success()
     return response_base.fail()

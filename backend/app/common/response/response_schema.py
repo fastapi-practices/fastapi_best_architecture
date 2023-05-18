@@ -50,11 +50,5 @@ class ResponseBase:
         data = data if data is None else ResponseBase.__encode_json(data)
         return ResponseModel(code=code, msg=msg, data=data).dict(exclude={'data': exclude})
 
-    @staticmethod
-    @validate_arguments
-    def response_200(*, msg: str = 'Success', data: Any | None = None, exclude: _JsonEncoder | None = None):
-        data = data if data is None else ResponseBase.__encode_json(data)
-        return ResponseModel(code=200, msg=msg, data=data).dict(exclude={'data': exclude})
-
 
 response_base = ResponseBase()
