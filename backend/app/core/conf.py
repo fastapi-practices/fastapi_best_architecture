@@ -29,6 +29,7 @@ class Settings(BaseSettings):
 
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
+    TOKEN_WHITE_LIST: list[str]  # 白名单用户ID，可多点登录
 
     # FastAPI
     TITLE: str = 'FastAPI'

@@ -3,7 +3,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from backend.app.common.jwt import DependsUser
+from backend.app.common.jwt import DependsUser, JwtAuthentication
+from backend.app.common.redis import redis_client
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import Token
 from backend.app.schemas.user import Auth
@@ -27,6 +28,9 @@ async def user_login(obj: Auth):
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsUser])
-async def user_logout():
-    # TODO: 加入 token 黑名单
+async def user_logout(jwt: JwtAuthentication):
+    user_id = jwt.get('payload').get('sub')
+    token = jwt.get('token')
+    key = f'token:{user_id}:{token}'
+    await redis_client.delete(key)
     return response_base.success()
