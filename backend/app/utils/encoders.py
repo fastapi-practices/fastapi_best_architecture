@@ -18,7 +18,7 @@ ARRAY_TYPES = (list, set, frozenset, GeneratorType, tuple)
 
 
 def _generate_encoders_by_class_tuples(
-        type_encoder_map: dict[Any, Callable[[Any], Any]]
+    type_encoder_map: dict[Any, Callable[[Any], Any]]
 ) -> dict[Callable[[Any], Any], tuple[Any, ...]]:
     encoders_by_class_tuples: dict[Callable[[Any], Any], tuple[Any, ...]] = defaultdict(tuple)
     for type_, encoder in type_encoder_map.items():
@@ -30,15 +30,15 @@ encoders_by_class_tuples = _generate_encoders_by_class_tuples(ENCODERS_BY_TYPE)
 
 
 def jsonable_encoder(
-        obj: Any,
-        include: SetIntStr | DictIntStrAny | None = None,
-        exclude: SetIntStr | DictIntStrAny | None = None,
-        by_alias: bool = True,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-        custom_encoder: dict[Any, Callable[[Any], Any]] | None = None,
-        sqlalchemy_safe: bool = True,
+    obj: Any,
+    include: SetIntStr | DictIntStrAny | None = None,
+    exclude: SetIntStr | DictIntStrAny | None = None,
+    by_alias: bool = True,
+    exclude_unset: bool = False,
+    exclude_defaults: bool = False,
+    exclude_none: bool = False,
+    custom_encoder: dict[Any, Callable[[Any], Any]] | None = None,
+    sqlalchemy_safe: bool = True,
 ) -> Any:
     custom_encoder = custom_encoder or {}
     if custom_encoder:
@@ -63,13 +63,9 @@ def jsonable_encoder(
 
         for key, value in obj.items():
             if (
-                    (
-                            not sqlalchemy_safe
-                            or (not isinstance(key, str))
-                            or (not key.startswith('_sa'))
-                    )
-                    and (value is not None or not exclude_none)
-                    and key in allowed_keys
+                (not sqlalchemy_safe or (not isinstance(key, str)) or (not key.startswith('_sa')))
+                and (value is not None or not exclude_none)
+                and key in allowed_keys
             ):
                 if isinstance(key, PRIMITIVE_TYPE):
                     encoded_key = key

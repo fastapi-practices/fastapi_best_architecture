@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Any, Union, Set, Dict
+from typing import Any
 
-from fastapi.encoders import jsonable_encoder
 from pydantic import validate_arguments, BaseModel
 
-_JsonEncoder = Union[Set[int | str], Dict[int | str, Any]]
+from backend.app.utils.encoders import jsonable_encoder
+
+_ExcludeData = set[int | str] | dict[int | str, Any]
 
 __all__ = ['ResponseModel', 'response_base']
 
@@ -26,12 +27,16 @@ class ResponseModel(BaseModel):
 
 class ResponseBase:
     @staticmethod
-    def __encode_json(data: Any):
-        return jsonable_encoder(data, custom_encoder={datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')})
+    def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
+        custom_encoder = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
+        kwargs.update({'custom_encoder': custom_encoder})
+        return jsonable_encoder(data, exclude=exclude, **kwargs)
 
     @staticmethod
     @validate_arguments
-    def success(*, code: int = 200, msg: str = 'Success', data: Any | None = None, exclude: _JsonEncoder | None = None):
+    def success(
+        *, code: int = 200, msg: str = 'Success', data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+    ) -> dict:
         """
         请求成功返回通用方法
 
@@ -41,14 +46,16 @@ class ResponseBase:
         :param exclude: 排除返回数据(data)字段
         :return:
         """
-        data = data if data is None else ResponseBase.__encode_json(data)
-        return ResponseModel(code=code, msg=msg, data=data).dict(exclude={'data': exclude})
+        data = data if data is None else ResponseBase.__json_encoder(data, exclude, **kwargs)
+        return {'code': code, 'msg': msg, 'data': data}
 
     @staticmethod
     @validate_arguments
-    def fail(*, code: int = 400, msg: str = 'Bad Request', data: Any = None, exclude: _JsonEncoder | None = None):
-        data = data if data is None else ResponseBase.__encode_json(data)
-        return ResponseModel(code=code, msg=msg, data=data).dict(exclude={'data': exclude})
+    def fail(
+        *, code: int = 400, msg: str = 'Bad Request', data: Any = None, exclude: _ExcludeData | None = None, **kwargs
+    ) -> dict:
+        data = data if data is None else ResponseBase.__json_encoder(data, exclude, **kwargs)
+        return {'code': code, 'msg': msg, 'data': data}
 
 
 response_base = ResponseBase()
