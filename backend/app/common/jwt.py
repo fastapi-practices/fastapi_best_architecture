@@ -56,8 +56,8 @@ async def create_access_token(sub: int | Any, data: dict, expires_delta: timedel
         expires = datetime.utcnow() + expires_delta
         expire_seconds = expires_delta.total_seconds()
     else:
-        expires = datetime.utcnow() + timedelta(settings.TOKEN_EXPIRE_MINUTES)
-        expire_seconds = settings.TOKEN_EXPIRE_MINUTES * 60
+        expires = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_MINUTES)
+        expire_seconds = settings.TOKEN_EXPIRE_SECONDS
     to_encode = {'exp': expires, 'sub': str(sub), **data}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if sub not in settings.TOKEN_WHITE_LIST:
