@@ -57,7 +57,7 @@ class UserService:
             return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def refresh_token(user_id: int, token: str):
+    async def refresh_token(user_id: int):
         async with async_db_session() as db:
             current_user = await UserDao.get_user_by_id(db, user_id)
             if not current_user:

@@ -24,8 +24,8 @@ async def user_login(obj: Auth):
     data = LoginToken(
         access_token=access_token,
         refresh_token=refresh_token,
-        access_token_expires=access_expire,
-        refresh_token_expires=refresh_expire,
+        access_token_expire_time=access_expire,
+        refresh_token_expire_time=refresh_expire,
         user=user,
     )
     return response_base.success(data=data)
@@ -35,8 +35,8 @@ async def user_login(obj: Auth):
 async def get_refresh_token(request: Request):
     token = get_token(request)
     user_id, _ = jwt_decode(token)
-    refresh_token, refresh_expire = await UserService.refresh_token(user_id, token)
-    data = RefreshToken(refresh_token=refresh_token, refresh_token_expires=refresh_expire)
+    refresh_token, refresh_expire = await UserService.refresh_token(user_id)
+    data = RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=refresh_expire)
     return response_base.success(data=data)
 
 
