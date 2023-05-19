@@ -43,12 +43,11 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def create_access_token(sub: int | Any, data: dict, expires_delta: timedelta | None = None) -> str:
+async def create_access_token(sub: int | Any, expires_delta: timedelta | None = None, **kwargs) -> str:
     """
     Generate encryption token
 
     :param sub: The subject/userid of the JWT
-    :param data: Data transferred to the token
     :param expires_delta: Increased expiry time
     :return:
     """
@@ -56,9 +55,9 @@ async def create_access_token(sub: int | Any, data: dict, expires_delta: timedel
         expires = datetime.utcnow() + expires_delta
         expire_seconds = expires_delta.total_seconds()
     else:
-        expires = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_MINUTES)
+        expires = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
-    to_encode = {'exp': expires, 'sub': str(sub), **data}
+    to_encode = {'exp': expires, 'sub': str(sub), **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if sub not in settings.TOKEN_WHITE_LIST:
         await redis_client.delete(f'token:{sub}:*')
