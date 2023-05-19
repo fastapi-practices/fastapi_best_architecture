@@ -14,7 +14,21 @@ __all__ = ['ResponseModel', 'response_base']
 
 class ResponseModel(BaseModel):
     """
-    统一返回模型, 可在 FastAPI 接口请求中指定 response_model 及更多操作
+    统一返回模型
+
+    .. tip::
+
+        如果你不想使用 ResponseBase 中的自定义编码器，可以使用此模型，返回数据将通过 fastapi 内部的编码器直接自动解析并返回
+
+    E.g. ::
+
+        @router.get('/test', response_model=ResponseModel)
+        def test():
+            return ResponseModel(data={'test': 'test'})
+
+        @router.get('/test')
+        def test() -> ResponseModel:
+            return ResponseModel(data={'test': 'test'})
     """
 
     code: int = 200
@@ -26,6 +40,19 @@ class ResponseModel(BaseModel):
 
 
 class ResponseBase:
+    """
+    统一返回方法
+
+    .. tip::
+
+        此类中的返回方法将通过自定义编码器预解析，然后由 fastapi 内部的编码器再次处理并返回，可能存在性能损耗，取决于个人喜好
+
+    E.g. ::
+
+        @router.get('/test')
+        def test():
+            return response_base.success(data={'test': 'test'})
+    """
     @staticmethod
     def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
         custom_encoder = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
