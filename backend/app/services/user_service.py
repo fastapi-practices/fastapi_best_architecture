@@ -5,6 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
+from backend.app.common.redis import redis_client
+from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
@@ -20,11 +22,11 @@ class UserService:
         async with async_db_session() as db:
             current_user = await UserDao.get_user_by_username(db, form_data.username)
             if not current_user:
-                raise errors.NotFoundError(msg='用户名不存在')
+                raise errors.NotFoundError(msg='用户不存在')
             elif not jwt.password_verify(form_data.password, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
+                raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
             await UserDao.update_user_login_time(db, form_data.username)
             # 查询用户角色
@@ -32,7 +34,7 @@ class UserService:
             # 获取最新用户信息
             user = await UserDao.get_user_by_id(db, current_user.id)
             # 创建token
-            access_token = await jwt.create_access_token(user.id, role_ids=user_role_ids)
+            access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             return access_token, user
 
     @staticmethod
@@ -40,16 +42,39 @@ class UserService:
         async with async_db_session() as db:
             current_user = await UserDao.get_user_by_username(db, obj.username)
             if not current_user:
-                raise errors.NotFoundError(msg='用户名不存在')
+                raise errors.NotFoundError(msg='用户不存在')
             elif not jwt.password_verify(obj.password, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='该用户已被锁定，无法登录')
+                raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             await UserDao.update_user_login_time(db, obj.username)
             user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
             user = await UserDao.get_user_by_id(db, current_user.id)
-            access_token = await jwt.create_access_token(user.id, role_ids=user_role_ids)
-            return access_token, user
+            access_token, access_token_expire_time = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
+            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
+                str(user.id), access_token_expire_time, role_ids=user_role_ids
+            )
+            return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
+
+    @staticmethod
+    async def refresh_token(user_id: int):
+        async with async_db_session() as db:
+            current_user = await UserDao.get_user_by_id(db, user_id)
+            if not current_user:
+                raise errors.NotFoundError(msg='用户不存在')
+            elif not current_user.is_active:
+                raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
+            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
+            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
+                str(current_user.id), role_ids=user_role_ids
+            )
+            return refresh_token, refresh_token_expire_time
+
+    @staticmethod
+    async def logout(user_id: int):
+        key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
+        await redis_client.delete_prefix(key)
+        return
 
     @staticmethod
     async def register(obj: CreateUser):

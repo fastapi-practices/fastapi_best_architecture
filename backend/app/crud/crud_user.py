@@ -55,7 +55,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
     async def delete_user(self, db: AsyncSession, user_id: int) -> int:
         return await self.delete(db, user_id)
 
-    async def check_email(self, db: AsyncSession, email: str) -> User:
+    async def check_email(self, db: AsyncSession, email: str) -> User | None:
         mail = await db.execute(select(self.model).where(self.model.email == email))
         return mail.scalars().first()
 
@@ -101,7 +101,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         roles_id = [role.id for role in user.scalars().first().roles]
         return roles_id
 
-    async def get_user_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User:
+    async def get_user_with_relation(
+        self, db: AsyncSession, *, user_id: int = None, username: str = None
+    ) -> User | None:
         where = 'condition'
         if user_id:
             where = 'self.model.id == user_id'

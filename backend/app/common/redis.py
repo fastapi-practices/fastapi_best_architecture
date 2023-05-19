@@ -37,6 +37,17 @@ class RedisCli(Redis):
             log.error('❌ 数据库 redis 连接异常 {}', e)
             sys.exit()
 
+    async def delete_prefix(self, key: str):
+        """
+        删除指定前缀的所有key
+
+        :param key:
+        :return:
+        """
+        keys = await self.keys(f'{key}*')
+        if keys:
+            await self.delete(*keys)
+
 
 # 创建redis连接对象
 redis_client = RedisCli()

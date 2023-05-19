@@ -22,6 +22,7 @@ class RBAC:
 
         :return:
         """
+        # TODO: https://github.com/pycasbin/async-sqlalchemy-adapter/issues/4
         adapter = casbin_sqlalchemy_adapter.Adapter(self._CASBIN_DATABASE_URL, db_class=CasbinRule)
 
         enforcer = casbin.Enforcer(RBAC_MODEL_CONF, adapter)
