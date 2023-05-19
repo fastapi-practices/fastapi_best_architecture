@@ -29,6 +29,7 @@ class Settings(BaseSettings):
 
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
+    TOKEN_WHITE_LIST: list[str]  # 白名单用户ID，可多点登录
 
     # FastAPI
     TITLE: str = 'FastAPI'
@@ -70,7 +71,7 @@ class Settings(BaseSettings):
 
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
-    TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # token 时效 60 * 24 * 1 = 1 天
+    TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_URL_SWAGGER: str = '/v1/auth/users/swagger_login'
 
     # Log

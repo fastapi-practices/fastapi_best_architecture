@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from typing_extensions import Annotated
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
+from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import CurrentSession
@@ -42,28 +43,34 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: int | Any, expires_delta: timedelta | None = None) -> str:
+async def create_access_token(sub: int | Any, data: dict, expires_delta: timedelta | None = None) -> str:
     """
     Generate encryption token
 
+    :param sub: The subject/userid of the JWT
     :param data: Data transferred to the token
     :param expires_delta: Increased expiry time
     :return:
     """
     if expires_delta:
         expires = datetime.utcnow() + expires_delta
+        expire_seconds = expires_delta.total_seconds()
     else:
-        expires = datetime.utcnow() + timedelta(settings.TOKEN_EXPIRE_MINUTES)
-    to_encode = {'exp': expires, 'sub': str(data[0]), 'role_ids': str(data[1])}
-    encoded_jwt = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
-    return encoded_jwt
+        expires = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_MINUTES)
+        expire_seconds = settings.TOKEN_EXPIRE_SECONDS
+    to_encode = {'exp': expires, 'sub': str(sub), **data}
+    token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
+    if sub not in settings.TOKEN_WHITE_LIST:
+        await redis_client.delete(f'token:{sub}:*')
+    key = f'token:{sub}:{token}'
+    await redis_client.setex(key, expire_seconds, token)
+    return token
 
 
-async def get_current_user(db: CurrentSession, token: str = Depends(oauth2_schema)) -> User:
+async def jwt_authentication(token: str = Depends(oauth2_schema)):
     """
-    Get the current user through tokens
+    JWT authentication
 
-    :param db:
     :param token:
     :return:
     """
@@ -73,8 +80,25 @@ async def get_current_user(db: CurrentSession, token: str = Depends(oauth2_schem
         user_role = payload.get('role_ids')
         if not user_id or not user_role:
             raise TokenError
+        # 验证token是否有效
+        key = f'token:{user_id}:{token}'
+        valid_token = await redis_client.get(key)
+        if not valid_token:
+            raise TokenError
+        return {'payload': payload, 'token': token}
     except (jwt.JWTError, ValidationError):
         raise TokenError
+
+
+async def get_current_user(db: CurrentSession, data: dict = Depends(jwt_authentication)) -> User:
+    """
+    Get the current user through tokens
+
+    :param db:
+    :param data:
+    :return:
+    """
+    user_id = data.get('payload').get('sub')
     user = await UserDao.get_user_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError
@@ -97,6 +121,8 @@ async def get_current_is_superuser(user: User = Depends(get_current_user)):
 # User Annotated
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentSuperUser = Annotated[bool, Depends(get_current_is_superuser)]
+# Token dependency injection
+JwtAuthentication = Annotated[dict, Depends(jwt_authentication)]
 # Permission dependency injection
 DependsUser = Depends(get_current_user)
 DependsSuperUser = Depends(get_current_is_superuser)
