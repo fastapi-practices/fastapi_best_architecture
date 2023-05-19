@@ -32,7 +32,7 @@ class UserService:
             # 获取最新用户信息
             user = await UserDao.get_user_by_id(db, current_user.id)
             # 创建token
-            access_token = await jwt.create_access_token(user.id, {'role_ids': user_role_ids})
+            access_token = await jwt.create_access_token(user.id, role_ids=user_role_ids)
             return access_token, user
 
     @staticmethod
@@ -48,7 +48,7 @@ class UserService:
             await UserDao.update_user_login_time(db, obj.username)
             user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
             user = await UserDao.get_user_by_id(db, current_user.id)
-            access_token = await jwt.create_access_token(user.id, {'role_ids': user_role_ids})
+            access_token = await jwt.create_access_token(user.id, role_ids=user_role_ids)
             return access_token, user
 
     @staticmethod
