@@ -114,7 +114,7 @@ def jwt_decode(token: str) -> tuple[int, list[int]]:
         user_roles = list(payload.get('role_ids'))
         if not user_id or not user_roles:
             raise TokenError
-    except (jwt.JWTError, ValidationError):
+    except (jwt.JWTError, ValidationError, Exception):
         raise TokenError
     return user_id, user_roles
 
