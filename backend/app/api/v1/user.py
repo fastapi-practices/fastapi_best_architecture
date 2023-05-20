@@ -29,7 +29,7 @@ async def password_reset(obj: ResetPassword):
 async def userinfo(username: str):
     current_user = await UserService.get_userinfo(username)
     data = GetUserInfo(**select_to_json(current_user))
-    return response_base.success(data=data, exclude={'password'})
+    return response_base.success(data=data)
 
 
 @router.put('/{username}', summary='更新用户信息')
