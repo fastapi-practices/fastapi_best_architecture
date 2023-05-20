@@ -12,6 +12,7 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
+from backend.app.schemas.token import RefreshTokenTime
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
 from backend.app.utils import re_verify
 
@@ -57,7 +58,7 @@ class UserService:
             return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def refresh_token(user_id: int):
+    async def refresh_token(user_id: int, custom_time: RefreshTokenTime):
         async with async_db_session() as db:
             current_user = await UserDao.get_user_by_id(db, user_id)
             if not current_user:
@@ -66,7 +67,7 @@ class UserService:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
             refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(current_user.id), role_ids=user_role_ids
+                str(current_user.id), custom_expire_time=custom_time, role_ids=user_role_ids
             )
             return refresh_token, refresh_token_expire_time
 

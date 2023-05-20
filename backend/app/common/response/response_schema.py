@@ -29,7 +29,7 @@ class ResponseModel(BaseModel):
         @router.get('/test')
         def test() -> ResponseModel:
             return ResponseModel(data={'test': 'test'})
-    """
+    """  # noqa: E501
 
     code: int = 200
     msg: str = 'Success'
@@ -52,7 +52,8 @@ class ResponseBase:
         @router.get('/test')
         def test():
             return response_base.success(data={'test': 'test'})
-    """
+    """  # noqa: E501
+
     @staticmethod
     def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
         custom_encoder = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
