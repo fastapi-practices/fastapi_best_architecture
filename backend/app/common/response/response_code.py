@@ -3,9 +3,9 @@
 from enum import Enum
 
 
-class CodeEnum(Enum):
+class CustomCode(Enum):
     """
-    错误码
+    自定义错误码
     """
 
     CAPTCHA_ERROR = (40001, '图形验证码错误')

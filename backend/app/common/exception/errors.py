@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from backend.app.common.response.response_code import CodeEnum
+from backend.app.common.response.response_code import CustomCode
 
 
 class BaseExceptionMixin(Exception):
@@ -16,7 +16,14 @@ class BaseExceptionMixin(Exception):
 
 
 class HTTPError(HTTPException):
-    pass
+    def __init__(self, *, code: int, msg: Any = None, headers: dict[str, Any] | None = None):
+        super().__init__(status_code=code, detail=msg, headers=headers)
+
+
+class CustomError(BaseExceptionMixin):
+    def __init__(self, *, error: CustomCode, data: Any = None):
+        self.code = error.code
+        super().__init__(msg=error.msg, data=data)
 
 
 class RequestError(BaseExceptionMixin):
@@ -54,12 +61,6 @@ class GatewayError(BaseExceptionMixin):
         super().__init__(msg=msg, data=data)
 
 
-class CodeError(BaseExceptionMixin):
-    def __init__(self, *, error: CodeEnum, data: Any = None):
-        self.code = error.code
-        super().__init__(msg=error.msg, data=data)
-
-
 class AuthorizationError(BaseExceptionMixin):
     code = 401
 
@@ -67,8 +68,8 @@ class AuthorizationError(BaseExceptionMixin):
         super().__init__(msg=msg, data=data)
 
 
-class TokenError(BaseExceptionMixin):
+class TokenError(HTTPError):
     code = 401
 
-    def __init__(self, *, msg: str = 'Token is invalid', data: Any = None):
-        super().__init__(msg=msg, data=data)
+    def __init__(self, *, msg: str = 'Not authenticated', headers: dict[str, Any] | None = None):
+        super().__init__(code=self.code, msg=msg, headers=headers or {'WWW-Authenticate': 'Bearer'})
