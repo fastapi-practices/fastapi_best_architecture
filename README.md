@@ -1,5 +1,7 @@
 # FastAPI Best Architecture
 
+English | [简体中文](./README.zh-CN.md)
+
 This is a base project of the FastAPI framework, in production
 
 It‘s purpose is to allow you to develop your project directly with it
