@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pydantic import BaseModel, Field, validator
+from pydantic.datetime_parse import parse_datetime
 
 from backend.app.schemas.user import GetUserInfoNoRelation
 
@@ -38,7 +39,11 @@ class RefreshTokenTime(BaseModel):
             return None
         if not isinstance(v, str) or 'T' not in v:
             raise ValueError('输入时间格式错误')
-        v = datetime.strptime(v, '%Y-%m-%dT%H:%M:%S.%fZ')
-        if v < datetime.now():
-            raise ValueError('输入时间不能小于当前时间')
-        return v
+        v = parse_datetime(v)
+        utcnow = datetime.utcnow()
+        no_tz_v = v.replace(tzinfo=None)
+        if no_tz_v < utcnow:
+            raise ValueError('输入时间小于当前时间')
+        if no_tz_v > utcnow + timedelta(days=7):
+            raise ValueError('输入时间大于当前时间上限 7 天')
+        return no_tz_v
