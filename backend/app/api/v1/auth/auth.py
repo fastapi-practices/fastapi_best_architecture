@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.app.common.jwt import DependsUser, get_token, jwt_decode, CurrentJwtAuth
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.token import RefreshToken, LoginToken, SwaggerToken
+from backend.app.schemas.token import RefreshToken, LoginToken, SwaggerToken, RefreshTokenTime
 from backend.app.schemas.user import Auth
 from backend.app.services.user_service import UserService
 
@@ -32,10 +32,10 @@ async def user_login(obj: Auth):
 
 
 @router.post('/refresh_token', summary='刷新 token', dependencies=[DependsUser])
-async def get_refresh_token(request: Request):
+async def get_refresh_token(request: Request, custom_time: RefreshTokenTime):
     token = get_token(request)
     user_id, _ = jwt_decode(token)
-    refresh_token, refresh_expire = await UserService.refresh_token(user_id)
+    refresh_token, refresh_expire = await UserService.refresh_token(user_id, custom_time)
     data = RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=refresh_expire)
     return response_base.success(data=data)
 

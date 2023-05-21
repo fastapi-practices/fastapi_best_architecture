@@ -16,6 +16,7 @@ from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.models import User
+from backend.app.schemas.token import RefreshTokenTime
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -66,26 +67,32 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     return token, expire
 
 
-async def create_refresh_token(sub: str, expire_time: datetime | None = None, **kwargs) -> tuple[str, datetime]:
+async def create_refresh_token(
+    sub: str, expire_time: datetime | None = None, custom_expire_time: RefreshTokenTime | None = None, **kwargs
+) -> tuple[str, datetime]:
     """
     Generate encryption refresh token
 
     :param sub: The subject/userid of the JWT
     :param expire_time: expiry time
+    :param custom_expire_time: custom expiry time
     :return:
     """
     if expire_time:
-        expires = expire_time + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = int((expires - datetime.utcnow()).total_seconds())
+        expire = expire_time + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+        expire_seconds = int((expire - datetime.utcnow()).total_seconds())
+    elif custom_expire_time:
+        expire = custom_expire_time.expire_time
+        expire_seconds = int((expire - datetime.utcnow()).total_seconds())
     else:
-        expires = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+        expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
-    to_encode = {'exp': expires, 'sub': sub, **kwargs}
+    to_encode = {'exp': expire, 'sub': sub, **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     # 刷新 token 时，保持旧 token 有效，不执行删除操作
     key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
     await redis_client.setex(key, expire_seconds, token)
-    return token, expires
+    return token, expire
 
 
 def get_token(request: Request) -> str:
