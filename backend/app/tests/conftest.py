@@ -2,30 +2,24 @@
 # -*- coding: utf-8 -*-
 import sys
 
-import pytest
-from httpx import AsyncClient
-
 sys.path.append('../../')
 
-from backend.app.common.redis import redis_client  # noqa: E402
-from backend.app.core.conf import settings  # noqa: E402
+import pytest
+from typing import Generator, Dict
+
+from starlette.testclient import TestClient
+
+from backend.app.main import app
+from backend.app.core.conf import settings
+from backend.app.tests.utils.get_headers import get_token_headers
 
 
-@pytest.fixture(scope='session')
-def anyio_backend():
-    return 'asyncio'
+@pytest.fixture(scope='module')
+def client() -> Generator:
+    with TestClient(app) as c:
+        yield c
 
 
-@pytest.fixture(scope='package', autouse=True)
-async def function_fixture(anyio_backend):
-    auth_data = {
-        'url': f'http://{settings.UVICORN_HOST}:{settings.UVICORN_PORT}/v1/auth/users/login',
-        'headers': {'accept': 'application/json', 'Content-Type': 'application/json'},
-        'json': {'username': 'test', 'password': 'test'},
-    }
-    async with AsyncClient() as client:
-        response = await client.post(**auth_data)
-        token = response.json()['data']['access_token']
-        test_token = await redis_client.get('test_token')
-        if not test_token:
-            await redis_client.set('test_token', token, ex=86400)
+@pytest.fixture(scope='module')
+def token_headers(client: TestClient) -> Dict[str, str]:
+    return get_token_headers(client=client, username=settings.TEST_USERNAME, password=settings.TEST_USER_PASSWORD)

@@ -31,13 +31,18 @@ class Settings(BaseSettings):
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
     TOKEN_WHITE_LIST: list[str]  # 白名单用户ID，可多点登录
 
+    # Test
+    TEST_USERNAME: str
+    TEST_USER_PASSWORD: str
+
     # FastAPI
+    API_V1_STR: str = '/v1'
     TITLE: str = 'FastAPI'
     VERSION: str = '0.0.1'
     DESCRIPTION: str = 'FastAPI Best Architecture'
-    DOCS_URL: str | None = '/v1/docs'
-    REDOCS_URL: str | None = '/v1/redocs'
-    OPENAPI_URL: str | None = '/v1/openapi'
+    DOCS_URL: str | None = f'{API_V1_STR}/docs'
+    REDOCS_URL: str | None = f'{API_V1_STR}/redocs'
+    OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
     @root_validator
     def validator_api_url(cls, values):
@@ -54,7 +59,7 @@ class Settings(BaseSettings):
     STATIC_FILES: bool = False
 
     # MySQL
-    DB_ECHO: bool = True
+    DB_ECHO: bool = False
     DB_DATABASE: str = 'fba'
     DB_CHARSET: str = 'utf8mb4'
 
@@ -72,7 +77,7 @@ class Settings(BaseSettings):
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
-    TOKEN_URL_SWAGGER: str = '/v1/auth/users/swagger_login'
+    TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
 
     # Log
@@ -86,10 +91,10 @@ class Settings(BaseSettings):
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
     CASBIN_EXCLUDE: list[dict[str, str], dict[str, str]] = [
-        {'method': 'POST', 'path': '/api/v1/auth/users/swagger_login'},
-        {'method': 'POST', 'path': '/api/v1/auth/users/login'},
-        {'method': 'POST', 'path': '/api/v1/auth/users/register'},
-        {'method': 'POST', 'path': '/api/v1/auth/users/password/reset'},
+        {'method': 'POST', 'path': '/api/v1/auth/swagger_login'},
+        {'method': 'POST', 'path': '/api/v1/auth/login'},
+        {'method': 'POST', 'path': '/api/v1/auth/register'},
+        {'method': 'POST', 'path': '/api/v1/auth/password/reset'},
     ]
 
     class Config:
