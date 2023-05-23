@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_limiter.depends import RateLimiter
 
 from backend.app.common.jwt import DependsUser, get_token, jwt_decode, CurrentJwtAuth
 from backend.app.common.response.response_schema import response_base
@@ -18,7 +19,12 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     return SwaggerToken(access_token=token, user=user)
 
 
-@router.post('/login', summary='用户登录', description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman')
+@router.post(
+    '/login',
+    summary='用户登录',
+    description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
+    dependencies=[Depends(RateLimiter(times=5, minutes=15))],
+)
 async def user_login(obj: Auth):
     access_token, refresh_token, access_expire, refresh_expire, user = await UserService.login(obj)
     data = LoginToken(

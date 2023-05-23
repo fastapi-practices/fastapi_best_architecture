@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 
 from backend.app.api.routers import v1
@@ -27,15 +28,19 @@ async def register_init(app: FastAPI):
     """
     # 创建数据库表
     await create_table()
-    # 连接redis
+    # 连接 redis
     await redis_client.open()
+    # 初始化 limiter
+    await FastAPILimiter.init(redis_client, prefix='fba_limiter')
     # 启动定时任务
     scheduler.start()
 
     yield
 
-    # 关闭redis连接
+    # 关闭 redis 连接
     await redis_client.close()
+    # 关闭 limiter
+    await FastAPILimiter.close()
     # 关闭定时任务
     scheduler.shutdown()
 

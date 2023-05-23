@@ -13,7 +13,6 @@ from backend.app.models.sys_casbin_rule import CasbinRule
 
 
 class RBAC:
-
     @staticmethod
     async def get_casbin_enforcer() -> casbin.Enforcer:
         """
