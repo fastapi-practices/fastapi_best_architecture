@@ -84,15 +84,21 @@ Execute the `backend/app/init_test_data.py` file
 
 Perform tests via pytest
 
-**Tip**: Before the test starts, please execute init the test data first, also, the fastapi service needs to be started
+1. Create a database `fba_test`, choose utf8mb4 encode
 
-1. First, go to the app directory
+2. First, go to the app directory
 
    ```shell
    cd backend/app/
    ```
+   
+3. Init the test data
 
-2. Execute the test command
+   ```shell
+   python tests/init_test_data.py
+   ```
+
+4. Execute the test command
 
    ```shell
    pytest -vs --disable-warnings
