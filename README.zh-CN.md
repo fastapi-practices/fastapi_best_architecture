@@ -77,15 +77,21 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 
 通过 pytest 进行测试
 
-**提示**： 在测试开始前，请先执行初始化测试数据，同时，需要启动 fastapi 服务。
+1. 创建一个数据库`fba_test`，选择 utf8mb4 编码
 
-1. 首先，进入app目录
+2. 首先，进入app目录
 
    ```shell
    cd backend/app/
    ```
+   
+3. 初始化测试数据
 
-2. 执行测试命令
+   ```shell
+   python tests/init_test_data.py
+   ```
+
+4. 执行测试命令
 
    ```shell
    pytest -vs --disable-warnings
