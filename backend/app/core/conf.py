@@ -31,10 +31,6 @@ class Settings(BaseSettings):
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
     TOKEN_WHITE_LIST: list[str]  # 白名单用户ID，可多点登录
 
-    # Test
-    TEST_USERNAME: str
-    TEST_USER_PASSWORD: str
-
     # FastAPI
     API_V1_STR: str = '/v1'
     TITLE: str = 'FastAPI'

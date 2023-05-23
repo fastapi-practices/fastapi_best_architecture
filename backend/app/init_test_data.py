@@ -14,28 +14,26 @@ from backend.app.models import User, Role, Menu, Dept
 class InitTestData:
     """初始化测试数据"""
 
-    def __init__(self):
+    def __init__(self, session):
         self.fake = Faker('zh_CN')
+        self.session = session
 
-    @staticmethod
-    async def create_dept():
+    async def create_dept(self):
         """自动创建部门"""
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             department_obj = Dept(name='test', create_user=1)
             db.add(department_obj)
         log.info('部门 test 创建成功')
 
-    @staticmethod
-    async def create_role():
+    async def create_role(self):
         """自动创建角色"""
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             role_obj = Role(name='test', create_user=1)
             role_obj.menus.append(Menu(name='test', create_user=1))
             db.add(role_obj)
         log.info('角色 test 创建成功')
 
-    @staticmethod
-    async def create_test_user():
+    async def create_test_user(self):
         """创建测试用户"""
         username = 'test'
         password = 'test'
@@ -48,13 +46,12 @@ class InitTestData:
             is_superuser=True,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'测试用户创建成功，账号：{username}，密码：{password}')
 
-    @staticmethod
-    async def create_superuser_by_yourself():
+    async def create_superuser_by_yourself(self):
         """手动创建管理员账户"""
         log.info('开始创建自定义管理员用户')
         print('请输入用户名:')
@@ -78,7 +75,7 @@ class InitTestData:
             is_superuser=True,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'自定义管理员用户创建成功，账号：{username}，密码：{password}')
@@ -96,7 +93,7 @@ class InitTestData:
             is_superuser=False,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'普通用户创建成功，账号：{username}，密码：{password}')
@@ -115,7 +112,7 @@ class InitTestData:
             is_superuser=False,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'普通锁定用户创建成功，账号：{username}，密码：{password}')
@@ -133,7 +130,7 @@ class InitTestData:
             is_superuser=True,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
@@ -152,7 +149,7 @@ class InitTestData:
             is_superuser=True,
             dept_id=1,
         )
-        async with async_db_session.begin() as db:
+        async with self.session.begin() as db:
             user_obj.roles.append(await db.get(Role, 1))
             db.add(user_obj)
         log.info(f'管理员锁定用户创建成功，账号：{username}，密码：{password}')
@@ -172,6 +169,6 @@ class InitTestData:
 
 
 if __name__ == '__main__':
-    init = InitTestData()
+    init = InitTestData(session=async_db_session)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(init.init_data())

@@ -3,6 +3,7 @@
 import sys
 
 from fastapi import Depends
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from typing_extensions import Annotated
 
@@ -14,20 +15,26 @@ from backend.app.database.base_class import MappedBase
 说明：SqlAlchemy
 """
 
+
+def create_engine_and_session(url: str | URL):
+    try:
+        # 数据库引擎
+        engine = create_async_engine(url, echo=settings.DB_ECHO, future=True, pool_pre_ping=True)
+        # log.success('数据库连接成功')
+    except Exception as e:
+        log.error('❌ 数据库链接失败 {}', e)
+        sys.exit()
+    else:
+        db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+        return engine, db_session
+
+
 SQLALCHEMY_DATABASE_URL = (
     f'mysql+asyncmy://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:'
     f'{settings.DB_PORT}/{settings.DB_DATABASE}?charset={settings.DB_CHARSET}'
 )
 
-try:
-    # 数据库引擎
-    async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=settings.DB_ECHO, future=True, pool_pre_ping=True)
-    # log.success('数据库连接成功')
-except Exception as e:
-    log.error('❌ 数据库链接失败 {}', e)
-    sys.exit()
-else:
-    async_db_session = async_sessionmaker(bind=async_engine, autoflush=False, expire_on_commit=False)
+async_engine, async_db_session = create_engine_and_session(SQLALCHEMY_DATABASE_URL)
 
 
 async def get_db() -> AsyncSession:

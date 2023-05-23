@@ -7,8 +7,8 @@ from backend.app.core.conf import settings
 
 def test_login(client: TestClient) -> None:
     data = {
-        'username': settings.TEST_USERNAME,
-        'password': settings.TEST_USER_PASSWORD,
+        'username': 'test',
+        'password': 'test',
     }
     response = client.post(f'{settings.API_V1_STR}/auth/login', json=data)
     assert response.status_code == 200
