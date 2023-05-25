@@ -104,16 +104,16 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
     async def get_user_with_relation(
         self, db: AsyncSession, *, user_id: int = None, username: str = None
     ) -> User | None:
-        where = 'condition'
+        where = []
         if user_id:
-            where = 'self.model.id == user_id'
+            where.append(self.model.id == user_id)
         if username:
-            where = 'self.model.username == username'
+            where.append(self.model.username == username)
         user = await db.execute(
             select(self.model)
-            .where(eval(where))
             .options(selectinload(self.model.dept))
             .options(selectinload(self.model.roles).joinedload(Role.menus))
+            .where(*where)
         )
         return user.scalars().first()
 
