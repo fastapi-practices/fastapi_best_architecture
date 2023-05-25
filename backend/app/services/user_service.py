@@ -21,8 +21,7 @@ from backend.app.schemas.login_log import CreateLoginLog
 from backend.app.schemas.token import RefreshTokenTime
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
 from backend.app.services.login_log_service import LoginLogService
-from backend.app.utils import re_verify
-from backend.app.utils.location_parse import get_location
+from backend.app.utils import re_verify, request_parse
 
 
 class UserService:
@@ -66,14 +65,10 @@ class UserService:
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                     str(user.id), access_token_expire_time, role_ids=user_role_ids
                 )
-                forwarded = request.headers.get('X-Real-IP') or request.headers.get('X-Forwarded-For')
-                if forwarded:
-                    ip = forwarded.split(',')[0]
-                else:
-                    ip = request.client.host
+                ip = await request_parse.get_request_ip(request)
                 user_agent = request.headers.get('User-Agent')
                 user_agent_parse = str(parse(user_agent)).replace(' ', '').split('/')
-                location = await get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
+                location = await request_parse.get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except errors.AuthorizationError as e:
