@@ -150,7 +150,7 @@ async def get_current_user(db: CurrentSession, data: dict = Depends(jwt_authenti
     :return:
     """
     user_id = data.get('sub')
-    user = await UserDao.get_user_with_relation(db, user_id=user_id)
+    user = await UserDao.get_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError
     return user

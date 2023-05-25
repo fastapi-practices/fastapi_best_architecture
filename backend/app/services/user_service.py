@@ -21,7 +21,7 @@ class UserService:
     @staticmethod
     async def swagger_login(form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:
-            current_user = await UserDao.get_user_by_username(db, form_data.username)
+            current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not jwt.password_verify(form_data.password, current_user.password):
@@ -29,11 +29,11 @@ class UserService:
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
-            await UserDao.update_user_login_time(db, form_data.username)
+            await UserDao.update_login_time(db, form_data.username)
             # 查询用户角色
-            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
+            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
             # 获取最新用户信息
-            user = await UserDao.get_user_by_id(db, current_user.id)
+            user = await UserDao.get(db, current_user.id)
             # 创建token
             access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             return access_token, user
@@ -41,16 +41,16 @@ class UserService:
     @staticmethod
     async def login(obj: Auth):
         async with async_db_session() as db:
-            current_user = await UserDao.get_user_by_username(db, obj.username)
+            current_user = await UserDao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not jwt.password_verify(obj.password, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-            await UserDao.update_user_login_time(db, obj.username)
-            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
-            user = await UserDao.get_user_by_id(db, current_user.id)
+            await UserDao.update_login_time(db, obj.username)
+            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
+            user = await UserDao.get(db, current_user.id)
             access_token, access_token_expire_time = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                 str(user.id), access_token_expire_time, role_ids=user_role_ids
@@ -60,12 +60,12 @@ class UserService:
     @staticmethod
     async def refresh_token(user_id: int, custom_time: RefreshTokenTime):
         async with async_db_session() as db:
-            current_user = await UserDao.get_user_by_id(db, user_id)
+            current_user = await UserDao.get(db, user_id)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
-            user_role_ids = await UserDao.get_user_role_ids(db, current_user.id)
+            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
             refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                 str(current_user.id), custom_expire_time=custom_time, role_ids=user_role_ids
             )
@@ -80,7 +80,7 @@ class UserService:
     @staticmethod
     async def register(obj: CreateUser):
         async with async_db_session.begin() as db:
-            username = await UserDao.get_user_by_username(db, obj.username)
+            username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
             email = await UserDao.check_email(db, obj.email)
@@ -90,14 +90,14 @@ class UserService:
                 validate_email(obj.email, check_deliverability=False).email
             except EmailNotValidError:
                 raise errors.ForbiddenError(msg='邮箱格式错误')
-            dept = await DeptDao.get_dept_by_id(db, obj.dept_id)
+            dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
-                role = await RoleDao.get_role_by_id(db, role_id)
+                role = await RoleDao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
-            await UserDao.create_user(db, obj)
+            await UserDao.create(db, obj)
 
     @staticmethod
     async def pwd_reset(obj: ResetPassword):
@@ -111,7 +111,7 @@ class UserService:
     @staticmethod
     async def get_userinfo(username: str):
         async with async_db_session() as db:
-            user = await UserDao.get_user_with_relation(db, username=username)
+            user = await UserDao.get_with_relation(db, username=username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             return user
@@ -122,11 +122,11 @@ class UserService:
             if not current_user.is_superuser:
                 if not username == current_user.username:
                     raise errors.AuthorizationError
-            input_user = await UserDao.get_user_with_relation(db, username=username)
+            input_user = await UserDao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             if input_user.username != obj.username:
-                username = await UserDao.get_user_by_username(db, obj.username)
+                username = await UserDao.get_by_username(db, obj.username)
                 if username:
                     raise errors.ForbiddenError(msg='该用户名已存在')
             if input_user.email != obj.email:
@@ -140,11 +140,11 @@ class UserService:
             if obj.phone is not None:
                 if not re_verify.is_phone(obj.phone):
                     raise errors.ForbiddenError(msg='手机号码输入有误')
-            dept = await DeptDao.get_dept_by_id(db, obj.dept_id)
+            dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
-                role = await RoleDao.get_role_by_id(db, role_id)
+                role = await RoleDao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
             count = await UserDao.update_userinfo(db, input_user, obj)
@@ -156,7 +156,7 @@ class UserService:
             if not current_user.is_superuser:
                 if not username == current_user.username:
                     raise errors.AuthorizationError
-            input_user = await UserDao.get_user_by_username(db, username)
+            input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await UserDao.update_avatar(db, input_user, avatar)
@@ -164,13 +164,13 @@ class UserService:
 
     @staticmethod
     async def get_user_list():
-        return UserDao.get_users()
+        return UserDao.get_all()
 
     @staticmethod
     async def update_permission(pk: int):
         async with async_db_session.begin() as db:
-            if await UserDao.get_user_by_id(db, pk):
-                count = await UserDao.super_set(db, pk)
+            if await UserDao.get(db, pk):
+                count = await UserDao.set_super(db, pk)
                 return count
             else:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -178,8 +178,8 @@ class UserService:
     @staticmethod
     async def update_active(pk: int):
         async with async_db_session.begin() as db:
-            if await UserDao.get_user_by_id(db, pk):
-                count = await UserDao.active_set(db, pk)
+            if await UserDao.get(db, pk):
+                count = await UserDao.set_active(db, pk)
                 return count
             else:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -190,8 +190,8 @@ class UserService:
             if not current_user.is_superuser:
                 if not username == current_user.username:
                     raise errors.AuthorizationError
-            input_user = await UserDao.get_user_by_username(db, username)
+            input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            count = await UserDao.delete_user(db, input_user.id)
+            count = await UserDao.delete(db, input_user.id)
             return count

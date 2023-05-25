@@ -3,8 +3,6 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 
@@ -14,9 +12,8 @@ from backend.app.common.redis import redis_client
 from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
-from backend.app.middleware.access_middleware import AccessMiddleware
-from backend.app.utils.openapi import simplify_operation_ids
 from backend.app.utils.health_check import ensure_unique_route_names
+from backend.app.utils.openapi import simplify_operation_ids
 
 
 @asynccontextmanager
@@ -57,9 +54,8 @@ def register_app():
         lifespan=register_init,
     )
 
-    if settings.STATIC_FILES:
-        # 注册静态文件
-        register_static_file(app)
+    # 静态文件
+    register_static_file(app)
 
     # 中间件
     register_middleware(app)
@@ -83,17 +79,20 @@ def register_static_file(app: FastAPI):
     :param app:
     :return:
     """
-    import os
-    from fastapi.staticfiles import StaticFiles
+    if settings.STATIC_FILES:
+        import os
+        from fastapi.staticfiles import StaticFiles
 
-    if not os.path.exists('./static'):
-        os.mkdir('./static')
-    app.mount('/static', StaticFiles(directory='static'), name='static')
+        if not os.path.exists('./static'):
+            os.mkdir('./static')
+        app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
 def register_middleware(app: FastAPI):
     # CORS
     if settings.MIDDLEWARE_CORS:
+        from fastapi.middleware.cors import CORSMiddleware
+
         app.add_middleware(
             CORSMiddleware,
             allow_origins=['*'],
@@ -103,9 +102,13 @@ def register_middleware(app: FastAPI):
         )
     # Gzip
     if settings.MIDDLEWARE_GZIP:
+        from fastapi.middleware.gzip import GZipMiddleware
+
         app.add_middleware(GZipMiddleware)
     # Api access logs
     if settings.MIDDLEWARE_ACCESS:
+        from backend.app.middleware.access_middleware import AccessMiddleware
+
         app.add_middleware(AccessMiddleware)
 
 
@@ -118,7 +121,7 @@ def register_router(app: FastAPI):
     """
     app.include_router(v1)
 
-    # extra
+    # Extra
     ensure_unique_route_names(app)
     simplify_operation_ids(app)
 
