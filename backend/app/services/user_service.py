@@ -6,7 +6,6 @@ from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic.datetime_parse import parse_datetime
-from sqlalchemy import func
 from user_agents import parse
 
 from backend.app.common import jwt
@@ -90,7 +89,7 @@ class UserService:
                         os=user_agent_parse[1],
                         msg=e.msg,
                         login_time=self.login_time,
-                    )
+                    ),
                 )
                 raise errors.AuthorizationError(msg=e.msg)
             except Exception as e:
@@ -106,7 +105,7 @@ class UserService:
                         os=user_agent_parse[1],
                         msg=str(e),
                         login_time=self.login_time,
-                    )
+                    ),
                 )
                 raise e
             else:
@@ -122,7 +121,7 @@ class UserService:
                         os=user_agent_parse[1],
                         msg='登陆成功',
                         login_time=self.login_time,
-                    )
+                    ),
                 )
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 

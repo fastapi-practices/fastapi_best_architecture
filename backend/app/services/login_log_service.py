@@ -7,7 +7,6 @@ from backend.app.schemas.login_log import CreateLoginLog
 
 
 class LoginLogService:
-
     @staticmethod
     async def get_select():
         return await LoginLogDao.get_all()
