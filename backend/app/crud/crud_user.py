@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from typing import NoReturn
 
-from sqlalchemy import func, select, update, desc
+from sqlalchemy import select, update, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
@@ -21,8 +22,8 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         user = await db.execute(select(self.model).where(self.model.username == username))
         return user.scalars().first()
 
-    async def update_login_time(self, db: AsyncSession, username: str) -> int:
-        user = await db.execute(update(self.model).where(self.model.username == username).values(last_login=func.now()))
+    async def update_login_time(self, db: AsyncSession, username: str, login_time: datetime) -> int:
+        user = await db.execute(update(self.model).where(self.model.username == username).values(last_login=login_time))
         return user.rowcount
 
     async def create(self, db: AsyncSession, create: CreateUser) -> NoReturn:

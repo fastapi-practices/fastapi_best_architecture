@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post('/swagger_login', summary='swagger 表单登录', description='form 格式登录，仅用于 swagger 文档调试接口')
 async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> SwaggerToken:
-    token, user = await UserService.swagger_login(form_data)
+    token, user = await UserService().swagger_login(form_data)
     return SwaggerToken(access_token=token, user=user)
 
 
@@ -25,8 +25,8 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=15))],
 )
-async def user_login(obj: Auth):
-    access_token, refresh_token, access_expire, refresh_expire, user = await UserService.login(obj)
+async def user_login(request: Request, obj: Auth):
+    access_token, refresh_token, access_expire, refresh_expire, user = await UserService().login(request, obj)
     data = LoginToken(
         access_token=access_token,
         refresh_token=refresh_token,

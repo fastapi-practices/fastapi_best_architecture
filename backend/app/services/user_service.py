@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from email_validator import validate_email, EmailNotValidError
+from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic.datetime_parse import parse_datetime
+from sqlalchemy import func
+from user_agents import parse
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
@@ -12,14 +18,18 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
+from backend.app.schemas.login_log import CreateLoginLog
 from backend.app.schemas.token import RefreshTokenTime
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
+from backend.app.services.login_log_service import LoginLogService
 from backend.app.utils import re_verify
+from backend.app.utils.location_parse import get_location
 
 
 class UserService:
-    @staticmethod
-    async def swagger_login(form_data: OAuth2PasswordRequestForm):
+    login_time = parse_datetime(datetime.utcnow())
+
+    async def swagger_login(self, form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:
             current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
@@ -29,7 +39,7 @@ class UserService:
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
-            await UserDao.update_login_time(db, form_data.username)
+            await UserDao.update_login_time(db, form_data.username, self.login_time)
             # 查询用户角色
             user_role_ids = await UserDao.get_role_ids(db, current_user.id)
             # 获取最新用户信息
@@ -38,24 +48,83 @@ class UserService:
             access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             return access_token, user
 
-    @staticmethod
-    async def login(obj: Auth):
+    async def login(self, request: Request, obj: Auth):
         async with async_db_session() as db:
-            current_user = await UserDao.get_by_username(db, obj.username)
-            if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
-            elif not jwt.password_verify(obj.password, current_user.password):
-                raise errors.AuthorizationError(msg='密码错误')
-            elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-            await UserDao.update_login_time(db, obj.username)
-            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
-            user = await UserDao.get(db, current_user.id)
-            access_token, access_token_expire_time = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
-            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(user.id), access_token_expire_time, role_ids=user_role_ids
-            )
-            return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
+            try:
+                current_user = await UserDao.get_by_username(db, obj.username)
+                if not current_user:
+                    raise errors.NotFoundError(msg='用户不存在')
+                elif not jwt.password_verify(obj.password, current_user.password):
+                    raise errors.AuthorizationError(msg='密码错误')
+                elif not current_user.is_active:
+                    raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
+                await UserDao.update_login_time(db, obj.username, self.login_time)
+                user_role_ids = await UserDao.get_role_ids(db, current_user.id)
+                user = await UserDao.get(db, current_user.id)
+                access_token, access_token_expire_time = await jwt.create_access_token(
+                    str(user.id), role_ids=user_role_ids
+                )
+                refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
+                    str(user.id), access_token_expire_time, role_ids=user_role_ids
+                )
+                forwarded = request.headers.get('X-Real-IP') or request.headers.get('X-Forwarded-For')
+                if forwarded:
+                    ip = forwarded.split(',')[0]
+                else:
+                    ip = request.client.host
+                user_agent = request.headers.get('User-Agent')
+                user_agent_parse = str(parse(user_agent)).replace(' ', '').split('/')
+                location = await get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
+            except errors.NotFoundError as e:
+                raise errors.NotFoundError(msg=e.msg)
+            except errors.AuthorizationError as e:
+                await LoginLogService.create(
+                    db=db,
+                    obj_in=CreateLoginLog(
+                        user_uuid=user.user_uuid,
+                        username=user.username,
+                        status=0,
+                        ipaddr=ip,
+                        location=location,
+                        browser=user_agent_parse[2],
+                        os=user_agent_parse[1],
+                        msg=e.msg,
+                        login_time=self.login_time,
+                    )
+                )
+                raise errors.AuthorizationError(msg=e.msg)
+            except Exception as e:
+                await LoginLogService.create(
+                    db=db,
+                    obj_in=CreateLoginLog(
+                        user_uuid=user.user_uuid,
+                        username=user.username,
+                        status=0,
+                        ipaddr=ip,
+                        location=location,
+                        browser=user_agent_parse[2],
+                        os=user_agent_parse[1],
+                        msg=str(e),
+                        login_time=self.login_time,
+                    )
+                )
+                raise e
+            else:
+                await LoginLogService.create(
+                    db=db,
+                    obj_in=CreateLoginLog(
+                        user_uuid=user.user_uuid,
+                        username=user.username,
+                        status=1,
+                        ipaddr=ip,
+                        location=location,
+                        browser=user_agent_parse[2],
+                        os=user_agent_parse[1],
+                        msg='登陆成功',
+                        login_time=self.login_time,
+                    )
+                )
+                return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
     async def refresh_token(user_id: int, custom_time: RefreshTokenTime):
@@ -163,7 +232,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_user_list():
+    async def get_select():
         return UserDao.get_all()
 
     @staticmethod

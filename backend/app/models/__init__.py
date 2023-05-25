@@ -11,3 +11,4 @@ from backend.app.models.sys_dept import Dept
 from backend.app.models.sys_menu import Menu
 from backend.app.models.sys_role import Role
 from backend.app.models.sys_user import User
+from backend.app.models.sys_login_log import LoginLog
