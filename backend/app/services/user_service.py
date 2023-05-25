@@ -88,20 +88,6 @@ class UserService:
                 )
                 raise errors.AuthorizationError(msg=e.msg)
             except Exception as e:
-                await LoginLogService.create(
-                    db=db,
-                    obj_in=CreateLoginLog(
-                        user_uuid=user.user_uuid,
-                        username=user.username,
-                        status=0,
-                        ipaddr=ip,
-                        location=location,
-                        browser=user_agent_parse[2],
-                        os=user_agent_parse[1],
-                        msg=str(e),
-                        login_time=self.login_time,
-                    ),
-                )
                 raise e
             else:
                 await LoginLogService.create(

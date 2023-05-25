@@ -109,6 +109,6 @@ def register_exception(app: FastAPI):
             return JSONResponse(
                 status_code=500,
                 content=response_base.fail(code=500, msg=str(exc))
-                if settings.UVICORN_RELOAD
+                if settings.ENVIRONMENT != 'pro'
                 else response_base.fail(code=500, msg='Internal Server Error'),
             )
