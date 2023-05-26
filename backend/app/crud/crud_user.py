@@ -54,7 +54,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         return user.rowcount
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
-        return await super().delete_(db, user_id)
+        return await self.delete_(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
         mail = await db.execute(select(self.model).where(self.model.email == email))

@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
+from starlette.background import BackgroundTasks
 
 from backend.app.common.jwt import DependsUser, get_token, jwt_decode, CurrentJwtAuth
 from backend.app.common.response.response_schema import response_base
@@ -25,8 +26,10 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=15))],
 )
-async def user_login(request: Request, obj: Auth):
-    access_token, refresh_token, access_expire, refresh_expire, user = await UserService().login(request, obj)
+async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTasks):
+    access_token, refresh_token, access_expire, refresh_expire, user = await UserService().login(
+        request=request, obj=obj, background_tasks=background_tasks
+    )
     data = LoginToken(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -41,7 +44,7 @@ async def user_login(request: Request, obj: Auth):
 async def get_refresh_token(request: Request, custom_time: RefreshTokenTime):
     token = get_token(request)
     user_id, _ = jwt_decode(token)
-    refresh_token, refresh_expire = await UserService.refresh_token(user_id, custom_time)
+    refresh_token, refresh_expire = await UserService.refresh_token(user_id=user_id, custom_time=custom_time)
     data = RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=refresh_expire)
     return response_base.success(data=data)
 

@@ -21,7 +21,7 @@ async def get_request_ip(request: Request) -> str:
 
 async def get_location(ipaddr: str, user_agent: str) -> str:
     """获取ip地址归属地(临时)"""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=3) as client:
         ip_api_url = f'http://ip-api.com/json/{ipaddr}?lang=zh-CN'
         whois_url = f'http://whois.pconline.com.cn/ipJson.jsp?ip={ipaddr}&json=true'
         headers = {'User-Agent': user_agent}

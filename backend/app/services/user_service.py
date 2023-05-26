@@ -8,7 +8,7 @@ from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic.datetime_parse import parse_datetime
 from sqlalchemy import Select
-from user_agents import parse
+from starlette.background import BackgroundTasks
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
@@ -19,11 +19,10 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.login_log import CreateLoginLog
 from backend.app.schemas.token import RefreshTokenTime
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
 from backend.app.services.login_log_service import LoginLogService
-from backend.app.utils import re_verify, request_parse
+from backend.app.utils import re_verify
 
 
 class UserService:
@@ -48,7 +47,7 @@ class UserService:
             access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             return access_token, user
 
-    async def login(self, request: Request, obj: Auth):
+    async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):
         async with async_db_session() as db:
             try:
                 current_user = await UserDao.get_by_username(db, obj.username)
@@ -67,49 +66,23 @@ class UserService:
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                     str(user.id), access_token_expire_time, role_ids=user_role_ids
                 )
-                ip = await request_parse.get_request_ip(request)
-                user_agent = request.headers.get('User-Agent')
-                user_agent_parse = str(parse(user_agent)).replace(' ', '').split('/')
-                location = await request_parse.get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
+                login_logs_params = dict(
+                    db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
+                )
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except errors.AuthorizationError as e:
-                await LoginLogService.create(
-                    db=db,
-                    obj_in=CreateLoginLog(
-                        user_uuid=user.user_uuid,
-                        username=user.username,
-                        status=0,
-                        ipaddr=ip,
-                        location=location,
-                        browser=user_agent_parse[2],
-                        os=user_agent_parse[1],
-                        msg=e.msg,
-                        login_time=self.login_time,
-                    ),
-                )
+                login_logs_params.update({'status': 0, 'msg': e.msg})
+                background_tasks.add_task(LoginLogService.create, **login_logs_params)
                 raise errors.AuthorizationError(msg=e.msg)
             except Exception as e:
                 raise e
             else:
-                await LoginLogService.create(
-                    db=db,
-                    obj_in=CreateLoginLog(
-                        user_uuid=user.user_uuid,
-                        username=user.username,
-                        status=1,
-                        ipaddr=ip,
-                        location=location,
-                        browser=user_agent_parse[2],
-                        os=user_agent_parse[1],
-                        msg='登陆成功',
-                        login_time=self.login_time,
-                    ),
-                )
+                background_tasks.add_task(LoginLogService.create, **login_logs_params)
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def refresh_token(user_id: int, custom_time: RefreshTokenTime) -> tuple[str, datetime]:
+    async def refresh_token(*, user_id: int, custom_time: RefreshTokenTime) -> tuple[str, datetime]:
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
