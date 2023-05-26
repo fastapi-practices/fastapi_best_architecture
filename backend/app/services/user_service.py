@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import NoReturn
 
 from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic.datetime_parse import parse_datetime
+from sqlalchemy import Select
 from user_agents import parse
 
 from backend.app.common import jwt
@@ -107,7 +109,7 @@ class UserService:
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def refresh_token(user_id: int, custom_time: RefreshTokenTime):
+    async def refresh_token(user_id: int, custom_time: RefreshTokenTime) -> tuple[str, datetime]:
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
@@ -121,13 +123,12 @@ class UserService:
             return refresh_token, refresh_token_expire_time
 
     @staticmethod
-    async def logout(user_id: int):
+    async def logout(user_id: int) -> NoReturn:
         key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
         await redis_client.delete_prefix(key)
-        return
 
     @staticmethod
-    async def register(obj: CreateUser):
+    async def register(obj: CreateUser) -> NoReturn:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -149,16 +150,17 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def pwd_reset(obj: ResetPassword):
+    async def pwd_reset(obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
             pwd1 = obj.password1
             pwd2 = obj.password2
             if pwd1 != pwd2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            await UserDao.reset_password(db, obj.id, obj.password2)
+            count = await UserDao.reset_password(db, obj.id, obj.password2)
+            return count
 
     @staticmethod
-    async def get_userinfo(username: str):
+    async def get_userinfo(username: str) -> User:
         async with async_db_session() as db:
             user = await UserDao.get_with_relation(db, username=username)
             if not user:
@@ -166,7 +168,7 @@ class UserService:
             return user
 
     @staticmethod
-    async def update(*, username: str, current_user: User, obj: UpdateUser):
+    async def update(*, username: str, current_user: User, obj: UpdateUser) -> int:
         async with async_db_session.begin() as db:
             if not current_user.is_superuser:
                 if not username == current_user.username:
@@ -200,7 +202,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_avatar(*, username: str, current_user: User, avatar: Avatar):
+    async def update_avatar(*, username: str, current_user: User, avatar: Avatar) -> int:
         async with async_db_session.begin() as db:
             if not current_user.is_superuser:
                 if not username == current_user.username:
@@ -212,11 +214,11 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_select():
+    async def get_select() -> Select:
         return UserDao.get_all()
 
     @staticmethod
-    async def update_permission(pk: int):
+    async def update_permission(pk: int) -> int:
         async with async_db_session.begin() as db:
             if await UserDao.get(db, pk):
                 count = await UserDao.set_super(db, pk)
@@ -225,7 +227,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
-    async def update_active(pk: int):
+    async def update_active(pk: int) -> int:
         async with async_db_session.begin() as db:
             if await UserDao.get(db, pk):
                 count = await UserDao.set_active(db, pk)
@@ -234,7 +236,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
-    async def delete(*, username: str, current_user: User):
+    async def delete(*, username: str, current_user: User) -> int:
         async with async_db_session.begin() as db:
             if not current_user.is_superuser:
                 if not username == current_user.username:
