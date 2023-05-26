@@ -29,7 +29,7 @@ class LoginLogService:
         try:
             ip = await request_parse.get_request_ip(request)
             user_agent = request.headers.get('User-Agent')
-            user_agent_parse = str(parse(user_agent)).replace(' ', '').split('/')
+            _, os_info, browser = str(parse(user_agent)).replace(' ', '').split('/')
             location = await request_parse.get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
             obj_in = CreateLoginLog(
                 user_uuid=user.user_uuid,
@@ -37,8 +37,8 @@ class LoginLogService:
                 status=status,
                 ipaddr=ip,
                 location=location,
-                browser=user_agent_parse[2],
-                os=user_agent_parse[1],
+                browser=browser,
+                os=os_info,
                 msg=msg,
                 login_time=login_time,
             )
