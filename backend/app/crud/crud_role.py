@@ -6,8 +6,8 @@ from backend.app.schemas.role import CreateRole, UpdateRole
 
 
 class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
-    async def get_role_by_id(self, db, role_id):
-        return await self.get(db, role_id)
+    async def get(self, db, role_id: int):
+        return await self.get_(db, role_id)
 
 
 RoleDao: CRUDRole = CRUDRole(Role)

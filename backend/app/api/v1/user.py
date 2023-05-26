@@ -50,8 +50,8 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 
 @router.get('', summary='获取所有用户', dependencies=[DependsUser, PageDepends])
 async def get_all_users(db: CurrentSession):
-    user_list = await UserService.get_user_list()
-    page_data = await paging_data(db, user_list, GetUserInfo)
+    user_select = await UserService.get_select()
+    page_data = await paging_data(db, user_select, GetUserInfo)
     return response_base.success(data=page_data)
 
 
