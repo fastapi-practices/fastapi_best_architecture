@@ -77,7 +77,8 @@ class Settings(BaseSettings):
     TOKEN_REDIS_PREFIX: str = 'fba_token'
 
     # Log
-    LOG_FILE_NAME: str = 'fba.log'
+    LOG_STDOUT_FILENAME: str = 'fba_access.log'
+    LOG_STDERR_FILENAME: str = 'fba_error.log'
 
     # Middleware
     MIDDLEWARE_CORS: bool = True

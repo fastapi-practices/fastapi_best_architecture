@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.app.common.exception.errors import BaseExceptionMixin
+from backend.app.common.log import log
 from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
 
@@ -106,9 +107,11 @@ def register_exception(app: FastAPI):
             )
 
         else:
+            import traceback
+            log.exception(traceback.format_exc())
             return JSONResponse(
                 status_code=500,
-                content=response_base.fail(code=500, msg=str(exc))
-                if settings.UVICORN_RELOAD
+                content=response_base.fail(code=500, msg=traceback.format_exc())
+                if settings.ENVIRONMENT == 'dev'
                 else response_base.fail(code=500, msg='Internal Server Error'),
             )
