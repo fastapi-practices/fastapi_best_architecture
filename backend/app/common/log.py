@@ -15,24 +15,36 @@ if TYPE_CHECKING:
 
 
 class Logger:
-    @staticmethod
-    def log() -> loguru.Logger:
-        if not os.path.exists(path_conf.LogPath):
-            os.mkdir(path_conf.LogPath)
+
+    def __init__(self):
+        self.log_path = path_conf.LogPath
+
+    def log(self) -> loguru.Logger:
+        if not os.path.exists(self.log_path):
+            os.mkdir(self.log_path)
 
         # 日志文件
-        log_file = os.path.join(path_conf.LogPath, settings.LOG_FILE_NAME)
+        log_stdout_file = os.path.join(self.log_path, settings.LOG_STDOUT_FILENAME)
+        log_stderr_file = os.path.join(self.log_path, settings.LOG_STDERR_FILENAME)
 
-        # loguru日志
-        # more: https://github.com/Delgan/loguru#ready-to-use-out-of-the-box-without-boilerplate
+        # loguru 日志: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
+        log_config = dict(rotation='10 MB', retention='15 days', compression='tar.gz', enqueue=True)
+        # stdout
         logger.add(
-            log_file,
-            encoding='utf-8',
-            level='DEBUG',
-            rotation='00:00',  # 每天 0 点创建一个新日志文件
-            retention='7 days',  # 定时自动清理文件
-            enqueue=True,  # 异步安全
-            backtrace=True,  # 错误跟踪
+            log_stdout_file,
+            level='INFO',
+            filter=lambda record: record['level'].name == 'INFO' or record['level'].no <= 25,
+            **log_config,
+            backtrace=False,
+            diagnose=False,
+        )
+        # stderr
+        logger.add(
+            log_stderr_file,
+            level='ERROR',
+            filter=lambda record: record['level'].name == 'ERROR' or record['level'].no >= 30,
+            **log_config,
+            backtrace=True,
             diagnose=True,
         )
 
