@@ -6,7 +6,7 @@ from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.user import CreateUser, GetUserInfo, ResetPassword, UpdateUser, Avatar
+from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
 
@@ -21,14 +21,16 @@ async def user_register(obj: CreateUser):
 
 @router.post('/password/reset', summary='密码重置')
 async def password_reset(obj: ResetPassword):
-    await UserService.pwd_reset(obj)
-    return response_base.success()
+    count = await UserService.pwd_reset(obj)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
 async def userinfo(username: str):
     current_user = await UserService.get_userinfo(username)
-    data = GetUserInfo(**select_to_json(current_user))
+    data = GetAllUserInfo(**select_to_json(current_user))
     return response_base.success(data=data)
 
 
@@ -51,7 +53,7 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 @router.get('', summary='获取所有用户', dependencies=[DependsUser, PageDepends])
 async def get_all_users(db: CurrentSession):
     user_select = await UserService.get_select()
-    page_data = await paging_data(db, user_select, GetUserInfo)
+    page_data = await paging_data(db, user_select, GetAllUserInfo)
     return response_base.success(data=page_data)
 
 

@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     # Static Server
     STATIC_FILES: bool = False
 
+    # Location Parse
+    LOCATION_PARSE: bool = True  # 将会导致登录延时，建议关闭，有条件自行使用第三方离线数据库
+
     # MySQL
     DB_ECHO: bool = False
     DB_DATABASE: str = 'fba'
