@@ -32,5 +32,6 @@ SQLAlchemy==2.0.8
 starlette==0.27.0
 supervisor==4.2.5
 tzlocal==2.1
+user_agents==2.2.0
 uvicorn[standard]==0.13.4
 wait-for-it==2.2.1

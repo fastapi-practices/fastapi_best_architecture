@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from decimal import Decimal
+from typing import Any, TypeVar
 
-from sqlalchemy.sql import Select
+from sqlalchemy import Row, RowMapping
+
+RowData = Row | RowMapping | Any
+
+R = TypeVar('R', bound=RowData)
 
 
-def select_to_dict(obj: Select) -> dict:
+def select_to_dict(obj: R) -> dict:
     """
     Serialize SQLAlchemy Select to dict
 
@@ -21,7 +26,7 @@ def select_to_dict(obj: Select) -> dict:
     return obj_dict
 
 
-def select_to_list(obj: list) -> list:
+def select_to_list(obj: list[R]) -> list:
     """
     Serialize SQLAlchemy Select to list
 
@@ -35,7 +40,7 @@ def select_to_list(obj: list) -> list:
     return ret_list
 
 
-def select_to_json(obj: Select) -> dict:
+def select_to_json(obj: R) -> dict:
     """
     Serialize SQLAlchemy Select to json
 

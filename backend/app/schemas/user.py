@@ -49,7 +49,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
         orm_mode = True
 
 
-class GetUserInfo(GetUserInfoNoRelation):
+class GetAllUserInfo(GetUserInfoNoRelation):
     dept: GetAllDept | None = None
     roles: list[GetAllRole]
 
