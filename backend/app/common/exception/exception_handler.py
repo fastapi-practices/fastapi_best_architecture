@@ -108,6 +108,7 @@ def register_exception(app: FastAPI):
 
         else:
             import traceback
+
             log.exception(traceback.format_exc())
             return JSONResponse(
                 status_code=500,
