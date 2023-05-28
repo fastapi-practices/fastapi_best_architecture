@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
 
 from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
 from backend.app.common.pagination import paging_data, PageDepends
@@ -28,7 +30,7 @@ async def password_reset(obj: ResetPassword):
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsUser])
-async def userinfo(username: str):
+async def get_user(username: str):
     current_user = await UserService.get_userinfo(username)
     data = GetAllUserInfo(**select_to_json(current_user))
     return response_base.success(data=data)
@@ -50,9 +52,14 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
     return response_base.fail()
 
 
-@router.get('', summary='获取所有用户', dependencies=[DependsUser, PageDepends])
-async def get_all_users(db: CurrentSession):
-    user_select = await UserService.get_select()
+@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsUser, PageDepends])
+async def get_all_users(
+        db: CurrentSession,
+        username: Annotated[str | None, Query()] = None,
+        phone: Annotated[str | None, Query()] = None,
+        status: Annotated[int | None, Query()] = None,
+):
+    user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)
     return response_base.success(data=page_data)
 
