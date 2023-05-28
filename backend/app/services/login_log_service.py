@@ -30,7 +30,12 @@ class LoginLogService:
             ip = await request_parse.get_request_ip(request)
             user_agent = request.headers.get('User-Agent')
             _, os_info, browser = str(parse(user_agent)).replace(' ', '').split('/')
-            location = await request_parse.get_location(ip, user_agent) if settings.LOCATION_PARSE else '未知'
+            if settings.LOCATION_PARSE == 'online':
+                location = await request_parse.get_location_online(ip, user_agent)
+            elif settings.LOCATION_PARSE == 'offline':
+                location = request_parse.get_location_offline(ip)
+            else:
+                location = '未知'
             obj_in = CreateLoginLog(
                 user_uuid=user.user_uuid,
                 username=user.username,
