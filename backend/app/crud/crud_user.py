@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import NoReturn
 
-from sqlalchemy import select, update, desc
+from sqlalchemy import select, update, desc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
@@ -66,12 +66,22 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    def get_all(self) -> Select:
-        return (
+    async def get_all(self, username: str = None, phone: str = None, status: int = None) -> Select:
+        se = (
             select(self.model)
             .options(selectinload(self.model.roles).selectinload(Role.menus))
             .order_by(desc(self.model.time_joined))
         )
+        where_list = []
+        if username:
+            where_list.append(self.model.username.like(f'%{username}%'))
+        if phone:
+            where_list.append(self.model.phone.like(f'%{phone}%'))
+        if status is not None:
+            where_list.append(self.model.is_active == bool(status))
+        if where_list:
+            se = se.where(and_(*where_list))
+        return se
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get(db, user_id)

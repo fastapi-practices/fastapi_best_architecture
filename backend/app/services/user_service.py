@@ -187,8 +187,8 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_select() -> Select:
-        return UserDao.get_all()
+    async def get_select(*, username: str = None, phone: str = None, status: bool = None) -> Select:
+        return await UserDao.get_all(username=username, phone=phone, status=status)
 
     @staticmethod
     async def update_permission(pk: int) -> int:
