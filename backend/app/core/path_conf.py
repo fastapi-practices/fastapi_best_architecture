@@ -17,3 +17,6 @@ LogPath = os.path.join(BasePath, 'app', 'log')
 
 # RBAC model.conf 文件路径
 RBAC_MODEL_CONF = os.path.join(BasePath, 'app', 'core', settings.CASBIN_RBAC_MODEL_NAME)
+
+# 离线 IP 数据库路径
+IP2REGION_XDB = os.path.join(BasePath, 'app', 'static', 'ip2region.xdb')

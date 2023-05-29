@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
 
 class Logger:
-
     def __init__(self):
         self.log_path = path_conf.LogPath
 

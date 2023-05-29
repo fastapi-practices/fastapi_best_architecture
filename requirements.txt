@@ -35,3 +35,4 @@ tzlocal==2.1
 user_agents==2.2.0
 uvicorn[standard]==0.13.4
 wait-for-it==2.2.1
+XdbSearchIP==1.0.2

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import BaseSettings, root_validator
 
@@ -55,7 +56,7 @@ class Settings(BaseSettings):
     STATIC_FILES: bool = False
 
     # Location Parse
-    LOCATION_PARSE: bool = True  # 将会导致登录延时，建议关闭，有条件自行使用第三方离线数据库
+    LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
 
     # MySQL
     DB_ECHO: bool = False
