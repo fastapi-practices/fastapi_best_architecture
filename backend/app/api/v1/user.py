@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 
 from backend.app.common.jwt import DependsUser, CurrentUser, DependsSuperUser
 from backend.app.common.pagination import paging_data, PageDepends
@@ -54,10 +54,10 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 
 @router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsUser, PageDepends])
 async def get_all_users(
-        db: CurrentSession,
-        username: Annotated[str | None, Query()] = None,
-        phone: Annotated[str | None, Query()] = None,
-        status: Annotated[int | None, Query()] = None,
+    db: CurrentSession,
+    username: Annotated[str | None, Query()] = None,
+    phone: Annotated[str | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)
@@ -75,6 +75,14 @@ async def super_set(pk: int):
 @router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsSuperUser])
 async def active_set(pk: int):
     count = await UserService.update_active(pk)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.post('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[DependsSuperUser])
+async def multi_set(request: Request, pk: int, refresh_token: Annotated[str, Query(...)]):
+    count = await UserService.update_multi_login(request=request, pk=pk, refresh_token=refresh_token)
     if count > 0:
         return response_base.success()
     return response_base.fail()

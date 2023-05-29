@@ -42,6 +42,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
     avatar: str | None = None
     is_active: bool
     is_superuser: bool
+    is_multi_login: bool
     time_joined: datetime = None
     last_login: datetime | None = None
 

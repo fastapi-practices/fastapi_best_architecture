@@ -91,6 +91,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         user = await self.get(db, user_id)
         return user.is_active
 
+    async def get_multi_login(self, db: AsyncSession, user_id: int) -> bool:
+        user = await self.get(db, user_id)
+        return user.is_multi_login
+
     async def set_super(self, db: AsyncSession, user_id: int) -> int:
         super_status = await self.get_super(db, user_id)
         user = await db.execute(
@@ -102,6 +106,13 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         active_status = await self.get_active(db, user_id)
         user = await db.execute(
             update(self.model).where(self.model.id == user_id).values(is_active=False if active_status else True)
+        )
+        return user.rowcount
+
+    async def set_multi_login(self, db: AsyncSession, user_id: int) -> int:
+        multi_login = await self.get_multi_login(db, user_id)
+        user = await db.execute(
+            update(self.model).where(self.model.id == user_id).values(is_multi_login=False if multi_login else True)
         )
         return user.rowcount
 

@@ -23,6 +23,7 @@ class User(DataClassBase):
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
     is_active: Mapped[bool] = mapped_column(default=True, comment='用户账号状态(0停用 1正常)')
+    is_multi_login: Mapped[bool] = mapped_column(default=False, comment='是否重复登陆(0否 1是)')
     avatar: Mapped[str | None] = mapped_column(String(255), default=None, comment='头像')
     phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机号')
     time_joined: Mapped[datetime] = mapped_column(init=False, default=func.now(), comment='注册时间')

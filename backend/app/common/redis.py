@@ -37,16 +37,26 @@ class RedisCli(Redis):
             log.error('❌ 数据库 redis 连接异常 {}', e)
             sys.exit()
 
-    async def delete_prefix(self, key: str):
+    async def delete_prefix(self, prefix: str, exclude: str | list = None):
         """
         删除指定前缀的所有key
 
-        :param key:
+        :param prefix:
+        :param exclude:
         :return:
         """
-        keys = await self.keys(f'{key}*')
-        if keys:
-            await self.delete(*keys)
+        keys = []
+        async for key in self.scan_iter(match=f'{prefix}*'):
+            if isinstance(exclude, str):
+                if key != exclude:
+                    keys.append(key)
+            if isinstance(exclude, list):
+                if key not in exclude:
+                    keys.append(key)
+            else:
+                keys.append(key)
+        for key in keys:
+            await self.delete(key)
 
 
 # 创建redis连接对象

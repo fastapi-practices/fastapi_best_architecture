@@ -5,13 +5,11 @@ from typing import NoReturn
 
 from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic.datetime_parse import parse_datetime
 from sqlalchemy import Select
-from starlette.background import BackgroundTasks
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
+from backend.app.common.jwt import get_token, jwt_decode
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
@@ -19,86 +17,11 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.token import RefreshTokenTime
-from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, Auth
-from backend.app.services.login_log_service import LoginLogService
+from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
 from backend.app.utils import re_verify
 
 
 class UserService:
-    login_time = parse_datetime(datetime.utcnow())
-
-    async def swagger_login(self, form_data: OAuth2PasswordRequestForm):
-        async with async_db_session() as db:
-            current_user = await UserDao.get_by_username(db, form_data.username)
-            if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
-            elif not jwt.password_verify(form_data.password, current_user.password):
-                raise errors.AuthorizationError(msg='密码错误')
-            elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-            # 更新登陆时间
-            await UserDao.update_login_time(db, form_data.username, self.login_time)
-            # 查询用户角色
-            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
-            # 获取最新用户信息
-            user = await UserDao.get(db, current_user.id)
-            # 创建token
-            access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
-            return access_token, user
-
-    async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):
-        async with async_db_session() as db:
-            try:
-                current_user = await UserDao.get_by_username(db, obj.username)
-                if not current_user:
-                    raise errors.NotFoundError(msg='用户不存在')
-                elif not jwt.password_verify(obj.password, current_user.password):
-                    raise errors.AuthorizationError(msg='密码错误')
-                elif not current_user.is_active:
-                    raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-                await UserDao.update_login_time(db, obj.username, self.login_time)
-                user_role_ids = await UserDao.get_role_ids(db, current_user.id)
-                user = await UserDao.get(db, current_user.id)
-                access_token, access_token_expire_time = await jwt.create_access_token(
-                    str(user.id), role_ids=user_role_ids
-                )
-                refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                    str(user.id), access_token_expire_time, role_ids=user_role_ids
-                )
-                login_logs_params = dict(
-                    db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
-                )
-            except errors.NotFoundError as e:
-                raise errors.NotFoundError(msg=e.msg)
-            except errors.AuthorizationError as e:
-                login_logs_params.update({'status': 0, 'msg': e.msg})
-                background_tasks.add_task(LoginLogService.create, **login_logs_params)
-                raise errors.AuthorizationError(msg=e.msg)
-            except Exception as e:
-                raise e
-            else:
-                background_tasks.add_task(LoginLogService.create, **login_logs_params)
-                return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
-
-    @staticmethod
-    async def refresh_token(*, user_id: int, custom_time: RefreshTokenTime) -> tuple[str, datetime]:
-        async with async_db_session() as db:
-            current_user = await UserDao.get(db, user_id)
-            if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
-            elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
-            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
-            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(current_user.id), custom_expire_time=custom_time, role_ids=user_role_ids
-            )
-            return refresh_token, refresh_token_expire_time
-
-    @staticmethod
-    async def logout(user_id: int) -> NoReturn:
-        key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
-        await redis_client.delete_prefix(key)
 
     @staticmethod
     async def register(obj: CreateUser) -> NoReturn:
@@ -205,6 +128,26 @@ class UserService:
             if await UserDao.get(db, pk):
                 count = await UserDao.set_active(db, pk)
                 return count
+            else:
+                raise errors.NotFoundError(msg='用户不存在')
+
+    @staticmethod
+    async def update_multi_login(*, request: Request, pk: int, refresh_token: str) -> tuple[int, str, datetime]:
+        async with async_db_session.begin() as db:
+            if await UserDao.get(db, pk):
+                count = await UserDao.set_multi_login(db, pk)
+                token = get_token(request)
+                user_id, role_ids, _ = jwt_decode(token)
+                # 获取用户多点登录最新状态
+                is_multi_login = await UserDao.get_multi_login(db, user_id)
+                if not is_multi_login:
+                    prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
+                    await redis_client.delete_prefix(prefix, exclude=prefix + token)
+                # 刷新 token 以更新多点登录状态
+                access_new_token, access_new_token_expire_time = await jwt.create_new_token(
+                    str(user_id), refresh_token, role_ids=role_ids, multi_login=is_multi_login, update_multi_login=True
+                )
+                return count, access_new_token, access_new_token_expire_time
             else:
                 raise errors.NotFoundError(msg='用户不存在')
 
