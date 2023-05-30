@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     # Location Parse
     LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
 
+    # Limiter
+    LIMITER_REDIS_PREFIX: str = 'fba_limiter'
+
     # MySQL
     DB_ECHO: bool = False
     DB_DATABASE: str = 'fba'
