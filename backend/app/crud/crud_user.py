@@ -24,6 +24,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
 
     async def update_login_time(self, db: AsyncSession, username: str, login_time: datetime) -> int:
         user = await db.execute(update(self.model).where(self.model.username == username).values(last_login=login_time))
+        await db.commit()
         return user.rowcount
 
     async def create(self, db: AsyncSession, create: CreateUser) -> NoReturn:
