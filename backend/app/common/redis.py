@@ -50,7 +50,7 @@ class RedisCli(Redis):
             if isinstance(exclude, str):
                 if key != exclude:
                     keys.append(key)
-            if isinstance(exclude, list):
+            elif isinstance(exclude, list):
                 if key not in exclude:
                     keys.append(key)
             else:
