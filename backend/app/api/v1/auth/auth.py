@@ -45,9 +45,7 @@ async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTa
 @router.get('/refresh_token', summary='获取刷新 token', dependencies=[DependsUser])
 async def get_refresh_token(request: Request):
     refresh_token = await AuthService.get_refresh_token(request)
-    if len(refresh_token) > 0:
-        return response_base.success(data=refresh_token)
-    return response_base.success()
+    return response_base.success(data=refresh_token)
 
 
 @router.post('/refresh_token', summary='创建刷新 token', dependencies=[DependsUser])
