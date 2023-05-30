@@ -162,8 +162,8 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await UserDao.delete(db, input_user.id)
             prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{current_user.id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{current_user.id}:',
+                f'{settings.TOKEN_REDIS_PREFIX}:{input_user.id}:',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{input_user.id}:',
             ]
             for i in prefix:
                 await redis_client.delete_prefix(i)
