@@ -132,22 +132,25 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
-    async def update_multi_login(*, request: Request, pk: int, refresh_token: str) -> tuple[int, str, datetime]:
+    async def update_multi_login(*, request: Request, pk: int, current_user: User) -> int:
         async with async_db_session.begin() as db:
+            if not current_user.is_superuser:
+                if not pk == current_user.id:
+                    raise errors.AuthorizationError
             if await UserDao.get(db, pk):
                 count = await UserDao.set_multi_login(db, pk)
                 token = get_token(request)
-                user_id, role_ids, _ = jwt_decode(token)
-                # 获取用户多点登录最新状态
-                is_multi_login = await UserDao.get_multi_login(db, user_id)
-                if not is_multi_login:
-                    prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
-                    await redis_client.delete_prefix(prefix, exclude=prefix + token)
-                # 刷新 token 以更新多点登录状态
-                access_new_token, access_new_token_expire_time = await jwt.create_new_token(
-                    str(user_id), refresh_token, role_ids=role_ids, multi_login=is_multi_login, update_multi_login=True
-                )
-                return count, access_new_token, access_new_token_expire_time
+                user_id, role_ids = jwt_decode(token)
+                latest_multi_login = await UserDao.get_multi_login(db, pk)
+                if pk == user_id:
+                    if not latest_multi_login:
+                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
+                        await redis_client.delete_prefix(prefix, exclude=prefix + token)
+                else:
+                    if not latest_multi_login:
+                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
+                        await redis_client.delete_prefix(prefix)
+                return count
             else:
                 raise errors.NotFoundError(msg='用户不存在')
 

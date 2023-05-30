@@ -118,7 +118,7 @@ def get_token(request: Request) -> str:
     return token
 
 
-def jwt_decode(token: str) -> tuple[int, list[int], bool]:
+def jwt_decode(token: str) -> tuple[int, list[int]]:
     """
     Decode token
 
@@ -129,12 +129,11 @@ def jwt_decode(token: str) -> tuple[int, list[int], bool]:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = int(payload.get('sub'))
         role_ids = list(payload.get('role_ids'))
-        is_multi_login = bool(payload.get('multi_login'))
-        if not user_id or not role_ids or is_multi_login is None:
+        if not user_id or not role_ids:
             raise TokenError
     except (jwt.JWTError, ValidationError, Exception):
         raise TokenError
-    return user_id, role_ids, is_multi_login
+    return user_id, role_ids
 
 
 async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
@@ -144,7 +143,7 @@ async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, i
     :param token:
     :return:
     """
-    user_id, _, _ = jwt_decode(token)
+    user_id, _ = jwt_decode(token)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:

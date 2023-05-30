@@ -39,7 +39,7 @@ class AuthService:
             user = await UserDao.get(db, current_user.id)
             # 创建token
             access_token, _ = await jwt.create_access_token(
-                str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
+                str(user.id), role_ids=user_role_ids
             )
             return access_token, user
 
@@ -57,10 +57,10 @@ class AuthService:
                 user_role_ids = await UserDao.get_role_ids(db, current_user.id)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(
-                    str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
+                    str(user.id), role_ids=user_role_ids
                 )
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                    str(user.id), access_token_expire_time, role_ids=user_role_ids, multi_login=user.is_multi_login
+                    str(user.id), access_token_expire_time, role_ids=user_role_ids
                 )
                 login_logs_params = dict(
                     db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
@@ -80,14 +80,14 @@ class AuthService:
     @staticmethod
     async def get_refresh_token(request: Request) -> list | None:
         token = get_token(request)
-        user_id, _, _ = jwt_decode(token)
+        user_id, _ = jwt_decode(token)
         refresh_token = await redis_client.keys(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}')
         return refresh_token
 
     @staticmethod
     async def refresh_token(request: Request) -> tuple[str, datetime]:
         token = get_token(request)
-        user_id, _, _ = jwt_decode(token)
+        user_id, _ = jwt_decode(token)
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
@@ -96,13 +96,13 @@ class AuthService:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             user_role_ids = await UserDao.get_role_ids(db, current_user.id)
             refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(current_user.id), role_ids=user_role_ids, multi_login=current_user.is_multi_login
+                str(current_user.id), role_ids=user_role_ids
             )
             return refresh_token, refresh_token_expire_time
 
     @staticmethod
     async def new_token(refresh_token: str) -> tuple[str, datetime]:
-        user_id, role_ids, _ = jwt.jwt_decode(refresh_token)
+        user_id, role_ids = jwt.jwt_decode(refresh_token)
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
@@ -110,14 +110,14 @@ class AuthService:
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             access_new_token, access_new_token_expire_time = await jwt.create_new_token(
-                str(current_user.id), refresh_token, role_ids=role_ids, multi_login=current_user.is_multi_login
+                str(current_user.id), refresh_token, role_ids=role_ids
             )
             return access_new_token, access_new_token_expire_time
 
     @staticmethod
     async def logout(request: Request) -> NoReturn:
         token = get_token(request)
-        user_id, _, is_multi_login = jwt_decode(token)
+        user_id, _ = jwt_decode(token)
         if is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
             await redis_client.delete(key)
