@@ -39,7 +39,9 @@ class AuthService:
             # 获取最新用户信息
             user = await UserDao.get(db, current_user.id)
             # 创建token
-            access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
+            access_token, _ = await jwt.create_access_token(
+                str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
+            )
             return access_token, user
 
     async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):
@@ -56,7 +58,7 @@ class AuthService:
                 user_role_ids = await UserDao.get_role_ids(db, current_user.id)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(
-                    str(user.id), role_ids=user_role_ids
+                    str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
                 )
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                     str(user.id), access_token_expire_time, role_ids=user_role_ids
@@ -109,7 +111,7 @@ class AuthService:
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             access_new_token, access_new_token_expire_time = await jwt.create_new_token(
-                str(current_user.id), refresh_token, role_ids=role_ids
+                str(current_user.id), refresh_token, role_ids=role_ids, multi_login=current_user.is_multi_login
             )
             return access_new_token, access_new_token_expire_time
 

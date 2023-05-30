@@ -13,10 +13,13 @@ class SwaggerToken(BaseModel):
     user: GetUserInfoNoRelation
 
 
-class LoginToken(BaseModel):
+class AccessToken(BaseModel):
     access_token: str
     access_token_type: str = 'Bearer'
     access_token_expire_time: datetime
+
+
+class LoginToken(AccessToken):
     refresh_token: str
     refresh_token_type: str = 'Bearer'
     refresh_token_expire_time: datetime
@@ -29,7 +32,5 @@ class RefreshToken(BaseModel):
     refresh_token_expire_time: datetime
 
 
-class NewToken(BaseModel):
-    access_token: str
-    access_token_type: str = 'Bearer'
-    access_token_expire_time: datetime
+class NewToken(AccessToken):
+    pass

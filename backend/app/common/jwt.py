@@ -57,9 +57,10 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     else:
         expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
+    multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
-    if not kwargs.get('multi_login') or kwargs.get('update_multi_login') is True:
+    if multi_login is False:
         prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:'
         await redis_client.delete_prefix(prefix)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
