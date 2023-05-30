@@ -38,9 +38,7 @@ class AuthService:
             # 获取最新用户信息
             user = await UserDao.get(db, current_user.id)
             # 创建token
-            access_token, _ = await jwt.create_access_token(
-                str(user.id), role_ids=user_role_ids
-            )
+            access_token, _ = await jwt.create_access_token(str(user.id), role_ids=user_role_ids)
             return access_token, user
 
     async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):

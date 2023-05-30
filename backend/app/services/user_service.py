@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from typing import NoReturn
 
 from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
 from sqlalchemy import Select
 
-from backend.app.common import jwt
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token, jwt_decode
 from backend.app.common.redis import redis_client
@@ -22,7 +20,6 @@ from backend.app.utils import re_verify
 
 
 class UserService:
-
     @staticmethod
     async def register(obj: CreateUser) -> NoReturn:
         async with async_db_session.begin() as db:
@@ -164,4 +161,10 @@ class UserService:
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await UserDao.delete(db, input_user.id)
+            prefix = [
+                f'{settings.TOKEN_REDIS_PREFIX}:{current_user.id}:',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{current_user.id}:',
+            ]
+            for i in prefix:
+                await redis_client.delete_prefix(i)
             return count
