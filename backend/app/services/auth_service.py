@@ -80,7 +80,7 @@ class AuthService:
     async def get_refresh_token(request: Request) -> list | None:
         token = get_token(request)
         user_id, _ = jwt_decode(token)
-        refresh_token = await redis_client.keys(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}')
+        refresh_token = await redis_client.keys(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:*')
         return refresh_token
 
     @staticmethod
