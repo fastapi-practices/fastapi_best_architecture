@@ -15,6 +15,7 @@ from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
+from backend.app.models import User
 from backend.app.schemas.user import Auth
 from backend.app.services.login_log_service import LoginLogService
 
@@ -113,10 +114,10 @@ class AuthService:
             return access_new_token, access_new_token_expire_time
 
     @staticmethod
-    async def logout(request: Request) -> NoReturn:
+    async def logout(*, request: Request, current_user: User) -> NoReturn:
         token = get_token(request)
         user_id, _ = jwt_decode(token)
-        if is_multi_login:
+        if current_user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
             await redis_client.delete(key)
         else:
