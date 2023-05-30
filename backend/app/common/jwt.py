@@ -52,10 +52,10 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     :return:
     """
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now() + expires_delta
         expire_seconds = int(expires_delta.total_seconds())
     else:
-        expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+        expire = datetime.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
     multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
@@ -78,9 +78,9 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     """
     if expire_time:
         expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire_seconds = int((expire - datetime.utcnow()).total_seconds())
+        expire_seconds = int((expire - datetime.now()).total_seconds())
     else:
-        expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+        expire = datetime.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)

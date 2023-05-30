@@ -21,7 +21,7 @@ from backend.app.services.login_log_service import LoginLogService
 
 
 class AuthService:
-    login_time = parse_datetime(datetime.utcnow())
+    login_time = parse_datetime(datetime.now())
 
     async def swagger_login(self, form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:
