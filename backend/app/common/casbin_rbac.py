@@ -5,7 +5,7 @@ import casbin_async_sqlalchemy_adapter
 from fastapi import Request, Depends
 
 from backend.app.common.exception.errors import AuthorizationError
-from backend.app.common.jwt import CurrentUser
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.core.conf import settings
 from backend.app.core.path_conf import RBAC_MODEL_CONF
 from backend.app.database.db_mysql import async_engine
@@ -26,18 +26,18 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, user: CurrentUser) -> None:
+    async def rbac_verify(self, request: Request, _: str = DependsJwtAuth) -> None:
         """
         权限校验，超级用户跳过校验，默认拥有所有权限
 
         :param request:
-        :param user:
+        :param _:
         :return:
         """
-        user_uuid = user.user_uuid
-        user_roles = user.roles
+        user_uuid = request.user.user_uuid
+        user_roles = request.user.roles
         role_data_scope = [role.data_scope for role in user_roles]
-        super_user = user.is_superuser
+        super_user = request.user.is_superuser
         path = request.url.path
         method = request.method
 

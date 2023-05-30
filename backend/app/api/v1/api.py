@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 
 from backend.app.common.casbin_rbac import DependsRBAC
-from backend.app.common.jwt import DependsUser, CurrentUser
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -15,13 +15,13 @@ from backend.app.services.api_service import ApiService
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsUser])
+@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
 async def get_api(pk: int):
     api = await ApiService.get(pk=pk)
     return response_base.success(data=api)
 
 
-@router.get('', summary='（模糊条件）分页获取所有接口', dependencies=[DependsUser, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有接口', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_apis(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
@@ -34,14 +34,14 @@ async def get_all_apis(
 
 
 @router.post('', summary='创建接口', dependencies=[DependsRBAC])
-async def create_api(obj: CreateApi, user: CurrentUser):
-    await ApiService.create(obj=obj, user_id=user.id)
+async def create_api(request: Request, obj: CreateApi):
+    await ApiService.create(obj=obj, user_id=request.user.id)
     return response_base.success()
 
 
 @router.put('/{pk}', summary='更新接口', dependencies=[DependsRBAC])
-async def update_api(pk: int, obj: UpdateApi, user: CurrentUser):
-    count = await ApiService.update(pk=pk, obj=obj, user_id=user.id)
+async def update_api(request: Request, pk: int, obj: UpdateApi):
+    count = await ApiService.update(pk=pk, obj=obj, user_id=request.user.id)
     if count > 0:
         return response_base.success()
     return response_base.fail()

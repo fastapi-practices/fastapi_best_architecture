@@ -141,11 +141,9 @@ class UserService:
             return user
 
     @staticmethod
-    async def update(*, username: str, current_user: User, obj: UpdateUser) -> int:
+    async def update(*, request: Request, username: str, obj: UpdateUser) -> int:
         async with async_db_session.begin() as db:
-            if not current_user.is_superuser:
-                if not username == current_user.username:
-                    raise errors.AuthorizationError
+            await jwt.superuser_verify(request)
             input_user = await UserDao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -175,11 +173,9 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_avatar(*, username: str, current_user: User, avatar: Avatar) -> int:
+    async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:
         async with async_db_session.begin() as db:
-            if not current_user.is_superuser:
-                if not username == current_user.username:
-                    raise errors.AuthorizationError
+            await jwt.superuser_verify(request)
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -191,8 +187,9 @@ class UserService:
         return await UserDao.get_all(username=username, phone=phone, status=status)
 
     @staticmethod
-    async def update_permission(pk: int) -> int:
+    async def update_permission(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
+            await jwt.superuser_verify(request)
             if await UserDao.get(db, pk):
                 count = await UserDao.set_super(db, pk)
                 return count
@@ -200,20 +197,20 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
-    async def update_active(pk: int) -> int:
+    async def update_active(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
+            await jwt.superuser_verify(request)
             if await UserDao.get(db, pk):
                 count = await UserDao.set_active(db, pk)
+                # TODO: 清除用户所有token
                 return count
             else:
                 raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
-    async def delete(*, username: str, current_user: User) -> int:
+    async def delete(*, request: Request, username: str) -> int:
         async with async_db_session.begin() as db:
-            if not current_user.is_superuser:
-                if not username == current_user.username:
-                    raise errors.AuthorizationError
+            await jwt.superuser_verify(request)
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
