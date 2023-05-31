@@ -71,7 +71,7 @@ class AuthService:
                     request=request,
                     user=current_user,
                     login_time=self.login_time,
-                    status=LoginLogStatus.fail,
+                    status=LoginLogStatus.fail.value,
                     msg=e.msg,
                 )
                 task = BackgroundTask(LoginLogService.create, **err_log_info)
@@ -84,7 +84,7 @@ class AuthService:
                     request=request,
                     user=user,
                     login_time=self.login_time,
-                    status=LoginLogStatus.success,
+                    status=LoginLogStatus.success.value,
                     msg='登录成功',
                 )
                 background_tasks.add_task(LoginLogService.create, **log_info)
