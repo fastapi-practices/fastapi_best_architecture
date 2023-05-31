@@ -104,15 +104,14 @@ def register_exception(app: FastAPI):
             return JSONResponse(
                 status_code=_get_exception_code(exc.code),
                 content=response_base.fail(code=exc.code, msg=str(exc.msg), data=exc.data if exc.data else None),
+                background=exc.background,
             )
 
         else:
-            import traceback
-
-            log.exception(traceback.format_exc())
+            log.error(exc)
             return JSONResponse(
                 status_code=500,
-                content=response_base.fail(code=500, msg=traceback.format_exc())
+                content=response_base.fail(code=500, msg=str(exc))
                 if settings.ENVIRONMENT == 'dev'
                 else response_base.fail(code=500, msg='Internal Server Error'),
             )
