@@ -111,27 +111,26 @@ class UserService:
     async def update_permission(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await jwt.superuser_verify(request)
-            if await UserDao.get(db, pk):
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
                 count = await UserDao.set_super(db, pk)
                 return count
-            else:
-                raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
     async def update_active(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await jwt.superuser_verify(request)
-            if await UserDao.get(db, pk):
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
                 count = await UserDao.set_active(db, pk)
-                # TODO: 清除用户所有token
                 return count
 
     @staticmethod
-    async def update_multi_login(*, request: Request, pk: int, current_user: User) -> int:
+    async def update_multi_login(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            if not current_user.is_superuser:
-                if not pk == current_user.id:
-                    raise errors.AuthorizationError
+            await jwt.superuser_verify(request)
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:

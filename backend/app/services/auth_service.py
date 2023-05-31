@@ -10,12 +10,11 @@ from starlette.background import BackgroundTasks
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
-from backend.app.common.jwt import get_token, jwt_decode
+from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.models import User
 from backend.app.schemas.user import Auth
 from backend.app.services.login_log_service import LoginLogService
 
@@ -93,12 +92,11 @@ class AuthService:
             return access_new_token, access_new_token_expire_time
 
     @staticmethod
-    async def logout(*, request: Request, current_user: User) -> NoReturn:
+    async def logout(request: Request) -> NoReturn:
         token = get_token(request)
-        user_id, _ = jwt_decode(token)
-        if current_user.is_multi_login:
-            key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
+        if request.user.is_multi_login:
+            key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)
         else:
-            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:'
+            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
             await redis_client.delete_prefix(prefix)
