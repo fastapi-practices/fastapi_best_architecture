@@ -54,10 +54,10 @@ async def update_avatar(username: str, avatar: Avatar, current_user: CurrentUser
 
 @router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsUser, PageDepends])
 async def get_all_users(
-        db: CurrentSession,
-        username: Annotated[str | None, Query()] = None,
-        phone: Annotated[str | None, Query()] = None,
-        status: Annotated[int | None, Query()] = None,
+    db: CurrentSession,
+    username: Annotated[str | None, Query()] = None,
+    phone: Annotated[str | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)
