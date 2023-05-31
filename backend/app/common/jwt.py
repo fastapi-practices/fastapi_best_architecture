@@ -82,10 +82,12 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     else:
         expire = datetime.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
+    multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
-    prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
-    await redis_client.delete_prefix(prefix)
+    if multi_login is False:
+        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
+        await redis_client.delete_prefix(prefix)
     key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.setex(key, expire_seconds, refresh_token)
     return refresh_token, expire
