@@ -16,7 +16,6 @@ from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.models import User
-from backend.app.schemas.token import RefreshTokenTime
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -53,46 +52,60 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     :return:
     """
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now() + expires_delta
         expire_seconds = int(expires_delta.total_seconds())
     else:
-        expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+        expire = datetime.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
+    multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
-    if sub not in settings.TOKEN_WHITE_LIST:
-        await redis_client.delete_prefix(f'{settings.TOKEN_REDIS_PREFIX}:{sub}:')
+    if multi_login is False:
+        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:'
+        await redis_client.delete_prefix(prefix)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
     await redis_client.setex(key, expire_seconds, token)
     return token, expire
 
 
-async def create_refresh_token(
-    sub: str, expire_time: datetime | None = None, custom_expire_time: RefreshTokenTime | None = None, **kwargs
-) -> tuple[str, datetime]:
+async def create_refresh_token(sub: str, expire_time: datetime | None = None, **kwargs) -> tuple[str, datetime]:
     """
-    Generate encryption refresh token
+    Generate encryption refresh token, only used to create a new token
 
     :param sub: The subject/userid of the JWT
     :param expire_time: expiry time
-    :param custom_expire_time: custom expiry time
     :return:
     """
     if expire_time:
-        expire = expire_time + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = int((expire - datetime.utcnow()).total_seconds())
-    elif custom_expire_time:
-        expire = custom_expire_time.expire_time
-        expire_seconds = int((expire - datetime.utcnow()).total_seconds())
+        expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+        expire_seconds = int((expire - datetime.now()).total_seconds())
     else:
-        expire = datetime.utcnow() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = settings.TOKEN_EXPIRE_SECONDS
+        expire = datetime.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+        expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
+    multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
-    token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
-    # 刷新 token 时，保持旧 token 有效，不执行删除操作
-    key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
-    await redis_client.setex(key, expire_seconds, token)
-    return token, expire
+    refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
+    if multi_login is False:
+        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
+        await redis_client.delete_prefix(prefix)
+    key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
+    await redis_client.setex(key, expire_seconds, refresh_token)
+    return refresh_token, expire
+
+
+async def create_new_token(sub: str, refresh_token: str, **kwargs) -> tuple[str, datetime]:
+    """
+    Generate new token
+
+    :param sub:
+    :param refresh_token:
+    :return:
+    """
+    redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
+    if not redis_refresh_token or redis_refresh_token != refresh_token:
+        raise TokenError(msg='refresh_token 已过期')
+    new_token, expire = await create_access_token(sub, **kwargs)
+    return new_token, expire
 
 
 def get_token(request: Request) -> str:
@@ -102,10 +115,10 @@ def get_token(request: Request) -> str:
     :return:
     """
     authorization = request.headers.get('Authorization')
-    scheme, param = get_authorization_scheme_param(authorization)
+    scheme, token = get_authorization_scheme_param(authorization)
     if not authorization or scheme.lower() != 'bearer':
         raise TokenError
-    return param
+    return token
 
 
 def jwt_decode(token: str) -> tuple[int, list[int]]:
@@ -118,12 +131,12 @@ def jwt_decode(token: str) -> tuple[int, list[int]]:
     try:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = int(payload.get('sub'))
-        user_roles = list(payload.get('role_ids'))
-        if not user_id or not user_roles:
+        role_ids = list(payload.get('role_ids'))
+        if not user_id or not role_ids:
             raise TokenError
     except (jwt.JWTError, ValidationError, Exception):
         raise TokenError
-    return user_id, user_roles
+    return user_id, role_ids
 
 
 async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
@@ -137,7 +150,7 @@ async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, i
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
-        raise TokenError
+        raise TokenError(msg='token 已过期')
     return {'sub': user_id}
 
 
