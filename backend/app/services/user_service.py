@@ -113,20 +113,20 @@ class UserService:
     @staticmethod
     async def update_permission(pk: int) -> int:
         async with async_db_session.begin() as db:
-            if await UserDao.get(db, pk):
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
                 count = await UserDao.set_super(db, pk)
                 return count
-            else:
-                raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
     async def update_active(pk: int) -> int:
         async with async_db_session.begin() as db:
-            if await UserDao.get(db, pk):
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
                 count = await UserDao.set_active(db, pk)
                 return count
-            else:
-                raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
     async def update_multi_login(*, request: Request, pk: int, current_user: User) -> int:
@@ -134,22 +134,24 @@ class UserService:
             if not current_user.is_superuser:
                 if not pk == current_user.id:
                     raise errors.AuthorizationError
-            if await UserDao.get(db, pk):
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
                 count = await UserDao.set_multi_login(db, pk)
                 token = get_token(request)
                 user_id, role_ids = jwt_decode(token)
                 latest_multi_login = await UserDao.get_multi_login(db, pk)
+                # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:
                         prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
                         await redis_client.delete_prefix(prefix, exclude=prefix + token)
+                # 超级用户修改他人时，他人token将全部失效
                 else:
                     if not latest_multi_login:
                         prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
                         await redis_client.delete_prefix(prefix)
                 return count
-            else:
-                raise errors.NotFoundError(msg='用户不存在')
 
     @staticmethod
     async def delete(*, username: str, current_user: User) -> int:
