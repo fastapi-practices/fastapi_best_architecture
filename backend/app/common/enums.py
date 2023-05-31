@@ -48,3 +48,10 @@ class MethodType(StrEnum):
     PUT = 'PUT'
     DELETE = 'DELETE'
     PATCH = 'PATCH'
+
+
+class LoginLogStatus(IntEnum):
+    """登陆日志状态"""
+
+    fail = 0
+    success = 1
