@@ -9,6 +9,7 @@ from pydantic.datetime_parse import parse_datetime
 from starlette.background import BackgroundTasks, BackgroundTask
 
 from backend.app.common import jwt
+from backend.app.common.enums import LoginLogStatus
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
@@ -66,7 +67,12 @@ class AuthService:
                 raise errors.NotFoundError(msg=e.msg)
             except errors.AuthorizationError as e:
                 err_log_info = dict(
-                    db=db, request=request, user=current_user, login_time=self.login_time, status=0, msg=e.msg
+                    db=db,
+                    request=request,
+                    user=current_user,
+                    login_time=self.login_time,
+                    status=LoginLogStatus.fail,
+                    msg=e.msg,
                 )
                 task = BackgroundTask(LoginLogService.create, **err_log_info)
                 raise errors.AuthorizationError(msg=e.msg, background=task)
@@ -74,8 +80,14 @@ class AuthService:
                 raise e
             else:
                 log_info = dict(
-                    db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
+                    db=db,
+                    request=request,
+                    user=user,
+                    login_time=self.login_time,
+                    status=LoginLogStatus.success,
+                    msg='登录成功',
                 )
+                background_tasks.add_task(LoginLogService.create, **log_info)
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
