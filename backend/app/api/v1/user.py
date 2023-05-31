@@ -80,6 +80,14 @@ async def active_set(request: Request, pk: int):
     return response_base.fail()
 
 
+@router.post('/{pk}/multi', summary='修改用户多点登录状态')
+async def multi_set(request: Request, pk: int, current_user: CurrentUser):
+    count = await UserService.update_multi_login(request=request, pk=pk, current_user=current_user)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
 @router.delete(
     path='/{username}',
     summary='用户注销',
