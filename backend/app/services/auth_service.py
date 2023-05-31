@@ -61,7 +61,7 @@ class AuthService:
                     str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
                 )
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                    str(user.id), access_token_expire_time, role_ids=user_role_ids
+                    str(user.id), access_token_expire_time, role_ids=user_role_ids, multi_login=user.is_multi_login
                 )
                 login_logs_params = dict(
                     db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
@@ -77,33 +77,6 @@ class AuthService:
             else:
                 background_tasks.add_task(LoginLogService.create, **login_logs_params)
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
-
-    @staticmethod
-    async def get_refresh_token(request: Request) -> list | None:
-        token = get_token(request)
-        user_id, _ = jwt_decode(token)
-        refresh_tokens = await redis_client.keys(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:*')
-        refresh_token = None
-        if refresh_tokens:
-            for i in refresh_tokens:
-                refresh_token = i.split(':')[-1]
-        return refresh_token
-
-    @staticmethod
-    async def refresh_token(request: Request) -> tuple[str, datetime]:
-        token = get_token(request)
-        user_id, _ = jwt_decode(token)
-        async with async_db_session() as db:
-            current_user = await UserDao.get(db, user_id)
-            if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
-            elif not current_user.is_active:
-                raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
-            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
-            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(current_user.id), role_ids=user_role_ids
-            )
-            return refresh_token, refresh_token_expire_time
 
     @staticmethod
     async def new_token(refresh_token: str) -> tuple[str, datetime]:

@@ -9,7 +9,7 @@ from starlette.background import BackgroundTasks
 
 from backend.app.common.jwt import DependsUser, CurrentUser
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.token import RefreshToken, LoginToken, SwaggerToken, NewToken
+from backend.app.schemas.token import LoginToken, SwaggerToken, NewToken
 from backend.app.schemas.user import Auth
 from backend.app.services.auth_service import AuthService
 
@@ -39,19 +39,6 @@ async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTa
         refresh_token_expire_time=refresh_expire,
         user=user,
     )
-    return response_base.success(data=data)
-
-
-@router.get('/refresh_token', summary='获取刷新 token', dependencies=[DependsUser])
-async def get_refresh_token(request: Request):
-    refresh_token = await AuthService.get_refresh_token(request)
-    return response_base.success(data=refresh_token)
-
-
-@router.post('/refresh_token', summary='创建刷新 token', dependencies=[DependsUser])
-async def create_refresh_token(request: Request):
-    refresh_token, refresh_expire = await AuthService.refresh_token(request)
-    data = RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=refresh_expire)
     return response_base.success(data=data)
 
 
