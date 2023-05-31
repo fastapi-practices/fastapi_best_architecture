@@ -8,13 +8,12 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from passlib.context import CryptContext
 from pydantic import ValidationError
-from typing_extensions import Annotated
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
-from backend.app.database.db_mysql import CurrentSession
 from backend.app.models import User
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -139,7 +138,7 @@ def jwt_decode(token: str) -> tuple[int, list[int]]:
     return user_id, role_ids
 
 
-async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
+async def jwt_authentication(token: str) -> dict[str, int]:
     """
     JWT authentication
 
@@ -154,9 +153,9 @@ async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, i
     return {'sub': user_id}
 
 
-async def get_current_user(db: CurrentSession, data: dict = Depends(jwt_authentication)) -> User:
+async def get_current_user(db: AsyncSession, data: dict) -> User:
     """
-    Get the current user through tokens
+    Get the current user through token
 
     :param db:
     :param data:
@@ -169,24 +168,18 @@ async def get_current_user(db: CurrentSession, data: dict = Depends(jwt_authenti
     return user
 
 
-async def get_current_is_superuser(user: User = Depends(get_current_user)):
+async def superuser_verify(request: Request) -> bool:
     """
     Verify the current user permissions through token
 
-    :param user:
+    :param request:
     :return:
     """
-    is_superuser = user.is_superuser
+    is_superuser = request.user.is_superuser
     if not is_superuser:
         raise AuthorizationError
     return is_superuser
 
 
-# User Annotated
-CurrentUser = Annotated[User, Depends(get_current_user)]
-CurrentSuperUser = Annotated[bool, Depends(get_current_is_superuser)]
-# Token dependency injection
-CurrentJwtAuth = Annotated[dict, Depends(jwt_authentication)]
-# Permission dependency injection
-DependsUser = Depends(get_current_user)
-DependsSuperUser = Depends(get_current_is_superuser)
+# Jwt verify dependency
+DependsJwtAuth = Depends(oauth2_schema)
