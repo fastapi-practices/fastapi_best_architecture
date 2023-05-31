@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend.app.api.routers import v1
 from backend.app.common.exception.exception_handler import register_exception
@@ -28,7 +29,7 @@ async def register_init(app: FastAPI):
     # 连接 redis
     await redis_client.open()
     # 初始化 limiter
-    await FastAPILimiter.init(redis_client, prefix='fba_limiter')
+    await FastAPILimiter.init(redis_client, prefix=settings.LIMITER_REDIS_PREFIX)
     # 启动定时任务
     scheduler.start()
 
@@ -105,6 +106,11 @@ def register_middleware(app: FastAPI):
         from fastapi.middleware.gzip import GZipMiddleware
 
         app.add_middleware(GZipMiddleware)
+    # JWT auth
+    if settings.MIDDLEWARE_JWT_AUTH:
+        from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
+
+        app.add_middleware(AuthenticationMiddleware, backend=JwtAuthMiddleware())
     # Api access logs
     if settings.MIDDLEWARE_ACCESS:
         from backend.app.middleware.access_middleware import AccessMiddleware

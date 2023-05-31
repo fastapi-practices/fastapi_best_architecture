@@ -30,7 +30,6 @@ class Settings(BaseSettings):
 
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
-    TOKEN_WHITE_LIST: list[str]  # 白名单用户ID，可多点登录
 
     # FastAPI
     API_V1_STR: str = '/v1'
@@ -58,6 +57,9 @@ class Settings(BaseSettings):
     # Location Parse
     LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
 
+    # Limiter
+    LIMITER_REDIS_PREFIX: str = 'fba_limiter'
+
     # MySQL
     DB_ECHO: bool = False
     DB_DATABASE: str = 'fba'
@@ -77,8 +79,10 @@ class Settings(BaseSettings):
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
+    TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
     TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
+    TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
 
     # Log
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
@@ -87,6 +91,7 @@ class Settings(BaseSettings):
     # Middleware
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_GZIP: bool = True
+    MIDDLEWARE_JWT_AUTH: bool = True
     MIDDLEWARE_ACCESS: bool = False
 
     # Casbin
