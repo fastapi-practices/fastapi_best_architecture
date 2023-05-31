@@ -6,7 +6,7 @@ from typing import NoReturn
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic.datetime_parse import parse_datetime
-from starlette.background import BackgroundTasks
+from starlette.background import BackgroundTasks, BackgroundTask
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
@@ -62,19 +62,20 @@ class AuthService:
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
                     str(user.id), access_token_expire_time, role_ids=user_role_ids, multi_login=user.is_multi_login
                 )
-                login_logs_params = dict(
-                    db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
-                )
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except errors.AuthorizationError as e:
-                login_logs_params.update({'status': 0, 'msg': e.msg})
-                background_tasks.add_task(LoginLogService.create, **login_logs_params)
-                raise errors.AuthorizationError(msg=e.msg)
+                err_log_info = dict(
+                    db=db, request=request, user=current_user, login_time=self.login_time, status=0, msg=e.msg
+                )
+                task = BackgroundTask(LoginLogService.create, **err_log_info)
+                raise errors.AuthorizationError(msg=e.msg, background=task)
             except Exception as e:
                 raise e
             else:
-                background_tasks.add_task(LoginLogService.create, **login_logs_params)
+                log_info = dict(
+                    db=db, request=request, user=user, login_time=self.login_time, status=1, msg='登录成功'
+                )
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
