@@ -19,8 +19,8 @@ from backend.app.utils import request_parse
 
 class LoginLogService:
     @staticmethod
-    async def get_select() -> Select:
-        return await LoginLogDao.get_all()
+    async def get_select(*, username: str, status: bool, ipaddr: str) -> Select:
+        return await LoginLogDao.get_all(username=username, status=status, ipaddr=ipaddr)
 
     @staticmethod
     async def create(

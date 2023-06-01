@@ -70,6 +70,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
     async def get_all(self, username: str = None, phone: str = None, status: int = None) -> Select:
         se = (
             select(self.model)
+            .options(selectinload(self.model.dept))
             .options(selectinload(self.model.roles).selectinload(Role.menus))
             .order_by(desc(self.model.time_joined))
         )

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from sqlalchemy import Select, select, desc, delete
+from sqlalchemy import Select, select, desc, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
@@ -11,8 +11,18 @@ from backend.app.schemas.login_log import CreateLoginLog, UpdateLoginLog
 
 
 class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
-    async def get_all(self) -> Select:
-        return select(self.model).order_by(desc(self.model.create_time))
+    async def get_all(self, username: str = None, status: bool = None, ipaddr: str = None) -> Select:
+        se = select(self.model).order_by(desc(self.model.create_time))
+        where_list = []
+        if username:
+            where_list.append(self.model.username.like(f'%{username}%'))
+        if status is not None:
+            where_list.append(self.model.status == status)
+        if ipaddr:
+            where_list.append(self.model.ipaddr.like(f'%{ipaddr}%'))
+        if where_list:
+            se = se.where(and_(*where_list))
+        return se
 
     async def create(self, db: AsyncSession, obj_in: CreateLoginLog) -> NoReturn:
         await self.create_(db, obj_in)

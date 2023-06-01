@@ -57,7 +57,7 @@ async def get_all_users(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
-    status: Annotated[int | None, Query()] = None,
+    status: Annotated[bool | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)
