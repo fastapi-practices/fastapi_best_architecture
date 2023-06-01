@@ -8,7 +8,7 @@ from pydantic import BaseModel
 class LoginLogBase(BaseModel):
     user_uuid: str
     username: str
-    status: int
+    status: bool
     ipaddr: str
     location: str
     browser: str

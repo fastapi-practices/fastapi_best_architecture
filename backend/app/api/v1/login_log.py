@@ -15,9 +15,14 @@ from backend.app.services.login_log_service import LoginLogService
 router = APIRouter()
 
 
-@router.get('', summary='获取所有登录日志', dependencies=[DependsJwtAuth, PageDepends])
-async def get_all_login_logs(db: CurrentSession):
-    log_select = await LoginLogService.get_select()
+@router.get('', summary='（模糊条件）分页获取登录日志', dependencies=[DependsJwtAuth, PageDepends])
+async def get_all_login_logs(
+    db: CurrentSession,
+    username: Annotated[str | None, Query()] = None,
+    status: Annotated[bool | None, Query()] = None,
+    ipaddr: Annotated[str | None, Query()] = None,
+):
+    log_select = await LoginLogService.get_select(username=username, status=status, ipaddr=ipaddr)
     page_data = await paging_data(db, log_select, GetAllLoginLog)
     return response_base.success(data=page_data)
 
