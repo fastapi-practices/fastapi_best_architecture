@@ -2,7 +2,7 @@
 
 简体中文 | [English](./README.md)
 
-这是 FastAPI 框架的一个基础项目，在制作中
+这是 FastAPI 框架的一个基础项目，使用伪三层架构，**目前还在制作中**
 
 它的目的是让你直接用它作为你的基础项目来开发你的项目
 
@@ -14,6 +14,7 @@
 - [x] Pydantic
 - [x] SQLAlchemy
 - [x] Alembic
+- [x] Casbin
 - [x] MySQL
 - [x] Redis
 - [x] APScheduler
@@ -41,7 +42,10 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
     cd backend/app/
     touch .env
     ```
-5. 复制 `.env.example` 到 `.env` 并查看`backend/app/core/conf.py`，更新数据库配置信息
+5. 复制 `.env.example` 到 `.env`
+   ```shell
+   cp .env.example .env
+   ```
 6. 进行数据库迁移[alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
    ```shell
    cd backend/app/
@@ -59,15 +63,19 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 
 ### 2：Docker
 
-1. 在 `docker-compose.yml` 文件所在的目录中运行一键启动命令
-
+1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
+   ```shell
+   cp .env.server ../../backend/app/.env
+   
+   # 此命令为可选
+   cp .env.docker .env
+   ```
+2. 执行一键启动命令
    ```shell
    docker-compose up -d -build
    ```
-   
-2. 等待命令自动完成
-
-3. 浏览器访问：http://127.0.0.1:8000/v1/docs
+3. 等待命令自动完成
+4. 浏览器访问：http://127.0.0.1:8000/v1/docs
 
 ## 初始化测试数据
 
@@ -78,21 +86,15 @@ git clone https://github.com/wu-clan/fastapi_best_architecture.git
 通过 pytest 进行测试
 
 1. 创建一个数据库`fba_test`，选择 utf8mb4 编码
-
 2. 首先，进入app目录
-
    ```shell
    cd backend/app/
    ```
-   
 3. 初始化测试数据
-
    ```shell
    python tests/init_test_data.py
    ```
-
 4. 执行测试命令
-
    ```shell
    pytest -vs --disable-warnings
    ```
