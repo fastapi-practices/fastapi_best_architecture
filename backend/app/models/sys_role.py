@@ -15,9 +15,8 @@ class Role(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(20), unique=True, comment='角色名称')
-    sort: Mapped[int] = mapped_column(default=0, comment='显示顺序')
     data_scope: Mapped[int | None] = mapped_column(default=2, comment='数据范围（1：全部数据权限 2：自定数据权限）')
-    del_flag: Mapped[bool] = mapped_column(default=True, comment='删除标志（0删除 1存在）')
+    del_flag: Mapped[bool] = mapped_column(default=False, comment='删除标志（0删除 1存在）')
     # 角色用户多对多
     users: Mapped[list['User']] = relationship(  # noqa: F821
         init=False, secondary=sys_user_role, back_populates='roles'

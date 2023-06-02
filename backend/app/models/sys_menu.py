@@ -22,7 +22,7 @@ class Menu(Base):
     menu_type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
     icon: Mapped[str | None] = mapped_column(String(100), default='#', comment='菜单图标')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
-    del_flag: Mapped[bool] = mapped_column(default=True, comment='删除标志（0删除 1存在）')
+    del_flag: Mapped[bool] = mapped_column(default=False, comment='删除标志（0删除 1存在）')
     # 菜单角色多对多
     roles: Mapped[list['Role']] = relationship(  # noqa: F821
         init=False, secondary=sys_role_menu, back_populates='menus'
