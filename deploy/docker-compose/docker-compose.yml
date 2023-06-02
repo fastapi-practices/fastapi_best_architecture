@@ -1,18 +1,29 @@
 version: "3.10"
 
+networks:
+  fba_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.10.10.0/24
+
+volumes:
+  fba_mysql:
+  fba_redis:
+  fba_static:
+
 services:
-  app:
+  fba_server:
     build:
-      context: .
+      context: ../../
       dockerfile: Dockerfile
     container_name: "fba_server"
     restart: always
     depends_on:
-      - mysql
-      - redis
+      - fba_mysql
+      - fba_redis
     volumes:
-      - ./backend:/fba/backend
-      - .env.docker:/fba/backend/app/.env
       - fba_static:/fba/backend/app/static
     networks:
       - fba_network
@@ -20,21 +31,21 @@ services:
       - bash
       - -c
       - |
-        wait-for-it -s mysql:3306 -s redis:6379 -t 300
-        supervisord -c supervisor.conf
+        wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
+        supervisord -c /fba/deploy/supervisor.conf
 
-  mysql:
+  fba_mysql:
     image: mysql:8.0.29
     ports:
-      - "3306:3306"
-    container_name: "mysql"
+      - "${DOCKER_DB_MAP_PORT:-3306}:3306"
+    container_name: "fba_mysql"
     restart: always
     environment:
       MYSQL_DATABASE: fba
       MYSQL_ROOT_PASSWORD: 123456
       TZ: Asia/Shanghai
     volumes:
-      - /var/lib/mysql
+      - fba_mysql:/var/lib/mysql
     networks:
       - fba_network
     command:
@@ -43,36 +54,29 @@ services:
       --collation-server=utf8mb4_general_ci
       --lower_case_table_names=1
 
-  redis:
+  fba_redis:
     image: redis:6.2.7
     ports:
-      - "6379:6379"
-    container_name: "redis"
+      - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
+    container_name: "fba_redis"
     restart: always
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      - /var/lib/redis
+      - fba_redis:/var/lib/redis
     networks:
       - fba_network
 
-  nginx:
+  fba_nginx:
     image: nginx
     ports:
       - "8000:80"
-    container_name: "nginx"
+    container_name: "fba_nginx"
     restart: always
     depends_on:
-      - app
+      - fba_server
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
       - fba_static:/www/fba/backend/app/static
     networks:
       - fba_network
-
-
-networks:
-  fba_network:
-
-volumes:
-  fba_static:
