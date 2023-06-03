@@ -2,18 +2,16 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from sqlalchemy import Select, select, desc, delete, and_
+from sqlalchemy import select, desc, and_, delete, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
-from backend.app.models import LoginLog
-from backend.app.schemas.login_log import CreateLoginLog, UpdateLoginLog
+from backend.app.models.sys_opera_log import OperaLog
+from backend.app.schemas.opera_log import CreateOperaLog, UpdateOperaLog
 
 
-class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
-    async def get_all(
-        self, username: str | None = None, status: bool | None = None, ipaddr: str | None = None
-    ) -> Select:
+class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
+    async def get_all(self, username: str | None = None, status: bool | None = None, ipaddr: str | None = None) -> Select:
         se = select(self.model).order_by(desc(self.model.create_time))
         where_list = []
         if username:
@@ -26,9 +24,8 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
             se = se.where(and_(*where_list))
         return se
 
-    async def create(self, db: AsyncSession, obj_in: CreateLoginLog) -> NoReturn:
+    async def create(self, db: AsyncSession, obj_in: CreateOperaLog) -> NoReturn:
         await self.create_(db, obj_in)
-        await db.commit()
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         logs = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
@@ -39,4 +36,4 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
         return logs.rowcount
 
 
-LoginLogDao: CRUDLoginLog = CRUDLoginLog(LoginLog)
+OperaLogDao: CRUDOperaLogDao = CRUDOperaLogDao(OperaLog)

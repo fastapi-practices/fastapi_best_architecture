@@ -13,6 +13,7 @@ from backend.app.common.redis import redis_client
 from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
+from backend.app.middleware.access_middleware import OperaLogMiddleware
 from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.app.utils.health_check import ensure_unique_route_names
 from backend.app.utils.openapi import simplify_operation_ids
@@ -96,11 +97,8 @@ def register_middleware(app: FastAPI):
         from fastapi.middleware.gzip import GZipMiddleware
 
         app.add_middleware(GZipMiddleware)
-    # Api access logs
-    if settings.MIDDLEWARE_ACCESS:
-        from backend.app.middleware.access_middleware import AccessMiddleware
-
-        app.add_middleware(AccessMiddleware)
+    # Opera log
+    app.add_middleware(OperaLogMiddleware)
     # JWT auth: Always open
     app.add_middleware(
         AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
