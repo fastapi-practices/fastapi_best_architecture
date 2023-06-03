@@ -6,8 +6,8 @@ from backend.app.schemas.menu import CreateMenu, UpdateMenu
 
 
 class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
-    # TODO: 添加 menu 相关数据库操作
-    pass
+    async def get(self, db, menu_id: int) -> Menu | None:
+        return await self.get_(db, menu_id)
 
 
 MenuDao: CRUDMenu = CRUDMenu(Menu)

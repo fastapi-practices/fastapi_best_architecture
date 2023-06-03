@@ -12,7 +12,7 @@ from backend.app.schemas.api import CreateApi, UpdateApi
 class ApiService:
     @staticmethod
     async def get(*, pk: int) -> Api:
-        async with async_db_session.begin() as db:
+        async with async_db_session() as db:
             api = await ApiDao.get(db, pk)
             if not api:
                 raise errors.NotFoundError(msg='接口不存在')
