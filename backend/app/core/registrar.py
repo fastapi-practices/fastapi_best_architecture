@@ -103,6 +103,12 @@ def register_middleware(app: FastAPI):
         from fastapi.middleware.gzip import GZipMiddleware
 
         app.add_middleware(GZipMiddleware)
+    # Access log
+    # TODO: opera log 中间件完全可行时将被删除
+    if settings.MIDDLEWARE_ACCESS:
+        from backend.app.middleware.access_middleware import AccessMiddleware
+
+        app.add_middleware(AccessMiddleware)
     # Opera log
     app.add_middleware(OperaLogMiddleware)
     # JWT auth: Always open
