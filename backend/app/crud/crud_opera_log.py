@@ -6,7 +6,7 @@ from sqlalchemy import select, desc, and_, delete, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
-from backend.app.models.sys_opera_log import OperaLog
+from backend.app.models import OperaLog
 from backend.app.schemas.opera_log import CreateOperaLog, UpdateOperaLog
 
 
