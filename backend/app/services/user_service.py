@@ -135,8 +135,8 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             else:
                 count = await UserDao.set_multi_login(db, pk)
-                token = get_token(request)
-                user_id, role_ids = jwt_decode(token)
+                token = await get_token(request)
+                user_id, role_ids = await jwt_decode(token)
                 latest_multi_login = await UserDao.get_multi_login(db, pk)
                 # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效

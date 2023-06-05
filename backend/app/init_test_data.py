@@ -41,7 +41,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_superuser=True,
             dept_id=1,
@@ -70,7 +70,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_superuser=True,
             dept_id=1,
@@ -88,7 +88,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_superuser=False,
             dept_id=1,
@@ -106,7 +106,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_active=False,
             is_superuser=False,
@@ -125,7 +125,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_superuser=True,
             dept_id=1,
@@ -143,7 +143,7 @@ class InitTestData:
         user_obj = User(
             username=username,
             nickname=username,
-            password=get_hash_password(password),
+            password=await get_hash_password(password),
             email=email,
             is_active=False,
             is_superuser=True,

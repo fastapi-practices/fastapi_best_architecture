@@ -39,17 +39,17 @@ async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTa
         refresh_token_expire_time=refresh_expire,
         user=user,
     )
-    return response_base.success(data=data)
+    return await response_base.success(data=data)
 
 
 @router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(refresh_token: Annotated[str, Query(...)]):
     access_token, access_expire = await AuthService.new_token(refresh_token)
     data = NewToken(access_token=access_token, access_token_expire_time=access_expire)
-    return response_base.success(data=data)
+    return await response_base.success(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request):
     await AuthService.logout(request)
-    return response_base.success()
+    return await response_base.success()

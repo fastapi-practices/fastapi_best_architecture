@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 import httpx
 from XdbSearchIP.xdbSearcher import XdbSearcher
+from asynctranslator import sync_to_async
 from httpx import HTTPError
 from fastapi import Request
 
 from backend.app.core.path_conf import IP2REGION_XDB
 
 
-async def get_request_ip(request: Request) -> str:
+@sync_to_async
+def get_request_ip(request: Request) -> str:
     """获取请求的 ip 地址"""
     real = request.headers.get('X-Real-IP')
     if real:
@@ -46,6 +48,7 @@ async def get_location_online(ipaddr: str, user_agent: str) -> str:
     return city or '未知' if city != '' else '未知'
 
 
+@sync_to_async
 def get_location_offline(ipaddr: str) -> str:
     """
     离线获取 ip 地址属地，无法保证准确率，100%可用

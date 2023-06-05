@@ -37,7 +37,7 @@ def _get_exception_code(status_code):
 
 def register_exception(app: FastAPI):
     @app.exception_handler(HTTPException)
-    def http_exception_handler(request: Request, exc: HTTPException):
+    async def http_exception_handler(request: Request, exc: HTTPException):
         """
         全局HTTP异常处理
 
@@ -47,12 +47,12 @@ def register_exception(app: FastAPI):
         """
         return JSONResponse(
             status_code=_get_exception_code(exc.status_code),
-            content=response_base.fail(code=exc.status_code, msg=exc.detail),
+            content=await response_base.fail(code=exc.status_code, msg=exc.detail),
             headers=exc.headers,
         )
 
     @app.exception_handler(RequestValidationError)
-    def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
         """
         数据验证异常处理
 
@@ -84,7 +84,7 @@ def register_exception(app: FastAPI):
                 message += 'json解析失败'
         return JSONResponse(
             status_code=422,
-            content=response_base.fail(
+            content=await response_base.fail(
                 code=422,
                 msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
                 data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
@@ -92,7 +92,7 @@ def register_exception(app: FastAPI):
         )
 
     @app.exception_handler(Exception)
-    def all_exception_handler(request: Request, exc: Exception):
+    async def all_exception_handler(request: Request, exc: Exception):
         """
         全局异常处理
 
@@ -103,14 +103,14 @@ def register_exception(app: FastAPI):
         if isinstance(exc, BaseExceptionMixin):
             return JSONResponse(
                 status_code=_get_exception_code(exc.code),
-                content=response_base.fail(code=exc.code, msg=str(exc.msg), data=exc.data if exc.data else None),
+                content=await response_base.fail(code=exc.code, msg=str(exc.msg), data=exc.data if exc.data else None),
                 background=exc.background,
             )
 
         elif isinstance(exc, AssertionError):
             return JSONResponse(
                 status_code=500,
-                content=response_base.fail(
+                content=await response_base.fail(
                     code=500,
                     msg=','.join(exc.args)
                     if exc.args
@@ -119,14 +119,14 @@ def register_exception(app: FastAPI):
                     else exc.__doc__,
                 )
                 if settings.ENVIRONMENT == 'dev'
-                else response_base.fail(code=500, msg='Internal Server Error'),
+                else await response_base.fail(code=500, msg='Internal Server Error'),
             )
 
         else:
             log.error(exc)
             return JSONResponse(
                 status_code=500,
-                content=response_base.fail(code=500, msg=str(exc))
+                content=await response_base.fail(code=500, msg=str(exc))
                 if settings.ENVIRONMENT == 'dev'
-                else response_base.fail(code=500, msg='Internal Server Error'),
+                else await response_base.fail(code=500, msg='Internal Server Error'),
             )

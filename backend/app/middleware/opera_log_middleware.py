@@ -43,7 +43,7 @@ class OperaLogMiddleware:
         if settings.LOCATION_PARSE == 'online':
             location = await request_parse.get_location_online(ip, user_agent)
         elif settings.LOCATION_PARSE == 'offline':
-            location = request_parse.get_location_offline(ip)
+            location = await request_parse.get_location_offline(ip)
         else:
             location = '未知'
         try:
