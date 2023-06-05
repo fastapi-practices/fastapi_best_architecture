@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
 from datetime import datetime
 from typing import Any
 
-from fastapi import UploadFile
 from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
@@ -39,7 +37,9 @@ class OperaLogMiddleware:
         # 请求信息解析
         ip = await request_parse.get_request_ip(request)
         user_agent = request.headers.get('User-Agent')
-        _, os, browser = str(parse(user_agent)).replace(' ', '').split('/')
+        user_agent_parsed = parse(user_agent)
+        os = user_agent_parsed.get_os()
+        browser = user_agent_parsed.get_browser()
         if settings.LOCATION_PARSE == 'online':
             location = await request_parse.get_location_online(ip, user_agent)
         elif settings.LOCATION_PARSE == 'offline':
@@ -52,17 +52,18 @@ class OperaLogMiddleware:
             username = None
         method = request.method
         args = dict(request.query_params)
-        form_data = await request.form()
-        if len(form_data) > 0:
-            args = json.dumps(
-                args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()}),
-                ensure_ascii=False,
-            )
-        else:
-            body = await request.body()
-            if body:
-                json_data = await request.json()
-                args = json.dumps(args.update(json_data), ensure_ascii=False)
+        # TODO: 注释说明，详见 https://github.com/fastapi-practices/fastapi_best_architecture/pull/92
+        # form_data = await request.form()
+        # if len(form_data) > 0:
+        #     args = json.dumps(
+        #         args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()}),
+        #         ensure_ascii=False,
+        #     )
+        # else:
+        #     body = await request.body()
+        #     if body:
+        #         json_data = await request.json()
+        #         args = json.dumps(args.update(json_data), ensure_ascii=False)
         args = str(args) if len(args) > 0 else None
 
         # 设置附加请求信息
@@ -81,10 +82,8 @@ class OperaLogMiddleware:
         start_time = datetime.now()
         try:
             await self.app(request.scope, request.receive, send)
-            log.info('3')
         except Exception as e:
-            log.info('4')
-            # log.exception(e)
+            log.exception(e)
             code = getattr(e, 'code', 500)
             msg = getattr(e, 'msg', 'Internal Server Error')
             status = False
