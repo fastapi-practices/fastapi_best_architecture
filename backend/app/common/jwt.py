@@ -165,6 +165,8 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     user = await UserDao.get_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError
+    if not user.is_active:
+        raise AuthorizationError(msg='用户已锁定')
     return user
 
 
