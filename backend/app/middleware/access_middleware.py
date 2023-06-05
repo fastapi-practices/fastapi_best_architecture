@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from backend.app.common.log import log
 
@@ -11,7 +11,7 @@ from backend.app.common.log import log
 class AccessMiddleware(BaseHTTPMiddleware):
     """记录请求日志中间件"""
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         start_time = datetime.now()
         response = await call_next(request)
         end_time = datetime.now()

@@ -24,18 +24,14 @@ class LoginLogService:
 
     @staticmethod
     async def create(
-        *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: int, msg: str
+        *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: bool, msg: str
     ) -> NoReturn:
         try:
             ip = await request_parse.get_request_ip(request)
-            user_agent = request.headers.get('User-Agent')
-            _, os_info, browser = str(parse(user_agent)).replace(' ', '').split('/')
-            if settings.LOCATION_PARSE == 'online':
-                location = await request_parse.get_location_online(ip, user_agent)
-            elif settings.LOCATION_PARSE == 'offline':
-                location = request_parse.get_location_offline(ip)
-            else:
-                location = '未知'
+            # 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
+            location = request.state.location
+            browser = request.state.browser
+            os = request.state.os
             obj_in = CreateLoginLog(
                 user_uuid=user.user_uuid,
                 username=user.username,
@@ -43,7 +39,7 @@ class LoginLogService:
                 ipaddr=ip,
                 location=location,
                 browser=browser,
-                os=os_info,
+                os=os,
                 msg=msg,
                 login_time=login_time,
             )
