@@ -107,6 +107,21 @@ def register_exception(app: FastAPI):
                 background=exc.background,
             )
 
+        elif isinstance(exc, AssertionError):
+            return JSONResponse(
+                status_code=500,
+                content=response_base.fail(
+                    code=500,
+                    msg=','.join(exc.args)
+                    if exc.args
+                    else exc.__repr__()
+                    if not exc.__repr__().startswith('AssertionError()')
+                    else exc.__doc__,
+                )
+                if settings.ENVIRONMENT == 'dev'
+                else response_base.fail(code=500, msg='Internal Server Error'),
+            )
+
         else:
             log.error(exc)
             return JSONResponse(
