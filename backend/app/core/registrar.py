@@ -13,7 +13,7 @@ from backend.app.common.redis import redis_client
 from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
-from backend.app.middleware.access_middleware import OperaLogMiddleware
+from backend.app.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.app.utils.health_check import ensure_unique_route_names
 from backend.app.utils.openapi import simplify_operation_ids
@@ -92,6 +92,12 @@ def register_static_file(app: FastAPI):
 
 
 def register_middleware(app: FastAPI):
+    """
+    中间件，执行顺序从下往上
+
+    :param app:
+    :return:
+    """
     # Gzip
     if settings.MIDDLEWARE_GZIP:
         from fastapi.middleware.gzip import GZipMiddleware

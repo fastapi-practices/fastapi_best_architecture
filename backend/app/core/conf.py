@@ -101,6 +101,14 @@ class Settings(BaseSettings):
         {'method': 'POST', 'path': '/api/v1/auth/password/reset'},
     ]
 
+    # Opera log
+    OPERA_LOG_EXCLUDE: list[str] = [
+        DOCS_URL,
+        REDOCS_URL,
+        OPENAPI_URL,
+        '/api/v1/auth/swagger_login',
+    ]
+
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
         env_file = '.env'

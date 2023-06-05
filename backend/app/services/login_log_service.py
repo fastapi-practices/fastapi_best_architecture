@@ -27,7 +27,7 @@ class LoginLogService:
         *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: bool, msg: str
     ) -> NoReturn:
         try:
-            # TODO: 替换为 request.state 中的数据（来自 access 中间件）
+            # TODO: 替换为 request.state 中的数据（来自 opera_log 中间件）
             ip = await request_parse.get_request_ip(request)
             user_agent = request.headers.get('User-Agent')
             _, os_info, browser = str(parse(user_agent)).replace(' ', '').split('/')
