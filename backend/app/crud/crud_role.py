@@ -16,9 +16,7 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
 
     async def get_with_relation(self, db, role_id: int) -> Role | None:
         role = await db.execute(
-            select(self.model)
-            .options(selectinload(self.model.menus))
-            .where(self.model.id == role_id)
+            select(self.model).options(selectinload(self.model.menus)).where(self.model.id == role_id)
         )
         return role.scalars().first()
 
