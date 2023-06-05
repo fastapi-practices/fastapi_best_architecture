@@ -46,9 +46,10 @@ class OperaLogMiddleware:
             location = request_parse.get_location_offline(ip)
         else:
             location = '未知'
-        if request.user.is_authenticated:
+        try:
+            # 此信息依赖于 jwt 中间件
             username = request.user.username
-        else:
+        except AttributeError:
             username = None
         method = request.method
         args = dict(request.query_params)

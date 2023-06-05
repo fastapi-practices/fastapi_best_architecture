@@ -52,4 +52,6 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
             raise _AuthenticationError(msg=traceback.format_exc() if settings.ENVIRONMENT == 'dev' else None)
 
+        # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
+        # 标准返回模式请查看：https://www.starlette.io/authentication/
         return auth, user
