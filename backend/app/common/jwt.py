@@ -63,9 +63,9 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if multi_login is False:
-        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:'
+        prefix = f'{settings.TOKEN_REDIS_PREFIX}::{sub}::'
         await redis_client.delete_prefix(prefix)
-    key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
+    key = f'{settings.TOKEN_REDIS_PREFIX}::{sub}::{token}'
     await redis_client.setex(key, expire_seconds, token)
     return token, expire
 
@@ -88,9 +88,9 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if multi_login is False:
-        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
+        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}::{sub}::'
         await redis_client.delete_prefix(prefix)
-    key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
+    key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}::{sub}::{refresh_token}'
     await redis_client.setex(key, expire_seconds, refresh_token)
     return refresh_token, expire
 
@@ -103,7 +103,7 @@ async def create_new_token(sub: str, refresh_token: str, **kwargs) -> tuple[str,
     :param refresh_token:
     :return:
     """
-    redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
+    redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}::{sub}::{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
         raise TokenError(msg='refresh_token 已过期')
     new_token, expire = await create_access_token(sub, **kwargs)
@@ -151,7 +151,7 @@ async def jwt_authentication(token: str) -> dict[str, int]:
     :return:
     """
     user_id, _ = await jwt_decode(token)
-    key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
+    key = f'{settings.TOKEN_REDIS_PREFIX}::{user_id}::{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
         raise TokenError(msg='token 已过期')

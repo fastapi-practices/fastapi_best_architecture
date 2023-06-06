@@ -108,8 +108,8 @@ class AuthService:
     async def logout(request: Request) -> NoReturn:
         token = await get_token(request)
         if request.user.is_multi_login:
-            key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
+            key = f'{settings.TOKEN_REDIS_PREFIX}::{request.user.id}::{token}'
             await redis_client.delete(key)
         else:
-            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
+            prefix = f'{settings.TOKEN_REDIS_PREFIX}::{request.user.id}::'
             await redis_client.delete_prefix(prefix)

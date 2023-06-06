@@ -142,12 +142,12 @@ class UserService:
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:
-                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
+                        prefix = f'{settings.TOKEN_REDIS_PREFIX}::{pk}::'
                         await redis_client.delete_prefix(prefix, exclude=prefix + token)
                 # 超级用户修改他人时，他人token将全部失效
                 else:
                     if not latest_multi_login:
-                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
+                        prefix = f'{settings.TOKEN_REDIS_PREFIX}::{pk}::'
                         await redis_client.delete_prefix(prefix)
                 return count
 
@@ -160,8 +160,8 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await UserDao.delete(db, input_user.id)
             prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{input_user.id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{input_user.id}:',
+                f'{settings.TOKEN_REDIS_PREFIX}::{input_user.id}::',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}::{input_user.id}::',
             ]
             for i in prefix:
                 await redis_client.delete_prefix(i)
