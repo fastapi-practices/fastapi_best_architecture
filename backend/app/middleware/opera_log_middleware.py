@@ -92,7 +92,7 @@ class OperaLogMiddleware:
         end_time = datetime.now()
         summary = request.scope.get('route').summary
         title = summary if summary != '' else request.scope.get('route').summary
-        cost_time = (end_time - start_time).total_seconds() / 1000.0
+        cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         # 日志创建
         opera_log_in = CreateOperaLog(
@@ -102,6 +102,8 @@ class OperaLogMiddleware:
             path=path,
             ipaddr=ip,
             location=location,
+            os=os,
+            browser=browser,
             args=args,
             status=status,
             code=code,

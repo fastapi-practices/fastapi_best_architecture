@@ -12,6 +12,8 @@ class OperaLogBase(BaseModel):
     path: str
     ipaddr: str
     location: str
+    os: str
+    browser: str
     args: str | None
     status: bool
     code: int
