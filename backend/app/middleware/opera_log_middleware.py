@@ -102,6 +102,8 @@ class OperaLogMiddleware:
             path=path,
             ipaddr=ip,
             location=location,
+            os=os,
+            browser=browser,
             args=args,
             status=status,
             code=code,
