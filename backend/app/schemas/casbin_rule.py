@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from curses.ascii import isupper
-
 from pydantic import BaseModel, Field, validator
 
 from backend.app.common.enums import MethodType
@@ -17,7 +15,7 @@ class CreatePolicy(RBACBase):
 
     @validator('method')
     def check_method(cls, v):
-        if not isupper(v):
+        if not v.isupper():
             raise ValueError('请求方式必须大写')
         allow_method = MethodType.get_member_values()
         if v not in allow_method:
@@ -33,7 +31,7 @@ class DeletePolicy(CreatePolicy):
     pass
 
 
-class UserRole(BaseModel):
+class CreateUserRole(BaseModel):
     uuid: str = Field(..., description='用户uuid')
     role: str = Field(..., description='角色')
 
