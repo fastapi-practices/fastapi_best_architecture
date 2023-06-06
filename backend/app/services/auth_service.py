@@ -28,7 +28,7 @@ class AuthService:
             current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not jwt.password_verify(form_data.password, current_user.password):
+            elif not await jwt.password_verify(form_data.password, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
@@ -50,7 +50,7 @@ class AuthService:
                 current_user = await UserDao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户不存在')
-                elif not jwt.password_verify(obj.password, current_user.password):
+                elif not await jwt.password_verify(obj.password, current_user.password):
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.is_active:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
@@ -92,7 +92,7 @@ class AuthService:
 
     @staticmethod
     async def new_token(refresh_token: str) -> tuple[str, datetime]:
-        user_id, role_ids = jwt.jwt_decode(refresh_token)
+        user_id, role_ids = await jwt.jwt_decode(refresh_token)
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
@@ -106,7 +106,7 @@ class AuthService:
 
     @staticmethod
     async def logout(request: Request) -> NoReturn:
-        token = get_token(request)
+        token = await get_token(request)
         if request.user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)

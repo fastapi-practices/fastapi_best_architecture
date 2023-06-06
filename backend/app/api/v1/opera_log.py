@@ -17,27 +17,27 @@ router = APIRouter()
 
 @router.get('', summary='（模糊条件）分页获取操作日志', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_opera_logs(
-        db: CurrentSession,
-        username: Annotated[str | None, Query()] = None,
-        status: Annotated[bool | None, Query()] = None,
-        ipaddr: Annotated[str | None, Query()] = None,
+    db: CurrentSession,
+    username: Annotated[str | None, Query()] = None,
+    status: Annotated[bool | None, Query()] = None,
+    ipaddr: Annotated[str | None, Query()] = None,
 ):
     log_select = await OperaLogService.get_select(username=username, status=status, ipaddr=ipaddr)
     page_data = await paging_data(db, log_select, GetAllOperaLog)
-    return response_base.success(data=page_data)
+    return await response_base.success(data=page_data)
 
 
 @router.delete('', summary='（批量）删除操作日志', dependencies=[DependsRBAC])
 async def delete_opera_log(pk: Annotated[list[int], Query(...)]):
     count = await OperaLogService.delete(pk)
     if count > 0:
-        return response_base.success()
-    return response_base.fail()
+        return await response_base.success()
+    return await response_base.fail()
 
 
 @router.delete('/all', summary='清空操作日志', dependencies=[DependsRBAC])
 async def delete_all_opera_logs():
     count = await OperaLogService.delete_all()
     if count > 0:
-        return response_base.success()
-    return response_base.fail()
+        return await response_base.success()
+    return await response_base.fail()

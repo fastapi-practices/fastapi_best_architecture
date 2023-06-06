@@ -11,7 +11,9 @@ from backend.app.schemas.opera_log import CreateOperaLog, UpdateOperaLog
 
 
 class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
-    async def get_all(self, username: str | None = None, status: bool | None = None, ipaddr: str | None = None) -> Select:
+    async def get_all(
+        self, username: str | None = None, status: bool | None = None, ipaddr: str | None = None
+    ) -> Select:
         se = select(self.model).order_by(desc(self.model.create_time))
         where_list = []
         if username:

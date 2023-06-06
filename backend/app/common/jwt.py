@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
+from asgiref.sync import sync_to_async
 from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -21,6 +22,7 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_schema = OAuth2PasswordBearer(tokenUrl=settings.TOKEN_URL_SWAGGER)
 
 
+@sync_to_async
 def get_hash_password(password: str) -> str:
     """
     Encrypt passwords using the hash algorithm
@@ -31,6 +33,7 @@ def get_hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
+@sync_to_async
 def password_verify(plain_password: str, hashed_password: str) -> bool:
     """
     Password verification
@@ -107,6 +110,7 @@ async def create_new_token(sub: str, refresh_token: str, **kwargs) -> tuple[str,
     return new_token, expire
 
 
+@sync_to_async
 def get_token(request: Request) -> str:
     """
     Get token for request header
@@ -120,6 +124,7 @@ def get_token(request: Request) -> str:
     return token
 
 
+@sync_to_async
 def jwt_decode(token: str) -> tuple[int, list[int]]:
     """
     Decode token
@@ -145,7 +150,7 @@ async def jwt_authentication(token: str) -> dict[str, int]:
     :param token:
     :return:
     """
-    user_id, _ = jwt_decode(token)
+    user_id, _ = await jwt_decode(token)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
@@ -170,7 +175,8 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     return user
 
 
-async def superuser_verify(request: Request) -> bool:
+@sync_to_async
+def superuser_verify(request: Request) -> bool:
     """
     Verify the current user permissions through token
 

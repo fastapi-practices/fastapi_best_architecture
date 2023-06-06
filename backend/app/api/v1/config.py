@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get('', summary='获取系统配置', dependencies=[DependsRBAC])
 async def get_sys_config():
-    return response_base.success(
+    return await response_base.success(
         data={
             'title': settings.TITLE,
             'version': settings.VERSION,
@@ -59,4 +59,4 @@ async def get_all_route(request: Request):
     for route in request.app.routes:
         if isinstance(route, APIRoute):
             data.append({'path': route.path, 'name': route.name, 'summary': route.summary, 'methods': route.methods})
-    return response_base.success(data={'route_list': data})
+    return await response_base.success(data={'route_list': data})

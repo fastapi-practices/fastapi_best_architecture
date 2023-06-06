@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from pydantic import validate_arguments, BaseModel
 
 from backend.app.utils.encoders import jsonable_encoder
@@ -51,19 +52,26 @@ class ResponseBase:
 
         @router.get('/test')
         def test():
-            return response_base.success(data={'test': 'test'})
+            return await response_base.success(data={'test': 'test'})
     """  # noqa: E501
 
     @staticmethod
+    @sync_to_async
     def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
         custom_encoder = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
         kwargs.update({'custom_encoder': custom_encoder})
-        return jsonable_encoder(data, exclude=exclude, **kwargs)
+        result = jsonable_encoder(data, exclude=exclude, **kwargs)
+        return result
 
-    @staticmethod
     @validate_arguments
-    def success(
-        *, code: int = 200, msg: str = 'Success', data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+    async def success(
+        self,
+        *,
+        code: int = 200,
+        msg: str = 'Success',
+        data: Any | None = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs
     ) -> dict:
         """
         请求成功返回通用方法
@@ -74,15 +82,20 @@ class ResponseBase:
         :param exclude: 排除返回数据(data)字段
         :return:
         """
-        data = data if data is None else ResponseBase.__json_encoder(data, exclude, **kwargs)
+        data = data if data is None else await self.__json_encoder(data, exclude, **kwargs)
         return {'code': code, 'msg': msg, 'data': data}
 
-    @staticmethod
     @validate_arguments
-    def fail(
-        *, code: int = 400, msg: str = 'Bad Request', data: Any = None, exclude: _ExcludeData | None = None, **kwargs
+    async def fail(
+        self,
+        *,
+        code: int = 400,
+        msg: str = 'Bad Request',
+        data: Any = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs
     ) -> dict:
-        data = data if data is None else ResponseBase.__json_encoder(data, exclude, **kwargs)
+        data = data if data is None else await self.__json_encoder(data, exclude, **kwargs)
         return {'code': code, 'msg': msg, 'data': data}
 
 

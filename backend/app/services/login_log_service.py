@@ -6,10 +6,8 @@ from typing import NoReturn
 from fastapi import Request
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
-from user_agents import parse
 
 from backend.app.common.log import log
-from backend.app.core.conf import settings
 from backend.app.crud.crud_login_log import LoginLogDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User

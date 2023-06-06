@@ -4,7 +4,7 @@ import datetime
 import uuid
 
 
-def get_uuid() -> str:
+def get_uuid_str() -> str:
     """
     生成uuid
 
