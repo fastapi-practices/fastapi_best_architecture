@@ -3,9 +3,9 @@ aioredis==2.0.1
 aiosmtplib==1.1.6
 alembic==1.7.4
 APScheduler==3.8.1
+asgiref==3.7.2
 asynccasbin==1.1.8
 asyncmy==0.2.5
-asynctranslator==1.0.1
 bcrypt==3.2.2
 casbin_async_sqlalchemy_adapter==1.1.0
 cryptography==41.0.0

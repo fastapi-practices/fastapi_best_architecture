@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import httpx
 from XdbSearchIP.xdbSearcher import XdbSearcher
-from asynctranslator import sync_to_async
+from asgiref.sync import sync_to_async
 from httpx import HTTPError
 from fastapi import Request
 

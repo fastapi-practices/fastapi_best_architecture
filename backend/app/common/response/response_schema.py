@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from asynctranslator import sync_to_async
+from asgiref.sync import sync_to_async
 from pydantic import validate_arguments, BaseModel
 
 from backend.app.utils.encoders import jsonable_encoder
