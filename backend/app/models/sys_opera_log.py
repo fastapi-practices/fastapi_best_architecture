@@ -21,6 +21,8 @@ class OperaLog(DataClassBase):
     path: Mapped[str] = mapped_column(String(500), comment='请求路径')
     ipaddr: Mapped[str] = mapped_column(String(50), comment='IP地址')
     location: Mapped[str] = mapped_column(String(50), comment='归属地')
+    os: Mapped[str] = mapped_column(String(50), comment='操作系统')
+    browser: Mapped[str] = mapped_column(String(50), comment='浏览器')
     args: Mapped[str | None] = mapped_column(JSON(), comment='请求参数')
     status: Mapped[bool] = mapped_column(comment='操作状态（0异常 1正常）')
     code: Mapped[int] = mapped_column(insert_default=200, comment='操作状态码')
