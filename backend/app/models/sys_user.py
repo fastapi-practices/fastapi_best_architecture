@@ -29,7 +29,9 @@ class User(DataClassBase):
     time_joined: Mapped[datetime] = mapped_column(init=False, default=func.now(), comment='注册时间')
     last_login: Mapped[datetime | None] = mapped_column(init=False, onupdate=func.now(), comment='上次登录')
     # 部门用户一对多
-    dept_id: Mapped[int | None] = mapped_column(ForeignKey('sys_dept.id'), default=None, comment='部门关联ID')
+    dept_id: Mapped[int | None] = mapped_column(
+        ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, comment='部门关联ID'
+    )
     dept: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='users')  # noqa: F821
     # 用户角色多对多
     roles: Mapped[list['Role']] = relationship(  # noqa: F821
