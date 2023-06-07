@@ -55,3 +55,10 @@ class LoginLogStatus(IntEnum):
 
     fail = 0
     success = 1
+
+
+class BuildTreeType(StrEnum):
+    """构建树形结构类型"""
+
+    traversal = 'traversal'
+    recursive = 'recursive'

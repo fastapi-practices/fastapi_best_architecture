@@ -16,7 +16,7 @@ from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
 
 class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
-        return await self.get_(db, user_id)
+        return await self.get_(db, pk=user_id)
 
     async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
         user = await db.execute(select(self.model).where(self.model.username == username))

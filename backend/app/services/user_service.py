@@ -22,7 +22,7 @@ from backend.app.utils import re_verify
 
 class UserService:
     @staticmethod
-    async def register(obj: CreateUser) -> NoReturn:
+    async def register(*, obj: CreateUser) -> NoReturn:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -44,7 +44,7 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def pwd_reset(obj: ResetPassword) -> int:
+    async def pwd_reset(*, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
             pwd1 = obj.password1
             pwd2 = obj.password2
@@ -54,7 +54,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_userinfo(username: str) -> User:
+    async def get_userinfo(*, username: str) -> User:
         async with async_db_session() as db:
             user = await UserDao.get_with_relation(db, username=username)
             if not user:

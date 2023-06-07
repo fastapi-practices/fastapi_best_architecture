@@ -46,7 +46,7 @@ class LoginLogService:
             log.exception(f'登录日志创建失败: {e}')
 
     @staticmethod
-    async def delete(pk: list[int]) -> int:
+    async def delete(*, pk: list[int]) -> int:
         async with async_db_session.begin() as db:
             count = await LoginLogDao.delete(db, pk)
             return count

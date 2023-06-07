@@ -61,7 +61,7 @@ async def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | Non
 
 
 async def get_tree_data(
-        row: Sequence[RowData], build_type: BuildTreeType = BuildTreeType.traversal, *, parent_id: int | None = None
+    row: Sequence[RowData], build_type: BuildTreeType = BuildTreeType.traversal, *, parent_id: int | None = None
 ) -> list[dict[str, Any]]:
     """
     获取树形结构数据

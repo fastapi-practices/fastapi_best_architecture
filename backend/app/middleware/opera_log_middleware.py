@@ -111,7 +111,7 @@ class OperaLogMiddleware:
             cost_time=cost_time,
             opera_time=start_time,
         )
-        back = BackgroundTask(OperaLogService.create, opera_log_in)
+        back = BackgroundTask(OperaLogService.create, obj_in=opera_log_in)
         await back()
 
         # 错误抛出

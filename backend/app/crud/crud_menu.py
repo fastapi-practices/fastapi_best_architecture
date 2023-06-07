@@ -7,7 +7,7 @@ from backend.app.schemas.menu import CreateMenu, UpdateMenu
 
 class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
     async def get(self, db, menu_id: int) -> Menu | None:
-        return await self.get_(db, menu_id)
+        return await self.get_(db, pk=menu_id)
 
 
 MenuDao: CRUDMenu = CRUDMenu(Menu)

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Annotated
 
-from fastapi import Query
 from pydantic import BaseModel
 
 from backend.app.schemas.user import GetUserInfoNoRelation
