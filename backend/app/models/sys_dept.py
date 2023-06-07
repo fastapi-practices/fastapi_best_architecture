@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Union
+
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,8 +26,7 @@ class Dept(Base):
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
     )
     # 父级部门一对多
-    parent: Mapped['Dept' | None] = relationship(init=False, back_populates='children', remote_side=[id])
-    # 子部门一对多
-    children: Mapped['Dept' | None] = relationship(init=False, back_populates='parent')
+    parent: Mapped[list['Dept']] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='parent')
     # 部门用户一对多
     users: Mapped['User'] = relationship(init=False, back_populates='dept')  # noqa: F821

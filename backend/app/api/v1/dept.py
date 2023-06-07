@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 
+from backend.app.common.casbin_rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.dept import CreateDept, GetAllDept
@@ -31,13 +32,13 @@ async def get_all_depts(
     return await response_base.success(data=dept)
 
 
-@router.post('', summary='创建部门', dependencies=[DependsJwtAuth])
+@router.post('', summary='创建部门', dependencies=[DependsRBAC])
 async def create_dept(request: Request, obj: CreateDept):
     await DeptService.create(obj=obj, user_id=request.user.id)
     return await response_base.success()
 
 
-@router.put('/{pk}', summary='更新部门', dependencies=[DependsJwtAuth])
+@router.put('/{pk}', summary='更新部门', dependencies=[DependsRBAC])
 async def update_dept(request: Request, pk: int, obj: CreateDept):
     count = await DeptService.update(pk=pk, obj=obj, user_id=request.user.id)
     if count > 0:
@@ -45,7 +46,7 @@ async def update_dept(request: Request, pk: int, obj: CreateDept):
     return await response_base.fail()
 
 
-@router.delete('{pk}', summary='删除部门', dependencies=[DependsJwtAuth])
+@router.delete('{pk}', summary='删除部门', dependencies=[DependsRBAC])
 async def delete_dept(pk: int):
     count = await DeptService.delete(pk=pk)
     if count > 0:
