@@ -34,6 +34,7 @@ class UserService:
                 validate_email(obj.email, check_deliverability=False).email
             except EmailNotValidError:
                 raise errors.ForbiddenError(msg='邮箱格式错误')
+            # TODO: 部门删除状态校验
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -84,6 +85,7 @@ class UserService:
                 if not re_verify.is_phone(obj.phone):
                     raise errors.ForbiddenError(msg='手机号码输入有误')
             dept = await DeptDao.get(db, obj.dept_id)
+            # TODO: 部门删除状态校验
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:

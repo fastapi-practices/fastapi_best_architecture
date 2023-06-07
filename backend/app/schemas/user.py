@@ -51,6 +51,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
 
 
 class GetAllUserInfo(GetUserInfoNoRelation):
+    dept_id: int | None = None
     dept: GetAllDept | None = None
     roles: list[GetAllRole]
 

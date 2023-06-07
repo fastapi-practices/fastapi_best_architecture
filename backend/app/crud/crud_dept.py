@@ -15,6 +15,9 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
     async def get(self, db: AsyncSession, dept_id: int) -> Dept | None:
         return await self.get_(db, pk=dept_id, del_flag=0)
 
+    async def get_by_name(self, db: AsyncSession, name: str) -> Dept | None:
+        return await self.get_(db, name=name)
+
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: bool = None
     ) -> Any:

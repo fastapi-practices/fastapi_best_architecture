@@ -21,6 +21,7 @@ class InitTestData:
     async def create_dept(self):
         """自动创建部门"""
         async with self.session.begin() as db:
+            # TODO: 添加手机号，邮箱
             department_obj = Dept(name='test', create_user=1)
             db.add(department_obj)
         log.info('部门 test 创建成功')
