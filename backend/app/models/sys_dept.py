@@ -26,7 +26,7 @@ class Dept(Base):
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
     )
     # 父级部门一对多
-    parent: Mapped[list['Dept']] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[list['Dept'] | None] = relationship(init=False, back_populates='parent')
     # 部门用户一对多
-    users: Mapped['User'] = relationship(init=False, back_populates='dept')  # noqa: F821
+    users: Mapped[list['User']] = relationship(init=False, back_populates='dept')  # noqa: F821
