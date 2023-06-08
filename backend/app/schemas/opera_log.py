@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel
 
 
 class OperaLogBase(BaseModel):
-    username: str | None
+    username: str | None = None
     method: str
     title: str
     path: str
@@ -14,10 +15,10 @@ class OperaLogBase(BaseModel):
     location: str
     os: str
     browser: str
-    args: str | None
+    args: dict | None = None
     status: bool
     code: int
-    msg: str | None
+    msg: str | None = None
     cost_time: float
     opera_time: datetime
 
