@@ -45,3 +45,22 @@ class AESCipher:
         padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
         plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
         return plaintext
+
+
+class Md5Cipher:
+    @staticmethod
+    def encrypt(plaintext: bytes | str) -> str:
+        """
+        MD5 加密
+
+        :param plaintext: 加密前的明文
+        :return:
+        """
+        import hashlib
+
+        md5 = hashlib.md5()
+        if isinstance(plaintext, str):
+            md5.update(plaintext.encode('utf-8'))
+        else:
+            md5.update(plaintext)
+        return md5.hexdigest()

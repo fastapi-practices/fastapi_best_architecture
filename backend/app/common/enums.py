@@ -62,3 +62,11 @@ class BuildTreeType(StrEnum):
 
     traversal = 'traversal'
     recursive = 'recursive'
+
+
+class OperaLogCipherType(IntEnum):
+    """操作日志加密类型"""
+
+    aes = 0
+    md5 = 1
+    plan = 2

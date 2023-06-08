@@ -9,12 +9,13 @@ from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
 from user_agents import parse
 
+from backend.app.common.enums import OperaLogCipherType
 from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
 from backend.app.utils import request_parse
-from backend.app.utils.encrypt import AESCipher
+from backend.app.utils.encrypt import AESCipher, Md5Cipher
 
 
 class OperaLogMiddleware:
@@ -103,12 +104,25 @@ class OperaLogMiddleware:
         title = summary if summary != '' else request.scope.get('route').summary
         args.update(request.path_params)
         if len(args) > 0:
-            if settings.OPERA_LOG_ENCRYPT:
-                for key in args.keys():
-                    if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
-                        args[key] = (
-                            AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(bytes(args[key], encoding='utf-8'))
-                        ).hex()
+            match settings.OPERA_LOG_ENCRYPT:
+                case OperaLogCipherType.aes:
+                    for key in args.keys():
+                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                            args[key] = (
+                                AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(
+                                    bytes(args[key], encoding='utf-8')
+                                )
+                            ).hex()
+                case OperaLogCipherType.md5:
+                    for key in args.keys():
+                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                            args[key] = Md5Cipher.encrypt(args[key])
+                case OperaLogCipherType.plan:
+                    pass
+                case _:
+                    for key in args.keys():
+                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                            args[key] = '******'
         args = args if len(args) > 0 else None
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 

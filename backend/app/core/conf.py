@@ -112,7 +112,7 @@ class Settings(BaseSettings):
         OPENAPI_URL,
         '/v1/auth/swagger_login',
     ]
-    OPERA_LOG_ENCRYPT: bool = True  # 请求入参加密, 可能造成性能影响
+    OPERA_LOG_ENCRYPT: int = 1  # 请求入参加密, 0: AES (高性能损耗), 1: md5, 2: 不加密, other: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password']
 
     class Config:
