@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 from typing import Any
 
+from fastapi import UploadFile
 from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
@@ -53,19 +55,18 @@ class OperaLogMiddleware:
             username = None
         method = request.method
         args = dict(request.query_params)
-        # TODO: 注释说明，详见 https://github.com/fastapi-practices/fastapi_best_architecture/pull/92
+        # TODO: 详见 https://github.com/fastapi-practices/fastapi_best_architecture/pull/92
+        # TODO: 详见 https://github.com/tiangolo/fastapi/pull/9636
         # form_data = await request.form()
         # if len(form_data) > 0:
-        #     args = json.dumps(
-        #         args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()}),
-        #         ensure_ascii=False,
-        #     )
+        #     args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})
+        #     args = json.dumps(args, ensure_ascii=False,)
         # else:
         #     body = await request.body()
         #     if body:
         #         json_data = await request.json()
-        #         args = json.dumps(args.update(json_data), ensure_ascii=False)
-        args = str(args) if len(args) > 0 else None
+        #         args.update(json_data)
+        #         args = json.dumps(args, ensure_ascii=False)
 
         # 设置附加请求信息
         request.state.ip = ip
@@ -92,6 +93,8 @@ class OperaLogMiddleware:
         end_time = datetime.now()
         summary = request.scope.get('route').summary
         title = summary if summary != '' else request.scope.get('route').summary
+        args.update(request.path_params)
+        args = str(args) if len(args) > 0 else None
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         # 日志创建
