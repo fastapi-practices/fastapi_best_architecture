@@ -19,7 +19,7 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         return await self.get_(db, name=name)
 
     async def get_all(
-        self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: bool = None
+            self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: bool = None
     ) -> Any:
         se = select(self.model).order_by(desc(self.model.sort))
         where_list = [self.model.del_flag == 0]
@@ -57,16 +57,6 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         result = await db.execute(select(self.model).where(self.model.id == dept_id))
         dept = result.scalars().first()
         return dept.children
-
-    async def remove_user_relation(self, db: AsyncSession, dept_id: int) -> None:
-        user_relation = await self.get_user_relation(db, dept_id)
-        for i in user_relation:
-            user_relation.remove(i)
-
-    async def get_status(self, db: AsyncSession, dept_id: int) -> bool:
-        result = await db.execute(select(self.model).where(self.model.id == dept_id))
-        dept = result.scalars().first()
-        return dept.status
 
 
 DeptDao: CRUDDept = CRUDDept(Dept)

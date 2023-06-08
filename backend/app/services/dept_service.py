@@ -54,7 +54,6 @@ class DeptService:
     @staticmethod
     async def delete(*, pk: int):
         async with async_db_session.begin() as db:
-            await DeptDao.remove_user_relation(db, pk)
             dept_user = await DeptDao.get_user_relation(db, pk)
             if dept_user:
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
