@@ -14,6 +14,7 @@ from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
 from backend.app.utils import request_parse
+from backend.app.utils.encrypt import AESCipher
 
 
 class OperaLogMiddleware:
@@ -21,7 +22,6 @@ class OperaLogMiddleware:
 
     def __init__(self, app: ASGIApp):
         self.app = app
-
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope['type'] != 'http':
@@ -88,7 +88,8 @@ class OperaLogMiddleware:
                         # body = message.get('body', b'')
                         # if body:
                         #     yield body
-                            yield message
+                        yield message
+
             wrapped_rcv = wrapped_rcv_gen().__anext__
             await self.app(request.scope, wrapped_rcv, send)
         except Exception as e:
@@ -101,6 +102,13 @@ class OperaLogMiddleware:
         summary = request.scope.get('route').summary
         title = summary if summary != '' else request.scope.get('route').summary
         args.update(request.path_params)
+        if len(args) > 0:
+            if settings.OPERA_LOG_ENCRYPT:
+                for key in args.keys():
+                    if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                        args[key] = (
+                            AESCipher(settings.OPERA_ENCRYPT_SECRET_KEY).encrypt(bytes(args[key], encoding='utf-8'))
+                        ).hex()
         args = args if len(args) > 0 else None
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 

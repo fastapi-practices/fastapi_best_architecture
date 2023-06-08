@@ -84,5 +84,5 @@ class GetAllUserInfo(GetUserInfoNoRelation):
 
 class ResetPassword(BaseModel):
     id: int
-    password1: str
-    password2: str
+    old_password: str
+    new_password: str

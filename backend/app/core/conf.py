@@ -29,7 +29,10 @@ class Settings(BaseSettings):
     APS_REDIS_DATABASE: int
 
     # Env Token
-    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
+    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
+
+    # Env Opera Log
+    OPERA_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # FastAPI
     API_V1_STR: str = '/v1'
@@ -109,6 +112,8 @@ class Settings(BaseSettings):
         OPENAPI_URL,
         '/v1/auth/swagger_login',
     ]
+    OPERA_LOG_ENCRYPT: bool = True  # 请求入参加密, 可能造成性能影响
+    OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password']
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support

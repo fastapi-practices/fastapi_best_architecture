@@ -23,6 +23,7 @@ async def user_register(obj: CreateUser):
 
 @router.post('/password/reset', summary='密码重置')
 async def password_reset(obj: ResetPassword):
+    # TODO: 权限验证
     count = await UserService.pwd_reset(obj=obj)
     if count > 0:
         return await response_base.success()

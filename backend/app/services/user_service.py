@@ -40,11 +40,11 @@ class UserService:
     @staticmethod
     async def pwd_reset(*, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
-            pwd1 = obj.password1
-            pwd2 = obj.password2
+            pwd1 = obj.old_password
+            pwd2 = obj.new_password
             if pwd1 != pwd2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await UserDao.reset_password(db, obj.id, obj.password2)
+            count = await UserDao.reset_password(db, obj.id, obj.new_password)
             return count
 
     @staticmethod
