@@ -68,7 +68,6 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         return user.rowcount
 
     async def get_all(self, username: str = None, phone: str = None, status: int = None) -> Select:
-        # TODO: 部门删除状态
         se = (
             select(self.model)
             .options(selectinload(self.model.dept))
@@ -134,7 +133,6 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
             where.append(self.model.username == username)
         user = await db.execute(
             select(self.model)
-            # TODO: 部门删除状态
             .options(selectinload(self.model.dept))
             .options(selectinload(self.model.roles).joinedload(Role.menus))
             .where(*where)

@@ -19,7 +19,7 @@ class MenuBase(BaseModel):
     del_flag: bool
 
     @validator('menu_type')
-    def check_menu_type(cls, v):
+    def menu_type_validator(cls, v):
         if v not in MenuType.get_member_values():
             raise ValueError('菜单类型只能是0、1、2')
         return v

@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
 from datetime import datetime
 from typing import Any
 
-from fastapi import UploadFile
 from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
@@ -55,8 +53,7 @@ class OperaLogMiddleware:
             username = None
         method = request.method
         args = dict(request.query_params)
-        # TODO: 详见 https://github.com/fastapi-practices/fastapi_best_architecture/pull/92
-        # TODO: 详见 https://github.com/tiangolo/fastapi/pull/9636
+        # TODO: 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
         # form_data = await request.form()
         # if len(form_data) > 0:
         #     args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})

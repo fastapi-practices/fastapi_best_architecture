@@ -14,7 +14,7 @@ class CreatePolicy(RBACBase):
     method: str = Field(default=MethodType.GET, description='请求方法')
 
     @validator('method')
-    def check_method(cls, v):
+    def method_validator(cls, v):
         if not v.isupper():
             raise ValueError('请求方式必须大写')
         allow_method = MethodType.get_member_values()

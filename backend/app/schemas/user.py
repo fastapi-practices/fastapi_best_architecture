@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, HttpUrl, Field
+from email_validator import validate_email, EmailNotValidError
+from pydantic import BaseModel, HttpUrl, Field, validator
 
 from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
@@ -19,6 +20,14 @@ class CreateUser(Auth):
     nickname: str
     email: str = Field(..., example='user@example.com')
 
+    @validator('email')
+    def email_validate(cls, v):
+        try:
+            validate_email(v, check_deliverability=False).email
+        except EmailNotValidError:
+            raise ValueError('邮箱格式错误')
+        return v
+
 
 class _UserInfoBase(BaseModel):
     dept_id: int
@@ -26,6 +35,20 @@ class _UserInfoBase(BaseModel):
     nickname: str
     email: str = Field(..., example='user@example.com')
     phone: str | None = None
+
+    @validator('email')
+    def email_validate(cls, v):
+        try:
+            validate_email(v, check_deliverability=False).email
+        except EmailNotValidError:
+            raise ValueError('邮箱格式错误')
+        return v
+
+    @validator('phone')
+    def phone_validate(cls, v):
+        if v is not None and not v.isdigit():
+            raise ValueError('手机号格式错误')
+        return v
 
 
 class UpdateUser(_UserInfoBase):

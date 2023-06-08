@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import event
-
 from backend.app.common.exception import errors
 from backend.app.crud.crud_dept import DeptDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.models import Dept
 from backend.app.schemas.dept import CreateDept, UpdateDept
 from backend.app.utils.build_tree import get_tree_data
 
@@ -36,7 +33,6 @@ class DeptService:
             dept = await DeptDao.get_by_name(db, obj.name)
             if dept:
                 raise errors.ForbiddenError(msg='部门名称已存在')
-            # TODO: 手机号，邮箱格式校验
             new_obj = obj.dict()
             new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'create_user': user_id})
             await DeptDao.create(db, new_obj)
@@ -50,7 +46,6 @@ class DeptService:
             if dept.name != obj.name:
                 if await DeptDao.get_by_name(db, obj.name):
                     raise errors.ForbiddenError(msg='部门名称已存在')
-            # TODO: 手机号，邮箱格式校验
             new_obj = obj.dict()
             new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'update_user': user_id})
             count = await DeptDao.update(db, pk, new_obj)
@@ -59,19 +54,12 @@ class DeptService:
     @staticmethod
     async def delete(*, pk: int):
         async with async_db_session.begin() as db:
+            await DeptDao.remove_user_relation(db, pk)
             dept_user = await DeptDao.get_user_relation(db, pk)
             if dept_user:
-                # 用于确认监听事件是否生效
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
             children = await DeptDao.get_children(db, pk)
             if children:
                 raise errors.ForbiddenError(msg='部门下存在子部门，无法删除')
             count = await DeptDao.delete(db, pk)
             return count
-
-    @staticmethod
-    @event.listens_for(Dept, 'before_delete')
-    # TODO: 更新为内部逻辑，因为是软删除，此处将不适用
-    async def before_delete_handler(dept_id: int):
-        async with async_db_session() as db:
-            await DeptDao.remove_user_relation(db, dept_id)

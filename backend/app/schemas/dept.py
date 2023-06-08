@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+
+from backend.app.utils.re_verify import is_phone
 
 
 class DeptBase(BaseModel):
@@ -13,6 +15,24 @@ class DeptBase(BaseModel):
     phone: str | None = None
     email: str | None = None
     status: bool
+
+    @validator('phone')
+    def phone_validator(cls, v):
+        if v is not None and not v.isdigit():
+            if not is_phone(v):
+                raise ValueError('手机号码输入有误')
+        return v
+
+    @validator('email')
+    def email_validator(cls, v):
+        if v is not None:
+            from email_validator import validate_email, EmailNotValidError
+
+            try:
+                validate_email(v, check_deliverability=False).email
+            except EmailNotValidError:
+                raise ValueError('邮箱格式错误')
+        return v
 
 
 class CreateDept(DeptBase):

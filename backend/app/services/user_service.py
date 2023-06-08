@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
 from sqlalchemy import Select
 
@@ -17,7 +16,6 @@ from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
-from backend.app.utils import re_verify
 
 
 class UserService:
@@ -30,11 +28,6 @@ class UserService:
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
-            try:
-                validate_email(obj.email, check_deliverability=False).email
-            except EmailNotValidError:
-                raise errors.ForbiddenError(msg='邮箱格式错误')
-            # TODO: 部门删除状态校验
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -74,18 +67,10 @@ class UserService:
                 if username:
                     raise errors.ForbiddenError(msg='该用户名已存在')
             if input_user.email != obj.email:
-                _email = await UserDao.check_email(db, obj.email)
-                if _email:
+                email = await UserDao.check_email(db, obj.email)
+                if email:
                     raise errors.ForbiddenError(msg='该邮箱已注册')
-                try:
-                    validate_email(obj.email, check_deliverability=False).email
-                except EmailNotValidError:
-                    raise errors.ForbiddenError(msg='邮箱格式错误')
-            if obj.phone is not None:
-                if not re_verify.is_phone(obj.phone):
-                    raise errors.ForbiddenError(msg='手机号码输入有误')
             dept = await DeptDao.get(db, obj.dept_id)
-            # TODO: 部门删除状态校验
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
