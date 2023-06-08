@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
 
     # Env Opera Log
-    OPERA_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
+    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # FastAPI
     API_V1_STR: str = '/v1'

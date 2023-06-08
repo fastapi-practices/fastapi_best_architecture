@@ -89,6 +89,7 @@ class OperaLogMiddleware:
                         # if body:
                         #     yield body
                         yield message
+
             wrapped_rcv = wrapped_rcv_gen().__anext__
             await self.app(request.scope, wrapped_rcv, send)
         except Exception as e:
@@ -106,7 +107,7 @@ class OperaLogMiddleware:
                 for key in args.keys():
                     if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
                         args[key] = (
-                            AESCipher(settings.OPERA_ENCRYPT_SECRET_KEY).encrypt(bytes(args[key], encoding='utf-8'))
+                            AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(bytes(args[key], encoding='utf-8'))
                         ).hex()
         args = args if len(args) > 0 else None
         cost_time = (end_time - start_time).total_seconds() * 1000.0
