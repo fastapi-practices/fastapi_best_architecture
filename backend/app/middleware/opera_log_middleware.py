@@ -89,7 +89,6 @@ class OperaLogMiddleware:
                         # if body:
                         #     yield body
                         yield message
-
             wrapped_rcv = wrapped_rcv_gen().__anext__
             await self.app(request.scope, wrapped_rcv, send)
         except Exception as e:
