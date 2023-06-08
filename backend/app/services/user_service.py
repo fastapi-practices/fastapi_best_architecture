@@ -7,7 +7,7 @@ from sqlalchemy import Select
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
-from backend.app.common.jwt import get_token, jwt_decode
+from backend.app.common.jwt import get_token, jwt_decode, password_verify
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
@@ -38,13 +38,16 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def pwd_reset(*, obj: ResetPassword) -> int:
+    async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
-            pwd1 = obj.old_password
-            pwd2 = obj.new_password
-            if pwd1 != pwd2:
-                raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await UserDao.reset_password(db, obj.id, obj.new_password)
+            iop = obj.old_password
+            if not await password_verify(iop, request.user.password):
+                raise errors.ForbiddenError(msg='旧密码错误')
+            np1 = obj.new_password
+            np2 = obj.new_password_confirm
+            if np1 != np2:
+                raise errors.ForbiddenError(msg='新密码输入不一致')
+            count = await UserDao.reset_password(db, request.user.id, obj.new_password)
             return count
 
     @staticmethod

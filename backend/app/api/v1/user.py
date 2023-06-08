@@ -21,10 +21,9 @@ async def user_register(obj: CreateUser):
     return await response_base.success()
 
 
-@router.post('/password/reset', summary='密码重置')
-async def password_reset(obj: ResetPassword):
-    # TODO: 权限验证
-    count = await UserService.pwd_reset(obj=obj)
+@router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
+async def password_reset(request: Request, obj: ResetPassword):
+    count = await UserService.pwd_reset(request=request, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
