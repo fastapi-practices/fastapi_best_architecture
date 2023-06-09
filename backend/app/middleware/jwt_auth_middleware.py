@@ -52,7 +52,9 @@ class JwtAuthMiddleware(AuthenticationBackend):
             log.exception(e)
             raise _AuthenticationError(
                 code=getattr(e, 'code', 500),
-                msg=traceback.format_exc() if settings.ENVIRONMENT == 'dev' else 'Internal Server Error',
+                msg=getattr(e, 'msg', traceback.format_exc())
+                if settings.ENVIRONMENT == 'dev'
+                else 'Internal Server Error',
             )
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
