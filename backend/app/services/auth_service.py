@@ -34,14 +34,10 @@ class AuthService:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
             await UserDao.update_login_time(db, form_data.username, self.login_time)
-            # 查询用户角色
-            user_role_ids = await UserDao.get_role_ids(db, current_user.id)
             # 获取最新用户信息
             user = await UserDao.get(db, current_user.id)
             # 创建token
-            access_token, _ = await jwt.create_access_token(
-                str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
-            )
+            access_token, _ = await jwt.create_access_token(str(user.id), multi_login=user.is_multi_login)
             return access_token, user
 
     async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):
@@ -55,13 +51,12 @@ class AuthService:
                 elif not current_user.is_active:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
                 await UserDao.update_login_time(db, obj.username, self.login_time)
-                user_role_ids = await UserDao.get_role_ids(db, current_user.id)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(
-                    str(user.id), role_ids=user_role_ids, multi_login=user.is_multi_login
+                    str(user.id), multi_login=user.is_multi_login
                 )
                 refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                    str(user.id), access_token_expire_time, role_ids=user_role_ids, multi_login=user.is_multi_login
+                    str(user.id), access_token_expire_time, multi_login=user.is_multi_login
                 )
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
@@ -92,7 +87,7 @@ class AuthService:
 
     @staticmethod
     async def new_token(*, refresh_token: str) -> tuple[str, datetime]:
-        user_id, role_ids = await jwt.jwt_decode(refresh_token)
+        user_id = await jwt.jwt_decode(refresh_token)
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
@@ -100,7 +95,7 @@ class AuthService:
             elif not current_user.is_active:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             access_new_token, access_new_token_expire_time = await jwt.create_new_token(
-                str(current_user.id), refresh_token, role_ids=role_ids, multi_login=current_user.is_multi_login
+                str(current_user.id), refresh_token, multi_login=current_user.is_multi_login
             )
             return access_new_token, access_new_token_expire_time
 
