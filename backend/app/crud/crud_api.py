@@ -12,7 +12,7 @@ from backend.app.schemas.api import CreateApi, UpdateApi
 
 class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
     async def get(self, db: AsyncSession, pk: int) -> Api | None:
-        return await self.get_(db, pk)
+        return await self.get_(db, pk=pk)
 
     async def get_all(self, name: str = None, method: str = None, path: str = None) -> Select:
         se = select(self.model).order_by(desc(self.model.created_time))

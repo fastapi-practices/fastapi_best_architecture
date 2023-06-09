@@ -29,7 +29,10 @@ class Settings(BaseSettings):
     APS_REDIS_DATABASE: int
 
     # Env Token
-    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32))
+    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
+
+    # Env Opera Log
+    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # FastAPI
     API_V1_STR: str = '/v1'
@@ -95,7 +98,7 @@ class Settings(BaseSettings):
 
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
-    CASBIN_EXCLUDE: list[dict[str, str], dict[str, str]] = [
+    CASBIN_EXCLUDE: list[dict[str, str]] = [
         {'method': 'POST', 'path': '/v1/auth/swagger_login'},
         {'method': 'POST', 'path': '/v1/auth/login'},
         {'method': 'POST', 'path': '/v1/auth/register'},
@@ -109,6 +112,8 @@ class Settings(BaseSettings):
         OPENAPI_URL,
         '/v1/auth/swagger_login',
     ]
+    OPERA_LOG_ENCRYPT: int = 1  # 请求入参加密, 0: AES (高性能损耗), 1: md5, 2: 不加密, other: 替换为 ******
+    OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support

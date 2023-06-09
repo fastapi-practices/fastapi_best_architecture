@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from email_validator import validate_email, EmailNotValidError
 from fastapi import Request
 from sqlalchemy import Select
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
-from backend.app.common.jwt import get_token, jwt_decode
+from backend.app.common.jwt import get_token, jwt_decode, password_verify
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
@@ -17,12 +16,11 @@ from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
-from backend.app.utils import re_verify
 
 
 class UserService:
     @staticmethod
-    async def register(obj: CreateUser) -> NoReturn:
+    async def register(*, obj: CreateUser) -> NoReturn:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -30,10 +28,6 @@ class UserService:
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
-            try:
-                validate_email(obj.email, check_deliverability=False).email
-            except EmailNotValidError:
-                raise errors.ForbiddenError(msg='邮箱格式错误')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -44,17 +38,20 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def pwd_reset(obj: ResetPassword) -> int:
+    async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
-            pwd1 = obj.password1
-            pwd2 = obj.password2
-            if pwd1 != pwd2:
-                raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await UserDao.reset_password(db, obj.id, obj.password2)
+            iop = obj.old_password
+            if not await password_verify(iop, request.user.password):
+                raise errors.ForbiddenError(msg='旧密码错误')
+            np1 = obj.new_password
+            np2 = obj.confirm_password
+            if np1 != np2:
+                raise errors.ForbiddenError(msg='新密码输入不一致')
+            count = await UserDao.reset_password(db, request.user.id, obj.new_password)
             return count
 
     @staticmethod
-    async def get_userinfo(username: str) -> User:
+    async def get_userinfo(*, username: str) -> User:
         async with async_db_session() as db:
             user = await UserDao.get_with_relation(db, username=username)
             if not user:
@@ -73,16 +70,9 @@ class UserService:
                 if username:
                     raise errors.ForbiddenError(msg='该用户名已存在')
             if input_user.email != obj.email:
-                _email = await UserDao.check_email(db, obj.email)
-                if _email:
+                email = await UserDao.check_email(db, obj.email)
+                if email:
                     raise errors.ForbiddenError(msg='该邮箱已注册')
-                try:
-                    validate_email(obj.email, check_deliverability=False).email
-                except EmailNotValidError:
-                    raise errors.ForbiddenError(msg='邮箱格式错误')
-            if obj.phone is not None:
-                if not re_verify.is_phone(obj.phone):
-                    raise errors.ForbiddenError(msg='手机号码输入有误')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')

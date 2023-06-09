@@ -14,9 +14,9 @@ class RoleBase(BaseModel):
     del_flag: bool
 
     @validator('data_scope')
-    def check_data_scope(cls, v):
+    def data_scope_validator(cls, v):
         if v not in RoleDataScope.get_member_values():
-            raise ValueError('数据范围只能是1或2')
+            raise ValueError('数据范围只能是 1 或 2')
         return v
 
 

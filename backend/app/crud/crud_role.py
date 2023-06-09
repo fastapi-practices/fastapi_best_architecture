@@ -12,7 +12,7 @@ from backend.app.schemas.role import CreateRole, UpdateRole
 
 class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
     async def get(self, db, role_id: int) -> Role | None:
-        return await self.get_(db, role_id)
+        return await self.get_(db, pk=role_id)
 
     async def get_with_relation(self, db, role_id: int) -> Role | None:
         role = await db.execute(

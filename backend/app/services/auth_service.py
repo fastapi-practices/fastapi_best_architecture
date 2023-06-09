@@ -23,7 +23,7 @@ from backend.app.services.login_log_service import LoginLogService
 class AuthService:
     login_time = parse_datetime(datetime.now())
 
-    async def swagger_login(self, form_data: OAuth2PasswordRequestForm):
+    async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:
             current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
@@ -91,7 +91,7 @@ class AuthService:
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def new_token(refresh_token: str) -> tuple[str, datetime]:
+    async def new_token(*, refresh_token: str) -> tuple[str, datetime]:
         user_id, role_ids = await jwt.jwt_decode(refresh_token)
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
@@ -105,7 +105,7 @@ class AuthService:
             return access_new_token, access_new_token_expire_time
 
     @staticmethod
-    async def logout(request: Request) -> NoReturn:
+    async def logout(*, request: Request) -> NoReturn:
         token = await get_token(request)
         if request.user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'

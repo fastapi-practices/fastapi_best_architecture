@@ -14,7 +14,7 @@ class ApiBase(BaseModel):
     remark: str | None = None
 
     @validator('method')
-    def check_method(cls, v):
+    def method_validator(cls, v):
         if not v.isupper():
             raise ValueError('请求方式必须大写')
         allow_method = MethodType.get_member_values()

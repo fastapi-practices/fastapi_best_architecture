@@ -2,19 +2,37 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+
+from backend.app.utils.re_verify import is_phone
 
 
 class DeptBase(BaseModel):
     name: str
-    parent_id: int = Field(default=0, ge=0, description='菜单父级ID')
-    level: int = Field(default=0, ge=0, description='菜单层级')
+    parent_id: int | None = Field(default=None, ge=1, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
     leader: str | None = None
     phone: str | None = None
     email: str | None = None
     status: bool
-    del_flag: bool
+
+    @validator('phone')
+    def phone_validator(cls, v):
+        if v is not None and not v.isdigit():
+            if not is_phone(v):
+                raise ValueError('手机号码输入有误')
+        return v
+
+    @validator('email')
+    def email_validator(cls, v):
+        if v is not None:
+            from email_validator import validate_email, EmailNotValidError
+
+            try:
+                validate_email(v, check_deliverability=False).email
+            except EmailNotValidError:
+                raise ValueError('邮箱格式错误')
+        return v
 
 
 class CreateDept(DeptBase):
@@ -27,6 +45,8 @@ class UpdateDept(DeptBase):
 
 class GetAllDept(DeptBase):
     id: int
+    level: int
+    del_flag: bool
     create_user: int
     update_user: int = None
     created_time: datetime

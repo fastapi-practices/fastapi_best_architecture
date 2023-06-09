@@ -17,13 +17,13 @@ router = APIRouter()
 
 @router.post('/register', summary='用户注册')
 async def user_register(obj: CreateUser):
-    await UserService.register(obj)
+    await UserService.register(obj=obj)
     return await response_base.success()
 
 
-@router.post('/password/reset', summary='密码重置')
-async def password_reset(obj: ResetPassword):
-    count = await UserService.pwd_reset(obj)
+@router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
+async def password_reset(request: Request, obj: ResetPassword):
+    count = await UserService.pwd_reset(request=request, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -31,7 +31,7 @@ async def password_reset(obj: ResetPassword):
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: str):
-    current_user = await UserService.get_userinfo(username)
+    current_user = await UserService.get_userinfo(username=username)
     data = GetAllUserInfo(**select_to_json(current_user))
     return await response_base.success(data=data)
 

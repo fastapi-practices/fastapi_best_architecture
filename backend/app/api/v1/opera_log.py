@@ -29,7 +29,7 @@ async def get_all_opera_logs(
 
 @router.delete('', summary='（批量）删除操作日志', dependencies=[DependsRBAC])
 async def delete_opera_log(pk: Annotated[list[int], Query(...)]):
-    count = await OperaLogService.delete(pk)
+    count = await OperaLogService.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

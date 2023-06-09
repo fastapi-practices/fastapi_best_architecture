@@ -12,7 +12,7 @@ from backend.app.schemas.role import CreateRole, UpdateRole
 
 class RoleService:
     @staticmethod
-    async def get(pk: int) -> Role:
+    async def get(*, pk: int) -> Role:
         async with async_db_session() as db:
             role = await RoleDao.get_with_relation(db, pk)
             if not role:

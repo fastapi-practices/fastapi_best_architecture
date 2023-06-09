@@ -29,7 +29,7 @@ async def get_all_login_logs(
 
 @router.delete('', summary='（批量）删除登录日志', dependencies=[DependsRBAC])
 async def delete_login_log(pk: Annotated[list[int], Query(...)]):
-    count = await LoginLogService.delete(pk)
+    count = await LoginLogService.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

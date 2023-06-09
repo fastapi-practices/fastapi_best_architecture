@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.post('/swagger_login', summary='swagger 表单登录', description='form 格式登录，仅用于 swagger 文档调试接口')
 async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> GetSwaggerToken:
-    token, user = await AuthService().swagger_login(form_data)
+    token, user = await AuthService().swagger_login(form_data=form_data)
     return GetSwaggerToken(access_token=token, user=user)
 
 
@@ -44,12 +44,12 @@ async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTa
 
 @router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(refresh_token: Annotated[str, Query(...)]):
-    access_token, access_expire = await AuthService.new_token(refresh_token)
+    access_token, access_expire = await AuthService.new_token(refresh_token=refresh_token)
     data = GetNewToken(access_token=access_token, access_token_expire_time=access_expire)
     return await response_base.success(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request):
-    await AuthService.logout(request)
+    await AuthService.logout(request=request)
     return await response_base.success()

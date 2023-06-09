@@ -11,12 +11,12 @@ class OperaLogService:
         return await OperaLogDao.get_all(username=username, status=status, ipaddr=ipaddr)
 
     @staticmethod
-    async def create(obj_in: CreateOperaLog):
+    async def create(*, obj_in: CreateOperaLog):
         async with async_db_session.begin() as db:
             await OperaLogDao.create(db, obj_in)
 
     @staticmethod
-    async def delete(pk: list[int]):
+    async def delete(*, pk: list[int]):
         async with async_db_session.begin() as db:
             count = await OperaLogDao.delete(db, pk)
             return count
