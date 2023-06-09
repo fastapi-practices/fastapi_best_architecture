@@ -118,13 +118,6 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def get_role_ids(self, db: AsyncSession, user_id: int) -> list[int]:
-        user = await db.execute(
-            select(self.model).where(self.model.id == user_id).options(selectinload(self.model.roles))
-        )
-        roles_id = [role.id for role in user.scalars().first().roles]
-        return roles_id
-
     async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
         where = []
         if user_id:
