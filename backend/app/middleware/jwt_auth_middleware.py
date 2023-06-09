@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 
 from backend.app.common import jwt
 from backend.app.common.exception.errors import TokenError
+from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import async_db_session
 
@@ -26,11 +27,9 @@ class JwtAuthMiddleware(AuthenticationBackend):
     """JWT 认证中间件"""
 
     @staticmethod
-    def auth_exception_handler(conn: HTTPConnection, exc: Exception) -> Response:
+    def auth_exception_handler(conn: HTTPConnection, exc: _AuthenticationError) -> Response:
         """覆盖内部认证错误处理"""
-        code = getattr(exc, 'code', 500)
-        msg = getattr(exc, 'msg', 'Internal Server Error')
-        return JSONResponse(content={'code': code, 'msg': msg, 'data': None}, status_code=code)
+        return JSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
     async def authenticate(self, request: Request):
         auth = request.headers.get('Authorization')
@@ -47,10 +46,14 @@ class JwtAuthMiddleware(AuthenticationBackend):
                 user = await jwt.get_current_user(db, data=sub)
         except TokenError as exc:
             raise _AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
-        except Exception:
+        except Exception as e:
             import traceback
 
-            raise _AuthenticationError(msg=traceback.format_exc() if settings.ENVIRONMENT == 'dev' else None)
+            log.exception(e)
+            raise _AuthenticationError(
+                code=getattr(e, 'code', 500),
+                msg=traceback.format_exc() if settings.ENVIRONMENT == 'dev' else 'Internal Server Error',
+            )
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
         # 标准返回模式请查看：https://www.starlette.io/authentication/

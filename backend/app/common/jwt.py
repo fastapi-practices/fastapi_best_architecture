@@ -172,6 +172,9 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
         raise TokenError
     if not user.is_active:
         raise AuthorizationError(msg='用户已锁定')
+    if user.dept_id:
+        if not user.dept.status:
+            raise AuthorizationError(msg='用户所属部门已锁定')
     return user
 
 

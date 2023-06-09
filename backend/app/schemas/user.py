@@ -60,6 +60,7 @@ class Avatar(BaseModel):
 
 
 class GetUserInfoNoRelation(_UserInfoBase):
+    dept_id: int | None = None
     id: int
     user_uuid: str
     avatar: str | None = None
@@ -74,7 +75,6 @@ class GetUserInfoNoRelation(_UserInfoBase):
 
 
 class GetAllUserInfo(GetUserInfoNoRelation):
-    dept_id: int | None = None
     dept: GetAllDept | None = None
     roles: list[GetAllRole]
 
