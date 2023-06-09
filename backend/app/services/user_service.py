@@ -44,7 +44,7 @@ class UserService:
             if not await password_verify(iop, request.user.password):
                 raise errors.ForbiddenError(msg='旧密码错误')
             np1 = obj.new_password
-            np2 = obj.new_password_confirm
+            np2 = obj.confirm_password
             if np1 != np2:
                 raise errors.ForbiddenError(msg='新密码输入不一致')
             count = await UserDao.reset_password(db, request.user.id, obj.new_password)
