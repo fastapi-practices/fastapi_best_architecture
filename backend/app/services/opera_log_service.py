@@ -7,8 +7,8 @@ from backend.app.schemas.opera_log import CreateOperaLog
 
 class OperaLogService:
     @staticmethod
-    async def get_select(*, username: str | None = None, status: bool | None = None, ipaddr: str | None = None):
-        return await OperaLogDao.get_all(username=username, status=status, ipaddr=ipaddr)
+    async def get_select(*, username: str | None = None, status: bool | None = None, ip: str | None = None):
+        return await OperaLogDao.get_all(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(*, obj_in: CreateOperaLog):

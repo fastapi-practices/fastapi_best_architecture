@@ -7,15 +7,14 @@ from fastapi import UploadFile
 from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
-from user_agents import parse
 
 from backend.app.common.enums import OperaLogCipherType
 from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
-from backend.app.utils import request_parse
 from backend.app.utils.encrypt import AESCipher, Md5Cipher
+from backend.app.utils.request_parse import parse_user_agent_info, parse_ip_info
 
 
 class OperaLogMiddleware:
@@ -38,17 +37,8 @@ class OperaLogMiddleware:
             return
 
         # 请求信息解析
-        ip = await request_parse.get_request_ip(request)
-        user_agent = request.headers.get('User-Agent')
-        user_agent_parsed = parse(user_agent)
-        os = user_agent_parsed.get_os()
-        browser = user_agent_parsed.get_browser()
-        if settings.LOCATION_PARSE == 'online':
-            location = await request_parse.get_location_online(ip, user_agent)
-        elif settings.LOCATION_PARSE == 'offline':
-            location = await request_parse.get_location_offline(ip)
-        else:
-            location = '未知'
+        user_agent, device, os, browser = await parse_user_agent_info(request)
+        ip, country, region, city = await parse_ip_info(request)
         try:
             # 此信息依赖于 jwt 中间件
             username = request.user.username
@@ -65,20 +55,62 @@ class OperaLogMiddleware:
                 json_data = await request.json()
                 args.update(json_data)
 
-        # 设置附加请求信息
+        # 设置附加请求信息(可选)
         request.state.ip = ip
-        request.state.location = location
+        request.state.country = country
+        request.state.region = region
+        request.state.city = city
+        request.state.user_agent = user_agent
         request.state.os = os
         request.state.browser = browser
+        request.state.device = device
 
+        # 执行请求
+        start_time = datetime.now()
+        code, msg, status, err = await self.execute_request(request, send)
+        end_time = datetime.now()
+        cost_time = (end_time - start_time).total_seconds() * 1000.0
+
+        summary = request.scope.get('route').summary
+        title = summary if summary != '' else request.scope.get('route').summary
+        args.update(request.path_params)
+        # 脱敏处理
+        args = self.desensitization(args)
+
+        # 日志创建
+        opera_log_in = CreateOperaLog(
+            username=username,
+            method=method,
+            title=title,
+            path=path,
+            ip=ip,
+            country=country,
+            region=region,
+            city=city,
+            user_agent=user_agent,
+            os=os,
+            browser=browser,
+            device=device,
+            args=args,
+            status=status,
+            code=code,
+            msg=msg,
+            cost_time=cost_time,
+            opera_time=start_time,
+        )
+        back = BackgroundTask(OperaLogService.create, obj_in=opera_log_in)
+        await back()
+
+        # 错误抛出
+        if err:
+            raise err from None
+
+    async def execute_request(self, request: Request, send: Send) -> tuple:
         # 预置响应信息
         code: int = 200
         msg: str = 'Success'
         status: bool = True
         err: Any = None
-
-        # 执行请求
-        start_time = datetime.now()
         try:
             # 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
             async def wrapped_rcv_gen():
@@ -99,10 +131,11 @@ class OperaLogMiddleware:
             msg = getattr(e, 'msg', str(e) or 'Internal Server Error')
             status = False
             err = e
-        end_time = datetime.now()
-        summary = request.scope.get('route').summary
-        title = summary if summary != '' else request.scope.get('route').summary
-        args.update(request.path_params)
+
+        return code, msg, status, err
+
+    @staticmethod
+    def desensitization(args: dict):
         if len(args) > 0:
             match settings.OPERA_LOG_ENCRYPT:
                 case OperaLogCipherType.aes:
@@ -123,29 +156,4 @@ class OperaLogMiddleware:
                     for key in args.keys():
                         if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
                             args[key] = '******'
-        args = args if len(args) > 0 else None
-        cost_time = (end_time - start_time).total_seconds() * 1000.0
-
-        # 日志创建
-        opera_log_in = CreateOperaLog(
-            username=username,
-            method=method,
-            title=title,
-            path=path,
-            ipaddr=ip,
-            location=location,
-            os=os,
-            browser=browser,
-            args=args,
-            status=status,
-            code=code,
-            msg=msg,
-            cost_time=cost_time,
-            opera_time=start_time,
-        )
-        back = BackgroundTask(OperaLogService.create, obj_in=opera_log_in)
-        await back()
-
-        # 错误抛出
-        if err:
-            raise err from None
+        return args or None

@@ -20,9 +20,9 @@ async def get_all_login_logs(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
     status: Annotated[bool | None, Query()] = None,
-    ipaddr: Annotated[str | None, Query()] = None,
+    ip: Annotated[str | None, Query()] = None,
 ):
-    log_select = await LoginLogService.get_select(username=username, status=status, ipaddr=ipaddr)
+    log_select = await LoginLogService.get_select(username=username, status=status, ip=ip)
     page_data = await paging_data(db, log_select, GetAllLoginLog)
     return await response_base.success(data=page_data)
 

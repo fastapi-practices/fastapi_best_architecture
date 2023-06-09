@@ -10,10 +10,14 @@ class OperaLogBase(BaseModel):
     method: str
     title: str
     path: str
-    ipaddr: str
-    location: str
-    os: str
-    browser: str
+    ip: str
+    country: str | None = None
+    region: str | None = None
+    city: str | None = None
+    user_agent: str
+    os: str | None = None
+    browser: str | None = None
+    device: str | None = None
     args: dict | None = None
     status: bool
     code: int

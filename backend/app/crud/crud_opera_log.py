@@ -12,7 +12,7 @@ from backend.app.schemas.opera_log import CreateOperaLog, UpdateOperaLog
 
 class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
     async def get_all(
-        self, username: str | None = None, status: bool | None = None, ipaddr: str | None = None
+        self, username: str | None = None, status: bool | None = None, ip: str | None = None
     ) -> Select:
         se = select(self.model).order_by(desc(self.model.create_time))
         where_list = []
@@ -20,8 +20,8 @@ class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
             where_list.append(self.model.username.like(f'%{username}%'))
         if status is not None:
             where_list.append(self.model.status == status)
-        if ipaddr:
-            where_list.append(self.model.ipaddr.like(f'%{ipaddr}%'))
+        if ip:
+            where_list.append(self.model.ip.like(f'%{ip}%'))
         if where_list:
             se = se.where(and_(*where_list))
         return se

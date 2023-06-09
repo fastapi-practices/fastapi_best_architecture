@@ -12,32 +12,31 @@ from backend.app.crud.crud_login_log import LoginLogDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.login_log import CreateLoginLog
-from backend.app.utils import request_parse
 
 
 class LoginLogService:
     @staticmethod
-    async def get_select(*, username: str, status: bool, ipaddr: str) -> Select:
-        return await LoginLogDao.get_all(username=username, status=status, ipaddr=ipaddr)
+    async def get_select(*, username: str, status: bool, ip: str) -> Select:
+        return await LoginLogDao.get_all(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(
-        *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: bool, msg: str
+            *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: bool, msg: str
     ) -> NoReturn:
         try:
-            ip = await request_parse.get_request_ip(request)
-            # 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
-            location = request.state.location
-            browser = request.state.browser
-            os = request.state.os
+            # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
             obj_in = CreateLoginLog(
                 user_uuid=user.user_uuid,
                 username=user.username,
                 status=status,
-                ipaddr=ip,
-                location=location,
-                browser=browser,
-                os=os,
+                ip=request.state.ip,
+                country=request.state.country,
+                region=request.state.region,
+                city=request.state.city,
+                user_agent=request.state.user_agent,
+                browser=request.state.browser,
+                os=request.state.os,
+                device=request.state.device,
                 msg=msg,
                 login_time=login_time,
             )

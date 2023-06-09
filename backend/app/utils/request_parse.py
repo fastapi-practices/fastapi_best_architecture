@@ -3,9 +3,11 @@
 import httpx
 from XdbSearchIP.xdbSearcher import XdbSearcher
 from asgiref.sync import sync_to_async
-from httpx import HTTPError
 from fastapi import Request
+from user_agents import parse
 
+from backend.app.common.log import log
+from backend.app.core.conf import settings
 from backend.app.core.path_conf import IP2REGION_XDB
 
 
@@ -24,44 +26,69 @@ def get_request_ip(request: Request) -> str:
     return ip
 
 
-async def get_location_online(ipaddr: str, user_agent: str) -> str:
+async def get_location_online(ip: str, user_agent: str) -> dict | None:
     """
     在线获取 ip 地址属地，无法保证可用性，准确率较高
 
-    :param ipaddr:
+    :param ip:
     :param user_agent:
     :return:
     """
     async with httpx.AsyncClient(timeout=3) as client:
-        ip_api_url = f'http://ip-api.com/json/{ipaddr}?lang=zh-CN'
-        whois_url = f'http://whois.pconline.com.cn/ipJson.jsp?ip={ipaddr}&json=true'
+        ip_api_url = f'http://ip-api.com/json/{ip}?lang=zh-CN'
         headers = {'User-Agent': user_agent}
         try:
-            resp1 = await client.get(ip_api_url, headers=headers)
-            city = resp1.json()['city']
-        except (HTTPError, KeyError):
-            try:
-                resp2 = await client.get(whois_url, headers=headers)
-                city = resp2.json()['city']
-            except (HTTPError, KeyError):
-                city = None
-    return city or '未知' if city != '' else '未知'
+            response = await client.get(ip_api_url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+        except Exception as e:
+            log.error(f'在线获取 ip 地址属地失败，错误信息：{e}')
+            return None
 
 
 @sync_to_async
-def get_location_offline(ipaddr: str) -> str:
+def get_location_offline(ip: str) -> str | None:
     """
     离线获取 ip 地址属地，无法保证准确率，100%可用
 
-    :param ipaddr:
+    :param ip:
     :return:
     """
-    cb = XdbSearcher.loadContentFromFile(dbfile=IP2REGION_XDB)
-    searcher = XdbSearcher(contentBuff=cb)
-    data = searcher.search(ipaddr)
-    searcher.close()
-    location_info = data.split('|')
-    country = location_info[0]
-    province = location_info[2]
-    city = location_info[3]
-    return city if city != '0' else province if province != '0' else country if country != '0' else '未知'
+    try:
+        cb = XdbSearcher.loadContentFromFile(dbfile=IP2REGION_XDB)
+        searcher = XdbSearcher(contentBuff=cb)
+        data = searcher.search(ip)
+        searcher.close()
+        location_info = data.split('|')
+        return location_info
+    except Exception as e:
+        log.error(f'离线获取 ip 地址属地失败，错误信息：{e}')
+        return None
+
+
+async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
+    country, region, city = None, None, None
+    ip = await get_request_ip(request)
+    if settings.LOCATION_PARSE == 'online':
+        location_info = await get_location_online(ip, request.headers.get('User-Agent'))
+        if location_info:
+            country = location_info.get('country')
+            region = location_info.get('regionName')
+            city = location_info.get('city')
+    elif settings.LOCATION_PARSE == 'offline':
+        location_info = await get_location_offline(ip)
+        if location_info:
+            country = location_info[0] if location_info[0] != '0' else None
+            region = location_info[1] if location_info[1] != '0' else None
+            city = location_info[2] if location_info[2] != '0' else None
+    return ip, country, region, city
+
+
+@sync_to_async
+def parse_user_agent_info(request: Request) -> tuple[str, str, str, str]:
+    user_agent = request.headers.get('User-Agent')
+    _user_agent = parse(user_agent)
+    device = _user_agent.get_device()
+    os = _user_agent.get_os()
+    browser = _user_agent.get_browser()
+    return user_agent, device, os, browser
