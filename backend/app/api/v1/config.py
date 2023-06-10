@@ -58,5 +58,13 @@ async def get_all_route(request: Request):
     data = []
     for route in request.app.routes:
         if isinstance(route, APIRoute):
-            data.append({'path': route.path, 'name': route.name, 'summary': route.summary, 'methods': route.methods})
+            data.append(
+                {
+                    'path': route.path,
+                    'name': route.name,
+                    'summary': route.summary,
+                    'methods': route.methods,
+                    'dependencies': route.dependencies,
+                }
+            )
     return await response_base.success(data={'route_list': data})

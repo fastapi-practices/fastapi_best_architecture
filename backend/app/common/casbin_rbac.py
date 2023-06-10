@@ -14,7 +14,7 @@ from backend.app.models.sys_casbin_rule import CasbinRule
 
 class RBAC:
     @staticmethod
-    async def get_casbin_enforcer() -> casbin.Enforcer:
+    def enforcer() -> casbin.Enforcer:
         """
         获取 casbin 执行器
 
@@ -28,35 +28,34 @@ class RBAC:
 
     async def rbac_verify(self, request: Request, _: str = DependsJwtAuth) -> None:
         """
-        权限校验，超级用户跳过校验，默认拥有所有权限
+        权限校验
 
         :param request:
         :param _:
         :return:
         """
-        user_uuid = request.user.user_uuid
-        user_roles = request.user.roles
-        role_data_scope = [role.data_scope for role in user_roles]
         super_user = request.user.is_superuser
-        path = request.url.path
-        method = request.method
-
         if super_user:
             return
 
-        for ce in settings.CASBIN_EXCLUDE:
-            if ce['method'] == method and ce['path'] == path:
-                return
+        method = request.method
+        path = request.url.path
+        if (method, path) in settings.CASBIN_EXCLUDE:
+            return
 
-        if 1 in set(role_data_scope):
+        user_roles = request.user.roles
+        data_scope = [role.data_scope for role in user_roles if role.data_scope == 1]
+        if data_scope:
             return
 
         # TODO: 通过 redis 做鉴权查询优化，减少数据库查询
-        enforcer = await self.get_casbin_enforcer()
+        user_uuid = request.user.user_uuid
+        enforcer = self.enforcer()
         if not enforcer.enforce(user_uuid, path, method):
             raise AuthorizationError
 
 
-rbac = RBAC()
+RBAC = RBAC()
+RbacEnforcer = RBAC.enforcer()
 # RBAC 依赖注入
-DependsRBAC = Depends(rbac.rbac_verify)
+DependsRBAC = Depends(RBAC.rbac_verify)
