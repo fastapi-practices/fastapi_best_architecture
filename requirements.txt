@@ -1,5 +1,4 @@
 aiofiles==0.8.0
-aioredis==2.0.1
 aiosmtplib==1.1.6
 alembic==1.7.4
 APScheduler==3.8.1
@@ -27,7 +26,7 @@ pytest==7.2.2
 pytest-pretty==1.2.0
 python-jose==3.3.0
 python-multipart==0.0.5
-redis==4.5.4
+redis[hiredis]==4.5.5
 ruff==0.0.262
 SQLAlchemy==2.0.8
 starlette==0.27.0
