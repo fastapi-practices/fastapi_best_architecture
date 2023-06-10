@@ -65,8 +65,8 @@ class OperaLogMiddleware:
         end_time = datetime.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
-        summary = request.scope.get('route').summary
-        title = summary if summary != '' else request.scope.get('route').summary
+        router = request.scope.get('route')
+        title = router.get('summary') if router else ''
         args.update(request.path_params)
         # 脱敏处理
         args = await self.desensitization(args)
@@ -166,4 +166,4 @@ class OperaLogMiddleware:
                     for key in args.keys():
                         if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
                             args[key] = '******'
-        return args or None
+        return args if len(args) > 0 else None
