@@ -45,15 +45,7 @@ class OperaLogMiddleware:
         except AttributeError:
             username = None
         method = request.method
-        args = dict(request.query_params)
-        form_data = await request.form()
-        if len(form_data) > 0:
-            args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})
-        else:
-            body_data = await request.body()
-            if body_data:
-                json_data = await request.json()
-                args.update(json_data)
+        args = await self.get_request_args(request)
 
         # 设置附加请求信息(可选)
         request.state.ip = ip
@@ -133,6 +125,19 @@ class OperaLogMiddleware:
             err = e
 
         return code, msg, status, err
+
+    @staticmethod
+    async def get_request_args(request: Request) -> dict:
+        args = dict(request.query_params)
+        form_data = await request.form()
+        if len(form_data) > 0:
+            args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})
+        else:
+            body_data = await request.body()
+            if body_data:
+                json_data = await request.json()
+                args.update(json_data)
+        return args
 
     @staticmethod
     def desensitization(args: dict):
