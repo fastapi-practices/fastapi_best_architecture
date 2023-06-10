@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import traceback
 from datetime import datetime
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from fastapi import UploadFile
 from starlette.background import BackgroundTask
 from starlette.requests import Request
@@ -67,7 +69,7 @@ class OperaLogMiddleware:
         title = summary if summary != '' else request.scope.get('route').summary
         args.update(request.path_params)
         # 脱敏处理
-        args = self.desensitization(args)
+        args = await self.desensitization(args)
 
         # 日志创建
         opera_log_in = CreateOperaLog(
@@ -120,7 +122,9 @@ class OperaLogMiddleware:
         except Exception as e:
             log.exception(e)
             code = getattr(e, 'code', 500)
-            msg = getattr(e, 'msg', str(e) or 'Internal Server Error')
+            msg = getattr(
+                e, 'msg', traceback.format_exc() if settings.ENVIRONMENT == 'dev' else 'Internal Server Error'
+            )
             status = False
             err = e
 
@@ -140,6 +144,7 @@ class OperaLogMiddleware:
         return args
 
     @staticmethod
+    @sync_to_async
     def desensitization(args: dict):
         if len(args) > 0:
             match settings.OPERA_LOG_ENCRYPT:
