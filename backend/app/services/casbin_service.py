@@ -9,7 +9,6 @@ from backend.app.schemas.casbin_rule import CreatePolicy, UpdatePolicy, DeletePo
 
 
 class CasbinService:
-
     @staticmethod
     async def get_casbin_list(*, ptype: str, sub: str) -> Select:
         return await CasbinDao.get_all_policy(ptype, sub)
