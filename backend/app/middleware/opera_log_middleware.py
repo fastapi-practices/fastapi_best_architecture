@@ -66,7 +66,7 @@ class OperaLogMiddleware:
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         router = request.scope.get('route')
-        title = router.get('summary') if router else ''
+        summary = getattr(router, 'summary', '')
         args.update(request.path_params)
         # 脱敏处理
         args = await self.desensitization(args)
@@ -75,7 +75,7 @@ class OperaLogMiddleware:
         opera_log_in = CreateOperaLog(
             username=username,
             method=method,
-            title=title,
+            title=summary,
             path=path,
             ip=ip,
             country=country,
