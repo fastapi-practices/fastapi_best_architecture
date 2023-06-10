@@ -38,7 +38,7 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
+    async def reset_pwd(*, request: Request, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
             iop = obj.old_password
             if not await password_verify(iop, request.user.password):

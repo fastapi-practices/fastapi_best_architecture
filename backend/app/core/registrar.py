@@ -7,7 +7,6 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from backend.app.api.routers import v1
 from backend.app.common.exception.exception_handler import register_exception
 from backend.app.common.redis import redis_client
 from backend.app.common.task import scheduler
@@ -15,6 +14,7 @@ from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
 from backend.app.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
+from backend.app.routers.enter import v1
 from backend.app.utils.health_check import ensure_unique_route_names
 from backend.app.utils.openapi import simplify_operation_ids
 

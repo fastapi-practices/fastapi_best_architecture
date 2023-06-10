@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from fastapi import APIRouter, Query
+from fastapi import Query
 from typing_extensions import Annotated
 
 from backend.app.common.task import scheduler
-
-router = APIRouter()
 
 
 def task_demo():
@@ -18,8 +16,8 @@ async def task_demo_async():
     print('异步任务')
 
 
-@router.get('', summary='获取任务')
-async def task_demo_get():
+async def get_all_task_demos():
+    """获取所有任务示例"""
     tasks = []
     for job in scheduler.get_jobs():
         tasks.append(
@@ -40,8 +38,8 @@ async def task_demo_get():
     return {'msg': 'success', 'data': tasks}
 
 
-@router.post('', summary='添加同步任务')
-async def task_demo_add():
+async def create_sync_task_demo():
+    """创建同步任务示例"""
     scheduler.add_job(
         task_demo, 'interval', seconds=1, id='task_demo', replace_existing=True, start_date=datetime.datetime.now()
     )
@@ -49,8 +47,8 @@ async def task_demo_add():
     return {'msg': 'success'}
 
 
-@router.post('/async', summary='添加异步任务')
-async def task_demo_add_async():
+async def create_async_task_demo():
+    """创建异步任务示例"""
     scheduler.add_job(
         task_demo_async,
         'interval',
@@ -63,8 +61,8 @@ async def task_demo_add_async():
     return {'msg': 'success'}
 
 
-@router.delete('', summary='删除任务')
-async def task_demo_delete(job_id: Annotated[str, Query(..., description='任务id')]):
+async def delete_task_demo(job_id: Annotated[str, Query(..., description='任务id')]):
+    """删除任务示例"""
     scheduler.remove_job(job_id=job_id)
 
     return {'msg': 'success'}

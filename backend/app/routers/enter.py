@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
-from backend.app.api.v1.auth import router as auth_router
-from backend.app.api.v1.user import router as user_router
-from backend.app.api.v1.casbin import router as casbin_router
-from backend.app.api.v1.dept import router as dept_router
-from backend.app.api.v1.role import router as role_router
-from backend.app.api.v1.menu import router as menu_router
-from backend.app.api.v1.api import router as api_router
-from backend.app.api.v1.config import router as config_router
-from backend.app.api.v1.login_log import router as login_log_router
-from backend.app.api.v1.opera_log import router as opera_log_router
-from backend.app.api.v1.task_demo import router as task_demo_router
+from backend.app.routers.v1.auth import router as auth_router
+from backend.app.routers.v1.user import router as user_router
+from backend.app.routers.v1.casbin import router as casbin_router
+from backend.app.routers.v1.dept import router as dept_router
+from backend.app.routers.v1.role import router as role_router
+from backend.app.routers.v1.menu import router as menu_router
+from backend.app.routers.v1.api import router as api_router
+from backend.app.routers.v1.config import router as config_router
+from backend.app.routers.v1.login_log import router as login_log_router
+from backend.app.routers.v1.opera_log import router as opera_log_router
+from backend.app.routers.v1.task_demo import router as task_demo_router
 
 v1 = APIRouter(prefix='/v1')
 
