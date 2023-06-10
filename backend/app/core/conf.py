@@ -98,12 +98,12 @@ class Settings(BaseSettings):
 
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
-    CASBIN_EXCLUDE: list[dict[str, str]] = [
-        {'method': 'POST', 'path': '/v1/auth/swagger_login'},
-        {'method': 'POST', 'path': '/v1/auth/login'},
-        {'method': 'POST', 'path': '/v1/auth/register'},
-        {'method': 'POST', 'path': '/v1/auth/password/reset'},
-    ]
+    CASBIN_EXCLUDE: set[tuple[str, str]] = {
+        ('POST', '/v1/auth/swagger_login'),
+        ('POST', '/v1/auth/login'),
+        ('POST', '/v1/auth/register'),
+        ('POST', '/v1/auth/password/reset'),
+    }
 
     # Opera log
     OPERA_LOG_EXCLUDE: list[str] = [

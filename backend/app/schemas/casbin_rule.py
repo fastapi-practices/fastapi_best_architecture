@@ -5,12 +5,9 @@ from pydantic import BaseModel, Field, validator
 from backend.app.common.enums import MethodType
 
 
-class RBACBase(BaseModel):
+class CreatePolicy(BaseModel):
     sub: str = Field(..., description='用户uuid / 角色')
-
-
-class CreatePolicy(RBACBase):
-    path: str = Field(..., description='api路径')
+    path: str = Field(..., description='api 路径')
     method: str = Field(default=MethodType.GET, description='请求方法')
 
     @validator('method')
@@ -32,15 +29,19 @@ class DeletePolicy(CreatePolicy):
 
 
 class CreateUserRole(BaseModel):
-    uuid: str = Field(..., description='用户uuid')
+    uuid: str = Field(..., description='用户 uuid')
     role: str = Field(..., description='角色')
+
+
+class DeleteUserRole(CreateUserRole):
+    pass
 
 
 class GetAllPolicy(BaseModel):
     id: int
-    ptype: str
-    v0: str
-    v1: str
+    ptype: str = Field(..., description='规则类型, p 或 g')
+    v0: str = Field(..., description='用户 uuid / 角色')
+    v1: str = Field(..., description='api 路径 / 角色')
     v2: str | None = None
     v3: str | None = None
     v4: str | None = None
