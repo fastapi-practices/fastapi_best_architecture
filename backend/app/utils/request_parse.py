@@ -79,8 +79,8 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
         location_info = await get_location_offline(ip)
         if location_info:
             country = location_info[0] if location_info[0] != '0' else None
-            region = location_info[1] if location_info[1] != '0' else None
-            city = location_info[2] if location_info[2] != '0' else None
+            region = location_info[2] if location_info[2] != '0' else None
+            city = location_info[3] if location_info[3] != '0' else None
     return ip, country, region, city
 
 
