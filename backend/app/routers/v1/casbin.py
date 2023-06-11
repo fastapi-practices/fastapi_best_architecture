@@ -54,7 +54,7 @@ router.add_api_route(
     path='/grouping_policies',
     endpoint=casbin_views.get_all_grouping_policies,
     methods=['GET'],
-    summary='获取所有 g 规则',
+    summary='获取所有 G 规则',
     dependencies=[DependsJwtAuth],
 )
 

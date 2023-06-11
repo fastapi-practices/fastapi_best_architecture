@@ -42,12 +42,12 @@ async def create_policy(p: CreatePolicy):
     """
     添加基于角色(主)/用户(次)的访问权限
 
-    p 规则:
+    P 规则:
 
-    - 推荐添加基于角色的访问权限, 需配合添加 g 规则才能真正拥有访问权限，适合配置全局接口访问策略<br>
+    - 推荐添加基于角色的访问权限, 需配合添加 G 规则才能真正拥有访问权限，适合配置全局接口访问策略<br>
     **格式**: 角色 role + 访问路径 path + 访问方法 method
 
-    - 如果添加基于用户的访问权限, 不需配合添加 g 规则就能真正拥有权限，适合配置指定用户接口访问策略<br>
+    - 如果添加基于用户的访问权限, 不需配合添加 G 规则就能真正拥有权限，适合配置指定用户接口访问策略<br>
     **格式**: 用户 uuid + 访问路径 path + 访问方法 method
     """
     data = await CasbinService.create_policy(p=p)
@@ -68,7 +68,7 @@ async def delete_policy(p: DeletePolicy):
 
 
 async def get_all_grouping_policies():
-    """获取所有 g 规则"""
+    """获取所有 G 规则"""
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
 
@@ -77,13 +77,13 @@ async def create_grouping_policy(g: CreateUserRole):
     """
     添加基于用户组的访问权限
 
-    g 规则 (**依赖 p 规则**):
+    G 规则 (**依赖 P 规则**):
 
-    - 如果在 p 规则中添加了基于角色的访问权限, 则还需要在 g 规则中添加基于用户组的访问权限, 才能真正拥有访问权限<br>
+    - 如果在 P 规则中添加了基于角色的访问权限, 则还需要在 G 规则中添加基于用户组的访问权限, 才能真正拥有访问权限<br>
     **格式**: 用户 uuid + 角色 role
 
-    - 如果在p策略中添加了基于用户的访问权限, 则不添加相应的 g 规则能直接拥有访问权限<br>
-    但是拥有的不是用户角色的所有权限, 而只是单一的对应的 p 规则所添加的访问权限
+    - 如果在 P 策略中添加了基于用户的访问权限, 则不添加相应的 G 规则能直接拥有访问权限<br>
+    但是拥有的不是用户角色的所有权限, 而只是单一的对应的 P 规则所添加的访问权限
     """
     data = await CasbinService.create_group(g=g)
     return await response_base.success(data=data)
