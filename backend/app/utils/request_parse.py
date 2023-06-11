@@ -47,7 +47,7 @@ async def get_location_online(ip: str, user_agent: str) -> dict | None:
 
 
 @sync_to_async
-def get_location_offline(ip: str) -> str | None:
+def get_location_offline(ip: str) -> list[str] | None:
     """
     离线获取 ip 地址属地，无法保证准确率，100%可用
 
