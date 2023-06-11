@@ -86,7 +86,7 @@ it a pseudo three-tier architecture
    file ``.env``
 
    ```shell
-   cp .env.server ... /... /backend/app/.env
+   cp .env.server ../../backend/app/.env
    
    # This command is optional
    cp .env.docker .env
@@ -115,7 +115,7 @@ Development process, for reference only
 4. Define routes (router) and views (api)
 5. Write database operations (crud)
 
-## Testing
+## Test
 
 Execute tests via pytest
 
