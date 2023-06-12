@@ -107,6 +107,7 @@ class Settings(BaseSettings):
 
     # Opera log
     OPERA_LOG_EXCLUDE: list[str] = [
+        '/favicon.ico',
         DOCS_URL,
         REDOCS_URL,
         OPENAPI_URL,
