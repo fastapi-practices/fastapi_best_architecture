@@ -13,7 +13,7 @@ class MenuBase(BaseModel):
     sort: int = Field(default=0, ge=0, description='排序')
     icon: str | None = None
     path: str | None = None
-    meun_type: int = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
+    menu_type: int = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
     component: str | None = None
     perms: str | None = None
     status: bool
@@ -22,7 +22,7 @@ class MenuBase(BaseModel):
     @validator('menu_type')
     def menu_type_validator(cls, v):
         if v not in MenuType.get_member_values():
-            raise ValueError('菜单类型只能是0、1、2')
+            raise ValueError('菜单类型只能是 0，1，2')
         return v
 
 
