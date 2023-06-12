@@ -9,14 +9,15 @@ from backend.app.common.enums import MenuType
 
 class MenuBase(BaseModel):
     name: str
-    parent_id: int = Field(default=0, ge=0, description='菜单父级ID')
-    level: int = Field(default=0, ge=0, description='菜单层级')
+    parent_id: int = Field(default=None, ge=1, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
-    path: str = Field(..., description='路由地址')
-    menu_type: int = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
     icon: str | None = None
+    path: str | None = None
+    meun_type: int = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
+    component: str | None = None
+    perms: str | None = None
+    status: bool
     remark: str | None = None
-    del_flag: bool
 
     @validator('menu_type')
     def menu_type_validator(cls, v):

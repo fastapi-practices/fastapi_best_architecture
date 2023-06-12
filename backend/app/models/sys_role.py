@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from sqlalchemy import String
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database.base_class import Base, id_key
@@ -16,7 +17,8 @@ class Role(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(20), unique=True, comment='角色名称')
     data_scope: Mapped[int | None] = mapped_column(default=2, comment='数据范围（1：全部数据权限 2：自定数据权限）')
-    del_flag: Mapped[bool] = mapped_column(default=False, comment='删除标志（0删除 1存在）')
+    status: Mapped[bool] = mapped_column(default=True, comment='角色状态（0停用 1正常）')
+    remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     # 角色用户多对多
     users: Mapped[list['User']] = relationship(  # noqa: F821
         init=False, secondary=sys_user_role, back_populates='roles'
