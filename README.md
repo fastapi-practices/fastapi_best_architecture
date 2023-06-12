@@ -111,8 +111,8 @@ Development process, for reference only
 
 1. Define the database model (model) and remember to perform database migration for each change
 2. Define the data validation model (schema)
-3. Define the business logic (service)
-4. Define routes (router) and views (api)
+3. Define routes (router) and views (api)
+4. Define the business logic (service)
 5. Write database operations (crud)
 
 ## Test
