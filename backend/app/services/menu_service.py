@@ -12,6 +12,8 @@ class MenuService:
     async def get(pk: int):
         async with async_db_session() as db:
             menu = await MenuDao.get(db, menu_id=pk)
+            if not menu:
+                raise errors.NotFoundError(msg='菜单不存在')
             return menu
 
     @staticmethod
