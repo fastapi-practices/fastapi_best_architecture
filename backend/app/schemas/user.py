@@ -14,6 +14,10 @@ class Auth(BaseModel):
     password: str
 
 
+class AuthLogin(Auth):
+    captcha: str
+
+
 class CreateUser(Auth):
     dept_id: int
     roles: list[int]

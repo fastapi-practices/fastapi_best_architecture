@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from sqlalchemy import select, desc, and_, asc
+from sqlalchemy import select, and_, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
