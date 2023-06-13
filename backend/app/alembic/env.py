@@ -36,6 +36,13 @@ from backend.app.database.db_mysql import SQLALCHEMY_DATABASE_URL  # noqa: E402
 config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
 
 
+def include_name(name, type_, parent_names):
+    if type_ == "table":
+        return name in target_metadata.tables
+    else:
+        return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -54,6 +61,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={'paramstyle': 'named'},
+        include_name=include_name,
     )
 
     with context.begin_transaction():
@@ -61,7 +69,11 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_name=include_name,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
