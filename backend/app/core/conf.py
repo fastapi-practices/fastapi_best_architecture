@@ -87,6 +87,10 @@ class Settings(BaseSettings):
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
 
+    # captcha
+    CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba_login_captcha'
+    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 过期时间，单位：秒
+
     # Log
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'

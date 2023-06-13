@@ -13,10 +13,11 @@ from backend.app.common.enums import LoginLogStatus
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
+from backend.app.common.response.response_code import CustomCode
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.schemas.user import Auth
+from backend.app.schemas.user import AuthLogin
 from backend.app.services.login_log_service import LoginLogService
 
 
@@ -40,7 +41,7 @@ class AuthService:
             access_token, _ = await jwt.create_access_token(str(user.id), multi_login=user.is_multi_login)
             return access_token, user
 
-    async def login(self, *, request: Request, obj: Auth, background_tasks: BackgroundTasks):
+    async def login(self, *, request: Request, obj: AuthLogin, background_tasks: BackgroundTasks):
         async with async_db_session() as db:
             try:
                 current_user = await UserDao.get_by_username(db, obj.username)
@@ -50,6 +51,11 @@ class AuthService:
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.is_active:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
+                captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                if not captcha_code:
+                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                if captcha_code.lower() != obj.captcha.lower():
+                    raise errors.CustomError(error=CustomCode.CAPTCHA_ERROR)
                 await UserDao.update_login_time(db, obj.username, self.login_time)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(
@@ -60,7 +66,7 @@ class AuthService:
                 )
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
-            except errors.AuthorizationError as e:
+            except (errors.AuthorizationError, errors.CustomError) as e:
                 err_log_info = dict(
                     db=db,
                     request=request,

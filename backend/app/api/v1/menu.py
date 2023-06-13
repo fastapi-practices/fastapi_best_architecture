@@ -13,6 +13,7 @@ from backend.app.utils.serializers import select_to_json
 
 router = APIRouter()
 
+
 @router.get('/{pk}', summary='获取目录详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: int):
     menu = await MenuService.get(pk=pk)
@@ -22,8 +23,8 @@ async def get_menu(pk: int):
 
 @router.get('', summary='获取所有目录展示树', dependencies=[DependsJwtAuth])
 async def get_all_menus(
-        name: Annotated[str | None, Query()] = None,
-        status: Annotated[bool | None, Query()] = None,
+    name: Annotated[str | None, Query()] = None,
+    status: Annotated[bool | None, Query()] = None,
 ):
     menu = await MenuService.get_select(name=name, status=status)
     return await response_base.success(data=menu)
@@ -49,6 +50,3 @@ async def delete_menu(pk: int):
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
-
-
-

@@ -10,7 +10,7 @@ from starlette.background import BackgroundTasks
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import GetLoginToken, GetSwaggerToken, GetNewToken
-from backend.app.schemas.user import Auth
+from backend.app.schemas.user import AuthLogin
 from backend.app.services.auth_service import AuthService
 
 router = APIRouter()
@@ -28,7 +28,7 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=15))],
 )
-async def user_login(request: Request, obj: Auth, background_tasks: BackgroundTasks):
+async def user_login(request: Request, obj: AuthLogin, background_tasks: BackgroundTasks):
     access_token, refresh_token, access_expire, refresh_expire, user = await AuthService().login(
         request=request, obj=obj, background_tasks=background_tasks
     )

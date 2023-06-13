@@ -10,7 +10,7 @@ from backend.app.schemas.menu import GetAllMenu
 
 class RoleBase(BaseModel):
     name: str
-    data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')
+    data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
     status: bool
     remark: str | None = None
 
