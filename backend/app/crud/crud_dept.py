@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from sqlalchemy import select, desc, and_
+from sqlalchemy import select, desc, and_, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -21,7 +21,7 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: bool = None
     ) -> Any:
-        se = select(self.model).order_by(desc(self.model.sort))
+        se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]
         if name:
             where_list.append(self.model.name.like(f'%{name}%'))
