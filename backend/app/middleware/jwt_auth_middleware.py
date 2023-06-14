@@ -10,7 +10,6 @@ from starlette.responses import JSONResponse
 from backend.app.common import jwt
 from backend.app.common.exception.errors import TokenError
 from backend.app.common.log import log
-from backend.app.core.conf import settings
 from backend.app.database.db_mysql import async_db_session
 
 
@@ -34,6 +33,10 @@ class JwtAuthMiddleware(AuthenticationBackend):
     async def authenticate(self, request: Request):
         auth = request.headers.get('Authorization')
         if not auth:
+            return
+
+        scheme, token = auth.split()
+        if scheme.lower() != 'bearer':
             return
 
         try:
