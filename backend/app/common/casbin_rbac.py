@@ -4,8 +4,8 @@ import casbin
 import casbin_async_sqlalchemy_adapter
 from fastapi import Request, Depends
 
-from backend.app.common.exception.errors import AuthorizationError, TokenError
-from backend.app.common.jwt import oauth2_schema, DependsJwtAuth
+from backend.app.common.exception.errors import AuthorizationError
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.core.conf import settings
 from backend.app.core.path_conf import RBAC_MODEL_CONF
 from backend.app.database.db_mysql import async_engine
@@ -50,7 +50,7 @@ class RBAC:
             return
         if settings.MENU_PERMISSION:
             # 菜单权限校验
-            path_auth = request.url.path.replace('/api/v1', '').replace('/', ':')
+            path_auth = request.url.path.replace(f'{settings.API_V1_STR}', '').replace('/', ':')
             menu_perms = []
             for role in user_roles:
                 menu_perms.extend([menu.perms for menu in role.menus])
