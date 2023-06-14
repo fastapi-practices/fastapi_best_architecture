@@ -13,8 +13,9 @@ from backend.app.api.v1.config import router as config_router
 from backend.app.api.v1.login_log import router as login_log_router
 from backend.app.api.v1.opera_log import router as opera_log_router
 from backend.app.api.v1.task_demo import router as task_demo_router
+from backend.app.core.conf import settings
 
-v1 = APIRouter(prefix='/v1')
+v1 = APIRouter(prefix=settings.API_V1_STR)
 
 v1.include_router(auth_router)
 v1.include_router(user_router, prefix='/users', tags=['用户管理'])

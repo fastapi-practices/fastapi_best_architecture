@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # FastAPI
-    API_V1_STR: str = '/v1'
+    API_V1_STR: str = '/api/v1'
     TITLE: str = 'FastAPI'
     VERSION: str = '0.0.1'
     DESCRIPTION: str = 'FastAPI Best Architecture'
@@ -83,7 +83,7 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
-    TOKEN_URL_SWAGGER: str = '/api/v1/auth/swagger_login'
+    TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
 
@@ -103,10 +103,10 @@ class Settings(BaseSettings):
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', '/api/v1/auth/swagger_login'),
-        ('POST', '/api/v1/auth/login'),
-        ('POST', '/api/v1/auth/register'),
-        ('GET', '/api/v1/auth/captcha'),
+        ('POST', f'{API_V1_STR}/auth/swagger_login'),
+        ('POST', f'{API_V1_STR}/auth/login'),
+        ('POST', f'{API_V1_STR}/auth/register'),
+        ('GET', f'{API_V1_STR}/auth/captcha'),
     }
 
     # Menu
@@ -124,7 +124,7 @@ class Settings(BaseSettings):
         DOCS_URL,
         REDOCS_URL,
         OPENAPI_URL,
-        '/api/v1/auth/swagger_login',
+        f'{API_V1_STR}/auth/swagger_login',
     ]
     OPERA_LOG_ENCRYPT: int = 1  # 请求入参加密, 0: AES (高性能损耗), 1: md5, 2: 不加密, other: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']

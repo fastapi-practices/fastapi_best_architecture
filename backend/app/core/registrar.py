@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -13,8 +13,8 @@ from backend.app.common.redis import redis_client
 from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
-from backend.app.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
+from backend.app.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.app.utils.health_check import ensure_unique_route_names
 from backend.app.utils.openapi import simplify_operation_ids
 
@@ -136,11 +136,7 @@ def register_router(app: FastAPI):
     :return:
     """
     # API
-    router = APIRouter(prefix='/api')
-    router.include_router(v1)
-
-    # Register
-    app.include_router(router)
+    app.include_router(v1)
 
     # Extra
     ensure_unique_route_names(app)
