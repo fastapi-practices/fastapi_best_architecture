@@ -49,7 +49,7 @@ class OperaLogMiddleware:
         method = request.method
         args = await self.get_request_args(request)
 
-        # 设置附加请求信息(可选)
+        # 设置附加请求信息
         request.state.ip = ip
         request.state.country = country
         request.state.region = region

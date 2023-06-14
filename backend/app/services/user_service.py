@@ -7,7 +7,7 @@ from sqlalchemy import Select
 
 from backend.app.common import jwt
 from backend.app.common.exception import errors
-from backend.app.common.jwt import get_token, jwt_decode, password_verify
+from backend.app.common.jwt import get_token, password_verify
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
@@ -104,6 +104,8 @@ class UserService:
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
+                if pk == request.user.id:
+                    raise errors.ForbiddenError(msg='禁止修改自身权限')
                 count = await UserDao.set_super(db, pk)
                 return count
 
@@ -114,6 +116,8 @@ class UserService:
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
+                if pk == request.user.id:
+                    raise errors.ForbiddenError(msg='禁止修改自身状态')
                 count = await UserDao.set_active(db, pk)
                 return count
 
@@ -126,7 +130,7 @@ class UserService:
             else:
                 count = await UserDao.set_multi_login(db, pk)
                 token = await get_token(request)
-                user_id = await jwt_decode(token)
+                user_id = request.user.id
                 latest_multi_login = await UserDao.get_multi_login(db, pk)
                 # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效

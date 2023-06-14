@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 
-from backend.app.common.jwt import DependsJwtAuth
+from backend.app.common.casbin_rbac import DependsRBAC
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -21,7 +21,7 @@ async def user_register(obj: CreateUser):
     return await response_base.success()
 
 
-@router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
+@router.post('/password/reset', summary='密码重置', dependencies=[DependsRBAC])
 async def password_reset(request: Request, obj: ResetPassword):
     count = await UserService.pwd_reset(request=request, obj=obj)
     if count > 0:
@@ -29,14 +29,14 @@ async def password_reset(request: Request, obj: ResetPassword):
     return await response_base.fail()
 
 
-@router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
+@router.get('/{username}', summary='查看用户信息', dependencies=[DependsRBAC])
 async def get_user(username: str):
     current_user = await UserService.get_userinfo(username=username)
     data = GetAllUserInfo(**select_to_json(current_user))
     return await response_base.success(data=data)
 
 
-@router.put('/{username}', summary='更新用户信息', dependencies=[DependsJwtAuth])
+@router.put('/{username}', summary='更新用户信息', dependencies=[DependsRBAC])
 async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     count = await UserService.update(request=request, username=username, obj=obj)
     if count > 0:
@@ -44,7 +44,7 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     return await response_base.fail()
 
 
-@router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsJwtAuth])
+@router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsRBAC])
 async def update_avatar(request: Request, username: str, avatar: Avatar):
     count = await UserService.update_avatar(request=request, username=username, avatar=avatar)
     if count > 0:
@@ -52,7 +52,7 @@ async def update_avatar(request: Request, username: str, avatar: Avatar):
     return await response_base.fail()
 
 
-@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsJwtAuth, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsRBAC, PageDepends])
 async def get_all_users(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
@@ -64,7 +64,7 @@ async def get_all_users(
     return await response_base.success(data=page_data)
 
 
-@router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsJwtAuth])
+@router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsRBAC])
 async def super_set(request: Request, pk: int):
     count = await UserService.update_permission(request=request, pk=pk)
     if count > 0:
@@ -72,7 +72,7 @@ async def super_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsJwtAuth])
+@router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsRBAC])
 async def active_set(request: Request, pk: int):
     count = await UserService.update_active(request=request, pk=pk)
     if count > 0:
@@ -80,7 +80,7 @@ async def active_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.post('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[DependsJwtAuth])
+@router.post('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[DependsRBAC])
 async def multi_set(request: Request, pk: int):
     count = await UserService.update_multi_login(request=request, pk=pk)
     if count > 0:
@@ -92,7 +92,7 @@ async def multi_set(request: Request, pk: int):
     path='/{username}',
     summary='用户注销',
     description='用户注销 != 用户登出，注销之后用户将从数据库删除',
-    dependencies=[DependsJwtAuth],
+    dependencies=[DependsRBAC],
 )
 async def delete_user(request: Request, username: str):
     count = await UserService.delete(request=request, username=username)

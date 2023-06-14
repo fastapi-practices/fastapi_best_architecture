@@ -83,11 +83,11 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
-    TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
+    TOKEN_URL_SWAGGER: str = '/api/v1/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
 
-    # captcha
+    # Captcha
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba_login_captcha'
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 过期时间，单位：秒
 
@@ -103,11 +103,20 @@ class Settings(BaseSettings):
     # Casbin
     CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', '/v1/auth/swagger_login'),
-        ('POST', '/v1/auth/login'),
-        ('POST', '/v1/auth/register'),
-        ('POST', '/v1/auth/password/reset'),
+        ('POST', '/api/v1/auth/swagger_login'),
+        ('POST', '/api/v1/auth/login'),
+        ('POST', '/api/v1/auth/register'),
+        ('GET', '/api/v1/auth/captcha'),
     }
+
+    # Menu
+    MENU_PERMISSION: bool = True  # 开启此功能后, Casbin 鉴权将失效
+    MENU_EXCLUDE: list[str] = [
+        'auth:swagger_login',
+        'auth:login',
+        'auth:register',
+        'auth:captcha',
+    ]
 
     # Opera log
     OPERA_LOG_EXCLUDE: list[str] = [
@@ -115,7 +124,7 @@ class Settings(BaseSettings):
         DOCS_URL,
         REDOCS_URL,
         OPENAPI_URL,
-        '/v1/auth/swagger_login',
+        '/api/v1/auth/swagger_login',
     ]
     OPERA_LOG_ENCRYPT: int = 1  # 请求入参加密, 0: AES (高性能损耗), 1: md5, 2: 不加密, other: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']

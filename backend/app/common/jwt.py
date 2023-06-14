@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
-from fastapi import Depends, Request
+from fastapi import Request
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
@@ -174,6 +174,12 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     if user.dept_id:
         if not user.dept.status:
             raise AuthorizationError(msg='用户所属部门已锁定')
+        if user.dept.del_flag:
+            raise AuthorizationError(msg='用户所属部门已删除')
+    if user.roles:
+        role_status = [role.status for role in user.roles]
+        if all(status == 0 for status in role_status):
+            raise AuthorizationError(msg='用户所属角色已锁定')
     return user
 
 
@@ -189,7 +195,3 @@ def superuser_verify(request: Request) -> bool:
     if not is_superuser:
         raise AuthorizationError
     return is_superuser
-
-
-# Jwt verify dependency
-DependsJwtAuth = Depends(oauth2_schema)
