@@ -120,7 +120,7 @@ class OperaLogMiddleware:
             await self.app(request.scope, wrapped_rcv, send)
         except Exception as e:
             log.exception(e)
-            code = getattr(e, 'code', 500)
+            code = getattr(e, 'code', '500')
             msg = getattr(e, 'msg', 'Internal Server Error')
             status = False
             err = e
