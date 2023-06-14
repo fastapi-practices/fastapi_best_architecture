@@ -19,5 +19,5 @@ class DictData(Base):
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
     status: Mapped[bool] = mapped_column(default=True, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
-    # 字典类型一对多
+    # 字典数据一对多
     type: Mapped['DictType'] = relationship(init=False, back_populates='datas')  # noqa: F821
