@@ -50,7 +50,7 @@ async def create_new_token(refresh_token: Annotated[str, Query(...)]):
     return await response_base.success(data=data)
 
 
-@router.post('/logout', summary='用户登出', dependencies=[DependsRBAC])
+@router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request):
     await AuthService.logout(request=request)
     return await response_base.success()
