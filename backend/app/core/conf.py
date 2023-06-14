@@ -110,7 +110,7 @@ class Settings(BaseSettings):
     }
 
     # Menu
-    MENU_PERMISSION: bool = True  # 开启此功能后, Casbin 鉴权将失效
+    MENU_PERMISSION: bool = False  # 危险行为，开启此功能, Casbin 鉴权将失效，并将使用角色菜单鉴权 (默认关闭)
     MENU_EXCLUDE: list[str] = [
         'auth:swagger_login',
         'auth:login',
