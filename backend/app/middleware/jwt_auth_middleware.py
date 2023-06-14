@@ -40,7 +40,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
             return
 
         try:
-            sub = await jwt.jwt_authentication()
+            sub = await jwt.jwt_authentication(token)
             async with async_db_session() as db:
                 user = await jwt.get_current_user(db, data=sub)
         except TokenError as exc:

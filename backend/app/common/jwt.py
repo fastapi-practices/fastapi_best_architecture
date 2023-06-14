@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
+from backend.app.common.log import log
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
@@ -120,7 +121,7 @@ def get_token(request: Request) -> str:
     authorization = request.headers.get('Authorization')
     scheme, token = get_authorization_scheme_param(authorization)
     if not authorization or scheme.lower() != 'bearer':
-        raise TokenError
+        raise TokenError(msg='token 无效')
     return token
 
 
@@ -136,9 +137,9 @@ def jwt_decode(token: str) -> int:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = int(payload.get('sub'))
         if not user_id:
-            raise TokenError
+            raise TokenError(msg='token 无效')
     except (jwt.JWTError, ValidationError, Exception):
-        raise TokenError
+        raise TokenError(msg='token 无效')
     return user_id
 
 
@@ -153,7 +154,7 @@ async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, i
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
-        raise TokenError(msg='token 无效或已过期')
+        raise TokenError(msg='token 已过期')
     return {'sub': user_id}
 
 
@@ -168,7 +169,7 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     user_id = data.get('sub')
     user = await UserDao.get_with_relation(db, user_id=user_id)
     if not user:
-        raise TokenError
+        raise TokenError(msg='token 无效')
     if not user.is_active:
         raise AuthorizationError(msg='用户已锁定')
     if user.dept_id:

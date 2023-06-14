@@ -26,7 +26,7 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, _: str = DependsJwtAuth) -> None:
+    async def rbac_verify(self, request: Request, _: dict = DependsJwtAuth) -> None:
         """
         RBAC 权限校验
 
