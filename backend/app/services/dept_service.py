@@ -19,7 +19,7 @@ class DeptService:
             return dept
 
     @staticmethod
-    async def get_select(
+    async def get_dept_tree(
         *, name: str | None = None, leader: str | None = None, phone: str | None = None, status: bool | None = None
     ):
         async with async_db_session() as db:

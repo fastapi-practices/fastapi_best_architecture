@@ -26,6 +26,18 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         menu = await db.execute(se)
         return menu.scalars().all()
 
+    async def get_role_menus(self, db, superuser: bool, menu_ids: list[int]) -> list[Menu]:
+        se = select(self.model).order_by(asc(self.model.sort))
+        where_list = [
+            self.model.menu_type.in_([0, 1]),
+            self.model.status == 1,
+        ]
+        if not superuser:
+            where_list.append(self.model.id.in_(menu_ids))
+        se = se.where(and_(*where_list))
+        menu = await db.execute(se)
+        return menu.scalars().all()
+
     async def create(self, db, obj_in: dict) -> None:
         obj = self.model(**obj_in)
         db.add(obj)

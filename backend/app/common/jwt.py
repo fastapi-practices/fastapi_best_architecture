@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
-from fastapi import Depends, Request
+from fastapi import Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
+from backend.app.common.log import log
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
@@ -120,7 +121,7 @@ def get_token(request: Request) -> str:
     authorization = request.headers.get('Authorization')
     scheme, token = get_authorization_scheme_param(authorization)
     if not authorization or scheme.lower() != 'bearer':
-        raise TokenError
+        raise TokenError(msg='token 无效')
     return token
 
 
@@ -136,13 +137,13 @@ def jwt_decode(token: str) -> int:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = int(payload.get('sub'))
         if not user_id:
-            raise TokenError
+            raise TokenError(msg='token 无效')
     except (jwt.JWTError, ValidationError, Exception):
-        raise TokenError
+        raise TokenError(msg='token 无效')
     return user_id
 
 
-async def jwt_authentication(token: str) -> dict[str, int]:
+async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
     """
     JWT authentication
 
@@ -168,12 +169,18 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     user_id = data.get('sub')
     user = await UserDao.get_with_relation(db, user_id=user_id)
     if not user:
-        raise TokenError
+        raise TokenError(msg='token 无效')
     if not user.is_active:
         raise AuthorizationError(msg='用户已锁定')
     if user.dept_id:
         if not user.dept.status:
             raise AuthorizationError(msg='用户所属部门已锁定')
+        if user.dept.del_flag:
+            raise AuthorizationError(msg='用户所属部门已删除')
+    if user.roles:
+        role_status = [role.status for role in user.roles]
+        if all(status == 0 for status in role_status):
+            raise AuthorizationError(msg='用户所属角色已锁定')
     return user
 
 
@@ -191,5 +198,6 @@ def superuser_verify(request: Request) -> bool:
     return is_superuser
 
 
-# Jwt verify dependency
-DependsJwtAuth = Depends(oauth2_schema)
+# JWT authorizes dependency injection, which can be used if the interface only
+# needs to provide a token instead of RBAC permission control
+DependsJwtAuth = Depends(jwt_authentication)

@@ -3,14 +3,13 @@
 from typing import Any
 
 from fastapi import Request, Response
-from starlette.authentication import AuthenticationBackend, AuthenticationError
+from starlette.authentication import AuthenticationBackend, AuthenticationError, AuthCredentials
 from starlette.requests import HTTPConnection
 from starlette.responses import JSONResponse
 
 from backend.app.common import jwt
 from backend.app.common.exception.errors import TokenError
 from backend.app.common.log import log
-from backend.app.core.conf import settings
 from backend.app.database.db_mysql import async_db_session
 
 
@@ -55,4 +54,4 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
         # 标准返回模式请查看：https://www.starlette.io/authentication/
-        return auth, user
+        return AuthCredentials(['authenticated']), user

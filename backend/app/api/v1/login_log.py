@@ -5,7 +5,6 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
-from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -15,7 +14,7 @@ from backend.app.services.login_log_service import LoginLogService
 router = APIRouter()
 
 
-@router.get('', summary='（模糊条件）分页获取登录日志', dependencies=[DependsJwtAuth, PageDepends])
+@router.get('', summary='（模糊条件）分页获取登录日志', dependencies=[DependsRBAC, PageDepends])
 async def get_all_login_logs(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,

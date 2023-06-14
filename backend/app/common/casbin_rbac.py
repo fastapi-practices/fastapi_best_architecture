@@ -26,36 +26,45 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, _: str = DependsJwtAuth) -> None:
+    async def rbac_verify(self, request: Request, _: dict = DependsJwtAuth) -> None:
         """
-        权限校验
+        RBAC 权限校验
 
         :param request:
         :param _:
         :return:
         """
+        # 超级管理员免校验
         super_user = request.user.is_superuser
         if super_user:
             return
-
+        # 免鉴权的接口
         method = request.method
         path = request.url.path
         if (method, path) in settings.CASBIN_EXCLUDE:
             return
-
+        # 检测角色数据权限范围
         user_roles = request.user.roles
-        data_scope = [role.data_scope for role in user_roles if role.data_scope == 1]
+        data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
-
-        # TODO: 通过 redis 做鉴权查询优化，减少数据库查询
-        user_uuid = request.user.user_uuid
-        enforcer = self.enforcer()
-        if not enforcer.enforce(user_uuid, path, method):
-            raise AuthorizationError
+        if settings.MENU_PERMISSION:
+            # 菜单权限校验
+            path_auth = request.url.path.replace(f'{settings.API_V1_STR}', '').replace('/', ':')
+            menu_perms = []
+            for role in user_roles:
+                menu_perms.extend([menu.perms for menu in role.menus])
+            if not menu_perms or path_auth not in menu_perms:
+                raise AuthorizationError
+        else:
+            # casbin 权限校验
+            user_uuid = request.user.user_uuid
+            enforcer = self.enforcer()
+            if not enforcer.enforce(user_uuid, path, method):
+                raise AuthorizationError
 
 
 RBAC = RBAC()
 RbacEnforcer = RBAC.enforcer()
-# RBAC 依赖注入
+# RBAC 授权依赖注入
 DependsRBAC = Depends(RBAC.rbac_verify)

@@ -5,7 +5,6 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
-from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -15,7 +14,7 @@ from backend.app.services.opera_log_service import OperaLogService
 router = APIRouter()
 
 
-@router.get('', summary='（模糊条件）分页获取操作日志', dependencies=[DependsJwtAuth, PageDepends])
+@router.get('', summary='（模糊条件）分页获取操作日志', dependencies=[DependsRBAC, PageDepends])
 async def get_all_opera_logs(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
