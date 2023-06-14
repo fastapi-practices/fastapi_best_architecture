@@ -26,12 +26,12 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, token: str = Depends(oauth2_schema)) -> None:
+    async def rbac_verify(self, request: Request, _: str = Depends(oauth2_schema)) -> None:
         """
         RBAC 权限校验
 
         :param request:
-        :param token:
+        :param _:
         :return:
         """
         # 强制校验 JWT 授权状态
