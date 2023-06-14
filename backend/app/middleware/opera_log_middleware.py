@@ -34,7 +34,7 @@ class OperaLogMiddleware:
 
         # 排除记录白名单
         path = request.url.path
-        if path in settings.OPERA_LOG_EXCLUDE:
+        if path in settings.OPERA_LOG_EXCLUDE or not path.startswith(f'{settings.API_V1_STR}'):
             await self.app(scope, receive, send)
             return
 
