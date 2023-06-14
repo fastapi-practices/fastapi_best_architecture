@@ -47,14 +47,10 @@ class JwtAuthMiddleware(AuthenticationBackend):
         except TokenError as exc:
             raise _AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
         except Exception as e:
-            import traceback
-
             log.exception(e)
             raise _AuthenticationError(
                 code=getattr(e, 'code', 500),
-                msg=getattr(e, 'msg', traceback.format_exc())
-                if settings.ENVIRONMENT == 'dev'
-                else 'Internal Server Error',
+                msg=getattr(e, 'msg', 'Internal Server Error')
             )
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性

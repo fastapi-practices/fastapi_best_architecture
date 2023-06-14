@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import traceback
 from datetime import datetime
 from typing import Any
 
@@ -122,9 +121,7 @@ class OperaLogMiddleware:
         except Exception as e:
             log.exception(e)
             code = getattr(e, 'code', 500)
-            msg = getattr(
-                e, 'msg', traceback.format_exc() if settings.ENVIRONMENT == 'dev' else 'Internal Server Error'
-            )
+            msg = getattr(e, 'msg', 'Internal Server Error')
             status = False
             err = e
 
