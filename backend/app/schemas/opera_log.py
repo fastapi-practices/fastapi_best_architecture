@@ -20,7 +20,7 @@ class OperaLogBase(BaseModel):
     device: str | None = None
     args: dict | None = None
     status: bool
-    code: int
+    code: int | str
     msg: str | None = None
     cost_time: float
     opera_time: datetime

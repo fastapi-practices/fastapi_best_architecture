@@ -123,7 +123,9 @@ def register_exception(app: FastAPI):
             )
 
         else:
-            log.error(exc)
+            import traceback
+            log.error(f'未知异常: {exc}')
+            log.error(traceback.format_exc())
             return JSONResponse(
                 status_code=500,
                 content=await response_base.fail(code=500, msg=str(exc))
