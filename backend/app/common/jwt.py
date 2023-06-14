@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
-from fastapi import Request
+from fastapi import Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
@@ -142,7 +142,7 @@ def jwt_decode(token: str) -> int:
     return user_id
 
 
-async def jwt_authentication(token: str) -> dict[str, int]:
+async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
     """
     JWT authentication
 
@@ -153,7 +153,7 @@ async def jwt_authentication(token: str) -> dict[str, int]:
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
-        raise TokenError(msg='token 已过期')
+        raise TokenError(msg='token 无效或已过期')
     return {'sub': user_id}
 
 
@@ -195,3 +195,8 @@ def superuser_verify(request: Request) -> bool:
     if not is_superuser:
         raise AuthorizationError
     return is_superuser
+
+
+# JWT authorizes dependency injection, which can be used if the interface only
+# needs to provide a token instead of RBAC permission control
+DependsJwtAuth = Depends(jwt_authentication)

@@ -36,12 +36,8 @@ class JwtAuthMiddleware(AuthenticationBackend):
         if not auth:
             return
 
-        scheme, token = auth.split()
-        if scheme.lower() != 'bearer':
-            return
-
         try:
-            sub = await jwt.jwt_authentication(token)
+            sub = await jwt.jwt_authentication()
             async with async_db_session() as db:
                 user = await jwt.get_current_user(db, data=sub)
         except TokenError as exc:

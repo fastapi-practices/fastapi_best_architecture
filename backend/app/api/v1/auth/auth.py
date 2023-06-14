@@ -8,6 +8,7 @@ from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import GetLoginToken, GetSwaggerToken, GetNewToken
 from backend.app.schemas.user import AuthLogin
@@ -42,7 +43,7 @@ async def user_login(request: Request, obj: AuthLogin, background_tasks: Backgro
     return await response_base.success(data=data)
 
 
-@router.post('/new_token', summary='创建新 token', dependencies=[DependsRBAC])
+@router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(refresh_token: Annotated[str, Query(...)]):
     access_token, access_expire = await AuthService.new_token(refresh_token=refresh_token)
     data = GetNewToken(access_token=access_token, access_token_expire_time=access_expire)

@@ -5,7 +5,7 @@ import casbin_async_sqlalchemy_adapter
 from fastapi import Request, Depends
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
-from backend.app.common.jwt import oauth2_schema
+from backend.app.common.jwt import oauth2_schema, DependsJwtAuth
 from backend.app.core.conf import settings
 from backend.app.core.path_conf import RBAC_MODEL_CONF
 from backend.app.database.db_mysql import async_engine
@@ -26,7 +26,7 @@ class RBAC:
 
         return enforcer
 
-    async def rbac_verify(self, request: Request, _: str = Depends(oauth2_schema)) -> None:
+    async def rbac_verify(self, request: Request, _: str = DependsJwtAuth) -> None:
         """
         RBAC 权限校验
 
@@ -34,9 +34,6 @@ class RBAC:
         :param _:
         :return:
         """
-        # 强制校验 JWT 授权状态
-        if not request.auth.scopes:
-            raise TokenError
         # 超级管理员免校验
         super_user = request.user.is_superuser
         if super_user:
@@ -69,5 +66,5 @@ class RBAC:
 
 RBAC = RBAC()
 RbacEnforcer = RBAC.enforcer()
-# RBAC 依赖注入
+# RBAC 授权依赖注入
 DependsRBAC = Depends(RBAC.rbac_verify)
