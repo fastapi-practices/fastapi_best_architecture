@@ -33,9 +33,12 @@ class DeptService:
             dept = await DeptDao.get_by_name(db, obj.name)
             if dept:
                 raise errors.ForbiddenError(msg='部门名称已存在')
+            if obj.parent_id:
+                parent_dept = await DeptDao.get(db, obj.parent_id)
+                if not parent_dept:
+                    raise errors.NotFoundError(msg='父级部门不存在')
             new_obj = obj.dict()
-            new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'create_user': user_id})
-            await DeptDao.create(db, new_obj)
+            await DeptDao.create(db, new_obj, user_id)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDept, user_id: int):
@@ -46,9 +49,12 @@ class DeptService:
             if dept.name != obj.name:
                 if await DeptDao.get_by_name(db, obj.name):
                     raise errors.ForbiddenError(msg='部门名称已存在')
+            if obj.parent_id:
+                parent_dept = await DeptDao.get(db, obj.parent_id)
+                if not parent_dept:
+                    raise errors.NotFoundError(msg='父级部门不存在')
             new_obj = obj.dict()
-            new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'update_user': user_id})
-            count = await DeptDao.update(db, pk, new_obj)
+            count = await DeptDao.update(db, pk, new_obj, user_id)
             return count
 
     @staticmethod

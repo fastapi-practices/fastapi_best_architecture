@@ -124,6 +124,7 @@ def register_exception(app: FastAPI):
 
         else:
             import traceback
+
             log.error(f'未知异常: {exc}')
             log.error(traceback.format_exc())
             return JSONResponse(

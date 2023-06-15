@@ -41,9 +41,12 @@ class MenuService:
             menu = await MenuDao.get_by_name(db, obj.name)
             if menu:
                 raise errors.ForbiddenError(msg='菜单名称已存在')
+            if obj.parent_id:
+                parent_menu = await MenuDao.get(db, obj.parent_id)
+                if not parent_menu:
+                    raise errors.NotFoundError(msg='父级菜单不存在')
             new_obj = obj.dict()
-            new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'create_user': user_id})
-            await MenuDao.create(db, new_obj)
+            await MenuDao.create(db, new_obj, user_id)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateMenu, user_id: int):
@@ -54,9 +57,12 @@ class MenuService:
             if menu.name != obj.name:
                 if await MenuDao.get_by_name(db, obj.name):
                     raise errors.ForbiddenError(msg='菜单名称已存在')
+            if obj.parent_id:
+                parent_menu = await MenuDao.get(db, obj.parent_id)
+                if not parent_menu:
+                    raise errors.NotFoundError(msg='父级菜单不存在')
             new_obj = obj.dict()
-            new_obj.update({'level': obj.parent_id + 1 if obj.parent_id else 1, 'update_user': user_id})
-            count = await MenuDao.update(db, pk, new_obj)
+            count = await MenuDao.update(db, pk, new_obj, user_id)
             return count
 
     @staticmethod
