@@ -36,12 +36,13 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         dept = await db.execute(se)
         return dept.scalars().all()
 
-    async def create(self, db: AsyncSession, obj_in: dict) -> None:
+    async def create(self, db: AsyncSession, obj_in: dict, user_id: int) -> None:
+        obj_in.update({'create_user': user_id})
         obj = self.model(**obj_in)
         db.add(obj)
 
-    async def update(self, db: AsyncSession, dept_id: int, obj_in: dict) -> int:
-        return await self.update_(db, dept_id, obj_in)
+    async def update(self, db: AsyncSession, dept_id: int, obj_in: dict, user_id: int) -> int:
+        return await self.update_(db, dept_id, obj_in, user_id=user_id)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
         return await self.delete_(db, dept_id, del_flag=1)
@@ -54,7 +55,9 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         return user_relation.users
 
     async def get_children(self, db: AsyncSession, dept_id: int) -> Any:
-        result = await db.execute(select(self.model).where(self.model.id == dept_id))
+        result = await db.execute(
+            select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
+        )
         dept = result.scalars().first()
         return dept.children
 

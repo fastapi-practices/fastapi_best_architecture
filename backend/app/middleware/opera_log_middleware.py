@@ -100,7 +100,7 @@ class OperaLogMiddleware:
 
     async def execute_request(self, request: Request, send: Send) -> tuple:
         # 预置响应信息
-        code: int = 200
+        code: str = '200'
         msg: str = 'Success'
         status: bool = True
         err: Any = None
