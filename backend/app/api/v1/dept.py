@@ -22,6 +22,7 @@ async def get_dept(pk: int):
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsRBAC])
 async def get_all_depts(
+    level: Annotated[int | None, Query()] = None,
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,

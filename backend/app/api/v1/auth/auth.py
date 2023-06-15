@@ -7,7 +7,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
-from backend.app.common.casbin_rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import GetLoginToken, GetSwaggerToken, GetNewToken

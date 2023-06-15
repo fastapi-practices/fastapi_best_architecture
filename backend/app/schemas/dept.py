@@ -45,7 +45,6 @@ class UpdateDept(DeptBase):
 
 class GetAllDept(DeptBase):
     id: int
-    level: int
     del_flag: bool
     create_user: int
     update_user: int = None

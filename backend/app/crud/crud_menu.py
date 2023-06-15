@@ -38,12 +38,13 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         menu = await db.execute(se)
         return menu.scalars().all()
 
-    async def create(self, db, obj_in: dict) -> None:
+    async def create(self, db, obj_in: dict, user_id: int) -> None:
+        obj_in.update({'create_user': user_id})
         obj = self.model(**obj_in)
         db.add(obj)
 
-    async def update(self, db, menu_id: int, obj_in: dict) -> int:
-        return await self.update_(db, menu_id, obj_in)
+    async def update(self, db, menu_id: int, obj_in: dict, user_id: int) -> int:
+        return await self.update_(db, menu_id, obj_in, user_id)
 
     async def delete(self, db, menu_id: int) -> int:
         return await self.delete_(db, menu_id)
