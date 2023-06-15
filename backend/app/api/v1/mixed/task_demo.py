@@ -5,9 +5,10 @@ import datetime
 from fastapi import APIRouter, Query
 from typing_extensions import Annotated
 
+from backend.app.common.response.response_schema import response_base
 from backend.app.common.task import scheduler
 
-router = APIRouter()
+router = APIRouter(prefix='/tasks')
 
 
 def task_demo():
@@ -37,16 +38,16 @@ async def task_demo_get():
                 'next_run_time': job.next_run_time,
             }
         )
-    return {'msg': 'success', 'data': tasks}
+    return await response_base.success({'msg': 'success', 'data': tasks})
 
 
-@router.post('', summary='添加同步任务')
+@router.post('/sync', summary='添加同步任务')
 async def task_demo_add():
     scheduler.add_job(
         task_demo, 'interval', seconds=1, id='task_demo', replace_existing=True, start_date=datetime.datetime.now()
     )
 
-    return {'msg': 'success'}
+    return await response_base.success({'msg': 'success'})
 
 
 @router.post('/async', summary='添加异步任务')
@@ -60,11 +61,11 @@ async def task_demo_add_async():
         start_date=datetime.datetime.now(),
     )
 
-    return {'msg': 'success'}
+    return await response_base.success({'msg': 'success'})
 
 
 @router.delete('', summary='删除任务')
 async def task_demo_delete(job_id: Annotated[str, Query(..., description='任务id')]):
     scheduler.remove_job(job_id=job_id)
 
-    return {'msg': 'success'}
+    return await response_base.success({'msg': 'success'})
