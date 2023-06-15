@@ -10,7 +10,7 @@ from backend.app.core.conf import settings
 router = APIRouter()
 
 
-@router.get('', summary='获取系统配置', dependencies=[DependsRBAC])
+@router.get('/configs', summary='获取系统配置', dependencies=[DependsRBAC])
 async def get_sys_config():
     return await response_base.success(
         data={
