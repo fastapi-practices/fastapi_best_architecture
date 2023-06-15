@@ -4,7 +4,7 @@ import casbin
 import casbin_async_sqlalchemy_adapter
 from fastapi import Request, Depends
 
-from backend.app.common.exception.errors import AuthorizationError
+from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.core.conf import settings
 from backend.app.core.path_conf import RBAC_MODEL_CONF
@@ -34,6 +34,9 @@ class RBAC:
         :param _:
         :return:
         """
+        # 强制校验 JWT 授权状态
+        if not request.auth.scopes:
+            raise TokenError
         # 超级管理员免校验
         super_user = request.user.is_superuser
         if super_user:

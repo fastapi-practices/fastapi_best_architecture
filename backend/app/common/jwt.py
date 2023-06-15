@@ -143,7 +143,7 @@ def jwt_decode(token: str) -> int:
     return user_id
 
 
-async def jwt_authentication(token: str = Depends(oauth2_schema)) -> dict[str, int]:
+async def jwt_authentication(token: str) -> dict[str, int]:
     """
     JWT authentication
 
@@ -200,4 +200,4 @@ def superuser_verify(request: Request) -> bool:
 
 # JWT authorizes dependency injection, which can be used if the interface only
 # needs to provide a token instead of RBAC permission control
-DependsJwtAuth = Depends(jwt_authentication)
+DependsJwtAuth = Depends(oauth2_schema)
