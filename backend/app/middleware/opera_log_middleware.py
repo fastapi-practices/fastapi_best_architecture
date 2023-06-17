@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Any
 
 from asgiref.sync import sync_to_async
-from fastapi import UploadFile
 from starlette.background import BackgroundTask
+from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
 
@@ -65,7 +65,7 @@ class OperaLogMiddleware:
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         router = request.scope.get('route')
-        summary = getattr(router, 'summary', '')
+        summary = getattr(router, 'summary') or ''
         args.update(request.path_params)
         # 脱敏处理
         args = await self.desensitization(args)
