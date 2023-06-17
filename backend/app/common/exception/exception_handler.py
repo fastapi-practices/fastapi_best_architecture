@@ -45,9 +45,11 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
+        content = {'code': exc.status_code, 'msg': exc.detail}
+        request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=_get_exception_code(exc.status_code),
-            content=await response_base.fail(code=exc.status_code, msg=exc.detail),
+            content=await response_base.fail(**content),
             headers=exc.headers,
         )
 
@@ -82,14 +84,13 @@ def register_exception(app: FastAPI):
                     )
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'
-        return JSONResponse(
-            status_code=422,
-            content=await response_base.fail(
-                code=422,
-                msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
-                data={'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
-            ),
-        )
+        content = {
+            'code': 422,
+            'msg': '请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
+            'data': {'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
+        }
+        request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
+        return JSONResponse(status_code=422, content=await response_base.fail(**content))
 
     @app.exception_handler(Exception)
     async def all_exception_handler(request: Request, exc: Exception):

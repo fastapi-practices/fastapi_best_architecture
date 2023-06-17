@@ -99,10 +99,6 @@ class OperaLogMiddleware:
             raise err from None
 
     async def execute_request(self, request: Request, send: Send) -> tuple:
-        # 预置响应信息
-        code: str = '200'
-        msg: str = 'Success'
-        status: bool = True
         err: Any = None
         try:
             # 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
@@ -118,6 +114,7 @@ class OperaLogMiddleware:
 
             wrapped_rcv = wrapped_rcv_gen().__anext__
             await self.app(request.scope, wrapped_rcv, send)
+            code, msg, status = await self.exception_middleware_handler(request)
         except Exception as e:
             log.exception(e)
             code = getattr(e, 'code', '500')
@@ -126,6 +123,31 @@ class OperaLogMiddleware:
             err = e
 
         return code, msg, status, err
+
+    @staticmethod
+    @sync_to_async
+    def exception_middleware_handler(request: Request):
+        # 预置响应信息
+        code: str = '200'
+        msg: str = 'Success'
+        status: bool = True
+        try:
+            http_exception = request.state.__request_http_exception__
+        except AttributeError:
+            pass
+        else:
+            code = http_exception.get('code', '500')
+            msg = http_exception.get('msg', 'Internal Server Error')
+            status = False
+        try:
+            validation_exception = request.state.__request_validation_exception__
+        except AttributeError:
+            pass
+        else:
+            code = validation_exception.get('code', '400')
+            msg = validation_exception.get('msg', 'Bad Request')
+            status = False
+        return code, msg, status
 
     @staticmethod
     async def get_request_args(request: Request) -> dict:
