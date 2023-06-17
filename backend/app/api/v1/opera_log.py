@@ -18,7 +18,7 @@ router = APIRouter()
 async def get_all_opera_logs(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
-    status: Annotated[bool | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
     ip: Annotated[str | None, Query()] = None,
 ):
     log_select = await OperaLogService.get_select(username=username, status=status, ip=ip)

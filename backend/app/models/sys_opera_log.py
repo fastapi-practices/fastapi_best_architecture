@@ -28,7 +28,7 @@ class OperaLog(DataClassBase):
     browser: Mapped[str | None] = mapped_column(String(50), comment='浏览器')
     device: Mapped[str | None] = mapped_column(String(50), comment='设备')
     args: Mapped[str | None] = mapped_column(JSON(), comment='请求参数')
-    status: Mapped[bool] = mapped_column(comment='操作状态（0异常 1正常）')
+    status: Mapped[int] = mapped_column(comment='操作状态（0异常 1正常）')
     code: Mapped[str] = mapped_column(String(20), insert_default='200', comment='操作状态码')
     msg: Mapped[str | None] = mapped_column(LONGTEXT, comment='提示消息')
     cost_time: Mapped[float] = mapped_column(insert_default=0.0, comment='请求耗时ms')

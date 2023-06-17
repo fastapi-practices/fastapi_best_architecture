@@ -22,7 +22,7 @@ class User(DataClassBase):
     password: Mapped[str] = mapped_column(String(255), comment='密码')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
-    is_active: Mapped[bool] = mapped_column(default=True, comment='用户账号状态(0停用 1正常)')
+    status: Mapped[int] = mapped_column(default=1, comment='用户账号状态(0停用 1正常)')
     is_multi_login: Mapped[bool] = mapped_column(default=False, comment='是否重复登陆(0否 1是)')
     avatar: Mapped[str | None] = mapped_column(String(255), default=None, comment='头像')
     phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机号')

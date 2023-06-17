@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 
-from backend.app.common.enums import MenuType
+from backend.app.common.enums import MenuType, StatusType
 
 
 class MenuBase(BaseModel):
@@ -13,10 +13,10 @@ class MenuBase(BaseModel):
     sort: int = Field(default=0, ge=0, description='排序')
     icon: str | None = None
     path: str | None = None
-    menu_type: int = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
+    menu_type: MenuType = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
     component: str | None = None
     perms: str | None = None
-    status: bool
+    status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 
     @validator('menu_type')

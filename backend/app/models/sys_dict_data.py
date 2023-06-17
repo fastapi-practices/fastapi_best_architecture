@@ -17,7 +17,7 @@ class DictData(Base):
     value: Mapped[str] = mapped_column(String(32), unique=True, comment='字典值')
     type_id: Mapped[int] = mapped_column(ForeignKey('sys_dict_type.id'), comment='字典类型id')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
-    status: Mapped[bool] = mapped_column(default=True, comment='状态（0停用 1正常）')
+    status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     # 字典类型一对多
     type: Mapped['DictType'] = relationship(init=False, back_populates='datas')  # noqa: F821

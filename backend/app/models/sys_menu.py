@@ -24,7 +24,7 @@ class Menu(Base):
     menu_type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
     component: Mapped[str | None] = mapped_column(String(255), default=None, comment='组件路径')
     perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='权限标识')
-    status: Mapped[bool] = mapped_column(default=True, comment='菜单状态（0停用 1正常）')
+    status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     parent_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'

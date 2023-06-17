@@ -19,7 +19,7 @@ async def get_all_dict_types(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     code: Annotated[str | None, Query()] = None,
-    status: Annotated[str | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     dict_type_select = await DictTypeService.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select, GetAllDictType)

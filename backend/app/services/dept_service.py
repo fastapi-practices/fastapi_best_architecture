@@ -20,7 +20,7 @@ class DeptService:
 
     @staticmethod
     async def get_dept_tree(
-        *, name: str | None = None, leader: str | None = None, phone: str | None = None, status: bool | None = None
+        *, name: str | None = None, leader: str | None = None, phone: str | None = None, status: int | None = None
     ):
         async with async_db_session() as db:
             dept_select = await DeptDao.get_all(db=db, name=name, leader=leader, phone=phone, status=status)

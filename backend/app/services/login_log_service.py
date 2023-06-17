@@ -16,12 +16,12 @@ from backend.app.schemas.login_log import CreateLoginLog
 
 class LoginLogService:
     @staticmethod
-    async def get_select(*, username: str, status: bool, ip: str) -> Select:
+    async def get_select(*, username: str, status: int, ip: str) -> Select:
         return await LoginLogDao.get_all(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(
-        *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: bool, msg: str
+        *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: int, msg: str
     ) -> NoReturn:
         try:
             # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py

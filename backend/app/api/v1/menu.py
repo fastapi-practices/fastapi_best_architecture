@@ -29,7 +29,7 @@ async def get_menu(pk: int):
 @router.get('', summary='获取所有菜单展示树', dependencies=[DependsRBAC])
 async def get_all_menus(
     name: Annotated[str | None, Query()] = None,
-    status: Annotated[bool | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     menu = await MenuService.get_menu_tree(name=name, status=status)
     return await response_base.success(data=menu)

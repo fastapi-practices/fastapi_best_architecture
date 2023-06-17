@@ -5,6 +5,7 @@ from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 from pydantic import BaseModel, HttpUrl, Field, validator
 
+from backend.app.common.enums import StatusType
 from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
 
@@ -68,7 +69,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
     id: int
     user_uuid: str
     avatar: str | None = None
-    is_active: bool
+    status: StatusType = Field(default=StatusType.enable)
     is_superuser: bool
     is_multi_login: bool
     time_joined: datetime = None

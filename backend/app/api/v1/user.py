@@ -57,7 +57,7 @@ async def get_all_users(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
-    status: Annotated[bool | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)
@@ -73,8 +73,8 @@ async def super_set(request: Request, pk: int):
 
 
 @router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsRBAC])
-async def active_set(request: Request, pk: int):
-    count = await UserService.update_active(request=request, pk=pk)
+async def status_set(request: Request, pk: int):
+    count = await UserService.update_status(request=request, pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

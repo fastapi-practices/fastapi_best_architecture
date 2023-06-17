@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from backend.app.common.enums import StatusType
 from backend.app.schemas.dict_type import GetAllDictType
 
 
@@ -11,7 +12,7 @@ class DictDataBase(BaseModel):
     label: str
     value: str
     sort: int
-    status: bool
+    status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
     type_id: int
 

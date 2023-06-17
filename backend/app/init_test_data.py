@@ -98,7 +98,7 @@ class InitTestData:
             db.add(user_obj)
         log.info(f'普通用户创建成功，账号：{username}，密码：{password}')
 
-    async def fake_no_active_user(self):
+    async def fake_no_status_user(self):
         """自动创建锁定普通用户"""
         username = self.fake.user_name()
         password = self.fake.password()
@@ -108,7 +108,7 @@ class InitTestData:
             nickname=username,
             password=await get_hash_password(password),
             email=email,
-            is_active=False,
+            status=0,
             is_superuser=False,
             dept_id=1,
         )
@@ -135,7 +135,7 @@ class InitTestData:
             db.add(user_obj)
         log.info(f'管理员用户创建成功，账号：{username}，密码：{password}')
 
-    async def fake_no_active_superuser(self):
+    async def fake_no_status_superuser(self):
         """自动创建锁定管理员用户"""
         username = self.fake.user_name()
         password = self.fake.password()
@@ -145,7 +145,7 @@ class InitTestData:
             nickname=username,
             password=await get_hash_password(password),
             email=email,
-            is_active=False,
+            status=0,
             is_superuser=True,
             dept_id=1,
         )
@@ -162,9 +162,9 @@ class InitTestData:
         await self.create_test_user()
         await self.create_superuser_by_yourself()
         await self.fake_user()
-        await self.fake_no_active_user()
+        await self.fake_no_status_user()
         await self.fake_superuser()
-        await self.fake_no_active_superuser()
+        await self.fake_no_status_superuser()
         log.info('✅ 数据初始化完成')
 
 

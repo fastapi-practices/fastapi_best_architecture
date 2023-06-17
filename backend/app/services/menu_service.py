@@ -18,7 +18,7 @@ class MenuService:
             return menu
 
     @staticmethod
-    async def get_menu_tree(*, name: str | None = None, status: bool | None = None):
+    async def get_menu_tree(*, name: str | None = None, status: int | None = None):
         async with async_db_session() as db:
             menu_select = await MenuDao.get_all(db, name=name, status=status)
             menu_tree = await get_tree_data(menu_select)

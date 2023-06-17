@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from backend.app.common.enums import StatusType
 
 
 class OperaLogBase(BaseModel):
@@ -19,7 +21,7 @@ class OperaLogBase(BaseModel):
     browser: str | None = None
     device: str | None = None
     args: dict | None = None
-    status: bool
+    status: StatusType = Field(default=StatusType.enable)
     code: str
     msg: str | None = None
     cost_time: float
