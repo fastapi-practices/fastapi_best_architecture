@@ -3,8 +3,9 @@
 import json
 
 from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
