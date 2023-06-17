@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Any
 
 from asgiref.sync import sync_to_async
-from fastapi import UploadFile
 from starlette.background import BackgroundTask
+from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.types import ASGIApp, Scope, Receive, Send
 
