@@ -80,7 +80,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         if phone:
             where_list.append(self.model.phone.like(f'%{phone}%'))
         if status is not None:
-            where_list.append(self.model.is_active == bool(status))
+            where_list.append(self.model.status == status)
         if where_list:
             se = se.where(and_(*where_list))
         return se
@@ -89,9 +89,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         user = await self.get(db, user_id)
         return user.is_superuser
 
-    async def get_active(self, db: AsyncSession, user_id: int) -> bool:
+    async def get_status(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get(db, user_id)
-        return user.is_active
+        return user.status
 
     async def get_multi_login(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get(db, user_id)
@@ -104,10 +104,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def set_active(self, db: AsyncSession, user_id: int) -> int:
-        active_status = await self.get_active(db, user_id)
+    async def set_status(self, db: AsyncSession, user_id: int) -> int:
+        status = await self.get_status(db, user_id)
         user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_active=False if active_status else True)
+            update(self.model).where(self.model.id == user_id).values(status=False if status else True)
         )
         return user.rowcount
 

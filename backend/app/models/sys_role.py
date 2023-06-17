@@ -17,7 +17,7 @@ class Role(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(20), unique=True, comment='角色名称')
     data_scope: Mapped[int | None] = mapped_column(default=2, comment='数据范围（1：全部数据权限 2：自定数据权限）')
-    status: Mapped[bool] = mapped_column(default=True, comment='角色状态（0停用 1正常）')
+    status: Mapped[int] = mapped_column(default=1, comment='角色状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     # 角色用户多对多
     users: Mapped[list['User']] = relationship(  # noqa: F821

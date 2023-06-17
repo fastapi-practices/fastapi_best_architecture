@@ -70,3 +70,10 @@ class OperaLogCipherType(IntEnum):
     aes = 0
     md5 = 1
     plan = 2
+
+
+class StatusType(IntEnum):
+    """状态类型"""
+
+    disable = 0
+    enable = 1

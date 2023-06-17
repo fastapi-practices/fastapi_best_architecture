@@ -14,7 +14,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
     async def get_by_name(self, db, name: str) -> Menu | None:
         return await self.get_(db, name=name)
 
-    async def get_all(self, db, name: str | None = None, status: bool | None = None) -> list[Menu]:
+    async def get_all(self, db, name: str | None = None, status: int | None = None) -> list[Menu]:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = []
         if name:

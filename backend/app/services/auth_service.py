@@ -31,7 +31,7 @@ class AuthService:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not await jwt.password_verify(form_data.password, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
-            elif not current_user.is_active:
+            elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
             await UserDao.update_login_time(db, form_data.username, self.login_time)
@@ -49,7 +49,7 @@ class AuthService:
                     raise errors.NotFoundError(msg='用户不存在')
                 elif not await jwt.password_verify(obj.password, current_user.password):
                     raise errors.AuthorizationError(msg='密码错误')
-                elif not current_user.is_active:
+                elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
                 captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
@@ -98,7 +98,7 @@ class AuthService:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not current_user.is_active:
+            elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
             access_new_token, access_new_token_expire_time = await jwt.create_new_token(
                 str(current_user.id), refresh_token, multi_login=current_user.is_multi_login

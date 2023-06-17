@@ -19,7 +19,7 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         return await self.get_(db, name=name)
 
     async def get_all(
-        self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: bool = None
+        self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
     ) -> Any:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]

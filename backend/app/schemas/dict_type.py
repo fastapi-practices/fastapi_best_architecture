@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from backend.app.common.enums import StatusType
 
 
 class DictTypeBase(BaseModel):
     name: str
     code: str
-    status: bool
+    status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 
 

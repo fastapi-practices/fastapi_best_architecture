@@ -119,7 +119,7 @@ class OperaLogMiddleware:
             log.exception(e)
             code = getattr(e, 'code', '500')
             msg = getattr(e, 'msg', 'Internal Server Error')
-            status = False
+            status = 0
             err = e
 
         return code, msg, status, err
@@ -130,7 +130,7 @@ class OperaLogMiddleware:
         # 预置响应信息
         code: str = '200'
         msg: str = 'Success'
-        status: bool = True
+        status: int = 1
         try:
             http_exception = request.state.__request_http_exception__
         except AttributeError:
@@ -138,7 +138,7 @@ class OperaLogMiddleware:
         else:
             code = http_exception.get('code', '500')
             msg = http_exception.get('msg', 'Internal Server Error')
-            status = False
+            status = 0
         try:
             validation_exception = request.state.__request_validation_exception__
         except AttributeError:
@@ -146,7 +146,7 @@ class OperaLogMiddleware:
         else:
             code = validation_exception.get('code', '400')
             msg = validation_exception.get('msg', 'Bad Request')
-            status = False
+            status = 0
         return code, msg, status
 
     @staticmethod

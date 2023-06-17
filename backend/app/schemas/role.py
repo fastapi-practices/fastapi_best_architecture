@@ -4,14 +4,14 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 
-from backend.app.common.enums import RoleDataScope
+from backend.app.common.enums import RoleDataScope, StatusType
 from backend.app.schemas.menu import GetAllMenu
 
 
 class RoleBase(BaseModel):
     name: str
-    data_scope: int | None = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
-    status: bool
+    data_scope: RoleDataScope = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
+    status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 
     @validator('data_scope')

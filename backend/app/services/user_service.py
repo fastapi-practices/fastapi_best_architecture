@@ -94,7 +94,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_select(*, username: str = None, phone: str = None, status: bool = None) -> Select:
+    async def get_select(*, username: str = None, phone: str = None, status: int = None) -> Select:
         return await UserDao.get_all(username=username, phone=phone, status=status)
 
     @staticmethod
@@ -110,7 +110,7 @@ class UserService:
                 return count
 
     @staticmethod
-    async def update_active(*, request: Request, pk: int) -> int:
+    async def update_status(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await jwt.superuser_verify(request)
             if not await UserDao.get(db, pk):
@@ -118,7 +118,7 @@ class UserService:
             else:
                 if pk == request.user.id:
                     raise errors.ForbiddenError(msg='禁止修改自身状态')
-                count = await UserDao.set_active(db, pk)
+                count = await UserDao.set_status(db, pk)
                 return count
 
     @staticmethod

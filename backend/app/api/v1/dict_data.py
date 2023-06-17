@@ -27,7 +27,7 @@ async def get_all_dict_datas(
     db: CurrentSession,
     label: Annotated[str | None, Query()] = None,
     value: Annotated[str | None, Query()] = None,
-    status: Annotated[str | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     dict_data_select = await DictDataService.get_select(label=label, value=value, status=status)
     page_data = await paging_data(db, dict_data_select, GetAllDictData)

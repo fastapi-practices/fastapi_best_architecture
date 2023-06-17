@@ -26,7 +26,7 @@ async def get_all_depts(
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
-    status: Annotated[bool | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     dept = await DeptService.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
     return await response_base.success(data=dept)

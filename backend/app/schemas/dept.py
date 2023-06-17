@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 
+from backend.app.common.enums import StatusType
 from backend.app.utils.re_verify import is_phone
 
 
@@ -14,7 +15,7 @@ class DeptBase(BaseModel):
     leader: str | None = None
     phone: str | None = None
     email: str | None = None
-    status: bool
+    status: StatusType = Field(default=StatusType.enable)
 
     @validator('phone')
     def phone_validator(cls, v):
