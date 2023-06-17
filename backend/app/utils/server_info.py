@@ -38,9 +38,16 @@ class ServerInfo:
         info = dict()
         info.update({'cpu_num': psutil.cpu_count(logical=True)})
         cpu_times = psutil.cpu_times()
-        total = cpu_times.user + cpu_times.nice + cpu_times.system + cpu_times.idle \
-                + getattr(cpu_times, 'iowait', 0.0) + getattr(cpu_times, 'irq', 0.0) \
-                + getattr(cpu_times, 'softirq', 0.0) + getattr(cpu_times, 'steal', 0.0)
+        total = (
+            cpu_times.user
+            + cpu_times.nice
+            + cpu_times.system
+            + cpu_times.idle
+            + getattr(cpu_times, 'iowait', 0.0)
+            + getattr(cpu_times, 'irq', 0.0)
+            + getattr(cpu_times, 'softirq', 0.0)
+            + getattr(cpu_times, 'steal', 0.0)
+        )
         info.update({'total': round(total, 2)})
         info.update({'sys': round(cpu_times.system / total, 2)})
         info.update({'used': round(cpu_times.user / total, 2)})
@@ -51,12 +58,12 @@ class ServerInfo:
     @staticmethod
     def get_mem_info() -> dict:
         """获取内存信息"""
-        number = 1024 ** 3
+        number = 1024**3
         return {
             'total': round(psutil.virtual_memory().total / number, 2),
             'used': round(psutil.virtual_memory().used / number, 2),
             'free': round(psutil.virtual_memory().available / number, 2),
-            'usage': round(psutil.virtual_memory().percent, 2)
+            'usage': round(psutil.virtual_memory().percent, 2),
         }
 
     @staticmethod
@@ -70,12 +77,7 @@ class ServerInfo:
             ip = '127.0.0.1'
         finally:
             sk.close()
-        return {
-            'name': socket.gethostname(),
-            'ip': ip,
-            'os': platform.system(),
-            'arch': platform.machine()
-        }
+        return {'name': socket.gethostname(), 'ip': ip, 'os': platform.system(), 'arch': platform.machine()}
 
     @staticmethod
     def get_disk_info() -> List[dict]:
@@ -83,21 +85,23 @@ class ServerInfo:
         disk_info = []
         for disk in psutil.disk_partitions():
             usage = psutil.disk_usage(disk.mountpoint)
-            disk_info.append({
-                'dir': disk.mountpoint,
-                'type': disk.fstype,
-                'device': disk.device,
-                'total': ServerInfo.get_size(usage.total),
-                'free': ServerInfo.get_size(usage.free),
-                'used': ServerInfo.get_size(usage.used),
-                'usage': round(usage.percent, 2),
-            })
+            disk_info.append(
+                {
+                    'dir': disk.mountpoint,
+                    'type': disk.fstype,
+                    'device': disk.device,
+                    'total': ServerInfo.get_size(usage.total),
+                    'free': ServerInfo.get_size(usage.free),
+                    'used': ServerInfo.get_size(usage.used),
+                    'usage': round(usage.percent, 2),
+                }
+            )
         return disk_info
 
     @staticmethod
     def get_service_info():
         """获取服务信息"""
-        number = 1024 ** 2
+        number = 1024**2
         cur_proc = psutil.Process(os.getpid())
         mem_info = cur_proc.memory_info()
         start_time = datetime.fromtimestamp(cur_proc.create_time())
