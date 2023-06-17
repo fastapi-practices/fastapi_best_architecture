@@ -10,73 +10,64 @@ import psutil
 
 class ServerInfo:
     @staticmethod
-    def get_size(data, suffix='B') -> str:
-        """按照正确的格式缩放字节"""
+    def format_bytes(size) -> str:
+        """格式化字节"""
         factor = 1024
-        for unit in ['', 'K', 'M', 'G', 'T', 'P']:
-            if data < factor:
-                return f'{data:.2f}{unit}{suffix}'
-            data /= factor
+        for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
+            if abs(size) < factor:
+                return f'{size:.2f} {unit}B'
+            size /= factor
+        return f'{size:.2f} YB'
 
     @staticmethod
     def fmt_timedelta(td: timedelta) -> str:
         """格式化时间戳"""
-        rem = td.seconds
-        days, rem = rem // 86400, rem % 86400
-        hours, rem = rem // 3600, rem % 3600
-        minutes = rem // 60
+        days, rem = divmod(td.seconds, 86400)
+        hours, rem = divmod(rem, 3600)
+        minutes, _ = divmod(rem, 60)
         res = f'{minutes} 分钟'
-        if hours > 0:
+        if hours:
             res = f'{hours} 小时 {res}'
-        if days > 0:
+        if days:
             res = f'{days} 天 {res}'
         return res
 
     @staticmethod
     def get_cpu_info() -> dict:
-        """获取CPU信息"""
-        info = dict()
-        info.update({'cpu_num': psutil.cpu_count(logical=True)})
-        cpu_times = psutil.cpu_times()
-        total = (
-            cpu_times.user
-            + cpu_times.nice
-            + cpu_times.system
-            + cpu_times.idle
-            + getattr(cpu_times, 'iowait', 0.0)
-            + getattr(cpu_times, 'irq', 0.0)
-            + getattr(cpu_times, 'softirq', 0.0)
-            + getattr(cpu_times, 'steal', 0.0)
-        )
-        info.update({'total': round(total, 2)})
-        info.update({'sys': round(cpu_times.system / total, 2)})
-        info.update({'used': round(cpu_times.user / total, 2)})
-        info.update({'wait': round(getattr(cpu_times, 'iowait', 0.0) / total, 2)})
-        info.update({'free': round(cpu_times.idle / total, 2)})
-        return info
+        """获取 CPU 信息"""
+        cpu_info = {'usage': f'{round(psutil.cpu_percent(interval=1, percpu=False), 2)} %'}
+
+        # CPU 频率信息，最大、最小和当前频率
+        cpu_freq = psutil.cpu_freq()
+        cpu_info['max_freq'] = f'{round(cpu_freq.max, 2)} MHz'
+        cpu_info['min_freq'] = f'{round(cpu_freq.min, 2)} MHz'
+        cpu_info['current_freq'] = f'{round(cpu_freq.current, 2)} MHz'
+
+        # CPU 逻辑核心数，物理核心数
+        cpu_info['logical_num'] = psutil.cpu_count(logical=True)
+        cpu_info['physical_num'] = psutil.cpu_count(logical=False)
+        return cpu_info
 
     @staticmethod
     def get_mem_info() -> dict:
         """获取内存信息"""
-        number = 1024**3
+        mem = psutil.virtual_memory()
         return {
-            'total': round(psutil.virtual_memory().total / number, 2),
-            'used': round(psutil.virtual_memory().used / number, 2),
-            'free': round(psutil.virtual_memory().available / number, 2),
-            'usage': round(psutil.virtual_memory().percent, 2),
+            'total': ServerInfo.format_bytes(mem.total),
+            'used': ServerInfo.format_bytes(mem.used),
+            'free': ServerInfo.format_bytes(mem.available),
+            'usage': f'{round(mem.percent, 2)} %',
         }
 
     @staticmethod
     def get_sys_info() -> dict:
         """获取服务器信息"""
-        sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            sk.connect(('10.0.0.0', 0))
-            ip = sk.getsockname()[0]
-        except Exception:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sk:
+                sk.connect(('8.8.8.8', 80))
+                ip = sk.getsockname()[0]
+        except socket.gaierror:
             ip = '127.0.0.1'
-        finally:
-            sk.close()
         return {'name': socket.gethostname(), 'ip': ip, 'os': platform.system(), 'arch': platform.machine()}
 
     @staticmethod
@@ -90,10 +81,10 @@ class ServerInfo:
                     'dir': disk.mountpoint,
                     'type': disk.fstype,
                     'device': disk.device,
-                    'total': ServerInfo.get_size(usage.total),
-                    'free': ServerInfo.get_size(usage.free),
-                    'used': ServerInfo.get_size(usage.used),
-                    'usage': round(usage.percent, 2),
+                    'total': ServerInfo.format_bytes(usage.total),
+                    'free': ServerInfo.format_bytes(usage.free),
+                    'used': ServerInfo.format_bytes(usage.used),
+                    'usage': f'{round(usage.percent, 2)} %',
                 }
             )
         return disk_info
@@ -101,18 +92,17 @@ class ServerInfo:
     @staticmethod
     def get_service_info():
         """获取服务信息"""
-        number = 1024**2
-        cur_proc = psutil.Process(os.getpid())
-        mem_info = cur_proc.memory_info()
-        start_time = datetime.fromtimestamp(cur_proc.create_time())
+        process = psutil.Process(os.getpid())
+        mem_info = process.memory_info()
+        start_time = datetime.fromtimestamp(process.create_time())
         return {
             'name': 'Python3',
             'version': platform.python_version(),
             'home': sys.executable,
-            'total': round(mem_info.vms / number, 2),
-            'max': round(mem_info.vms / number, 2),
-            'free': round((mem_info.vms - mem_info.rss) / number, 2),
-            'usage': round(mem_info.rss / number, 2),
-            'elapsed': ServerInfo.fmt_timedelta(datetime.now() - start_time),
+            'cpu_usage': f'{round(process.cpu_percent(interval=1), 2)} %',
+            'mem_vms': ServerInfo.format_bytes(mem_info.vms),  # 虚拟内存, 即当前进程申请的虚拟内存
+            'mem_rss': ServerInfo.format_bytes(mem_info.rss),  # 常驻内存, 即当前进程实际使用的物理内存
+            'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),  # 空闲内存
             'startup': start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'elapsed': f'{ServerInfo.fmt_timedelta(datetime.now() - start_time)}',
         }
