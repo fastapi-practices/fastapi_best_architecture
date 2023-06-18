@@ -7,7 +7,6 @@ from backend.app.core.conf import settings
 
 
 class DateTimeUtils:
-
     def __init__(self, timezone_str=settings.DATETIME_TIMEZONE):
         """
         初始化函数，设置时区
@@ -121,7 +120,9 @@ class DateTimeUtils:
         timezone = self.get_timezone(timezone_str)
         return dt.astimezone(timezone)
 
-    def datetime_to_timezone_str(self, dt: datetime.datetime, timezone_str: str, format_str: str=settings.DATETIME_FORMAT) -> str:
+    def datetime_to_timezone_str(
+        self, dt: datetime.datetime, timezone_str: str, format_str: str = settings.DATETIME_FORMAT
+    ) -> str:
         """
         将 datetime 对象转换为指定时区的时间字符串
 
@@ -133,7 +134,9 @@ class DateTimeUtils:
         dt_timezone = self.datetime_to_timezone(dt, timezone_str)
         return dt_timezone.strftime(format_str)
 
-    def str_to_timezone(self, time_str: str, timezone_str: str, format_str: str=settings.DATETIME_FORMAT) -> datetime.datetime:
+    def str_to_timezone(
+        self, time_str: str, timezone_str: str, format_str: str = settings.DATETIME_FORMAT
+    ) -> datetime.datetime:
         """
         将指定时区的时间字符串转换为 datetime 对象
 
@@ -155,7 +158,7 @@ class DateTimeUtils:
         """
         return dt.astimezone(pytz.utc)
 
-    def str_to_utc(self, time_str: str, format_str: str=settings.DATETIME_FORMAT) -> datetime.datetime:
+    def str_to_utc(self, time_str: str, format_str: str = settings.DATETIME_FORMAT) -> datetime.datetime:
         """
         将时间字符串转换为 UTC 时间的 datetime 对象
 

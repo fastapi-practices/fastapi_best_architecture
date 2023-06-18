@@ -32,7 +32,6 @@ SCHEMA_ERROR_MSG_TEMPLATES: dict[str, str] = {
     'type_error.subclass': '预期 {expected_class} 的子类',
     'type_error.tuple': '值不是有效的元组',
     'type_error.uuid': '值不是有效的 UUID',
-
     # Value Errors
     'value_error.any_str.max_length': '确保此值最多包含 {limit_value} 个字符',
     'value_error.any_str.min_length': '确保此值至少包含 {limit_value} 个字符',
@@ -44,7 +43,7 @@ SCHEMA_ERROR_MSG_TEMPLATES: dict[str, str] = {
     'value_error.decimal.max_places': '确保小数位数不超过 {decimal_places} 位',
     'value_error.decimal.not_finite': '值不是有效的小数（Decimal）',
     'value_error.decimal.whole_digits': '确保小数点前不超过 {whole_digits} 位',
-    'value_error.discriminated_union.invalid_discriminator': '不匹配鉴别器 {discriminator_key!r} 和值 {discriminator_value!r}（允许的值：{allowed_values}）',
+    'value_error.discriminated_union.invalid_discriminator': '不匹配鉴别器 {discriminator_key!r} 和值 {discriminator_value!r}（允许的值：{allowed_values}）',  # noqa: E501
     'value_error.discriminated_union.missing_discriminator': '鉴别器 {discriminator_key!r} 的值缺失',
     'value_error.extra': '不允许使用额外字段',
     'value_error.frozenset.max_items': '确保此值最多包含 {limit_value} 个项目',
