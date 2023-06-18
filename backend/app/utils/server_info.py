@@ -7,6 +7,8 @@ from typing import List
 
 import psutil
 
+from backend.app.core.conf import settings
+
 
 class ServerInfo:
     @staticmethod
@@ -103,6 +105,6 @@ class ServerInfo:
             'mem_vms': ServerInfo.format_bytes(mem_info.vms),  # 虚拟内存, 即当前进程申请的虚拟内存
             'mem_rss': ServerInfo.format_bytes(mem_info.rss),  # 常驻内存, 即当前进程实际使用的物理内存
             'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),  # 空闲内存
-            'startup': start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'startup': start_time.strftime(settings.DATETIME_FORMAT),
             'elapsed': f'{ServerInfo.fmt_timedelta(datetime.now() - start_time)}',
         }

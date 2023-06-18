@@ -37,3 +37,4 @@ user_agents==2.2.0
 uvicorn[standard]==0.13.4
 wait-for-it==2.2.1
 XdbSearchIP==1.0.2
+pytz==2023.3

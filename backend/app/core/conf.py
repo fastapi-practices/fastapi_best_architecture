@@ -63,6 +63,10 @@ class Settings(BaseSettings):
     # Limiter
     LIMITER_REDIS_PREFIX: str = 'fba_limiter'
 
+    # DateTime
+    DATETIME_TIMEZONE: str = 'Asia/Shanghai'
+    DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
+
     # MySQL
     DB_ECHO: bool = False
     DB_DATABASE: str = 'fba'
