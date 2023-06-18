@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel
+
+from backend.app.schemas.base import SchemaBase
 
 
-class LoginLogBase(BaseModel):
+class LoginLogBase(SchemaBase):
     user_uuid: str
     username: str
     status: int

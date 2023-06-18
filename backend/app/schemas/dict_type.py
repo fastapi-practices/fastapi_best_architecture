@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from backend.app.common.enums import StatusType
+from backend.app.schemas.base import SchemaBase
 
 
-class DictTypeBase(BaseModel):
+class DictTypeBase(SchemaBase):
     name: str
     code: str
     status: StatusType = Field(default=StatusType.enable)

@@ -5,6 +5,7 @@ import json
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
+from pydantic.errors import EnumMemberError, WrongConstantError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
@@ -66,22 +67,30 @@ def register_exception(app: FastAPI):
         message = ''
         data = {}
         for raw_error in exc.raw_errors:
-            if isinstance(raw_error.exc, ValidationError):
-                exc = raw_error.exc
-                if hasattr(exc, 'model'):
-                    fields = exc.model.__dict__.get('__fields__')
+            raw_exc = raw_error.exc
+            if isinstance(raw_exc, ValidationError):
+                if hasattr(raw_exc, 'model'):
+                    fields = raw_exc.model.__dict__.get('__fields__')
                     for field_key in fields.keys():
                         field_title = fields.get(field_key).field_info.title
                         data[field_key] = field_title if field_title else field_key
-                errors_len = len(exc.errors())
-                for error in exc.errors():
+                # 处理特殊类型异常模板信息 -> backend/app/schemas/base.py: SCHEMA_ERROR_MSG_TEMPLATES
+                sub_raw_exc = raw_exc.raw_errors[0].exc
+                if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
+                    if getattr(sub_raw_exc, 'code') == 'enum':
+                        sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v.value) for v in sub_raw_exc.enum_values)  # type: ignore  # noqa: E501
+                    else:
+                        sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v) for v in sub_raw_exc.permitted)  # type: ignore  # noqa: E501
+                # 处理异常信息
+                errors_len = len(raw_exc.errors())
+                for error in raw_exc.errors():
                     field = str(error.get('loc')[-1])
-                    _msg = error.get('msg')
+                    msg = error.get('msg')
                     errors_len = errors_len - 1
                     message += (
-                        f'{data.get(field, field) if field != "__root__" else ""} {_msg}' + ', '
+                        f'{data.get(field, field) if field != "__root__" else ""} {msg}' + ', '
                         if errors_len > 0
-                        else f'{data.get(field, field) if field != "__root__" else ""} {_msg}' + '.'
+                        else f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
                     )
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'

@@ -2,19 +2,20 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from backend.app.common.enums import StatusType
+from backend.app.schemas.base import SchemaBase
 from backend.app.schemas.dict_type import GetAllDictType
 
 
-class DictDataBase(BaseModel):
+class DictDataBase(SchemaBase):
+    type_id: int
     label: str
     value: str
     sort: int
     status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
-    type_id: int
 
 
 class CreateDictData(DictDataBase):

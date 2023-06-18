@@ -3,14 +3,15 @@
 from datetime import datetime
 
 from email_validator import validate_email, EmailNotValidError
-from pydantic import BaseModel, HttpUrl, Field, validator
+from pydantic import HttpUrl, Field, validator
 
 from backend.app.common.enums import StatusType
+from backend.app.schemas.base import SchemaBase
 from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
 
 
-class Auth(BaseModel):
+class Auth(SchemaBase):
     username: str
     password: str
 
@@ -34,7 +35,7 @@ class CreateUser(Auth):
         return v
 
 
-class _UserInfoBase(BaseModel):
+class _UserInfoBase(SchemaBase):
     dept_id: int
     username: str
     nickname: str
@@ -60,7 +61,7 @@ class UpdateUser(_UserInfoBase):
     roles: list[int]
 
 
-class Avatar(BaseModel):
+class Avatar(SchemaBase):
     url: HttpUrl = Field(..., description='头像 http 地址')
 
 
@@ -87,7 +88,7 @@ class GetAllUserInfo(GetUserInfoNoRelation):
         orm_mode = True
 
 
-class ResetPassword(BaseModel):
+class ResetPassword(SchemaBase):
     old_password: str
     new_password: str
     confirm_password: str

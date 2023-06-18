@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
 from backend.app.common.enums import MethodType
+from backend.app.schemas.base import SchemaBase
 
 
-class CreatePolicy(BaseModel):
+class CreatePolicy(SchemaBase):
     sub: str = Field(..., description='用户uuid / 角色')
     path: str = Field(..., description='api 路径')
-    method: str = Field(default=MethodType.GET, description='请求方法')
+    method: MethodType = Field(default=MethodType.GET, description='请求方法')
 
     @validator('method')
     def method_validator(cls, v):
         if not v.isupper():
             raise ValueError('请求方式必须大写')
-        allow_method = MethodType.get_member_values()
-        if v not in allow_method:
-            raise ValueError(f'请求方式不合法, 仅支持: {allow_method}')
         return v
 
 
@@ -28,7 +26,7 @@ class DeletePolicy(CreatePolicy):
     pass
 
 
-class CreateUserRole(BaseModel):
+class CreateUserRole(SchemaBase):
     uuid: str = Field(..., description='用户 uuid')
     role: str = Field(..., description='角色')
 
@@ -37,7 +35,7 @@ class DeleteUserRole(CreateUserRole):
     pass
 
 
-class GetAllPolicy(BaseModel):
+class GetAllPolicy(SchemaBase):
     id: int
     ptype: str = Field(..., description='规则类型, p 或 g')
     v0: str = Field(..., description='用户 uuid / 角色')
