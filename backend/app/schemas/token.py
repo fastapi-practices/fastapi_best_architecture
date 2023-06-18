@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel
 
+from backend.app.schemas.base import SchemaBase
 from backend.app.schemas.user import GetUserInfoNoRelation
 
 
-class GetSwaggerToken(BaseModel):
+class GetSwaggerToken(SchemaBase):
     access_token: str
     token_type: str = 'Bearer'
     user: GetUserInfoNoRelation
 
 
-class AccessTokenBase(BaseModel):
+class AccessTokenBase(SchemaBase):
     access_token: str
     access_token_type: str = 'Bearer'
     access_token_expire_time: datetime

@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field
 
 from backend.app.common.enums import MenuType, StatusType
+from backend.app.schemas.base import SchemaBase
 
 
-class MenuBase(BaseModel):
+class MenuBase(SchemaBase):
     name: str
     parent_id: int = Field(default=None, ge=1, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
@@ -18,12 +19,6 @@ class MenuBase(BaseModel):
     perms: str | None = None
     status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
-
-    @validator('menu_type')
-    def menu_type_validator(cls, v):
-        if v not in MenuType.get_member_values():
-            raise ValueError('菜单类型只能是 0，1，2')
-        return v
 
 
 class CreateMenu(MenuBase):

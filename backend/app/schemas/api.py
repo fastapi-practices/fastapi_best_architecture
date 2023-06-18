@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
 from backend.app.common.enums import MethodType
+from backend.app.schemas.base import SchemaBase
 
 
-class ApiBase(BaseModel):
+class ApiBase(SchemaBase):
     name: str
-    method: str = Field(default=MethodType.GET, description='请求方法')
+    method: MethodType = Field(default=MethodType.GET, description='请求方法')
     path: str = Field(..., description='api路径')
     remark: str | None = None
 
@@ -17,9 +18,6 @@ class ApiBase(BaseModel):
     def method_validator(cls, v):
         if not v.isupper():
             raise ValueError('请求方式必须大写')
-        allow_method = MethodType.get_member_values()
-        if v not in allow_method:
-            raise ValueError(f'请求方式不合法, 仅支持: {allow_method}')
         return v
 
 

@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
 from backend.app.common.enums import StatusType
+from backend.app.schemas.base import SchemaBase
 from backend.app.utils.re_verify import is_phone
 
 
-class DeptBase(BaseModel):
+class DeptBase(SchemaBase):
     name: str
     parent_id: int | None = Field(default=None, ge=1, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
