@@ -75,22 +75,19 @@ def register_exception(app: FastAPI):
                         field_title = fields.get(field_key).field_info.title
                         data[field_key] = field_title if field_title else field_key
                 # 处理特殊类型异常模板信息 -> backend/app/schemas/base.py: SCHEMA_ERROR_MSG_TEMPLATES
-                sub_raw_exc = raw_exc.raw_errors[0].exc
-                if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
-                    if getattr(sub_raw_exc, 'code') == 'enum':
-                        sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v.value) for v in sub_raw_exc.enum_values)  # type: ignore  # noqa: E501
-                    else:
-                        sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v) for v in sub_raw_exc.permitted)  # type: ignore  # noqa: E501
+                for sub_raw_error in raw_exc.raw_errors:
+                    sub_raw_exc = sub_raw_error.exc
+                    if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
+                        if getattr(sub_raw_exc, 'code') == 'enum':
+                            sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v.value) for v in sub_raw_exc.enum_values)  # type: ignore  # noqa: E501
+                        else:
+                            sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v) for v in sub_raw_exc.permitted)  # type: ignore  # noqa: E501
                 # 处理异常信息
-                errors_len = len(raw_exc.errors())
-                for error in raw_exc.errors():
+                for error in raw_exc.errors()[:1]:
                     field = str(error.get('loc')[-1])
                     msg = error.get('msg')
-                    errors_len = errors_len - 1
                     message += (
-                        f'{data.get(field, field) if field != "__root__" else ""} {msg}' + ', '
-                        if errors_len > 0
-                        else f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
+                        f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
                     )
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'
