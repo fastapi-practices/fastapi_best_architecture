@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, File, UploadFile, Form
 from typing_extensions import Annotated
 
 from backend.app.common.response.response_schema import response_base
@@ -69,3 +69,12 @@ async def task_demo_delete(job_id: Annotated[str, Query(..., description='任务
     scheduler.remove_job(job_id=job_id)
 
     return await response_base.success({'msg': 'success'})
+
+
+@router.post('/files', summary='文件上传')
+async def create_file(file: bytes = File(), fileb: UploadFile = File(), token: str = Form()):
+    return {
+        'file_size': len(file),
+        'token': token,
+        'fileb_content_type': fileb.content_type,
+    }

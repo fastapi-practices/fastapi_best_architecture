@@ -6,6 +6,7 @@ from typing import Any
 from asgiref.sync import sync_to_async
 from pydantic import validate_arguments, BaseModel
 
+from backend.app.core.conf import settings
 from backend.app.utils.encoders import jsonable_encoder
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
@@ -37,7 +38,7 @@ class ResponseModel(BaseModel):
     data: Any | None = None
 
     class Config:
-        json_encoders = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
+        json_encoders = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
 
 
 class ResponseBase:
@@ -58,7 +59,7 @@ class ResponseBase:
     @staticmethod
     @sync_to_async
     def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
-        custom_encoder = {datetime: lambda x: x.strftime('%Y-%m-%d %H:%M:%S')}
+        custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
         kwargs.update({'custom_encoder': custom_encoder})
         result = jsonable_encoder(data, exclude=exclude, **kwargs)
         return result

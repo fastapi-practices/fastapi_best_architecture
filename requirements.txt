@@ -27,6 +27,7 @@ pytest==7.2.2
 pytest-pretty==1.2.0
 python-jose==3.3.0
 python-multipart==0.0.5
+pytz==2023.3
 redis[hiredis]==4.5.5
 ruff==0.0.262
 SQLAlchemy==2.0.8
