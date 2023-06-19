@@ -117,8 +117,8 @@ class OperaLogMiddleware:
             code, msg, status = await self.exception_middleware_handler(request)
         except Exception as e:
             log.exception(e)
-            code = getattr(e, 'code', '500')
-            msg = getattr(e, 'msg', 'Internal Server Error')
+            code = getattr(e, 'code', None) or '500'
+            msg = getattr(e, 'msg', None) or 'Internal Server Error'
             status = 0
             err = e
 
