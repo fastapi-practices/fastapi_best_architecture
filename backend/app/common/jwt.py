@@ -81,7 +81,7 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     """
     if expire_time:
         expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire_seconds = int((expire - timezone_utils.get_timezone_datetime()).total_seconds())
+        expire_seconds = timezone_utils.get_timezone_expire_seconds(expire_time)
     else:
         expire = timezone_utils.get_timezone_expire_time(timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS))
         expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS

@@ -7,7 +7,6 @@ from typing import List
 
 import psutil
 
-from backend.app.core.conf import settings
 from backend.app.utils.timezone import timezone_utils
 
 
@@ -24,16 +23,24 @@ class ServerInfo:
 
     @staticmethod
     def fmt_timedelta(td: timedelta) -> str:
-        """格式化时间戳"""
-        days, rem = divmod(td.seconds, 86400)
+        """格式化时间差"""
+        total_seconds = round(td.total_seconds())
+        days, rem = divmod(total_seconds, 86400)
         hours, rem = divmod(rem, 3600)
-        minutes, _ = divmod(rem, 60)
-        res = f'{minutes} 分钟'
-        if hours:
-            res = f'{hours} 小时 {res}'
+        minutes, seconds = divmod(rem, 60)
+        parts = []
         if days:
-            res = f'{days} 天 {res}'
-        return res
+            parts.append('{} 天'.format(days))
+        if hours:
+            parts.append('{} 小时'.format(hours))
+        if minutes:
+            parts.append('{} 分钟'.format(minutes))
+        if seconds:
+            parts.append('{} 秒'.format(seconds))
+        if len(parts) == 0:
+            return '0 秒'
+        else:
+            return ' '.join(parts)
 
     @staticmethod
     def get_cpu_info() -> dict:
@@ -97,7 +104,7 @@ class ServerInfo:
         """获取服务信息"""
         process = psutil.Process(os.getpid())
         mem_info = process.memory_info()
-        start_time = timezone_utils.timestamp_to_timezone_datetime(process.create_time())
+        start_time = timezone_utils.utc_timestamp_to_timezone_datetime(process.create_time())
         return {
             'name': 'Python3',
             'version': platform.python_version(),
@@ -106,6 +113,6 @@ class ServerInfo:
             'mem_vms': ServerInfo.format_bytes(mem_info.vms),  # 虚拟内存, 即当前进程申请的虚拟内存
             'mem_rss': ServerInfo.format_bytes(mem_info.rss),  # 常驻内存, 即当前进程实际使用的物理内存
             'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),  # 空闲内存
-            'startup': start_time.strftime(settings.DATETIME_FORMAT),
+            'startup': start_time,
             'elapsed': f'{ServerInfo.fmt_timedelta(timezone_utils.get_timezone_datetime() - start_time)}',
         }

@@ -35,43 +35,6 @@ class TimeZoneUtils:
         """
         return int(self.get_timezone_datetime().timestamp() * 1000)
 
-    def timestamp_to_timezone_datetime(self, timestamp: int) -> datetime.datetime:
-        """
-        时间戳转 datetime 时区对象
-
-        :param timestamp:
-        :return:
-        """
-        return datetime.datetime.utcfromtimestamp(timestamp).replace(tzinfo=self.timezone)
-
-    def datetime_to_timezone_timestamp(self, dt: datetime.datetime) -> int:
-        """
-        datetime 对象转时区时间戳（秒）
-
-        :param dt:
-        :return:
-        """
-        return int(dt.astimezone(self.timezone).timestamp())
-
-    def datetime_to_timezone_milliseconds(self, dt: datetime.datetime) -> int:
-        """
-        datetime 对象转时区时间戳（毫秒）
-
-        :param dt:
-        :return:
-        """
-        return int(dt.astimezone(self.timezone).timestamp() * 1000)
-
-    def str_to_timezone_datetime(self, time_str: str, format_str: str = settings.DATETIME_FORMAT) -> datetime.datetime:
-        """
-        时间字符串转 datetime 时区对象
-
-        :param time_str:
-        :param format_str:
-        :return:
-        """
-        return datetime.datetime.strptime(time_str, format_str).replace(tzinfo=self.timezone)
-
     def datetime_to_timezone_str(self, dt: datetime.datetime, format_str: str = settings.DATETIME_FORMAT) -> str:
         """
         datetime 对象转时区时间字符串
@@ -101,6 +64,24 @@ class TimeZoneUtils:
         """
         return dt.astimezone(pytz.utc)
 
+    def datetime_to_timezone_timestamp(self, dt: datetime.datetime) -> int:
+        """
+        datetime 对象转时区时间戳（秒）
+
+        :param dt:
+        :return:
+        """
+        return int(dt.astimezone(self.timezone).timestamp())
+
+    def datetime_to_timezone_milliseconds(self, dt: datetime.datetime) -> int:
+        """
+        datetime 对象转时区时间戳（毫秒）
+
+        :param dt:
+        :return:
+        """
+        return int(dt.astimezone(self.timezone).timestamp() * 1000)
+
     def str_to_timezone_utc(self, time_str: str, format_str: str = settings.DATETIME_FORMAT) -> datetime.datetime:
         """
         时间字符串转时区 datetime UTC 对象
@@ -112,7 +93,17 @@ class TimeZoneUtils:
         dt = datetime.datetime.strptime(time_str, format_str).replace(tzinfo=self.timezone)
         return self.datetime_to_timezone_utc(dt)
 
-    def utc_to_timezone_datetime(self, utc_time: datetime.datetime) -> datetime.datetime:
+    def str_to_timezone_datetime(self, time_str: str, format_str: str = settings.DATETIME_FORMAT) -> datetime.datetime:
+        """
+        时间字符串转 datetime 时区对象
+
+        :param time_str:
+        :param format_str:
+        :return:
+        """
+        return datetime.datetime.strptime(time_str, format_str).replace(tzinfo=self.timezone)
+
+    def utc_datetime_to_timezone_datetime(self, utc_time: datetime.datetime) -> datetime.datetime:
         """
         datetime UTC 对象转 datetime 时区对象
 
@@ -120,6 +111,16 @@ class TimeZoneUtils:
         :return:
         """
         return utc_time.replace(tzinfo=pytz.utc).astimezone(self.timezone)
+
+    def utc_timestamp_to_timezone_datetime(self, timestamp: int) -> datetime.datetime:
+        """
+        时间戳转 datetime 时区对象
+
+        :param timestamp:
+        :return:
+        """
+        utc_datetime = datetime.datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc)
+        return self.datetime_to_timezone_datetime(utc_datetime)
 
     def get_timezone_expire_time(self, expires_delta: datetime.timedelta) -> datetime.datetime:
         """
