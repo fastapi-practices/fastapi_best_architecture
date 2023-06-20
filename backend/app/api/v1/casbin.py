@@ -21,7 +21,7 @@ from backend.app.services.casbin_service import CasbinService
 router = APIRouter()
 
 
-@router.get('', summary='（模糊条件）分页获取所有 casbin 规则', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有权限规则', dependencies=[DependsRBAC, PageDepends])
 async def get_all_casbin(
     db: CurrentSession,
     ptype: Annotated[str | None, Query()] = None,
@@ -32,13 +32,13 @@ async def get_all_casbin(
     return await response_base.success(data=page_data)
 
 
-@router.get('/policy', summary='获取所有 P 规则', dependencies=[DependsRBAC])
+@router.get('/policy', summary='获取所有访问权限规则', dependencies=[DependsRBAC])
 async def get_all_policies():
     policies = await CasbinService.get_policy_list()
     return await response_base.success(data=policies)
 
 
-@router.post('/policy', summary='添加基于角色(主)/用户(次)的访问权限', dependencies=[DependsRBAC])
+@router.post('/policy', summary='添加访问权限', dependencies=[DependsRBAC])
 async def create_policy(p: CreatePolicy):
     """
     p 规则:
@@ -53,25 +53,25 @@ async def create_policy(p: CreatePolicy):
     return await response_base.success(data=data)
 
 
-@router.put('/policy', summary='更新基于角色(主)/用户(次)的访问权限', dependencies=[DependsRBAC])
+@router.put('/policy', summary='更新访问权限', dependencies=[DependsRBAC])
 async def update_policy(old: UpdatePolicy, new: UpdatePolicy):
     data = await CasbinService.update_policy(old=old, new=new)
     return await response_base.success(data=data)
 
 
-@router.delete('/policy', summary='删除基于角色(主)/用户的访问权限', dependencies=[DependsRBAC])
+@router.delete('/policy', summary='删除访问权限', dependencies=[DependsRBAC])
 async def delete_policy(p: DeletePolicy):
     data = await CasbinService.delete_policy(p=p)
     return await response_base.success(data=data)
 
 
-@router.get('/group', summary='获取所有 g 规则', dependencies=[DependsRBAC])
+@router.get('/group', summary='获取所有组访问权限规则', dependencies=[DependsRBAC])
 async def get_all_groups():
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
 
 
-@router.post('/group', summary='添加基于用户组的访问权限', dependencies=[DependsRBAC])
+@router.post('/group', summary='添加组访问权限', dependencies=[DependsRBAC])
 async def create_group(g: CreateUserRole):
     """
     g 规则 (**依赖 p 规则**):
@@ -79,14 +79,14 @@ async def create_group(g: CreateUserRole):
     - 如果在 p 规则中添加了基于角色的访问权限, 则还需要在 g 规则中添加基于用户组的访问权限, 才能真正拥有访问权限<br>
     **格式**: 用户 uuid + 角色 role
 
-    - 如果在p策略中添加了基于用户的访问权限, 则不添加相应的 g 规则能直接拥有访问权限<br>
+    - 如果在 p 策略中添加了基于用户的访问权限, 则不添加相应的 g 规则能直接拥有访问权限<br>
     但是拥有的不是用户角色的所有权限, 而只是单一的对应的 p 规则所添加的访问权限
     """
     data = await CasbinService.create_group(g=g)
     return await response_base.success(data=data)
 
 
-@router.delete('/group', summary='删除基于用户组的访问权限', dependencies=[DependsRBAC])
+@router.delete('/group', summary='删除组访问权限', dependencies=[DependsRBAC])
 async def delete_group(g: DeleteUserRole):
     data = await CasbinService.delete_group(g=g)
     return await response_base.success(data=data)
