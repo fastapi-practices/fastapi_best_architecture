@@ -45,9 +45,7 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
 
     async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:
         role = await db.execute(
-            update(self.model)
-            .where(self.model.id == role_id)
-            .values(**obj_in.dict(exclude={'menus'}))
+            update(self.model).where(self.model.id == role_id).values(**obj_in.dict(exclude={'menus'}))
         )
         current_role = await self.get_with_relation(db, role_id)
         # 删除角色所有菜单
