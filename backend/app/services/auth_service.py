@@ -89,6 +89,7 @@ class AuthService:
                     msg='登录成功',
                 )
                 background_tasks.add_task(LoginLogService.create, **log_info)
+                await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
