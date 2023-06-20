@@ -36,14 +36,14 @@ async def get_all_menus(
 
 
 @router.post('', summary='创建菜单', dependencies=[DependsRBAC])
-async def create_menu(request: Request, obj: CreateMenu):
-    await MenuService.create(obj=obj, user_id=request.user.id)
+async def create_menu(obj: CreateMenu):
+    await MenuService.create(obj=obj)
     return await response_base.success()
 
 
 @router.put('/{pk}', summary='更新菜单', dependencies=[DependsRBAC])
-async def update_menu(request: Request, pk: int, obj: UpdateMenu):
-    count = await MenuService.update(pk=pk, obj=obj, user_id=request.user.id)
+async def update_menu(pk: int, obj: UpdateMenu):
+    count = await MenuService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-
 from backend.app.schemas.base import SchemaBase
 
 
@@ -32,7 +31,7 @@ class UpdateLoginLog(LoginLogBase):
 
 class GetAllLoginLog(LoginLogBase):
     id: int
-    create_time: datetime
+    created_time: datetime
 
     class Config:
         orm_mode = True

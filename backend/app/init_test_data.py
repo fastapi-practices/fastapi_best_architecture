@@ -21,15 +21,15 @@ class InitTestData:
     async def create_dept(self):
         """自动创建部门"""
         async with self.session.begin() as db:
-            department_obj = Dept(name='test', create_user=1)
+            department_obj = Dept(name='test')
             db.add(department_obj)
         log.info('部门 test 创建成功')
 
     async def create_role(self):
         """自动创建角色"""
         async with self.session.begin() as db:
-            role_obj = Role(name='test', create_user=1)
-            role_obj.menus.append(Menu(name='test', create_user=1))
+            role_obj = Role(name='test')
+            role_obj.menus.append(Menu(name='test'))
             db.add(role_obj)
         log.info('角色 test 创建成功')
 

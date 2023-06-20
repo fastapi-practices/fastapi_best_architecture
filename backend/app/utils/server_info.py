@@ -2,12 +2,13 @@ import os
 import platform
 import socket
 import sys
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import List
 
 import psutil
 
 from backend.app.core.conf import settings
+from backend.app.utils.timezone import timezone_utils
 
 
 class ServerInfo:
@@ -96,7 +97,7 @@ class ServerInfo:
         """获取服务信息"""
         process = psutil.Process(os.getpid())
         mem_info = process.memory_info()
-        start_time = datetime.fromtimestamp(process.create_time())
+        start_time = timezone_utils.timestamp_to_timezone_datetime(process.create_time())
         return {
             'name': 'Python3',
             'version': platform.python_version(),
@@ -106,5 +107,5 @@ class ServerInfo:
             'mem_rss': ServerInfo.format_bytes(mem_info.rss),  # 常驻内存, 即当前进程实际使用的物理内存
             'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),  # 空闲内存
             'startup': start_time.strftime(settings.DATETIME_FORMAT),
-            'elapsed': f'{ServerInfo.fmt_timedelta(datetime.now() - start_time)}',
+            'elapsed': f'{ServerInfo.fmt_timedelta(timezone_utils.get_timezone_datetime() - start_time)}',
         }

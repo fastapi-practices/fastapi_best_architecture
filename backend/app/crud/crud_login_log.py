@@ -12,7 +12,7 @@ from backend.app.schemas.login_log import CreateLoginLog, UpdateLoginLog
 
 class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
     async def get_all(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
-        se = select(self.model).order_by(desc(self.model.create_time))
+        se = select(self.model).order_by(desc(self.model.created_time))
         where_list = []
         if username:
             where_list.append(self.model.username.like(f'%{username}%'))

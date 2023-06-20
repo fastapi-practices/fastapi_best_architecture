@@ -33,14 +33,14 @@ async def get_all_depts(
 
 
 @router.post('', summary='创建部门', dependencies=[DependsRBAC])
-async def create_dept(request: Request, obj: CreateDept):
-    await DeptService.create(obj=obj, user_id=request.user.id)
+async def create_dept(obj: CreateDept):
+    await DeptService.create(obj=obj)
     return await response_base.success()
 
 
 @router.put('/{pk}', summary='更新部门', dependencies=[DependsRBAC])
-async def update_dept(request: Request, pk: int, obj: UpdateDept):
-    count = await DeptService.update(pk=pk, obj=obj, user_id=request.user.id)
+async def update_dept(pk: int, obj: UpdateDept):
+    count = await DeptService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

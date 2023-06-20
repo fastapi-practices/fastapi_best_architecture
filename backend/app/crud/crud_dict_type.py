@@ -29,11 +29,11 @@ class CRUDDictType(CRUDBase[DictType, CreateDictType, UpdateDictType]):
         dept = await db.execute(select(self.model).where(self.model.code == code))
         return dept.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateDictType, user_id: int) -> None:
-        await self.create_(db, obj_in, user_id)
+    async def create(self, db: AsyncSession, obj_in: CreateDictType) -> None:
+        await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictType, user_id: int) -> int:
-        return await self.update_(db, pk, obj_in, user_id)
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictType) -> int:
+        return await self.update_(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         apis = await db.execute(delete(self.model).where(self.model.id.in_(pk)))

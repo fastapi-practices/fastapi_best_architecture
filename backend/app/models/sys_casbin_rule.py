@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.database.base_class import id_key, MappedBase
+from backend.app.models.base import id_key, Base
 
 
-class CasbinRule(MappedBase):
-    """
-    重写 casbin_sqlalchemy_adapter 中的 casbinRule model类, 使用自定义 MappedBase, 避免产生 alembic 迁移问题
-    """
+class CasbinRule(Base):
+    """重写 casbin 中的 casbinRule model 类, 使用自定义 Base, 避免产生 alembic 迁移问题"""
 
     __tablename__ = 'sys_casbin_rule'
 
@@ -23,3 +20,14 @@ class CasbinRule(MappedBase):
     v3: Mapped[str | None] = mapped_column(String(255))
     v4: Mapped[str | None] = mapped_column(String(255))
     v5: Mapped[str | None] = mapped_column(String(255))
+
+    def __str__(self):
+        arr = [self.ptype]
+        for v in (self.v0, self.v1, self.v2, self.v3, self.v4, self.v5):
+            if v is None:
+                break
+            arr.append(v)
+        return ', '.join(arr)
+
+    def __repr__(self):
+        return '<CasbinRule {}: "{}">'.format(self.id, str(self))

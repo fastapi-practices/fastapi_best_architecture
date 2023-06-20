@@ -28,7 +28,7 @@ class DeptService:
             return tree_data
 
     @staticmethod
-    async def create(*, obj: CreateDept, user_id: int):
+    async def create(*, obj: CreateDept):
         async with async_db_session.begin() as db:
             dept = await DeptDao.get_by_name(db, obj.name)
             if dept:
@@ -37,11 +37,10 @@ class DeptService:
                 parent_dept = await DeptDao.get(db, obj.parent_id)
                 if not parent_dept:
                     raise errors.NotFoundError(msg='父级部门不存在')
-            new_obj = obj.dict()
-            await DeptDao.create(db, new_obj, user_id)
+            await DeptDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateDept, user_id: int):
+    async def update(*, pk: int, obj: UpdateDept):
         async with async_db_session.begin() as db:
             dept = await DeptDao.get(db, pk)
             if not dept:
@@ -53,8 +52,7 @@ class DeptService:
                 parent_dept = await DeptDao.get(db, obj.parent_id)
                 if not parent_dept:
                     raise errors.NotFoundError(msg='父级部门不存在')
-            new_obj = obj.dict()
-            count = await DeptDao.update(db, pk, new_obj, user_id)
+            count = await DeptDao.update(db, pk, obj)
             return count
 
     @staticmethod

@@ -5,7 +5,6 @@ from typing import NoReturn
 
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic.datetime_parse import parse_datetime
 from starlette.background import BackgroundTasks, BackgroundTask
 
 from backend.app.common import jwt
@@ -19,10 +18,11 @@ from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.schemas.user import AuthLogin
 from backend.app.services.login_log_service import LoginLogService
+from backend.app.utils.timezone import timezone_utils
 
 
 class AuthService:
-    login_time = parse_datetime(datetime.now())
+    login_time = timezone_utils.get_timezone_datetime()
 
     async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:

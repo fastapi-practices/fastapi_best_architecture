@@ -24,7 +24,7 @@ class DictDataService:
         return await DictDataDao.get_all(label=label, value=value, status=status)
 
     @staticmethod
-    async def create(*, obj: CreateDictData, user_id: int) -> None:
+    async def create(*, obj: CreateDictData) -> None:
         async with async_db_session.begin() as db:
             dict_data = await DictDataDao.get_by_label(db, obj.label)
             if dict_data:
@@ -32,10 +32,10 @@ class DictDataService:
             dict_type = await DictTypeDao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.ForbiddenError(msg='字典类型不存在')
-            await DictDataDao.create(db, obj, user_id)
+            await DictDataDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateDictData, user_id: int) -> int:
+    async def update(*, pk: int, obj: UpdateDictData) -> int:
         async with async_db_session.begin() as db:
             dict_data = await DictDataDao.get(db, pk)
             if not dict_data:
@@ -46,7 +46,7 @@ class DictDataService:
             dict_type = await DictTypeDao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.ForbiddenError(msg='字典类型不存在')
-            count = await DictDataDao.update(db, pk, obj, user_id)
+            count = await DictDataDao.update(db, pk, obj)
             return count
 
     @staticmethod

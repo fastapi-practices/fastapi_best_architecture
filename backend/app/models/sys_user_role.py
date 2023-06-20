@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Table, Column, ForeignKey, INT, Integer
 
-from backend.app.database.base_class import MappedBase
+from backend.app.models.base import MappedBase
 
 sys_user_role = Table(
     'sys_user_role',

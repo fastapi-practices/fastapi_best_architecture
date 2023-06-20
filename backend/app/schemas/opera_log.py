@@ -39,7 +39,7 @@ class UpdateOperaLog(OperaLogBase):
 
 class GetAllOperaLog(OperaLogBase):
     id: int
-    create_time: datetime
+    created_time: datetime
 
     class Config:
         orm_mode = True

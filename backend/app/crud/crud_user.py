@@ -23,7 +23,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         return user.scalars().first()
 
     async def update_login_time(self, db: AsyncSession, username: str, login_time: datetime) -> int:
-        user = await db.execute(update(self.model).where(self.model.username == username).values(last_login=login_time))
+        user = await db.execute(
+            update(self.model).where(self.model.username == username).values(last_login_time=login_time)
+        )
         await db.commit()
         return user.rowcount
 
@@ -72,7 +74,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
             select(self.model)
             .options(selectinload(self.model.dept))
             .options(selectinload(self.model.roles).selectinload(Role.menus))
-            .order_by(desc(self.model.time_joined))
+            .order_by(desc(self.model.join_time))
         )
         where_list = []
         if username:

@@ -16,6 +16,7 @@ from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.models import User
+from backend.app.utils.timezone import timezone_utils
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -54,10 +55,10 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     :return:
     """
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = timezone_utils.get_timezone_expire_time(expires_delta)
         expire_seconds = int(expires_delta.total_seconds())
     else:
-        expire = datetime.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+        expire = timezone_utils.get_timezone_expire_time(timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS))
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
     multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
@@ -80,9 +81,9 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     """
     if expire_time:
         expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire_seconds = int((expire - datetime.now()).total_seconds())
+        expire_seconds = int((expire - timezone_utils.get_timezone_datetime()).total_seconds())
     else:
-        expire = datetime.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+        expire = timezone_utils.get_timezone_expire_time(timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS))
         expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
     multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}

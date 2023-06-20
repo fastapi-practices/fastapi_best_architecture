@@ -34,14 +34,14 @@ async def get_all_roles(
 
 
 @router.post('', summary='创建角色', dependencies=[DependsRBAC])
-async def create_role(request: Request, obj: CreateRole):
-    await RoleService.create(obj=obj, user_id=request.user.id)
+async def create_role(obj: CreateRole):
+    await RoleService.create(obj=obj)
     return await response_base.success()
 
 
 @router.put('/{pk}', summary='更新角色', dependencies=[DependsRBAC])
-async def update_role(request: Request, pk: int, obj: UpdateRole):
-    count = await RoleService.update(pk=pk, obj=obj, user_id=request.user.id)
+async def update_role(pk: int, obj: UpdateRole):
+    count = await RoleService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

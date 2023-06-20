@@ -9,11 +9,7 @@ from typing_extensions import Annotated
 
 from backend.app.common.log import log
 from backend.app.core.conf import settings
-from backend.app.database.base_class import MappedBase
-
-""" 
-说明：SqlAlchemy
-"""
+from backend.app.models.base import MappedBase
 
 
 def create_engine_and_session(url: str | URL):
@@ -38,11 +34,7 @@ async_engine, async_db_session = create_engine_and_session(SQLALCHEMY_DATABASE_U
 
 
 async def get_db() -> AsyncSession:
-    """
-    session 生成器
-
-    :return:
-    """
+    """session 生成器"""
     session = async_db_session()
     try:
         yield session
@@ -58,8 +50,6 @@ CurrentSession = Annotated[AsyncSession, Depends(get_db)]
 
 
 async def create_table():
-    """
-    创建数据库表
-    """
+    """创建数据库表"""
     async with async_engine.begin() as coon:
         await coon.run_sync(MappedBase.metadata.create_all)
