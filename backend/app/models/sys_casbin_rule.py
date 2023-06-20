@@ -4,10 +4,10 @@ from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.models.base import id_key, Base
+from backend.app.models.base import id_key, MappedBase
 
 
-class CasbinRule(Base):
+class CasbinRule(MappedBase):
     """重写 casbin 中的 casbinRule model 类, 使用自定义 Base, 避免产生 alembic 迁移问题"""
 
     __tablename__ = 'sys_casbin_rule'
