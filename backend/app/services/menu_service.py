@@ -36,7 +36,7 @@ class MenuService:
             return menu_tree
 
     @staticmethod
-    async def create(*, obj: CreateMenu, user_id: int):
+    async def create(*, obj: CreateMenu):
         async with async_db_session.begin() as db:
             menu = await MenuDao.get_by_name(db, obj.name)
             if menu:
@@ -45,11 +45,10 @@ class MenuService:
                 parent_menu = await MenuDao.get(db, obj.parent_id)
                 if not parent_menu:
                     raise errors.NotFoundError(msg='父级菜单不存在')
-            new_obj = obj.dict()
-            await MenuDao.create(db, new_obj, user_id)
+            await MenuDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateMenu, user_id: int):
+    async def update(*, pk: int, obj: UpdateMenu):
         async with async_db_session.begin() as db:
             menu = await MenuDao.get(db, pk)
             if not menu:
@@ -61,8 +60,7 @@ class MenuService:
                 parent_menu = await MenuDao.get(db, obj.parent_id)
                 if not parent_menu:
                     raise errors.NotFoundError(msg='父级菜单不存在')
-            new_obj = obj.dict()
-            count = await MenuDao.update(db, pk, new_obj, user_id)
+            count = await MenuDao.update(db, pk, obj)
             return count
 
     @staticmethod

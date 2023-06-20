@@ -36,13 +36,11 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         dept = await db.execute(se)
         return dept.scalars().all()
 
-    async def create(self, db: AsyncSession, obj_in: dict, user_id: int) -> None:
-        obj_in.update({'create_user': user_id})
-        obj = self.model(**obj_in)
-        db.add(obj)
+    async def create(self, db: AsyncSession, obj_in: CreateDept) -> None:
+        await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, dept_id: int, obj_in: dict, user_id: int) -> int:
-        return await self.update_(db, dept_id, obj_in, user_id=user_id)
+    async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDept) -> int:
+        return await self.update_(db, dept_id, obj_in)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
         return await self.delete_(db, dept_id, del_flag=1)

@@ -24,7 +24,7 @@ class RoleService:
         return await RoleDao.get_all(name=name, data_scope=data_scope)
 
     @staticmethod
-    async def create(*, obj: CreateRole, user_id: int) -> None:
+    async def create(*, obj: CreateRole) -> None:
         async with async_db_session.begin() as db:
             role = await RoleDao.get_by_name(db, obj.name)
             if role:
@@ -33,10 +33,10 @@ class RoleService:
                 menu = await MenuDao.get(db, menu_id)
                 if not menu:
                     raise errors.ForbiddenError(msg='菜单不存在')
-            await RoleDao.create(db, obj, user_id)
+            await RoleDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateRole, user_id: int) -> int:
+    async def update(*, pk: int, obj: UpdateRole) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:
@@ -49,7 +49,7 @@ class RoleService:
                 menu = await MenuDao.get(db, menu_id)
                 if not menu:
                     raise errors.ForbiddenError(msg='菜单不存在')
-            count = await RoleDao.update(db, pk, obj, user_id)
+            count = await RoleDao.update(db, pk, obj)
             return count
 
     @staticmethod

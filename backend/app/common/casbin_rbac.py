@@ -61,7 +61,7 @@ class RBAC:
                 raise AuthorizationError
         else:
             # casbin 权限校验
-            user_uuid = request.user.user_uuid
+            user_uuid = request.user.uuid
             enforcer = self.enforcer()
             if not enforcer.enforce(user_uuid, path, method):
                 raise AuthorizationError

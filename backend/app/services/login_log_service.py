@@ -26,7 +26,7 @@ class LoginLogService:
         try:
             # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
             obj_in = CreateLoginLog(
-                user_uuid=user.user_uuid,
+                user_uuid=user.uuid,
                 username=user.username,
                 status=status,
                 ip=request.state.ip,

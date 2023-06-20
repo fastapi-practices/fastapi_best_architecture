@@ -5,7 +5,7 @@ from typing import Union
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.database.base_class import Base, id_key
+from backend.app.models.base import Base, id_key
 
 
 class Dept(Base):

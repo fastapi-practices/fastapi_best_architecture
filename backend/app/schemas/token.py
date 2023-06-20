@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-
 from backend.app.schemas.base import SchemaBase
 from backend.app.schemas.user import GetUserInfoNoRelation
 

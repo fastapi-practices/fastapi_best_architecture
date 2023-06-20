@@ -8,7 +8,7 @@ class CustomCode(Enum):
     自定义错误码
     """
 
-    CAPTCHA_ERROR = (40001, '图形验证码错误')
+    CAPTCHA_ERROR = (40001, '验证码错误')
 
     @property
     def code(self):

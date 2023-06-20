@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
 from backend.app.common.pagination import PageDepends, paging_data
@@ -35,14 +35,14 @@ async def get_all_dict_datas(
 
 
 @router.post('', summary='创建字典', dependencies=[DependsRBAC])
-async def create_dict_data(request: Request, obj: CreateDictData):
-    await DictDataService.create(obj=obj, user_id=request.user.id)
+async def create_dict_data(obj: CreateDictData):
+    await DictDataService.create(obj=obj)
     return await response_base.success()
 
 
 @router.put('/{pk}', summary='更新字典', dependencies=[DependsRBAC])
-async def update_dict_data(request: Request, pk: int, obj: UpdateDictData):
-    count = await DictDataService.update(pk=pk, obj=obj, user_id=request.user.id)
+async def update_dict_data(pk: int, obj: UpdateDictData):
+    count = await DictDataService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

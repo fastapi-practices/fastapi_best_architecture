@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
 from backend.app.common.pagination import PageDepends, paging_data
@@ -33,14 +33,14 @@ async def get_all_apis(
 
 
 @router.post('', summary='创建接口', dependencies=[DependsRBAC])
-async def create_api(request: Request, obj: CreateApi):
-    await ApiService.create(obj=obj, user_id=request.user.id)
+async def create_api(obj: CreateApi):
+    await ApiService.create(obj=obj)
     return await response_base.success()
 
 
 @router.put('/{pk}', summary='更新接口', dependencies=[DependsRBAC])
-async def update_api(request: Request, pk: int, obj: UpdateApi):
-    count = await ApiService.update(pk=pk, obj=obj, user_id=request.user.id)
+async def update_api(pk: int, obj: UpdateApi):
+    count = await ApiService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

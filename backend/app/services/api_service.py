@@ -23,17 +23,17 @@ class ApiService:
         return await ApiDao.get_all(name=name, method=method, path=path)
 
     @staticmethod
-    async def create(*, obj: CreateApi, user_id: int) -> None:
+    async def create(*, obj: CreateApi) -> None:
         async with async_db_session.begin() as db:
             api = await ApiDao.get_by_name(db, obj.name)
             if api:
                 raise errors.ForbiddenError(msg='接口已存在')
-            await ApiDao.create(db, obj, user_id)
+            await ApiDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateApi, user_id: int) -> int:
+    async def update(*, pk: int, obj: UpdateApi) -> int:
         async with async_db_session.begin() as db:
-            count = await ApiDao.update(db, pk, obj, user_id)
+            count = await ApiDao.update(db, pk, obj)
             return count
 
     @staticmethod

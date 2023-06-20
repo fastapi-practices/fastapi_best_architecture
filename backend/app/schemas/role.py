@@ -26,8 +26,6 @@ class UpdateRole(RoleBase):
 
 class GetAllRole(RoleBase):
     id: int
-    create_user: int
-    update_user: int = None
     created_time: datetime
     updated_time: datetime | None = None
     menus: list[GetAllMenu]

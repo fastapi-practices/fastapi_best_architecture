@@ -86,9 +86,7 @@ def register_exception(app: FastAPI):
                 for error in raw_exc.errors()[:1]:
                     field = str(error.get('loc')[-1])
                     msg = error.get('msg')
-                    message += (
-                        f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
-                    )
+                    message += f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'
         content = {

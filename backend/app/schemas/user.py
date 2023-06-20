@@ -68,13 +68,13 @@ class Avatar(SchemaBase):
 class GetUserInfoNoRelation(_UserInfoBase):
     dept_id: int | None = None
     id: int
-    user_uuid: str
+    uuid: str
     avatar: str | None = None
     status: StatusType = Field(default=StatusType.enable)
     is_superuser: bool
     is_multi_login: bool
-    time_joined: datetime = None
-    last_login: datetime | None = None
+    join_time: datetime = None
+    last_login_time: datetime | None = None
 
     class Config:
         orm_mode = True

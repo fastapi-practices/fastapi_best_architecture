@@ -31,11 +31,11 @@ class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
         api = await db.execute(select(self.model).where(self.model.name == name))
         return api.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateApi, user_id: int) -> NoReturn:
-        await self.create_(db, obj_in, user_id)
+    async def create(self, db: AsyncSession, obj_in: CreateApi) -> NoReturn:
+        await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApi, user_id: int) -> int:
-        return await self.update_(db, pk, obj_in, user_id)
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApi) -> int:
+        return await self.update_(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         apis = await db.execute(delete(self.model).where(self.model.id.in_(pk)))

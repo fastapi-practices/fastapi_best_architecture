@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.database.base_class import Base, id_key
+from backend.app.models.base import Base, id_key
 from backend.app.models.sys_role_menu import sys_role_menu
 from backend.app.models.sys_user_role import sys_user_role
 

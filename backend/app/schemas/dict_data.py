@@ -29,8 +29,6 @@ class UpdateDictData(DictDataBase):
 class GetAllDictData(DictDataBase):
     id: int
     type: GetAllDictType
-    create_user: int
-    update_user: int = None
     created_time: datetime
     updated_time: datetime | None = None
 

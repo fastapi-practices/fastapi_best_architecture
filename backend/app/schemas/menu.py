@@ -31,8 +31,6 @@ class UpdateMenu(MenuBase):
 
 class GetAllMenu(MenuBase):
     id: int
-    create_user: int
-    update_user: int = None
     created_time: datetime
     updated_time: datetime | None = None
 

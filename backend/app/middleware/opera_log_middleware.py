@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from typing import Any
 
 from asgiref.sync import sync_to_async
@@ -16,6 +15,7 @@ from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
 from backend.app.utils.encrypt import AESCipher, Md5Cipher
 from backend.app.utils.request_parse import parse_user_agent_info, parse_ip_info
+from backend.app.utils.timezone import timezone_utils
 
 
 class OperaLogMiddleware:
@@ -59,9 +59,9 @@ class OperaLogMiddleware:
         request.state.device = device
 
         # 执行请求
-        start_time = datetime.now()
+        start_time = timezone_utils.get_timezone_datetime()
         code, msg, status, err = await self.execute_request(request, send)
-        end_time = datetime.now()
+        end_time = timezone_utils.get_timezone_datetime()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         router = request.scope.get('route')
