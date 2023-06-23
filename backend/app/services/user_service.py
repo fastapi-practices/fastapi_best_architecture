@@ -46,7 +46,7 @@ class UserService:
             np1 = obj.new_password
             np2 = obj.confirm_password
             if np1 != np2:
-                raise errors.ForbiddenError(msg='新密码输入不一致')
+                raise errors.ForbiddenError(msg='两次密码输入不一致')
             count = await UserDao.reset_password(db, request.user.id, obj.new_password)
             prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
