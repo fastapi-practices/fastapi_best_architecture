@@ -1,6 +1,5 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import tzlocal
 from apscheduler.executors.asyncio import AsyncIOExecutor
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -37,7 +36,7 @@ def _scheduler_conf() -> dict:
             'misfire_grace_time': settings.APS_MISFIRE_GRACE_TIME,
         },
         # 时区
-        'timezone': str(tzlocal.get_localzone()),
+        'timezone': settings.DATETIME_TIMEZONE,
     }
 
     return end_conf

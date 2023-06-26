@@ -14,6 +14,7 @@ from backend.app.api.v1.login_log import router as login_log_router
 from backend.app.api.v1.opera_log import router as opera_log_router
 from backend.app.api.v1.dict_type import router as dict_type_router
 from backend.app.api.v1.dict_data import router as dict_data_router
+from backend.app.api.v1.task import router as task_router
 from backend.app.api.v1.mixed import router as mixed_router
 
 v1 = APIRouter(prefix=settings.API_V1_STR)
@@ -29,4 +30,5 @@ v1.include_router(dict_type_router, prefix='/dict-types', tags=['字典类型管
 v1.include_router(dict_data_router, prefix='/dict-datas', tags=['字典数据管理'])
 v1.include_router(login_log_router, prefix='/login-logs', tags=['登录日志管理'])
 v1.include_router(opera_log_router, prefix='/opera-logs', tags=['操作日志管理'])
+v1.include_router(task_router, prefix='/tasks', tags=['任务管理'])
 v1.include_router(mixed_router, prefix='/mixes', tags=['杂项'])
