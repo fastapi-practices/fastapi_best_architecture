@@ -41,11 +41,6 @@ class RBAC:
         super_user = request.user.is_superuser
         if super_user:
             return
-        # 免鉴权的接口
-        method = request.method
-        path = request.url.path
-        if (method, path) in settings.CASBIN_EXCLUDE:
-            return
         # 检测角色数据权限范围
         user_roles = request.user.roles
         data_scope = any(role.data_scope == 1 for role in user_roles)
@@ -57,10 +52,14 @@ class RBAC:
             menu_perms = []
             for role in user_roles:
                 menu_perms.extend([menu.perms for menu in role.menus])
-            if not menu_perms or path_auth not in menu_perms:
+            if not menu_perms or path_auth not in settings.MENU_EXCLUDE:
                 raise AuthorizationError
         else:
             # casbin 权限校验
+            method = request.method
+            path = request.url.path
+            if (method, path) in settings.CASBIN_EXCLUDE:
+                return
             user_uuid = request.user.uuid
             enforcer = self.enforcer()
             if not enforcer.enforce(user_uuid, path, method):

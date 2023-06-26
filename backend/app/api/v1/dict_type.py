@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -14,7 +15,7 @@ from backend.app.services.dict_type_service import DictTypeService
 router = APIRouter()
 
 
-@router.get('', summary='（模糊条件）分页获取所有字典类型', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有字典类型', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_dict_types(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
