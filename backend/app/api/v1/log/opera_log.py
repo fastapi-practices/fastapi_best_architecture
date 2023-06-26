@@ -11,7 +11,7 @@ from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.opera_log import GetAllOperaLog
 from backend.app.services.opera_log_service import OperaLogService
 
-router = APIRouter()
+router = APIRouter(prefix='/opera-log')
 
 
 @router.get('', summary='（模糊条件）分页获取操作日志', dependencies=[DependsRBAC, PageDepends])
