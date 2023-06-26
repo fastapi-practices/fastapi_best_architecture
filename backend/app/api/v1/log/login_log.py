@@ -11,7 +11,7 @@ from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.login_log import GetAllLoginLog
 from backend.app.services.login_log_service import LoginLogService
 
-router = APIRouter(prefix='/login-log')
+router = APIRouter()
 
 
 @router.get('', summary='（模糊条件）分页获取登录日志', dependencies=[DependsRBAC, PageDepends])
