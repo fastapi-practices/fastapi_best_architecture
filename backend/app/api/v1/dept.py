@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
 from backend.app.services.dept_service import DeptService
@@ -13,14 +14,14 @@ from backend.app.utils.serializers import select_to_json
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取部门详情', dependencies=[DependsRBAC])
+@router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: int):
     dept = await DeptService.get(pk=pk)
     data = GetAllDept(**select_to_json(dept))
     return await response_base.success(data=data)
 
 
-@router.get('', summary='获取所有部门展示树', dependencies=[DependsRBAC])
+@router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
 async def get_all_depts(
     level: Annotated[int | None, Query()] = None,
     name: Annotated[str | None, Query()] = None,
