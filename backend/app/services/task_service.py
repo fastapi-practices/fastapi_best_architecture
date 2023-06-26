@@ -14,7 +14,31 @@ class TaskService:
     def get_task_list():
         tasks = []
         for job in scheduler.get_jobs():
-            tasks.append(GetTask(**{
+            tasks.append(
+                GetTask(
+                    **{
+                        'id': job.id,
+                        'func_name': job.func_ref,
+                        'trigger': str(job.trigger),
+                        'executor': job.executor,
+                        'name': job.name,
+                        'misfire_grace_time': job.misfire_grace_time,
+                        'coalesce': job.coalesce,
+                        'max_instances': job.max_instances,
+                        'next_run_time': job.next_run_time,
+                    }
+                ).dict()
+            )
+        return tasks
+
+    @staticmethod
+    @sync_to_async
+    def get_task(pk: str):
+        job = scheduler.get_job(job_id=pk)
+        if not job:
+            raise errors.NotFoundError(msg='任务不存在')
+        task = GetTask(
+            **{
                 'id': job.id,
                 'func_name': job.func_ref,
                 'trigger': str(job.trigger),
@@ -24,26 +48,8 @@ class TaskService:
                 'coalesce': job.coalesce,
                 'max_instances': job.max_instances,
                 'next_run_time': job.next_run_time,
-            }).dict())
-        return tasks
-
-    @staticmethod
-    @sync_to_async
-    def get_task(pk: str):
-        job = scheduler.get_job(job_id=pk)
-        if not job:
-            raise errors.NotFoundError(msg='任务不存在')
-        task = GetTask(**{
-            'id': job.id,
-            'func_name': job.func_ref,
-            'trigger': str(job.trigger),
-            'executor': job.executor,
-            'name': job.name,
-            'misfire_grace_time': job.misfire_grace_time,
-            'coalesce': job.coalesce,
-            'max_instances': job.max_instances,
-            'next_run_time': job.next_run_time,
-        })
+            }
+        )
         return task
 
     async def run(self, pk: str):

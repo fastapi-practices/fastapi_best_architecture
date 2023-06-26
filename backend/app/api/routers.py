@@ -7,11 +7,13 @@ from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.casbin import router as casbin_router
 from backend.app.api.v1.dept import router as dept_router
 from backend.app.api.v1.dict_type import router as dict_type_router
+from backend.app.api.v1.dict_data import router as dict_data_router
 from backend.app.api.v1.log import router as log_router
 from backend.app.api.v1.menu import router as menu_router
 from backend.app.api.v1.mixed import router as mixed_router
 from backend.app.api.v1.monitor import router as monitor_router
 from backend.app.api.v1.role import router as role_router
+from backend.app.api.v1.task import router as task_router
 from backend.app.api.v1.user import router as user_router
 from backend.app.core.conf import settings
 
@@ -28,4 +30,5 @@ v1.include_router(dict_type_router, prefix='/dict-types', tags=['字典类型管
 v1.include_router(dict_data_router, prefix='/dict-datas', tags=['字典数据管理'])
 v1.include_router(log_router, prefix='/logs', tags=['日志管理'])
 v1.include_router(monitor_router, prefix='/monitors', tags=['监控管理'])
+v1.include_router(task_router, prefix='/tasks', tags=['任务管理'])
 v1.include_router(mixed_router, prefix='/mixes', tags=['杂项'])
