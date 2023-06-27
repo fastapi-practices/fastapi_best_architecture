@@ -37,10 +37,8 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
 
     async def create(self, db, obj_in: CreateRole) -> NoReturn:
         new_role = self.model(**obj_in.dict(exclude={'menus'}))
-        menu_list = []
-        for menu_id in obj_in.menus:
-            menu_list.append(await db.get(Menu, menu_id))
-        new_role.menus.append(*menu_list)
+        menus = await db.execute(select(Menu).where(Menu.id.in_(obj_in.menus)))
+        new_role.menus = menus.scalars().all()
         db.add(new_role)
 
     async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:

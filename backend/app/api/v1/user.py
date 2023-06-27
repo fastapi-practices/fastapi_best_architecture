@@ -5,10 +5,11 @@ from typing import Annotated
 from fastapi import APIRouter, Query, Request
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar
+from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar, GetCurrentUserInfo
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
 
@@ -27,6 +28,12 @@ async def password_reset(request: Request, obj: ResetPassword):
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
+
+
+@router.get('/info', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
+async def current_userinfo(request: Request):
+    data = GetCurrentUserInfo(**select_to_json(request.user))
+    return await response_base.success(data=data, exclude={'password'})
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsRBAC])
@@ -54,10 +61,10 @@ async def update_avatar(request: Request, username: str, avatar: Avatar):
 
 @router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsRBAC, PageDepends])
 async def get_all_users(
-    db: CurrentSession,
-    username: Annotated[str | None, Query()] = None,
-    phone: Annotated[str | None, Query()] = None,
-    status: Annotated[int | None, Query()] = None,
+        db: CurrentSession,
+        username: Annotated[str | None, Query()] = None,
+        phone: Annotated[str | None, Query()] = None,
+        status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)

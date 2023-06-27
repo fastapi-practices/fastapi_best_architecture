@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from email_validator import validate_email, EmailNotValidError
-from pydantic import HttpUrl, Field, validator
+from pydantic import HttpUrl, Field, validator, root_validator
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
@@ -17,7 +17,7 @@ class Auth(SchemaBase):
 
 
 class AuthLogin(Auth):
-    captcha: str
+    captcha: str | None = None
 
 
 class CreateUser(Auth):
@@ -83,6 +83,25 @@ class GetUserInfoNoRelation(_UserInfoBase):
 class GetAllUserInfo(GetUserInfoNoRelation):
     dept: GetAllDept | None = None
     roles: list[GetAllRole]
+
+    class Config:
+        orm_mode = True
+
+
+class GetCurrentUserInfo(GetUserInfoNoRelation):
+    dept: GetAllDept | None = None
+    roles: list[GetAllRole]
+
+    @root_validator
+    def handel(cls, values):
+        """处理部门和角色"""
+        dept = values.get('dept')
+        if dept:
+            values['dept'] = dept.name
+        roles = values.get('roles')
+        if roles:
+            values['roles'] = [role.name for role in roles]
+        return values
 
     class Config:
         orm_mode = True
