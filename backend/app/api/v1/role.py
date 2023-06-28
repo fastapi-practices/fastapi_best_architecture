@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -15,14 +16,14 @@ from backend.app.utils.serializers import select_to_json
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取角色详情', dependencies=[DependsRBAC])
+@router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(pk: int):
     role = await RoleService.get(pk=pk)
     data = GetAllRole(**select_to_json(role))
     return await response_base.success(data=data)
 
 
-@router.get('', summary='（模糊条件）分页获取所有角色', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有角色', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_roles(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,

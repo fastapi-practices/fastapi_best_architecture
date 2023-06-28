@@ -19,7 +19,7 @@ it a pseudo three-tier architecture
 
 | workflow        | java           | fastapi_best_architecture |
 |-----------------|----------------|---------------------------|
-| view            | controller     | api / view                |
+| view            | controller     | api                       |
 | data validation | dto            | schema                    |
 | business logic  | service + impl | service                   |
 | data access     | dao / mapper   | crud                      |
@@ -27,16 +27,16 @@ it a pseudo three-tier architecture
 
 ## Features
 
-- [x] FastAPI New Features
+- [x] FastAPI new features
 - [x] Asynchronous design
-- [x] RESTful API specification
+- [x] Restful API specification
 - [x] SQLAlchemy 2.0 syntax
-- [x] Pydantic Data Validation
-- [x] Casbin RBAC Permission Control
-- [x] APScheduler Timed Tasks
-- [x] JWT Authentication
-- [x] Redis Caching
-- [x] Docker Deployment
+- [x] Pydantic data validation
+- [x] Casbin RBAC permission control
+- [x] APScheduler timed tasks
+- [x] JWT authentication
+- [x] Redis caching
+- [x] Docker deployment
 - [x] Pytest testing
 
 ## Getting started:
@@ -48,7 +48,7 @@ it a pseudo three-tier architecture
     pip install -r requirements.txt
     ```
 
-2. Create a database ``fba``, choose utf8mb4 encoding
+2. Create a database `fba`, choose utf8mb4 encoding
 3. Install and start Redis
 4. Create a `.env` file in the `backend/app/` directory
 
@@ -76,7 +76,7 @@ it a pseudo three-tier architecture
     ```
 
 7. Execute the `backend/app/main.py` file to start the service
-8. Browser access: http://127.0.0.1:8000/v1/docs
+8. Browser access: http://127.0.0.1:8000/api/v1/docs
 
 ---
 
@@ -86,6 +86,8 @@ it a pseudo three-tier architecture
    file ``.env``
 
    ```shell
+   cd deploy/docker-compose/
+   
    cp .env.server ../../backend/app/.env
    
    # This command is optional
@@ -99,7 +101,7 @@ it a pseudo three-tier architecture
    ```
 
 3. Wait for the command to complete automatically
-4. Visit the browser: http://127.0.0.1:8000/v1/docs
+4. Visit the browser: http://127.0.0.1:8000/api/v1/docs
 
 ## Test data
 

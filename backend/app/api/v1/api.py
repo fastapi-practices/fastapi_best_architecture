@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -14,13 +15,13 @@ from backend.app.services.api_service import ApiService
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsRBAC])
+@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
 async def get_api(pk: int):
     api = await ApiService.get(pk=pk)
     return await response_base.success(data=api)
 
 
-@router.get('', summary='（模糊条件）分页获取所有接口', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有接口', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_apis(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,

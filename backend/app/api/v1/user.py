@@ -9,7 +9,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar, GetCurrentUserInfo
+from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
 
@@ -22,7 +22,7 @@ async def user_register(obj: CreateUser):
     return await response_base.success()
 
 
-@router.post('/password/reset', summary='密码重置', dependencies=[DependsRBAC])
+@router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
 async def password_reset(request: Request, obj: ResetPassword):
     count = await UserService.pwd_reset(request=request, obj=obj)
     if count > 0:
@@ -30,20 +30,14 @@ async def password_reset(request: Request, obj: ResetPassword):
     return await response_base.fail()
 
 
-@router.get('/info', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
-async def current_userinfo(request: Request):
-    data = GetCurrentUserInfo(**select_to_json(request.user))
-    return await response_base.success(data=data, exclude={'password'})
-
-
-@router.get('/{username}', summary='查看用户信息', dependencies=[DependsRBAC])
+@router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: str):
     current_user = await UserService.get_userinfo(username=username)
     data = GetAllUserInfo(**select_to_json(current_user))
     return await response_base.success(data=data)
 
 
-@router.put('/{username}', summary='更新用户信息', dependencies=[DependsRBAC])
+@router.put('/{username}', summary='更新用户信息', dependencies=[DependsJwtAuth])
 async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     count = await UserService.update(request=request, username=username, obj=obj)
     if count > 0:
@@ -51,7 +45,7 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     return await response_base.fail()
 
 
-@router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsRBAC])
+@router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsJwtAuth])
 async def update_avatar(request: Request, username: str, avatar: Avatar):
     count = await UserService.update_avatar(request=request, username=username, avatar=avatar)
     if count > 0:
@@ -59,12 +53,12 @@ async def update_avatar(request: Request, username: str, avatar: Avatar):
     return await response_base.fail()
 
 
-@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_users(
-        db: CurrentSession,
-        username: Annotated[str | None, Query()] = None,
-        phone: Annotated[str | None, Query()] = None,
-        status: Annotated[int | None, Query()] = None,
+    db: CurrentSession,
+    username: Annotated[str | None, Query()] = None,
+    phone: Annotated[str | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select, GetAllUserInfo)

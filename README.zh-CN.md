@@ -16,7 +16,7 @@
 
 | 工作流程 | java           | fastapi_best_architecture |
 |------|----------------|---------------------------|
-| 视图   | controller     | api / view                |
+| 视图   | controller     | api                       |
 | 数据验证 | dto            | schema                    |
 | 业务逻辑 | service + impl | service                   |
 | 数据访问 | dao / mapper   | crud                      |
@@ -26,7 +26,7 @@
 
 - [x] FastAPI 新特性
 - [x] 异步设计
-- [x] RESTful API 规范
+- [x] Restful API 规范
 - [x] SQLAlchemy 2.0 语法
 - [x] Pydantic 数据验证
 - [x] Casbin RBAC 权限控制
@@ -73,7 +73,7 @@
     ```
 
 7. 执行 `backend/app/main.py` 文件启动服务
-8. 浏览器访问：http://127.0.0.1:8000/v1/docs
+8. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ---
 
@@ -82,6 +82,8 @@
 1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
 
    ```shell
+   cd deploy/docker-compose/
+   
    cp .env.server ../../backend/app/.env
    
    # 此命令为可选
@@ -95,7 +97,7 @@
    ```
 
 3. 等待命令自动完成
-4. 浏览器访问：http://127.0.0.1:8000/v1/docs
+4. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ## 测试数据
 

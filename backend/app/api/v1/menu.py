@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query, Request
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.menu import GetAllMenu, CreateMenu, UpdateMenu
 from backend.app.services.menu_service import MenuService
@@ -13,20 +14,20 @@ from backend.app.utils.serializers import select_to_json
 router = APIRouter()
 
 
-@router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsRBAC])
+@router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
 async def get_user_menus(request: Request):
     menu = await MenuService.get_user_menu_tree(request=request)
     return await response_base.success(data=menu)
 
 
-@router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsRBAC])
+@router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: int):
     menu = await MenuService.get(pk=pk)
     data = GetAllMenu(**select_to_json(menu))
     return await response_base.success(data=data)
 
 
-@router.get('', summary='获取所有菜单展示树', dependencies=[DependsRBAC])
+@router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
 async def get_all_menus(
     name: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,

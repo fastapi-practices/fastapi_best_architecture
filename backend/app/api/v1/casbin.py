@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -21,7 +22,7 @@ from backend.app.services.casbin_service import CasbinService
 router = APIRouter()
 
 
-@router.get('', summary='（模糊条件）分页获取所有权限规则', dependencies=[DependsRBAC, PageDepends])
+@router.get('', summary='（模糊条件）分页获取所有权限规则', dependencies=[DependsJwtAuth, PageDepends])
 async def get_all_casbin(
     db: CurrentSession,
     ptype: Annotated[str | None, Query()] = None,
@@ -32,7 +33,7 @@ async def get_all_casbin(
     return await response_base.success(data=page_data)
 
 
-@router.get('/policy', summary='获取所有访问权限规则', dependencies=[DependsRBAC])
+@router.get('/policy', summary='获取所有访问权限规则', dependencies=[DependsJwtAuth])
 async def get_all_policies():
     policies = await CasbinService.get_policy_list()
     return await response_base.success(data=policies)
