@@ -6,5 +6,5 @@ from backend.app.api.v1.log.opera_log import router as opera_log
 
 router = APIRouter()
 
-router.include_router(login_log, prefix='/login-log')
-router.include_router(opera_log, prefix='/opera-log')
+router.include_router(login_log, prefix='/login')
+router.include_router(opera_log, prefix='/opera')
