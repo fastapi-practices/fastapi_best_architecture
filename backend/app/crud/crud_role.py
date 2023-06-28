@@ -43,17 +43,14 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
 
     async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:
         role = await db.execute(
-            update(self.model).where(self.model.id == role_id).values(**obj_in.dict(exclude={'menus'}))
+            update(self.model)
+            .where(self.model.id == role_id)
+            .values(**obj_in.dict(exclude={'menus'}))
         )
         current_role = await self.get_with_relation(db, role_id)
-        # 删除角色所有菜单
-        for i in list(current_role.menus):
-            current_role.menus.remove(i)
-        # 添加角色菜单
-        menu_list = []
-        for menu_id in obj_in.menus:
-            menu_list.append(await db.get(Menu, menu_id))
-        current_role.menus.append(*menu_list)
+        # 更新菜单
+        menus = await db.execute(select(Menu).where(Menu.id.in_(obj_in.menus)))
+        current_role.menus = menus.scalars().all()
         return role.rowcount
 
     async def delete(self, db, role_id: list[int]) -> int:
