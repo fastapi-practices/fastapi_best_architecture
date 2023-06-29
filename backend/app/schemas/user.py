@@ -17,7 +17,8 @@ class Auth(SchemaBase):
 
 
 class AuthLogin(Auth):
-    captcha: str | None = None
+    # captcha: str
+    pass
 
 
 class CreateUser(Auth):

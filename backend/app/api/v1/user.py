@@ -30,7 +30,7 @@ async def password_reset(request: Request, obj: ResetPassword):
     return await response_base.fail()
 
 
-@router.get('/info', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
+@router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
 async def current_userinfo(request: Request):
     data = GetCurrentUserInfo(**select_to_json(request.user))
     return await response_base.success(data=data, exclude={'password'})
