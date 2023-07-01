@@ -79,9 +79,13 @@ def register_exception(app: FastAPI):
                     sub_raw_exc = sub_raw_error.exc
                     if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
                         if getattr(sub_raw_exc, 'code') == 'enum':
-                            sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v.value) for v in sub_raw_exc.enum_values)  # type: ignore  # noqa: E501
+                            sub_raw_exc.__dict__['permitted'] = ', '.join(
+                                repr(v.value) for v in sub_raw_exc.enum_values  # type: ignore
+                            )
                         else:
-                            sub_raw_exc.__dict__['permitted'] = ', '.join(repr(v) for v in sub_raw_exc.permitted)  # type: ignore  # noqa: E501
+                            sub_raw_exc.__dict__['permitted'] = ', '.join(
+                                repr(v) for v in sub_raw_exc.permitted  # type: ignore
+                            )
                 # 处理异常信息
                 for error in raw_exc.errors()[:1]:
                     field = str(error.get('loc')[-1])

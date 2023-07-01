@@ -12,7 +12,6 @@ from backend.app.common.enums import LoginLogStatus
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
-from backend.app.common.response.response_code import CustomCode
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
