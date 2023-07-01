@@ -26,7 +26,7 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     '/login',
     summary='用户登录',
     description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
-    dependencies=[Depends(RateLimiter(times=5, minutes=15))],
+    dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def user_login(request: Request, obj: AuthLogin, background_tasks: BackgroundTasks):
     access_token, refresh_token, access_expire, refresh_expire, user = await AuthService().login(
