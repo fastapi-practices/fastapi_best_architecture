@@ -101,7 +101,9 @@
 
 ## 测试数据
 
-执行 `backend/app/init_test_data.py` 文件，自动创建测试数据
+[//]: # (执行 `backend/app/init_test_data.py` 文件，自动创建测试数据)
+
+使用 `backend/sql/init_test_data.sql` 文件初始化测试数据
 
 ## 开发
 
@@ -124,12 +126,7 @@
    cd backend/app/
    ```
 
-3. 初始化测试数据
-
-   ```shell
-   python tests/init_test_data.py
-   ```
-
+3. 使用 `backend/sql/init_test_data.sql` 文件初始化测试数据
 4. 执行测试命令
 
    ```shell

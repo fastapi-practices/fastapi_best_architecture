@@ -105,7 +105,7 @@ it a pseudo three-tier architecture
 
 ## Test data
 
-Execute ``backend/app/init_test_data.py`` file to automatically create test data
+Initialize the test data using the `backend/sql/init_test_data.sql` file
 
 ## Development
 
@@ -128,12 +128,7 @@ Execute tests via pytest
    cd backend/app/
    ```
 
-3. Initialize the test data
-
-   ```shell
-   python tests/init_test_data.py
-   ```
-
+3. Initialize the test data using the `backend/sql/init_test_data.sql` file
 4. Execute the test command
 
    ```shell
