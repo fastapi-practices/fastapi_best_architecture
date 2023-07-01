@@ -107,6 +107,8 @@ CREATE TABLE sys_menu
     component    VARCHAR(255) COMMENT '组件路径',
     perms        VARCHAR(100) COMMENT '权限标识',
     status       INTEGER     NOT NULL COMMENT '菜单状态（0停用 1正常）',
+    `show`       INTEGER     NOT NULL comment '是否显示（0否 1是）',
+    cache        INTEGER     NOT NULL comment '是否缓存（0否 1是）',
     remark       LONGTEXT COMMENT '备注',
     parent_id    INTEGER COMMENT '父菜单ID',
     created_time DATETIME    NOT NULL COMMENT '创建时间',
