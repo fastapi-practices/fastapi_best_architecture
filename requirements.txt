@@ -11,7 +11,7 @@ cryptography==41.0.0
 email-validator==1.1.3
 Faker==9.7.1
 fast-captcha==0.2.1
-fastapi==0.95.2
+fastapi==0.99.0
 fastapi-limiter==0.1.5
 fastapi-pagination==0.12.1
 gunicorn==20.1.0
