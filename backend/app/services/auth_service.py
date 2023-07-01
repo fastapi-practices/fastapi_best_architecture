@@ -51,11 +51,11 @@ class AuthService:
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-                captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
-                if not captcha_code:
-                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
-                if captcha_code.lower() != obj.captcha.lower():
-                    raise errors.CustomError(error=CustomCode.CAPTCHA_ERROR)
+                # captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                # if not captcha_code:
+                #     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                # if captcha_code.lower() != obj.captcha.lower():
+                #     raise errors.CustomError(error=CustomCode.CAPTCHA_ERROR)
                 await UserDao.update_login_time(db, obj.username, self.login_time)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(

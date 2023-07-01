@@ -31,7 +31,7 @@ class MenuService:
             menu_ids = []
             for role in roles:
                 menu_ids.extend([menu.id for menu in role.menus])
-            menu_select = await MenuDao.get_role_menus(db, request.user.is_superuser, menu_ids)
+            menu_select = await MenuDao.get_role_menus(db, menu_ids)
             menu_tree = await get_tree_data(menu_select)
             return menu_tree
 

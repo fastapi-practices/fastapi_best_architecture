@@ -3,7 +3,7 @@
 from typing import Union
 
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.dialects.mysql import LONGTEXT, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.models.base import Base, id_key
@@ -22,6 +22,7 @@ class Menu(Base):
     icon: Mapped[str | None] = mapped_column(String(100), default=None, comment='菜单图标')
     path: Mapped[str | None] = mapped_column(String(200), default=None, comment='路由地址')
     menu_type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
+    meta: Mapped[dict | None] = mapped_column(JSON, default=None, comment='菜单元数据')
     component: Mapped[str | None] = mapped_column(String(255), default=None, comment='组件路径')
     perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='权限标识')
     status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
