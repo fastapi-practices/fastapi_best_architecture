@@ -24,20 +24,21 @@ def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     :param nodes:
     :return:
     """
-    node_map = {}
-    root_nodes = []
+    tree = []
+    node_dict = {node['id']: node for node in nodes}
 
     for node in nodes:
         parent_id = node['parent_id']
         if parent_id is None:
-            root_nodes.append(node)
+            tree.append(node)
         else:
-            parent_node = node_map.get(parent_id, {})
-            parent_node.setdefault('children', []).append(node)
-            node_map[parent_id] = parent_node
-        node_map[node['id']] = node
+            parent_node = node_dict.get(parent_id)
+            if parent_node is not None:
+                if 'children' not in parent_node:
+                    parent_node['children'] = []
+                parent_node['children'].append(node)
 
-    return root_nodes
+    return tree
 
 
 async def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = None) -> list[dict[str, Any]]:
@@ -51,12 +52,10 @@ async def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | Non
     tree = []
     for node in nodes:
         if node['parent_id'] == parent_id:
-            child_node = {
-                'id': node['id'],
-                'parent_id': node['parent_id'],
-                'children': await recursive_to_tree(nodes, parent_id=node['id']),
-            }
-            tree.append(child_node)
+            child_node = await recursive_to_tree(nodes, parent_id=node['id'])
+            if child_node:
+                node['children'] = child_node
+            tree.append(node)
     return tree
 
 

@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     # Uvicorn
     UVICORN_HOST: str = '127.0.0.1'
-    UVICORN_PORT: int = 8000
+    UVICORN_PORT: int = 8100
     UVICORN_RELOAD: bool = True
 
     # Static Server
@@ -100,7 +100,7 @@ class Settings(BaseSettings):
     LOG_STDERR_FILENAME: str = 'fba_error.log'
 
     # Middleware
-    MIDDLEWARE_CORS: bool = True
+    MIDDLEWARE_CORS: bool = False
     MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
 
