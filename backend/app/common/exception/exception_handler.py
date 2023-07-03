@@ -150,7 +150,9 @@ def register_exception(app: FastAPI):
         @app.exception_handler(500)
         async def cors_status_code_500_exception_handler(request, exc):
             """
-            跨域 500 异常处理 https://github.com/encode/starlette/issues/1175
+            跨域 500 异常处理
+
+            `Related issue <https://github.com/encode/starlette/issues/1175>`_
 
             :param request:
             :param exc:
