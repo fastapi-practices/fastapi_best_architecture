@@ -3,7 +3,7 @@
 from typing import Union
 
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.dialects.mysql import LONGTEXT, JSON
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.models.base import Base, id_key
