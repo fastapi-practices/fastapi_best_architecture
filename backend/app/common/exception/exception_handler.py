@@ -159,8 +159,12 @@ def register_exception(app: FastAPI):
             :return:
             """
             response = JSONResponse(
-                status_code=exc.code,
-                content={'code': exc.code, 'msg': exc.msg, 'data': exc.data},
+                status_code=exc.code if isinstance(exc, BaseExceptionMixin) else 500,
+                content={'code': exc.code, 'msg': exc.msg, 'data': exc.data}
+                if isinstance(exc, BaseExceptionMixin)
+                else await response_base.fail(code=500, msg=str(exc))
+                if settings.ENVIRONMENT == 'dev'
+                else await response_base.fail(code=500, msg='Internal Server Error'),
                 background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
             )
             origin = request.headers.get('origin')
