@@ -11,14 +11,15 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
     async def get(self, db, menu_id: int) -> Menu | None:
         return await self.get_(db, pk=menu_id)
 
-    async def get_by_name(self, db, name: str) -> Menu | None:
-        return await self.get_(db, name=name)
+    async def get_by_title(self, db, title: str) -> Menu | None:
+        result = await db.execute(select(self.model).where(self.model.title == title))
+        return result.scalars().first()
 
-    async def get_all(self, db, name: str | None = None, status: int | None = None) -> list[Menu]:
+    async def get_all(self, db, title: str | None = None, status: int | None = None) -> list[Menu]:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = []
-        if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
+        if title:
+            where_list.append(self.model.title.like(f'%{title}%'))
         if status is not None:
             where_list.append(self.model.status == status)
         if where_list:
