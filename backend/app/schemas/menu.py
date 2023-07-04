@@ -9,6 +9,7 @@ from backend.app.schemas.base import SchemaBase
 
 
 class MenuBase(SchemaBase):
+    title: str
     name: str
     parent_id: int | None = Field(default=None, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
