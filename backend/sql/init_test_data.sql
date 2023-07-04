@@ -1,7 +1,7 @@
 INSERT INTO fba.sys_dept (id, name, level, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
 VALUES (1, 'test', 0, 0, null, null, null, 1, 0, null, '2023-06-26 17:13:45', null);
 
-insert into fba.sys_menu (id, name, level, sort, icon, path, menu_type, component, perms, status, remark, parent_id, created_time, updated_time, 'show', cache)
+insert into fba.sys_menu (id, name, level, sort, icon, path, menu_type, component, perms, status, remark, parent_id, created_time, updated_time, `show`, cache)
 values  (1, 'test', 0, 0, null, null, 0, null, null, 1, null, null, '2023-06-26 17:13:45', null, 0, 1),
         (2, 'dashboard', 0, 0, 'icon-dashboard', '/dashboard', 0, '/dashboard/workplace/index.vue', null, 1, null, null, '2023-06-30 10:10:34', null, 1, 1),
         (3, 'Workplace', 0, 0, null, '/workplace', 0, null, null, 1, null, 2, '2023-06-30 10:11:40', null, 1, 1),
