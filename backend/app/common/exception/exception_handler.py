@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from pydantic.errors import EnumMemberError, WrongConstantError
 from starlette.exceptions import HTTPException
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
@@ -143,3 +144,39 @@ def register_exception(app: FastAPI):
                 if settings.ENVIRONMENT == 'dev'
                 else await response_base.fail(code=500, msg='Internal Server Error'),
             )
+
+    if settings.MIDDLEWARE_CORS:
+
+        @app.exception_handler(500)
+        async def cors_status_code_500_exception_handler(request, exc):
+            """
+            跨域 500 异常处理
+
+            `Related issue <https://github.com/encode/starlette/issues/1175>`_
+
+            :param request:
+            :param exc:
+            :return:
+            """
+            response = JSONResponse(
+                status_code=exc.code if isinstance(exc, BaseExceptionMixin) else 500,
+                content={'code': exc.code, 'msg': exc.msg, 'data': exc.data}
+                if isinstance(exc, BaseExceptionMixin)
+                else await response_base.fail(code=500, msg=str(exc))
+                if settings.ENVIRONMENT == 'dev'
+                else await response_base.fail(code=500, msg='Internal Server Error'),
+                background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
+            )
+            origin = request.headers.get('origin')
+            if origin:
+                cors = CORSMiddleware(
+                    app=app, allow_origins=['*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*']
+                )
+                response.headers.update(cors.simple_headers)
+                has_cookie = 'cookie' in request.headers
+                if cors.allow_all_origins and has_cookie:
+                    response.headers['Access-Control-Allow-Origin'] = origin
+                elif not cors.allow_all_origins and cors.is_allowed_origin(origin=origin):
+                    response.headers['Access-Control-Allow-Origin'] = origin
+                    response.headers.add_vary_header('Origin')
+            return response
