@@ -49,6 +49,15 @@ class Settings(BaseSettings):
             values['OPENAPI_URL'] = None
         return values
 
+    # Demo mode
+    # Only GET, OPTIONS requests are allowed
+    DEMO_MODE: bool = True
+    DEMO_MODE_EXCLUDE: set[tuple[str, str]] = {
+        ('POST', f'{API_V1_STR}/auth/login'),
+        ('POST', f'{API_V1_STR}/auth/logout'),
+        ('GET', f'{API_V1_STR}/auth/captcha'),
+    }
+
     # Uvicorn
     UVICORN_HOST: str = '127.0.0.1'
     UVICORN_PORT: int = 8000
@@ -109,6 +118,7 @@ class Settings(BaseSettings):
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
         ('POST', f'{API_V1_STR}/auth/swagger_login'),
         ('POST', f'{API_V1_STR}/auth/login'),
+        ('POST', f'{API_V1_STR}/auth/logout'),
         ('POST', f'{API_V1_STR}/auth/register'),
         ('GET', f'{API_V1_STR}/auth/captcha'),
     }
@@ -118,6 +128,7 @@ class Settings(BaseSettings):
     MENU_EXCLUDE: list[str] = [
         'auth:swagger_login',
         'auth:login',
+        'auth:logout',
         'auth:register',
         'auth:captcha',
     ]
