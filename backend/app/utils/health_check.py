@@ -25,11 +25,11 @@ def ensure_unique_route_names(app: FastAPI) -> None:
 
 async def http_limit_callback(request: Request, response: Response, expire: int):
     """
-    请求过多时的默认回调函数
+    请求限制时的默认回调函数
 
     :param request:
-    :param expire: 剩余毫秒
     :param response:
+    :param expire: 剩余毫秒
     :return:
     """
     expires = ceil(expire / 1000)
