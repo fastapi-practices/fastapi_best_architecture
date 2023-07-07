@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from sqlalchemy import select, asc, and_
+from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Menu
@@ -49,7 +50,9 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         return await self.delete_(db, menu_id)
 
     async def get_children(self, db, menu_id: int) -> list[Menu]:
-        result = await db.execute(select(self.model).where(self.model.id == menu_id))
+        result = await db.execute(
+            select(self.model).options(selectinload(self.model.children)).where(self.model.id == menu_id)
+        )
         menu = result.scalars().first()
         return menu.children
 
