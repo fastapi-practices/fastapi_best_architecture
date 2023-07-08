@@ -11,7 +11,7 @@ from backend.app.utils.re_verify import is_phone
 
 class DeptBase(SchemaBase):
     name: str
-    parent_id: int | None = Field(default=None, ge=1, description='菜单父级ID')
+    parent_id: int | None = Field(default=None, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
     leader: str | None = None
     phone: str | None = None
