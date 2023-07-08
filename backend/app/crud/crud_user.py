@@ -69,7 +69,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         )
         return user.rowcount
 
-    async def get_all(self, username: str = None, phone: str = None, status: int = None) -> Select:
+    async def get_all(self, dept: int = None, username: str = None, phone: str = None, status: int = None) -> Select:
         se = (
             select(self.model)
             .options(selectinload(self.model.dept))
@@ -77,6 +77,8 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
             .order_by(desc(self.model.join_time))
         )
         where_list = []
+        if dept:
+            where_list.append(self.model.dept_id == dept)
         if username:
             where_list.append(self.model.username.like(f'%{username}%'))
         if phone:
