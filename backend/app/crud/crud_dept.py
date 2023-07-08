@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from sqlalchemy import select, and_, asc
+from sqlalchemy import select, and_, asc, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -24,7 +24,10 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]
         if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
+            se_name = self.model.name.like(f'%{name}%')
+            dept_select = await db.execute(se.where(se_name))
+            dept_likes = dept_select.scalars().all()
+            where_list.append(or_(se_name, self.model.id.in_([dept.parent_id for dept in dept_likes])))
         if leader:
             where_list.append(self.model.leader.like(f'%{leader}%'))
         if phone:
