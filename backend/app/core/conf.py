@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     # Demo mode
     # Only GET, OPTIONS requests are allowed
-    DEMO_MODE: bool = True
+    DEMO_MODE: bool = False
     DEMO_MODE_EXCLUDE: set[tuple[str, str]] = {
         ('POST', f'{API_V1_STR}/auth/login'),
         ('POST', f'{API_V1_STR}/auth/logout'),

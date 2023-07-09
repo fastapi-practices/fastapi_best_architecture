@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from sqlalchemy import select, and_, asc
+from sqlalchemy import select, and_, asc, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -23,14 +23,22 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
     ) -> Any:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]
+        conditions = []
         if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
+            conditions.append(self.model.name.like(f'%{name}%'))
         if leader:
-            where_list.append(self.model.leader.like(f'%{leader}%'))
+            conditions.append(self.model.leader.like(f'%{leader}%'))
         if phone:
-            where_list.append(self.model.phone.startswith(phone))
+            se_phone = self.model.phone.startswith(phone)
+            dept_select = await db.execute(se.where(se_phone))
+            dept_likes = dept_select.scalars().all()
+            where_list.append(or_(se_phone, self.model.id.in_([dept.parent_id for dept in dept_likes])))
         if status is not None:
             where_list.append(self.model.status == status)
+        if conditions:
+            dept_select = await db.execute(se.where(and_(*conditions)))
+            dept_likes = dept_select.scalars().all()
+            where_list.append(or_(*conditions, self.model.id.in_([dept.parent_id for dept in dept_likes])))
         if where_list:
             se = se.where(and_(*where_list))
         dept = await db.execute(se)

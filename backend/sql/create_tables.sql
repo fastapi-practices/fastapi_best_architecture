@@ -99,6 +99,7 @@ CREATE TABLE sys_menu
 (
     id           INTEGER     NOT NULL AUTO_INCREMENT,
     name         VARCHAR(50) NOT NULL COMMENT '菜单名称',
+    title        varchar(50)  not null comment '菜单标题',
     level        INTEGER     NOT NULL COMMENT '菜单层级',
     sort         INTEGER     NOT NULL COMMENT '排序',
     icon         VARCHAR(100) COMMENT '菜单图标',
