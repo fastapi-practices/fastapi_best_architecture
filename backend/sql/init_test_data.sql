@@ -1,7 +1,7 @@
 INSERT INTO fba.sys_dept (id, name, level, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
 VALUES (1, 'test', 0, 0, null, null, null, 1, 0, null, '2023-06-26 17:13:45', null);
 
-insert into fba.sys_menu (id, name, level, sort, icon, path, menu_type, component, perms, status, remark, parent_id, created_time, updated_time, show, cache, title)
+INSERT INTO fba.sys_menu (id, name, level, sort, icon, path, menu_type, component, perms, status, remark, parent_id, created_time, updated_time, show, cache, title)
 values  (1, 'test', 0, 0, null, null, 0, null, null, 1, null, null, '2023-06-26 17:13:45', null, 0, 1, '测试'),
         (2, 'dashboard', 0, 0, 'icon-dashboard', '/dashboard', 0, '/dashboard/workplace/index.vue', null, 1, null, null, '2023-06-30 10:10:34', null, 1, 1, '仪表盘'),
         (3, 'Workplace', 0, 0, null, '/workplace', 1, null, null, 1, null, 2, '2023-06-30 10:11:40', null, 1, 1, '工作台'),
@@ -18,6 +18,10 @@ values  (1, 'test', 0, 0, null, null, 0, null, null, 1, null, null, '2023-06-26 
         (14, '', 0, 0, null, null, 2, null, null, 1, null, 11, '2023-07-07 20:16:27', null, 1, 1, '测试6'),
         (15, 'Opera', 0, 0, null, '/opera', 1, '/log/opera/index.vue', null, 1, null, 5, '2023-07-07 20:28:21', null, 1, 1, '操作日志'),
         (16, 'SysDept', 0, 0, null, 'sys-dept', 1, '/admin/dept/index.vue', null, 1, null, 8, '2023-07-08 22:43:20', null, 1, 1, '部门管理');
+        (17, 'SysApi', 0, 1, null, 'sys-api', 1, '/admin/api/index.vue', null, 1, null, 8, '2023-07-10 13:10:16', null, 1, 1, 'API管理');
+        (18, 'monitor', 0, 88, 'icon-computer', null, 0, null, null, 1, null, null, '2023-07-11 20:20:20', null, 1, 1, '系统监控'),
+        (19, 'Redis', 0, 0, null, null, 1, '/monitor/redis/index.vue', null, 1, null, 18, '2023-07-11 20:21:28', null, 1, 1, 'Redis监控'),
+        (20, 'Server', 0, 0, null, 'server', 1, '/monitor/server/index.vue', null, 1, null, 18, '2023-07-11 20:23:43', null, 1, 1, '服务器监控');
 
 INSERT INTO fba.sys_role (id, name, data_scope, status, remark, created_time, updated_time)
 VALUES (1, 'test', 2, 1, null, '2023-06-26 17:13:45', null);
