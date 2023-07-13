@@ -22,10 +22,8 @@ class ServerInfo:
         return f'{size:.2f} YB'
 
     @staticmethod
-    def fmt_timedelta(td: timedelta) -> str:
-        """格式化时间差"""
-        total_seconds = round(td.total_seconds())
-        days, rem = divmod(total_seconds, 86400)
+    def fmt_seconds(seconds: int) -> str:
+        days, rem = divmod(int(seconds), 86400)
         hours, rem = divmod(rem, 3600)
         minutes, seconds = divmod(rem, 60)
         parts = []
@@ -43,15 +41,21 @@ class ServerInfo:
             return ' '.join(parts)
 
     @staticmethod
+    def fmt_timedelta(td: timedelta) -> str:
+        """格式化时间差"""
+        total_seconds = round(td.total_seconds())
+        return ServerInfo.fmt_seconds(total_seconds)
+
+    @staticmethod
     def get_cpu_info() -> dict:
         """获取 CPU 信息"""
-        cpu_info = {'usage': f'{round(psutil.cpu_percent(interval=1, percpu=False), 2)} %'}
+        cpu_info = {'usage': round(psutil.cpu_percent(interval=1, percpu=False), 2)}  # %
 
         # CPU 频率信息，最大、最小和当前频率
         cpu_freq = psutil.cpu_freq()
-        cpu_info['max_freq'] = f'{round(cpu_freq.max, 2)} MHz'
-        cpu_info['min_freq'] = f'{round(cpu_freq.min, 2)} MHz'
-        cpu_info['current_freq'] = f'{round(cpu_freq.current, 2)} MHz'
+        cpu_info['max_freq'] = round(cpu_freq.max, 2)  # MHz
+        cpu_info['min_freq'] = round(cpu_freq.min, 2)  # MHz
+        cpu_info['current_freq'] = round(cpu_freq.current, 2)  # MHz
 
         # CPU 逻辑核心数，物理核心数
         cpu_info['logical_num'] = psutil.cpu_count(logical=True)
@@ -63,10 +67,10 @@ class ServerInfo:
         """获取内存信息"""
         mem = psutil.virtual_memory()
         return {
-            'total': ServerInfo.format_bytes(mem.total),
-            'used': ServerInfo.format_bytes(mem.used),
-            'free': ServerInfo.format_bytes(mem.available),
-            'usage': f'{round(mem.percent, 2)} %',
+            'total': round(mem.total / 1024 / 1024 / 1024, 2),  # GB
+            'used': round(mem.used / 1024 / 1024 / 1024, 2),  # GB
+            'free': round(mem.available / 1024 / 1024 / 1024, 2),  # GB
+            'usage': round(mem.percent, 2),  # %
         }
 
     @staticmethod
@@ -116,3 +120,6 @@ class ServerInfo:
             'startup': start_time,
             'elapsed': f'{ServerInfo.fmt_timedelta(timezone_utils.get_timezone_datetime() - start_time)}',
         }
+
+
+server_info = ServerInfo()
