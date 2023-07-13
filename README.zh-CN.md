@@ -149,6 +149,8 @@
 
 ## 赞助
 
+> 如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励 :coffee:
+
 <table>
   <tr>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px"/>

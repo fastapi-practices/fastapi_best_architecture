@@ -151,6 +151,8 @@ Execute tests via pytest
 
 ## Sponsor
 
+> If this program has helped you, you can sponsor the author with some coffee beans :coffee:
+
 <table>
   <tr>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px"/>
