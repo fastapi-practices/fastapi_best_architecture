@@ -9,7 +9,15 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.user import CreateUser, GetAllUserInfo, ResetPassword, UpdateUser, Avatar, GetCurrentUserInfo
+from backend.app.schemas.user import (
+    CreateUser,
+    GetAllUserInfo,
+    ResetPassword,
+    UpdateUser,
+    Avatar,
+    GetCurrentUserInfo,
+    UpdateUserRole,
+)
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
 
@@ -31,7 +39,7 @@ async def password_reset(request: Request, obj: ResetPassword):
 
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
-async def current_userinfo(request: Request):
+async def get_current_userinfo(request: Request):
     data = GetCurrentUserInfo(**select_to_json(request.user))
     return await response_base.success(data=data, exclude={'password'})
 
@@ -49,6 +57,12 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
+
+
+@router.put('/{username}/role', summary='更新用户角色', dependencies=[DependsRBAC])
+async def update_user_role(request: Request, username: str, obj: UpdateUserRole):
+    await UserService.update_role(request=request, username=username, obj=obj)
+    return await response_base.success()
 
 
 @router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsJwtAuth])
@@ -72,7 +86,7 @@ async def get_all_users(
     return await response_base.success(data=page_data)
 
 
-@router.post('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsRBAC])
+@router.put('/{pk}/super', summary='修改用户超级权限', dependencies=[DependsRBAC])
 async def super_set(request: Request, pk: int):
     count = await UserService.update_permission(request=request, pk=pk)
     if count > 0:
@@ -80,7 +94,7 @@ async def super_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.post('/{pk}/action', summary='修改用户状态', dependencies=[DependsRBAC])
+@router.put('/{pk}/status', summary='修改用户状态', dependencies=[DependsRBAC])
 async def status_set(request: Request, pk: int):
     count = await UserService.update_status(request=request, pk=pk)
     if count > 0:
@@ -88,7 +102,7 @@ async def status_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.post('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[DependsRBAC])
+@router.put('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[DependsRBAC])
 async def multi_set(request: Request, pk: int):
     count = await UserService.update_multi_login(request=request, pk=pk)
     if count > 0:

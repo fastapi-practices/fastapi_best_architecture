@@ -5,7 +5,6 @@ from backend.app.utils.server_info import server_info
 
 
 class RedisInfo:
-
     @staticmethod
     async def get_info():
         info = await redis_client.info()

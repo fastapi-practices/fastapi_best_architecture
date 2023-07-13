@@ -15,7 +15,7 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar
+from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, UpdateUserRole
 
 
 class UserService:
@@ -82,17 +82,30 @@ class UserService:
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
-            for role_id in obj.roles:
-                role = await RoleDao.get(db, role_id)
-                if not role:
-                    raise errors.NotFoundError(msg='角色不存在')
             count = await UserDao.update_userinfo(db, input_user, obj)
             return count
 
     @staticmethod
+    async def update_role(*, request: Request, username: str, obj: UpdateUserRole) -> None:
+        async with async_db_session.begin() as db:
+            if not request.user.is_superuser:
+                if request.user.username != username:
+                    raise errors.ForbiddenError(msg='你只能修改自己的角色')
+            input_user = await UserDao.get_with_relation(db, username=username)
+            if not input_user:
+                raise errors.NotFoundError(msg='用户不存在')
+            for role_id in obj.roles:
+                role = await RoleDao.get(db, role_id)
+                if not role:
+                    raise errors.NotFoundError(msg='角色不存在')
+            await UserDao.update_role(db, input_user, obj)
+
+    @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            if not request.user.is_superuser:
+                if request.user.username != username:
+                    raise errors.ForbiddenError(msg='你只能修改自己的头像')
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -111,7 +124,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             else:
                 if pk == request.user.id:
-                    raise errors.ForbiddenError(msg='禁止修改自身权限')
+                    raise errors.ForbiddenError(msg='禁止修改自身管理员权限')
                 count = await UserDao.set_super(db, pk)
                 return count
 

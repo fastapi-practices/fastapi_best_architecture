@@ -36,7 +36,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         :param del_flag:
         :return:
         """
-        assert pk is not None or name is not None, '查询错误, pk 和 name 参数不能同时为空'
+        assert pk is not None or name is not None, '查询错误, pk 和 name 参数不能同时存在'
+        assert pk is None or name is None, '查询错误, pk 和 name 参数不能同时为空'
         where_list = [self.model.id == pk] if pk is not None else [self.model.name == name]
         if status is not None:
             assert status in (0, 1), '查询错误, status 参数只能为 0 或 1'

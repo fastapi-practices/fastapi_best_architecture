@@ -58,6 +58,10 @@ class _UserInfoBase(SchemaBase):
 
 
 class UpdateUser(_UserInfoBase):
+    pass
+
+
+class UpdateUserRole(SchemaBase):
     roles: list[int]
 
 
