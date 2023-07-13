@@ -54,7 +54,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         input_user.roles.extend(role_list)
 
     async def update_avatar(self, db: AsyncSession, current_user: User, avatar: Avatar) -> int:
-        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar))
+        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar.url))
         return user.rowcount
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
