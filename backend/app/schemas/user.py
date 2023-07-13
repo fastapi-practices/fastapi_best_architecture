@@ -21,7 +21,7 @@ class AuthLogin(Auth):
 
 
 class CreateUser(Auth):
-    dept_id: int
+    dept_id: int | None = None
     roles: list[int]
     nickname: str
     email: str = Field(..., example='user@example.com')
@@ -36,7 +36,7 @@ class CreateUser(Auth):
 
 
 class _UserInfoBase(SchemaBase):
-    dept_id: int
+    dept_id: int | None = None
     username: str
     nickname: str
     email: str = Field(..., example='user@example.com')
