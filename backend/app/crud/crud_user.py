@@ -39,7 +39,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         db.add(new_user)
 
     async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
-        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj))
+        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.dict()))
         return user.rowcount
 
     @staticmethod
