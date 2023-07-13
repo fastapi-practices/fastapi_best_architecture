@@ -22,6 +22,7 @@ values  (1, 'test', 0, 0, null, null, 0, null, null, 1, null, null, '2023-06-26 
         (18, 'monitor', 0, 88, 'icon-computer', null, 0, null, null, 1, null, null, '2023-07-11 20:20:20', null, 1, 1, '系统监控'),
         (19, 'Redis', 0, 0, null, null, 1, '/monitor/redis/index.vue', null, 1, null, 18, '2023-07-11 20:21:28', null, 1, 1, 'Redis监控'),
         (20, 'Server', 0, 0, null, 'server', 1, '/monitor/server/index.vue', null, 1, null, 18, '2023-07-11 20:23:43', null, 1, 1, '服务器监控');
+        (21, 'SysUser', 0, 0, null, 'sys-user', 1, '/admin/user/index.vue', null, 1, null, 8, '2023-07-13 03:32:47', null, 1, 1, '用户管理');
 
 INSERT INTO fba.sys_role (id, name, data_scope, status, remark, created_time, updated_time)
 VALUES (1, 'test', 2, 1, null, '2023-06-26 17:13:45', null);
