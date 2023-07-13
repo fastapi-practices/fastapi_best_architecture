@@ -157,8 +157,8 @@ Execute tests via pytest
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px"/>
   </tr>
   <tr>
-    <td align="center">微信</td>
-    <td align="center">支付宝</td>
+    <td align="center">Wechat Pay</td>
+    <td align="center">Ali Pay</td>
   </tr>
 </table>
 
