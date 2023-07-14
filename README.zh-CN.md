@@ -131,7 +131,12 @@
 
    ```shell
    pytest -vs --disable-warnings
-   ```
+   ``` 
+
+## 贡献者
+
+<span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
+<span style="margin: 0 5px;" ><a href="https://github.com/downdawn" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
 
 ## 鸣谢
 
@@ -141,6 +146,21 @@
 - [Casbin](https://casbin.org/zh/)
 - [Ruff](https://beta.ruff.rs/docs/)
 - ......
+
+## 赞助
+
+> 如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励 :coffee:
+
+<table>
+  <tr>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px"/>
+  </tr>
+  <tr>
+    <td align="center">微信</td>
+    <td align="center">支付宝</td>
+  </tr>
+</table>
 
 ## 许可证
 

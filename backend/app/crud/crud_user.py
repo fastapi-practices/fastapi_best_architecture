@@ -11,7 +11,7 @@ from sqlalchemy.sql import Select
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import User, Role
-from backend.app.schemas.user import CreateUser, UpdateUser, Avatar
+from backend.app.schemas.user import CreateUser, UpdateUser, Avatar, UpdateUserRole
 
 
 class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
@@ -35,13 +35,15 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         role_list = []
         for role_id in create.roles:
             role_list.append(await db.get(Role, role_id))
-        new_user.roles.append(*role_list)
+        new_user.roles.extend(role_list)
         db.add(new_user)
 
     async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
-        user = await db.execute(
-            update(self.model).where(self.model.id == input_user.id).values(**obj.dict(exclude={'roles'}))
-        )
+        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.dict()))
+        return user.rowcount
+
+    @staticmethod
+    async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRole) -> None:
         # 删除用户所有角色
         for i in list(input_user.roles):
             input_user.roles.remove(i)
@@ -49,11 +51,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         role_list = []
         for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
-        input_user.roles.append(*role_list)
-        return user.rowcount
+        input_user.roles.extend(role_list)
 
     async def update_avatar(self, db: AsyncSession, current_user: User, avatar: Avatar) -> int:
-        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar))
+        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar.url))
         return user.rowcount
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
