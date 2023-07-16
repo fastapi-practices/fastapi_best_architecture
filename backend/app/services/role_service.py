@@ -20,8 +20,20 @@ class RoleService:
             return role
 
     @staticmethod
+    async def get_all() -> list[Role]:
+        async with async_db_session() as db:
+            roles = await RoleDao.get_all(db)
+            return roles
+
+    @staticmethod
+    async def get_user_all(*, pk: int) -> list[Role]:
+        async with async_db_session() as db:
+            roles = await RoleDao.get_user_all(db, user_id=pk)
+            return roles
+
+    @staticmethod
     async def get_select(*, name: str = None, data_scope: int = None) -> Select:
-        return await RoleDao.get_all(name=name, data_scope=data_scope)
+        return await RoleDao.get_list(name=name, data_scope=data_scope)
 
     @staticmethod
     async def create(*, obj: CreateRole) -> None:

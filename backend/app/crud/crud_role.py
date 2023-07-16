@@ -6,7 +6,7 @@ from sqlalchemy import select, update, delete, desc
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
-from backend.app.models import Role, Menu
+from backend.app.models import Role, Menu, User
 from backend.app.schemas.role import CreateRole, UpdateRole
 
 
@@ -20,7 +20,15 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         )
         return role.scalars().first()
 
-    async def get_all(self, name: str = None, data_scope: int = None):
+    async def get_all(self, db) -> list[Role]:
+        roles = await db.execute(select(self.model))
+        return roles.scalars().all()
+
+    async def get_user_all(self, db, user_id: int) -> list[Role]:
+        roles = await db.execute(select(self.model).join(self.model.users).where(User.id == user_id))
+        return roles.scalars().all()
+
+    async def get_list(self, name: str = None, data_scope: int = None):
         se = select(self.model).options(selectinload(self.model.menus)).order_by(desc(self.model.created_time))
         where_list = []
         if name:
