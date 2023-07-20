@@ -42,8 +42,9 @@ async def get_all_role_list(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     data_scope: Annotated[int | None, Query()] = None,
+    status: Annotated[int | None, Query()] = None,
 ):
-    role_select = await RoleService.get_select(name=name, data_scope=data_scope)
+    role_select = await RoleService.get_select(name=name, data_scope=data_scope, status=status)
     page_data = await paging_data(db, role_select, GetAllRole)
     return await response_base.success(data=page_data)
 
