@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Role, Menu, User
-from backend.app.schemas.role import CreateRole, UpdateRole
+from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
 
 
 class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
@@ -50,10 +50,10 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         rowcount = await self.update_(db, pk=role_id, obj_in=obj_in)
         return rowcount
 
-    async def update_menus(self, db, role_id: int, menu_ids: list[int]) -> int:
+    async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenu) -> int:
         current_role = await self.get_with_relation(db, role_id)
         # 更新菜单
-        menus = await db.execute(select(Menu).where(Menu.id.in_(menu_ids)))
+        menus = await db.execute(select(Menu).where(Menu.id.in_(menu_ids.menus)))
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
 

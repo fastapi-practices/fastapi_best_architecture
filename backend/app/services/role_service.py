@@ -7,7 +7,7 @@ from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import Role
-from backend.app.schemas.role import CreateRole, UpdateRole
+from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
 
 
 class RoleService:
@@ -57,12 +57,12 @@ class RoleService:
             return count
 
     @staticmethod
-    async def update_menus(*, pk: int, menu_ids: list[int]) -> int:
+    async def update_menus(*, pk: int, menu_ids: UpdateRoleMenu) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
-            for menu_id in menu_ids:
+            for menu_id in menu_ids.menus:
                 menu = await MenuDao.get(db, menu_id)
                 if not menu:
                     raise errors.NotFoundError(msg='菜单不存在')
