@@ -65,7 +65,7 @@ class RoleService:
             for menu_id in menu_ids:
                 menu = await MenuDao.get(db, menu_id)
                 if not menu:
-                    raise errors.ForbiddenError(msg='菜单不存在')
+                    raise errors.NotFoundError(msg='菜单不存在')
             count = await RoleDao.update_menus(db, pk, menu_ids)
             return count
 
