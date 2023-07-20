@@ -41,10 +41,6 @@ class RoleService:
             role = await RoleDao.get_by_name(db, obj.name)
             if role:
                 raise errors.ForbiddenError(msg='角色已存在')
-            for menu_id in obj.menus:
-                menu = await MenuDao.get(db, menu_id)
-                if not menu:
-                    raise errors.ForbiddenError(msg='菜单不存在')
             await RoleDao.create(db, obj)
 
     @staticmethod
@@ -57,11 +53,20 @@ class RoleService:
                 role = await RoleDao.get_by_name(db, obj.name)
                 if role:
                     raise errors.ForbiddenError(msg='角色已存在')
-            for menu_id in obj.menus:
+            count = await RoleDao.update(db, pk, obj)
+            return count
+
+    @staticmethod
+    async def update_menus(*, pk: int, menu_ids: list[int]) -> int:
+        async with async_db_session.begin() as db:
+            role = await RoleDao.get(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            for menu_id in menu_ids:
                 menu = await MenuDao.get(db, menu_id)
                 if not menu:
                     raise errors.ForbiddenError(msg='菜单不存在')
-            count = await RoleDao.update(db, pk, obj)
+            count = await RoleDao.update_menus(db, pk, menu_ids)
             return count
 
     @staticmethod

@@ -62,6 +62,14 @@ async def update_role(pk: int, obj: UpdateRole):
     return await response_base.fail()
 
 
+@router.put('/{pk}/menu', summary='更新角色菜单', dependencies=[DependsRBAC])
+async def update_role_menu(pk: int, menu_ids: list[int]):
+    count = await RoleService.update_menus(pk=pk, menu_ids=menu_ids)
+    if count > 0:
+        return await response_base.success()
+    return await response_base.fail()
+
+
 @router.delete('', summary='（批量）删除角色', dependencies=[DependsRBAC])
 async def delete_role(pk: Annotated[list[int], Query(...)]):
     count = await RoleService.delete(pk=pk)
