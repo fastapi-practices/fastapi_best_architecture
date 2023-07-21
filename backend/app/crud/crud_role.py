@@ -28,13 +28,15 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         roles = await db.execute(select(self.model).join(self.model.users).where(User.id == user_id))
         return roles.scalars().all()
 
-    async def get_list(self, name: str = None, data_scope: int = None):
+    async def get_list(self, name: str = None, data_scope: int = None, status: int = None):
         se = select(self.model).options(selectinload(self.model.menus)).order_by(desc(self.model.created_time))
         where_list = []
         if name:
             where_list.append(self.model.name.like(f'%{name}%'))
         if data_scope:
             where_list.append(self.model.data_scope == data_scope)
+        if status is not None:
+            where_list.append(self.model.status == status)
         if where_list:
             se = se.where(*where_list)
         return se

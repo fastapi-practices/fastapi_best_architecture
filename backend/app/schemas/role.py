@@ -11,7 +11,7 @@ from backend.app.schemas.menu import GetAllMenu
 
 class RoleBase(SchemaBase):
     name: str
-    data_scope: RoleDataScope = Field(default=RoleDataScope.custom, description='数据范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
+    data_scope: RoleDataScope = Field(default=RoleDataScope.custom, description='权限范围（1：全部数据权限 2：自定数据权限）')  # noqa: E501
     status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 
@@ -21,6 +21,10 @@ class CreateRole(RoleBase):
 
 
 class UpdateRole(RoleBase):
+    menus: list[int]
+
+
+class UpdateRoleMenu(SchemaBase):
     menus: list[int]
 
 
