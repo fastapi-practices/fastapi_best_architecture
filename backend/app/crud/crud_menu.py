@@ -30,10 +30,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
 
     async def get_role_menus(self, db, superuser: bool, menu_ids: list[int]) -> list[Menu]:
         se = select(self.model).order_by(asc(self.model.sort))
-        where_list = [
-            self.model.menu_type.in_([0, 1]),
-            self.model.status == 1,
-        ]
+        where_list = [self.model.menu_type.in_([0, 1])]
         if not superuser:
             where_list.append(self.model.id.in_(menu_ids))
         se = se.where(and_(*where_list))
