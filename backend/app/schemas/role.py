@@ -28,10 +28,6 @@ class UpdateRoleMenu(SchemaBase):
     menus: list[int]
 
 
-class UpdateRoleMenu(SchemaBase):
-    menus: list[int]
-
-
 class GetAllRole(RoleBase):
     id: int
     created_time: datetime
