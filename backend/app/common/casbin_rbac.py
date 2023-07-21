@@ -52,7 +52,9 @@ class RBAC:
             menu_perms = []
             for role in user_roles:
                 menu_perms.extend([menu.perms for menu in role.menus])
-            if not menu_perms or path_auth not in settings.MENU_EXCLUDE:
+            if path_auth in set(settings.MENU_EXCLUDE):
+                return
+            if path_auth not in set(menu_perms):
                 raise AuthorizationError
         else:
             # casbin 权限校验

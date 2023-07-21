@@ -17,10 +17,14 @@ class RoleBase(SchemaBase):
 
 
 class CreateRole(RoleBase):
-    menus: list[int]
+    pass
 
 
 class UpdateRole(RoleBase):
+    pass
+
+
+class UpdateRoleMenu(SchemaBase):
     menus: list[int]
 
 

@@ -17,13 +17,13 @@ the way to go
 But in python development, there is no universal standard for the concept of a three-tier architecture, so here I call
 it a pseudo three-tier architecture
 
-| workflow        | java           | fastapi_best_architecture |
-|-----------------|----------------|---------------------------|
-| view            | controller     | api                       |
-| data validation | dto            | schema                    |
-| business logic  | service + impl | service                   |
-| data access     | dao / mapper   | crud                      |
-| model           | model / entity | model                     |
+| workflow       | java           | fastapi_best_architecture |
+|----------------|----------------|---------------------------|
+| view           | controller     | api                       |
+| data transmit  | dto            | schema                    |
+| business logic | service + impl | service                   |
+| data access    | dao / mapper   | crud                      |
+| model          | model / entity | model                     |
 
 ## Features
 

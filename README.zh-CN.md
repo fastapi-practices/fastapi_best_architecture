@@ -17,7 +17,7 @@
 | 工作流程 | java           | fastapi_best_architecture |
 |------|----------------|---------------------------|
 | 视图   | controller     | api                       |
-| 数据验证 | dto            | schema                    |
+| 数据传输 | dto            | schema                    |
 | 业务逻辑 | service + impl | service                   |
 | 数据访问 | dao / mapper   | crud                      |
 | 模型   | model / entity | model                     |

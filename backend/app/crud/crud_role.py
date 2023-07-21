@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from sqlalchemy import select, update, delete, desc
+from sqlalchemy import select, delete, desc
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Role, Menu, User
-from backend.app.schemas.role import CreateRole, UpdateRole
+from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
 
 
 class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
@@ -46,20 +46,18 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         return role.scalars().first()
 
     async def create(self, db, obj_in: CreateRole) -> NoReturn:
-        new_role = self.model(**obj_in.dict(exclude={'menus'}))
-        menus = await db.execute(select(Menu).where(Menu.id.in_(obj_in.menus)))
-        new_role.menus = menus.scalars().all()
-        db.add(new_role)
+        await self.create_(db, obj_in)
 
     async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:
-        role = await db.execute(
-            update(self.model).where(self.model.id == role_id).values(**obj_in.dict(exclude={'menus'}))
-        )
+        rowcount = await self.update_(db, pk=role_id, obj_in=obj_in)
+        return rowcount
+
+    async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenu) -> int:
         current_role = await self.get_with_relation(db, role_id)
         # 更新菜单
-        menus = await db.execute(select(Menu).where(Menu.id.in_(obj_in.menus)))
+        menus = await db.execute(select(Menu).where(Menu.id.in_(menu_ids.menus)))
         current_role.menus = menus.scalars().all()
-        return role.rowcount
+        return len(current_role.menus)
 
     async def delete(self, db, role_id: list[int]) -> int:
         roles = await db.execute(delete(self.model).where(self.model.id.in_(role_id)))

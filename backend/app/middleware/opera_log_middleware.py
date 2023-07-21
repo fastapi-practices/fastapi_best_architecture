@@ -159,6 +159,12 @@ class OperaLogMiddleware:
             body_data = await request.body()
             if body_data:
                 json_data = await request.json()
+                if not isinstance(json_data, dict):
+                    json_data = {
+                        f'{type(json_data)}_to_dict_data': json_data.decode('utf-8')
+                        if isinstance(json_data, bytes)
+                        else json_data
+                    }
                 args.update(json_data)
         return args
 
