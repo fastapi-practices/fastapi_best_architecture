@@ -10,6 +10,7 @@ from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.role import GetAllRole, CreateRole, UpdateRole, UpdateRoleMenu
+from backend.app.services.menu_service import MenuService
 from backend.app.services.role_service import RoleService
 from backend.app.utils.serializers import select_to_json, select_to_list
 
@@ -28,6 +29,12 @@ async def get_user_all_roles(pk: int):
     roles = await RoleService.get_user_all(pk=pk)
     data = select_to_list(roles)
     return await response_base.success(data=data)
+
+
+@router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
+async def get_role_all_menus(pk: int):
+    menu = await MenuService.get_role_menu_tree(pk=pk)
+    return await response_base.success(data=menu)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])

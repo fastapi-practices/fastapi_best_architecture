@@ -35,11 +35,6 @@ async def get_all_menus(
     menu = await MenuService.get_menu_tree(title=title, status=status)
     return await response_base.success(data=menu)
 
-@router.get('/{pk}/all', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
-async def get_role_all_menus(pk: int):
-    menu = await MenuService.get_role_menu_tree(pk=pk)
-    return await response_base.success(data=menu)
-
 
 @router.post('', summary='创建菜单', dependencies=[DependsRBAC])
 async def create_menu(obj: CreateMenu):
