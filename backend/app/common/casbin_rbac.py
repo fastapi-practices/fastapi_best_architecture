@@ -4,6 +4,7 @@ import casbin
 import casbin_async_sqlalchemy_adapter
 from fastapi import Request, Depends
 
+from backend.app.common.enums import StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.core.conf import settings
@@ -43,6 +44,8 @@ class RBAC:
             return
         # 检测角色数据权限范围
         user_roles = request.user.roles
+        if not user_roles:
+            raise AuthorizationError(msg='用户未分配角色，授权失败')
         data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
@@ -50,16 +53,27 @@ class RBAC:
             # 菜单权限校验
             path_auth = request.url.path.replace(f'{settings.API_V1_STR}', '').replace('/', ':')
             menu_perms = []
+            forbid_menu_perms = []
             for role in user_roles:
-                menu_perms.extend([menu.perms for menu in role.menus])
+                for menu in role.menus:
+                    menu_perms.append(menu.perms) if menu.status == StatusType.enable else forbid_menu_perms.append(
+                        menu.perms
+                    )
             if path_auth in set(settings.MENU_EXCLUDE):
                 return
-            if path_auth not in set(menu_perms):
+            if path_auth in set([perm for perms_str in forbid_menu_perms for perm in perms_str.split(',')]):
+                raise AuthorizationError(msg='菜单已禁用，授权失败')
+            if path_auth not in set([perm for perms_str in menu_perms for perm in perms_str.split(',')]):
                 raise AuthorizationError
         else:
             # casbin 权限校验
             method = request.method
             path = request.url.path
+            forbid_menu_path = [
+                menu.path for role in user_roles for menu in role.menus if menu.status == StatusType.disable
+            ]
+            if path.split('/')[-1] in forbid_menu_path:
+                raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return
             user_uuid = request.user.uuid

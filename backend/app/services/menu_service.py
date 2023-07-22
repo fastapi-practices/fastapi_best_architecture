@@ -3,6 +3,7 @@
 from fastapi import Request
 from backend.app.common.exception import errors
 from backend.app.crud.crud_menu import MenuDao
+from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.schemas.menu import CreateMenu, UpdateMenu
 from backend.app.utils.build_tree import get_tree_data
@@ -21,6 +22,17 @@ class MenuService:
     async def get_menu_tree(*, title: str | None = None, status: int | None = None):
         async with async_db_session() as db:
             menu_select = await MenuDao.get_all(db, title=title, status=status)
+            menu_tree = await get_tree_data(menu_select)
+            return menu_tree
+
+    @staticmethod
+    async def get_role_menu_tree(*, pk: int):
+        async with async_db_session() as db:
+            role = await RoleDao.get_with_relation(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            menu_ids = [menu.id for menu in role.menus]
+            menu_select = await MenuDao.get_role_menus(db, False, menu_ids)
             menu_tree = await get_tree_data(menu_select)
             return menu_tree
 
