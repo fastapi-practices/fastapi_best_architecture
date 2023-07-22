@@ -69,6 +69,11 @@ class RBAC:
             # casbin 权限校验
             method = request.method
             path = request.url.path
+            forbid_menu_path = [
+                menu.path for role in user_roles for menu in role.menus if menu.status == StatusType.disable
+            ]
+            if path.split('/')[-1] in forbid_menu_path:
+                raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return
             user_uuid = request.user.uuid
