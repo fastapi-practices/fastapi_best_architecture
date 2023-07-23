@@ -15,7 +15,7 @@ class MenuBase(SchemaBase):
     sort: int = Field(default=0, ge=0, description='排序')
     icon: str | None = None
     path: str | None = None
-    menu_type: MenuType = Field(default=MenuType.directory, ge=0, description='菜单类型（0目录 1菜单 2按钮）')
+    menu_type: MenuType = Field(default=MenuType.directory, description='菜单类型（0目录 1菜单 2按钮）')
     component: str | None = None
     perms: str | None = None
     status: StatusType = Field(default=StatusType.enable)
