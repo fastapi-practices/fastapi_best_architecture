@@ -33,7 +33,7 @@ class MenuType(IntEnum):
     button = 2
 
 
-class RoleDataScope(IntEnum):
+class RoleDataScopeType(IntEnum):
     """数据范围"""
 
     all = 1
@@ -50,7 +50,7 @@ class MethodType(StrEnum):
     PATCH = 'PATCH'
 
 
-class LoginLogStatus(IntEnum):
+class LoginLogStatusType(IntEnum):
     """登陆日志状态"""
 
     fail = 0

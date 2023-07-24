@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette.background import BackgroundTasks, BackgroundTask
 
 from backend.app.common import jwt
-from backend.app.common.enums import LoginLogStatus
+from backend.app.common.enums import LoginLogStatusType
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
@@ -72,7 +72,7 @@ class AuthService:
                     request=request,
                     user=current_user,
                     login_time=self.login_time,
-                    status=LoginLogStatus.fail.value,
+                    status=LoginLogStatusType.fail.value,
                     msg=e.msg,
                 )
                 task = BackgroundTask(LoginLogService.create, **err_log_info)
@@ -85,7 +85,7 @@ class AuthService:
                     request=request,
                     user=user,
                     login_time=self.login_time,
-                    status=LoginLogStatus.success.value,
+                    status=LoginLogStatusType.success.value,
                     msg='登录成功',
                 )
                 background_tasks.add_task(LoginLogService.create, **log_info)
