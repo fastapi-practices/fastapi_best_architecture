@@ -128,8 +128,9 @@ Execute tests via pytest
    cd backend/app/
    ```
 
-3. Initialize the test data using the `backend/sql/init_test_data.sql` file
-4. Execute the test command
+3. Using `backend/sql/create_tables.sql` file to create database tables
+4. Initialize the test data using the `backend/sql/init_test_data.sql` file
+5. Execute the test command
 
    ```shell
    pytest -vs --disable-warnings

@@ -49,8 +49,7 @@ CREATE TABLE sys_dept
     created_time DATETIME    NOT NULL COMMENT '创建时间',
     updated_time DATETIME COMMENT '更新时间',
     PRIMARY KEY (id),
-    FOREIGN KEY (parent_id) REFERENCES sys_dept (id) ON DELETE SET NULL,
-    UNIQUE (name)
+    FOREIGN KEY (parent_id) REFERENCES sys_dept (id) ON DELETE SET NULL
 );
 
 CREATE INDEX ix_sys_dept_id ON sys_dept (id);
@@ -98,8 +97,8 @@ CREATE INDEX ix_sys_login_log_id ON sys_login_log (id);
 CREATE TABLE sys_menu
 (
     id           INTEGER     NOT NULL AUTO_INCREMENT,
+    title        VARCHAR(50) NOT NULL COMMENT '菜单标题',
     name         VARCHAR(50) NOT NULL COMMENT '菜单名称',
-    title        varchar(50)  not null comment '菜单标题',
     level        INTEGER     NOT NULL COMMENT '菜单层级',
     sort         INTEGER     NOT NULL COMMENT '排序',
     icon         VARCHAR(100) COMMENT '菜单图标',
@@ -108,15 +107,15 @@ CREATE TABLE sys_menu
     component    VARCHAR(255) COMMENT '组件路径',
     perms        VARCHAR(100) COMMENT '权限标识',
     status       INTEGER     NOT NULL COMMENT '菜单状态（0停用 1正常）',
-    `show`       INTEGER     NOT NULL comment '是否显示（0否 1是）',
-    cache        INTEGER     NOT NULL comment '是否缓存（0否 1是）',
+    `show`       INTEGER     NOT NULL COMMENT '是否显示（0否 1是）',
+    cache        INTEGER     NOT NULL COMMENT '是否缓存（0否 1是）',
     remark       LONGTEXT COMMENT '备注',
     parent_id    INTEGER COMMENT '父菜单ID',
     created_time DATETIME    NOT NULL COMMENT '创建时间',
     updated_time DATETIME COMMENT '更新时间',
     PRIMARY KEY (id),
     FOREIGN KEY (parent_id) REFERENCES sys_menu (id) ON DELETE SET NULL,
-    UNIQUE (name)
+    UNIQUE (title)
 );
 
 CREATE INDEX ix_sys_menu_id ON sys_menu (id);
@@ -154,7 +153,7 @@ CREATE TABLE sys_role
 (
     id           INTEGER     NOT NULL AUTO_INCREMENT,
     name         VARCHAR(20) NOT NULL COMMENT '角色名称',
-    data_scope   INTEGER COMMENT '数据范围（1：全部数据权限 2：自定数据权限）',
+    data_scope   INTEGER COMMENT '权限范围（1：全部数据权限 2：自定义数据权限）',
     status       INTEGER     NOT NULL COMMENT '角色状态（0停用 1正常）',
     remark       LONGTEXT COMMENT '备注',
     created_time DATETIME    NOT NULL COMMENT '创建时间',
