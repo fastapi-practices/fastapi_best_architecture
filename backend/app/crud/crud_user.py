@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import NoReturn
 
+from fast_captcha import text_captcha
 from sqlalchemy import select, update, desc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -29,11 +30,14 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, create: CreateUser) -> NoReturn:
-        create.password = await jwt.get_hash_password(create.password + create.salt)
-        new_user = self.model(**create.dict(exclude={'roles'}))
+    async def create(self, db: AsyncSession, obj: CreateUser) -> NoReturn:
+        salt = text_captcha(5)
+        obj.password = await jwt.get_hash_password(obj.password + salt)
+        dict_obj = obj.dict(exclude={'roles'})
+        dict_obj.update({'salt': salt})
+        new_user = self.model(**dict_obj)
         role_list = []
-        for role_id in create.roles:
+        for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
         db.add(new_user)

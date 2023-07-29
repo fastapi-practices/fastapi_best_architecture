@@ -3,7 +3,6 @@
 from datetime import datetime
 
 from email_validator import validate_email, EmailNotValidError
-from fast_captcha import text_captcha
 from pydantic import HttpUrl, Field, validator, root_validator
 
 from backend.app.common.enums import StatusType
@@ -26,7 +25,6 @@ class CreateUser(Auth):
     roles: list[int]
     nickname: str
     email: str = Field(..., example='user@example.com')
-    salt: str = Field(default_factory=lambda x: text_captcha(5))
 
     @validator('email')
     def email_validate(cls, v):
