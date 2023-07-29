@@ -26,8 +26,8 @@ VALUES (1, 'test', 2, 1, null, '2023-06-26 17:13:45', null);
 INSERT INTO fba.sys_role_menu (id, role_id, menu_id)
 VALUES (1, 1, 1);
 
-INSERT INTO fba.sys_user (id, uuid, username, nickname, password, email, is_superuser, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
-VALUES (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'test', 'test', '$2b$12$TpdL7kKriqhpJHSBMT.Fr.hJNBx5SdUybi.NT1DV5MojYpV9PpRre', 'test@gmail.com', 1, 1, 0, null, null, '2023-06-26 17:13:45', null, 1, '2023-06-26 17:13:45', null);
+INSERT INTO fba.sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
+VALUES (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'test', 'test', '$2b$12$eYLKJttq2/e66er1VK7NFezNIYkAu.XTGrJppJpqOW1DHmbcBf5ou', 'NvxNx', 'test@example.com', 1, 1, 1, 0, null, null, '2023-06-26 17:13:45', null, 1, '2023-06-26 17:13:45', null);
 
 INSERT INTO fba.sys_user_role (id, user_id, role_id)
 VALUES (1, 1, 1);
