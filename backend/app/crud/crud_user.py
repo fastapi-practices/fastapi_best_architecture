@@ -33,8 +33,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         create.password = await jwt.get_hash_password(create.password)
         new_user = self.model(**create.dict(exclude={'roles'}))
         role_list = []
-        for role_id in create.roles:
-            role_list.append(await db.get(Role, role_id))
+        if create.roles:
+            for role_id in create.roles:
+                role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
         db.add(new_user)
 
