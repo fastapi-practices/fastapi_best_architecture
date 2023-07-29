@@ -129,6 +129,18 @@ class UserService:
                 return count
 
     @staticmethod
+    async def update_staff(*, request: Request, pk: int) -> int:
+        async with async_db_session.begin() as db:
+            await jwt.superuser_verify(request)
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
+                if pk == request.user.id:
+                    raise errors.ForbiddenError(msg='禁止修改自身后台登陆权限')
+                count = await UserDao.set_staff(db, pk)
+                return count
+
+    @staticmethod
     async def update_status(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await jwt.superuser_verify(request)

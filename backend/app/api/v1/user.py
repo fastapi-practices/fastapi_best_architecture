@@ -94,6 +94,14 @@ async def super_set(request: Request, pk: int):
     return await response_base.fail()
 
 
+@router.put('/{pk}/staff', summary='修改用户后台登录权限', dependencies=[DependsRBAC])
+async def staff_set(request: Request, pk: int):
+    count = await UserService.update_staff(request=request, pk=pk)
+    if count > 0:
+        return await response_base.success()
+    return await response_base.fail()
+
+
 @router.put('/{pk}/status', summary='修改用户状态', dependencies=[DependsRBAC])
 async def status_set(request: Request, pk: int):
     count = await UserService.update_status(request=request, pk=pk)

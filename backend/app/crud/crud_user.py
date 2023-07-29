@@ -98,6 +98,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         user = await self.get(db, user_id)
         return user.is_superuser
 
+    async def get_staff(self, db: AsyncSession, user_id: int) -> bool:
+        user = await self.get(db, user_id)
+        return user.is_staff
+
     async def get_status(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get(db, user_id)
         return user.status
@@ -110,6 +114,13 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         super_status = await self.get_super(db, user_id)
         user = await db.execute(
             update(self.model).where(self.model.id == user_id).values(is_superuser=False if super_status else True)
+        )
+        return user.rowcount
+
+    async def set_staff(self, db: AsyncSession, user_id: int) -> int:
+        staff_status = await self.get_staff(db, user_id)
+        user = await db.execute(
+            update(self.model).where(self.model.id == user_id).values(is_staff=False if staff_status else True)
         )
         return user.rowcount
 
