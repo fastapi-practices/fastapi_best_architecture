@@ -30,7 +30,7 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         return user.rowcount
 
     async def create(self, db: AsyncSession, create: CreateUser) -> NoReturn:
-        create.password = await jwt.get_hash_password(create.password)
+        create.password = await jwt.get_hash_password(create.password + create.salt)
         new_user = self.model(**create.dict(exclude={'roles'}))
         role_list = []
         for role_id in create.roles:
@@ -64,9 +64,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         mail = await db.execute(select(self.model).where(self.model.email == email))
         return mail.scalars().first()
 
-    async def reset_password(self, db: AsyncSession, pk: int, password: str) -> int:
+    async def reset_password(self, db: AsyncSession, pk: int, password: str, salt: str) -> int:
         user = await db.execute(
-            update(self.model).where(self.model.id == pk).values(password=await jwt.get_hash_password(password))
+            update(self.model).where(self.model.id == pk).values(password=await jwt.get_hash_password(password + salt))
         )
         return user.rowcount
 

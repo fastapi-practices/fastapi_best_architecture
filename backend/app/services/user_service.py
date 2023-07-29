@@ -40,14 +40,14 @@ class UserService:
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
-            iop = obj.old_password
-            if not await password_verify(iop, request.user.password):
+            op = obj.old_password
+            if not await password_verify(op + request.user.salt, request.user.password):
                 raise errors.ForbiddenError(msg='旧密码错误')
             np1 = obj.new_password
             np2 = obj.confirm_password
             if np1 != np2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await UserDao.reset_password(db, request.user.id, obj.new_password)
+            count = await UserDao.reset_password(db, request.user.id, obj.new_password, request.user.salt)
             prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
