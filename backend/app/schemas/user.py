@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import random
 from datetime import datetime
 
 from email_validator import validate_email, EmailNotValidError
@@ -22,8 +23,8 @@ class AuthLogin(Auth):
 
 class CreateUser(Auth):
     dept_id: int | None = None
-    roles: list[int]
-    nickname: str
+    roles: list[int] | None = None
+    nickname: str = Field(f'用户{random.randrange(10000, 99999)}')
     email: str = Field(..., example='user@example.com')
 
     @validator('email')
