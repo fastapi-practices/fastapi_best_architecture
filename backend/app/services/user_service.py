@@ -10,7 +10,6 @@ from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token, password_verify
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
-from backend.app.crud.crud_dept import DeptDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
@@ -28,13 +27,6 @@ class UserService:
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
-            dept = await DeptDao.get(db, obj.dept_id)
-            if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
-            for role_id in obj.roles:
-                role = await RoleDao.get(db, role_id)
-                if not role:
-                    raise errors.NotFoundError(msg='角色不存在')
             await UserDao.create(db, obj)
 
     @staticmethod
@@ -79,9 +71,6 @@ class UserService:
                 email = await UserDao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='该邮箱已注册')
-            dept = await DeptDao.get(db, obj.dept_id)
-            if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
             count = await UserDao.update_userinfo(db, input_user, obj)
             return count
 
