@@ -205,7 +205,7 @@ CREATE TABLE sys_user
     salt            VARCHAR(5)   NOT NULL COMMENT '加密盐',
     email           VARCHAR(50)  NOT NULL COMMENT '邮箱',
     is_superuser    BOOL         NOT NULL COMMENT '超级权限(0否 1是)',
-    is_staff        BOOL         NOT NULL COMMENT '后台登陆(0否 1是)',
+    is_staff        BOOL         NOT NULL COMMENT '后台管理登陆(0否 1是)',
     status          INTEGER      NOT NULL COMMENT '用户账号状态(0停用 1正常)',
     is_multi_login  BOOL         NOT NULL COMMENT '是否重复登陆(0否 1是)',
     avatar          VARCHAR(255) COMMENT '头像',
