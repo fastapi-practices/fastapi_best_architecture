@@ -136,7 +136,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             else:
                 if pk == request.user.id:
-                    raise errors.ForbiddenError(msg='禁止修改自身后台登陆权限')
+                    raise errors.ForbiddenError(msg='禁止修改自身后台管理登陆权限')
                 count = await UserDao.set_staff(db, pk)
                 return count
 
