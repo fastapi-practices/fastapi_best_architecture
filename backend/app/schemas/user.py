@@ -21,9 +21,22 @@ class AuthLogin(Auth):
     captcha: str
 
 
-class CreateUser(Auth):
-    dept_id: int | None = None
-    roles: list[int] | None = None
+class RegisterUser(Auth):
+    nickname: str = Field(f'用户{random.randrange(10000, 99999)}')
+    email: str = Field(..., example='user@example.com')
+
+    @validator('email')
+    def email_validate(cls, v):
+        try:
+            validate_email(v, check_deliverability=False).email
+        except EmailNotValidError:
+            raise ValueError('邮箱格式错误')
+        return v
+
+
+class AddUser(Auth):
+    dept_id: int
+    roles: list[int]
     nickname: str = Field(f'用户{random.randrange(10000, 99999)}')
     email: str = Field(..., example='user@example.com')
 
