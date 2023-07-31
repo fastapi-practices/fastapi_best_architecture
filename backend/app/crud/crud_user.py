@@ -12,15 +12,19 @@ from sqlalchemy.sql import Select
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import User, Role
-from backend.app.schemas.user import CreateUser, UpdateUser, Avatar, UpdateUserRole
+from backend.app.schemas.user import RegisterUser, UpdateUser, Avatar, UpdateUserRole, AddUser
 
 
-class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
+class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
         return await self.get_(db, pk=user_id)
 
     async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
         user = await db.execute(select(self.model).where(self.model.username == username))
+        return user.scalars().first()
+
+    async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
+        user = await db.execute(select(self.model).where(self.model.nickname == nickname))
         return user.scalars().first()
 
     async def update_login_time(self, db: AsyncSession, username: str, login_time: datetime) -> int:
@@ -30,7 +34,15 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, obj: CreateUser) -> NoReturn:
+    async def create(self, db: AsyncSession, obj: RegisterUser) -> NoReturn:
+        salt = text_captcha(5)
+        obj.password = await jwt.get_hash_password(obj.password + salt)
+        dict_obj = obj.dict()
+        dict_obj.update({'salt': salt})
+        new_user = self.model(**dict_obj)
+        db.add(new_user)
+
+    async def add(self, db: AsyncSession, obj: AddUser) -> NoReturn:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.dict(exclude={'roles'})

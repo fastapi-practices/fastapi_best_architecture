@@ -10,13 +10,14 @@ from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import (
-    CreateUser,
+    RegisterUser,
     GetAllUserInfo,
     ResetPassword,
     UpdateUser,
     Avatar,
     GetCurrentUserInfo,
     UpdateUserRole,
+    AddUser,
 )
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
@@ -25,8 +26,14 @@ router = APIRouter()
 
 
 @router.post('/register', summary='用户注册')
-async def user_register(obj: CreateUser):
+async def user_register(obj: RegisterUser):
     await UserService.register(obj=obj)
+    return await response_base.success()
+
+
+@router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
+async def add_user(obj: AddUser):
+    await UserService.add(obj=obj)
     return await response_base.success()
 
 

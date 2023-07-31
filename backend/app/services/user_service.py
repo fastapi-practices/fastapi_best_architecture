@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
-
 from fastapi import Request
 from sqlalchemy import Select
 
@@ -15,19 +13,33 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import CreateUser, ResetPassword, UpdateUser, Avatar, UpdateUserRole
+from backend.app.schemas.user import RegisterUser, ResetPassword, UpdateUser, Avatar, UpdateUserRole, AddUser
 
 
 class UserService:
     @staticmethod
-    async def register(*, obj: CreateUser) -> NoReturn:
+    async def register(*, obj: RegisterUser) -> None:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
+            nickname = await UserDao.get_by_nickname(db, obj.nickname)
+            if nickname:
+                raise errors.ForbiddenError(msg='该昵称已注册')
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
+            await UserDao.create(db, obj)
+
+    @staticmethod
+    async def add(*, obj: AddUser) -> None:
+        async with async_db_session.begin() as db:
+            username = await UserDao.get_by_username(db, obj.username)
+            if username:
+                raise errors.ForbiddenError(msg='该用户名已注册')
+            nickname = await UserDao.get_by_nickname(db, obj.nickname)
+            if nickname:
+                raise errors.ForbiddenError(msg='该昵称已注册')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -35,7 +47,10 @@ class UserService:
                 role = await RoleDao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
-            await UserDao.create(db, obj)
+            email = await UserDao.check_email(db, obj.email)
+            if email:
+                raise errors.ForbiddenError(msg='该邮箱已注册')
+            await UserDao.add(db, obj)
 
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
@@ -72,16 +87,17 @@ class UserService:
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             if input_user.username != obj.username:
-                username = await UserDao.get_by_username(db, obj.username)
-                if username:
+                _username = await UserDao.get_by_username(db, obj.username)
+                if _username:
                     raise errors.ForbiddenError(msg='该用户名已存在')
+            if input_user.nickname != obj.nickname:
+                nickname = await UserDao.get_by_nickname(db, obj.nickname)
+                if nickname:
+                    raise errors.ForbiddenError(msg='改昵称已存在')
             if input_user.email != obj.email:
                 email = await UserDao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='该邮箱已注册')
-            dept = await DeptDao.get(db, obj.dept_id)
-            if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
             count = await UserDao.update_userinfo(db, input_user, obj)
             return count
 
