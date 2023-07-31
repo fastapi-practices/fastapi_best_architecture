@@ -45,6 +45,8 @@ class RBAC:
         user_roles = request.user.roles
         if not user_roles:
             raise AuthorizationError(msg='用户未分配角色，授权失败')
+        if not any(len(role.menus) > 0 for role in user_roles):
+            raise AuthorizationError(msg='用户所属角色未分配菜单，授权失败')
         if not request.user.is_staff:
             raise AuthorizationError(msg='此用户已被禁止后台管理操作')
         data_scope = any(role.data_scope == 1 for role in user_roles)
