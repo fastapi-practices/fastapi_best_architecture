@@ -15,16 +15,15 @@ from backend.app.models.sys_casbin_rule import CasbinRule
 
 class RBAC:
     @staticmethod
-    def enforcer() -> casbin.Enforcer:
+    async def enforcer() -> casbin.Enforcer:
         """
         获取 casbin 执行器
 
         :return:
         """
         adapter = casbin_async_sqlalchemy_adapter.Adapter(async_engine, db_class=CasbinRule)
-
         enforcer = casbin.Enforcer(RBAC_MODEL_CONF, adapter)
-
+        await enforcer.load_policy()
         return enforcer
 
     async def rbac_verify(self, request: Request, _: dict = DependsJwtAuth) -> None:
@@ -79,12 +78,11 @@ class RBAC:
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return
             user_uuid = request.user.uuid
-            enforcer = self.enforcer()
+            enforcer = await self.enforcer()
             if not enforcer.enforce(user_uuid, path, method):
                 raise AuthorizationError
 
 
 RBAC = RBAC()
-RbacEnforcer = RBAC.enforcer()
 # RBAC 授权依赖注入
 DependsRBAC = Depends(RBAC.rbac_verify)

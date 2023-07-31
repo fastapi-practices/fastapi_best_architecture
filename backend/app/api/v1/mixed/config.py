@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Request
 from fastapi.routing import APIRoute
 
-from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
 
