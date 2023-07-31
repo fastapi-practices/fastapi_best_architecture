@@ -31,7 +31,7 @@ async def user_register(obj: RegisterUser):
     return await response_base.success()
 
 
-@router.post('/add', summary='添加用户')
+@router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
 async def add_user(obj: AddUser):
     await UserService.add(obj=obj)
     return await response_base.success()
