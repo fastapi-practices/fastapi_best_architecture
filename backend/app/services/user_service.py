@@ -38,7 +38,7 @@ class UserService:
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
             nickname = await UserDao.get_by_nickname(db, obj.nickname)
-            if not nickname:
+            if nickname:
                 raise errors.ForbiddenError(msg='该昵称已注册')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
