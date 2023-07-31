@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import NoReturn
 
+from fast_captcha import text_captcha
 from sqlalchemy import select, update, desc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -29,13 +30,15 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, create: CreateUser) -> NoReturn:
-        create.password = await jwt.get_hash_password(create.password)
-        new_user = self.model(**create.dict(exclude={'roles'}))
+    async def create(self, db: AsyncSession, obj: CreateUser) -> NoReturn:
+        salt = text_captcha(5)
+        obj.password = await jwt.get_hash_password(obj.password + salt)
+        dict_obj = obj.dict(exclude={'roles'})
+        dict_obj.update({'salt': salt})
+        new_user = self.model(**dict_obj)
         role_list = []
-        if create.roles:
-            for role_id in create.roles:
-                role_list.append(await db.get(Role, role_id))
+        for role_id in obj.roles:
+            role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
         db.add(new_user)
 
@@ -65,9 +68,9 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         mail = await db.execute(select(self.model).where(self.model.email == email))
         return mail.scalars().first()
 
-    async def reset_password(self, db: AsyncSession, pk: int, password: str) -> int:
+    async def reset_password(self, db: AsyncSession, pk: int, password: str, salt: str) -> int:
         user = await db.execute(
-            update(self.model).where(self.model.id == pk).values(password=await jwt.get_hash_password(password))
+            update(self.model).where(self.model.id == pk).values(password=await jwt.get_hash_password(password + salt))
         )
         return user.rowcount
 
@@ -95,6 +98,10 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         user = await self.get(db, user_id)
         return user.is_superuser
 
+    async def get_staff(self, db: AsyncSession, user_id: int) -> bool:
+        user = await self.get(db, user_id)
+        return user.is_staff
+
     async def get_status(self, db: AsyncSession, user_id: int) -> bool:
         user = await self.get(db, user_id)
         return user.status
@@ -107,6 +114,13 @@ class CRUDUser(CRUDBase[User, CreateUser, UpdateUser]):
         super_status = await self.get_super(db, user_id)
         user = await db.execute(
             update(self.model).where(self.model.id == user_id).values(is_superuser=False if super_status else True)
+        )
+        return user.rowcount
+
+    async def set_staff(self, db: AsyncSession, user_id: int) -> int:
+        staff_status = await self.get_staff(db, user_id)
+        user = await db.execute(
+            update(self.model).where(self.model.id == user_id).values(is_staff=False if staff_status else True)
         )
         return user.rowcount
 
