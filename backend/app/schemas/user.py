@@ -90,6 +90,7 @@ class GetUserInfoNoRelation(_UserInfoBase):
     avatar: str | None = None
     status: StatusType = Field(default=StatusType.enable)
     is_superuser: bool
+    is_staff: bool
     is_multi_login: bool
     join_time: datetime = None
     last_login_time: datetime | None = None

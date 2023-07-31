@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import paging_data, PageDepends
 from backend.app.common.response.response_schema import response_base

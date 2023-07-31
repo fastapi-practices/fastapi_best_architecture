@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.app.common.casbin_rbac import DependsRBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
 from backend.app.common.response.response_schema import response_base
@@ -66,7 +66,7 @@ async def delete_policy(p: DeletePolicy):
     return await response_base.success(data=data)
 
 
-@router.get('/group', summary='获取所有组访问权限规则', dependencies=[DependsRBAC])
+@router.get('/group', summary='获取所有组访问权限规则', dependencies=[DependsJwtAuth])
 async def get_all_groups():
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
