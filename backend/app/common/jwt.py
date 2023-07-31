@@ -195,6 +195,8 @@ def superuser_verify(request: Request) -> bool:
     is_superuser = request.user.is_superuser
     if not is_superuser:
         raise AuthorizationError(msg='仅管理员有权操作')
+    if not request.user.is_staff:
+        raise AuthorizationError(msg='此管理员已被禁止后台管理操作')
     return is_superuser
 
 

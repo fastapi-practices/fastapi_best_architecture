@@ -29,7 +29,7 @@ class AuthService:
             current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not await jwt.password_verify(form_data.password, current_user.password):
+            elif not await jwt.password_verify(form_data.password + current_user.salt, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
@@ -47,7 +47,7 @@ class AuthService:
                 current_user = await UserDao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户不存在')
-                elif not await jwt.password_verify(obj.password, current_user.password):
+                elif not await jwt.password_verify(obj.password + current_user.salt, current_user.password):
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')

@@ -40,14 +40,14 @@ class UserService:
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
         async with async_db_session.begin() as db:
-            iop = obj.old_password
-            if not await password_verify(iop, request.user.password):
+            op = obj.old_password
+            if not await password_verify(op + request.user.salt, request.user.password):
                 raise errors.ForbiddenError(msg='旧密码错误')
             np1 = obj.new_password
             np2 = obj.confirm_password
             if np1 != np2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await UserDao.reset_password(db, request.user.id, obj.new_password)
+            count = await UserDao.reset_password(db, request.user.id, obj.new_password, request.user.salt)
             prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
@@ -126,6 +126,18 @@ class UserService:
                 if pk == request.user.id:
                     raise errors.ForbiddenError(msg='禁止修改自身管理员权限')
                 count = await UserDao.set_super(db, pk)
+                return count
+
+    @staticmethod
+    async def update_staff(*, request: Request, pk: int) -> int:
+        async with async_db_session.begin() as db:
+            await jwt.superuser_verify(request)
+            if not await UserDao.get(db, pk):
+                raise errors.NotFoundError(msg='用户不存在')
+            else:
+                if pk == request.user.id:
+                    raise errors.ForbiddenError(msg='禁止修改自身后台管理登陆权限')
+                count = await UserDao.set_staff(db, pk)
                 return count
 
     @staticmethod
