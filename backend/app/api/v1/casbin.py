@@ -66,7 +66,7 @@ async def delete_policy(p: DeletePolicy):
     return await response_base.success(data=data)
 
 
-@router.get('/group', summary='获取所有组访问权限规则', dependencies=[DependsRBAC])
+@router.get('/group', summary='获取所有组访问权限规则', dependencies=[DependsJwtAuth])
 async def get_all_groups():
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
