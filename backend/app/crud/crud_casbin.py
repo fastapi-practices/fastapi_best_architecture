@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, select, and_
+from sqlalchemy import Select, select, and_, delete, or_
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import CasbinRule
-from backend.app.schemas.casbin_rule import CreatePolicy, UpdatePolicy
+from backend.app.schemas.casbin_rule import CreatePolicy, UpdatePolicy, DeleteAllPolicies, DeleteAllUserRoles
 
 
 class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
@@ -18,6 +19,18 @@ class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
         if where_list:
             se = se.where(and_(*where_list))
         return se
+
+    async def delete_policies_by_sub(self, db: AsyncSession, sub: DeleteAllPolicies) -> int:
+        where_list = []
+        if sub.uuid:
+            where_list.append(self.model.v0 == sub.uuid)
+        where_list.append(self.model.v0 == sub.role)
+        result = await db.execute(delete(self.model).where(or_(*where_list)))
+        return result.rowcount
+
+    async def delete_groups_by_uuid(self, db: AsyncSession, sub: DeleteAllUserRoles) -> int:
+        result = await db.execute(delete(self.model).where(self.model.v0 == sub.uuid))
+        return result.rowcount
 
 
 CasbinDao: CRUDCasbin = CRUDCasbin(CasbinRule)
