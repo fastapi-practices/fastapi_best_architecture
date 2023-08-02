@@ -6,12 +6,18 @@ from backend.app.common.rbac import RBAC
 from backend.app.common.exception import errors
 from backend.app.crud.crud_casbin import CasbinDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.schemas.casbin_rule import CreatePolicy, UpdatePolicy, DeletePolicy, CreateUserRole, DeleteUserRole, \
-    DeleteAllPolicies, DeleteAllUserRoles
+from backend.app.schemas.casbin_rule import (
+    CreatePolicy,
+    UpdatePolicy,
+    DeletePolicy,
+    CreateUserRole,
+    DeleteUserRole,
+    DeleteAllPolicies,
+    DeleteAllUserRoles,
+)
 
 
 class CasbinService:
-
     @staticmethod
     async def get_casbin_list(*, ptype: str, sub: str) -> Select:
         return await CasbinDao.get_all_policy(ptype, sub)
@@ -50,7 +56,9 @@ class CasbinService:
     @staticmethod
     async def update_policies(*, old: list[UpdatePolicy], new: list[UpdatePolicy]):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.update_policies([list(o.dict().values()) for o in old], [list(n.dict().values()) for n in new])
+        data = await enforcer.update_policies(
+            [list(o.dict().values()) for o in old], [list(n.dict().values()) for n in new]
+        )
         return data
 
     @staticmethod

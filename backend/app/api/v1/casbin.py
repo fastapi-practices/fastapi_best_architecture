@@ -15,7 +15,9 @@ from backend.app.schemas.casbin_rule import (
     DeletePolicy,
     CreateUserRole,
     DeleteUserRole,
-    GetAllPolicy, DeleteAllPolicies, DeleteAllUserRoles,
+    GetAllPolicy,
+    DeleteAllPolicies,
+    DeleteAllUserRoles,
 )
 from backend.app.services.casbin_service import CasbinService
 
