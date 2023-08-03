@@ -42,7 +42,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
-    async def add(self, db: AsyncSession, obj: AddUser) -> User:
+    async def add(self, db: AsyncSession, obj: AddUser) -> NoReturn:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.dict(exclude={'roles'})
@@ -53,8 +53,6 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
             role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
         db.add(new_user)
-        new_user = await self.get_by_username(db, obj.username)
-        return new_user
 
     async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
         user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.dict()))

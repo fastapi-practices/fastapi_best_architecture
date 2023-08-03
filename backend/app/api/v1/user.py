@@ -34,9 +34,10 @@ async def user_register(obj: RegisterUser):
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
 async def add_user(obj: AddUser):
-    new_user = await UserService.add(obj=obj)
-    data = GetUserInfoNoRelation(**select_to_json(new_user))
-    return await response_base.success(data=data, exclude={'password'})
+    await UserService.add(obj=obj)
+    current_user = await UserService.get_userinfo(username=obj.username)
+    data = GetAllUserInfo(**select_to_json(current_user))
+    return await response_base.success(data=data)
 
 
 @router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])

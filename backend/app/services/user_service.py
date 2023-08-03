@@ -32,7 +32,7 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def add(*, obj: AddUser) -> User:
+    async def add(*, obj: AddUser) -> None:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -50,8 +50,7 @@ class UserService:
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
-            new_user = await UserDao.add(db, obj)
-            return new_user
+            await UserDao.add(db, obj)
 
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
