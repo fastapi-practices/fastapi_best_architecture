@@ -21,6 +21,8 @@ def select_to_dict(row: R) -> dict:
     for column in row.__table__.columns.keys():
         val = getattr(row, column)
         if isinstance(val, Decimal):
+            if val % 1 == 0:
+                val = int(val)
             val = float(val)
         obj_dict[column] = val
     return obj_dict

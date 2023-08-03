@@ -26,6 +26,11 @@ class DeletePolicy(CreatePolicy):
     pass
 
 
+class DeleteAllPolicies(SchemaBase):
+    uuid: str | None = None
+    role: str
+
+
 class CreateUserRole(SchemaBase):
     uuid: str = Field(..., description='用户 uuid')
     role: str = Field(..., description='角色')
@@ -33,6 +38,10 @@ class CreateUserRole(SchemaBase):
 
 class DeleteUserRole(CreateUserRole):
     pass
+
+
+class DeleteAllUserRoles(SchemaBase):
+    uuid: str
 
 
 class GetAllPolicy(SchemaBase):
