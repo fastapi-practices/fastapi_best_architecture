@@ -18,7 +18,6 @@ from backend.app.schemas.user import (
     GetCurrentUserInfo,
     UpdateUserRole,
     AddUser,
-    GetUserInfoNoRelation,
 )
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
