@@ -86,7 +86,7 @@ async def delete_policies(ps: list[DeletePolicy]):
     return await response_base.success(data=data)
 
 
-@router.delete('/all', summary='删除所有P权限规则', dependencies=[DependsRBAC])
+@router.delete('/policies/all', summary='删除所有P权限规则', dependencies=[DependsRBAC])
 async def delete_all_policies(sub: DeleteAllPolicies):
     count = await CasbinService.delete_all_policies(sub=sub)
     if count > 0:
@@ -133,7 +133,7 @@ async def delete_groups(gs: list[DeleteUserRole]):
     return await response_base.success(data=data)
 
 
-@router.delete('/all', summary='删除所有G权限规则', dependencies=[DependsRBAC])
+@router.delete('/groups/all', summary='删除所有G权限规则', dependencies=[DependsRBAC])
 async def delete_all_groups(uuid: DeleteAllUserRoles):
     count = await CasbinService.delete_all_groups(uuid=uuid)
     if count > 0:
