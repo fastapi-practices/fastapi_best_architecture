@@ -25,9 +25,9 @@ class UserService:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
-            nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
-            v_nickname = await UserDao.get_by_nickname(db, nickname)
-            if v_nickname:
+            obj.nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+            nickname = await UserDao.get_by_nickname(db, obj.nickname)
+            if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
             email = await UserDao.check_email(db, obj.email)
             if email:
@@ -40,9 +40,9 @@ class UserService:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='此用户名已注册')
-            nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
-            v_nickname = await UserDao.get_by_nickname(db, nickname)
-            if v_nickname:
+            obj.nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+            nickname = await UserDao.get_by_nickname(db, obj.nickname)
+            if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
