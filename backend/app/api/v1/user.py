@@ -18,6 +18,7 @@ from backend.app.schemas.user import (
     GetCurrentUserInfo,
     UpdateUserRole,
     AddUser,
+    GetUserInfoNoRelation,
 )
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_to_json
@@ -33,8 +34,9 @@ async def user_register(obj: RegisterUser):
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
 async def add_user(obj: AddUser):
-    await UserService.add(obj=obj)
-    return await response_base.success()
+    new_user = await UserService.add(obj=obj)
+    data = GetUserInfoNoRelation(**select_to_json(new_user))
+    return await response_base.success(data=data, exclude={'password'})
 
 
 @router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
