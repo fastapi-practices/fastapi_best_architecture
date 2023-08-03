@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import random
+
 from fastapi import Request
 from sqlalchemy import Select
 
@@ -23,9 +25,10 @@ class UserService:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
-            nickname = await UserDao.get_by_nickname(db, obj.nickname)
-            if nickname:
-                raise errors.ForbiddenError(msg='该昵称已注册')
+            nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+            v_nickname = await UserDao.get_by_nickname(db, nickname)
+            if v_nickname:
+                raise errors.ForbiddenError(msg='昵称已注册')
             email = await UserDao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
@@ -36,10 +39,11 @@ class UserService:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
-                raise errors.ForbiddenError(msg='该用户名已注册')
-            nickname = await UserDao.get_by_nickname(db, obj.nickname)
-            if nickname:
-                raise errors.ForbiddenError(msg='该昵称已注册')
+                raise errors.ForbiddenError(msg='此用户名已注册')
+            nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+            v_nickname = await UserDao.get_by_nickname(db, nickname)
+            if v_nickname:
+                raise errors.ForbiddenError(msg='昵称已注册')
             dept = await DeptDao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
