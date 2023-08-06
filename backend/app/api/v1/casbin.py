@@ -41,7 +41,7 @@ async def get_all_policies():
     return await response_base.success(data=policies)
 
 
-@router.get('/policy/{role}/all', summary='获取所有指定角色的P权限规则', dependencies=[DependsJwtAuth])
+@router.get('/policy/{role}/all', summary='获取指定角色的所有P权限规则', dependencies=[DependsJwtAuth])
 async def get_all_policies_by_role(role: str):
     policies = await CasbinService.get_policy_list_by_role(role=role)
     return await response_base.success(data=policies)
