@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
+from typing import NoReturn, Sequence
 
 from sqlalchemy import Select, select, desc, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +14,7 @@ class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
     async def get(self, db: AsyncSession, pk: int) -> Api | None:
         return await self.get_(db, pk=pk)
 
-    async def get_all(self, name: str = None, method: str = None, path: str = None) -> Select:
+    async def get_list(self, name: str = None, method: str = None, path: str = None) -> Select:
         se = select(self.model).order_by(desc(self.model.created_time))
         where_list = []
         if name:
@@ -26,6 +26,10 @@ class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
         if where_list:
             se = se.where(and_(*where_list))
         return se
+
+    async def get_all(self, db: AsyncSession) -> Sequence[Api]:
+        apis = await db.execute(select(self.model))
+        return apis.scalars().all()
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Api | None:
         api = await db.execute(select(self.model).where(self.model.name == name))
