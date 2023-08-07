@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 
 from backend.app.common.exception import errors
@@ -20,7 +22,13 @@ class ApiService:
 
     @staticmethod
     async def get_select(*, name: str = None, method: str = None, path: str = None) -> Select:
-        return await ApiDao.get_all(name=name, method=method, path=path)
+        return await ApiDao.get_list(name=name, method=method, path=path)
+
+    @staticmethod
+    async def get_all() -> Sequence[Api]:
+        async with async_db_session() as db:
+            apis = await ApiDao.get_all(db)
+            return apis
 
     @staticmethod
     async def create(*, obj: CreateApi) -> None:

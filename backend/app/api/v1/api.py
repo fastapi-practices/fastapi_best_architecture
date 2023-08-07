@@ -15,6 +15,12 @@ from backend.app.services.api_service import ApiService
 router = APIRouter()
 
 
+@router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
+async def get_all_apis():
+    data = await ApiService.get_all()
+    return await response_base.success(data=data)
+
+
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
 async def get_api(pk: int):
     api = await ApiService.get(pk=pk)
@@ -22,7 +28,7 @@ async def get_api(pk: int):
 
 
 @router.get('', summary='（模糊条件）分页获取所有接口', dependencies=[DependsJwtAuth, PageDepends])
-async def get_all_apis(
+async def get_api_list(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,

@@ -29,6 +29,12 @@ class CasbinService:
         return data
 
     @staticmethod
+    async def get_policy_list_by_role(*, role: str):
+        enforcer = await RBAC.enforcer()
+        data = await enforcer.get_filtered_named_policy('p', 0, role)
+        return data
+
+    @staticmethod
     async def create_policy(*, p: CreatePolicy):
         enforcer = await RBAC.enforcer()
         data = await enforcer.add_policy(p.sub, p.path, p.method)
