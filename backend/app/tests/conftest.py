@@ -25,4 +25,4 @@ def client() -> Generator:
 
 @pytest.fixture(scope='module')
 def token_headers(client: TestClient) -> Dict[str, str]:
-    return get_token_headers(client=client, username='test', password='test')
+    return get_token_headers(client=client, username='admin', password='123456')
