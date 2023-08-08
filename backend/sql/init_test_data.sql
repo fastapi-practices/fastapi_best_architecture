@@ -3,8 +3,8 @@ VALUES (1, 'test', 0, 0, null, null, null, 1, 0, null, '2023-06-26 17:13:45', nu
 
 insert into fba.sys_menu (id, title, name, level, sort, icon, path, menu_type, component, perms, status, `show`, cache, remark, parent_id, created_time, updated_time)
 values  (1, '测试', 'test', 0, 0, '', null, 0, null, null, 0, 0, 1, null, null, '2023-07-27 19:14:10', '2023-07-27 19:14:52'),
-        (2, '仪表盘', 'dashboard', 0, 0, 'IconDashboard', 'dashboard', 1, '/dashboard/workplace/index.vue', null, 1, 1, 1, null, null, '2023-07-27 19:15:45', null),
-        (3, '工作台', 'Workplace', 0, 0, null, 'workplace', 0, null, null, 1, 1, 1, null, 2, '2023-07-27 19:17:59', null),
+        (2, '仪表盘', 'dashboard', 0, 0, 'IconDashboard', 'dashboard', 0, null, null, 1, 1, 1, null, null, '2023-07-27 19:15:45', null),
+        (3, '工作台', 'Workplace', 0, 0, null, 'workplace', 1, '/dashboard/workplace/index.vue', null, 1, 1, 1, null, 2, '2023-07-27 19:17:59', null),
         (4, 'arco官网', 'arcoWebsite', 0, 888, 'IconLink', 'https://arco.design', 1, null, null, 1, 1, 1, null, null, '2023-07-27 19:19:23', null),
         (5, '日志', 'log', 0, 66, 'IconBug', 'log', 0, null, null, 1, 1, 1, null, null, '2023-07-27 19:19:59', null),
         (6, '登录日志', 'Login', 0, 0, null, 'login', 1, '/log/login/index.vue', null, 1, 1, 1, null, 5, '2023-07-27 19:20:56', null),
@@ -26,8 +26,9 @@ VALUES (1, 'test', 2, 1, null, '2023-06-26 17:13:45', null);
 INSERT INTO fba.sys_role_menu (id, role_id, menu_id)
 VALUES (1, 1, 1);
 
+-- 密码明文：123456
 INSERT INTO fba.sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
-VALUES (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'test', 'test', '$2b$12$eYLKJttq2/e66er1VK7NFezNIYkAu.XTGrJppJpqOW1DHmbcBf5ou', 'NvxNx', 'test@example.com', 1, 1, 1, 0, null, null, '2023-06-26 17:13:45', null, 1, '2023-06-26 17:13:45', null);
+VALUES (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b$12$RJXAtJodRw37ZQGxTPlu0OH.aN5lNXG6yvC4Tp9GIQEBmMY/YCc.m', 'bcNjV', 'admin@example.com', 1, 1, 1, 0, null, null, '2023-06-26 17:13:45', null, 1, '2023-06-26 17:13:45', null);
 
 INSERT INTO fba.sys_user_role (id, user_id, role_id)
 VALUES (1, 1, 1);

@@ -15,14 +15,14 @@ from backend.app.models.sys_casbin_rule import CasbinRule
 
 class RBAC:
     @staticmethod
-    async def enforcer() -> casbin.Enforcer:
+    async def enforcer() -> casbin.AsyncEnforcer:
         """
         获取 casbin 执行器
 
         :return:
         """
         adapter = casbin_async_sqlalchemy_adapter.Adapter(async_engine, db_class=CasbinRule)
-        enforcer = casbin.Enforcer(RBAC_MODEL_CONF, adapter)
+        enforcer = casbin.AsyncEnforcer(RBAC_MODEL_CONF, adapter)
         await enforcer.load_policy()
         return enforcer
 

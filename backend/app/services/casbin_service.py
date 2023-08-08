@@ -25,13 +25,13 @@ class CasbinService:
     @staticmethod
     async def get_policy_list():
         enforcer = await RBAC.enforcer()
-        data = await enforcer.get_policy()
+        data = enforcer.get_policy()
         return data
 
     @staticmethod
     async def get_policy_list_by_role(*, role: str):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.get_filtered_named_policy('p', 0, role)
+        data = enforcer.get_filtered_named_policy('p', 0, role)
         return data
 
     @staticmethod
@@ -53,7 +53,7 @@ class CasbinService:
     @staticmethod
     async def update_policy(*, old: UpdatePolicy, new: UpdatePolicy):
         enforcer = await RBAC.enforcer()
-        _p = await enforcer.has_policy(old.sub, old.path, old.method)
+        _p = enforcer.has_policy(old.sub, old.path, old.method)
         if not _p:
             raise errors.NotFoundError(msg='权限不存在')
         data = await enforcer.update_policy([old.sub, old.path, old.method], [new.sub, new.path, new.method])
@@ -70,7 +70,7 @@ class CasbinService:
     @staticmethod
     async def delete_policy(*, p: DeletePolicy):
         enforcer = await RBAC.enforcer()
-        _p = await enforcer.has_policy(p.sub, p.path, p.method)
+        _p = enforcer.has_policy(p.sub, p.path, p.method)
         if not _p:
             raise errors.NotFoundError(msg='权限不存在')
         data = await enforcer.remove_policy(p.sub, p.path, p.method)
@@ -115,7 +115,7 @@ class CasbinService:
     @staticmethod
     async def delete_group(*, g: DeleteUserRole):
         enforcer = await RBAC.enforcer()
-        _g = await enforcer.has_grouping_policy(g.uuid, g.role)
+        _g = enforcer.has_grouping_policy(g.uuid, g.role)
         if not _g:
             raise errors.NotFoundError(msg='权限不存在')
         data = await enforcer.remove_grouping_policy(g.uuid, g.role)
