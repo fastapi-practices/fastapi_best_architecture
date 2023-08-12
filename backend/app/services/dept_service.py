@@ -14,8 +14,6 @@ class DeptService:
             dept = await DeptDao.get(db, pk)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
-            if not dept.status:
-                raise errors.ForbiddenError(msg='部门已关停')
             return dept
 
     @staticmethod

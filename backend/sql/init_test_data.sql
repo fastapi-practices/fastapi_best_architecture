@@ -10,7 +10,7 @@ values  (1, '测试', 'test', 0, 0, '', null, 0, null, null, 0, 0, 1, null, null
         (6, '登录日志', 'Login', 0, 0, null, 'login', 1, '/log/login/index.vue', null, 1, 1, 1, null, 5, '2023-07-27 19:20:56', null),
         (7, '操作日志', 'Opera', 0, 0, null, 'opera', 1, '/log/opera/index.vue', null, 1, 1, 1, null, 5, '2023-07-27 19:21:28', null),
         (8, '常见问题', 'faq', 0, 999, 'IconQuestion', 'https://arco.design/vue/docs/pro/faq', 1, null, null, 1, 1, 1, null, null, '2023-07-27 19:22:24', null),
-        (9, '系统管理', 'admin', 0, 6, 'IconSettings', 'admin', 1, null, null, 1, 1, 1, null, null, '2023-07-27 19:23:00', null),
+        (9, '系统管理', 'admin', 0, 6, 'IconSettings', 'admin', 0, null, null, 1, 1, 1, null, null, '2023-07-27 19:23:00', null),
         (10, '部门管理', 'SysDept', 0, 0, null, 'sys-dept', 1, '/admin/dept/index.vue', null, 1, 1, 1, null, 9, '2023-07-27 19:23:42', null),
         (11, 'API管理', 'SysApi', 0, 1, null, 'sys-api', 1, '/admin/api/index.vue', null, 1, 1, 1, null, 9, '2023-07-27 19:24:12', null),
         (12, '用户管理', 'SysUser', 0, 0, null, 'sys-user', 1, '/admin/user/index.vue', null, 1, 1, 1, null, 9, '2023-07-27 19:25:13', null),
