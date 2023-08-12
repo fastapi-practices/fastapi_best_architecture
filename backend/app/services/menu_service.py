@@ -41,6 +41,7 @@ class MenuService:
         async with async_db_session() as db:
             roles = request.user.roles
             menu_ids = []
+            menu_tree = []
             if roles:
                 for role in roles:
                     menu_ids.extend([menu.id for menu in role.menus])
