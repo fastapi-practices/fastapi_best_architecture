@@ -95,7 +95,7 @@ class ItsDCipher:
 
     def decrypt(self, ciphertext: str) -> Any:
         """
-        ItsDangerous 解密 (可能失败，如果 ciphertext 无法反序列化，则解密失败, 返回 MD5 密文)
+        ItsDangerous 解密 (可能失败，如果 ciphertext 无法反序列化，则解密失败, 返回原始密文)
 
         :param ciphertext: 解密前的密文
         :return:
