@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+from typing import Any
 
 from cryptography.hazmat.backends.openssl import backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from itsdangerous import URLSafeSerializer
+
+from backend.app.common.log import log
 
 
 class AESCipher:
@@ -14,13 +18,15 @@ class AESCipher:
         """
         self.key = key if isinstance(key, bytes) else bytes.fromhex(key)
 
-    def encrypt(self, plaintext: bytes) -> bytes:
+    def encrypt(self, plaintext: bytes | str) -> bytes:
         """
         AES 加密
 
         :param plaintext: 加密前的明文
         :return:
         """
+        if not isinstance(plaintext, bytes):
+            plaintext = str(plaintext).encode('utf-8')
         iv = os.urandom(16)
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv), backend=backend)
         encryptor = cipher.encryptor()
@@ -59,8 +65,45 @@ class Md5Cipher:
         import hashlib
 
         md5 = hashlib.md5()
-        if isinstance(plaintext, str):
-            md5.update(plaintext.encode('utf-8'))
-        else:
-            md5.update(plaintext)
+        if not isinstance(plaintext, bytes):
+            plaintext = str(plaintext).encode('utf-8')
+        md5.update(plaintext)
         return md5.hexdigest()
+
+
+class ItsDCipher:
+    def __init__(self, key: bytes | str):
+        """
+        :param key: 密钥，16/24/32 bytes 或 16 进制字符串
+        """
+        self.key = key if isinstance(key, bytes) else bytes.fromhex(key)
+
+    def encrypt(self, plaintext: Any) -> str:
+        """
+        ItsDangerous 加密 (可能失败，如果 plaintext 无法序列化，则会加密为 MD5)
+
+        :param plaintext: 加密前的明文
+        :return:
+        """
+        serializer = URLSafeSerializer(self.key)
+        try:
+            ciphertext = serializer.dumps(plaintext)
+        except Exception as e:
+            log.error(e)
+            ciphertext = Md5Cipher.encrypt(plaintext)
+        return ciphertext
+
+    def decrypt(self, ciphertext: str) -> Any:
+        """
+        ItsDangerous 解密 (可能失败，如果 ciphertext 无法反序列化，则解密失败, 返回 MD5 密文)
+
+        :param ciphertext: 解密前的密文
+        :return:
+        """
+        serializer = URLSafeSerializer(self.key)
+        try:
+            plaintext = serializer.loads(ciphertext)
+        except Exception as e:
+            log.error(e)
+            plaintext = ciphertext
+        return plaintext
