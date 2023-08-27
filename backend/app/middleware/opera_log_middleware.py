@@ -13,7 +13,7 @@ from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
-from backend.app.utils.encrypt import AESCipher, Md5Cipher
+from backend.app.utils.encrypt import AESCipher, Md5Cipher, ItsDCipher
 from backend.app.utils.request_parse import parse_user_agent_info, parse_ip_info
 from backend.app.utils.timezone import timezone_utils
 
@@ -176,15 +176,15 @@ class OperaLogMiddleware:
                 case OperaLogCipherType.aes:
                     for key in args.keys():
                         if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
-                            args[key] = (
-                                AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(
-                                    bytes(args[key], encoding='utf-8')
-                                )
-                            ).hex()
+                            args[key] = (AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(args[key])).hex()
                 case OperaLogCipherType.md5:
                     for key in args.keys():
                         if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
                             args[key] = Md5Cipher.encrypt(args[key])
+                case OperaLogCipherType.itsdangerous:
+                    for key in args.keys():
+                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                            args[key] = ItsDCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(args[key])
                 case OperaLogCipherType.plan:
                     pass
                 case _:
