@@ -35,7 +35,7 @@ class AESCipher:
         ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
         return iv + ciphertext
 
-    def decrypt(self, ciphertext: bytes | str) -> bytes:
+    def decrypt(self, ciphertext: bytes | str) -> str:
         """
         AES 解密
 
@@ -50,7 +50,7 @@ class AESCipher:
         unpadder = padding.PKCS7(cipher.algorithm.block_size).unpadder()  # type: ignore
         padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
         plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
-        return plaintext
+        return plaintext.decode('utf-8')
 
 
 class Md5Cipher:
@@ -89,7 +89,7 @@ class ItsDCipher:
         try:
             ciphertext = serializer.dumps(plaintext)
         except Exception as e:
-            log.error(e)
+            log.error(f'ItsDangerous encrypt failed: {e}')
             ciphertext = Md5Cipher.encrypt(plaintext)
         return ciphertext
 
@@ -104,6 +104,6 @@ class ItsDCipher:
         try:
             plaintext = serializer.loads(ciphertext)
         except Exception as e:
-            log.error(e)
+            log.error(f'ItsDangerous decrypt failed: {e}')
             plaintext = ciphertext
         return plaintext
