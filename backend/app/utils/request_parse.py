@@ -48,7 +48,7 @@ async def get_location_online(ip: str, user_agent: str) -> dict | None:
 
 
 @sync_to_async
-def get_location_offline(ip: str) -> list[str] | None:
+def get_location_offline(ip: str) -> dict | None:
     """
     离线获取 ip 地址属地，无法保证准确率，100%可用
 
@@ -60,8 +60,12 @@ def get_location_offline(ip: str) -> list[str] | None:
         searcher = XdbSearcher(contentBuff=cb)
         data = searcher.search(ip)
         searcher.close()
-        location_info = data.split('|')
-        return location_info
+        data = data.split('|')
+        return {
+            'country': data[0] if data[0] != '0' else None,
+            'regionName': data[1] if data[1] != '0' else None,
+            'city': data[2] if data[2] != '0' else None,
+        }
     except Exception as e:
         log.error(f'离线获取 ip 地址属地失败，错误信息：{e}')
         return None
@@ -73,21 +77,19 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
         country, region, city = location.split(' ')
+        return ip, country, region, city
+    if settings.LOCATION_PARSE == 'online':
+        location_info = await get_location_online(ip, request.headers.get('User-Agent'))
+    elif settings.LOCATION_PARSE == 'offline':
+        location_info = await get_location_offline(ip)
     else:
-        if settings.LOCATION_PARSE == 'online':
-            location_info = await get_location_online(ip, request.headers.get('User-Agent'))
-            if location_info:
-                country = location_info.get('country')
-                region = location_info.get('regionName')
-                city = location_info.get('city')
-        elif settings.LOCATION_PARSE == 'offline':
-            location_info = await get_location_offline(ip)
-            if location_info:
-                country = location_info[0] if location_info[0] != '0' else None
-                region = location_info[2] if location_info[2] != '0' else None
-                city = location_info[3] if location_info[3] != '0' else None
-    await redis_client.set(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}', f'{country} {region} {city}',
-                           ex=settings.IP_LOCATION_EXPIRE_SECONDS)
+        location_info = None
+    if location_info:
+        country = location_info.get('country')
+        region = location_info.get('regionName')
+        city = location_info.get('city')
+        await redis_client.set(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}', f'{country} {region} {city}',
+                               ex=settings.IP_LOCATION_EXPIRE_SECONDS)
     return ip, country, region, city
 
 
