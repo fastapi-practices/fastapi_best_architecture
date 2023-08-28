@@ -63,8 +63,8 @@ def get_location_offline(ip: str) -> dict | None:
         data = data.split('|')
         return {
             'country': data[0] if data[0] != '0' else None,
-            'regionName': data[1] if data[1] != '0' else None,
-            'city': data[2] if data[2] != '0' else None,
+            'regionName': data[2] if data[2] != '0' else None,
+            'city': data[3] if data[3] != '0' else None,
         }
     except Exception as e:
         log.error(f'离线获取 ip 地址属地失败，错误信息：{e}')
