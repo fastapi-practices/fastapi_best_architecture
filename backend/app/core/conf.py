@@ -147,6 +147,10 @@ class Settings(BaseSettings):
     OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']
 
+    # ip location
+    IP_LOCATION_REDIS_PREFIX: str = 'fba_ip_location'
+    IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
+
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
         env_file = '.env'
