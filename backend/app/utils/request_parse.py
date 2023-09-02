@@ -88,8 +88,11 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
         country = location_info.get('country')
         region = location_info.get('regionName')
         city = location_info.get('city')
-        await redis_client.set(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}', f'{country} {region} {city}',
-                               ex=settings.IP_LOCATION_EXPIRE_SECONDS)
+        await redis_client.set(
+            f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}',
+            f'{country} {region} {city}',
+            ex=settings.IP_LOCATION_EXPIRE_SECONDS,
+        )
     return ip, country, region, city
 
 
