@@ -7,7 +7,7 @@ asyncmy==0.2.5
 bcrypt==3.2.2
 casbin==1.23.0
 casbin_async_sqlalchemy_adapter==1.3.0
-cryptography==41.0.2
+cryptography==41.0.4
 email-validator==1.1.3
 Faker==9.7.1
 fast-captcha==0.2.1
