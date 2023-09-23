@@ -1,18 +1,21 @@
 # FastAPI 最佳架构
 
+[![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
+[![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+
 简体中文 | [English](./README.md)
 
-这是 FastAPI 框架的一个基础项目，使用伪三层架构，**目前还在制作中**
+基于 FastAPI 框架的前后端分离中后台解决方案，遵循[伪三层架构](#伪三层架构)设计， 支持 **python3.10** 及以上版本
 
-它的目的是让你可以直接用它作为你的基础架构来开发你的项目，本仓库作为模板库公开，可直接使用
+它的目的是让你可以直接用它作为你新项目的基础架构，本仓库作为模板库公开，任何人或企业均可免费使用
 
-支持 **python3.10** 及以上版本
+**持续更新维护中**
 
 ## 伪三层架构
 
-在 python 的 web 框架中，mvc 架构是最常见的，但是对于 restful 用户，三层架构是不二选择
+mvc 架构作为常规设计模式，在 python web 中也很常见，但是三层架构更令人着迷
 
-但是在 python 开发中，三层架构的概念并没有通用标准，所以这里我称之为伪三层架构
+在 python web 开发中，三层架构的概念并没有通用标准，所以这里我们称之为伪三层架构
 
 | 工作流程 | java           | fastapi_best_architecture |
 |------|----------------|---------------------------|
@@ -24,21 +27,50 @@
 
 ## 特征
 
-- [x] FastAPI 新特性
-- [x] 异步设计
-- [x] Restful API 规范
-- [x] SQLAlchemy 2.0 语法
-- [x] Pydantic 数据验证
-- [x] Casbin RBAC 权限控制
-- [x] APScheduler 定时任务
-- [x] JWT 认证
-- [x] Redis 缓存
-- [x] Docker 部署
-- [x] Pytest 测试
+- [x] 使用 FastAPI PEP 593 Annotated 参数设计
+- [x] async/await + asgiref 的全局异步设计
+- [x] 遵循 Restful API 规范
+- [x] 全局 SQLAlchemy 2.0 语法
+- [x] Casbin RBAC 访问控制模型
+- [x] APScheduler 在线定时任务
+- [x] JWT 中间件白名单认证
+- [x] 全局自定义时区时间
+- [x] Docker / Docker-compose 部署
+- [x] Pytest 单元测试
 
-## 开始：
+TODO:
 
-### 1：传统模式
+1. [ ] Pydantic 2.0
+
+## 内置功能
+
+1. [x] 用户管理：系统用户角色管理，权限分配
+2. [x] 部门管理：配置系统组织机构（公司、部门、小组...）
+3. [x] 菜单管理：配置系统菜单，用户菜单，按钮权限标识
+4. [x] 角色管理：角色菜单权限分配，角色路由权限分配
+5. [x] 字典管理：维护系统内部常用固定数据或参数
+6. [x] 操作日志：系统正常操作和异常操作日志记录和查询
+7. [x] 登录认证：图形验证码后台认证登录
+8. [x] 登录日志：用户正常登录和异常登录的日志记录与查询
+9. [x] 服务监控：服务器硬件设备信息与状态
+10. [x] 定时任务：在线任务控制（修改，删除，暂停...）
+11. [x] 接口文档：自动生成在线交互式 API 接口文档
+
+TODO:
+
+1. [ ] 动态配置：对系统环境进行动态配置（网站标题，LOGO，备案，页脚...）
+2. [ ] 代码生成：根据表结构，可视化生成增删改查业务代码
+3. [ ] 文件上传：对接云OSS加本地备份
+4. [ ] 系统通知：主动发送定时任务通知，资源警告，服务异常预警...
+
+## 本地开发：
+
+* Python 3.10+
+* Mysql 8.0+
+* Redis 推荐最新稳定版
+* Nodejs 14.0+
+
+### 后端
 
 1. 安装依赖项
     ```shell
@@ -72,12 +104,17 @@
    alembic upgrade head
     ```
 
-7. 执行 `backend/app/main.py` 文件启动服务
-8. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+7. 按需修改配置文件
+8. 执行 `backend/app/main.py` 文件启动服务
+9. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ---
 
-### 2：Docker
+### 前端：
+
+点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
+
+### Docker 部署
 
 1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
 
@@ -90,24 +127,25 @@
    cp .env.docker .env
    ```
 
-2. 执行一键启动命令
+2. 按需修改配置文件
+3. 执行一键启动命令
 
    ```shell
    docker-compose up -d -build
    ```
 
-3. 等待命令自动完成
-4. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+4. 等待命令自动完成
+5. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ## 测试数据
 
-[//]: # (执行 `backend/app/init_test_data.py` 文件，自动创建测试数据)
-
 使用 `backend/sql/init_test_data.sql` 文件初始化测试数据
 
-## 开发
+## 开发流程
 
-开发流程，仅供参考
+仅供参考
+
+### 后端：
 
 1. 定义数据库模型（model），每次变化记得执行数据库迁移
 2. 定义数据验证模型（schema）
@@ -115,9 +153,13 @@
 4. 定义业务逻辑（service）
 5. 编写数据库操作（crud）
 
+### 前端：
+
+点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
+
 ## 测试
 
-通过 pytest 执行测试
+通过 pytest 执行单元测试
 
 1. 创建测试数据库 `fba_test`，选择 utf8mb4 编码
 2. 进入app目录
@@ -139,14 +181,16 @@
 <span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
 <span style="margin: 0 5px;" ><a href="https://github.com/downdawn" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
 
-## 鸣谢
+## 特别鸣谢
 
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Pydantic](https://docs.pydantic.dev/latest/)
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
 - [Casbin](https://casbin.org/zh/)
 - [Ruff](https://beta.ruff.rs/docs/)
-- ......
+- [Black](https://black.readthedocs.io/en/stable/index.html)
+- [RuoYi](http://ruoyi.vip/)
+- ...
 
 ## 赞助
 
@@ -154,15 +198,17 @@
 
 <table>
   <tr>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px"/>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="Wechat"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px" alt="Alipay"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/ERC20.jpg?raw=true" width="180px" alt="0x40D5e2304b452256afD9CE2d3d5531dc8d293138"/>
   </tr>
   <tr>
     <td align="center">微信</td>
     <td align="center">支付宝</td>
+    <td align="center">ERC20</td>
   </tr>
 </table>
 
 ## 许可证
 
-本项目根据 MIT 许可证的条款进行许可
+本项目根据 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
