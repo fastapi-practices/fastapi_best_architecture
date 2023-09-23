@@ -32,7 +32,7 @@ pseudo three-tier architecture here
 ## Online preview
 
 Unfortunately, we don't have the funds to provide an online preview, you can deploy by checking
-out [local-development](#local-development), or directly using [Docker](#docker-deployment)
+out [local-development](#local-development), or directly using [Docker](#docker-deploy)
 to deploy, or at [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
 See a preview of some of the screenshots
 
@@ -67,7 +67,7 @@ TODO:
 10. [x] Timed Tasks: online task control (modify, delete, pause...)
 11. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
 
-TODO.
+TODO:
 
 1. [ ] Dynamic Configuration: Dynamic configuration of the system environment (site title, logo, filing, footer...)
 2. [ ] code generation: according to the table structure, visualize the generation of additions, deletions,
