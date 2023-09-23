@@ -63,7 +63,13 @@ TODO:
 3. [ ] 文件上传：对接云OSS加本地备份
 4. [ ] 系统通知：主动发送定时任务通知，资源警告，服务异常预警...
 
-## 本地开发：
+## 在线预览
+
+遗憾的是，我们没有资金提供在线预览，您可以通过查看[本地开发](#本地开发)进行部署，或直接使用 [Docker](#docker-部署)
+进行部署，或者在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
+查看部分截图预览
+
+## 本地开发
 
 * Python 3.10+
 * Mysql 8.0+
@@ -110,7 +116,7 @@ TODO:
 
 ---
 
-### 前端：
+### 前端
 
 点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
@@ -153,7 +159,7 @@ TODO:
 4. 定义业务逻辑（service）
 5. 编写数据库操作（crud）
 
-### 前端：
+### 前端
 
 点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
@@ -192,9 +198,9 @@ TODO:
 - [RuoYi](http://ruoyi.vip/)
 - ...
 
-## 赞助
+## 赞助我们
 
-> 如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励 :coffee:
+> 如果此项目能够帮助到你，你可以赞助我们一些咖啡豆表示鼓励 :coffee:
 
 <table>
   <tr>

@@ -29,6 +29,13 @@ pseudo three-tier architecture here
 | data access    | dao / mapper   | crud                      |
 | model          | model / entity | model                     |
 
+## Online preview
+
+Unfortunately, we don't have the funds to provide an online preview, you can deploy by checking
+out [local-development](#local-development), or directly using [Docker](#docker-deployment)
+to deploy, or at [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
+See a preview of some of the screenshots
+
 ## Features
 
 - [x] Design with FastAPI PEP 593 Annotated Parameters
@@ -68,7 +75,7 @@ TODO.
 3. [ ] File Upload: Docking cloud OSS and local backup.
 4. [ ] System Notification: proactively send timed task notifications, resource warnings, service anomaly warnings...
 
-## Local development：
+## Local development
 
 * Python: 3.10+
 * Mysql: 8.0+
@@ -114,7 +121,7 @@ TODO.
 
 ---
 
-### Front：
+### Front
 
 Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
@@ -150,7 +157,7 @@ Initialize the test data using the `backend/sql/init_test_data.sql` file
 
 For reference only
 
-### BackEnd：
+### BackEnd
 
 1. Define the database model (model) and remember to perform database migration for each change
 2. Define the data validation model (schema)
@@ -158,7 +165,7 @@ For reference only
 4. Define the business logic (service)
 5. Write database operations (crud)
 
-### Front：
+### Front
 
 Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
@@ -197,18 +204,18 @@ Execute unittests via pytest
 - [RuoYi](http://ruoyi.vip/)
 - ...
 
-## Sponsor
+## Sponsor us
 
-> If this program has helped you, you can sponsor the author with some coffee beans :coffee:
+> If this program has helped you, you can sponsor us with some coffee beans :coffee:
 
 <table>
   <tr>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="Wechat"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="WeChat"/>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px" alt="Alipay"/>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/ERC20.jpg?raw=true" width="180px" alt="0x40D5e2304b452256afD9CE2d3d5531dc8d293138"/>
   </tr>
   <tr>
-    <td align="center">Wechat Pay</td>
+    <td align="center">WeChat Pay</td>
     <td align="center">Ali Pay</td>
     <td align="center">ERC20</td>
   </tr>
