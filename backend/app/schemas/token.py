@@ -26,4 +26,6 @@ class GetLoginToken(AccessTokenBase):
 
 
 class GetNewToken(AccessTokenBase):
-    pass
+    refresh_token: str
+    refresh_token_type: str = 'Bearer'
+    refresh_token_expire_time: datetime

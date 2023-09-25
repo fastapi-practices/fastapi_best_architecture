@@ -36,7 +36,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
         if not auth:
             return
 
-        if request.url.path in settings.TOKEN_WHITELIST:
+        if request.url.path in settings.TOKEN_EXCLUDE:
             return
 
         scheme, token = auth.split()

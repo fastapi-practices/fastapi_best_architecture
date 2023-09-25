@@ -34,6 +34,9 @@ class RBAC:
         :param _:
         :return:
         """
+        path = request.url.path
+        if path in settings.TOKEN_EXCLUDE:
+            return
         # 强制校验 JWT 授权状态
         if not request.auth.scopes:
             raise TokenError
@@ -71,7 +74,6 @@ class RBAC:
         else:
             # casbin 权限校验
             method = request.method
-            path = request.url.path
             forbid_menu_path = [
                 menu.path for role in user_roles for menu in role.menus if menu.status == StatusType.disable
             ]

@@ -5,9 +5,8 @@ import random
 from fastapi import Request
 from sqlalchemy import Select
 
-from backend.app.common import jwt
 from backend.app.common.exception import errors
-from backend.app.common.jwt import get_token, password_verify
+from backend.app.common.jwt import get_token, password_verify, superuser_verify
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_dept import DeptDao
@@ -86,7 +85,7 @@ class UserService:
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUser) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             input_user = await UserDao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -139,7 +138,7 @@ class UserService:
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -151,7 +150,7 @@ class UserService:
     @staticmethod
     async def update_staff(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -163,7 +162,7 @@ class UserService:
     @staticmethod
     async def update_status(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -175,7 +174,7 @@ class UserService:
     @staticmethod
     async def update_multi_login(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             if not await UserDao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -199,7 +198,7 @@ class UserService:
     @staticmethod
     async def delete(*, request: Request, username: str) -> int:
         async with async_db_session.begin() as db:
-            await jwt.superuser_verify(request)
+            await superuser_verify(request)
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
