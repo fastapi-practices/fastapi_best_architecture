@@ -34,6 +34,7 @@ class RBAC:
         :param _:
         :return:
         """
+        path = request.url.path
         # 强制校验 JWT 授权状态
         if not request.auth.scopes:
             raise TokenError
@@ -52,16 +53,20 @@ class RBAC:
         data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
+        method = request.method
         if settings.MENU_PERMISSION:
             # 菜单权限校验
-            path_auth = request.url.path.replace(f'{settings.API_V1_STR}', '').replace('/', ':')
+            # TODO: 改用流行方案，自定义接口权限字段标识
+            path_auth = path.split(f'{settings.API_V1_STR}/')[-1].replace('/', ':') + f':{method}'
             menu_perms = []
             forbid_menu_perms = []
             for role in user_roles:
-                for menu in role.menus:
-                    menu_perms.append(menu.perms) if menu.status == StatusType.enable else forbid_menu_perms.append(
-                        menu.perms
-                    )
+                if role.menus:
+                    for menu in role.menus:
+                        if menu.status == StatusType.enable:
+                            menu_perms.append(menu.perms)
+                        else:
+                            forbid_menu_perms.append(menu.perms)
             if path_auth in set(settings.MENU_EXCLUDE):
                 return
             if path_auth in set([perm for perms_str in forbid_menu_perms for perm in perms_str.split(',')]):
@@ -70,11 +75,12 @@ class RBAC:
                 raise AuthorizationError
         else:
             # casbin 权限校验
-            method = request.method
-            path = request.url.path
-            forbid_menu_path = [
-                menu.path for role in user_roles for menu in role.menus if menu.status == StatusType.disable
-            ]
+            forbid_menu_path = []
+            for role in user_roles:
+                if role.menus:
+                    for menu in role.menus:
+                        if menu.status == StatusType.disable:
+                            forbid_menu_path.append(menu.path)
             if path.split('/')[-1] in forbid_menu_path:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
