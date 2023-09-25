@@ -15,12 +15,10 @@ from backend.app.schemas.user import (
     ResetPassword,
     UpdateUser,
     Avatar,
-    GetCurrentUserInfo,
     UpdateUserRole,
     AddUser,
 )
 from backend.app.services.user_service import UserService
-from backend.app.utils.serializers import select_to_json
 
 router = APIRouter()
 
@@ -34,9 +32,8 @@ async def user_register(obj: RegisterUser):
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
 async def add_user(obj: AddUser):
     await UserService.add(obj=obj)
-    current_user = await UserService.get_userinfo(username=obj.username)
-    data = GetAllUserInfo(**select_to_json(current_user))
-    return await response_base.success(data=data)
+    data = await UserService.get_userinfo(username=obj.username)
+    return await response_base.success(data=data, relationship_safe=True)
 
 
 @router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
@@ -49,15 +46,13 @@ async def password_reset(request: Request, obj: ResetPassword):
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
 async def get_current_userinfo(request: Request):
-    data = GetCurrentUserInfo(**select_to_json(request.user))
-    return await response_base.success(data=data, exclude={'password'})
+    return await response_base.success(data=request.user, exclude={'password'}, relationship_safe=True)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: str):
-    current_user = await UserService.get_userinfo(username=username)
-    data = GetAllUserInfo(**select_to_json(current_user))
-    return await response_base.success(data=data)
+    data = await UserService.get_userinfo(username=username)
+    return await response_base.success(data=data, relationship_safe=True)
 
 
 @router.put('/{username}', summary='更新用户信息', dependencies=[DependsJwtAuth])

@@ -12,7 +12,7 @@ from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.role import GetAllRole, CreateRole, UpdateRole, UpdateRoleMenu
 from backend.app.services.menu_service import MenuService
 from backend.app.services.role_service import RoleService
-from backend.app.utils.serializers import select_to_json, select_to_list
+from backend.app.utils.serializers import select_to_list
 
 router = APIRouter()
 
@@ -20,14 +20,14 @@ router = APIRouter()
 @router.get('/all', summary='获取所有角色', dependencies=[DependsJwtAuth])
 async def get_all_roles():
     roles = await RoleService.get_all()
-    data = select_to_list(roles)
+    data = await select_to_list(roles)
     return await response_base.success(data=data)
 
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(pk: int):
     roles = await RoleService.get_user_all(pk=pk)
-    data = select_to_list(roles)
+    data = await select_to_list(roles)
     return await response_base.success(data=data)
 
 
@@ -39,9 +39,8 @@ async def get_role_all_menus(pk: int):
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(pk: int):
-    role = await RoleService.get(pk=pk)
-    data = GetAllRole(**select_to_json(role))
-    return await response_base.success(data=data)
+    data = await RoleService.get(pk=pk)
+    return await response_base.success(data=data, relationship_safe=True)
 
 
 @router.get('', summary='（模糊条件）分页获取所有角色', dependencies=[DependsJwtAuth, PageDepends])

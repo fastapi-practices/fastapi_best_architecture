@@ -11,16 +11,14 @@ from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_data import GetAllDictData, CreateDictData, UpdateDictData
 from backend.app.services.dict_data_service import DictDataService
-from backend.app.utils.serializers import select_to_json
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: int):
-    dict_data = await DictDataService.get(pk=pk)
-    data = GetAllDictData(**select_to_json(dict_data))
-    return await response_base.success(data=data)
+    data = await DictDataService.get(pk=pk)
+    return await response_base.success(data=data, relationship_safe=True)
 
 
 @router.get('', summary='（模糊条件）分页获取所有字典', dependencies=[DependsJwtAuth, PageDepends])

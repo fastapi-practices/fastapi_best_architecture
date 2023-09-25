@@ -3,11 +3,11 @@
 from datetime import datetime
 from typing import Any
 
-from asgiref.sync import sync_to_async
-from pydantic import validate_arguments, BaseModel
+from pydantic import BaseModel
 
 from backend.app.core.conf import settings
 from backend.app.utils.encoders import jsonable_encoder
+from backend.app.utils.serializers import select_to_dict, select_to_dict_unsafe
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
 
@@ -20,7 +20,8 @@ class ResponseModel(BaseModel):
 
     .. tip::
 
-        如果你不想使用 ResponseBase 中的自定义编码器，可以使用此模型，返回数据将通过 fastapi 内部的编码器直接自动解析并返回
+        如果你不想使用 ResponseBase 中的自定义编码器，可以使用此模型，返回数据将通过 fastapi 内部的编码器自动解析并返回；
+        此返回模型会生成 openapi schema 文档
 
     E.g. ::
 
@@ -47,7 +48,8 @@ class ResponseBase:
 
     .. tip::
 
-        此类中的返回方法将通过自定义编码器预解析，然后由 fastapi 内部的编码器再次处理并返回，可能存在性能损耗，取决于个人喜好
+        此类中的返回方法将通过自定义编码器预解析，然后由 fastapi 内部的编码器再次处理并返回，可能存在性能损耗，取决于个人喜好；
+        此返回模型不会生成 openapi schema 文档
 
     E.g. ::
 
@@ -57,20 +59,13 @@ class ResponseBase:
     """  # noqa: E501
 
     @staticmethod
-    @sync_to_async
-    def __json_encoder(data: Any, exclude: _ExcludeData | None = None, **kwargs):
-        custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
-        kwargs.update({'custom_encoder': custom_encoder})
-        result = jsonable_encoder(data, exclude=exclude, **kwargs)
-        return result
-
-    @validate_arguments
-    async def success(
-        self,
+    async def __response(
         *,
-        code: int = 200,
-        msg: str = 'Success',
+        code: int = None,
+        msg: str = None,
         data: Any | None = None,
+        relationship_safe: bool = False,
+        fields_safe: bool = False,
         exclude: _ExcludeData | None = None,
         **kwargs
     ) -> dict:
@@ -81,23 +76,67 @@ class ResponseBase:
         :param msg: 返回信息
         :param data: 返回数据
         :param exclude: 排除返回数据(data)字段
+        :param relationship_safe: 关系数据安全，仅适用于 sqlalchemy 查询”关系数据“异常字段清理
+        :param fields_safe: 字段安全，仅适用于 sqlalchemy 查询”字段数据“异常字段清理
+        :param kwargs: jsonable_encoder 配置项
         :return:
         """
-        data = data if data is None else await self.__json_encoder(data, exclude, **kwargs)
+        assert (
+            relationship_safe is not True or fields_safe is not True
+        ), '序列化错误，relationship_safe 和 fields_safe 参数不能同时为真'
+        if relationship_safe:
+            data = await select_to_dict(data)
+        if fields_safe:
+            data = await select_to_dict_unsafe(data)
+        if data is not None:
+            custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
+            kwargs.update({'custom_encoder': custom_encoder})
+            data = jsonable_encoder(data, exclude=exclude, **kwargs)
         return {'code': code, 'msg': msg, 'data': data}
 
-    @validate_arguments
-    async def fail(
+    async def success(
         self,
         *,
-        code: int = 400,
-        msg: str = 'Bad Request',
-        data: Any = None,
+        code=200,
+        msg='Success',
+        data: Any | None = None,
+        relationship_safe: bool = False,
+        fields_safe: bool = False,
         exclude: _ExcludeData | None = None,
         **kwargs
     ) -> dict:
-        data = data if data is None else await self.__json_encoder(data, exclude, **kwargs)
-        return {'code': code, 'msg': msg, 'data': data}
+        result = await self.__response(
+            code=code,
+            msg=msg,
+            data=data,
+            relationship_safe=relationship_safe,
+            fields_safe=fields_safe,
+            exclude=exclude,
+            **kwargs
+        )
+        return result
+
+    async def fail(
+        self,
+        *,
+        code=400,
+        msg='Bad Request',
+        data: Any = None,
+        relationship_safe: bool = False,
+        fields_safe: bool = False,
+        exclude: _ExcludeData | None = None,
+        **kwargs
+    ) -> dict:
+        result = await self.__response(
+            code=code,
+            msg=msg,
+            data=data,
+            relationship_safe=relationship_safe,
+            fields_safe=fields_safe,
+            exclude=exclude,
+            **kwargs
+        )
+        return result
 
 
 response_base = ResponseBase()

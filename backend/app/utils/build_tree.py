@@ -8,10 +8,9 @@ from backend.app.common.enums import BuildTreeType
 from backend.app.utils.serializers import RowData, select_to_list
 
 
-@sync_to_async
-def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
+async def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
     """获取所有树形结构节点"""
-    tree_nodes = select_to_list(row)
+    tree_nodes = await select_to_list(row)
     tree_nodes.sort(key=lambda x: x['sort'])
     return tree_nodes
 

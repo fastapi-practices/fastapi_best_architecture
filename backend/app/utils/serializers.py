@@ -3,6 +3,7 @@
 from decimal import Decimal
 from typing import Any, TypeVar, Sequence
 
+from asgiref.sync import sync_to_async
 from sqlalchemy import Row, RowMapping
 
 RowData = Row | RowMapping | Any
@@ -10,6 +11,7 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
+@sync_to_async
 def select_to_dict(row: R) -> dict:
     """
     Serialize SQLAlchemy Select to dict
@@ -28,20 +30,21 @@ def select_to_dict(row: R) -> dict:
     return obj_dict
 
 
-def select_to_list(row: Sequence[R]) -> list:
+async def select_to_list(row: Sequence[R]) -> list:
     """
     Serialize SQLAlchemy Select to list
 
     :param row:
     :return:
     """
-    ret_list = [select_to_dict(_) for _ in row]
+    ret_list = [await select_to_dict(_) for _ in row]
     return ret_list
 
 
-def select_to_json(row: R) -> dict:
+@sync_to_async
+def select_to_dict_unsafe(row: R) -> dict:
     """
-    Serialize SQLAlchemy Select to json
+    Serialize SQLAlchemy Select to dict, but unsafe
 
     :param row:
     :return:
