@@ -53,18 +53,21 @@ class TaskService:
         return task
 
     async def run(self, pk: str):
-        await self.get_task(pk=pk)
+        task = await self.get_task(pk=pk)
         scheduler.modify_job(job_id=pk, next_run_time=timezone_utils.get_timezone_datetime())
+        return task
 
     async def pause(self, pk: str):
-        await self.get_task(pk=pk)
+        task = await self.get_task(pk=pk)
         scheduler.pause_job(job_id=pk)
+        return task
 
     async def resume(self, pk: str):
-        await self.get_task(pk=pk)
+        task = await self.get_task(pk=pk)
         scheduler.resume_job(job_id=pk)
+        return task
 
     async def delete(self, pk: str):
-        await self.get_task(pk=pk)
+        task = await self.get_task(pk=pk)
         scheduler.remove_job(job_id=pk)
-        scheduler.add_job()
+        return task
