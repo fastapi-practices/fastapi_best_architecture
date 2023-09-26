@@ -120,5 +120,6 @@ class AuthService:
         if request.user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)
-        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
-        await redis_client.delete_prefix(prefix)
+        else:
+            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
+            await redis_client.delete_prefix(prefix)
