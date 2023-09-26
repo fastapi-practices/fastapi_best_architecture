@@ -35,6 +35,8 @@ class RBAC:
         :return:
         """
         path = request.url.path
+        if path in settings.TOKEN_EXCLUDE:
+            return
         # 强制校验 JWT 授权状态
         if not request.auth.scopes:
             raise TokenError

@@ -93,18 +93,26 @@ class AuthService:
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod
-    async def new_token(*, refresh_token: str) -> tuple[str, datetime]:
+    async def new_token(*, request: Request, refresh_token: str) -> tuple[str, str, datetime, datetime]:
         user_id = await jwt.jwt_decode(refresh_token)
+        if str(request.user.id) != user_id:
+            raise errors.TokenError(msg='刷新 token 无效')
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not current_user.status:
-                raise errors.AuthorizationError(msg='用户已锁定, 获取失败')
-            access_new_token, access_new_token_expire_time = await jwt.create_new_token(
-                str(current_user.id), refresh_token, multi_login=current_user.is_multi_login
+                raise errors.AuthorizationError(msg='用户已锁定，操作失败')
+            current_token = await get_token(request)
+            (
+                new_access_token,
+                new_refresh_token,
+                new_access_token_expire_time,
+                new_refresh_token_expire_time,
+            ) = await jwt.create_new_token(
+                str(current_user.id), current_token, refresh_token, multi_login=current_user.is_multi_login
             )
-            return access_new_token, access_new_token_expire_time
+            return new_access_token, new_refresh_token, new_access_token_expire_time, new_refresh_token_expire_time
 
     @staticmethod
     async def logout(*, request: Request) -> NoReturn:

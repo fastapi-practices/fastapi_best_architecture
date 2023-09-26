@@ -43,9 +43,19 @@ async def user_login(request: Request, obj: AuthLogin, background_tasks: Backgro
 
 
 @router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
-async def create_new_token(refresh_token: Annotated[str, Query(...)]):
-    access_token, access_expire = await AuthService.new_token(refresh_token=refresh_token)
-    data = GetNewToken(access_token=access_token, access_token_expire_time=access_expire)
+async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]):
+    (
+        new_access_token,
+        new_refresh_token,
+        new_access_token_expire_time,
+        new_refresh_token_expire_time,
+    ) = await AuthService.new_token(request=request, refresh_token=refresh_token)
+    data = GetNewToken(
+        access_token=new_access_token,
+        access_token_expire_time=new_access_token_expire_time,
+        refresh_token=new_refresh_token,
+        refresh_token_expire_time=new_refresh_token_expire_time,
+    )
     return await response_base.success(data=data)
 
 

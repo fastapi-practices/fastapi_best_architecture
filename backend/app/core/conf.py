@@ -99,7 +99,7 @@ class Settings(BaseSettings):
     TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
-    TOKEN_WHITELIST: list[str] = [  # 白名单
+    TOKEN_EXCLUDE: list[str] = [  # 白名单
         f'{API_V1_STR}/auth/login',
     ]
 
