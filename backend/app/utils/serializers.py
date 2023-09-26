@@ -12,9 +12,9 @@ R = TypeVar('R', bound=RowData)
 
 
 @sync_to_async
-def select_to_dict(row: R) -> dict:
+def select_columns_serialize(row: R) -> dict:
     """
-    Serialize SQLAlchemy Select to dict
+    Serialize SQLAlchemy select table columns, does not contain relational columns
 
     :param row:
     :return:
@@ -30,21 +30,21 @@ def select_to_dict(row: R) -> dict:
     return obj_dict
 
 
-async def select_to_list(row: Sequence[R]) -> list:
+async def select_list_serialize(row: Sequence[R]) -> list:
     """
-    Serialize SQLAlchemy Select to list
+    Serialize SQLAlchemy select list
 
     :param row:
     :return:
     """
-    ret_list = [await select_to_dict(_) for _ in row]
+    ret_list = [await select_columns_serialize(_) for _ in row]
     return ret_list
 
 
 @sync_to_async
-def select_to_dict_unsafe(row: R) -> dict:
+def select_as_dict(row: R) -> dict:
     """
-    Serialize SQLAlchemy Select to dict, but unsafe
+    Converting select to dict, which can contain relational data, depends on the properties of the select object itself
 
     :param row:
     :return:

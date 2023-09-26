@@ -4,7 +4,6 @@ from asgiref.sync import sync_to_async
 
 from backend.app.common.exception import errors
 from backend.app.common.task import scheduler
-from backend.app.schemas.task import GetTask
 from backend.app.utils.timezone import timezone_utils
 
 
@@ -15,19 +14,17 @@ class TaskService:
         tasks = []
         for job in scheduler.get_jobs():
             tasks.append(
-                GetTask(
-                    **{
-                        'id': job.id,
-                        'func_name': job.func_ref,
-                        'trigger': str(job.trigger),
-                        'executor': job.executor,
-                        'name': job.name,
-                        'misfire_grace_time': job.misfire_grace_time,
-                        'coalesce': job.coalesce,
-                        'max_instances': job.max_instances,
-                        'next_run_time': job.next_run_time,
-                    }
-                ).dict()
+                {
+                    'id': job.id,
+                    'func_name': job.func_ref,
+                    'trigger': str(job.trigger),
+                    'executor': job.executor,
+                    'name': job.name,
+                    'misfire_grace_time': job.misfire_grace_time,
+                    'coalesce': job.coalesce,
+                    'max_instances': job.max_instances,
+                    'next_run_time': job.next_run_time,
+                }
             )
         return tasks
 
@@ -37,19 +34,18 @@ class TaskService:
         job = scheduler.get_job(job_id=pk)
         if not job:
             raise errors.NotFoundError(msg='任务不存在')
-        task = GetTask(
-            **{
-                'id': job.id,
-                'func_name': job.func_ref,
-                'trigger': str(job.trigger),
-                'executor': job.executor,
-                'name': job.name,
-                'misfire_grace_time': job.misfire_grace_time,
-                'coalesce': job.coalesce,
-                'max_instances': job.max_instances,
-                'next_run_time': job.next_run_time,
-            }
-        )
+        task = {
+            'id': job.id,
+            'func_name': job.func_ref,
+            'trigger': str(job.trigger),
+            'executor': job.executor,
+            'name': job.name,
+            'misfire_grace_time': job.misfire_grace_time,
+            'coalesce': job.coalesce,
+            'max_instances': job.max_instances,
+            'next_run_time': job.next_run_time,
+        }
+
         return task
 
     async def run(self, pk: str):

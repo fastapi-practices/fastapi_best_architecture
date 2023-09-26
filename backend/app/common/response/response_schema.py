@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from backend.app.core.conf import settings
 from backend.app.utils.encoders import jsonable_encoder
-from backend.app.utils.serializers import select_to_dict, select_to_dict_unsafe
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
 
@@ -60,14 +59,7 @@ class ResponseBase:
 
     @staticmethod
     async def __response(
-        *,
-        code: int = None,
-        msg: str = None,
-        data: Any | None = None,
-        relationship_safe: bool = False,
-        fields_safe: bool = False,
-        exclude: _ExcludeData | None = None,
-        **kwargs
+        *, code: int = None, msg: str = None, data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
     ) -> dict:
         """
         请求成功返回通用方法
@@ -75,19 +67,10 @@ class ResponseBase:
         :param code: 返回状态码
         :param msg: 返回信息
         :param data: 返回数据
-        :param exclude: 排除返回数据(data)字段
-        :param relationship_safe: 关系数据安全，仅适用于 sqlalchemy 查询”关系数据“异常字段清理
-        :param fields_safe: 字段安全，仅适用于 sqlalchemy 查询”字段数据“异常字段清理
+        :param exclude: 返回数据字段排除
         :param kwargs: jsonable_encoder 配置项
         :return:
         """
-        assert (
-            relationship_safe is not True or fields_safe is not True
-        ), '序列化错误，relationship_safe 和 fields_safe 参数不能同时为真'
-        if relationship_safe:
-            data = await select_to_dict(data)
-        if fields_safe:
-            data = await select_to_dict_unsafe(data)
         if data is not None:
             custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
             kwargs.update({'custom_encoder': custom_encoder})
@@ -95,48 +78,14 @@ class ResponseBase:
         return {'code': code, 'msg': msg, 'data': data}
 
     async def success(
-        self,
-        *,
-        code=200,
-        msg='Success',
-        data: Any | None = None,
-        relationship_safe: bool = False,
-        fields_safe: bool = False,
-        exclude: _ExcludeData | None = None,
-        **kwargs
+        self, *, code=200, msg='Success', data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
     ) -> dict:
-        result = await self.__response(
-            code=code,
-            msg=msg,
-            data=data,
-            relationship_safe=relationship_safe,
-            fields_safe=fields_safe,
-            exclude=exclude,
-            **kwargs
-        )
-        return result
+        return await self.__response(code=code, msg=msg, data=data, exclude=exclude, **kwargs)
 
     async def fail(
-        self,
-        *,
-        code=400,
-        msg='Bad Request',
-        data: Any = None,
-        relationship_safe: bool = False,
-        fields_safe: bool = False,
-        exclude: _ExcludeData | None = None,
-        **kwargs
+        self, *, code=400, msg='Bad Request', data: Any = None, exclude: _ExcludeData | None = None, **kwargs
     ) -> dict:
-        result = await self.__response(
-            code=code,
-            msg=msg,
-            data=data,
-            relationship_safe=relationship_safe,
-            fields_safe=fields_safe,
-            exclude=exclude,
-            **kwargs
-        )
-        return result
+        return await self.__response(code=code, msg=msg, data=data, exclude=exclude, **kwargs)
 
 
 response_base = ResponseBase()

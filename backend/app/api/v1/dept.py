@@ -7,16 +7,18 @@ from fastapi import APIRouter, Query
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.dept import CreateDept, UpdateDept
+from backend.app.schemas.dept import CreateDept, UpdateDept, GetAllDept
 from backend.app.services.dept_service import DeptService
+from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: int):
-    data = await DeptService.get(pk=pk)
-    return await response_base.success(data=data, fields_safe=True)
+    dept = await DeptService.get(pk=pk)
+    data = GetAllDept(**await select_as_dict(dept))
+    return await response_base.success(data=data)
 
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
