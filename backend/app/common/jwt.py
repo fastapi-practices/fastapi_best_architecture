@@ -96,19 +96,25 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     return refresh_token, expire
 
 
-async def create_new_token(sub: str, refresh_token: str, **kwargs) -> tuple[str, datetime]:
+async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -> tuple[str, str, datetime, datetime]:
     """
     Generate new token
 
     :param sub:
+    :param token
     :param refresh_token:
     :return:
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
         raise TokenError(msg='refresh_token 已过期')
-    new_token, expire = await create_access_token(sub, **kwargs)
-    return new_token, expire
+    new_access_token, new_access_token_expire_time = await create_access_token(sub, **kwargs)
+    new_refresh_token, new_refresh_token_expire_time = await create_refresh_token(sub, **kwargs)
+    token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
+    refresh_token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{refresh_token}'
+    await redis_client.delete(token_key)
+    await redis_client.delete(refresh_token_key)
+    return new_access_token, new_refresh_token, new_access_token_expire_time, new_refresh_token_expire_time
 
 
 @sync_to_async
