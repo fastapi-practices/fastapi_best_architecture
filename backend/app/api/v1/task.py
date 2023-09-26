@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.task import GetTask
 from backend.app.services.task_service import TaskService
 
 router = APIRouter()
@@ -20,8 +19,7 @@ async def get_all_tasks():
 @router.get('/{pk}', summary='获取任务详情', dependencies=[DependsJwtAuth])
 async def get_task(pk: str):
     task = await TaskService.get_task(pk=pk)
-    data = GetTask(**task)
-    return await response_base.success(data=data)
+    return await response_base.success(data=task)
 
 
 @router.post('/{pk}/run', summary='执行任务', dependencies=[DependsRBAC])
