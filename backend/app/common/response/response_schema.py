@@ -5,6 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.core.conf import settings
 from backend.app.utils.encoders import jsonable_encoder
 
@@ -31,6 +32,11 @@ class ResponseModel(BaseModel):
         @router.get('/test')
         def test() -> ResponseModel:
             return ResponseModel(data={'test': 'test'})
+
+        @router.get('/test')
+        def test() -> ResponseModel:
+            res = CustomResponseCode.HTTP_200
+            return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
 
     code: int = 200
@@ -59,7 +65,7 @@ class ResponseBase:
 
     @staticmethod
     async def __response(
-        *, code: int = None, msg: str = None, data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+        *, res: CustomResponseCode = None, data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
     ) -> dict:
         """
         请求成功返回通用方法
@@ -75,17 +81,27 @@ class ResponseBase:
             custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
             kwargs.update({'custom_encoder': custom_encoder})
             data = jsonable_encoder(data, exclude=exclude, **kwargs)
-        return {'code': code, 'msg': msg, 'data': data}
+        return {'code': res.code, 'msg': res.msg, 'data': data}
 
     async def success(
-        self, *, code=200, msg='Success', data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+        self,
+        *,
+        res: CustomResponseCode = CustomResponseCode.HTTP_200,
+        data: Any | None = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs
     ) -> dict:
-        return await self.__response(code=code, msg=msg, data=data, exclude=exclude, **kwargs)
+        return await self.__response(res=res, data=data, exclude=exclude, **kwargs)
 
     async def fail(
-        self, *, code=400, msg='Bad Request', data: Any = None, exclude: _ExcludeData | None = None, **kwargs
+        self,
+        *,
+        res: CustomResponseCode = CustomResponseCode.HTTP_400,
+        data: Any = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs
     ) -> dict:
-        return await self.__response(code=code, msg=msg, data=data, exclude=exclude, **kwargs)
+        return await self.__response(res=res, data=data, exclude=exclude, **kwargs)
 
 
 response_base = ResponseBase()

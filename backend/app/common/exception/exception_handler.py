@@ -9,33 +9,12 @@ from pydantic.errors import EnumMemberError, WrongConstantError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.log import log
-from backend.app.common.response.response_schema import response_base
+from backend.app.common.response.response_code import StandardResponseCode, CustomResponseCode
+from backend.app.common.response.response_schema import response_base, ResponseModel
 from backend.app.core.conf import settings
-
-
-def _get_exception_code(status_code):
-    """
-    获取返回状态码, OpenAPI, Uvicorn... 可用状态码基于 RFC 定义, 详细代码见下方链接
-
-    `python 状态码标准支持 <https://github.com/python/cpython/blob/6e3cc72afeaee2532b4327776501eb8234ac787b/Lib/http
-    /__init__.py#L7>`__
-
-    `IANA 状态码注册表 <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`__
-
-    :param status_code:
-    :return:
-    """
-    try:
-        STATUS_PHRASES[status_code]
-    except Exception:
-        code = 400
-    else:
-        code = status_code
-    return code
 
 
 def register_exception(app: FastAPI):
@@ -48,11 +27,11 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        content = {'code': exc.status_code, 'msg': exc.detail}
+        content = ResponseModel(code=exc.status_code, msg=exc.detail).dict()
         request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
-            status_code=_get_exception_code(exc.status_code),
-            content=await response_base.fail(**content),
+            status_code=StandardResponseCode.HTTP_400,
+            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_400),
             headers=exc.headers,
         )
 
@@ -94,13 +73,16 @@ def register_exception(app: FastAPI):
                     message += f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
             elif isinstance(raw_error.exc, json.JSONDecodeError):
                 message += 'json解析失败'
-        content = {
-            'code': 422,
-            'msg': '请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
-            'data': {'errors': exc.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
-        }
+        content = ResponseModel(
+            code=StandardResponseCode.HTTP_422,
+            msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
+            data={'errors': exc.errors()} if message == '' else None,
+        ).dict()
         request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
-        return JSONResponse(status_code=422, content=await response_base.fail(**content))
+        return JSONResponse(
+            status_code=StandardResponseCode.HTTP_422,
+            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_422),
+        )
 
     @app.exception_handler(Exception)
     async def all_exception_handler(request: Request, exc: Exception):
@@ -113,24 +95,28 @@ def register_exception(app: FastAPI):
         """
         if isinstance(exc, BaseExceptionMixin):
             return JSONResponse(
-                status_code=_get_exception_code(exc.code),
-                content=await response_base.fail(code=exc.code, msg=str(exc.msg), data=exc.data if exc.data else None),
+                status_code=StandardResponseCode.HTTP_400,
+                content=ResponseModel(
+                    code=exc.code,
+                    msg=str(exc.msg),
+                    data=exc.data if exc.data else None,
+                ).dict(),
                 background=exc.background,
             )
 
         elif isinstance(exc, AssertionError):
             return JSONResponse(
-                status_code=500,
-                content=await response_base.fail(
-                    code=500,
+                status_code=StandardResponseCode.HTTP_500,
+                content=ResponseModel(
+                    code=StandardResponseCode.HTTP_500,
                     msg=','.join(exc.args)
                     if exc.args
                     else exc.__repr__()
                     if not exc.__repr__().startswith('AssertionError()')
                     else exc.__doc__,
-                )
+                ).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(code=500, msg='Internal Server Error'),
+                else await response_base.fail(CustomResponseCode.HTTP_500),
             )
 
         else:
@@ -139,15 +125,15 @@ def register_exception(app: FastAPI):
             log.error(f'未知异常: {exc}')
             log.error(traceback.format_exc())
             return JSONResponse(
-                status_code=500,
-                content=await response_base.fail(code=500, msg=str(exc))
+                status_code=StandardResponseCode.HTTP_500,
+                content=ResponseModel(code=500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(code=500, msg='Internal Server Error'),
+                else await response_base.fail(StandardResponseCode.HTTP_500),
             )
 
     if settings.MIDDLEWARE_CORS:
 
-        @app.exception_handler(500)
+        @app.exception_handler(StandardResponseCode.HTTP_500)
         async def cors_status_code_500_exception_handler(request, exc):
             """
             跨域 500 异常处理
@@ -159,12 +145,12 @@ def register_exception(app: FastAPI):
             :return:
             """
             response = JSONResponse(
-                status_code=exc.code if isinstance(exc, BaseExceptionMixin) else 500,
-                content={'code': exc.code, 'msg': exc.msg, 'data': exc.data}
+                status_code=exc.code if isinstance(exc, BaseExceptionMixin) else StandardResponseCode.HTTP_500,
+                content=ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).dict()
                 if isinstance(exc, BaseExceptionMixin)
-                else await response_base.fail(code=500, msg=str(exc))
+                else ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(code=500, msg='Internal Server Error'),
+                else await response_base.fail(CustomResponseCode.HTTP_500),
                 background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
             )
             origin = request.headers.get('origin')
