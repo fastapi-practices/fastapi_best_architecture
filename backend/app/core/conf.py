@@ -8,7 +8,7 @@ from pydantic import BaseSettings, root_validator
 
 class Settings(BaseSettings):
     # Env Config
-    ENVIRONMENT: str
+    ENVIRONMENT: Literal['dev', 'pro']
 
     # Env MySQL
     DB_HOST: str
