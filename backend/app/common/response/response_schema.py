@@ -39,8 +39,8 @@ class ResponseModel(BaseModel):
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
 
-    code: int = 200
-    msg: str = 'Success'
+    code: int = CustomResponseCode.HTTP_200.code
+    msg: str = CustomResponseCode.HTTP_200.msg
     data: Any | None = None
 
     class Config:
