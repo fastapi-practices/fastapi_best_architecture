@@ -12,7 +12,7 @@ from backend.app.common.enums import LoginLogStatusType
 from backend.app.common.exception import errors
 from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
-from backend.app.common.response.response_code import CustomCode
+from backend.app.common.response.response_code import CustomErrorCode
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
@@ -55,7 +55,7 @@ class AuthService:
                 if not captcha_code:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
-                    raise errors.CustomError(error=CustomCode.CAPTCHA_ERROR)
+                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await UserDao.update_login_time(db, obj.username, self.login_time)
                 user = await UserDao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(

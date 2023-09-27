@@ -24,7 +24,7 @@ async def task_demo_add():
         task_demo, 'interval', seconds=1, id='task_demo', replace_existing=True, start_date=datetime.datetime.now()
     )
 
-    return await response_base.success({'msg': 'success'})
+    return await response_base.success()
 
 
 @router.post('/async', summary='测试添加异步任务')
@@ -37,7 +37,7 @@ async def task_demo_add_async():
         replace_existing=True,
         start_date=datetime.datetime.now(),
     )
-    return await response_base.success({'msg': 'success'})
+    return await response_base.success()
 
 
 @router.post('/files', summary='测试文件上传')
