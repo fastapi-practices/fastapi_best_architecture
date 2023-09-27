@@ -11,7 +11,7 @@ from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_data import GetAllDictData, CreateDictData, UpdateDictData
 from backend.app.services.dict_data_service import DictDataService
-from backend.app.utils.serializers import select_to_json
+from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: int):
     dict_data = await DictDataService.get(pk=pk)
-    data = GetAllDictData(**select_to_json(dict_data))
+    data = GetAllDictData(**await select_as_dict(dict_data))
     return await response_base.success(data=data)
 
 

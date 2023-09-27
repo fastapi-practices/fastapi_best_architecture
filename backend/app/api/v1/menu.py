@@ -9,7 +9,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.menu import GetAllMenu, CreateMenu, UpdateMenu
 from backend.app.services.menu_service import MenuService
-from backend.app.utils.serializers import select_to_json
+from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -23,7 +23,7 @@ async def get_user_menus(request: Request):
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: int):
     menu = await MenuService.get(pk=pk)
-    data = GetAllMenu(**select_to_json(menu))
+    data = GetAllMenu(**await select_as_dict(menu))
     return await response_base.success(data=data)
 
 

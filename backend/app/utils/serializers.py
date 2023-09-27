@@ -3,6 +3,7 @@
 from decimal import Decimal
 from typing import Any, TypeVar, Sequence
 
+from asgiref.sync import sync_to_async
 from sqlalchemy import Row, RowMapping
 
 RowData = Row | RowMapping | Any
@@ -10,9 +11,10 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
-def select_to_dict(row: R) -> dict:
+@sync_to_async
+def select_columns_serialize(row: R) -> dict:
     """
-    Serialize SQLAlchemy Select to dict
+    Serialize SQLAlchemy select table columns, does not contain relational columns
 
     :param row:
     :return:
@@ -28,20 +30,21 @@ def select_to_dict(row: R) -> dict:
     return obj_dict
 
 
-def select_to_list(row: Sequence[R]) -> list:
+async def select_list_serialize(row: Sequence[R]) -> list:
     """
-    Serialize SQLAlchemy Select to list
+    Serialize SQLAlchemy select list
 
     :param row:
     :return:
     """
-    ret_list = [select_to_dict(_) for _ in row]
+    ret_list = [await select_columns_serialize(_) for _ in row]
     return ret_list
 
 
-def select_to_json(row: R) -> dict:
+@sync_to_async
+def select_as_dict(row: R) -> dict:
     """
-    Serialize SQLAlchemy Select to json
+    Converting select to dict, which can contain relational data, depends on the properties of the select object itself
 
     :param row:
     :return:

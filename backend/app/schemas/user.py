@@ -106,10 +106,7 @@ class GetAllUserInfo(GetUserInfoNoRelation):
         orm_mode = True
 
 
-class GetCurrentUserInfo(GetUserInfoNoRelation):
-    dept: GetAllDept | None = None
-    roles: list[GetAllRole]
-
+class GetCurrentUserInfo(GetAllUserInfo):
     @root_validator
     def handel(cls, values):
         """处理部门和角色"""

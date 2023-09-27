@@ -50,6 +50,7 @@ class TaskService:
                 'next_run_time': job.next_run_time,
             }
         )
+
         return task
 
     async def run(self, pk: str):
