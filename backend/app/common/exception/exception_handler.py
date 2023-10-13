@@ -112,7 +112,7 @@ def register_exception(app: FastAPI):
                     msg=','.join(exc.args)
                     if exc.args
                     else exc.__repr__()
-                    if not exc.__repr__().startswith('AssertionError()')
+                    if not exc.__repr__().startswith('AssertionError')
                     else exc.__doc__,
                 ).dict()
                 if settings.ENVIRONMENT == 'dev'
@@ -128,7 +128,7 @@ def register_exception(app: FastAPI):
                 status_code=StandardResponseCode.HTTP_500,
                 content=ResponseModel(code=500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(StandardResponseCode.HTTP_500),
+                else await response_base.fail(CustomResponseCode.HTTP_500),
             )
 
     if settings.MIDDLEWARE_CORS:
