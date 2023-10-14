@@ -5,7 +5,7 @@ from asgiref.sync import sync_to_async
 from backend.app.common.exception import errors
 from backend.app.common.task import scheduler
 from backend.app.schemas.task import GetTask
-from backend.app.utils.timezone import timezone_utils
+from backend.app.utils.timezone import timezone
 
 
 class TaskService:
@@ -55,7 +55,7 @@ class TaskService:
 
     async def run(self, pk: str):
         task = await self.get_task(pk=pk)
-        scheduler.modify_job(job_id=pk, next_run_time=timezone_utils.get_timezone_datetime())
+        scheduler.modify_job(job_id=pk, next_run_time=timezone.now())
         return task
 
     async def pause(self, pk: str):
