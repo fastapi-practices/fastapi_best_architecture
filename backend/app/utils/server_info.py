@@ -109,7 +109,6 @@ class ServerInfo:
         process = psutil.Process(os.getpid())
         mem_info = process.memory_info()
         start_time = timezone.f_datetime(datetime.utcfromtimestamp(process.create_time()).replace(tzinfo=tz.utc))
-        print(start_time)
         return {
             'name': 'Python3',
             'version': platform.python_version(),
