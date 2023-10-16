@@ -7,7 +7,7 @@ from sqlalchemy.dialects.mysql import JSON, LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.models.base import DataClassBase, id_key
-from backend.app.utils.timezone import timezone_utils
+from backend.app.utils.timezone import timezone
 
 
 class OperaLog(DataClassBase):
@@ -34,6 +34,4 @@ class OperaLog(DataClassBase):
     msg: Mapped[str | None] = mapped_column(LONGTEXT, comment='提示消息')
     cost_time: Mapped[float] = mapped_column(insert_default=0.0, comment='请求耗时ms')
     opera_time: Mapped[datetime] = mapped_column(comment='操作时间')
-    created_time: Mapped[datetime] = mapped_column(
-        init=False, default_factory=timezone_utils.get_timezone_datetime, comment='创建时间'
-    )
+    created_time: Mapped[datetime] = mapped_column(init=False, default_factory=timezone.now, comment='创建时间')

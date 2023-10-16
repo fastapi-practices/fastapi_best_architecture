@@ -18,11 +18,11 @@ from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.schemas.user import AuthLogin
 from backend.app.services.login_log_service import LoginLogService
-from backend.app.utils.timezone import timezone_utils
+from backend.app.utils.timezone import timezone
 
 
 class AuthService:
-    login_time = timezone_utils.get_timezone_datetime()
+    login_time = timezone.now()
 
     async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm):
         async with async_db_session() as db:

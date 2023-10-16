@@ -16,7 +16,7 @@ from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.models import User
-from backend.app.utils.timezone import timezone_utils
+from backend.app.utils.timezone import timezone
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -55,10 +55,10 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     :return:
     """
     if expires_delta:
-        expire = timezone_utils.get_timezone_expire_time(expires_delta)
+        expire = timezone.now() + expires_delta
         expire_seconds = int(expires_delta.total_seconds())
     else:
-        expire = timezone_utils.get_timezone_expire_time(timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS))
+        expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_EXPIRE_SECONDS
     multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
@@ -81,9 +81,13 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     """
     if expire_time:
         expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire_seconds = timezone_utils.get_timezone_expire_seconds(expire_time)
+        expire_datetime = timezone.f_datetime(expire_time)
+        current_datetime = timezone.now()
+        if expire_datetime < current_datetime:
+            raise TokenError(msg='Refresh Token 过期时间无效')
+        expire_seconds = int((expire_datetime - current_datetime).total_seconds())
     else:
-        expire = timezone_utils.get_timezone_expire_time(timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS))
+        expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
         expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
     multi_login = kwargs.pop('multi_login', None)
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
@@ -107,7 +111,7 @@ async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
-        raise TokenError(msg='refresh_token 已过期')
+        raise TokenError(msg='Refresh Token 已过期')
     new_access_token, new_access_token_expire_time = await create_access_token(sub, **kwargs)
     new_refresh_token, new_refresh_token_expire_time = await create_refresh_token(sub, **kwargs)
     token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
@@ -127,7 +131,7 @@ def get_token(request: Request) -> str:
     authorization = request.headers.get('Authorization')
     scheme, token = get_authorization_scheme_param(authorization)
     if not authorization or scheme.lower() != 'bearer':
-        raise TokenError(msg='token 无效')
+        raise TokenError(msg='Token 无效')
     return token
 
 
@@ -143,9 +147,9 @@ def jwt_decode(token: str) -> int:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         user_id = int(payload.get('sub'))
         if not user_id:
-            raise TokenError(msg='token 无效')
+            raise TokenError(msg='Token 无效')
     except (jwt.JWTError, ValidationError, Exception):
-        raise TokenError(msg='token 无效')
+        raise TokenError(msg='Token 无效')
     return user_id
 
 
@@ -160,7 +164,7 @@ async def jwt_authentication(token: str) -> dict[str, int]:
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
-        raise TokenError(msg='token 已过期')
+        raise TokenError(msg='Token 已过期')
     return {'sub': user_id}
 
 
@@ -175,7 +179,7 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     user_id = data.get('sub')
     user = await UserDao.get_with_relation(db, user_id=user_id)
     if not user:
-        raise TokenError(msg='token 无效')
+        raise TokenError(msg='Token 无效')
     if not user.status:
         raise AuthorizationError(msg='用户已锁定')
     if user.dept_id:
