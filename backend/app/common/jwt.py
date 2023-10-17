@@ -8,7 +8,6 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from passlib.context import CryptContext
-from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.common.exception.errors import AuthorizationError, TokenError
@@ -148,7 +147,9 @@ def jwt_decode(token: str) -> int:
         user_id = int(payload.get('sub'))
         if not user_id:
             raise TokenError(msg='Token 无效')
-    except (jwt.JWTError, ValidationError, Exception):
+    except jwt.ExpiredSignatureError:
+        raise TokenError(msg='Token 已过期')
+    except jwt.JWTError:
         raise TokenError(msg='Token 无效')
     return user_id
 
