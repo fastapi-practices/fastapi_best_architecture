@@ -149,7 +149,7 @@ def jwt_decode(token: str) -> int:
             raise TokenError(msg='Token 无效')
     except jwt.ExpiredSignatureError:
         raise TokenError(msg='Token 已过期')
-    except jwt.JWTError:
+    except (jwt.JWTError, Exception):
         raise TokenError(msg='Token 无效')
     return user_id
 
