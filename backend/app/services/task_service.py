@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
+import pytz
 from asgiref.sync import sync_to_async
 
 from backend.app.common.exception import errors
 from backend.app.common.task import scheduler
+from backend.app.core.conf import settings
 from backend.app.schemas.task import GetTask
-from backend.app.utils.timezone import timezone
 
 
 class TaskService:
@@ -55,7 +58,8 @@ class TaskService:
 
     async def run(self, pk: str):
         task = await self.get_task(pk=pk)
-        scheduler.modify_job(job_id=pk, next_run_time=timezone.now())
+        # next_run_time 仅适用于 pytz 模块
+        scheduler.modify_job(job_id=pk, next_run_time=datetime.now(pytz.timezone(settings.DATETIME_TIMEZONE)))
         return task
 
     async def pause(self, pk: str):
