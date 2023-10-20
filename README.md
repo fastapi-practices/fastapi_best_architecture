@@ -43,7 +43,7 @@ See a preview of some of the screenshots
 - [x] Follows Restful API specification
 - [x] Global SQLAlchemy 2.0 syntax
 - [x] Casbin RBAC access control model
-- [x] APScheduler online timed tasks
+- [x] Celery asynchronous tasks
 - [x] JWT middleware whitelist authentication
 - [x] Global customizable time zone time
 - [x] Docker / Docker-compose deployment
@@ -85,6 +85,7 @@ TODO:
 ### BackEnd
 
 1. Install dependencies
+
     ```shell
     pip install -r requirements.txt
     ```
@@ -115,9 +116,15 @@ TODO:
    # Execute the migration
    alembic upgrade head
     ```
-7. Modify the configuration file as needed
-8. Execute the `backend/app/main.py` file to start the service
-9. Browser access: http://127.0.0.1:8000/api/v1/docs
+7. Start celery worker
+
+   ```shell
+   celery -A tasks worker --loglevel=INFO
+   ```
+   
+8. Modify the configuration file as needed
+9. Execute the `backend/app/main.py` file to start the service
+10. Browser access: http://127.0.0.1:8000/api/v1/docs
 
 ---
 

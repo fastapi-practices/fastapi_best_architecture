@@ -32,7 +32,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 - [x] 遵循 Restful API 规范
 - [x] 全局 SQLAlchemy 2.0 语法
 - [x] Casbin RBAC 访问控制模型
-- [x] APScheduler 在线定时任务
+- [x] Celery 异步任务
 - [x] JWT 中间件白名单认证
 - [x] 全局自定义时区时间
 - [x] Docker / Docker-compose 部署
@@ -79,6 +79,7 @@ TODO:
 ### 后端
 
 1. 安装依赖项
+
     ```shell
     pip install -r requirements.txt
     ```
@@ -110,9 +111,15 @@ TODO:
    alembic upgrade head
     ```
 
-7. 按需修改配置文件
-8. 执行 `backend/app/main.py` 文件启动服务
-9. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+7. 启动 celery worker
+
+   ```shell
+   celery -A tasks worker --loglevel=INFO
+   ```
+
+8. 按需修改配置文件
+9. 执行 `backend/app/main.py` 文件启动服务
+10. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ---
 
