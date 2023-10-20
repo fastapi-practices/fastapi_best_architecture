@@ -1,46 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter
+from celery.exceptions import BackendGetMetaError
+from celery.result import AsyncResult
+from fastapi import APIRouter, Path
 
-from backend.app.common.rbac import DependsRBAC
-from backend.app.common.jwt import DependsJwtAuth
+from backend.app.common.exception.errors import NotFoundError
+from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.common.response.response_schema import response_base
-from backend.app.services.task_service import TaskService
 
 router = APIRouter()
 
 
-@router.get('', summary='获取任务列表', dependencies=[DependsJwtAuth])
-async def get_all_tasks():
-    tasks_list = await TaskService.get_task_list()
-    return await response_base.success(data=tasks_list)
-
-
-@router.get('/{pk}', summary='获取任务详情', dependencies=[DependsJwtAuth])
-async def get_task(pk: str):
-    task = await TaskService.get_task(pk=pk)
-    return await response_base.success(data=task)
-
-
-@router.post('/{pk}/run', summary='执行任务', dependencies=[DependsRBAC])
-async def run_task(pk: str):
-    task = await TaskService().run(pk=pk)
-    return await response_base.success(data=task)
-
-
-@router.post('/{pk}/pause', summary='暂停任务', dependencies=[DependsRBAC])
-async def pause_task(pk: str):
-    task = await TaskService().pause(pk=pk)
-    return await response_base.success(data=task)
-
-
-@router.post('/{pk}/resume', summary='恢复任务', dependencies=[DependsRBAC])
-async def resume_task(pk: str):
-    task = await TaskService().resume(pk=pk)
-    return await response_base.success(data=task)
-
-
-@router.post('/{pk}/stop', summary='删除任务', dependencies=[DependsRBAC])
-async def delete_task(pk: str):
-    task = await TaskService().delete(pk=pk)
-    return await response_base.success(data=task)
+@router.get('/{pk}', summary='获取任务结果')
+async def get_task_result(pk: str = Path(description='任务ID')):
+    try:
+        task = AsyncResult(pk)
+    except BackendGetMetaError:
+        raise NotFoundError(msg='任务不存在')
+    else:
+        status = task.status
+        if status == 'FAILURE':
+            return await response_base.fail(res=CustomResponseCode.HTTP_204, data=task.result)
+        return await response_base.success(data=task.result)

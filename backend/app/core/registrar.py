@@ -10,7 +10,6 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from backend.app.api.routers import v1
 from backend.app.common.exception.exception_handler import register_exception
 from backend.app.common.redis import redis_client
-from backend.app.common.task import scheduler
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
 from backend.app.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -33,8 +32,6 @@ async def register_init(app: FastAPI):
     await redis_client.open()
     # 初始化 limiter
     await FastAPILimiter.init(redis_client, prefix=settings.LIMITER_REDIS_PREFIX, http_callback=http_limit_callback)
-    # 启动定时任务
-    scheduler.start()
 
     yield
 
@@ -42,8 +39,6 @@ async def register_init(app: FastAPI):
     await redis_client.close()
     # 关闭 limiter
     await FastAPILimiter.close()
-    # 关闭定时任务
-    scheduler.shutdown()
 
 
 def register_app():

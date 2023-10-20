@@ -22,11 +22,12 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
     REDIS_DATABASE: int
 
-    # Env APScheduler Redis
-    APS_REDIS_HOST: str
-    APS_REDIS_PORT: int
-    APS_REDIS_PASSWORD: str
-    APS_REDIS_DATABASE: int
+    # Env Celery
+    CELERY_REDIS_HOST: str
+    CELERY_REDIS_PORT: int
+    CELERY_REDIS_PASSWORD: str
+    CELERY_REDIS_DATABASE_BROKER: int
+    CELERY_REDIS_DATABASE_BACKEND: int
 
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
@@ -63,6 +64,11 @@ class Settings(BaseSettings):
     UVICORN_PORT: int = 8000
     UVICORN_RELOAD: bool = True
 
+    # Celery
+    CELERY_REDIS_BACKEND_PREFIX: str = 'fba_celery'
+    CELERY_REDIS_BACKEND_TIMEOUT: float = 5.0
+    CELERY_REDIS_BACKEND_ORDERED: bool = True
+
     # Static Server
     STATIC_FILES: bool = False
 
@@ -83,14 +89,6 @@ class Settings(BaseSettings):
 
     # Redis
     REDIS_TIMEOUT: int = 5
-
-    # APScheduler Redis
-    APS_REDIS_TIMEOUT: int = 10
-
-    # APScheduler Default
-    APS_COALESCE: bool = False  # 是否合并运行
-    APS_MAX_INSTANCES: int = 3  # 最大实例数
-    APS_MISFIRE_GRACE_TIME: int = 60  # 任务错过执行时间后，最大容错时间，过期后不再执行，单位：秒
 
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
