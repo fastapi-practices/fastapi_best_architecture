@@ -10,8 +10,8 @@ router = APIRouter(prefix='/tests')
 
 @router.post('/task/async', summary='测试异步任务')
 async def task_demo_async_send():
-    celery_app.send_task('task_demo_async')
-    return {'msg': 'Success'}
+    result = celery_app.send_task('tasks.task_demo_async')
+    return {'msg': 'Success', 'data': result.id}
 
 
 @router.post('/files', summary='测试文件上传')

@@ -4,6 +4,8 @@ from celery import Celery
 
 from backend.app.core.conf import settings
 
+__all__ = ['celery_app']
+
 celery_app = Celery('celery_app')
 celery_app.conf.broker_url = (
     f'redis://:{settings.CELERY_REDIS_PASSWORD}@{settings.CELERY_REDIS_HOST}:'
@@ -20,4 +22,3 @@ celery_app.conf.result_backend_transport_options = {
 }
 celery_app.conf.timezone = settings.DATETIME_TIMEZONE
 celery_app.conf.task_track_started = True
-celery_app.autodiscover_tasks(['app'])
