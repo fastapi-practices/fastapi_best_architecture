@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import NoReturn
 
 from fast_captcha import text_captcha
 from sqlalchemy import select, update, desc, and_
@@ -34,7 +33,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, obj: RegisterUser) -> NoReturn:
+    async def create(self, db: AsyncSession, obj: RegisterUser) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.dict()
@@ -42,7 +41,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
-    async def add(self, db: AsyncSession, obj: AddUser) -> NoReturn:
+    async def add(self, db: AsyncSession, obj: AddUser) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.dict(exclude={'roles'})

@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Any
+
 from fastapi import Request
 from backend.app.common.exception import errors
 from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
+from backend.app.models import Menu
 from backend.app.schemas.menu import CreateMenu, UpdateMenu
 from backend.app.utils.build_tree import get_tree_data
 
 
 class MenuService:
     @staticmethod
-    async def get(*, pk: int):
+    async def get(*, pk: int) -> Menu:
         async with async_db_session() as db:
             menu = await MenuDao.get(db, menu_id=pk)
             if not menu:
@@ -19,14 +22,14 @@ class MenuService:
             return menu
 
     @staticmethod
-    async def get_menu_tree(*, title: str | None = None, status: int | None = None):
+    async def get_menu_tree(*, title: str | None = None, status: int | None = None) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             menu_select = await MenuDao.get_all(db, title=title, status=status)
             menu_tree = await get_tree_data(menu_select)
             return menu_tree
 
     @staticmethod
-    async def get_role_menu_tree(*, pk: int):
+    async def get_role_menu_tree(*, pk: int) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             role = await RoleDao.get_with_relation(db, pk)
             if not role:
@@ -37,7 +40,7 @@ class MenuService:
             return menu_tree
 
     @staticmethod
-    async def get_user_menu_tree(*, request: Request):
+    async def get_user_menu_tree(*, request: Request) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             roles = request.user.roles
             menu_ids = []
@@ -50,7 +53,7 @@ class MenuService:
             return menu_tree
 
     @staticmethod
-    async def create(*, obj: CreateMenu):
+    async def create(*, obj: CreateMenu) -> None:
         async with async_db_session.begin() as db:
             title = await MenuDao.get_by_title(db, obj.title)
             if title:
@@ -62,7 +65,7 @@ class MenuService:
             await MenuDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateMenu):
+    async def update(*, pk: int, obj: UpdateMenu) -> int:
         async with async_db_session.begin() as db:
             menu = await MenuDao.get(db, pk)
             if not menu:
@@ -78,7 +81,7 @@ class MenuService:
             return count
 
     @staticmethod
-    async def delete(*, pk: int):
+    async def delete(*, pk: int) -> int:
         async with async_db_session.begin() as db:
             children = await MenuDao.get_children(db, pk)
             if children:

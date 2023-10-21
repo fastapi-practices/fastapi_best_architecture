@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import NoReturn
 
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
@@ -16,6 +15,7 @@ from backend.app.common.response.response_code import CustomErrorCode
 from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
+from backend.app.models import User
 from backend.app.schemas.user import AuthLogin
 from backend.app.services.login_log_service import LoginLogService
 from backend.app.utils.timezone import timezone
@@ -24,7 +24,7 @@ from backend.app.utils.timezone import timezone
 class AuthService:
     login_time = timezone.now()
 
-    async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm):
+    async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm) -> tuple[str, User]:
         async with async_db_session() as db:
             current_user = await UserDao.get_by_username(db, form_data.username)
             if not current_user:
@@ -41,7 +41,9 @@ class AuthService:
             access_token, _ = await jwt.create_access_token(str(user.id), multi_login=user.is_multi_login)
             return access_token, user
 
-    async def login(self, *, request: Request, obj: AuthLogin, background_tasks: BackgroundTasks):
+    async def login(
+        self, *, request: Request, obj: AuthLogin, background_tasks: BackgroundTasks
+    ) -> tuple[str, str, datetime, datetime, User]:
         async with async_db_session() as db:
             try:
                 current_user = await UserDao.get_by_username(db, obj.username)
@@ -115,7 +117,7 @@ class AuthService:
             return new_access_token, new_refresh_token, new_access_token_expire_time, new_refresh_token_expire_time
 
     @staticmethod
-    async def logout(*, request: Request) -> NoReturn:
+    async def logout(*, request: Request) -> None:
         token = await get_token(request)
         if request.user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'

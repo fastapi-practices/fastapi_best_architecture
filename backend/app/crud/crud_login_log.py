@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
-
 from sqlalchemy import Select, select, desc, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +22,7 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
             se = se.where(and_(*where_list))
         return se
 
-    async def create(self, db: AsyncSession, obj_in: CreateLoginLog) -> NoReturn:
+    async def create(self, db: AsyncSession, obj_in: CreateLoginLog):
         await self.create_(db, obj_in)
         await db.commit()
 

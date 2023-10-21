@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import select, asc, and_
 from sqlalchemy.orm import selectinload
 
@@ -16,7 +18,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         result = await db.execute(select(self.model).where(self.model.title == title))
         return result.scalars().first()
 
-    async def get_all(self, db, title: str | None = None, status: int | None = None) -> list[Menu]:
+    async def get_all(self, db, title: str | None = None, status: int | None = None) -> Sequence[Menu]:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = []
         if title:
@@ -28,7 +30,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         menu = await db.execute(se)
         return menu.scalars().all()
 
-    async def get_role_menus(self, db, superuser: bool, menu_ids: list[int]) -> list[Menu]:
+    async def get_role_menus(self, db, superuser: bool, menu_ids: list[int]) -> Sequence[Menu]:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.menu_type.in_([0, 1])]
         if not superuser:
