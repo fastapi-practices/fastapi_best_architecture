@@ -17,6 +17,11 @@ from backend.app.tests.utils.db_mysql import override_get_db
 app.dependency_overrides[get_db] = override_get_db
 
 
+# Test user
+PYTEST_USERNAME = 'admin'
+PYTEST_PASSWORD = '123456'
+
+
 @pytest.fixture(scope='module')
 def client() -> Generator:
     with TestClient(app) as c:
@@ -25,4 +30,4 @@ def client() -> Generator:
 
 @pytest.fixture(scope='module')
 def token_headers(client: TestClient) -> Dict[str, str]:
-    return get_token_headers(client=client, username='admin', password='123456')
+    return get_token_headers(client=client, username=PYTEST_USERNAME, password=PYTEST_PASSWORD)

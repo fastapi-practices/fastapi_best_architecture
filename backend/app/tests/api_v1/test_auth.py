@@ -3,16 +3,17 @@
 from starlette.testclient import TestClient
 
 from backend.app.core.conf import settings
+from backend.app.tests.conftest import PYTEST_USERNAME, PYTEST_PASSWORD
 
 
 def test_login(client: TestClient) -> None:
     data = {
-        'username': 'admin',
-        'password': '123456',
+        'username': PYTEST_USERNAME,
+        'password': PYTEST_PASSWORD,
     }
-    response = client.post(f'{settings.API_V1_STR}/auth/login', json=data)
+    response = client.post(f'{settings.API_V1_STR}/auth/swagger_login', data=data)
     assert response.status_code == 200
-    assert response.json()['data']['access_token_type'] == 'Bearer'
+    assert response.json()['token_type'] == 'Bearer'
 
 
 def test_logout(client: TestClient, token_headers: dict[str, str]) -> None:

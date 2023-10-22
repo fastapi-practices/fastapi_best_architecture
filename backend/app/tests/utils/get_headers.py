@@ -12,8 +12,8 @@ def get_token_headers(client: TestClient, username: str, password: str) -> Dict[
         'username': username,
         'password': password,
     }
-    response = client.post(f'{settings.API_V1_STR}/auth/login', json=data)
-    token_type = response.json()['data']['access_token_type']
-    access_token = response.json()['data']['access_token']
+    response = client.post(f'{settings.API_V1_STR}/auth/swagger_login', data=data)
+    token_type = response.json()['token_type']
+    access_token = response.json()['access_token']
     headers = {'Authorization': f'{token_type} {access_token}'}
     return headers

@@ -174,14 +174,14 @@ Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastap
 Execute unittests via pytest
 
 1. Create the test database `fba_test`, select utf8mb4 encoding
-2. Enter the app directory
+2. Using `backend/sql/create_tables.sql` file to create database tables
+3. Initialize the test data using the `backend/sql/init_pytest_data.sql` file
+4. Enter the app directory
 
    ```shell
    cd backend/app/
    ```
 
-3. Using `backend/sql/create_tables.sql` file to create database tables
-4. Initialize the test data using the `backend/sql/init_pytest_data.sql` file
 5. Execute the test command
 
    ```shell
