@@ -181,7 +181,7 @@ Execute unittests via pytest
    ```
 
 3. Using `backend/sql/create_tables.sql` file to create database tables
-4. Initialize the test data using the `backend/sql/init_test_data.sql` file
+4. Initialize the test data using the `backend/sql/init_pytest_data.sql` file
 5. Execute the test command
 
    ```shell
