@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import NoReturn
 
 from fastapi import Request
 from sqlalchemy import Select
@@ -22,7 +21,7 @@ class LoginLogService:
     @staticmethod
     async def create(
         *, db: AsyncSession, request: Request, user: User, login_time: datetime, status: int, msg: str
-    ) -> NoReturn:
+    ) -> None:
         try:
             # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
             obj_in = CreateLoginLog(

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn, Sequence
+from typing import Sequence
 
 from sqlalchemy import Select, select, desc, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,7 +35,7 @@ class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
         api = await db.execute(select(self.model).where(self.model.name == name))
         return api.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateApi) -> NoReturn:
+    async def create(self, db: AsyncSession, obj_in: CreateApi) -> None:
         await self.create_(db, obj_in)
 
     async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApi) -> int:

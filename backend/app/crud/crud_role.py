@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
+from typing import Sequence
 
-from sqlalchemy import select, delete, desc
+from sqlalchemy import select, delete, desc, Select
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
@@ -20,15 +20,15 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         )
         return role.scalars().first()
 
-    async def get_all(self, db) -> list[Role]:
+    async def get_all(self, db) -> Sequence[Role]:
         roles = await db.execute(select(self.model))
         return roles.scalars().all()
 
-    async def get_user_all(self, db, user_id: int) -> list[Role]:
+    async def get_user_all(self, db, user_id: int) -> Sequence[Role]:
         roles = await db.execute(select(self.model).join(self.model.users).where(User.id == user_id))
         return roles.scalars().all()
 
-    async def get_list(self, name: str = None, data_scope: int = None, status: int = None):
+    async def get_list(self, name: str = None, data_scope: int = None, status: int = None) -> Select:
         se = select(self.model).options(selectinload(self.model.menus)).order_by(desc(self.model.created_time))
         where_list = []
         if name:
@@ -45,7 +45,7 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         role = await db.execute(select(self.model).where(self.model.name == name))
         return role.scalars().first()
 
-    async def create(self, db, obj_in: CreateRole) -> NoReturn:
+    async def create(self, db, obj_in: CreateRole) -> None:
         await self.create_(db, obj_in)
 
     async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:

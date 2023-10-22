@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, Generic, Type, TypeVar, NoReturn
+from typing import Any, Dict, Generic, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete, and_
@@ -49,7 +49,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await db.execute(select(self.model).where(and_(*where_list)))
         return result.scalars().first()
 
-    async def create_(self, db: AsyncSession, obj_in: CreateSchemaType, user_id: int | None = None) -> NoReturn:
+    async def create_(self, db: AsyncSession, obj_in: CreateSchemaType, user_id: int | None = None) -> None:
         """
         新增一条数据
 

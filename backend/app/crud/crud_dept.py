@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Sequence
 
 from sqlalchemy import select, and_, asc, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
-from backend.app.models import Dept
+from backend.app.models import Dept, User
 from backend.app.schemas.dept import CreateDept, UpdateDept
 
 
@@ -20,7 +20,7 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
 
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
-    ) -> Any:
+    ) -> Sequence[Dept]:
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]
         conditions = []
@@ -53,14 +53,14 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
         return await self.delete_(db, dept_id, del_flag=1)
 
-    async def get_user_relation(self, db: AsyncSession, dept_id: int) -> Any:
+    async def get_user_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
         result = await db.execute(
             select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
         )
         user_relation = result.scalars().first()
         return user_relation.users
 
-    async def get_children(self, db: AsyncSession, dept_id: int) -> Any:
+    async def get_children(self, db: AsyncSession, dept_id: int) -> list[Dept]:
         result = await db.execute(
             select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
         )

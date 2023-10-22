@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 
 from backend.app.common.exception import errors
@@ -20,13 +22,13 @@ class RoleService:
             return role
 
     @staticmethod
-    async def get_all() -> list[Role]:
+    async def get_all() -> Sequence[Role]:
         async with async_db_session() as db:
             roles = await RoleDao.get_all(db)
             return roles
 
     @staticmethod
-    async def get_user_all(*, pk: int) -> list[Role]:
+    async def get_user_all(*, pk: int) -> Sequence[Role]:
         async with async_db_session() as db:
             roles = await RoleDao.get_user_all(db, user_id=pk)
             return roles
