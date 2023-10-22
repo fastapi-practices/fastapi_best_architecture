@@ -8,8 +8,8 @@ from backend.app.core.celery import celery_app
 router = APIRouter(prefix='/tests')
 
 
-@router.post('/task/async', summary='测试异步任务')
-async def task_demo_async_send():
+@router.post('/send', summary='测试异步任务')
+async def task_send():
     result = celery_app.send_task('tasks.task_demo_async')
     return {'msg': 'Success', 'data': result.id}
 

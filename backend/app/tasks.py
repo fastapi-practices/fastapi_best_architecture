@@ -9,5 +9,5 @@ from backend.app.core.celery import celery_app  # noqa: E402
 
 
 @celery_app.task
-async def task_demo_async():
+def task_demo_async():
     print(f'异步任务 {uuid.uuid4().hex}')
