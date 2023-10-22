@@ -175,7 +175,7 @@ TODO:
    ```
 
 3. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
-4. 使用 `backend/sql/init_test_data.sql` 文件初始化测试数据
+4. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
 5. 执行测试命令
 
    ```shell
