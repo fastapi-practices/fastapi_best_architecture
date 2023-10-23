@@ -168,14 +168,14 @@ TODO:
 通过 pytest 执行单元测试
 
 1. 创建测试数据库 `fba_test`，选择 utf8mb4 编码
-2. 进入app目录
+2. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
+3. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
+4. 进入app目录
 
    ```shell
    cd backend/app/
    ```
 
-3. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
-4. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
 5. 执行测试命令
 
    ```shell

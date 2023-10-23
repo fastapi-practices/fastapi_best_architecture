@@ -24,6 +24,9 @@ def get_request_ip(request: Request) -> str:
             ip = forwarded.split(',')[0]
         else:
             ip = request.client.host
+    # 忽略 pytest
+    if ip == 'testclient':
+        ip = '127.0.0.1'
     return ip
 
 
