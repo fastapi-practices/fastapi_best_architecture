@@ -25,6 +25,7 @@ services:
       - fba_mysql
       - fba_redis
       - fba_rabbitmq
+      - fba_celery
     volumes:
       - fba_static:/fba/backend/app/static
     networks:

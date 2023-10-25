@@ -17,6 +17,8 @@ ENV TZ = Asia/Shanghai
 
 WORKDIR /fba/backend/app
 
-CMD chmod +x celery-start.sh
+RUN chmod +x celery-start.sh
 
-CMD ["./celery-start.sh"]
+# 这里不使用脚本启动 celery, 而是使用 supervisor
+# 因为 celery 脚本包含 worker 和 beat, 但是并不推荐它们在一条命令中启动
+#CMD ["./celery-start.sh"]
