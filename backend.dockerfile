@@ -12,8 +12,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # 某些包可能存在同步不及时导致安装失败的情况，可选择备用源
-# 清华源（国内快，也可能同步不及时）：https://pypi.tuna.tsinghua.edu.cn/simple
-# 官方源（国外慢，但永远都是最新的）：https://pypi.org/simple
+# 清华源：https://pypi.tuna.tsinghua.edu.cn/simple
+# 官方源：https://pypi.org/simple
 RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
     && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
