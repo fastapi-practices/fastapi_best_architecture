@@ -152,7 +152,7 @@ class Settings(BaseSettings):
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
 
     # Celery
-    CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'rabbitmq'
+    CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
     CELERY_BACKEND_REDIS_PREFIX: str = 'fba_celery'
     CELERY_BACKEND_REDIS_TIMEOUT: float = 5.0
     CELERY_BACKEND_REDIS_ORDERED: bool = True
