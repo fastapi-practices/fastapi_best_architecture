@@ -2,6 +2,7 @@ version: "3.10"
 
 networks:
   fba_network:
+    name: fba_network
     driver: bridge
     ipam:
       driver: default
@@ -10,21 +11,24 @@ networks:
 
 volumes:
   fba_mysql:
+    name: fba_mysql
   fba_redis:
+    name: fba_redis
   fba_static:
+    name: fba_static
   fba_rabbitmq:
+    name: fba_rabbitmq
 
 services:
   fba_server:
     build:
       context: ../../
       dockerfile: backend.dockerfile
-    container_name: "fba_server"
+    container_name: fba_server
     restart: always
     depends_on:
       - fba_mysql
       - fba_redis
-      - fba_rabbitmq
       - fba_celery
     volumes:
       - fba_static:/fba/backend/app/static
@@ -34,14 +38,16 @@ services:
       - bash
       - -c
       - |
-        wait-for-it -s fba_mysql:3306 -s fba_redis:6379 fba_rabbitmq:5672 fba_rabbitmq:15672 -t 300
+        wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
+        mkdir -p /var/log/supervisor/
         supervisord -c /fba/deploy/supervisor.conf
+        supervisorctl restart fastapi_server
 
   fba_mysql:
     image: mysql:8.0.29
     ports:
       - "${DOCKER_DB_MAP_PORT:-3306}:3306"
-    container_name: "fba_mysql"
+    container_name: fba_mysql
     restart: always
     environment:
       MYSQL_DATABASE: fba
@@ -61,7 +67,7 @@ services:
     image: redis:6.2.7
     ports:
       - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
-    container_name: "fba_redis"
+    container_name: fba_redis
     restart: always
     environment:
       - TZ=Asia/Shanghai
@@ -74,7 +80,7 @@ services:
     image: nginx
     ports:
       - "8000:80"
-    container_name: "fba_nginx"
+    container_name: fba_nginx
     restart: always
     depends_on:
       - fba_server
@@ -90,7 +96,7 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-    container_name: "fba_rabbitmq"
+    container_name: fba_rabbitmq
     restart: always
     environment:
       - RABBITMQ_DEFAULT_USER=guest
@@ -104,7 +110,18 @@ services:
     build:
       context: ../../
       dockerfile: celery.dockerfile
-    container_name: "fba_celery"
+    container_name: fba_celery
     restart: always
+    depends_on:
+      - fba_rabbitmq
     networks:
       - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s fba_rabbitmq:5672 -t 300
+        mkdir -p /var/log/supervisor/
+        supervisord -c /fba/deploy/supervisor.conf
+        supervisorctl restart celery_worker
+        supervisorctl restart celery_beat
