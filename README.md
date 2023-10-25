@@ -116,10 +116,12 @@ TODO:
    # Execute the migration
    alembic upgrade head
     ```
-7. Start celery worker
+7. Start celery worker and beat
 
    ```shell
    celery -A tasks worker --loglevel=INFO
+   # Optional, if you don't need to use the scheduled task
+   celery -A tasks beat --loglevel=INFO
    ```
    
 8. Modify the configuration file as needed

@@ -111,10 +111,12 @@ TODO:
    alembic upgrade head
     ```
 
-7. 启动 celery worker
+7. 启动 celery worker 和 beat
 
    ```shell
    celery -A tasks worker --loglevel=INFO
+   # 可选，如果您不需要使用计划任务
+   celery -A tasks beat --loglevel=INFO
    ```
 
 8. 按需修改配置文件
