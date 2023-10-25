@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
     @root_validator
-    def validator_api_url(cls, values):
+    def validate_openapi_url(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['OPENAPI_URL'] = None
         return values
@@ -163,6 +163,12 @@ class Settings(BaseSettings):
             'schedule': 5.0,
         },
     }
+
+    @root_validator
+    def validate_celery_broker(cls, values):
+        if values['ENVIRONMENT'] == 'pro':
+            values['CELERY_BROKER'] = 'rabbitmq'
+        return values
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
