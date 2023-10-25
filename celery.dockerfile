@@ -4,7 +4,8 @@ WORKDIR /fba
 
 COPY . .
 
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc python3-dev \
@@ -14,6 +15,8 @@ RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
     && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
 ENV TZ = Asia/Shanghai
+
+RUN mkdir -p /var/log/celery
 
 WORKDIR /fba/backend/app
 
