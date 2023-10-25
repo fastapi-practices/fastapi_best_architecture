@@ -129,6 +129,10 @@ TODO:
 
 ### Docker 部署
 
+> [!WARNING]
+> 默认端口冲突：8000，3306，6379，5672
+> 最佳做法是在部署之前关闭本地服务：mysql，redis，rabbitmq...
+
 1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
 
    ```shell
@@ -144,7 +148,7 @@ TODO:
 3. 执行一键启动命令
 
    ```shell
-   docker-compose up -d -build
+   docker-compose up -d --build
    ```
 
 4. 等待命令自动完成
