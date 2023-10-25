@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from fastapi import APIRouter, File, UploadFile, Form
 
-from backend.app.core.celery import celery_app
+from backend.app.tasks import task_demo_async
 
 router = APIRouter(prefix='/tests')
 
 
 @router.post('/send', summary='测试异步任务')
 async def task_send():
-    result = celery_app.send_task('tasks.task_demo_async')
+    result = task_demo_async.delay()
     return {'msg': 'Success', 'data': result.id}
 
 

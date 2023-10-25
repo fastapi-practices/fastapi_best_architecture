@@ -41,6 +41,7 @@ def make_celery(main_name: str) -> Celery:
     }
     app.conf.timezone = settings.DATETIME_TIMEZONE
     app.conf.task_track_started = True
+    app.autodiscover_tasks()
 
     # Celery Schedule Tasks
     # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
