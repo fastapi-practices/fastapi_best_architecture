@@ -5,13 +5,14 @@ from celery.result import AsyncResult
 from fastapi import APIRouter, Path
 
 from backend.app.common.exception.errors import NotFoundError
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.common.response.response_schema import response_base
 
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取任务结果')
+@router.get('/{pk}', summary='获取任务结果', dependencies=[DependsRBAC])
 async def get_task_result(pk: str = Path(description='任务ID')):
     try:
         task = AsyncResult(pk)
