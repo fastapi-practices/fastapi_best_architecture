@@ -22,11 +22,19 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
     REDIS_DATABASE: int
 
-    # Env APScheduler Redis
-    APS_REDIS_HOST: str
-    APS_REDIS_PORT: int
-    APS_REDIS_PASSWORD: str
-    APS_REDIS_DATABASE: int
+    # Env Celery
+    CELERY_REDIS_HOST: str
+    CELERY_REDIS_PORT: int
+    CELERY_REDIS_PASSWORD: str
+    CELERY_BROKER_REDIS_DATABASE: int  # 仅当使用 redis 作为 broker 时生效, 更适用于测试环境
+    CELERY_BACKEND_REDIS_DATABASE: int
+
+    # Env Rabbitmq
+    # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
+    RABBITMQ_HOST: str
+    RABBITMQ_PORT: int
+    RABBITMQ_USERNAME: str
+    RABBITMQ_PASSWORD: str
 
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
@@ -44,7 +52,7 @@ class Settings(BaseSettings):
     OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
     @root_validator
-    def validator_api_url(cls, values):
+    def validate_openapi_url(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['OPENAPI_URL'] = None
         return values
@@ -83,14 +91,6 @@ class Settings(BaseSettings):
 
     # Redis
     REDIS_TIMEOUT: int = 5
-
-    # APScheduler Redis
-    APS_REDIS_TIMEOUT: int = 10
-
-    # APScheduler Default
-    APS_COALESCE: bool = False  # 是否合并运行
-    APS_MAX_INSTANCES: int = 3  # 最大实例数
-    APS_MISFIRE_GRACE_TIME: int = 60  # 任务错过执行时间后，最大容错时间，过期后不再执行，单位：秒
 
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
@@ -147,9 +147,28 @@ class Settings(BaseSettings):
     OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']
 
-    # ip location
+    # Ip location
     IP_LOCATION_REDIS_PREFIX: str = 'fba_ip_location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
+
+    # Celery
+    CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
+    CELERY_BACKEND_REDIS_PREFIX: str = 'fba_celery'
+    CELERY_BACKEND_REDIS_TIMEOUT: float = 5.0
+    CELERY_BACKEND_REDIS_ORDERED: bool = True
+    CELERY_BEAT_SCHEDULE_FILENAME: str = './log/celery_beat-schedule'
+    CELERY_BEAT_SCHEDULE: dict = {
+        'task_demo_async': {
+            'task': 'tasks.task_demo_async',
+            'schedule': 5.0,
+        },
+    }
+
+    @root_validator
+    def validate_celery_broker(cls, values):
+        if values['ENVIRONMENT'] == 'pro':
+            values['CELERY_BROKER'] = 'rabbitmq'
+        return values
 
     class Config:
         # https://docs.pydantic.dev/usage/settings/#dotenv-env-support

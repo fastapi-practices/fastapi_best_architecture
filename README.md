@@ -43,7 +43,7 @@ See a preview of some of the screenshots
 - [x] Follows Restful API specification
 - [x] Global SQLAlchemy 2.0 syntax
 - [x] Casbin RBAC access control model
-- [x] APScheduler online timed tasks
+- [x] Celery asynchronous tasks
 - [x] JWT middleware whitelist authentication
 - [x] Global customizable time zone time
 - [x] Docker / Docker-compose deployment
@@ -85,6 +85,7 @@ TODO:
 ### BackEnd
 
 1. Install dependencies
+
     ```shell
     pip install -r requirements.txt
     ```
@@ -115,9 +116,17 @@ TODO:
    # Execute the migration
    alembic upgrade head
     ```
-7. Modify the configuration file as needed
-8. Execute the `backend/app/main.py` file to start the service
-9. Browser access: http://127.0.0.1:8000/api/v1/docs
+7. Start celery worker and beat
+
+   ```shell
+   celery -A tasks worker --loglevel=INFO
+   # Optional, if you don't need to use the scheduled task
+   celery -A tasks beat --loglevel=INFO
+   ```
+   
+8. Modify the configuration file as needed
+9. Execute the `backend/app/main.py` file to start the service
+10. Browser access: http://127.0.0.1:8000/api/v1/docs
 
 ---
 
@@ -126,6 +135,11 @@ TODO:
 Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
 ### Docker deploy
+
+> [!WARNING]
+> Default port conflict：8000，3306，6379，5672 
+> 
+> As a best practice, shut down on-premises services before deployment：mysql，redis，rabbitmq...
 
 1. Go to the directory where the ``docker-compose.yml`` file is located and create the environment variable
    file ``.env``
@@ -143,7 +157,7 @@ Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastap
 3. Execute the one-click boot command
 
    ```shell
-   docker-compose up -d -build
+   docker-compose up -d --build
    ```
 
 4. Wait for the command to complete automatically
