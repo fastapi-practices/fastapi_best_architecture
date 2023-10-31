@@ -11,6 +11,7 @@ from backend.app.crud.crud_login_log import LoginLogDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.login_log import CreateLoginLog
+from backend.app.utils.request_parse import parse_user_agent_info, parse_ip_info
 
 
 class LoginLogService:
@@ -24,18 +25,20 @@ class LoginLogService:
     ) -> None:
         try:
             # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
+            user_agent, device, os, browser = await parse_user_agent_info(request)
+            ip, country, region, city = await parse_ip_info(request)
             obj_in = CreateLoginLog(
                 user_uuid=user.uuid,
                 username=user.username,
                 status=status,
-                ip=request.state.ip,
-                country=request.state.country,
-                region=request.state.region,
-                city=request.state.city,
-                user_agent=request.state.user_agent,
-                browser=request.state.browser,
-                os=request.state.os,
-                device=request.state.device,
+                ip=ip,
+                country=country,
+                region=region,
+                city=city,
+                user_agent=user_agent,
+                browser=browser,
+                os=os,
+                device=device,
                 msg=msg,
                 login_time=login_time,
             )

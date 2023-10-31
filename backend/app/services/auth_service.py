@@ -19,6 +19,7 @@ from backend.app.models import User
 from backend.app.schemas.user import AuthLogin
 from backend.app.services.login_log_service import LoginLogService
 from backend.app.utils.timezone import timezone
+from backend.app.utils.request_parse import get_request_ip
 
 
 class AuthService:
@@ -53,7 +54,7 @@ class AuthService:
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-                captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{await get_request_ip(request)}')
                 if not captcha_code:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
@@ -91,7 +92,7 @@ class AuthService:
                     msg='登录成功',
                 )
                 background_tasks.add_task(LoginLogService.create, **log_info)
-                await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{await get_request_ip(request)}')
                 return access_token, refresh_token, access_token_expire_time, refresh_token_expire_time, user
 
     @staticmethod

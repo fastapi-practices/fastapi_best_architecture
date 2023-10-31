@@ -5,6 +5,7 @@ from XdbSearchIP.xdbSearcher import XdbSearcher
 from asgiref.sync import sync_to_async
 from fastapi import Request
 from user_agents import parse
+from functools import lru_cache
 
 from backend.app.common.log import log
 from backend.app.common.redis import redis_client
@@ -13,6 +14,7 @@ from backend.app.core.path_conf import IP2REGION_XDB
 
 
 @sync_to_async
+@lru_cache(maxsize=128)
 def get_request_ip(request: Request) -> str:
     """获取请求的 ip 地址"""
     real = request.headers.get('X-Real-IP')
@@ -73,7 +75,7 @@ def get_location_offline(ip: str) -> dict | None:
         log.error(f'离线获取 ip 地址属地失败，错误信息：{e}')
         return None
 
-
+@lru_cache(maxsize=128)
 async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
     country, region, city = None, None, None
     ip = await get_request_ip(request)
@@ -100,6 +102,7 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
 
 
 @sync_to_async
+@lru_cache(maxsize=128)
 def parse_user_agent_info(request: Request) -> tuple[str, str, str, str]:
     user_agent = request.headers.get('User-Agent')
     _user_agent = parse(user_agent)

@@ -8,6 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from backend.app.common.redis import redis_client
 from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
+from backend.app.utils.request_parse import get_request_ip
 
 router = APIRouter()
 
@@ -23,7 +24,7 @@ async def get_captcha(request: Request):
     """
     img_type: str = 'base64'
     img, code = await run_in_threadpool(img_captcha, img_byte=img_type)
-    ip = request.state.ip
+    ip = await get_request_ip(request)
     await redis_client.set(
         f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ip}', code, ex=settings.CAPTCHA_LOGIN_EXPIRE_SECONDS
     )
