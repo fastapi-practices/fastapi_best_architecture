@@ -60,7 +60,7 @@ class OperaLogMiddleware:
 
         # 执行请求
         start_time = timezone.now()
-        code, msg, status, err, wrapped_rcv = await self.execute_request(request)
+        code, msg, status, err = await self.execute_request(request, send)
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
@@ -98,9 +98,7 @@ class OperaLogMiddleware:
         if err:
             raise err from None
 
-        await self.app(scope, wrapped_rcv or receive, send)
-
-    async def execute_request(self, request: Request) -> tuple:
+    async def execute_request(self, request: Request, send: Send) -> tuple:
         err: Any = None
         try:
             # 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
@@ -111,6 +109,7 @@ class OperaLogMiddleware:
                         yield message
 
             wrapped_rcv = wrapped_rcv_gen().__anext__
+            await self.app(request.scope, wrapped_rcv, send)
             code, msg, status = await self.exception_middleware_handler(request)
         except Exception as e:
             log.exception(e)
@@ -118,9 +117,8 @@ class OperaLogMiddleware:
             msg = getattr(e, 'msg', None) or 'Internal Server Error'
             status = 0
             err = e
-            wrapped_rcv = None
 
-        return code, msg, status, err, wrapped_rcv
+        return code, msg, status, err
 
     @staticmethod
     @sync_to_async
