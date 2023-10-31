@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Any, AsyncGenerator
 
 from asgiref.sync import sync_to_async
 from starlette.background import BackgroundTask
@@ -60,7 +60,7 @@ class OperaLogMiddleware:
 
         # 执行请求
         start_time = timezone.now()
-        code, msg, status, err = await self.execute_request(request, send)
+        code, msg, status, err, wrapped_rcv = await self.execute_request(request)
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
@@ -98,22 +98,19 @@ class OperaLogMiddleware:
         if err:
             raise err from None
 
-    async def execute_request(self, request: Request, send: Send) -> tuple:
+        await self.app(scope, wrapped_rcv or receive, send)
+
+    async def execute_request(self, request: Request) -> tuple:
         err: Any = None
         try:
             # 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
-            async def wrapped_rcv_gen():
+            async def wrapped_rcv_gen() -> AsyncGenerator:
                 async for _ in request.stream():
                     yield {'type': 'http.request', 'body': await request.body()}
                     async for message in request.receive:  # type: ignore
-                        # assert message['type'] == 'http.response.body'
-                        # body = message.get('body', b'')
-                        # if body:
-                        #     yield body
                         yield message
 
             wrapped_rcv = wrapped_rcv_gen().__anext__
-            await self.app(request.scope, wrapped_rcv, send)
             code, msg, status = await self.exception_middleware_handler(request)
         except Exception as e:
             log.exception(e)
@@ -121,8 +118,9 @@ class OperaLogMiddleware:
             msg = getattr(e, 'msg', None) or 'Internal Server Error'
             status = 0
             err = e
+            wrapped_rcv = None
 
-        return code, msg, status, err
+        return code, msg, status, err, wrapped_rcv
 
     @staticmethod
     @sync_to_async
