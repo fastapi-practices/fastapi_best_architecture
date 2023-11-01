@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Any, AsyncGenerator
 
 from asgiref.sync import sync_to_async
 from starlette.background import BackgroundTask
@@ -102,14 +102,10 @@ class OperaLogMiddleware:
         err: Any = None
         try:
             # 详见 https://github.com/tiangolo/fastapi/discussions/8385#discussioncomment-6117967
-            async def wrapped_rcv_gen():
+            async def wrapped_rcv_gen() -> AsyncGenerator:
                 async for _ in request.stream():
                     yield {'type': 'http.request', 'body': await request.body()}
                     async for message in request.receive:  # type: ignore
-                        # assert message['type'] == 'http.response.body'
-                        # body = message.get('body', b'')
-                        # if body:
-                        #     yield body
                         yield message
 
             wrapped_rcv = wrapped_rcv_gen().__anext__

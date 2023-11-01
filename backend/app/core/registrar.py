@@ -94,23 +94,22 @@ def register_middleware(app: FastAPI):
     :param app:
     :return:
     """
-    # Gzip
+    # Gzip: Always at the top
     if settings.MIDDLEWARE_GZIP:
         from fastapi.middleware.gzip import GZipMiddleware
 
         app.add_middleware(GZipMiddleware)
-    # Access log
-    # TODO: opera log 中间件完全可行时将被删除
-    if settings.MIDDLEWARE_ACCESS:
-        from backend.app.middleware.access_middleware import AccessMiddleware
-
-        app.add_middleware(AccessMiddleware)
     # Opera log
     app.add_middleware(OperaLogMiddleware)
     # JWT auth: Always open
     app.add_middleware(
         AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
     )
+    # Access log
+    if settings.MIDDLEWARE_ACCESS:
+        from backend.app.middleware.access_middleware import AccessMiddleware
+
+        app.add_middleware(AccessMiddleware)
     # CORS: Always at the end
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
