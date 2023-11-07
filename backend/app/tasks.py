@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('../../')
 
-from backend.app.core.celery import celery_app  # noqa: E402
+from backend.app.common.celery import celery_app  # noqa: E402
 
 
 @celery_app.task
