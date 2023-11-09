@@ -15,8 +15,10 @@ def make_celery(main_name: str) -> Celery:
     :return:
     """
     app = Celery(main_name)
+    app.autodiscover_tasks(packages=['backend.app'])
 
     # Celery Config
+    # https://docs.celeryq.dev/en/stable/userguide/configuration.html
     app.conf.broker_url = (
         (
             f'redis://:{settings.CELERY_REDIS_PASSWORD}@{settings.CELERY_REDIS_HOST}:'
@@ -41,7 +43,6 @@ def make_celery(main_name: str) -> Celery:
     }
     app.conf.timezone = settings.DATETIME_TIMEZONE
     app.conf.task_track_started = True
-    app.autodiscover_tasks()
 
     # Celery Schedule Tasks
     # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
