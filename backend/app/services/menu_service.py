@@ -3,6 +3,7 @@
 from typing import Any
 
 from fastapi import Request
+
 from backend.app.common.exception import errors
 from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao

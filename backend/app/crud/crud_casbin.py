@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, select, and_, delete, or_
+from sqlalchemy import Select, and_, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import CasbinRule
-from backend.app.schemas.casbin_rule import CreatePolicy, UpdatePolicy, DeleteAllPolicies, DeleteAllUserRoles
+from backend.app.schemas.casbin_rule import CreatePolicy, DeleteAllPolicies, DeleteAllUserRoles, UpdatePolicy
 
 
 class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):

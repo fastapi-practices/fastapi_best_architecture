@@ -3,7 +3,7 @@
 from typing import Any
 
 from fastapi import Request, Response
-from starlette.authentication import AuthenticationBackend, AuthenticationError, AuthCredentials
+from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
 from starlette.responses import JSONResponse
 

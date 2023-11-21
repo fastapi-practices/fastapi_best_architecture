@@ -89,7 +89,7 @@ class ResponseBase:
         res: CustomResponseCode = CustomResponseCode.HTTP_200,
         data: Any | None = None,
         exclude: _ExcludeData | None = None,
-        **kwargs
+        **kwargs,
     ) -> dict:
         return await self.__response(res=res, data=data, exclude=exclude, **kwargs)
 
@@ -99,7 +99,7 @@ class ResponseBase:
         res: CustomResponseCode = CustomResponseCode.HTTP_400,
         data: Any = None,
         exclude: _ExcludeData | None = None,
-        **kwargs
+        **kwargs,
     ) -> dict:
         return await self.__response(res=res, data=data, exclude=exclude, **kwargs)
 

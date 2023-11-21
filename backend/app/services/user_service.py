@@ -14,7 +14,7 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import RegisterUser, ResetPassword, UpdateUser, Avatar, UpdateUserRole, AddUser
+from backend.app.schemas.user import AddUser, Avatar, RegisterUser, ResetPassword, UpdateUser, UpdateUserRole
 
 
 class UserService:

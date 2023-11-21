@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select
 
-from backend.app.common.rbac import RBAC
 from backend.app.common.exception import errors
+from backend.app.common.rbac import RBAC
 from backend.app.crud.crud_casbin import CasbinDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.schemas.casbin_rule import (
     CreatePolicy,
-    UpdatePolicy,
-    DeletePolicy,
     CreateUserRole,
-    DeleteUserRole,
     DeleteAllPolicies,
     DeleteAllUserRoles,
+    DeletePolicy,
+    DeleteUserRole,
+    UpdatePolicy,
 )
 
 

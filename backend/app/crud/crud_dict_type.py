@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, select, desc, delete
+from sqlalchemy import Select, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase

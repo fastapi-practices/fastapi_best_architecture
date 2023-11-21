@@ -4,12 +4,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.dict_type import GetAllDictType, CreateDictType, UpdateDictType
+from backend.app.schemas.dict_type import CreateDictType, GetAllDictType, UpdateDictType
 from backend.app.services.dict_type_service import DictTypeService
 
 router = APIRouter()

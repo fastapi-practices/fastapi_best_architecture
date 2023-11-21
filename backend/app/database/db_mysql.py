@@ -4,7 +4,7 @@ import sys
 
 from fastapi import Depends
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from typing_extensions import Annotated
 
 from backend.app.common.log import log

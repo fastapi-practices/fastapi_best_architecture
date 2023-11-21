@@ -2,7 +2,9 @@ import os
 import platform
 import socket
 import sys
-from datetime import timedelta, datetime, timezone as tz
+
+from datetime import datetime, timedelta
+from datetime import timezone as tz
 from typing import List
 
 import psutil

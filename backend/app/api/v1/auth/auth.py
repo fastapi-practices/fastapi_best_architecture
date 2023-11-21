@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, Query
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.token import GetLoginToken, GetSwaggerToken, GetNewToken
+from backend.app.schemas.token import GetLoginToken, GetNewToken, GetSwaggerToken
 from backend.app.schemas.user import AuthLogin
 from backend.app.services.auth_service import AuthService
 

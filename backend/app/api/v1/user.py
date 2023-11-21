@@ -4,20 +4,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 
-from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
-from backend.app.common.pagination import paging_data, PageDepends
+from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import (
-    RegisterUser,
+    AddUser,
+    Avatar,
     GetAllUserInfo,
+    GetCurrentUserInfo,
+    RegisterUser,
     ResetPassword,
     UpdateUser,
-    Avatar,
     UpdateUserRole,
-    AddUser,
-    GetCurrentUserInfo,
 )
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_as_dict

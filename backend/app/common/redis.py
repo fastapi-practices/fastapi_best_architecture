@@ -3,7 +3,7 @@
 import sys
 
 from redis.asyncio.client import Redis
-from redis.exceptions import TimeoutError, AuthenticationError
+from redis.exceptions import AuthenticationError, TimeoutError
 
 from backend.app.common.log import log
 from backend.app.core.conf import settings

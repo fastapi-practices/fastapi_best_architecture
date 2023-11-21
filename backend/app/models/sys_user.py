@@ -4,10 +4,10 @@ from datetime import datetime
 from typing import Union
 from uuid import uuid4
 
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.models.base import id_key, Base
+from backend.app.models.base import Base, id_key
 from backend.app.models.sys_user_role import sys_user_role
 from backend.app.utils.timezone import timezone
 

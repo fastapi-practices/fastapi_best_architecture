@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import select, delete, desc, Select
+from sqlalchemy import Select, delete, desc, select
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
-from backend.app.models import Role, Menu, User
+from backend.app.models import Menu, Role, User
 from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
 
 

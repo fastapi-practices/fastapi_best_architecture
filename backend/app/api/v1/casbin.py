@@ -4,20 +4,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.casbin_rule import (
     CreatePolicy,
-    UpdatePolicy,
-    DeletePolicy,
     CreateUserRole,
-    DeleteUserRole,
-    GetAllPolicy,
     DeleteAllPolicies,
     DeleteAllUserRoles,
+    DeletePolicy,
+    DeleteUserRole,
+    GetAllPolicy,
+    UpdatePolicy,
 )
 from backend.app.services.casbin_service import CasbinService
 

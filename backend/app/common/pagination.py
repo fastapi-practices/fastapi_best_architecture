@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import math
-from typing import TypeVar, Generic, Sequence, Dict, TYPE_CHECKING
 
-from fastapi import Query, Depends
+from typing import TYPE_CHECKING, Dict, Generic, Sequence, TypeVar
+
+from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import paginate
