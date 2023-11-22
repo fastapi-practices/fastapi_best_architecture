@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from uuid import uuid4
 
 from fastapi import Depends
 from sqlalchemy import URL
@@ -53,3 +54,8 @@ async def create_table():
     """创建数据库表"""
     async with async_engine.begin() as coon:
         await coon.run_sync(MappedBase.metadata.create_all)
+
+
+def uuid4_str() -> str:
+    """数据库引擎 UUID 类型兼容性解决方案"""
+    return str(uuid4())
