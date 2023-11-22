@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+
 from uuid import uuid4
 
 from fastapi import Depends
