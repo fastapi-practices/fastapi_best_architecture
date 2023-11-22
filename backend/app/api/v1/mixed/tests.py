@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, File, UploadFile, Form
+from fastapi import APIRouter, File, Form, UploadFile
 
 from backend.app.tasks import task_demo_async
 

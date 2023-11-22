@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

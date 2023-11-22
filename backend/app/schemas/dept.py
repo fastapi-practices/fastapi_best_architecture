@@ -28,7 +28,7 @@ class DeptBase(SchemaBase):
     @validator('email')
     def email_validator(cls, v):
         if v is not None:
-            from email_validator import validate_email, EmailNotValidError
+            from email_validator import EmailNotValidError, validate_email
 
             try:
                 validate_email(v, check_deliverability=False).email

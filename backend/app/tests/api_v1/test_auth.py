@@ -3,7 +3,7 @@
 from starlette.testclient import TestClient
 
 from backend.app.core.conf import settings
-from backend.app.tests.conftest import PYTEST_USERNAME, PYTEST_PASSWORD
+from backend.app.tests.conftest import PYTEST_PASSWORD, PYTEST_USERNAME
 
 
 def test_login(client: TestClient) -> None:

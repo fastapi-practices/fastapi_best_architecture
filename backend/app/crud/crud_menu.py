@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import select, asc, and_
+from sqlalchemy import and_, asc, select
 from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase

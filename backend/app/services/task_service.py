@@ -3,8 +3,8 @@
 from celery.exceptions import BackendGetMetaError, NotRegistered
 from celery.result import AsyncResult
 
-from backend.app.common.exception.errors import NotFoundError
 from backend.app.common.celery import celery_app
+from backend.app.common.exception.errors import NotFoundError
 
 
 class TaskService:

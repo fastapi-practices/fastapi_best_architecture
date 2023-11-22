@@ -6,15 +6,15 @@ from asgiref.sync import sync_to_async
 from starlette.background import BackgroundTask
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
-from starlette.types import ASGIApp, Scope, Receive, Send
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from backend.app.common.enums import OperaLogCipherType
 from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
 from backend.app.services.opera_log_service import OperaLogService
-from backend.app.utils.encrypt import AESCipher, Md5Cipher, ItsDCipher
-from backend.app.utils.request_parse import parse_user_agent_info, parse_ip_info
+from backend.app.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
+from backend.app.utils.request_parse import parse_ip_info, parse_user_agent_info
 from backend.app.utils.timezone import timezone
 
 

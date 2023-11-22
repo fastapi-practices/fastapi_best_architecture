@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.app.common.rbac import DependsRBAC
 from backend.app.common.jwt import DependsJwtAuth
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
-from backend.app.schemas.dept import GetAllDept, CreateDept, UpdateDept
+from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
 from backend.app.services.dept_service import DeptService
 from backend.app.utils.serializers import select_as_dict
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import dataclasses
+
 from collections import defaultdict
 from enum import Enum
 from pathlib import PurePath
@@ -134,7 +135,7 @@ def jsonable_encoder(
     # Use type comparisons on common types before expensive isinstance checks
     if type(obj) in PRIMITIVE_TYPE:
         return obj
-    if type(obj) == dict:
+    if isinstance(obj, dict):
         return encode_dict(obj)
     if type(obj) in ARRAY_TYPES:
         return encode_array(obj)
@@ -166,8 +167,7 @@ def jsonable_encoder(
     try:
         data = dict(obj)
     except Exception as e:
-        errors: list[Exception] = []
-        errors.append(e)
+        errors: list[Exception] = [e]
         try:
             data = vars(obj)
         except Exception as e:

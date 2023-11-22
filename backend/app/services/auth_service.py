@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import Request
 from fastapi.security import OAuth2PasswordRequestForm
-from starlette.background import BackgroundTasks, BackgroundTask
+from starlette.background import BackgroundTask, BackgroundTasks
 
 from backend.app.common import jwt
 from backend.app.common.enums import LoginLogStatusType

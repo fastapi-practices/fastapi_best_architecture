@@ -3,7 +3,7 @@
 from typing import Any, Dict, Generic, Type, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import select, update, delete, and_
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.models.base import MappedBase

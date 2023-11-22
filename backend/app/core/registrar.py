@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -80,6 +80,7 @@ def register_static_file(app: FastAPI):
     """
     if settings.STATIC_FILES:
         import os
+
         from fastapi.staticfiles import StaticFiles
 
         if not os.path.exists('./static'):

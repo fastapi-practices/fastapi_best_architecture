@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from decimal import Decimal
-from typing import Any, TypeVar, Sequence
+from typing import Any, Sequence, TypeVar
 
 from asgiref.sync import sync_to_async
 from sqlalchemy import Row, RowMapping

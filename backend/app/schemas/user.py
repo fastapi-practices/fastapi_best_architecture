@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from email_validator import validate_email, EmailNotValidError
-from pydantic import HttpUrl, Field, validator, root_validator
+from email_validator import EmailNotValidError, validate_email
+from pydantic import Field, HttpUrl, root_validator, validator
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase

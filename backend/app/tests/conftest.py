@@ -4,15 +4,16 @@ import sys
 
 sys.path.append('../../')
 
+from typing import Dict, Generator
+
 import pytest
-from typing import Generator, Dict
 
 from starlette.testclient import TestClient
 
-from backend.app.main import app
-from backend.app.tests.utils.get_headers import get_token_headers
 from backend.app.database.db_mysql import get_db
+from backend.app.main import app
 from backend.app.tests.utils.db_mysql import override_get_db
+from backend.app.tests.utils.get_headers import get_token_headers
 
 app.dependency_overrides[get_db] = override_get_db
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Table, Column, ForeignKey, INT, Integer
+from sqlalchemy import INT, Column, ForeignKey, Integer, Table
 
 from backend.app.models.base import MappedBase
 

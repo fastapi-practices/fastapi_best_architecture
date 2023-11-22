@@ -3,15 +3,15 @@
 from datetime import datetime
 
 from fast_captcha import text_captcha
-from sqlalchemy import select, update, desc, and_
+from sqlalchemy import and_, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
 
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
-from backend.app.models import User, Role
-from backend.app.schemas.user import RegisterUser, UpdateUser, Avatar, UpdateUserRole, AddUser
+from backend.app.models import Role, User
+from backend.app.schemas.user import AddUser, Avatar, RegisterUser, UpdateUser, UpdateUserRole
 
 
 class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):

@@ -12,8 +12,8 @@ from starlette.responses import JSONResponse
 
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.log import log
-from backend.app.common.response.response_code import StandardResponseCode, CustomResponseCode
-from backend.app.common.response.response_schema import response_base, ResponseModel
+from backend.app.common.response.response_code import CustomResponseCode, StandardResponseCode
+from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.core.conf import settings
 
 
@@ -60,11 +60,13 @@ def register_exception(app: FastAPI):
                     if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
                         if getattr(sub_raw_exc, 'code') == 'enum':
                             sub_raw_exc.__dict__['permitted'] = ', '.join(
-                                repr(v.value) for v in sub_raw_exc.enum_values  # type: ignore
+                                repr(v.value)
+                                for v in sub_raw_exc.enum_values  # type: ignore
                             )
                         else:
                             sub_raw_exc.__dict__['permitted'] = ', '.join(
-                                repr(v) for v in sub_raw_exc.permitted  # type: ignore
+                                repr(v)
+                                for v in sub_raw_exc.permitted  # type: ignore
                             )
                 # 处理异常信息
                 for error in raw_exc.errors()[:1]:

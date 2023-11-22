@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Body
+from fastapi import APIRouter, Body, Path
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.rbac import DependsRBAC

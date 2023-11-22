@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import casbin
 import casbin_async_sqlalchemy_adapter
-from fastapi import Request, Depends
+
+from fastapi import Depends, Request
 
 from backend.app.common.enums import StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
