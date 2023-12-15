@@ -25,6 +25,12 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 | 数据访问 | dao / mapper   | crud                      |
 | 模型   | model / entity | model                     |
 
+## 在线预览
+
+遗憾的是，我们没有资金提供在线预览，您可以通过查看[本地开发](#本地开发)进行部署，或直接使用 [Docker](#docker-部署)
+进行部署，或者在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
+查看部分截图预览
+
 ## 特征
 
 - [x] 使用 FastAPI PEP 593 Annotated 参数设计
@@ -53,7 +59,7 @@ TODO:
 7. [x] 登录认证：图形验证码后台认证登录
 8. [x] 登录日志：用户正常登录和异常登录的日志记录与查询
 9. [x] 服务监控：服务器硬件设备信息与状态
-10. [x] 定时任务：在线任务控制（修改，删除，暂停...）
+10. [x] 定时任务：自动化任务，异步任务，支持函数调用
 11. [x] 接口文档：自动生成在线交互式 API 接口文档
 
 TODO:
@@ -62,12 +68,6 @@ TODO:
 2. [ ] 代码生成：根据表结构，可视化生成增删改查业务代码
 3. [ ] 文件上传：对接云OSS加本地备份
 4. [ ] 系统通知：主动发送定时任务通知，资源警告，服务异常预警...
-
-## 在线预览
-
-遗憾的是，我们没有资金提供在线预览，您可以通过查看[本地开发](#本地开发)进行部署，或直接使用 [Docker](#docker-部署)
-进行部署，或者在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
-查看部分截图预览
 
 ## 本地开发
 
@@ -127,7 +127,7 @@ TODO:
 
 ### 前端
 
-点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
+跳转 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
 ### Docker 部署
 
@@ -175,7 +175,7 @@ TODO:
 
 ### 前端
 
-点击 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
+跳转 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
 ## 测试
 
@@ -208,13 +208,24 @@ TODO:
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
 - [Casbin](https://casbin.org/zh/)
 - [Ruff](https://beta.ruff.rs/docs/)
-- [Black](https://black.readthedocs.io/en/stable/index.html)
-- [RuoYi](http://ruoyi.vip/)
 - ...
+
+## 互动
+
+有且仅有当前一个频道，请注意辨别真伪
+
+<table>
+  <tr>
+    <td><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
+  </tr>
+  <tr>
+    <td> Telegram </td>
+  </tr>
+</table>
 
 ## 赞助我们
 
-> 如果此项目能够帮助到你，你可以赞助我们一些咖啡豆表示鼓励 :coffee:
+如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励 :coffee:
 
 <table>
   <tr>
