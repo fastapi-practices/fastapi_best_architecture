@@ -38,6 +38,7 @@ class ResponseModel(BaseModel):
             res = CustomResponseCode.HTTP_200
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
+
     # TODO: json_encoders 配置失效
     model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
 

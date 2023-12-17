@@ -16,8 +16,6 @@ from backend.app.core.conf import settings
 from backend.app.schemas.base import (
     CUSTOM_USAGE_ERROR_MESSAGES,
     CUSTOM_VALIDATION_ERROR_MESSAGES,
-    convert_usage_errors,
-    convert_validation_errors,
 )
 
 
@@ -28,8 +26,14 @@ async def _validation_exception_handler(request: Request, e: RequestValidationEr
     :param e:
     :return:
     """
+    errors = []
+    for error in e.errors():
+        custom_message = CUSTOM_VALIDATION_ERROR_MESSAGES.get(error['type'])
+        if custom_message:
+            ctx = error.get('ctx')
+            error['msg'] = custom_message.format(**ctx) if ctx else custom_message
+        errors.append(error)
     message = ''
-    errors = await convert_validation_errors(e, CUSTOM_VALIDATION_ERROR_MESSAGES)  # noqa: ignore
     for error in errors[:1]:
         if error.get('type') == 'json_invalid':
             message += 'json解析失败'
@@ -40,11 +44,11 @@ async def _validation_exception_handler(request: Request, e: RequestValidationEr
             field = str(error.get('loc')[-1])
             error_msg = error.get('msg')
             message += f'{field} {ctx_error if ctx else error_msg}: {error_input}' + '.'
-    content = {
-        'code': 422,
-        'msg': '请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
-        'data': {'errors': e.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
-    }
+    content = ResponseModel(
+        code=422,
+        msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
+        data={'errors': e.errors()} if message == '' and settings.UVICORN_RELOAD is True else None,
+    ).model_dump()
     request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
     return JSONResponse(status_code=422, content=await response_base.fail(**content))
 
@@ -98,11 +102,13 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
+        custom_message = CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code)  # type: ignore
+        msg = custom_message if custom_message else exc.message
         return JSONResponse(
             status_code=500,
             content=await response_base.fail(
                 code=exc.code,
-                msg=await convert_usage_errors(exc, CUSTOM_USAGE_ERROR_MESSAGES),  # noqa: ignore
+                msg=msg,
             ),
         )
 

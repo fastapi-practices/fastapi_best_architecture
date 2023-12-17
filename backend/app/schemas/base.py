@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from asgiref.sync import sync_to_async
-from fastapi.exceptions import ValidationException
-from pydantic import BaseModel, ConfigDict, PydanticUserError, ValidationError
-from pydantic_core import ErrorDetails
+from pydantic import BaseModel, ConfigDict
 
 # 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
 # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
@@ -138,28 +135,6 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
     'type-adapter-config-unused': '类型适配器配置项定义错误',
     'root-model-extra': '根模型禁止定义额外字段',
 }
-
-
-@sync_to_async
-def convert_validation_errors(
-    e: ValidationError | ValidationException, custom_messages: dict[str, str]
-) -> list[ErrorDetails]:
-    new_errors: list[ErrorDetails] = []
-    for error in e.errors():
-        custom_message = custom_messages.get(error['type'])
-        if custom_message:
-            ctx = error.get('ctx')
-            error['msg'] = custom_message.format(**ctx) if ctx else custom_message
-        new_errors.append(error)
-    return new_errors
-
-
-@sync_to_async
-def convert_usage_errors(e: PydanticUserError, custom_messages: dict[str, str]) -> str:
-    custom_message = custom_messages.get(e.code)  # type: ignore
-    if custom_message:
-        return custom_message
-    return e.message
 
 
 class SchemaBase(BaseModel):
