@@ -122,11 +122,11 @@ class OperaLogMiddleware:
 
     @staticmethod
     @sync_to_async
-    def exception_middleware_handler(request: Request):
+    def exception_middleware_handler(request: Request) -> tuple[str, str, int]:
         # 预置响应信息
-        code: str = '200'
-        msg: str = 'Success'
-        status: int = 1
+        code = '200'
+        msg = 'Success'
+        status = 1
         try:
             http_exception = request.state.__request_http_exception__
         except AttributeError:
@@ -143,7 +143,7 @@ class OperaLogMiddleware:
             code = validation_exception.get('code', '400')
             msg = validation_exception.get('msg', 'Bad Request')
             status = 0
-        return code, msg, status
+        return str(code), msg, status
 
     @staticmethod
     async def get_request_args(request: Request) -> dict:
