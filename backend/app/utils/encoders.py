@@ -21,10 +21,10 @@ ARRAY_TYPES = (list, set, frozenset, GeneratorType, tuple)
 def _generate_encoders_by_class_tuples(
     type_encoder_map: dict[Any, Callable[[Any], Any]],
 ) -> dict[Callable[[Any], Any], tuple[Any, ...]]:
-    encoders_by_class_tuples: dict[Callable[[Any], Any], tuple[Any, ...]] = defaultdict(tuple)
+    _encoders_by_class_tuples: dict[Callable[[Any], Any], tuple[Any, ...]] = defaultdict(tuple)
     for type_, encoder in type_encoder_map.items():
-        encoders_by_class_tuples[encoder] += (type_,)
-    return encoders_by_class_tuples
+        _encoders_by_class_tuples[encoder] += (type_,)
+    return _encoders_by_class_tuples
 
 
 encoders_by_class_tuples = _generate_encoders_by_class_tuples(ENCODERS_BY_TYPE)
@@ -113,7 +113,7 @@ def jsonable_encoder(
         if custom_encoder:
             encoder.update(custom_encoder)
 
-        obj_dict = obj.dict(
+        obj_dict = obj.model_dump(
             include=include,
             exclude=exclude,
             by_alias=by_alias,
