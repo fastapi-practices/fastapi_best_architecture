@@ -146,19 +146,27 @@ def register_exception(app: FastAPI):
             :param exc:
             :return:
             """
+            if isinstance(exc, BaseExceptionMixin):
+                content = ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).dict()
+            else:
+                content = (
+                    ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).dict()
+                    if settings.ENVIRONMENT == 'dev'
+                    else await response_base.fail(CustomResponseCode.HTTP_500)
+                )
             response = JSONResponse(
                 status_code=exc.code if isinstance(exc, BaseExceptionMixin) else StandardResponseCode.HTTP_500,
-                content=ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).dict()
-                if isinstance(exc, BaseExceptionMixin)
-                else ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).dict()
-                if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                content=content,
                 background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
             )
             origin = request.headers.get('origin')
             if origin:
                 cors = CORSMiddleware(
-                    app=app, allow_origins=['*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*']
+                    app=app,
+                    allow_origins=['*'],
+                    allow_credentials=True,
+                    allow_methods=['*'],
+                    allow_headers=['*'],
                 )
                 response.headers.update(cors.simple_headers)
                 has_cookie = 'cookie' in request.headers
