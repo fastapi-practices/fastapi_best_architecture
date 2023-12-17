@@ -3,11 +3,11 @@
 from datetime import datetime
 from typing import Any
 
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict
 
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.core.conf import settings
-from backend.app.utils.encoders import jsonable_encoder
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
 
