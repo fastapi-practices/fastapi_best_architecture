@@ -64,7 +64,7 @@ TODO:
 7. [x] Login Authentication: graphical authentication code background authentication login
 8. [x] Login Logs: Logging and querying of normal and abnormal user logins
 9. [x] Service Monitoring: server hardware device information and status
-10. [x] Timed Tasks: online task control (modify, delete, pause...)
+10. [x] Scheduled tasks: automated tasks, asynchronous tasks, and function invocation are supported
 11. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
 
 TODO:
@@ -123,7 +123,7 @@ TODO:
    # Optional, if you don't need to use the scheduled task
    celery -A tasks beat --loglevel=INFO
    ```
-   
+
 8. Modify the configuration file as needed
 9. Execute the `backend/app/main.py` file to start the service
 10. Browser access: http://127.0.0.1:8000/api/v1/docs
@@ -132,13 +132,13 @@ TODO:
 
 ### Front
 
-Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
+Go to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
 ### Docker deploy
 
 > [!WARNING]
-> Default port conflict：8000，3306，6379，5672 
-> 
+> Default port conflict：8000，3306，6379，5672
+>
 > As a best practice, shut down on-premises services before deployment：mysql，redis，rabbitmq...
 
 1. Go to the directory where the ``docker-compose.yml`` file is located and create the environment variable
@@ -181,7 +181,7 @@ For reference only
 
 ### Front
 
-Click [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
+Go to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
 ## Test
 
@@ -214,13 +214,24 @@ Execute unittests via pytest
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
 - [Casbin](https://casbin.org/zh/)
 - [Ruff](https://beta.ruff.rs/docs/)
-- [Black](https://black.readthedocs.io/en/stable/index.html)
-- [RuoYi](http://ruoyi.vip/)
 - ...
+
+## 互动
+
+有且仅有当前一个频道，请注意辨别真伪
+
+<table>
+  <tr>
+    <td><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
+  </tr>
+  <tr>
+    <td> Telegram </td>
+  </tr>
+</table>
 
 ## Sponsor us
 
-> If this program has helped you, you can sponsor us with some coffee beans :coffee:
+If this program has helped you, you can sponsor us with some coffee beans :coffee:
 
 <table>
   <tr>
