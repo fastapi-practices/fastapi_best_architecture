@@ -47,6 +47,9 @@ class OperaLogMiddleware:
             username = None
         method = request.method
         args = await self.get_request_args(request)
+        router = request.scope.get('route')
+        summary = getattr(router, 'summary', None) or ''
+        args.update(request.path_params)
 
         # 设置附加请求信息
         request.state.ip = ip
@@ -64,9 +67,6 @@ class OperaLogMiddleware:
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
-        router = request.scope.get('route')
-        summary = getattr(router, 'summary', None) or ''
-        args.update(request.path_params)
         # 脱敏处理
         args = await self.desensitization(args)
 
@@ -113,18 +113,19 @@ class OperaLogMiddleware:
             code, msg, status = await self.exception_middleware_handler(request)
         except Exception as e:
             log.exception(e)
-            code = getattr(e, 'code', None) or '500'
+            # code 处理包含 SQLAlchemy 和 Pydantic
+            code = getattr(e, 'code', None) or 500
             msg = getattr(e, 'msg', None) or 'Internal Server Error'
             status = 0
             err = e
 
-        return code, msg, status, err
+        return str(code), msg, status, err
 
     @staticmethod
     @sync_to_async
-    def exception_middleware_handler(request: Request) -> tuple[str, str, int]:
+    def exception_middleware_handler(request: Request) -> tuple:
         # 预置响应信息
-        code = '200'
+        code = 200
         msg = 'Success'
         status = 1
         try:
@@ -132,7 +133,7 @@ class OperaLogMiddleware:
         except AttributeError:
             pass
         else:
-            code = http_exception.get('code', '500')
+            code = http_exception.get('code', 500)
             msg = http_exception.get('msg', 'Internal Server Error')
             status = 0
         try:
@@ -140,10 +141,10 @@ class OperaLogMiddleware:
         except AttributeError:
             pass
         else:
-            code = validation_exception.get('code', '400')
+            code = validation_exception.get('code', 400)
             msg = validation_exception.get('msg', 'Bad Request')
             status = 0
-        return str(code), msg, status
+        return code, msg, status
 
     @staticmethod
     async def get_request_args(request: Request) -> dict:
@@ -166,7 +167,7 @@ class OperaLogMiddleware:
 
     @staticmethod
     @sync_to_async
-    def desensitization(args: dict):
+    def desensitization(args: dict) -> dict | None:
         if len(args) > 0:
             match settings.OPERA_LOG_ENCRYPT:
                 case OperaLogCipherType.aes:
