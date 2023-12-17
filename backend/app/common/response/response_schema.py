@@ -38,7 +38,7 @@ class ResponseModel(BaseModel):
             res = CustomResponseCode.HTTP_200
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
-
+    # TODO: json_encoders 配置失效
     model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
 
     code: int = CustomResponseCode.HTTP_200.code
@@ -77,6 +77,7 @@ class ResponseBase:
         :return:
         """
         if data is not None:
+            # TODO: custom_encoder 配置失效
             custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
             kwargs.update({'custom_encoder': custom_encoder})
             data = jsonable_encoder(data, exclude=exclude, **kwargs)
