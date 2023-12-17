@@ -97,7 +97,7 @@ class AuthService:
     @staticmethod
     async def new_token(*, request: Request, refresh_token: str) -> tuple[str, str, datetime, datetime]:
         user_id = await jwt.jwt_decode(refresh_token)
-        if str(request.user.id) != user_id:
+        if request.user.id != user_id:
             raise errors.TokenError(msg='刷新 token 无效')
         async with async_db_session() as db:
             current_user = await UserDao.get(db, user_id)
