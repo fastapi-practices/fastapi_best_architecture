@@ -31,7 +31,9 @@ def register_exception(app: FastAPI):
         request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_400,
-            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_400),
+            content=content
+            if settings.ENVIRONMENT == 'dev'
+            else await response_base.fail(res=CustomResponseCode.HTTP_400),
             headers=exc.headers,
         )
 
@@ -48,7 +50,9 @@ def register_exception(app: FastAPI):
         data = {}
         for raw_error in exc.raw_errors:
             raw_exc = raw_error.exc
-            if isinstance(raw_exc, ValidationError):
+            if isinstance(raw_error.exc, json.JSONDecodeError):
+                message = 'json解析失败'
+            elif isinstance(raw_exc, ValidationError):
                 if hasattr(raw_exc, 'model'):
                     fields = raw_exc.model.__dict__.get('__fields__')
                     for field_key in fields.keys():
@@ -69,12 +73,10 @@ def register_exception(app: FastAPI):
                                 for v in sub_raw_exc.permitted  # type: ignore
                             )
                 # 处理异常信息
-                for error in raw_exc.errors()[:1]:
-                    field = str(error.get('loc')[-1])
-                    msg = error.get('msg')
-                    message += f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
-            elif isinstance(raw_error.exc, json.JSONDecodeError):
-                message += 'json解析失败'
+                error = raw_exc.errors()[0]
+                field = str(error.get('loc')[-1])
+                msg = error.get('msg')
+                message = f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
         content = ResponseModel(
             code=StandardResponseCode.HTTP_422,
             msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
@@ -83,7 +85,10 @@ def register_exception(app: FastAPI):
         request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_422,
-            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_422),
+            content=content
+            if settings.ENVIRONMENT == 'dev'
+            # TODO: 返回自定义枚举类变量
+            else await response_base.fail(res=CustomResponseCode.HTTP_422),
         )
 
     @app.exception_handler(Exception)
@@ -118,7 +123,7 @@ def register_exception(app: FastAPI):
                     else exc.__doc__,
                 ).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                else await response_base.fail(res=CustomResponseCode.HTTP_500),
             )
 
         else:
@@ -130,7 +135,7 @@ def register_exception(app: FastAPI):
                 status_code=StandardResponseCode.HTTP_500,
                 content=ResponseModel(code=500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                else await response_base.fail(res=CustomResponseCode.HTTP_500),
             )
 
     if settings.MIDDLEWARE_CORS:
@@ -152,7 +157,7 @@ def register_exception(app: FastAPI):
                 if isinstance(exc, BaseExceptionMixin)
                 else ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                else await response_base.fail(res=CustomResponseCode.HTTP_500),
                 background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
             )
             origin = request.headers.get('origin')
