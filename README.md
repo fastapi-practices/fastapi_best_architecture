@@ -42,16 +42,13 @@ See a preview of some of the screenshots
 - [x] Global asynchronous design with async/await + asgiref
 - [x] Follows Restful API specification
 - [x] Global SQLAlchemy 2.0 syntax
+- [x] Pydantic v1 and v2 (different branches)
 - [x] Casbin RBAC access control model
 - [x] Celery asynchronous tasks
 - [x] JWT middleware whitelist authentication
 - [x] Global customizable time zone time
 - [x] Docker / Docker-compose deployment
 - [x] Pytest Unit Testing
-
-TODO:
-
-1. [ ] Pydantic 2.0
 
 ## Built-in features
 
