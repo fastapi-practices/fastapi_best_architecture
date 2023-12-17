@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.core.conf import settings
@@ -39,12 +39,11 @@ class ResponseModel(BaseModel):
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
 
+    model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
+
     code: int = CustomResponseCode.HTTP_200.code
     msg: str = CustomResponseCode.HTTP_200.msg
     data: Any | None = None
-
-    class Config:
-        json_encoders = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
 
 
 class ResponseBase:
