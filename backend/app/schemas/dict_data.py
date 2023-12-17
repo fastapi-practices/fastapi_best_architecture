@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
@@ -27,10 +27,9 @@ class UpdateDictData(DictDataBase):
 
 
 class GetAllDictData(DictDataBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     type: GetAllDictType
     created_time: datetime
     updated_time: datetime | None = None
-
-    class Config:
-        orm_mode = True

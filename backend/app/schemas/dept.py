@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import Field, validator
+from pydantic import ConfigDict, Field, field_validator
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
@@ -18,14 +18,16 @@ class DeptBase(SchemaBase):
     email: str | None = None
     status: StatusType = Field(default=StatusType.enable)
 
-    @validator('phone')
+    @field_validator('phone')
+    @classmethod
     def phone_validator(cls, v):
         if v is not None and not v.isdigit():
             if not is_phone(v):
                 raise ValueError('手机号码输入有误')
         return v
 
-    @validator('email')
+    @field_validator('email')
+    @classmethod
     def email_validator(cls, v):
         if v is not None:
             from email_validator import EmailNotValidError, validate_email
@@ -46,10 +48,9 @@ class UpdateDept(DeptBase):
 
 
 class GetAllDept(DeptBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     del_flag: bool
     created_time: datetime
     updated_time: datetime | None = None
-
-    class Config:
-        orm_mode = True
