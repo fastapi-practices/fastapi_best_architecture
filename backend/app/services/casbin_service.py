@@ -93,7 +93,7 @@ class CasbinService:
     @staticmethod
     async def get_group_list():
         enforcer = await RBAC.enforcer()
-        data = await enforcer.get_grouping_policy()
+        data = enforcer.get_grouping_policy()
         return data
 
     @staticmethod

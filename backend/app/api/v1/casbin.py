@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import PageDepends, paging_data
@@ -42,7 +42,7 @@ async def get_all_policies():
 
 
 @router.get('/policy/{role}/all', summary='获取指定角色的所有P权限规则', dependencies=[DependsJwtAuth])
-async def get_role_policies(role: str):
+async def get_role_policies(role: Annotated[str, Path(description='角色ID')]):
     policies = await CasbinService.get_policy_list_by_role(role=role)
     return await response_base.success(data=policies)
 
