@@ -110,16 +110,15 @@ class GetAllUserInfo(GetUserInfoNoRelation):
 class GetCurrentUserInfo(GetAllUserInfo):
     model_config = ConfigDict(from_attributes=True)
 
-    @model_validator(mode='before')
-    @classmethod
-    def handel(cls, values):
+    @model_validator(mode='after')
+    def handel(self, values):
         """处理部门和角色"""
-        dept = values.get('dept')
+        dept = self.dept
         if dept:
-            values['dept'] = dept.name
-        roles = values.get('roles')
+            self.dept = dept.name  # type: ignore
+        roles = self.roles
         if roles:
-            values['roles'] = [role.name for role in roles]
+            self.roles = [role.name for role in roles]  # type: ignore
         return values
 
 
