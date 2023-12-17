@@ -34,7 +34,7 @@ CUSTOM_VALIDATION_ERROR_MESSAGES = {
     'decimal_type': '小数类型输入错误',
     'decimal_whole_digits': '小数位数输入错误',
     'dict_type': '字典类型输入错误',
-    'enum': '枚举成员输入错误，允许：{expected}',
+    'enum': '枚举成员输入错误，允许 {expected}',
     'extra_forbidden': '禁止额外字段输入',
     'finite_number': '有限值输入错误',
     'float_parsing': '浮点数输入解析错误',

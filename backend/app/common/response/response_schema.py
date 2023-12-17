@@ -39,7 +39,7 @@ class ResponseModel(BaseModel):
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
 
-    # TODO: json_encoders 配置失效
+    # TODO: json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
     model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
 
     code: int = CustomResponseCode.HTTP_200.code
@@ -65,7 +65,11 @@ class ResponseBase:
 
     @staticmethod
     async def __response(
-        *, res: CustomResponseCode = None, data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+        *,
+        res: CustomResponseCode = None,
+        data: Any | None = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs,
     ) -> dict:
         """
         请求成功返回通用方法
@@ -78,7 +82,7 @@ class ResponseBase:
         :return:
         """
         if data is not None:
-            # TODO: custom_encoder 配置失效
+            # TODO: custom_encoder 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
             custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
             kwargs.update({'custom_encoder': custom_encoder})
             data = jsonable_encoder(data, exclude=exclude, **kwargs)
