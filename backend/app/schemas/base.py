@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from asgiref.sync import sync_to_async
 from fastapi.exceptions import ValidationException
-from pydantic import BaseModel, ConfigDict, ValidationError, PydanticUserError
+from pydantic import BaseModel, ConfigDict, PydanticUserError, ValidationError
 from pydantic_core import ErrorDetails
 
-# 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接  # noqa: E501
+# 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
 # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
 # 替换预期内容字段方式，参考以下链接
 # https://github.com/pydantic/pydantic/blob/caa78016433ec9b16a973f92f187a7b6bfde6cb5/docs/errors/errors.md?plain=1#L232
