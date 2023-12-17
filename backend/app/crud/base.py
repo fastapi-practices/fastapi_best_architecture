@@ -59,9 +59,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         :return:
         """
         if user_id:
-            create_data = self.model(**obj_in.dict(), create_user=user_id)
+            create_data = self.model(**obj_in.model_dump(), create_user=user_id)
         else:
-            create_data = self.model(**obj_in.dict())
+            create_data = self.model(**obj_in.model_dump())
         db.add(create_data)
 
     async def update_(
@@ -79,7 +79,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
-            update_data = obj_in.dict(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True)
         if user_id:
             update_data.update({'update_user': user_id})
         result = await db.execute(update(self.model).where(self.model.id == pk).values(**update_data))
