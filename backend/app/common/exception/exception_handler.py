@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.log import log
-from backend.app.common.response.response_code import CustomResponseCode, StandardResponseCode
+from backend.app.common.response.response_code import CustomResponse, CustomResponseCode, StandardResponseCode
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.core.conf import settings
 from backend.app.schemas.base import (
@@ -40,15 +40,20 @@ async def _validation_exception_handler(request: Request, e: RequestValidationEr
         error_input = error.get('input')
         field = str(error.get('loc')[-1])
         error_msg = error.get('msg')
-        message = f'{field} {error_msg}, 输入：{error_input}.'
+        message = f'{field} {error_msg}，输入：{error_input}'
     msg = f'请求参数非法: {message}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
-    content = ResponseModel(code=422, msg=msg, data=data).model_dump()
+    content = ResponseModel(
+        code=StandardResponseCode.HTTP_422,
+        msg=msg,
+    ).model_dump()
     request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
     return JSONResponse(
         status_code=422,
-        # TODO: 返回自定义枚举类变量
-        content=await response_base.fail(res=CustomResponseCode.HTTP_422, data=data),
+        content=await response_base.fail(
+            res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=msg),
+            data=data,
+        ),
     )
 
 
@@ -103,11 +108,11 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code)
-        # TODO: 返回自定义枚举类变量
         return JSONResponse(
-            status_code=500,
-            content=await response_base.fail(res=CustomResponseCode.HTTP_500),
+            status_code=StandardResponseCode.HTTP_500,
+            content=await response_base.fail(
+                res=CustomResponse(code=StandardResponseCode.HTTP_500, msg=CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code))
+            ),
         )
 
     @app.exception_handler(Exception)
