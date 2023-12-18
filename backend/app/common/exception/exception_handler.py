@@ -86,10 +86,8 @@ def register_exception(app: FastAPI):
         request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_422,
-            content=content
-            if settings.ENVIRONMENT == 'dev'
-            else await response_base.fail(
-                res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=message),
+            content=await response_base.fail(
+                res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=msg),
                 data=data,
             ),
         )
