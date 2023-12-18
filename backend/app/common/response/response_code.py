@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import dataclasses
+
 from enum import Enum
 
 
@@ -46,6 +48,16 @@ class CustomErrorCode(CustomCodeBase):
     """自定义错误状态码"""
 
     CAPTCHA_ERROR = (40001, '验证码错误')
+
+
+@dataclasses.dataclass
+class CustomResponse:
+    """
+    提供开放式响应状态码，而不是枚举，如果你想自定义响应信息，这可能很有用
+    """
+
+    code: int
+    msg: str
 
 
 class StandardResponseCode:
