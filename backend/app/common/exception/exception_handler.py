@@ -4,6 +4,7 @@ from json import JSONDecodeError
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from pydantic.errors import EnumMemberError, WrongConstantError  # noqa: ignore
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
@@ -45,12 +46,13 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
+        message = ''
         data = {}
         raw_error = exc.raw_errors[0]
         raw_exc = raw_error.exc
         if isinstance(raw_exc, JSONDecodeError):
             message = 'json解析失败'
-        else:
+        elif isinstance(raw_exc, ValidationError):
             if hasattr(raw_exc, 'model'):
                 fields = raw_exc.model.__dict__.get('__fields__')
                 for field_key in fields.keys():
@@ -75,7 +77,7 @@ def register_exception(app: FastAPI):
             field = str(error.get('loc')[-1])
             msg = error.get('msg')
             message = f'{data.get(field, field) if field != "__root__" else ""} {msg}.'
-        msg = f'请求参数非法: {message}'
+        msg = '请求参数非法' if message == '' else f'请求参数非法: {message}'
         data = {'errors': exc.errors()} if settings.ENVIRONMENT == 'dev' else None
         content = ResponseModel(
             code=StandardResponseCode.HTTP_422,
