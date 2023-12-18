@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
+from json import JSONDecodeError
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -48,7 +48,7 @@ def register_exception(app: FastAPI):
         data = {}
         raw_error = exc.raw_errors[0]
         raw_exc = raw_error.exc
-        if isinstance(raw_exc, json.JSONDecodeError):
+        if isinstance(raw_exc, JSONDecodeError):
             message = 'json解析失败'
         else:
             if hasattr(raw_exc, 'model'):
