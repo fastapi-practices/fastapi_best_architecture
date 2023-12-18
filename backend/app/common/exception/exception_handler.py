@@ -76,17 +76,20 @@ def register_exception(app: FastAPI):
             msg = error.get('msg')
             message = f'{data.get(field, field) if field != "__root__" else ""} {msg}.'
         msg = f'请求参数非法: {message}'
+        data = {'errors': exc.errors()} if settings.ENVIRONMENT == 'dev' else None
         content = ResponseModel(
             code=StandardResponseCode.HTTP_422,
             msg=msg,
-            data={'errors': exc.errors()} if settings.ENVIRONMENT == 'dev' else None,
         ).dict()
         request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_422,
             content=content
             if settings.ENVIRONMENT == 'dev'
-            else await response_base.fail(res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=message)),
+            else await response_base.fail(
+                res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=message),
+                data=data,
+            ),
         )
 
     @app.exception_handler(Exception)
