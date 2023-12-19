@@ -3,6 +3,9 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
+> [!TIP]
+> You are viewing the pydantic-v1 branch, which is locked and no longer provides updates and fixes
+
 English | [简体中文](./README.zh-CN.md)
 
 FastAPI framework based on the front-end and back-end separation of the middle and back-end solutions, follow
@@ -49,10 +52,6 @@ See a preview of some of the screenshots
 - [x] Docker / Docker-compose deployment
 - [x] Pytest Unit Testing
 
-TODO:
-
-1. [ ] Pydantic 2.0
-
 ## Built-in features
 
 1. [x] User management: system user role management, permission assignment
@@ -66,14 +65,6 @@ TODO:
 9. [x] Service Monitoring: server hardware device information and status
 10. [x] Scheduled tasks: automated tasks, asynchronous tasks, and function invocation are supported
 11. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
-
-TODO:
-
-1. [ ] Dynamic Configuration: Dynamic configuration of the system environment (site title, logo, filing, footer...)
-2. [ ] code generation: according to the table structure, visualize the generation of additions, deletions,
-   modifications and checks of the business code.
-3. [ ] File Upload: Docking cloud OSS and local backup.
-4. [ ] System Notification: proactively send timed task notifications, resource warnings, service anomaly warnings...
 
 ## Local development
 
