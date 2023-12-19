@@ -3,6 +3,9 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
+> [!TIP]
+> 你正在查看 pydantic-v1 分支，此分支已被锁定，不再提供更新和修复
+
 简体中文 | [English](./README.md)
 
 基于 FastAPI 框架的前后端分离中后台解决方案，遵循[伪三层架构](#伪三层架构)设计， 支持 **python3.10** 及以上版本
@@ -58,13 +61,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 9. [x] 服务监控：服务器硬件设备信息与状态
 10. [x] 定时任务：自动化任务，异步任务，支持函数调用
 11. [x] 接口文档：自动生成在线交互式 API 接口文档
-
-TODO:
-
-1. [ ] 动态配置：对系统环境进行动态配置（网站标题，LOGO，备案，页脚...）
-2. [ ] 代码生成：根据表结构，可视化生成增删改查业务代码
-3. [ ] 文件上传：对接云OSS加本地备份
-4. [ ] 系统通知：主动发送定时任务通知，资源警告，服务异常预警...
 
 ## 本地开发
 

@@ -102,7 +102,7 @@ def register_middleware(app: FastAPI):
         app.add_middleware(GZipMiddleware)
     # Opera log
     app.add_middleware(OperaLogMiddleware)
-    # JWT auth: Always open
+    # JWT auth, required
     app.add_middleware(
         AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
     )
