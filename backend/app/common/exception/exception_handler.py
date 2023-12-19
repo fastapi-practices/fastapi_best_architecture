@@ -115,6 +115,25 @@ def register_exception(app: FastAPI):
             ),
         )
 
+    @app.exception_handler(AssertionError)
+    async def assertion_error_handler(request: Request, exc: AssertionError):
+        """
+        断言错误处理
+
+        :param request:
+        :param exc:
+        :return:
+        """
+        return JSONResponse(
+            status_code=StandardResponseCode.HTTP_500,
+            content=ResponseModel(
+                code=StandardResponseCode.HTTP_500,
+                msg=str(''.join(exc.args) if exc.args else exc.__doc__),
+            ).model_dump()
+            if settings.ENVIRONMENT == 'dev'
+            else await response_base.fail(CustomResponseCode.HTTP_500),
+        )
+
     @app.exception_handler(Exception)
     async def all_exception_handler(request: Request, exc: Exception):
         """
@@ -134,24 +153,6 @@ def register_exception(app: FastAPI):
                 ).model_dump(),
                 background=exc.background,
             )
-
-        elif isinstance(exc, AssertionError):
-            if exc.args:
-                msg = ','.join(exc.args)
-            else:
-                msg = exc.__repr__()
-                if not exc.__repr__().startswith('AssertionError'):
-                    msg = exc.__doc__
-            return JSONResponse(
-                status_code=StandardResponseCode.HTTP_500,
-                content=ResponseModel(
-                    code=StandardResponseCode.HTTP_500,
-                    msg=str(msg),
-                ).model_dump()
-                if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
-            )
-
         else:
             import traceback
 
@@ -159,7 +160,7 @@ def register_exception(app: FastAPI):
             log.error(traceback.format_exc())
             return JSONResponse(
                 status_code=StandardResponseCode.HTTP_500,
-                content=ResponseModel(code=500, msg=str(exc)).dict()
+                content=ResponseModel(code=500, msg=str(exc)).model_dump()
                 if settings.ENVIRONMENT == 'dev'
                 else await response_base.fail(CustomResponseCode.HTTP_500),
             )
@@ -178,10 +179,10 @@ def register_exception(app: FastAPI):
             :return:
             """
             if isinstance(exc, BaseExceptionMixin):
-                content = ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).dict()
+                content = ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).model_dump()
             else:
                 content = (
-                    ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).dict()
+                    ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).model_dump()
                     if settings.ENVIRONMENT == 'dev'
                     else await response_base.fail(CustomResponseCode.HTTP_500)
                 )
