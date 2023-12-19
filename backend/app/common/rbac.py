@@ -59,7 +59,6 @@ class RBAC:
         method = request.method
         if settings.MENU_PERMISSION:
             # 菜单权限校验
-            # TODO: 改用流行方案，自定义接口权限字段标识
             path_auth = path.split(f'{settings.API_V1_STR}/')[-1].replace('/', ':') + f':{method}'
             menu_perms = []
             forbid_menu_perms = []
