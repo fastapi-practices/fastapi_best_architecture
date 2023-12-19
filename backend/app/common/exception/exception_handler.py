@@ -96,6 +96,7 @@ def register_exception(app: FastAPI):
     async def assertion_error_handler(request: Request, exc: AssertionError):
         """
         断言错误处理
+
         :param request:
         :param exc:
         :return:
