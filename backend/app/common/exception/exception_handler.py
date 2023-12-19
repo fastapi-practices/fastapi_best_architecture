@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
+from json import JSONDecodeError
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
-from pydantic.errors import EnumMemberError, WrongConstantError
+from pydantic.errors import EnumMemberError, WrongConstantError  # noqa: ignore
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.log import log
-from backend.app.common.response.response_code import CustomResponseCode, StandardResponseCode
+from backend.app.common.response.response_code import CustomResponse, CustomResponseCode, StandardResponseCode
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.core.conf import settings
 
@@ -31,7 +31,9 @@ def register_exception(app: FastAPI):
         request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_400,
-            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_400),
+            content=content
+            if settings.ENVIRONMENT == 'dev'
+            else await response_base.fail(res=CustomResponseCode.HTTP_400),
             headers=exc.headers,
         )
 
@@ -46,44 +48,48 @@ def register_exception(app: FastAPI):
         """
         message = ''
         data = {}
-        for raw_error in exc.raw_errors:
-            raw_exc = raw_error.exc
-            if isinstance(raw_exc, ValidationError):
-                if hasattr(raw_exc, 'model'):
-                    fields = raw_exc.model.__dict__.get('__fields__')
-                    for field_key in fields.keys():
-                        field_title = fields.get(field_key).field_info.title
-                        data[field_key] = field_title if field_title else field_key
-                # 处理特殊类型异常模板信息 -> backend/app/schemas/base.py: SCHEMA_ERROR_MSG_TEMPLATES
-                for sub_raw_error in raw_exc.raw_errors:
-                    sub_raw_exc = sub_raw_error.exc
-                    if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
-                        if getattr(sub_raw_exc, 'code') == 'enum':
-                            sub_raw_exc.__dict__['permitted'] = ', '.join(
-                                repr(v.value)
-                                for v in sub_raw_exc.enum_values  # type: ignore
-                            )
-                        else:
-                            sub_raw_exc.__dict__['permitted'] = ', '.join(
-                                repr(v)
-                                for v in sub_raw_exc.permitted  # type: ignore
-                            )
-                # 处理异常信息
-                for error in raw_exc.errors()[:1]:
-                    field = str(error.get('loc')[-1])
-                    msg = error.get('msg')
-                    message += f'{data.get(field, field) if field != "__root__" else ""} {msg}' + '.'
-            elif isinstance(raw_error.exc, json.JSONDecodeError):
-                message += 'json解析失败'
+        raw_error = exc.raw_errors[0]
+        raw_exc = raw_error.exc
+        if isinstance(raw_exc, JSONDecodeError):
+            message = 'json解析失败'
+        elif isinstance(raw_exc, ValidationError):
+            if hasattr(raw_exc, 'model'):
+                fields = raw_exc.model.__dict__.get('__fields__')
+                for field_key in fields.keys():
+                    field_title = fields.get(field_key).field_info.title
+                    data[field_key] = field_title if field_title else field_key
+            # 处理特殊类型异常模板信息 -> backend/app/schemas/base.py: SCHEMA_ERROR_MSG_TEMPLATES
+            for sub_raw_error in raw_exc.raw_errors:
+                sub_raw_exc = sub_raw_error.exc
+                if isinstance(sub_raw_exc, (EnumMemberError, WrongConstantError)):
+                    if getattr(sub_raw_exc, 'code') == 'enum':
+                        sub_raw_exc.__dict__['permitted'] = ', '.join(
+                            repr(v.value)
+                            for v in sub_raw_exc.enum_values  # type: ignore
+                        )
+                    else:
+                        sub_raw_exc.__dict__['permitted'] = ', '.join(
+                            repr(v)
+                            for v in sub_raw_exc.permitted  # type: ignore
+                        )
+            # 处理异常信息
+            error = raw_exc.errors()[0]
+            field = str(error.get('loc')[-1])
+            msg = error.get('msg')
+            message = f'{data.get(field, field) if field != "__root__" else ""} {msg}.'
+        msg = '请求参数非法' if message == '' else f'请求参数非法: {message}'
+        data = {'errors': exc.errors()} if settings.ENVIRONMENT == 'dev' else None
         content = ResponseModel(
             code=StandardResponseCode.HTTP_422,
-            msg='请求参数非法' if len(message) == 0 else f'请求参数非法: {message}',
-            data={'errors': exc.errors()} if message == '' else None,
+            msg=msg,
         ).dict()
         request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
         return JSONResponse(
             status_code=StandardResponseCode.HTTP_422,
-            content=content if settings.ENVIRONMENT == 'dev' else await response_base.fail(CustomResponseCode.HTTP_422),
+            content=await response_base.fail(
+                res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=msg),
+                data=data,
+            ),
         )
 
     @app.exception_handler(Exception)
@@ -120,7 +126,7 @@ def register_exception(app: FastAPI):
                     msg=str(msg),
                 ).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                else await response_base.fail(res=CustomResponseCode.HTTP_500),
             )
 
         else:
@@ -132,7 +138,7 @@ def register_exception(app: FastAPI):
                 status_code=StandardResponseCode.HTTP_500,
                 content=ResponseModel(code=500, msg=str(exc)).dict()
                 if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
+                else await response_base.fail(res=CustomResponseCode.HTTP_500),
             )
 
     if settings.MIDDLEWARE_CORS:

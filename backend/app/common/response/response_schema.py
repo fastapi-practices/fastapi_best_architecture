@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from backend.app.common.response.response_code import CustomResponseCode
+from backend.app.common.response.response_code import CustomResponse, CustomResponseCode
 from backend.app.core.conf import settings
 from backend.app.utils.encoders import jsonable_encoder
 
@@ -65,7 +65,11 @@ class ResponseBase:
 
     @staticmethod
     async def __response(
-        *, res: CustomResponseCode = None, data: Any | None = None, exclude: _ExcludeData | None = None, **kwargs
+        *,
+        res: CustomResponseCode | CustomResponse = None,
+        data: Any | None = None,
+        exclude: _ExcludeData | None = None,
+        **kwargs,
     ) -> dict:
         """
         请求成功返回通用方法
@@ -86,7 +90,7 @@ class ResponseBase:
     async def success(
         self,
         *,
-        res: CustomResponseCode = CustomResponseCode.HTTP_200,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
         data: Any | None = None,
         exclude: _ExcludeData | None = None,
         **kwargs,
@@ -96,7 +100,7 @@ class ResponseBase:
     async def fail(
         self,
         *,
-        res: CustomResponseCode = CustomResponseCode.HTTP_400,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
         data: Any = None,
         exclude: _ExcludeData | None = None,
         **kwargs,
