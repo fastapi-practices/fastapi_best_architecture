@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from email_validator import EmailNotValidError, validate_email
-from pydantic import ConfigDict, Field, HttpUrl, field_validator, model_validator
+from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 
 from backend.app.common.enums import StatusType
-from backend.app.schemas.base import SchemaBase
+from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
 from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
 
@@ -22,55 +21,22 @@ class AuthLogin(Auth):
 
 class RegisterUser(Auth):
     nickname: str | None = None
-    email: str = Field(..., example='user@example.com')
-
-    @field_validator('email')
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
 
 
 class AddUser(Auth):
     dept_id: int
     roles: list[int]
     nickname: str | None = None
-    email: str = Field(..., example='user@example.com')
-
-    @field_validator('email')
-    @classmethod
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
 
 
 class _UserInfoBase(SchemaBase):
     dept_id: int | None = None
     username: str
     nickname: str
-    email: str = Field(..., example='user@example.com')
-    phone: str | None = None
-
-    @field_validator('email')
-    @classmethod
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
-
-    @field_validator('phone')
-    @classmethod
-    def phone_validate(cls, v):
-        if v is not None and not v.isdigit():
-            raise ValueError('手机号格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
+    phone: CustomPhoneNumber | None = None
 
 
 class UpdateUser(_UserInfoBase):

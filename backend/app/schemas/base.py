@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from pydantic import BaseModel, ConfigDict
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 # 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
 # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
@@ -135,6 +136,10 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
     'type-adapter-config-unused': '类型适配器配置项定义错误',
     'root-model-extra': '根模型禁止定义额外字段',
 }
+
+
+class CustomPhoneNumber(PhoneNumber):
+    default_region_code = 'CN'
 
 
 class SchemaBase(BaseModel):

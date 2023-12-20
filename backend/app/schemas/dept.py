@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import ConfigDict, EmailStr, Field
 
 from backend.app.common.enums import StatusType
-from backend.app.schemas.base import SchemaBase
-from backend.app.utils.re_verify import is_phone
+from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
 
 
 class DeptBase(SchemaBase):
@@ -14,29 +13,9 @@ class DeptBase(SchemaBase):
     parent_id: int | None = Field(default=None, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
     leader: str | None = None
-    phone: str | None = None
-    email: str | None = None
+    phone: CustomPhoneNumber | None = None
+    email: EmailStr | None = None
     status: StatusType = Field(default=StatusType.enable)
-
-    @field_validator('phone')
-    @classmethod
-    def phone_validator(cls, v):
-        if v is not None and not v.isdigit():
-            if not is_phone(v):
-                raise ValueError('手机号码输入有误')
-        return v
-
-    @field_validator('email')
-    @classmethod
-    def email_validator(cls, v):
-        if v is not None:
-            from email_validator import EmailNotValidError, validate_email
-
-            try:
-                validate_email(v, check_deliverability=False).email
-            except EmailNotValidError:
-                raise ValueError('邮箱格式错误')
-        return v
 
 
 class CreateDept(DeptBase):
