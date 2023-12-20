@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from pydantic import ConfigDict
+
 from backend.app.schemas.base import SchemaBase
 
 
@@ -30,8 +32,7 @@ class UpdateLoginLog(LoginLogBase):
 
 
 class GetAllLoginLog(LoginLogBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_time: datetime
-
-    class Config:
-        orm_mode = True

@@ -182,6 +182,7 @@ class UserService:
                 token = await get_token(request)
                 user_id = request.user.id
                 latest_multi_login = await UserDao.get_multi_login(db, pk)
+                # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:

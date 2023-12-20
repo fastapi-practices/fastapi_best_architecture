@@ -12,7 +12,6 @@ from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 if TYPE_CHECKING:
     from sqlalchemy import Select
@@ -61,12 +60,12 @@ class _Page(AbstractPage[T], Generic[T]):
                 'next': {'page': f'{page + 1}', 'size': f'{size}'} if (page + 1) <= total_pages else None,
                 'prev': {'page': f'{page - 1}', 'size': f'{size}'} if (page - 1) >= 1 else None,
             }
-        ).dict()
+        ).model_dump()
 
         return cls(items=items, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)
 
 
-class _PageData(GenericModel, Generic[DataT]):
+class _PageData(BaseModel, Generic[DataT]):
     page_data: DataT | None = None
 
 
@@ -80,7 +79,7 @@ async def paging_data(db: AsyncSession, select: Select, page_data_schema: Schema
     :return:
     """
     _paginate = await paginate(db, select)
-    page_data = _PageData[_Page[page_data_schema]](page_data=_paginate).dict()['page_data']
+    page_data = _PageData[_Page[page_data_schema]](page_data=_paginate).model_dump()['page_data']
     return page_data
 
 

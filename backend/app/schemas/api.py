@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import Field, validator
+from pydantic import ConfigDict, Field, field_validator
 
 from backend.app.common.enums import MethodType
 from backend.app.schemas.base import SchemaBase
@@ -14,7 +14,8 @@ class ApiBase(SchemaBase):
     path: str = Field(..., description='api路径')
     remark: str | None = None
 
-    @validator('method')
+    @field_validator('method')
+    @classmethod
     def method_validator(cls, v):
         if not v.isupper():
             raise ValueError('请求方式必须大写')
@@ -30,9 +31,8 @@ class UpdateApi(ApiBase):
 
 
 class GetAllApi(ApiBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_time: datetime
     updated_time: datetime | None = None
-
-    class Config:
-        orm_mode = True

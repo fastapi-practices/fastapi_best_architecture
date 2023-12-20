@@ -3,10 +3,13 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import BaseSettings, root_validator
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
 
@@ -51,7 +54,8 @@ class Settings(BaseSettings):
     REDOCS_URL: str | None = f'{API_V1_STR}/redocs'
     OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
-    @root_validator
+    @model_validator(mode='before')
+    @classmethod
     def validate_openapi_url(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['OPENAPI_URL'] = None
@@ -145,7 +149,12 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/auth/swagger_login',
     ]
     OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
-    OPERA_LOG_ENCRYPT_INCLUDE: list[str] = ['password', 'old_password', 'new_password', 'confirm_password']
+    OPERA_LOG_ENCRYPT_INCLUDE: list[str] = [
+        'password',
+        'old_password',
+        'new_password',
+        'confirm_password',
+    ]
 
     # Ip location
     IP_LOCATION_REDIS_PREFIX: str = 'fba_ip_location'
@@ -164,21 +173,16 @@ class Settings(BaseSettings):
         },
     }
 
-    @root_validator
+    @model_validator(mode='before')
     def validate_celery_broker(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['CELERY_BROKER'] = 'rabbitmq'
         return values
 
-    class Config:
-        # https://docs.pydantic.dev/usage/settings/#dotenv-env-support
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-
 
 @lru_cache
 def get_settings():
-    """读取配置优化写法"""
+    """读取配置优化"""
     return Settings()
 
 

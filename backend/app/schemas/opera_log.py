@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
@@ -38,8 +38,7 @@ class UpdateOperaLog(OperaLogBase):
 
 
 class GetAllOperaLog(OperaLogBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_time: datetime
-
-    class Config:
-        orm_mode = True

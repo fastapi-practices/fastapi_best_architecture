@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from email_validator import EmailNotValidError, validate_email
-from pydantic import Field, HttpUrl, root_validator, validator
+from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 
 from backend.app.common.enums import StatusType
-from backend.app.schemas.base import SchemaBase
+from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
 from backend.app.schemas.dept import GetAllDept
 from backend.app.schemas.role import GetAllRole
 
@@ -22,52 +21,22 @@ class AuthLogin(Auth):
 
 class RegisterUser(Auth):
     nickname: str | None = None
-    email: str = Field(..., example='user@example.com')
-
-    @validator('email')
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
 
 
 class AddUser(Auth):
     dept_id: int
     roles: list[int]
     nickname: str | None = None
-    email: str = Field(..., example='user@example.com')
-
-    @validator('email')
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
 
 
 class _UserInfoBase(SchemaBase):
     dept_id: int | None = None
     username: str
     nickname: str
-    email: str = Field(..., example='user@example.com')
-    phone: str | None = None
-
-    @validator('email')
-    def email_validate(cls, v):
-        try:
-            validate_email(v, check_deliverability=False).email
-        except EmailNotValidError:
-            raise ValueError('邮箱格式错误')
-        return v
-
-    @validator('phone')
-    def phone_validate(cls, v):
-        if v is not None and not v.isdigit():
-            raise ValueError('手机号格式错误')
-        return v
+    email: EmailStr = Field(..., example='user@example.com')
+    phone: CustomPhoneNumber | None = None
 
 
 class UpdateUser(_UserInfoBase):
@@ -83,6 +52,8 @@ class Avatar(SchemaBase):
 
 
 class GetUserInfoNoRelation(_UserInfoBase):
+    model_config = ConfigDict(from_attributes=True)
+
     dept_id: int | None = None
     id: int
     uuid: str
@@ -94,32 +65,27 @@ class GetUserInfoNoRelation(_UserInfoBase):
     join_time: datetime = None
     last_login_time: datetime | None = None
 
-    class Config:
-        orm_mode = True
-
 
 class GetAllUserInfo(GetUserInfoNoRelation):
+    model_config = ConfigDict(from_attributes=True)
+
     dept: GetAllDept | None = None
     roles: list[GetAllRole]
 
-    class Config:
-        orm_mode = True
-
 
 class GetCurrentUserInfo(GetAllUserInfo):
-    @root_validator
-    def handel(cls, values):
-        """处理部门和角色"""
-        dept = values.get('dept')
-        if dept:
-            values['dept'] = dept.name
-        roles = values.get('roles')
-        if roles:
-            values['roles'] = [role.name for role in roles]
-        return values
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    @model_validator(mode='after')
+    def handel(self, values):
+        """处理部门和角色"""
+        dept = self.dept
+        if dept:
+            self.dept = dept.name  # type: ignore
+        roles = self.roles
+        if roles:
+            self.roles = [role.name for role in roles]  # type: ignore
+        return values
 
 
 class ResetPassword(SchemaBase):

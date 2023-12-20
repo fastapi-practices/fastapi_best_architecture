@@ -3,11 +3,11 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel, ConfigDict
 
 from backend.app.common.response.response_code import CustomResponse, CustomResponseCode
 from backend.app.core.conf import settings
-from backend.app.utils.encoders import jsonable_encoder
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
 
@@ -39,12 +39,12 @@ class ResponseModel(BaseModel):
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """  # noqa: E501
 
+    # TODO: json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
+    model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
+
     code: int = CustomResponseCode.HTTP_200.code
     msg: str = CustomResponseCode.HTTP_200.msg
     data: Any | None = None
-
-    class Config:
-        json_encoders = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
 
 
 class ResponseBase:
@@ -82,6 +82,7 @@ class ResponseBase:
         :return:
         """
         if data is not None:
+            # TODO: custom_encoder 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
             custom_encoder = {datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)}
             kwargs.update({'custom_encoder': custom_encoder})
             data = jsonable_encoder(data, exclude=exclude, **kwargs)
