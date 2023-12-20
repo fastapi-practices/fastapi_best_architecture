@@ -3,8 +3,10 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
-> [!TIP]
-> You are viewing the pydantic-v1 branch, which is locked and no longer provides updates and fixes
+> [!CAUTION] 2023-12-21
+> The master branch has been fully migrated to pydantic-v2, please pay extra attention to sync fork operations to avoid
+> irreparable damage!
+> We have kept and locked the original branch (pydantic-v1), which you can get in the branch selector
 
 English | [简体中文](./README.zh-CN.md)
 
