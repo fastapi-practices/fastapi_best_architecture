@@ -4,7 +4,8 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
 > [!CAUTION] 
-> 2023-12-21
+> **2023-12-21**
+> 
 > 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
 > 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
 

@@ -4,7 +4,8 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
 > [!CAUTION] 
-> 2023-12-21
+> **2023-12-21**
+> 
 > The master branch has been fully migrated to pydantic-v2, please pay extra attention to sync fork operations to avoid
 > irreparable damage!
 > We have kept and locked the original branch (pydantic-v1), which you can get in the branch selector
