@@ -3,8 +3,13 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 
-> [!TIP]
-> 你正在查看 pydantic-v1 分支，此分支已被锁定，不再提供更新和修复
+> [!CAUTION]
+> **2023-12-21 (公告)**
+>
+> 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
+> 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
+
+Pydantic-V2 完工 🎉
 
 简体中文 | [English](./README.md)
 
