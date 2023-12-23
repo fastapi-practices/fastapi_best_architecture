@@ -200,6 +200,10 @@ Execute unittests via pytest
    pytest -vs --disable-warnings
    ```
 
+## Status
+
+![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg "Repo beats analytics image")
+
 ## Contributors
 
 <span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
@@ -216,11 +220,11 @@ Execute unittests via pytest
 
 ## 互动
 
-有且仅有当前一个频道，请注意辨别真伪
+We only have one current channel.
 
 <table>
   <tr>
-    <td><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
+    <td style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1"> Jump </a></td>
   </tr>
   <tr>
     <td> Telegram </td>
