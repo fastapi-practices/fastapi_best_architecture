@@ -192,7 +192,11 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
    ```shell
    pytest -vs --disable-warnings
-   ``` 
+   ```
+
+## 状态
+
+![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg "Repo beats analytics image")
 
 ## 贡献者
 
@@ -214,10 +218,10 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 <table>
   <tr>
-    <td><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
+    <td  style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
   </tr>
   <tr>
-    <td> Telegram </td>
+    <td>Telegram（科学上网）</td>
   </tr>
 </table>
 
