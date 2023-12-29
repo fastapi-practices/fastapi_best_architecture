@@ -10,7 +10,7 @@ celery==5.3.6
 cryptography==41.0.7
 email-validator==2.0.0
 fast-captcha==0.2.1
-fastapi==0.105.0
+fastapi==0.108.0
 fastapi-limiter==0.1.5
 fastapi-pagination==0.12.13
 gunicorn==21.2.0
@@ -33,7 +33,6 @@ pytz==2023.3
 redis[hiredis]==4.5.5
 ruff==0.1.8
 SQLAlchemy==2.0.23
-starlette==0.27.0
 supervisor==4.2.5
 user-agents==2.2.0
 uvicorn[standard]==0.24.0
