@@ -8,6 +8,7 @@ from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend.app.api.routers import v1
+from backend.app.common.exception.exception_handler import register_exception
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import create_table
@@ -65,7 +66,7 @@ def register_app():
     register_page(app)
 
     # 全局异常处理
-    # register_exception(app)
+    register_exception(app)
 
     return app
 
