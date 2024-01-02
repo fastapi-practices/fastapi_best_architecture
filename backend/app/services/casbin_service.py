@@ -45,7 +45,7 @@ class CasbinService:
     @staticmethod
     async def create_policies(*, ps: list[CreatePolicy]):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.add_policies([list(p.dict().values()) for p in ps])
+        data = await enforcer.add_policies([list(p.model_dump().values()) for p in ps])
         if not data:
             raise errors.ForbiddenError(msg='权限已存在')
         return data
@@ -63,7 +63,7 @@ class CasbinService:
     async def update_policies(*, old: list[UpdatePolicy], new: list[UpdatePolicy]):
         enforcer = await RBAC.enforcer()
         data = await enforcer.update_policies(
-            [list(o.dict().values()) for o in old], [list(n.dict().values()) for n in new]
+            [list(o.model_dump().values()) for o in old], [list(n.model_dump().values()) for n in new]
         )
         return data
 
@@ -79,7 +79,7 @@ class CasbinService:
     @staticmethod
     async def delete_policies(*, ps: list[DeletePolicy]):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.remove_policies([list(p.dict().values()) for p in ps])
+        data = await enforcer.remove_policies([list(p.model_dump().values()) for p in ps])
         if not data:
             raise errors.NotFoundError(msg='权限不存在')
         return data
@@ -107,7 +107,7 @@ class CasbinService:
     @staticmethod
     async def create_groups(*, gs: list[CreateUserRole]):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.add_grouping_policies([list(g.dict().values()) for g in gs])
+        data = await enforcer.add_grouping_policies([list(g.model_dump().values()) for g in gs])
         if not data:
             raise errors.ForbiddenError(msg='权限已存在')
         return data
@@ -124,7 +124,7 @@ class CasbinService:
     @staticmethod
     async def delete_groups(*, gs: list[DeleteUserRole]):
         enforcer = await RBAC.enforcer()
-        data = await enforcer.remove_grouping_policies([list(g.dict().values()) for g in gs])
+        data = await enforcer.remove_grouping_policies([list(g.model_dump().values()) for g in gs])
         if not data:
             raise errors.NotFoundError(msg='权限不存在')
         return data
