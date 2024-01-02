@@ -29,6 +29,16 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         # 请求解析
         user_agent, device, os, browser = await parse_user_agent_info(request)
         ip, country, region, city = await parse_ip_info(request)
+        try:
+            # 此信息依赖于 jwt 中间件
+            username = request.user.username
+        except AttributeError:
+            username = None
+        method = request.method
+        router = request.scope.get('route')
+        summary = getattr(router, 'summary', None) or ''
+        args = await self.get_request_args(request)
+        args = await self.desensitization(args)
 
         # 设置附加请求信息
         request.state.ip = ip
@@ -39,22 +49,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         request.state.os = os
         request.state.browser = browser
         request.state.device = device
-
-        try:
-            # 此信息依赖于 jwt 中间件
-            username = request.user.username
-        except AttributeError:
-            username = None
-        method = request.method
-        router = request.scope.get('route')
-        summary = getattr(router, 'summary', None) or ''
-
-        # Tip: 在请求发送前解析请求体
-        args = await self.get_request_args(request)
-        args.update(request.path_params)
-
-        # 脱敏处理
-        args = await self.desensitization(args)
 
         # 执行请求
         start_time = timezone.now()
@@ -93,6 +87,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         return response
 
     async def execute_request(self, request: Request, call_next) -> tuple:
+        """执行请求"""
         err = None
         response = None
         try:
@@ -111,7 +106,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     @staticmethod
     @sync_to_async
     def request_exception_handler(request: Request) -> tuple:
-        # 预置响应信息
+        """请求异常处理器"""
         code = 200
         msg = 'Success'
         status = 1
@@ -135,8 +130,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     async def get_request_args(request: Request) -> dict:
+        """获取请求参数"""
         args = dict(request.query_params)
-        # body() 必须在 form() 之前获取
+        args.update(request.path_params)
+        # Tip: .body() 必须在 .form() 之前获取
         # https://github.com/encode/starlette/discussions/1933
         body_data = await request.body()
         form_data = await request.form()
@@ -157,7 +154,15 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     @staticmethod
     @sync_to_async
     def desensitization(args: dict) -> dict | None:
-        if len(args) > 0:
+        """
+        脱敏处理
+
+        :param args:
+        :return:
+        """
+        if not args:
+            args = None
+        else:
             match settings.OPERA_LOG_ENCRYPT:
                 case OperaLogCipherType.aes:
                     for key in args.keys():
@@ -177,4 +182,4 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     for key in args.keys():
                         if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
                             args[key] = '******'
-        return args if len(args) > 0 else None
+        return args
