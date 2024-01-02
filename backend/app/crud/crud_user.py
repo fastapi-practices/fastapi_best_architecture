@@ -36,7 +36,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
     async def create(self, db: AsyncSession, obj: RegisterUser) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
-        dict_obj = obj.dict()
+        dict_obj = obj.model_dump()
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
         db.add(new_user)
@@ -54,7 +54,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         db.add(new_user)
 
     async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
-        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.dict()))
+        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.model_dump()))
         return user.rowcount
 
     @staticmethod
