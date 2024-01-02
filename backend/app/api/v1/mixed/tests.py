@@ -16,7 +16,7 @@ async def send_task():
     return await response_base.success(data=result.id)
 
 
-@router.post('/files/', summary='上传文件演示')
+@router.post('/files', summary='上传文件演示')
 async def create_file(
     file: Annotated[bytes, File()],
     fileb: Annotated[UploadFile, File()],
