@@ -57,7 +57,7 @@ class RBAC:
         if data_scope:
             return
         method = request.method
-        # TODO: 手动编写每一个菜单及菜单按钮权限，使用 fastapi Depends 实现
+        # TODO: 手动编写每一个路由权限标识，使用 fastapi Depends 实现
         path_auth = 'todo'
         if settings.PERMISSION_MODE == 'role-menu':
             # 菜单权限校验
