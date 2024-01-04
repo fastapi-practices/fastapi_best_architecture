@@ -27,12 +27,12 @@ class RBAC:
         await enforcer.load_policy()
         return enforcer
 
-    async def rbac_verify(self, request: Request, _: dict = DependsJwtAuth) -> None:
+    async def rbac_verify(self, request: Request, _token: str = DependsJwtAuth) -> None:
         """
         RBAC 权限校验
 
         :param request:
-        :param _:
+        :param _token:
         :return:
         """
         path = request.url.path
@@ -57,34 +57,37 @@ class RBAC:
         if data_scope:
             return
         method = request.method
-        if settings.MENU_PERMISSION:
+        # TODO: 手动编写每一个菜单及菜单按钮权限，使用 fastapi Depends 实现
+        path_auth = 'todo'
+        if settings.PERMISSION_MODE == 'role-menu':
             # 菜单权限校验
-            # TODO: 改用流行方案，自定义接口权限字段标识
-            path_auth = path.split(f'{settings.API_V1_STR}/')[-1].replace('/', ':') + f':{method}'
+            if path_auth in set(settings.MENU_EXCLUDE):
+                return
             menu_perms = []
             forbid_menu_perms = []
             for role in user_roles:
-                if role.menus:
-                    for menu in role.menus:
+                user_menus = role.menus
+                if user_menus:
+                    for menu in user_menus:
+                        perms = menu.perms
                         if menu.status == StatusType.enable:
-                            menu_perms.append(menu.perms)
+                            menu_perms.extend(perms.split(','))
                         else:
-                            forbid_menu_perms.append(menu.perms)
-            if path_auth in set(settings.MENU_EXCLUDE):
-                return
-            if path_auth in set([perm for perms_str in forbid_menu_perms for perm in perms_str.split(',')]):
+                            forbid_menu_perms.extend(perms.split(','))
+            if path_auth in set(forbid_menu_perms):
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
-            if path_auth not in set([perm for perms_str in menu_perms for perm in perms_str.split(',')]):
+            if path_auth not in set(menu_perms):
                 raise AuthorizationError
         else:
             # casbin 权限校验
             forbid_menu_path = []
             for role in user_roles:
-                if role.menus:
-                    for menu in role.menus:
+                user_menus = role.menus
+                if user_menus:
+                    for menu in user_menus:
                         if menu.status == StatusType.disable:
-                            forbid_menu_path.append(menu.path)
-            if path.split('/')[-1] in forbid_menu_path:
+                            forbid_menu_path.append(menu.perms)
+            if path_auth in forbid_menu_path:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return
