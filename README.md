@@ -218,18 +218,13 @@ Execute unittests via pytest
 - [Ruff](https://beta.ruff.rs/docs/)
 - ...
 
-## 互动
+## Interactivity
 
 We only have one current channel.
 
-<table>
-  <tr>
-    <td style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1"> Jump </a></td>
-  </tr>
-  <tr>
-    <td> Telegram </td>
-  </tr>
-</table>
+| [Jump](https://t.me/+ZlPhIFkPp7E4NGI1) |
+|----------------------------------------|
+| Telegram                               |
 
 ## Sponsor us
 
