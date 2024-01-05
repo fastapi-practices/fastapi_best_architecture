@@ -7,7 +7,7 @@ from fastapi import Depends, Request
 
 from backend.app.common.enums import StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
-from backend.app.common.jwt import DependsJwtAuth
+from backend.app.common.jwt import jwt_auth
 from backend.app.core.conf import settings
 
 
@@ -47,7 +47,7 @@ class RBAC:
         await enforcer.load_policy()
         return enforcer
 
-    async def rbac_verify(self, request: Request, _token: str = DependsJwtAuth) -> None:
+    async def rbac_verify(self, request: Request, _token: str = Depends(jwt_auth)) -> None:
         """
         RBAC 权限校验
 
@@ -118,5 +118,3 @@ class RBAC:
 
 
 RBAC = RBAC()
-# RBAC 授权依赖注入
-DependsRBAC = Depends(RBAC.rbac_verify)

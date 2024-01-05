@@ -3,8 +3,8 @@
 from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
-from fastapi import Depends, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Request
+from fastapi.security import HTTPBearer, OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from passlib.context import CryptContext
@@ -19,7 +19,10 @@ from backend.app.utils.timezone import timezone
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
+# Deprecated, may be enabled when oauth2 is actually integrated
 oauth2_schema = OAuth2PasswordBearer(tokenUrl=settings.TOKEN_URL_SWAGGER)
+
+jwt_auth = HTTPBearer()
 
 
 @sync_to_async
@@ -209,8 +212,3 @@ def superuser_verify(request: Request) -> bool:
     if not request.user.is_staff:
         raise AuthorizationError(msg='此管理员已被禁止后台管理操作')
     return is_superuser
-
-
-# JWT authorizes dependency injection, which can be used if the interface only
-# needs to provide a token instead of RBAC permission control
-DependsJwtAuth = Depends(oauth2_schema)
