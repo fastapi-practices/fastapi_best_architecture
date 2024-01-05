@@ -5,7 +5,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from backend.app.common.jwt import jwt_auth
-from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.pagination import DependsPagination, paging_data
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import RBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -23,7 +24,14 @@ async def get_dict_data(pk: int):
     return await response_base.success(data=data)
 
 
-@router.get('', summary='（模糊条件）分页获取所有字典', dependencies=[Depends(jwt_auth), PageDepends])
+@router.get(
+    '',
+    summary='（模糊条件）分页获取所有字典',
+    dependencies=[
+        Depends(jwt_auth),
+        DependsPagination,
+    ],
+)
 async def get_all_dict_datas(
     db: CurrentSession,
     label: Annotated[str | None, Query()] = None,
@@ -35,13 +43,27 @@ async def get_all_dict_datas(
     return await response_base.success(data=page_data)
 
 
-@router.post('', summary='创建字典', dependencies=[Depends(RBAC.rbac_verify)])
+@router.post(
+    '',
+    summary='创建字典',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:dict:data:add')),
+    ],
+)
 async def create_dict_data(obj: CreateDictData):
     await DictDataService.create(obj=obj)
     return await response_base.success()
 
 
-@router.put('/{pk}', summary='更新字典', dependencies=[Depends(RBAC.rbac_verify)])
+@router.put(
+    '/{pk}',
+    summary='更新字典',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:dict:data:edit')),
+    ],
+)
 async def update_dict_data(pk: int, obj: UpdateDictData):
     count = await DictDataService.update(pk=pk, obj=obj)
     if count > 0:
@@ -49,7 +71,14 @@ async def update_dict_data(pk: int, obj: UpdateDictData):
     return await response_base.fail()
 
 
-@router.delete('', summary='（批量）删除字典', dependencies=[Depends(RBAC.rbac_verify)])
+@router.delete(
+    '',
+    summary='（批量）删除字典',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:dict:data:del')),
+    ],
+)
 async def delete_dict_data(pk: Annotated[list[int], Query(...)]):
     count = await DictDataService.delete(pk=pk)
     if count > 0:

@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 
 from backend.app.common.jwt import jwt_auth
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import RBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.menu import CreateMenu, GetAllMenu, UpdateMenu
@@ -36,13 +37,27 @@ async def get_all_menus(
     return await response_base.success(data=menu)
 
 
-@router.post('', summary='创建菜单', dependencies=[Depends(RBAC.rbac_verify)])
+@router.post(
+    '',
+    summary='创建菜单',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:menu:edit')),
+    ],
+)
 async def create_menu(obj: CreateMenu):
     await MenuService.create(obj=obj)
     return await response_base.success()
 
 
-@router.put('/{pk}', summary='更新菜单', dependencies=[Depends(RBAC.rbac_verify)])
+@router.put(
+    '/{pk}',
+    summary='更新菜单',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:menu:edit')),
+    ],
+)
 async def update_menu(pk: int, obj: UpdateMenu):
     count = await MenuService.update(pk=pk, obj=obj)
     if count > 0:
@@ -50,7 +65,14 @@ async def update_menu(pk: int, obj: UpdateMenu):
     return await response_base.fail()
 
 
-@router.delete('/{pk}', summary='删除菜单', dependencies=[Depends(RBAC.rbac_verify)])
+@router.delete(
+    '/{pk}',
+    summary='删除菜单',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:menu:edit')),
+    ],
+)
 async def delete_menu(pk: int):
     count = await MenuService.delete(pk=pk)
     if count > 0:

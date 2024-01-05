@@ -5,7 +5,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from backend.app.common.jwt import jwt_auth
-from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.pagination import DependsPagination, paging_data
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import RBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -44,7 +45,14 @@ async def get_role(pk: int):
     return await response_base.success(data=data)
 
 
-@router.get('', summary='（模糊条件）分页获取所有角色', dependencies=[Depends(jwt_auth), PageDepends])
+@router.get(
+    '',
+    summary='（模糊条件）分页获取所有角色',
+    dependencies=[
+        Depends(jwt_auth),
+        DependsPagination,
+    ],
+)
 async def get_all_role_list(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
@@ -56,13 +64,27 @@ async def get_all_role_list(
     return await response_base.success(data=page_data)
 
 
-@router.post('', summary='创建角色', dependencies=[Depends(RBAC.rbac_verify)])
+@router.post(
+    '',
+    summary='创建角色',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:role:add')),
+    ],
+)
 async def create_role(obj: CreateRole):
     await RoleService.create(obj=obj)
     return await response_base.success()
 
 
-@router.put('/{pk}', summary='更新角色', dependencies=[Depends(RBAC.rbac_verify)])
+@router.put(
+    '/{pk}',
+    summary='更新角色',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:role:edit')),
+    ],
+)
 async def update_role(pk: int, obj: UpdateRole):
     count = await RoleService.update(pk=pk, obj=obj)
     if count > 0:
@@ -70,7 +92,14 @@ async def update_role(pk: int, obj: UpdateRole):
     return await response_base.fail()
 
 
-@router.put('/{pk}/menu', summary='更新角色菜单', dependencies=[Depends(RBAC.rbac_verify)])
+@router.put(
+    '/{pk}/menu',
+    summary='更新角色菜单',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:role:menu:edit')),
+    ],
+)
 async def update_role_menu(pk: int, menu_ids: UpdateRoleMenu):
     count = await RoleService.update_menus(pk=pk, menu_ids=menu_ids)
     if count > 0:
@@ -78,7 +107,14 @@ async def update_role_menu(pk: int, menu_ids: UpdateRoleMenu):
     return await response_base.fail()
 
 
-@router.delete('', summary='（批量）删除角色', dependencies=[Depends(RBAC.rbac_verify)])
+@router.delete(
+    '',
+    summary='（批量）删除角色',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:role:del')),
+    ],
+)
 async def delete_role(pk: Annotated[list[int], Query(...)]):
     count = await RoleService.delete(pk=pk)
     if count > 0:

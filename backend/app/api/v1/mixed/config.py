@@ -3,13 +3,21 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.routing import APIRoute
 
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import RBAC
 from backend.app.common.response.response_schema import response_base
 
 router = APIRouter()
 
 
-@router.get('/routers', summary='获取所有路由', dependencies=[Depends(RBAC.rbac_verify)])
+@router.get(
+    '/routers',
+    summary='获取所有路由',
+    dependencies=[
+        Depends(RBAC.rbac_verify),
+        Depends(RequestPermission('sys:route:list')),
+    ],
+)
 async def get_all_route(request: Request):
     data = []
     for route in request.app.routes:

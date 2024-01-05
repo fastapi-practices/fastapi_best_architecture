@@ -84,4 +84,4 @@ async def paging_data(db: AsyncSession, select: Select, page_data_schema: Schema
 
 
 # 分页依赖注入
-PageDepends = Depends(pagination_ctx(_Page))
+DependsPagination = Depends(pagination_ctx(_Page))
