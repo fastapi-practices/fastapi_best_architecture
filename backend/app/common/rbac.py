@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import casbin
-import casbin_async_sqlalchemy_adapter
 
+from casbin_async_redis_adapter.adapter import Adapter
 from fastapi import Depends, Request
 
 from backend.app.common.enums import StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.core.conf import settings
-from backend.app.core.path_conf import RBAC_MODEL_CONF
-from backend.app.database.db_mysql import async_engine
-from backend.app.models.sys_casbin_rule import CasbinRule
 
 
 class RBAC:
@@ -22,8 +19,31 @@ class RBAC:
 
         :return:
         """
-        adapter = casbin_async_sqlalchemy_adapter.Adapter(async_engine, db_class=CasbinRule)
-        enforcer = casbin.AsyncEnforcer(RBAC_MODEL_CONF, adapter)
+        # 规则数据作为死数据直接在方法内定义
+        _CASBIN_RBAC_MODEL_CONF_TEXT = """
+        [request_definition]
+        r = sub, obj, act
+
+        [policy_definition]
+        p = sub, obj, act
+
+        [role_definition]
+        g = _, _
+
+        [policy_effect]
+        e = some(where (p.eft == allow))
+
+        [matchers]
+        m = g(r.sub, p.sub) && (keyMatch(r.obj, p.obj) || keyMatch3(r.obj, p.obj)) && (r.act == p.act || p.act == "*")
+        """
+        adapter = Adapter(
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
+            db=settings.CASBIN_REDIS_DATABASE,
+            password=settings.REDIS_PASSWORD,
+        )
+        model = casbin.AsyncEnforcer.new_model(text=_CASBIN_RBAC_MODEL_CONF_TEXT)
+        enforcer = casbin.AsyncEnforcer(model, adapter)
         await enforcer.load_policy()
         return enforcer
 

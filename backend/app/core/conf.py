@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
     REDIS_DATABASE: int
 
+    # Env Casbin
+    CASBIN_REDIS_DATABASE: int
+
     # Env Celery
     CELERY_REDIS_HOST: str
     CELERY_REDIS_PORT: int
@@ -124,7 +127,6 @@ class Settings(BaseSettings):
     PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
 
     # Casbin Auth
-    CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
         ('POST', f'{API_V1_STR}/auth/swagger_login'),
         ('POST', f'{API_V1_STR}/auth/login'),
