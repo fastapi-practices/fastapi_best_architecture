@@ -217,14 +217,9 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 有且仅有当前一个频道，请注意辨别真伪
 
-<table>
-  <tr>
-    <td  style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
-  </tr>
-  <tr>
-    <td>Telegram（科学上网）</td>
-  </tr>
-</table>
+| [直链跳转](https://t.me/+ZlPhIFkPp7E4NGI1) |
+|----------------------------------------|
+| Telegram（科学上网）                         |
 
 ## 赞助我们
 
