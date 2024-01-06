@@ -90,14 +90,15 @@ class RBAC:
                     if user_menus:
                         for menu in user_menus:
                             perms = menu.perms
-                            if menu.status == StatusType.enable:
-                                user_menu_perms.extend(perms.split(','))
-                            else:
-                                user_forbid_menu_perms.extend(perms.split(','))
-                await redis_client.rset(
+                            if perms:
+                                if menu.status == StatusType.enable:
+                                    user_menu_perms.extend(perms.split(','))
+                                else:
+                                    user_forbid_menu_perms.extend(perms.split(','))
+                await redis_client.set(
                     f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:enable', ','.join(user_menu_perms)
                 )
-                await redis_client.rset(
+                await redis_client.set(
                     f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
                 )
             if path_auth_perm in user_forbid_menu_perms:
@@ -117,9 +118,10 @@ class RBAC:
                     if user_menus:
                         for menu in user_menus:
                             perms = menu.perms
-                            if menu.status == StatusType.disable:
-                                user_forbid_menu_perms.extend(perms.split(','))
-                await redis_client.rset(
+                            if perms:
+                                if menu.status == StatusType.disable:
+                                    user_forbid_menu_perms.extend(perms.split(','))
+                await redis_client.set(
                     f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
                 )
             if path_auth_perm in user_forbid_menu_perms:
