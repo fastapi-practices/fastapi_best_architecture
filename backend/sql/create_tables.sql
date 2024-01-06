@@ -114,8 +114,7 @@ CREATE TABLE sys_menu
     created_time DATETIME    NOT NULL COMMENT '创建时间',
     updated_time DATETIME COMMENT '更新时间',
     PRIMARY KEY (id),
-    FOREIGN KEY (parent_id) REFERENCES sys_menu (id) ON DELETE SET NULL,
-    UNIQUE (title)
+    FOREIGN KEY (parent_id) REFERENCES sys_menu (id) ON DELETE SET NULL
 );
 
 CREATE INDEX ix_sys_menu_id ON sys_menu (id);
