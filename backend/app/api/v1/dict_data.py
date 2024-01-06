@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
-from backend.app.common.rbac import RBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_data import CreateDictData, GetAllDictData, UpdateDictData
@@ -17,7 +17,7 @@ from backend.app.utils.serializers import select_as_dict
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取字典详情', dependencies=[Depends(jwt_auth)])
+@router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: int):
     dict_data = await DictDataService.get(pk=pk)
     data = GetAllDictData(**await select_as_dict(dict_data))
@@ -28,7 +28,7 @@ async def get_dict_data(pk: int):
     '',
     summary='（模糊条件）分页获取所有字典',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         DependsPagination,
     ],
 )
@@ -47,7 +47,7 @@ async def get_all_dict_datas(
     '',
     summary='创建字典',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:add')),
     ],
 )
@@ -60,7 +60,7 @@ async def create_dict_data(obj: CreateDictData):
     '/{pk}',
     summary='更新字典',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:edit')),
     ],
 )
@@ -75,7 +75,7 @@ async def update_dict_data(pk: int, obj: UpdateDictData):
     '',
     summary='（批量）删除字典',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:del')),
     ],
 )

@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
-from backend.app.common.rbac import RBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.api import CreateApi, GetAllApi, UpdateApi
@@ -16,13 +16,13 @@ from backend.app.services.api_service import ApiService
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有接口', dependencies=[Depends(jwt_auth)])
+@router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
 async def get_all_apis():
     data = await ApiService.get_all()
     return await response_base.success(data=data)
 
 
-@router.get('/{pk}', summary='获取接口详情', dependencies=[Depends(jwt_auth)])
+@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
 async def get_api(pk: int):
     api = await ApiService.get(pk=pk)
     return await response_base.success(data=api)
@@ -32,7 +32,7 @@ async def get_api(pk: int):
     '',
     summary='（模糊条件）分页获取所有接口',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         DependsPagination,
     ],
 )
@@ -51,7 +51,7 @@ async def get_api_list(
     '',
     summary='创建接口',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:api:add')),
     ],
 )
@@ -64,7 +64,7 @@ async def create_api(obj: CreateApi):
     '/{pk}',
     summary='更新接口',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:api:edit')),
     ],
 )
@@ -79,7 +79,7 @@ async def update_api(pk: int, obj: UpdateApi):
     '',
     summary='（批量）删除接口',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:api:del')),
     ],
 )

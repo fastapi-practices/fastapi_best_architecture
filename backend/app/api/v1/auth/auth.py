@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.token import GetLoginToken, GetNewToken, GetSwaggerToken
 from backend.app.schemas.user import AuthLogin
@@ -47,7 +47,7 @@ async def user_login(request: Request, obj: AuthLogin, background_tasks: Backgro
     return await response_base.success(data=data)
 
 
-@router.post('/new_token', summary='创建新 token', dependencies=[Depends(jwt_auth)])
+@router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]):
     (
         new_access_token,
@@ -64,7 +64,7 @@ async def create_new_token(request: Request, refresh_token: Annotated[str, Query
     return await response_base.success(data=data)
 
 
-@router.post('/logout', summary='用户登出', dependencies=[Depends(jwt_auth)])
+@router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request):
     await AuthService.logout(request=request)
     return await response_base.success()

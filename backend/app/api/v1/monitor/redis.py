@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
 from backend.app.common.response.response_schema import response_base
 from backend.app.utils.redis_info import redis_info
@@ -14,7 +14,7 @@ router = APIRouter()
     '/redis',
     summary='redis 监控',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         Depends(RequestPermission('sys:monitor:redis')),
     ],
 )

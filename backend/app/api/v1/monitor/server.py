@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends
 from starlette.concurrency import run_in_threadpool
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
 from backend.app.common.response.response_schema import response_base
 from backend.app.utils.server_info import server_info
@@ -15,7 +15,7 @@ router = APIRouter()
     '/server',
     summary='server 监控',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         Depends(RequestPermission('sys:monitor:server')),
     ],
 )

@@ -4,9 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
-from backend.app.common.rbac import RBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
 from backend.app.services.dept_service import DeptService
@@ -15,14 +15,14 @@ from backend.app.utils.serializers import select_as_dict
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取部门详情', dependencies=[Depends(jwt_auth)])
+@router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: int):
     dept = await DeptService.get(pk=pk)
     data = GetAllDept(**await select_as_dict(dept))
     return await response_base.success(data=data)
 
 
-@router.get('', summary='获取所有部门展示树', dependencies=[Depends(jwt_auth)])
+@router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
 async def get_all_depts(
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
@@ -37,7 +37,7 @@ async def get_all_depts(
     '',
     summary='创建部门',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dept:add')),
     ],
 )
@@ -50,7 +50,7 @@ async def create_dept(obj: CreateDept):
     '/{pk}',
     summary='更新部门',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dept:edit')),
     ],
 )
@@ -65,7 +65,7 @@ async def update_dept(pk: int, obj: UpdateDept):
     '{pk}',
     summary='删除部门',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dept:del')),
     ],
 )

@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
-from backend.app.common.rbac import RBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_type import CreateDictType, GetAllDictType, UpdateDictType
@@ -20,7 +20,7 @@ router = APIRouter()
     '',
     summary='（模糊条件）分页获取所有字典类型',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         DependsPagination,
     ],
 )
@@ -39,7 +39,7 @@ async def get_all_dict_types(
     '',
     summary='创建字典类型',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:add')),
     ],
 )
@@ -52,7 +52,7 @@ async def create_dict_type(obj: CreateDictType):
     '/{pk}',
     summary='更新字典类型',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:edit')),
     ],
 )
@@ -67,7 +67,7 @@ async def update_dict_type(pk: int, obj: UpdateDictType):
     '',
     summary='（批量）删除字典类型',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:del')),
     ],
 )

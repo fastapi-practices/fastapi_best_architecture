@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.common.jwt import jwt_auth
+from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
-from backend.app.common.rbac import RBAC
+from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.login_log import GetAllLoginLog
@@ -20,7 +20,7 @@ router = APIRouter()
     '',
     summary='（模糊条件）分页获取登录日志',
     dependencies=[
-        Depends(jwt_auth),
+        DependsJwtAuth,
         DependsPagination,
     ],
 )
@@ -39,7 +39,7 @@ async def get_all_login_logs(
     '',
     summary='（批量）删除登录日志',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('log:login:del')),
     ],
 )
@@ -54,7 +54,7 @@ async def delete_login_log(pk: Annotated[list[int], Query(...)]):
     '/all',
     summary='清空登录日志',
     dependencies=[
-        Depends(RBAC.rbac_verify),
+        DependsRBAC,
         Depends(RequestPermission('log:login:empty')),
     ],
 )
