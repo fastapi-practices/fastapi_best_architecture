@@ -32,16 +32,9 @@ async def user_register(obj: RegisterUser):
     return await response_base.success()
 
 
-@router.post(
-    '/add',
-    summary='添加用户',
-    dependencies=[
-        Depends(RBAC.rbac_verify),
-        Depends(RequestPermission('sys:user:add')),
-    ],
-)
-async def add_user(obj: AddUser):
-    await UserService.add(obj=obj)
+@router.post('/add', summary='添加用户', dependencies=[Depends(RBAC.rbac_verify)])
+async def add_user(request: Request, obj: AddUser):
+    await UserService.add(request=request, obj=obj)
     current_user = await UserService.get_userinfo(username=obj.username)
     data = GetAllUserInfo(**await select_as_dict(current_user))
     return await response_base.success(data=data)
@@ -117,14 +110,7 @@ async def get_all_users(
     return await response_base.success(data=page_data)
 
 
-@router.put(
-    '/{pk}/super',
-    summary='修改用户超级权限',
-    dependencies=[
-        Depends(RBAC.rbac_verify),
-        Depends(RequestPermission('sys:user:super:edit')),
-    ],
-)
+@router.put('/{pk}/super', summary='修改用户超级权限', dependencies=[Depends(RBAC.rbac_verify)])
 async def super_set(request: Request, pk: int):
     count = await UserService.update_permission(request=request, pk=pk)
     if count > 0:
@@ -132,14 +118,7 @@ async def super_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.put(
-    '/{pk}/staff',
-    summary='修改用户后台登录权限',
-    dependencies=[
-        Depends(RBAC.rbac_verify),
-        Depends(RequestPermission('sys:user:staff:edit')),
-    ],
-)
+@router.put('/{pk}/staff', summary='修改用户后台登录权限', dependencies=[Depends(RBAC.rbac_verify)])
 async def staff_set(request: Request, pk: int):
     count = await UserService.update_staff(request=request, pk=pk)
     if count > 0:
@@ -147,14 +126,7 @@ async def staff_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.put(
-    '/{pk}/status',
-    summary='修改用户状态',
-    dependencies=[
-        Depends(RBAC.rbac_verify),
-        Depends(RequestPermission('sys:user:status:edit')),
-    ],
-)
+@router.put('/{pk}/status', summary='修改用户状态', dependencies=[Depends(RBAC.rbac_verify)])
 async def status_set(request: Request, pk: int):
     count = await UserService.update_status(request=request, pk=pk)
     if count > 0:
@@ -162,14 +134,7 @@ async def status_set(request: Request, pk: int):
     return await response_base.fail()
 
 
-@router.put(
-    '/{pk}/multi',
-    summary='修改用户多点登录状态',
-    dependencies=[
-        Depends(RBAC.rbac_verify),
-        Depends(RequestPermission('sys:user:multi:edit')),
-    ],
-)
+@router.put('/{pk}/multi', summary='修改用户多点登录状态', dependencies=[Depends(RBAC.rbac_verify)])
 async def multi_set(request: Request, pk: int):
     count = await UserService.update_multi_login(request=request, pk=pk)
     if count > 0:
@@ -186,8 +151,8 @@ async def multi_set(request: Request, pk: int):
         Depends(RequestPermission('sys:user:del')),
     ],
 )
-async def delete_user(request: Request, username: str):
-    count = await UserService.delete(request=request, username=username)
+async def delete_user(username: str):
+    count = await UserService.delete(username=username)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

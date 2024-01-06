@@ -44,7 +44,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
     async def add(self, db: AsyncSession, obj: AddUser) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
-        dict_obj = obj.dict(exclude={'roles'})
+        dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
         role_list = []
