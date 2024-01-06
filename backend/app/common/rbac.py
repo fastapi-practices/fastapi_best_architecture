@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import casbin
+import casbin_async_sqlalchemy_adapter
 
-from casbin_async_redis_adapter.adapter import Adapter
 from fastapi import Depends, Request
 
 from backend.app.common.enums import StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import jwt_auth
+from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
+from backend.app.database.db_mysql import async_engine
+from backend.app.models import CasbinRule
 
 
 class RBAC:
@@ -36,12 +39,7 @@ class RBAC:
         [matchers]
         m = g(r.sub, p.sub) && (keyMatch(r.obj, p.obj) || keyMatch3(r.obj, p.obj)) && (r.act == p.act || p.act == "*")
         """
-        adapter = Adapter(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.CASBIN_REDIS_DATABASE,
-            password=settings.REDIS_PASSWORD,
-        )
+        adapter = casbin_async_sqlalchemy_adapter.Adapter(async_engine, db_class=CasbinRule)
         model = casbin.AsyncEnforcer.new_model(text=_CASBIN_RBAC_MODEL_CONF_TEXT)
         enforcer = casbin.AsyncEnforcer(model, adapter)
         await enforcer.load_policy()
@@ -76,38 +74,55 @@ class RBAC:
         data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
-        method = request.method
-        # TODO: 手动编写每一个路由权限标识，使用 fastapi Depends 实现
-        path_auth = 'todo'
+        user_id = request.user.id
+        path_auth_perm = request.state.permission
         if settings.PERMISSION_MODE == 'role-menu':
-            # 菜单权限校验
-            if path_auth in set(settings.MENU_EXCLUDE):
+            # 角色菜单权限校验
+            if path_auth_perm in set(settings.ROLE_MENU_EXCLUDE):
                 return
-            menu_perms = []
-            forbid_menu_perms = []
-            for role in user_roles:
-                user_menus = role.menus
-                if user_menus:
-                    for menu in user_menus:
-                        perms = menu.perms
-                        if menu.status == StatusType.enable:
-                            menu_perms.extend(perms.split(','))
-                        else:
-                            forbid_menu_perms.extend(perms.split(','))
-            if path_auth in set(forbid_menu_perms):
+            user_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:enable')
+            user_forbid_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable')
+            if not user_menu_perms or not user_forbid_menu_perms:
+                user_menu_perms = []
+                user_forbid_menu_perms = []
+                for role in user_roles:
+                    user_menus = role.menus
+                    if user_menus:
+                        for menu in user_menus:
+                            perms = menu.perms
+                            if menu.status == StatusType.enable:
+                                user_menu_perms.extend(perms.split(','))
+                            else:
+                                user_forbid_menu_perms.extend(perms.split(','))
+                await redis_client.rset(
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:enable', ','.join(user_menu_perms)
+                )
+                await redis_client.rset(
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
+                )
+            if path_auth_perm in user_forbid_menu_perms:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
-            if path_auth not in set(menu_perms):
+            if path_auth_perm not in user_menu_perms:
                 raise AuthorizationError
         else:
             # casbin 权限校验
-            forbid_menu_path = []
-            for role in user_roles:
-                user_menus = role.menus
-                if user_menus:
-                    for menu in user_menus:
-                        if menu.status == StatusType.disable:
-                            forbid_menu_path.append(menu.perms)
-            if path_auth in forbid_menu_path:
+            method = request.method
+            user_forbid_menu_perms = await redis_client.get(
+                f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.id}:disable'
+            )
+            if not user_forbid_menu_perms:
+                user_forbid_menu_perms = []
+                for role in user_roles:
+                    user_menus = role.menus
+                    if user_menus:
+                        for menu in user_menus:
+                            perms = menu.perms
+                            if menu.status == StatusType.disable:
+                                user_forbid_menu_perms.extend(perms.split(','))
+                await redis_client.rset(
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
+                )
+            if path_auth_perm in user_forbid_menu_perms:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return

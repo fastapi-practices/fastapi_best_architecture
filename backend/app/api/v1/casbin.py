@@ -14,7 +14,6 @@ from backend.app.schemas.casbin_rule import (
     CreatePolicy,
     CreateUserRole,
     DeleteAllPolicies,
-    DeleteAllUserRoles,
     DeletePolicy,
     DeleteUserRole,
     GetAllPolicy,
@@ -35,8 +34,8 @@ router = APIRouter()
 )
 async def get_all_casbin(
     db: CurrentSession,
-    ptype: Annotated[str | None, Query()] = None,
-    sub: Annotated[str | None, Query()] = None,
+    ptype: Annotated[str | None, Query(description='规则类型, p / g')] = None,
+    sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
 ):
     casbin_select = await CasbinService.get_casbin_list(ptype=ptype, sub=sub)
     page_data = await paging_data(db, casbin_select, GetAllPolicy)
@@ -232,7 +231,7 @@ async def delete_groups(gs: list[DeleteUserRole]):
         Depends(RequestPermission('casbin:g:empty')),
     ],
 )
-async def delete_all_groups(uuid: DeleteAllUserRoles):
+async def delete_all_groups(uuid: str):
     count = await CasbinService.delete_all_groups(uuid=uuid)
     if count > 0:
         return await response_base.success()

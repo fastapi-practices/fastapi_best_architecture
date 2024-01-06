@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import CasbinRule
-from backend.app.schemas.casbin_rule import CreatePolicy, DeleteAllPolicies, DeleteAllUserRoles, UpdatePolicy
+from backend.app.schemas.casbin_rule import CreatePolicy, DeleteAllPolicies, UpdatePolicy
 
 
 class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
@@ -28,8 +28,8 @@ class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
         result = await db.execute(delete(self.model).where(or_(*where_list)))
         return result.rowcount
 
-    async def delete_groups_by_uuid(self, db: AsyncSession, sub: DeleteAllUserRoles) -> int:
-        result = await db.execute(delete(self.model).where(self.model.v0 == sub.uuid))
+    async def delete_groups_by_uuid(self, db: AsyncSession, uuid: str) -> int:
+        result = await db.execute(delete(self.model).where(self.model.v0 == uuid))
         return result.rowcount
 
 

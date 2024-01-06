@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from fastapi import Request
 from sqlalchemy import Select
 
 from backend.app.common.exception import errors
+from backend.app.common.redis import redis_client
+from backend.app.core.conf import settings
 from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
@@ -59,7 +62,7 @@ class RoleService:
             return count
 
     @staticmethod
-    async def update_menus(*, pk: int, menu_ids: UpdateRoleMenu) -> int:
+    async def update_menus(*, request: Request, pk: int, menu_ids: UpdateRoleMenu) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:
@@ -69,6 +72,7 @@ class RoleService:
                 if not menu:
                     raise errors.NotFoundError(msg='菜单不存在')
             count = await RoleDao.update_menus(db, pk, menu_ids)
+            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod

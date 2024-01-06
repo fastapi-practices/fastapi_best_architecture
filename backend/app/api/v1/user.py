@@ -85,7 +85,7 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     ],
 )
 async def update_user_role(request: Request, username: str, obj: UpdateUserRole):
-    await UserService.update_role(request=request, username=username, obj=obj)
+    await UserService.update_roles(request=request, username=username, obj=obj)
     return await response_base.success()
 
 

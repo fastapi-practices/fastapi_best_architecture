@@ -25,9 +25,6 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
     REDIS_DATABASE: int
 
-    # Env Casbin
-    CASBIN_REDIS_DATABASE: int
-
     # Env Celery
     CELERY_REDIS_HOST: str
     CELERY_REDIS_PORT: int
@@ -123,8 +120,9 @@ class Settings(BaseSettings):
     MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
 
-    # RBAC Permission Mode
+    # RBAC Permission
     PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
+    PERMISSION_REDIS_PREFIX: str = 'fba_permission'
 
     # Casbin Auth
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
@@ -136,12 +134,9 @@ class Settings(BaseSettings):
     }
 
     # Role Menu Auth
-    MENU_EXCLUDE: list[str] = [
-        'auth:swagger_login:post',
-        'auth:login:post',
-        'auth:logout:post',
-        'auth:register:post',
-        'auth:captcha:get',
+    ROLE_MENU_EXCLUDE: list[str] = [
+        'sys:monitor:redis',
+        'sys:monitor:server',
     ]
 
     # Opera log

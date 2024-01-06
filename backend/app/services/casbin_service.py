@@ -10,7 +10,6 @@ from backend.app.schemas.casbin_rule import (
     CreatePolicy,
     CreateUserRole,
     DeleteAllPolicies,
-    DeleteAllUserRoles,
     DeletePolicy,
     DeleteUserRole,
     UpdatePolicy,
@@ -130,7 +129,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_all_groups(*, uuid: DeleteAllUserRoles) -> int:
+    async def delete_all_groups(*, uuid: str) -> int:
         async with async_db_session.begin() as db:
             count = await CasbinDao.delete_groups_by_uuid(db, uuid)
         return count

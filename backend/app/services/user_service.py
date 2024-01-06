@@ -105,7 +105,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_role(*, request: Request, username: str, obj: UpdateUserRole) -> None:
+    async def update_roles(*, request: Request, username: str, obj: UpdateUserRole) -> None:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -118,6 +118,7 @@ class UserService:
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
             await UserDao.update_role(db, input_user, obj)
+            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.id}')
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:

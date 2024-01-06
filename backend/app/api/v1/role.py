@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
 from backend.app.common.jwt import jwt_auth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -100,8 +100,8 @@ async def update_role(pk: int, obj: UpdateRole):
         Depends(RequestPermission('sys:role:menu:edit')),
     ],
 )
-async def update_role_menu(pk: int, menu_ids: UpdateRoleMenu):
-    count = await RoleService.update_menus(pk=pk, menu_ids=menu_ids)
+async def update_role_menu(request: Request, pk: int, menu_ids: UpdateRoleMenu):
+    count = await RoleService.update_menus(request=request, pk=pk, menu_ids=menu_ids)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
