@@ -74,14 +74,14 @@ class RBAC:
         data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
-        user_id = request.user.id
+        user_uuid = request.user.uuid
         path_auth_perm = request.state.permission
         if settings.PERMISSION_MODE == 'role-menu':
             # 角色菜单权限校验
             if path_auth_perm in set(settings.ROLE_MENU_EXCLUDE):
                 return
-            user_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:enable')
-            user_forbid_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable')
+            user_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:enable')
+            user_forbid_menu_perms = await redis_client.get(f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:disable')
             if not user_menu_perms or not user_forbid_menu_perms:
                 user_menu_perms = []
                 user_forbid_menu_perms = []
@@ -96,10 +96,10 @@ class RBAC:
                                 else:
                                     user_forbid_menu_perms.extend(perms.split(','))
                 await redis_client.set(
-                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:enable', ','.join(user_menu_perms)
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:enable', ','.join(user_menu_perms)
                 )
                 await redis_client.set(
-                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:disable', ','.join(user_forbid_menu_perms)
                 )
             if path_auth_perm in user_forbid_menu_perms:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
@@ -109,7 +109,7 @@ class RBAC:
             # casbin 权限校验
             method = request.method
             user_forbid_menu_perms = await redis_client.get(
-                f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.id}:disable'
+                f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}:disable'
             )
             if not user_forbid_menu_perms:
                 user_forbid_menu_perms = []
@@ -122,13 +122,12 @@ class RBAC:
                                 if menu.status == StatusType.disable:
                                     user_forbid_menu_perms.extend(perms.split(','))
                 await redis_client.set(
-                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_id}:disable', ','.join(user_forbid_menu_perms)
+                    f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:disable', ','.join(user_forbid_menu_perms)
                 )
             if path_auth_perm in user_forbid_menu_perms:
                 raise AuthorizationError(msg='菜单已禁用，授权失败')
             if (method, path) in settings.CASBIN_EXCLUDE:
                 return
-            user_uuid = request.user.uuid
             enforcer = await self.enforcer()
             if not enforcer.enforce(user_uuid, path, method):
                 raise AuthorizationError

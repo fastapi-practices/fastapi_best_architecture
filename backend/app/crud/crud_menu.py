@@ -5,8 +5,6 @@ from typing import Sequence
 from sqlalchemy import and_, asc, select
 from sqlalchemy.orm import selectinload
 
-from backend.app.common.redis import redis_client
-from backend.app.core.conf import settings
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Menu
 from backend.app.schemas.menu import CreateMenu, UpdateMenu
@@ -46,7 +44,6 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
 
     async def update(self, db, menu_id: int, obj_in: UpdateMenu) -> int:
         count = await self.update_(db, menu_id, obj_in)
-        await redis_client.delete_prefix(settings.PERMISSION_REDIS_PREFIX)
         return count
 
     async def delete(self, db, menu_id: int) -> int:

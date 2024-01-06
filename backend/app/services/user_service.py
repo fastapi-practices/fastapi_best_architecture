@@ -121,7 +121,7 @@ class UserService:
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
             await UserDao.update_role(db, input_user, obj)
-            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.id}')
+            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:
