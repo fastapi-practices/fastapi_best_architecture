@@ -14,8 +14,8 @@ router = APIRouter()
     '/redis',
     summary='redis 监控',
     dependencies=[
-        DependsJwtAuth,
         Depends(RequestPermission('sys:monitor:redis')),
+        DependsJwtAuth,
     ],
 )
 async def get_redis_info():

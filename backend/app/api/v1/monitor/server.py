@@ -15,8 +15,8 @@ router = APIRouter()
     '/server',
     summary='server 监控',
     dependencies=[
-        DependsJwtAuth,
         Depends(RequestPermission('sys:monitor:server')),
+        DependsJwtAuth,
     ],
 )
 async def get_server_info():

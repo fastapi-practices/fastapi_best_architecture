@@ -32,8 +32,8 @@ async def get_task_result(pk: str = Path(description='任务ID')):
     '/{module}',
     summary='执行任务',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:task:run')),
+        DependsRBAC,
     ],
 )
 async def run_task(

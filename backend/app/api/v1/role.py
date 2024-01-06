@@ -68,8 +68,8 @@ async def get_all_role_list(
     '',
     summary='创建角色',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:role:add')),
+        DependsRBAC,
     ],
 )
 async def create_role(obj: CreateRole):
@@ -81,8 +81,8 @@ async def create_role(obj: CreateRole):
     '/{pk}',
     summary='更新角色',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:role:edit')),
+        DependsRBAC,
     ],
 )
 async def update_role(pk: int, obj: UpdateRole):
@@ -96,8 +96,8 @@ async def update_role(pk: int, obj: UpdateRole):
     '/{pk}/menu',
     summary='更新角色菜单',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:role:menu:edit')),
+        DependsRBAC,
     ],
 )
 async def update_role_menu(request: Request, pk: int, menu_ids: UpdateRoleMenu):
@@ -111,8 +111,8 @@ async def update_role_menu(request: Request, pk: int, menu_ids: UpdateRoleMenu):
     '',
     summary='（批量）删除角色',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:role:del')),
+        DependsRBAC,
     ],
 )
 async def delete_role(pk: Annotated[list[int], Query(...)]):

@@ -14,8 +14,8 @@ router = APIRouter()
     '/routers',
     summary='获取所有路由',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:route:list')),
+        DependsRBAC,
     ],
 )
 async def get_all_route(request: Request):

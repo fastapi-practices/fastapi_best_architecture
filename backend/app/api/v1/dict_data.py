@@ -47,8 +47,8 @@ async def get_all_dict_datas(
     '',
     summary='创建字典',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:add')),
+        DependsRBAC,
     ],
 )
 async def create_dict_data(obj: CreateDictData):
@@ -60,8 +60,8 @@ async def create_dict_data(obj: CreateDictData):
     '/{pk}',
     summary='更新字典',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:edit')),
+        DependsRBAC,
     ],
 )
 async def update_dict_data(pk: int, obj: UpdateDictData):
@@ -75,8 +75,8 @@ async def update_dict_data(pk: int, obj: UpdateDictData):
     '',
     summary='（批量）删除字典',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:data:del')),
+        DependsRBAC,
     ],
 )
 async def delete_dict_data(pk: Annotated[list[int], Query(...)]):

@@ -41,8 +41,8 @@ async def get_all_menus(
     '',
     summary='创建菜单',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:menu:add')),
+        DependsRBAC,
     ],
 )
 async def create_menu(obj: CreateMenu):
@@ -54,8 +54,8 @@ async def create_menu(obj: CreateMenu):
     '/{pk}',
     summary='更新菜单',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:menu:edit')),
+        DependsRBAC,
     ],
 )
 async def update_menu(pk: int, obj: UpdateMenu):
@@ -69,8 +69,8 @@ async def update_menu(pk: int, obj: UpdateMenu):
     '/{pk}',
     summary='删除菜单',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:menu:del')),
+        DependsRBAC,
     ],
 )
 async def delete_menu(pk: int):

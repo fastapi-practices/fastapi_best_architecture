@@ -51,8 +51,8 @@ async def get_api_list(
     '',
     summary='创建接口',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:api:add')),
+        DependsRBAC,
     ],
 )
 async def create_api(obj: CreateApi):
@@ -64,8 +64,8 @@ async def create_api(obj: CreateApi):
     '/{pk}',
     summary='更新接口',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:api:edit')),
+        DependsRBAC,
     ],
 )
 async def update_api(pk: int, obj: UpdateApi):
@@ -79,8 +79,8 @@ async def update_api(pk: int, obj: UpdateApi):
     '',
     summary='（批量）删除接口',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:api:del')),
+        DependsRBAC,
     ],
 )
 async def delete_api(pk: Annotated[list[int], Query(...)]):

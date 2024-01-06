@@ -39,8 +39,8 @@ async def get_all_dict_types(
     '',
     summary='创建字典类型',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:add')),
+        DependsRBAC,
     ],
 )
 async def create_dict_type(obj: CreateDictType):
@@ -52,8 +52,8 @@ async def create_dict_type(obj: CreateDictType):
     '/{pk}',
     summary='更新字典类型',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:edit')),
+        DependsRBAC,
     ],
 )
 async def update_dict_type(pk: int, obj: UpdateDictType):
@@ -67,8 +67,8 @@ async def update_dict_type(pk: int, obj: UpdateDictType):
     '',
     summary='（批量）删除字典类型',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dict:type:del')),
+        DependsRBAC,
     ],
 )
 async def delete_dict_type(pk: Annotated[list[int], Query(...)]):

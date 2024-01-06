@@ -37,8 +37,8 @@ async def get_all_depts(
     '',
     summary='创建部门',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dept:add')),
+        DependsRBAC,
     ],
 )
 async def create_dept(obj: CreateDept):
@@ -50,8 +50,8 @@ async def create_dept(obj: CreateDept):
     '/{pk}',
     summary='更新部门',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dept:edit')),
+        DependsRBAC,
     ],
 )
 async def update_dept(pk: int, obj: UpdateDept):
@@ -65,8 +65,8 @@ async def update_dept(pk: int, obj: UpdateDept):
     '{pk}',
     summary='删除部门',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:dept:del')),
+        DependsRBAC,
     ],
 )
 async def delete_dept(pk: int):

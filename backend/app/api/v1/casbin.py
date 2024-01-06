@@ -58,8 +58,8 @@ async def get_role_policies(role: Annotated[str, Path(description='角色ID')]):
     '/policy',
     summary='添加P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:add')),
+        DependsRBAC,
     ],
 )
 async def create_policy(p: CreatePolicy):
@@ -80,8 +80,8 @@ async def create_policy(p: CreatePolicy):
     '/policies',
     summary='添加多组P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:group:add')),
+        DependsRBAC,
     ],
 )
 async def create_policies(ps: list[CreatePolicy]):
@@ -93,8 +93,8 @@ async def create_policies(ps: list[CreatePolicy]):
     '/policy',
     summary='更新P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:edit')),
+        DependsRBAC,
     ],
 )
 async def update_policy(old: UpdatePolicy, new: UpdatePolicy):
@@ -106,8 +106,8 @@ async def update_policy(old: UpdatePolicy, new: UpdatePolicy):
     '/policies',
     summary='更新多组P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:group:edit')),
+        DependsRBAC,
     ],
 )
 async def update_policies(old: list[UpdatePolicy], new: list[UpdatePolicy]):
@@ -119,8 +119,8 @@ async def update_policies(old: list[UpdatePolicy], new: list[UpdatePolicy]):
     '/policy',
     summary='删除P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:del')),
+        DependsRBAC,
     ],
 )
 async def delete_policy(p: DeletePolicy):
@@ -132,8 +132,8 @@ async def delete_policy(p: DeletePolicy):
     '/policies',
     summary='删除多组P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:group:del')),
+        DependsRBAC,
     ],
 )
 async def delete_policies(ps: list[DeletePolicy]):
@@ -145,8 +145,8 @@ async def delete_policies(ps: list[DeletePolicy]):
     '/policies/all',
     summary='删除所有P权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:p:empty')),
+        DependsRBAC,
     ],
 )
 async def delete_all_policies(sub: DeleteAllPolicies):
@@ -166,8 +166,8 @@ async def get_all_groups():
     '/group',
     summary='添加G权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:g:add')),
+        DependsRBAC,
     ],
 )
 async def create_group(g: CreateUserRole):
@@ -188,8 +188,8 @@ async def create_group(g: CreateUserRole):
     '/groups',
     summary='添加多组G权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:g:group:add')),
+        DependsRBAC,
     ],
 )
 async def create_groups(gs: list[CreateUserRole]):
@@ -201,8 +201,8 @@ async def create_groups(gs: list[CreateUserRole]):
     '/group',
     summary='删除G权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:g:del')),
+        DependsRBAC,
     ],
 )
 async def delete_group(g: DeleteUserRole):
@@ -214,8 +214,8 @@ async def delete_group(g: DeleteUserRole):
     '/groups',
     summary='删除多组G权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:g:group:del')),
+        DependsRBAC,
     ],
 )
 async def delete_groups(gs: list[DeleteUserRole]):
@@ -227,8 +227,8 @@ async def delete_groups(gs: list[DeleteUserRole]):
     '/groups/all',
     summary='删除所有G权限规则',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('casbin:g:empty')),
+        DependsRBAC,
     ],
 )
 async def delete_all_groups(uuid: str):

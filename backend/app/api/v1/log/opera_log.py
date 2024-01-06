@@ -39,8 +39,8 @@ async def get_all_opera_logs(
     '',
     summary='（批量）删除操作日志',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('log:opera:del')),
+        DependsRBAC,
     ],
 )
 async def delete_opera_log(pk: Annotated[list[int], Query(...)]):
@@ -54,8 +54,8 @@ async def delete_opera_log(pk: Annotated[list[int], Query(...)]):
     '/all',
     summary='清空操作日志',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('log:opera:empty')),
+        DependsRBAC,
     ],
 )
 async def delete_all_opera_logs():

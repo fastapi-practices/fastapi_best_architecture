@@ -73,8 +73,8 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     '/{username}/role',
     summary='更新用户角色',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:user:role:edit')),
+        DependsRBAC,
     ],
 )
 async def update_user_role(request: Request, username: str, obj: UpdateUserRole):
@@ -147,8 +147,8 @@ async def multi_set(request: Request, pk: int):
     summary='用户注销',
     description='用户注销 != 用户登出，注销之后用户将从数据库删除',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('sys:user:del')),
+        DependsRBAC,
     ],
 )
 async def delete_user(username: str):

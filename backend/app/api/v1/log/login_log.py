@@ -39,8 +39,8 @@ async def get_all_login_logs(
     '',
     summary='（批量）删除登录日志',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('log:login:del')),
+        DependsRBAC,
     ],
 )
 async def delete_login_log(pk: Annotated[list[int], Query(...)]):
@@ -54,8 +54,8 @@ async def delete_login_log(pk: Annotated[list[int], Query(...)]):
     '/all',
     summary='清空登录日志',
     dependencies=[
-        DependsRBAC,
         Depends(RequestPermission('log:login:empty')),
+        DependsRBAC,
     ],
 )
 async def delete_all_login_logs():
