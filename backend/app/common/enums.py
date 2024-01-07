@@ -50,6 +50,7 @@ class MethodType(StrEnum):
     PUT = 'PUT'
     DELETE = 'DELETE'
     PATCH = 'PATCH'
+    OPTIONS = 'OPTIONS'
 
 
 class LoginLogStatusType(IntEnum):

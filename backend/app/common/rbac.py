@@ -5,7 +5,7 @@ import casbin_async_sqlalchemy_adapter
 
 from fastapi import Depends, Request
 
-from backend.app.common.enums import StatusType
+from backend.app.common.enums import StatusType, MethodType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.redis import redis_client
@@ -54,14 +54,14 @@ class RBAC:
         :return:
         """
         path = request.url.path
+        # 鉴权白名单
         if path in settings.TOKEN_EXCLUDE:
             return
-        # 强制校验 JWT 授权状态
+        # JWT 授权状态强制校验
         if not request.auth.scopes:
             raise TokenError
         # 超级管理员免校验
-        super_user = request.user.is_superuser
-        if super_user:
+        if request.user.is_superuser:
             return
         # 检测角色数据权限范围
         user_roles = request.user.roles
@@ -69,8 +69,11 @@ class RBAC:
             raise AuthorizationError(msg='用户未分配角色，授权失败')
         if not any(len(role.menus) > 0 for role in user_roles):
             raise AuthorizationError(msg='用户所属角色未分配菜单，授权失败')
-        if not request.user.is_staff:
-            raise AuthorizationError(msg='此用户已被禁止后台管理操作')
+        method = request.method
+        if method != MethodType.GET or method != MethodType.OPTIONS:
+            if not request.user.is_staff:
+                raise AuthorizationError(msg='此用户已被禁止后台管理操作')
+        # 数据权限范围
         data_scope = any(role.data_scope == 1 for role in user_roles)
         if data_scope:
             return
@@ -107,7 +110,6 @@ class RBAC:
                 raise AuthorizationError
         else:
             # casbin 权限校验
-            method = request.method
             user_forbid_menu_perms = await redis_client.get(
                 f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}:disable'
             )
