@@ -3,8 +3,11 @@
 from decimal import Decimal
 from typing import Any, Sequence, TypeVar
 
+import msgspec
+
 from asgiref.sync import sync_to_async
 from sqlalchemy import Row, RowMapping
+from starlette.responses import JSONResponse
 
 RowData = Row | RowMapping | Any
 
@@ -44,7 +47,8 @@ async def select_list_serialize(row: Sequence[R]) -> list:
 @sync_to_async
 def select_as_dict(row: R) -> dict:
     """
-    Converting select to dict, which can contain relational data, depends on the properties of the select object itself
+    Converting SQLAlchemy select to dict, which can contain relational data,
+    depends on the properties of the select object itself
 
     :param row:
     :return:
@@ -53,3 +57,17 @@ def select_as_dict(row: R) -> dict:
     if '_sa_instance_state' in obj_dict:
         del obj_dict['_sa_instance_state']
         return obj_dict
+
+
+class MsgSpecJSONResponse(JSONResponse):
+    """
+    JSON response using the high-performance msgspec library to serialize data to JSON.
+    """
+
+    # Pydantic json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
+    # 暂时使用 msgspec 平替: https://github.com/jcrist/msgspec/issues/336，这可能带来隐式性能损耗
+    # hooks = msgspec.Hooks()
+    # hooks.register_decoder(datetime, lambda x: x.strftime(settings.DATETIME_FORMAT))
+
+    def render(self, content: Any) -> bytes:
+        return msgspec.json.encode(content)

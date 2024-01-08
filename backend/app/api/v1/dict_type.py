@@ -8,7 +8,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
-from backend.app.common.response.response_schema import response_base
+from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_type import CreateDictType, GetAllDictType, UpdateDictType
 from backend.app.services.dict_type_service import DictTypeService
@@ -29,7 +29,7 @@ async def get_all_dict_types(
     name: Annotated[str | None, Query()] = None,
     code: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-):
+) -> ResponseModel:
     dict_type_select = await DictTypeService.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select, GetAllDictType)
     return await response_base.success(data=page_data)
@@ -43,7 +43,7 @@ async def get_all_dict_types(
         DependsRBAC,
     ],
 )
-async def create_dict_type(obj: CreateDictType):
+async def create_dict_type(obj: CreateDictType) -> ResponseModel:
     await DictTypeService.create(obj=obj)
     return await response_base.success()
 
@@ -56,7 +56,7 @@ async def create_dict_type(obj: CreateDictType):
         DependsRBAC,
     ],
 )
-async def update_dict_type(pk: int, obj: UpdateDictType):
+async def update_dict_type(pk: int, obj: UpdateDictType) -> ResponseModel:
     count = await DictTypeService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -71,7 +71,7 @@ async def update_dict_type(pk: int, obj: UpdateDictType):
         DependsRBAC,
     ],
 )
-async def delete_dict_type(pk: Annotated[list[int], Query(...)]):
+async def delete_dict_type(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await DictTypeService.delete(pk=pk)
     if count > 0:
         return await response_base.success()

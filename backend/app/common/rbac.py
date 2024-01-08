@@ -5,7 +5,7 @@ import casbin_async_sqlalchemy_adapter
 
 from fastapi import Depends, Request
 
-from backend.app.common.enums import StatusType, MethodType
+from backend.app.common.enums import MethodType, StatusType
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.redis import redis_client

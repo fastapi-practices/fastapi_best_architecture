@@ -5,7 +5,7 @@ from fastapi.routing import APIRoute
 
 from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
-from backend.app.common.response.response_schema import response_base
+from backend.app.common.response.response_schema import ResponseModel, response_base
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ router = APIRouter()
         DependsRBAC,
     ],
 )
-async def get_all_route(request: Request):
+async def get_all_route(request: Request) -> ResponseModel:
     data = []
     for route in request.app.routes:
         if isinstance(route, APIRoute):

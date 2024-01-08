@@ -5,13 +5,13 @@ from typing import Any
 from fastapi import Request, Response
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
-from starlette.responses import JSONResponse
 
 from backend.app.common import jwt
 from backend.app.common.exception.errors import TokenError
 from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.database.db_mysql import async_db_session
+from backend.app.utils.serializers import MsgSpecJSONResponse
 
 
 class _AuthenticationError(AuthenticationError):
@@ -29,7 +29,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
     @staticmethod
     def auth_exception_handler(conn: HTTPConnection, exc: _AuthenticationError) -> Response:
         """覆盖内部认证错误处理"""
-        return JSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
+        return MsgSpecJSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
     async def authenticate(self, request: Request):
         auth = request.headers.get('Authorization')
