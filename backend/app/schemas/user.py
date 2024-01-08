@@ -76,6 +76,9 @@ class GetAllUserInfo(GetUserInfoNoRelation):
 class GetCurrentUserInfo(GetAllUserInfo):
     model_config = ConfigDict(from_attributes=True)
 
+    dept: GetAllDept | str | None = None
+    roles: list[GetAllRole] | list[str] | None = None
+
     @model_validator(mode='after')
     def handel(self, values):
         """处理部门和角色"""

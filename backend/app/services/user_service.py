@@ -34,8 +34,9 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def add(*, obj: AddUser) -> None:
+    async def add(*, request: Request, obj: AddUser) -> None:
         async with async_db_session.begin() as db:
+            await superuser_verify(request)
             username = await UserDao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='此用户名已注册')
@@ -85,7 +86,9 @@ class UserService:
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUser) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            if not request.user.is_superuser:
+                if request.user.username != username:
+                    raise errors.ForbiddenError(msg='你只能修改自己的信息')
             input_user = await UserDao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -105,7 +108,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_role(*, request: Request, username: str, obj: UpdateUserRole) -> None:
+    async def update_roles(*, request: Request, username: str, obj: UpdateUserRole) -> None:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -118,6 +121,7 @@ class UserService:
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
             await UserDao.update_role(db, input_user, obj)
+            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:
@@ -196,9 +200,8 @@ class UserService:
                 return count
 
     @staticmethod
-    async def delete(*, request: Request, username: str) -> int:
+    async def delete(*, username: str) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')

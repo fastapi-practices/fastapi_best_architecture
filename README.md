@@ -53,6 +53,7 @@ See a preview of some of the screenshots
 - [x] Global SQLAlchemy 2.0 syntax
 - [x] Pydantic v1 and v2 (different branches)
 - [x] Casbin RBAC access control model
+- [x] Role menu RBAC access control model
 - [x] Celery asynchronous tasks
 - [x] JWT middleware whitelist authentication
 - [x] Global customizable time zone time
@@ -218,18 +219,13 @@ Execute unittests via pytest
 - [Ruff](https://beta.ruff.rs/docs/)
 - ...
 
-## 互动
+## Interactivity
 
 We only have one current channel.
 
-<table>
-  <tr>
-    <td style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1"> Jump </a></td>
-  </tr>
-  <tr>
-    <td> Telegram </td>
-  </tr>
-</table>
+| [Jump](https://t.me/+ZlPhIFkPp7E4NGI1) |
+|----------------------------------------|
+| Telegram                               |
 
 ## Sponsor us
 

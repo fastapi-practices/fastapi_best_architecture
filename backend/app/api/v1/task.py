@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Depends, Path
 
 from backend.app.common.jwt import DependsJwtAuth
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.common.response.response_schema import response_base
@@ -27,7 +28,14 @@ async def get_task_result(pk: str = Path(description='任务ID')):
     return await response_base.success(data=task.result)
 
 
-@router.post('/{module}', summary='执行任务', dependencies=[DependsRBAC])
+@router.post(
+    '/{module}',
+    summary='执行任务',
+    dependencies=[
+        Depends(RequestPermission('sys:task:run')),
+        DependsRBAC,
+    ],
+)
 async def run_task(
     module: Annotated[str, Path(description='任务模块')],
     args: Annotated[list | None, Body()] = None,

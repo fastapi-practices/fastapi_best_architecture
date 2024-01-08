@@ -103,7 +103,7 @@ class Settings(BaseSettings):
     TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
-    TOKEN_EXCLUDE: list[str] = [  # 白名单
+    TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{API_V1_STR}/auth/login',
     ]
 
@@ -120,8 +120,11 @@ class Settings(BaseSettings):
     MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
 
-    # Casbin
-    CASBIN_RBAC_MODEL_NAME: str = 'rbac_model.conf'
+    # RBAC Permission
+    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
+    PERMISSION_REDIS_PREFIX: str = 'fba_permission'
+
+    # Casbin Auth
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
         ('POST', f'{API_V1_STR}/auth/swagger_login'),
         ('POST', f'{API_V1_STR}/auth/login'),
@@ -130,14 +133,10 @@ class Settings(BaseSettings):
         ('GET', f'{API_V1_STR}/auth/captcha'),
     }
 
-    # Menu
-    MENU_PERMISSION: bool = False  # 危险行为，开启此功能, Casbin 鉴权将失效，并将使用角色菜单鉴权 (默认关闭)
-    MENU_EXCLUDE: list[str] = [
-        'auth:swagger_login:post',
-        'auth:login:post',
-        'auth:logout:post',
-        'auth:register:post',
-        'auth:captcha:get',
+    # Role Menu Auth
+    ROLE_MENU_EXCLUDE: list[str] = [
+        'sys:monitor:redis',
+        'sys:monitor:server',
     ]
 
     # Opera log

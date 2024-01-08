@@ -47,6 +47,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 - [x] 全局 SQLAlchemy 2.0 语法
 - [x] Pydantic v1 和 v2 (不同分支)
 - [x] Casbin RBAC 访问控制模型
+- [x] 角色菜单 RBAC 访问控制模型
 - [x] Celery 异步任务
 - [x] JWT 中间件白名单认证
 - [x] 全局自定义时区时间
@@ -216,14 +217,9 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 有且仅有当前一个频道，请注意辨别真伪
 
-<table>
-  <tr>
-    <td  style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
-  </tr>
-  <tr>
-    <td>Telegram（科学上网）</td>
-  </tr>
-</table>
+| [直链跳转](https://t.me/+ZlPhIFkPp7E4NGI1) |
+|----------------------------------------|
+| Telegram（科学上网）                         |
 
 ## 赞助我们
 

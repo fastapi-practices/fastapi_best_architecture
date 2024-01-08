@@ -16,7 +16,12 @@ from backend.app.services.auth_service import AuthService
 router = APIRouter()
 
 
-@router.post('/swagger_login', summary='swagger 表单登录', description='form 格式登录，仅用于 swagger 文档调试接口')
+@router.post(
+    '/swagger_login',
+    summary='swagger 表单登录',
+    description='form 格式登录，用于 swagger 文档调试以及获取 JWT Auth',
+    deprecated=True,
+)
 async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> GetSwaggerToken:
     token, user = await AuthService().swagger_login(form_data=form_data)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore
@@ -25,7 +30,7 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
 @router.post(
     '/login',
     summary='用户登录',
-    description='json 格式登录, 仅支持在第三方api工具调试接口, 例如: postman',
+    description='json 格式登录, 仅支持在第三方api工具调试, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def user_login(request: Request, obj: AuthLogin, background_tasks: BackgroundTasks):

@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
 from backend.app.common.jwt import DependsJwtAuth
-from backend.app.common.pagination import PageDepends, paging_data
+from backend.app.common.pagination import DependsPagination, paging_data
+from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import response_base
 from backend.app.database.db_mysql import CurrentSession
@@ -32,8 +33,8 @@ async def user_register(obj: RegisterUser):
 
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
-async def add_user(obj: AddUser):
-    await UserService.add(obj=obj)
+async def add_user(request: Request, obj: AddUser):
+    await UserService.add(request=request, obj=obj)
     current_user = await UserService.get_userinfo(username=obj.username)
     data = GetAllUserInfo(**await select_as_dict(current_user))
     return await response_base.success(data=data)
@@ -68,9 +69,16 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
     return await response_base.fail()
 
 
-@router.put('/{username}/role', summary='更新用户角色', dependencies=[DependsRBAC])
+@router.put(
+    '/{username}/role',
+    summary='更新用户角色',
+    dependencies=[
+        Depends(RequestPermission('sys:user:role:edit')),
+        DependsRBAC,
+    ],
+)
 async def update_user_role(request: Request, username: str, obj: UpdateUserRole):
-    await UserService.update_role(request=request, username=username, obj=obj)
+    await UserService.update_roles(request=request, username=username, obj=obj)
     return await response_base.success()
 
 
@@ -82,7 +90,14 @@ async def update_avatar(request: Request, username: str, avatar: Avatar):
     return await response_base.fail()
 
 
-@router.get('', summary='（模糊条件）分页获取所有用户', dependencies=[DependsJwtAuth, PageDepends])
+@router.get(
+    '',
+    summary='（模糊条件）分页获取所有用户',
+    dependencies=[
+        DependsJwtAuth,
+        DependsPagination,
+    ],
+)
 async def get_all_users(
     db: CurrentSession,
     dept: Annotated[int | None, Query()] = None,
@@ -131,10 +146,13 @@ async def multi_set(request: Request, pk: int):
     path='/{username}',
     summary='用户注销',
     description='用户注销 != 用户登出，注销之后用户将从数据库删除',
-    dependencies=[DependsRBAC],
+    dependencies=[
+        Depends(RequestPermission('sys:user:del')),
+        DependsRBAC,
+    ],
 )
-async def delete_user(request: Request, username: str):
-    count = await UserService.delete(request=request, username=username)
+async def delete_user(username: str):
+    count = await UserService.delete(username=username)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

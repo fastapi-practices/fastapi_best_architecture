@@ -4,14 +4,14 @@ alembic==1.13.0
 asgiref==3.7.2
 asyncmy==0.2.9
 bcrypt==4.0.1
-casbin==1.33.0
-casbin-async-sqlalchemy-adapter==1.3.0
+casbin==1.34.0
+casbin-async-sqlalchemy-adapter==1.4.0
 celery==5.3.6
 cryptography==41.0.7
 email-validator==2.0.0
 fast-captcha==0.2.1
 fastapi==0.108.0
-fastapi-limiter==0.1.5
+fastapi-limiter==0.1.6
 fastapi-pagination==0.12.13
 gunicorn==21.2.0
 httpx==0.25.2
@@ -30,7 +30,7 @@ pytest-pretty==1.2.0
 python-jose==3.3.0
 python-multipart==0.0.6
 pytz==2023.3
-redis[hiredis]==4.5.5
+redis[hiredis]==5.0.1
 ruff==0.1.8
 SQLAlchemy==2.0.23
 supervisor==4.2.5

@@ -5,6 +5,8 @@ from typing import Any
 from fastapi import Request
 
 from backend.app.common.exception import errors
+from backend.app.common.redis import redis_client
+from backend.app.core.conf import settings
 from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
@@ -79,6 +81,7 @@ class MenuService:
                 if not parent_menu:
                     raise errors.NotFoundError(msg='父级菜单不存在')
             count = await MenuDao.update(db, pk, obj)
+            await redis_client.delete_prefix(settings.PERMISSION_REDIS_PREFIX)
             return count
 
     @staticmethod

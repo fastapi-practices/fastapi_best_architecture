@@ -15,7 +15,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         return await self.get_(db, pk=menu_id)
 
     async def get_by_title(self, db, title: str) -> Menu | None:
-        result = await db.execute(select(self.model).where(self.model.title == title))
+        result = await db.execute(select(self.model).where(and_(self.model.title == title, self.model.menu_type != 2)))
         return result.scalars().first()
 
     async def get_all(self, db, title: str | None = None, status: int | None = None) -> Sequence[Menu]:
@@ -43,7 +43,8 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         await self.create_(db, obj_in)
 
     async def update(self, db, menu_id: int, obj_in: UpdateMenu) -> int:
-        return await self.update_(db, menu_id, obj_in)
+        count = await self.update_(db, menu_id, obj_in)
+        return count
 
     async def delete(self, db, menu_id: int) -> int:
         return await self.delete_(db, menu_id)
