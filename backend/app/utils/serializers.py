@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Sequence, TypeVar
 
@@ -63,11 +64,6 @@ class MsgSpecJSONResponse(JSONResponse):
     """
     JSON response using the high-performance msgspec library to serialize data to JSON.
     """
-
-    # Pydantic json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
-    # 暂时使用 msgspec 平替: https://github.com/jcrist/msgspec/issues/336，这可能带来隐式性能损耗
-    # hooks = msgspec.Hooks()
-    # hooks.register_decoder(datetime, lambda x: x.strftime(settings.DATETIME_FORMAT))
 
     def render(self, content: Any) -> bytes:
         return msgspec.json.encode(content)
