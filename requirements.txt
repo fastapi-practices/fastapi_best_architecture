@@ -17,6 +17,7 @@ gunicorn==21.2.0
 httpx==0.25.2
 itsdangerous==2.1.2
 loguru==0.7.2
+msgspec==0.18.5
 passlib==1.7.4
 path==15.1.2
 phonenumbers==8.13.27

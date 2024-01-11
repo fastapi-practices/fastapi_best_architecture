@@ -6,17 +6,17 @@ from pydantic import ValidationError
 from pydantic.errors import PydanticUserError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
 
 from backend.app.common.exception.errors import BaseExceptionMixin
 from backend.app.common.log import log
-from backend.app.common.response.response_code import CustomResponse, CustomResponseCode, StandardResponseCode
-from backend.app.common.response.response_schema import ResponseModel, response_base
+from backend.app.common.response.response_code import CustomResponseCode, StandardResponseCode
+from backend.app.common.response.response_schema import response_base
 from backend.app.core.conf import settings
 from backend.app.schemas.base import (
     CUSTOM_USAGE_ERROR_MESSAGES,
     CUSTOM_VALIDATION_ERROR_MESSAGES,
 )
+from backend.app.utils.serializers import MsgSpecJSONResponse
 
 
 async def _validation_exception_handler(request: Request, e: RequestValidationError | ValidationError):
@@ -43,18 +43,13 @@ async def _validation_exception_handler(request: Request, e: RequestValidationEr
         message = f'{field} {error_msg}，输入：{error_input}'
     msg = f'请求参数非法: {message}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
-    content = ResponseModel(
-        code=StandardResponseCode.HTTP_422,
-        msg=msg,
-    ).model_dump()
+    content = {
+        'code': StandardResponseCode.HTTP_422,
+        'msg': msg,
+        'data': data,
+    }
     request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
-    return JSONResponse(
-        status_code=422,
-        content=await response_base.fail(
-            res=CustomResponse(code=StandardResponseCode.HTTP_422, msg=msg),
-            data=data,
-        ),
-    )
+    return MsgSpecJSONResponse(status_code=422, content=content)
 
 
 def register_exception(app: FastAPI):
@@ -67,13 +62,19 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        content = ResponseModel(code=exc.status_code, msg=exc.detail).model_dump()
+        if settings.ENVIRONMENT == 'dev':
+            content = {
+                'code': exc.status_code,
+                'msg': exc.detail,
+                'data': None,
+            }
+        else:
+            res = await response_base.fail(res=CustomResponseCode.HTTP_400)
+            content = res.model_dump()
         request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
-        return JSONResponse(
+        return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_400,
-            content=content
-            if settings.ENVIRONMENT == 'dev'
-            else await response_base.fail(res=CustomResponseCode.HTTP_400),
+            content=content,
             headers=exc.headers,
         )
 
@@ -108,11 +109,13 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        return JSONResponse(
+        return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
-            content=await response_base.fail(
-                res=CustomResponse(code=StandardResponseCode.HTTP_500, msg=CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code))
-            ),
+            content={
+                'code': StandardResponseCode.HTTP_500,
+                'msg': CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code),
+                'data': None,
+            },
         )
 
     @app.exception_handler(AssertionError)
@@ -124,14 +127,18 @@ def register_exception(app: FastAPI):
         :param exc:
         :return:
         """
-        return JSONResponse(
+        if settings.ENVIRONMENT == 'dev':
+            content = {
+                'code': StandardResponseCode.HTTP_500,
+                'msg': str(''.join(exc.args) if exc.args else exc.__doc__),
+                'data': None,
+            }
+        else:
+            res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+            content = res.model_dump()
+        return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
-            content=ResponseModel(
-                code=StandardResponseCode.HTTP_500,
-                msg=str(''.join(exc.args) if exc.args else exc.__doc__),
-            ).model_dump()
-            if settings.ENVIRONMENT == 'dev'
-            else await response_base.fail(CustomResponseCode.HTTP_500),
+            content=content,
         )
 
     @app.exception_handler(Exception)
@@ -144,13 +151,13 @@ def register_exception(app: FastAPI):
         :return:
         """
         if isinstance(exc, BaseExceptionMixin):
-            return JSONResponse(
+            return MsgSpecJSONResponse(
                 status_code=StandardResponseCode.HTTP_400,
-                content=ResponseModel(
-                    code=exc.code,
-                    msg=str(exc.msg),
-                    data=exc.data if exc.data else None,
-                ).model_dump(),
+                content={
+                    'code': exc.code,
+                    'msg': str(exc.msg),
+                    'data': exc.data if exc.data else None,
+                },
                 background=exc.background,
             )
         else:
@@ -158,12 +165,16 @@ def register_exception(app: FastAPI):
 
             log.error(f'未知异常: {exc}')
             log.error(traceback.format_exc())
-            return JSONResponse(
-                status_code=StandardResponseCode.HTTP_500,
-                content=ResponseModel(code=500, msg=str(exc)).model_dump()
-                if settings.ENVIRONMENT == 'dev'
-                else await response_base.fail(CustomResponseCode.HTTP_500),
-            )
+            if settings.ENVIRONMENT == 'dev':
+                content = {
+                    'code': 500,
+                    'msg': str(exc),
+                    'data': None,
+                }
+            else:
+                res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+                content = res.model_dump()
+            return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_500, content=content)
 
     if settings.MIDDLEWARE_CORS:
 
@@ -179,14 +190,22 @@ def register_exception(app: FastAPI):
             :return:
             """
             if isinstance(exc, BaseExceptionMixin):
-                content = ResponseModel(code=exc.code, msg=exc.msg, data=exc.data).model_dump()
+                content = {
+                    'code': exc.code,
+                    'msg': exc.msg,
+                    'data': exc.data,
+                }
             else:
-                content = (
-                    ResponseModel(code=StandardResponseCode.HTTP_500, msg=str(exc)).model_dump()
-                    if settings.ENVIRONMENT == 'dev'
-                    else await response_base.fail(CustomResponseCode.HTTP_500)
-                )
-            response = JSONResponse(
+                if settings.ENVIRONMENT == 'dev':
+                    content = {
+                        'code': StandardResponseCode.HTTP_500,
+                        'msg': str(exc),
+                        'data': None,
+                    }
+                else:
+                    res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+                    content = res.model_dump()
+            response = MsgSpecJSONResponse(
                 status_code=exc.code if isinstance(exc, BaseExceptionMixin) else StandardResponseCode.HTTP_500,
                 content=content,
                 background=exc.background if isinstance(exc, BaseExceptionMixin) else None,

@@ -8,7 +8,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
-from backend.app.common.response.response_schema import response_base
+from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.api import CreateApi, GetAllApi, UpdateApi
 from backend.app.services.api_service import ApiService
@@ -17,13 +17,13 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
-async def get_all_apis():
+async def get_all_apis() -> ResponseModel:
     data = await ApiService.get_all()
     return await response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
-async def get_api(pk: int):
+async def get_api(pk: int) -> ResponseModel:
     api = await ApiService.get(pk=pk)
     return await response_base.success(data=api)
 
@@ -41,7 +41,7 @@ async def get_api_list(
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,
     path: Annotated[str | None, Query()] = None,
-):
+) -> ResponseModel:
     api_select = await ApiService.get_select(name=name, method=method, path=path)
     page_data = await paging_data(db, api_select, GetAllApi)
     return await response_base.success(data=page_data)
@@ -55,7 +55,7 @@ async def get_api_list(
         DependsRBAC,
     ],
 )
-async def create_api(obj: CreateApi):
+async def create_api(obj: CreateApi) -> ResponseModel:
     await ApiService.create(obj=obj)
     return await response_base.success()
 
@@ -68,7 +68,7 @@ async def create_api(obj: CreateApi):
         DependsRBAC,
     ],
 )
-async def update_api(pk: int, obj: UpdateApi):
+async def update_api(pk: int, obj: UpdateApi) -> ResponseModel:
     count = await ApiService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -83,7 +83,7 @@ async def update_api(pk: int, obj: UpdateApi):
         DependsRBAC,
     ],
 )
-async def delete_api(pk: Annotated[list[int], Query(...)]):
+async def delete_api(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await ApiService.delete(pk=pk)
     if count > 0:
         return await response_base.success()

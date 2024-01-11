@@ -8,7 +8,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
 from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
-from backend.app.common.response.response_schema import response_base
+from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import (
     AddUser,
@@ -27,7 +27,7 @@ router = APIRouter()
 
 
 @router.post('/register', summary='用户注册')
-async def user_register(obj: RegisterUser):
+async def user_register(obj: RegisterUser) -> ResponseModel:
     await UserService.register(obj=obj)
     return await response_base.success()
 
@@ -48,10 +48,10 @@ async def password_reset(request: Request, obj: ResetPassword):
     return await response_base.fail()
 
 
-@router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth])
+@router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
 async def get_current_userinfo(request: Request):
     data = GetCurrentUserInfo(**await select_as_dict(request.user))
-    return await response_base.success(data=data, exclude={'password'})
+    return await response_base.success(data=data)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])

@@ -17,6 +17,7 @@ from backend.app.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.app.utils.demo_site import demo_site
 from backend.app.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.app.utils.openapi import simplify_operation_ids
+from backend.app.utils.serializers import MsgSpecJSONResponse
 
 
 @asynccontextmanager
@@ -50,6 +51,7 @@ def register_app():
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOCS_URL,
         openapi_url=settings.OPENAPI_URL,
+        default_response_class=MsgSpecJSONResponse,
         lifespan=register_init,
     )
 
