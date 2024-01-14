@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.opera_log import GetAllOperaLog
-from backend.app.services.opera_log_service import OperaLogService
+from backend.app.services.impl.opera_log_service_impl import OperaLogService
 
 router = APIRouter()
 

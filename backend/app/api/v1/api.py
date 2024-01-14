@@ -11,18 +11,26 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.api import CreateApi, GetAllApi, UpdateApi
-from backend.app.services.api_service import ApiService
+from backend.app.services.impl.api_service_impl import ApiService
 
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
+@router.get(
+    '/all',
+    summary='获取所有接口',
+    dependencies=[DependsJwtAuth],
+)
 async def get_all_apis() -> ResponseModel:
-    data = await ApiService.get_all()
+    data = await ApiService.get_api_list()
     return await response_base.success(data=data)
 
 
-@router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
+@router.get(
+    '/{pk}',
+    summary='获取接口详情',
+    dependencies=[DependsJwtAuth],
+)
 async def get_api(pk: int) -> ResponseModel:
     api = await ApiService.get(pk=pk)
     return await response_base.success(data=api)
@@ -36,13 +44,13 @@ async def get_api(pk: int) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_api_list(
+async def get_pagination_apis(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,
     path: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
-    api_select = await ApiService.get_select(name=name, method=method, path=path)
+    api_select = await ApiService.get_api_list(name=name, method=method, path=path)
     page_data = await paging_data(db, api_select, GetAllApi)
     return await response_base.success(data=page_data)
 

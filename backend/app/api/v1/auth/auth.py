@@ -11,7 +11,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.token import GetLoginToken, GetNewToken, GetSwaggerToken
 from backend.app.schemas.user import AuthLogin
-from backend.app.services.auth_service import AuthService
+from backend.app.services.impl.auth_service_impl import AuthService
 
 router = APIRouter()
 
@@ -23,7 +23,7 @@ router = APIRouter()
     deprecated=True,
 )
 async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> GetSwaggerToken:
-    token, user = await AuthService().swagger_login(form_data=form_data)
+    token, user = await AuthService.swagger_login(form_data=form_data)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore
 
 
@@ -34,7 +34,7 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def user_login(request: Request, obj: AuthLogin, background_tasks: BackgroundTasks) -> ResponseModel:
-    access_token, refresh_token, access_expire, refresh_expire, user = await AuthService().login(
+    access_token, refresh_token, access_expire, refresh_expire, user = await AuthService.login(
         request=request, obj=obj, background_tasks=background_tasks
     )
     data = GetLoginToken(
@@ -47,7 +47,11 @@ async def user_login(request: Request, obj: AuthLogin, background_tasks: Backgro
     return await response_base.success(data=data)
 
 
-@router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
+@router.post(
+    '/new_token',
+    summary='创建新 token',
+    dependencies=[DependsJwtAuth],
+)
 async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]) -> ResponseModel:
     (
         new_access_token,
@@ -64,7 +68,11 @@ async def create_new_token(request: Request, refresh_token: Annotated[str, Query
     return await response_base.success(data=data)
 
 
-@router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
+@router.post(
+    '/logout',
+    summary='用户登出',
+    dependencies=[DependsJwtAuth],
+)
 async def user_logout(request: Request) -> ResponseModel:
     await AuthService.logout(request=request)
     return await response_base.success()

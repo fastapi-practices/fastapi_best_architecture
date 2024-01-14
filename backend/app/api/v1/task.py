@@ -9,18 +9,26 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.common.response.response_schema import ResponseModel, response_base
-from backend.app.services.task_service import TaskService
+from backend.app.services.impl.task_service_impl import TaskService
 
 router = APIRouter()
 
 
-@router.get('', summary='获取所有可执行任务模块', dependencies=[DependsJwtAuth])
+@router.get(
+    '',
+    summary='获取所有可执行任务模块',
+    dependencies=[DependsJwtAuth],
+)
 async def get_all_tasks() -> ResponseModel:
-    tasks = TaskService.gets()
+    tasks = TaskService.get_task_list()
     return await response_base.success(data=tasks)
 
 
-@router.get('/{pk}', summary='获取任务结果', dependencies=[DependsJwtAuth])
+@router.get(
+    '/{pk}',
+    summary='获取任务结果',
+    dependencies=[DependsJwtAuth],
+)
 async def get_task_result(pk: str = Path(description='任务ID')) -> ResponseModel:
     task = TaskService.get(pk)
     if not task:

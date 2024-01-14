@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -11,34 +11,50 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.role import CreateRole, GetAllRole, UpdateRole, UpdateRoleMenu
-from backend.app.services.menu_service import MenuService
-from backend.app.services.role_service import RoleService
+from backend.app.services.impl.menu_service_impl import MenuService
+from backend.app.services.impl.role_service_impl import RoleService
 from backend.app.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有角色', dependencies=[DependsJwtAuth])
+@router.get(
+    '/all',
+    summary='获取所有角色',
+    dependencies=[DependsJwtAuth],
+)
 async def get_all_roles() -> ResponseModel:
     roles = await RoleService.get_all()
     data = await select_list_serialize(roles)
     return await response_base.success(data=data)
 
 
-@router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
-async def get_user_all_roles(pk: int) -> ResponseModel:
-    roles = await RoleService.get_user_all(pk=pk)
+@router.get(
+    '/{pk}/all',
+    summary='获取用户所有角色',
+    dependencies=[DependsJwtAuth],
+)
+async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    roles = await RoleService.get_user_roles(pk=pk)
     data = await select_list_serialize(roles)
     return await response_base.success(data=data)
 
 
-@router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
+@router.get(
+    '/{pk}/menus',
+    summary='获取角色所有菜单',
+    dependencies=[DependsJwtAuth],
+)
 async def get_role_all_menus(pk: int) -> ResponseModel:
     menu = await MenuService.get_role_menu_tree(pk=pk)
     return await response_base.success(data=menu)
 
 
-@router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
+@router.get(
+    '/{pk}',
+    summary='获取角色详情',
+    dependencies=[DependsJwtAuth],
+)
 async def get_role(pk: int) -> ResponseModel:
     role = await RoleService.get(pk=pk)
     data = GetAllRole(**await select_as_dict(role))
@@ -100,8 +116,8 @@ async def update_role(pk: int, obj: UpdateRole) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_role_menu(request: Request, pk: int, menu_ids: UpdateRoleMenu) -> ResponseModel:
-    count = await RoleService.update_menus(request=request, pk=pk, menu_ids=menu_ids)
+async def update_role_menus(request: Request, pk: int, menu_ids: UpdateRoleMenu) -> ResponseModel:
+    count = await RoleService.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

@@ -9,21 +9,29 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
-from backend.app.services.dept_service import DeptService
+from backend.app.services.impl.dept_service_impl import DeptService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
+@router.get(
+    '/{pk}',
+    summary='获取部门详情',
+    dependencies=[DependsJwtAuth],
+)
 async def get_dept(pk: int) -> ResponseModel:
     dept = await DeptService.get(pk=pk)
     data = GetAllDept(**await select_as_dict(dept))
     return await response_base.success(data=data)
 
 
-@router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
-async def get_all_depts(
+@router.get(
+    '',
+    summary='获取所有部门展示树',
+    dependencies=[DependsJwtAuth],
+)
+async def get_all_depts_tree(
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
@@ -62,7 +70,7 @@ async def update_dept(pk: int, obj: UpdateDept) -> ResponseModel:
 
 
 @router.delete(
-    '{pk}',
+    '/{pk}',
     summary='删除部门',
     dependencies=[
         Depends(RequestPermission('sys:dept:del')),

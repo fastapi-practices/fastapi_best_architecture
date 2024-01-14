@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -19,7 +19,7 @@ from backend.app.schemas.casbin_rule import (
     GetAllPolicy,
     UpdatePolicy,
 )
-from backend.app.services.casbin_service import CasbinService
+from backend.app.services.impl.casbin_service_impl import CasbinService
 
 router = APIRouter()
 
@@ -42,15 +42,13 @@ async def get_all_casbin(
     return await response_base.success(data=page_data)
 
 
-@router.get('/policy', summary='获取所有P权限规则', dependencies=[DependsJwtAuth])
-async def get_all_policies() -> ResponseModel:
-    policies = await CasbinService.get_policy_list()
-    return await response_base.success(data=policies)
-
-
-@router.get('/policy/{role}/all', summary='获取指定角色的所有P权限规则', dependencies=[DependsJwtAuth])
-async def get_role_policies(role: Annotated[str, Path(description='角色ID')]) -> ResponseModel:
-    policies = await CasbinService.get_policy_list_by_role(role=role)
+@router.get(
+    '/policies',
+    summary='获取所有P权限规则',
+    dependencies=[DependsJwtAuth],
+)
+async def get_all_policies(role: Annotated[int | None, Query(description='角色ID')] = None) -> ResponseModel:
+    policies = await CasbinService.get_policy_list(role=role)
     return await response_base.success(data=policies)
 
 
@@ -156,7 +154,11 @@ async def delete_all_policies(sub: DeleteAllPolicies) -> ResponseModel:
     return await response_base.fail()
 
 
-@router.get('/group', summary='获取所有G权限规则', dependencies=[DependsJwtAuth])
+@router.get(
+    '/groups',
+    summary='获取所有G权限规则',
+    dependencies=[DependsJwtAuth],
+)
 async def get_all_groups() -> ResponseModel:
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
