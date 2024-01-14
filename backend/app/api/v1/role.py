@@ -69,7 +69,7 @@ async def get_role(pk: int) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_all_role_list(
+async def get_pagination_role_list(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     data_scope: Annotated[int | None, Query()] = None,

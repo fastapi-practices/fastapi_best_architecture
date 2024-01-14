@@ -32,7 +32,7 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_all_casbin(
+async def get_pagination_casbin(
     db: CurrentSession,
     ptype: Annotated[str | None, Query(description='规则类型, p / g')] = None,
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,

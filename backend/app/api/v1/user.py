@@ -126,7 +126,7 @@ async def update_avatar(request: Request, username: str, avatar: Avatar):
         DependsPagination,
     ],
 )
-async def get_all_users(
+async def get_pagination_users(
     db: CurrentSession,
     dept: Annotated[int | None, Query()] = None,
     username: Annotated[str | None, Query()] = None,
