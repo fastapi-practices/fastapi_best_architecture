@@ -9,6 +9,10 @@ from backend.app.services.opera_log_service import OperaLogServiceABC
 
 
 class OperaLogServiceImpl(OperaLogServiceABC):
+    """
+    操作日志服务实现类
+    """
+
     async def get_select(
         self, *, username: str | None = None, status: int | None = None, ip: str | None = None
     ) -> Select:

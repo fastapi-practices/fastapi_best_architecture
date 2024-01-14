@@ -12,6 +12,10 @@ from backend.app.services.dict_data_service import DictDataServiceABC
 
 
 class DictDataServiceImpl(DictDataServiceABC):
+    """
+    字典数据服务实现类
+    """
+
     async def get(self, *, pk: int) -> DictData:
         async with async_db_session() as db:
             dict_data = await DictDataDao.get_with_relation(db, pk)

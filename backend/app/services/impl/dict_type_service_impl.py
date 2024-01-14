@@ -10,6 +10,10 @@ from backend.app.services.dict_type_service import DictTypeServiceABC
 
 
 class DictTypeServiceImpl(DictTypeServiceABC):
+    """
+    字典类型服务实现类
+    """
+
     async def get_select(self, *, name: str = None, code: str = None, status: int = None) -> Select:
         return await DictTypeDao.get_all(name=name, code=code, status=status)
 

@@ -17,6 +17,10 @@ from backend.app.services.role_service import RoleServiceABC
 
 
 class RoleServiceImpl(RoleServiceABC):
+    """
+    角色服务实现类
+    """
+
     async def get(self, *, pk: int) -> Role:
         async with async_db_session() as db:
             role = await RoleDao.get_with_relation(db, pk)

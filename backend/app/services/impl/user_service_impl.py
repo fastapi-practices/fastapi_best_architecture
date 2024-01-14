@@ -19,6 +19,10 @@ from backend.app.services.user_service import UserServiceABC
 
 
 class UserServiceImpl(UserServiceABC):
+    """
+    用户服务实现类
+    """
+
     async def register(self, *, obj: RegisterUser) -> None:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)

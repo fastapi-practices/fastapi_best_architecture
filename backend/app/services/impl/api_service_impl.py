@@ -13,6 +13,10 @@ from backend.app.services.api_service import ApiServiceABC
 
 
 class ApiServiceImpl(ApiServiceABC):
+    """
+    后台API信息服务实现类
+    """
+
     async def get(self, *, pk: int) -> Api:
         async with async_db_session() as db:
             api = await ApiDao.get(db, pk)

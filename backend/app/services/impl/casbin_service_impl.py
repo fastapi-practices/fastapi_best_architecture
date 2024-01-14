@@ -18,6 +18,10 @@ from backend.app.services.casbin_service import CasbinServiceABC
 
 
 class CasbinServiceImpl(CasbinServiceABC):
+    """
+    Casbin服务实现类
+    """
+
     async def get_casbin_list(self, *, ptype: str, sub: str) -> Select:
         return await CasbinDao.get_all_policy(ptype, sub)
 

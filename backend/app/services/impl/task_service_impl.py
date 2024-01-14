@@ -9,6 +9,10 @@ from backend.app.services.task_service import TaskServiceABC
 
 
 class TaskServiceImpl(TaskServiceABC):
+    """
+    任务服务实现类
+    """
+
     def get(self, pk: str) -> AsyncResult | None:
         try:
             result = celery_app.AsyncResult(pk)

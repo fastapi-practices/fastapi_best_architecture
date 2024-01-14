@@ -17,6 +17,10 @@ from backend.app.utils.build_tree import get_tree_data
 
 
 class MenuServiceImpl(MenuServiceABC):
+    """
+    菜单服务实现类
+    """
+
     async def get(self, *, pk: int) -> Menu:
         async with async_db_session() as db:
             menu = await MenuDao.get(db, menu_id=pk)

@@ -23,6 +23,10 @@ from backend.app.utils.timezone import timezone
 
 
 class AuthServiceImpl(AuthServiceABC):
+    """
+    认证服务实现类
+    """
+
     login_time = timezone.now()
 
     async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm) -> tuple[str, User]:

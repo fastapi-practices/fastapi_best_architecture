@@ -15,6 +15,10 @@ from backend.app.services.login_log_service import LoginLogServiceABC
 
 
 class LoginLogServiceImpl(LoginLogServiceABC):
+    """
+    登录日志服务实现类
+    """
+
     async def get_select(self, *, username: str, status: int, ip: str) -> Select:
         return await LoginLogDao.get_all(username=username, status=status, ip=ip)
 

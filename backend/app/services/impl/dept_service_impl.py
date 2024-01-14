@@ -12,6 +12,10 @@ from backend.app.utils.build_tree import get_tree_data
 
 
 class DeptServiceImpl(DeptServiceABC):
+    """
+    部门服务实现类
+    """
+
     async def get(self, *, pk: int) -> Dept:
         async with async_db_session() as db:
             dept = await DeptDao.get(db, pk)
