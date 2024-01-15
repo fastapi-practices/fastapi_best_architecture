@@ -9,7 +9,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
-from backend.app.services.impl.dept_service_impl import DeptService
+from backend.app.services.dept_service import DeptService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()

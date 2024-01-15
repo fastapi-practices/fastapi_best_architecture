@@ -11,7 +11,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.token import GetLoginToken, GetNewToken, GetSwaggerToken
 from backend.app.schemas.user import AuthLogin
-from backend.app.services.impl.auth_service_impl import AuthService
+from backend.app.services.auth_service import AuthService
 
 router = APIRouter()
 

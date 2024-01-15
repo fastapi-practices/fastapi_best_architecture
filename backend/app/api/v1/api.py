@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.api import CreateApi, GetAllApi, UpdateApi
-from backend.app.services.impl.api_service_impl import ApiService
+from backend.app.services.api_service import ApiService
 
 router = APIRouter()
 
@@ -50,7 +50,7 @@ async def get_pagination_apis(
     method: Annotated[str | None, Query()] = None,
     path: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
-    api_select = await ApiService.get_api_list(name=name, method=method, path=path)
+    api_select = await ApiService.get_select(name=name, method=method, path=path)
     page_data = await paging_data(db, api_select, GetAllApi)
     return await response_base.success(data=page_data)
 

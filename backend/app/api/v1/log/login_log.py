@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.login_log import GetAllLoginLog
-from backend.app.services.impl.login_log_service_impl import LoginLogService
+from backend.app.services.login_log_service import LoginLogService
 
 router = APIRouter()
 

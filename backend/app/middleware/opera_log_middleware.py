@@ -11,7 +11,7 @@ from backend.app.common.enums import OperaLogCipherType
 from backend.app.common.log import log
 from backend.app.core.conf import settings
 from backend.app.schemas.opera_log import CreateOperaLog
-from backend.app.services.impl.opera_log_service_impl import OperaLogService
+from backend.app.services.opera_log_service import OperaLogService
 from backend.app.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.app.utils.request_parse import parse_ip_info, parse_user_agent_info
 from backend.app.utils.timezone import timezone

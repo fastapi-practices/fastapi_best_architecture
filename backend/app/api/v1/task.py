@@ -9,7 +9,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_code import CustomResponseCode
 from backend.app.common.response.response_schema import ResponseModel, response_base
-from backend.app.services.impl.task_service_impl import TaskService
+from backend.app.services.task_service import TaskService
 
 router = APIRouter()
 

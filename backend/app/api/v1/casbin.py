@@ -19,7 +19,7 @@ from backend.app.schemas.casbin_rule import (
     GetAllPolicy,
     UpdatePolicy,
 )
-from backend.app.services.impl.casbin_service_impl import CasbinService
+from backend.app.services.casbin_service import CasbinService
 
 router = APIRouter()
 

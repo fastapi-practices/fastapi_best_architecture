@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_data import CreateDictData, GetAllDictData, UpdateDictData
-from backend.app.services.impl.dict_data_service_impl import DictDateService
+from backend.app.services.dict_data_service import DictDateService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()

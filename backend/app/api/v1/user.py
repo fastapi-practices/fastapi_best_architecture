@@ -20,7 +20,7 @@ from backend.app.schemas.user import (
     UpdateUser,
     UpdateUserRole,
 )
-from backend.app.services.impl.user_service_impl import UserService
+from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()

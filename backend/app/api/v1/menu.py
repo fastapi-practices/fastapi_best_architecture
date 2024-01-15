@@ -9,7 +9,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.menu import CreateMenu, GetAllMenu, UpdateMenu
-from backend.app.services.impl.menu_service_impl import MenuService
+from backend.app.services.menu_service import MenuService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()

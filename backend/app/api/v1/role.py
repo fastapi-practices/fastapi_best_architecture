@@ -11,8 +11,8 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.role import CreateRole, GetAllRole, UpdateRole, UpdateRoleMenu
-from backend.app.services.impl.menu_service_impl import MenuService
-from backend.app.services.impl.role_service_impl import RoleService
+from backend.app.services.menu_service import MenuService
+from backend.app.services.role_service import RoleService
 from backend.app.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
