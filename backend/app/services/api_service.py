@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
-from typing import Self, Sequence
+from typing import Sequence
 
 from sqlalchemy import Select
 
@@ -84,9 +84,6 @@ class ApiServiceImpl(ApiServiceABC):
     """
     后台API信息服务实现类
     """
-
-    async def __call__(self) -> Self:
-        return self()
 
     async def get(self, *, pk: int) -> Api:
         async with async_db_session() as db:
