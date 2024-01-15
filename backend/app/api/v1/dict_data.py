@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_data import CreateDictData, GetAllDictData, UpdateDictData
-from backend.app.services.dict_data_service import DictDateService
+from backend.app.services.dict_data_service import DictDataService
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
@@ -23,7 +23,7 @@ router = APIRouter()
     dependencies=[DependsJwtAuth],
 )
 async def get_dict_data(pk: int) -> ResponseModel:
-    dict_data = await DictDateService.get(pk=pk)
+    dict_data = await DictDataService.get(pk=pk)
     data = GetAllDictData(**await select_as_dict(dict_data))
     return await response_base.success(data=data)
 
@@ -42,7 +42,7 @@ async def get_pagination_dict_datas(
     value: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
-    dict_data_select = await DictDateService.get_select(label=label, value=value, status=status)
+    dict_data_select = await DictDataService.get_select(label=label, value=value, status=status)
     page_data = await paging_data(db, dict_data_select, GetAllDictData)
     return await response_base.success(data=page_data)
 
@@ -56,7 +56,7 @@ async def get_pagination_dict_datas(
     ],
 )
 async def create_dict_data(obj: CreateDictData) -> ResponseModel:
-    await DictDateService.create(obj=obj)
+    await DictDataService.create(obj=obj)
     return await response_base.success()
 
 
@@ -69,7 +69,7 @@ async def create_dict_data(obj: CreateDictData) -> ResponseModel:
     ],
 )
 async def update_dict_data(pk: int, obj: UpdateDictData) -> ResponseModel:
-    count = await DictDateService.update(pk=pk, obj=obj)
+    count = await DictDataService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -84,7 +84,7 @@ async def update_dict_data(pk: int, obj: UpdateDictData) -> ResponseModel:
     ],
 )
 async def delete_dict_data(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await DictDateService.delete(pk=pk)
+    count = await DictDataService.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

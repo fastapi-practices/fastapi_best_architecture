@@ -116,4 +116,4 @@ class DictDataServiceImpl(DictDataServiceABC):
             return count
 
 
-DictDateService: DictDataServiceABC = DictDataServiceImpl()
+DictDataService: DictDataServiceABC = DictDataServiceImpl()
