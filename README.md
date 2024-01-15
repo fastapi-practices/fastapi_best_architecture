@@ -34,7 +34,7 @@ pseudo three-tier architecture here
 |----------------|----------------|---------------------------|
 | view           | controller     | api                       |
 | data transmit  | dto            | schema                    |
-| business logic | service + impl | service + impl            |
+| business logic | service + impl | service                   |
 | data access    | dao / mapper   | crud                      |
 | model          | model / entity | model                     |
 

@@ -29,7 +29,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 |------|----------------|---------------------------|
 | 视图   | controller     | api                       |
 | 数据传输 | dto            | schema                    |
-| 业务逻辑 | service + impl | service + impl            |
+| 业务逻辑 | service + impl | service                   |
 | 数据访问 | dao / mapper   | crud                      |
 | 模型   | model / entity | model                     |
 
