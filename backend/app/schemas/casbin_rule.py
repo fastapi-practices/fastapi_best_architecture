@@ -41,7 +41,7 @@ class DeleteUserRoleParam(CreateUserRoleParam):
     pass
 
 
-class GetAllPolicy(SchemaBase):
+class GetPolicyListDetails(SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
