@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models.sys_dict_type import DictType
-from backend.app.schemas.dict_type import CreateDictType, UpdateDictType
+from backend.app.schemas.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
 
-class CRUDDictType(CRUDBase[DictType, CreateDictType, UpdateDictType]):
+class CRUDDictType(CRUDBase[DictType, CreateDictTypeParam, UpdateDictTypeParam]):
     async def get(self, db: AsyncSession, pk: int) -> DictType | None:
         return await self.get_(db, pk=pk)
 
@@ -29,10 +29,10 @@ class CRUDDictType(CRUDBase[DictType, CreateDictType, UpdateDictType]):
         dept = await db.execute(select(self.model).where(self.model.code == code))
         return dept.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateDictType) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateDictTypeParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictType) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictTypeParam) -> int:
         return await self.update_(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:

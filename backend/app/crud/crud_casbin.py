@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import CasbinRule
-from backend.app.schemas.casbin_rule import CreatePolicy, DeleteAllPolicies, UpdatePolicy
+from backend.app.schemas.casbin_rule import CreatePolicyParam, DeleteAllPoliciesParam, UpdatePolicyParam
 
 
-class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
+class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicyParam, UpdatePolicyParam]):
     async def get_all_policy(self, ptype: str, sub: str) -> Select:
         se = select(self.model).order_by(self.model.id)
         where_list = []
@@ -20,7 +20,7 @@ class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicy, UpdatePolicy]):
             se = se.where(and_(*where_list))
         return se
 
-    async def delete_policies_by_sub(self, db: AsyncSession, sub: DeleteAllPolicies) -> int:
+    async def delete_policies_by_sub(self, db: AsyncSession, sub: DeleteAllPoliciesParam) -> int:
         where_list = []
         if sub.uuid:
             where_list.append(self.model.v0 == sub.uuid)

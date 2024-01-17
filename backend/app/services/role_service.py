@@ -12,7 +12,7 @@ from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import Role
-from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
+from backend.app.schemas.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
 
 
 class RoleService:
@@ -41,7 +41,7 @@ class RoleService:
         return await RoleDao.get_list(name=name, data_scope=data_scope, status=status)
 
     @staticmethod
-    async def create(*, obj: CreateRole) -> None:
+    async def create(*, obj: CreateRoleParam) -> None:
         async with async_db_session.begin() as db:
             role = await RoleDao.get_by_name(db, obj.name)
             if role:
@@ -49,7 +49,7 @@ class RoleService:
             await RoleDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateRole) -> int:
+    async def update(*, pk: int, obj: UpdateRoleParam) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:
@@ -62,7 +62,7 @@ class RoleService:
             return count
 
     @staticmethod
-    async def update_menus(*, request: Request, pk: int, menu_ids: UpdateRoleMenu) -> int:
+    async def update_menus(*, request: Request, pk: int, menu_ids: UpdateRoleMenuParam) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:

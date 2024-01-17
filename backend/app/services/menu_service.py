@@ -11,7 +11,7 @@ from backend.app.crud.crud_menu import MenuDao
 from backend.app.crud.crud_role import RoleDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import Menu
-from backend.app.schemas.menu import CreateMenu, UpdateMenu
+from backend.app.schemas.menu import CreateMenuParam, UpdateMenuParam
 from backend.app.utils.build_tree import get_tree_data
 
 
@@ -56,7 +56,7 @@ class MenuService:
             return menu_tree
 
     @staticmethod
-    async def create(*, obj: CreateMenu) -> None:
+    async def create(*, obj: CreateMenuParam) -> None:
         async with async_db_session.begin() as db:
             title = await MenuDao.get_by_title(db, obj.title)
             if title:
@@ -68,7 +68,7 @@ class MenuService:
             await MenuDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateMenu) -> int:
+    async def update(*, pk: int, obj: UpdateMenuParam) -> int:
         async with async_db_session.begin() as db:
             menu = await MenuDao.get(db, pk)
             if not menu:

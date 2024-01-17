@@ -6,7 +6,7 @@ from backend.app.common.exception import errors
 from backend.app.crud.crud_dept import DeptDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import Dept
-from backend.app.schemas.dept import CreateDept, UpdateDept
+from backend.app.schemas.dept import CreateDeptParam, UpdateDeptParam
 from backend.app.utils.build_tree import get_tree_data
 
 
@@ -29,7 +29,7 @@ class DeptService:
             return tree_data
 
     @staticmethod
-    async def create(*, obj: CreateDept) -> None:
+    async def create(*, obj: CreateDeptParam) -> None:
         async with async_db_session.begin() as db:
             dept = await DeptDao.get_by_name(db, obj.name)
             if dept:
@@ -41,7 +41,7 @@ class DeptService:
             await DeptDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateDept) -> int:
+    async def update(*, pk: int, obj: UpdateDeptParam) -> int:
         async with async_db_session.begin() as db:
             dept = await DeptDao.get(db, pk)
             if not dept:

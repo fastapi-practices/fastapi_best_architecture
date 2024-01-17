@@ -7,10 +7,10 @@ from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Menu, Role, User
-from backend.app.schemas.role import CreateRole, UpdateRole, UpdateRoleMenu
+from backend.app.schemas.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
 
 
-class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
+class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
     async def get(self, db, role_id: int) -> Role | None:
         return await self.get_(db, pk=role_id)
 
@@ -45,14 +45,14 @@ class CRUDRole(CRUDBase[Role, CreateRole, UpdateRole]):
         role = await db.execute(select(self.model).where(self.model.name == name))
         return role.scalars().first()
 
-    async def create(self, db, obj_in: CreateRole) -> None:
+    async def create(self, db, obj_in: CreateRoleParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db, role_id: int, obj_in: UpdateRole) -> int:
+    async def update(self, db, role_id: int, obj_in: UpdateRoleParam) -> int:
         rowcount = await self.update_(db, pk=role_id, obj_in=obj_in)
         return rowcount
 
-    async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenu) -> int:
+    async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:
         current_role = await self.get_with_relation(db, role_id)
         # 更新菜单
         menus = await db.execute(select(Menu).where(Menu.id.in_(menu_ids.menus)))

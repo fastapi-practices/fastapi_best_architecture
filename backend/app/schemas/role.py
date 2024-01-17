@@ -6,10 +6,10 @@ from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import RoleDataScopeType, StatusType
 from backend.app.schemas.base import SchemaBase
-from backend.app.schemas.menu import GetAllMenu
+from backend.app.schemas.menu import GetMenuListDetails
 
 
-class RoleBase(SchemaBase):
+class RoleSchemaBase(SchemaBase):
     name: str
     data_scope: RoleDataScopeType = Field(
         default=RoleDataScopeType.custom, description='权限范围（1：全部数据权限 2：自定义数据权限）'
@@ -18,22 +18,22 @@ class RoleBase(SchemaBase):
     remark: str | None = None
 
 
-class CreateRole(RoleBase):
+class CreateRoleParam(RoleSchemaBase):
     pass
 
 
-class UpdateRole(RoleBase):
+class UpdateRoleParam(RoleSchemaBase):
     pass
 
 
-class UpdateRoleMenu(SchemaBase):
+class UpdateRoleMenuParam(SchemaBase):
     menus: list[int]
 
 
-class GetAllRole(RoleBase):
+class GetRoleListDetails(RoleSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     created_time: datetime
     updated_time: datetime | None = None
-    menus: list[GetAllMenu]
+    menus: list[GetMenuListDetails]

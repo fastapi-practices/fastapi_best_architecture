@@ -11,10 +11,10 @@ from sqlalchemy.sql import Select
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Role, User
-from backend.app.schemas.user import AddUser, Avatar, RegisterUser, UpdateUser, UpdateUserRole
+from backend.app.schemas.user import AddUserParam, AvatarParam, RegisterUserParam, UpdateUserParam, UpdateUserRoleParam
 
 
-class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
+class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
         return await self.get_(db, pk=user_id)
 
@@ -33,7 +33,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, obj: RegisterUser) -> None:
+    async def create(self, db: AsyncSession, obj: RegisterUserParam) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.model_dump()
@@ -41,7 +41,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
-    async def add(self, db: AsyncSession, obj: AddUser) -> None:
+    async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
         dict_obj = obj.model_dump(exclude={'roles'})
@@ -53,12 +53,12 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
         new_user.roles.extend(role_list)
         db.add(new_user)
 
-    async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUser) -> int:
+    async def update_userinfo(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
         user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.model_dump()))
         return user.rowcount
 
     @staticmethod
-    async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRole) -> None:
+    async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
         # 删除用户所有角色
         for i in list(input_user.roles):
             input_user.roles.remove(i)
@@ -68,7 +68,7 @@ class CRUDUser(CRUDBase[User, RegisterUser, UpdateUser]):
             role_list.append(await db.get(Role, role_id))
         input_user.roles.extend(role_list)
 
-    async def update_avatar(self, db: AsyncSession, current_user: User, avatar: Avatar) -> int:
+    async def update_avatar(self, db: AsyncSession, current_user: User, avatar: AvatarParam) -> int:
         user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar.url))
         return user.rowcount
 

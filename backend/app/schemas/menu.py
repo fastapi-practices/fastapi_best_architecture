@@ -8,7 +8,7 @@ from backend.app.common.enums import MenuType, StatusType
 from backend.app.schemas.base import SchemaBase
 
 
-class MenuBase(SchemaBase):
+class MenuSchemaBase(SchemaBase):
     title: str
     name: str
     parent_id: int | None = Field(default=None, description='菜单父级ID')
@@ -24,15 +24,15 @@ class MenuBase(SchemaBase):
     remark: str | None = None
 
 
-class CreateMenu(MenuBase):
+class CreateMenuParam(MenuSchemaBase):
     pass
 
 
-class UpdateMenu(MenuBase):
+class UpdateMenuParam(MenuSchemaBase):
     pass
 
 
-class GetAllMenu(MenuBase):
+class GetMenuListDetails(MenuSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

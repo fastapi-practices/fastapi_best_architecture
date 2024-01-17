@@ -10,7 +10,7 @@ from starlette.requests import Request
 from backend.app.common.enums import OperaLogCipherType
 from backend.app.common.log import log
 from backend.app.core.conf import settings
-from backend.app.schemas.opera_log import CreateOperaLog
+from backend.app.schemas.opera_log import CreateOperaLogParam
 from backend.app.services.opera_log_service import OperaLogService
 from backend.app.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.app.utils.request_parse import parse_ip_info, parse_user_agent_info
@@ -57,7 +57,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
         # 日志创建
-        opera_log_in = CreateOperaLog(
+        opera_log_in = CreateOperaLogParam(
             username=username,
             method=method,
             title=summary,

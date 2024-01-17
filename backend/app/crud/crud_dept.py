@@ -8,10 +8,10 @@ from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Dept, User
-from backend.app.schemas.dept import CreateDept, UpdateDept
+from backend.app.schemas.dept import CreateDeptParam, UpdateDeptParam
 
 
-class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
+class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
     async def get(self, db: AsyncSession, dept_id: int) -> Dept | None:
         return await self.get_(db, pk=dept_id, del_flag=0)
 
@@ -44,10 +44,10 @@ class CRUDDept(CRUDBase[Dept, CreateDept, UpdateDept]):
         dept = await db.execute(se)
         return dept.scalars().all()
 
-    async def create(self, db: AsyncSession, obj_in: CreateDept) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateDeptParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDept) -> int:
+    async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDeptParam) -> int:
         return await self.update_(db, dept_id, obj_in)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:

@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import OperaLog
-from backend.app.schemas.opera_log import CreateOperaLog, UpdateOperaLog
+from backend.app.schemas.opera_log import CreateOperaLogParam, UpdateOperaLogParam
 
 
-class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
+class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLogParam, UpdateOperaLogParam]):
     async def get_all(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
         se = select(self.model).order_by(desc(self.model.created_time))
         where_list = []
@@ -22,7 +22,7 @@ class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLog, UpdateOperaLog]):
             se = se.where(and_(*where_list))
         return se
 
-    async def create(self, db: AsyncSession, obj_in: CreateOperaLog) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateOperaLogParam) -> None:
         await self.create_(db, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:

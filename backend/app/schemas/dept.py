@@ -8,7 +8,7 @@ from backend.app.common.enums import StatusType
 from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
 
 
-class DeptBase(SchemaBase):
+class DeptSchemaBase(SchemaBase):
     name: str
     parent_id: int | None = Field(default=None, description='菜单父级ID')
     sort: int = Field(default=0, ge=0, description='排序')
@@ -18,15 +18,15 @@ class DeptBase(SchemaBase):
     status: StatusType = Field(default=StatusType.enable)
 
 
-class CreateDept(DeptBase):
+class CreateDeptParam(DeptSchemaBase):
     pass
 
 
-class UpdateDept(DeptBase):
+class UpdateDeptParam(DeptSchemaBase):
     pass
 
 
-class GetAllDept(DeptBase):
+class GetDeptListDetails(DeptSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

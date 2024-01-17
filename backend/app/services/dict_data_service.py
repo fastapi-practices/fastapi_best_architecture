@@ -7,7 +7,7 @@ from backend.app.crud.crud_dict_data import DictDataDao
 from backend.app.crud.crud_dict_type import DictTypeDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models.sys_dict_data import DictData
-from backend.app.schemas.dict_data import CreateDictData, UpdateDictData
+from backend.app.schemas.dict_data import CreateDictDataParam, UpdateDictDataParam
 
 
 class DictDataService:
@@ -24,7 +24,7 @@ class DictDataService:
         return await DictDataDao.get_all(label=label, value=value, status=status)
 
     @staticmethod
-    async def create(*, obj: CreateDictData) -> None:
+    async def create(*, obj: CreateDictDataParam) -> None:
         async with async_db_session.begin() as db:
             dict_data = await DictDataDao.get_by_label(db, obj.label)
             if dict_data:
@@ -35,7 +35,7 @@ class DictDataService:
             await DictDataDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateDictData) -> int:
+    async def update(*, pk: int, obj: UpdateDictDataParam) -> int:
         async with async_db_session.begin() as db:
             dict_data = await DictDataDao.get(db, pk)
             if not dict_data:

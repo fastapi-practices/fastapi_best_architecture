@@ -4,7 +4,7 @@ from sqlalchemy import Select
 
 from backend.app.crud.crud_opera_log import OperaLogDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.schemas.opera_log import CreateOperaLog
+from backend.app.schemas.opera_log import CreateOperaLogParam
 
 
 class OperaLogService:
@@ -13,7 +13,7 @@ class OperaLogService:
         return await OperaLogDao.get_all(username=username, status=status, ip=ip)
 
     @staticmethod
-    async def create(*, obj_in: CreateOperaLog):
+    async def create(*, obj_in: CreateOperaLogParam):
         async with async_db_session.begin() as db:
             await OperaLogDao.create(db, obj_in)
 

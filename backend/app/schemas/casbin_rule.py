@@ -6,7 +6,7 @@ from backend.app.common.enums import MethodType
 from backend.app.schemas.base import SchemaBase
 
 
-class CreatePolicy(SchemaBase):
+class CreatePolicyParam(SchemaBase):
     sub: str = Field(..., description='用户uuid / 角色ID')
     path: str = Field(..., description='api 路径')
     method: MethodType = Field(default=MethodType.GET, description='请求方法')
@@ -19,25 +19,25 @@ class CreatePolicy(SchemaBase):
         return v
 
 
-class UpdatePolicy(CreatePolicy):
+class UpdatePolicyParam(CreatePolicyParam):
     pass
 
 
-class DeletePolicy(CreatePolicy):
+class DeletePolicyParam(CreatePolicyParam):
     pass
 
 
-class DeleteAllPolicies(SchemaBase):
+class DeleteAllPoliciesParam(SchemaBase):
     uuid: str | None = None
     role: str
 
 
-class CreateUserRole(SchemaBase):
+class CreateUserRoleParam(SchemaBase):
     uuid: str = Field(..., description='用户 uuid')
     role: str = Field(..., description='角色')
 
 
-class DeleteUserRole(CreateUserRole):
+class DeleteUserRoleParam(CreateUserRoleParam):
     pass
 
 

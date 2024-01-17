@@ -8,7 +8,7 @@ from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
-from backend.app.schemas.dept import CreateDept, GetAllDept, UpdateDept
+from backend.app.schemas.dept import CreateDeptParam, GetDeptListDetails, UpdateDeptParam
 from backend.app.services.dept_service import DeptService
 from backend.app.utils.serializers import select_as_dict
 
@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: int) -> ResponseModel:
     dept = await DeptService.get(pk=pk)
-    data = GetAllDept(**await select_as_dict(dept))
+    data = GetDeptListDetails(**await select_as_dict(dept))
     return await response_base.success(data=data)
 
 
@@ -41,7 +41,7 @@ async def get_all_depts(
         DependsRBAC,
     ],
 )
-async def create_dept(obj: CreateDept) -> ResponseModel:
+async def create_dept(obj: CreateDeptParam) -> ResponseModel:
     await DeptService.create(obj=obj)
     return await response_base.success()
 
@@ -54,7 +54,7 @@ async def create_dept(obj: CreateDept) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dept(pk: int, obj: UpdateDept) -> ResponseModel:
+async def update_dept(pk: int, obj: UpdateDeptParam) -> ResponseModel:
     count = await DeptService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

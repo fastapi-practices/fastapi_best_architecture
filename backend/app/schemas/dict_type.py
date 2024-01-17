@@ -8,22 +8,22 @@ from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
 
 
-class DictTypeBase(SchemaBase):
+class DictTypeSchemaBase(SchemaBase):
     name: str
     code: str
     status: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 
 
-class CreateDictType(DictTypeBase):
+class CreateDictTypeParam(DictTypeSchemaBase):
     pass
 
 
-class UpdateDictType(DictTypeBase):
+class UpdateDictTypeParam(DictTypeSchemaBase):
     pass
 
 
-class GetAllDictType(DictTypeBase):
+class GetDictTypeListDetails(DictTypeSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
