@@ -21,7 +21,7 @@ versions
 Its purpose is to allow you to use it directly as the infrastructure of your new project, this repository as a template
 library open to any person or enterprise can be used for free!
 
-**Continuously updated and maintained**
+**🔥Continuously updated and maintained🔥**
 
 ## Pseudo three-tier architecture
 
@@ -229,20 +229,8 @@ We only have one current channel.
 
 ## Sponsor us
 
-If this program has helped you, you can sponsor us with some coffee beans :coffee:
-
-<table>
-  <tr>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="WeChat"/>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px" alt="Alipay"/>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/ERC20.jpg?raw=true" width="180px" alt="0x40D5e2304b452256afD9CE2d3d5531dc8d293138"/>
-  </tr>
-  <tr>
-    <td align="center">WeChat Pay</td>
-    <td align="center">Ali Pay</td>
-    <td align="center">ERC20</td>
-  </tr>
-</table>
+If this program has helped you, you can sponsor us with some coffee
+beans: [:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
 
 ## License
 
