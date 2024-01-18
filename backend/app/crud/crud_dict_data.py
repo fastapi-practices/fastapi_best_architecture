@@ -6,10 +6,10 @@ from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models.sys_dict_data import DictData
-from backend.app.schemas.dict_data import CreateDictData, UpdateDictData
+from backend.app.schemas.dict_data import CreateDictDataParam, UpdateDictDataParam
 
 
-class CRUDDictData(CRUDBase[DictData, CreateDictData, UpdateDictData]):
+class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam]):
     async def get(self, db: AsyncSession, pk: int) -> DictData | None:
         return await self.get_(db, pk=pk)
 
@@ -30,10 +30,10 @@ class CRUDDictData(CRUDBase[DictData, CreateDictData, UpdateDictData]):
         api = await db.execute(select(self.model).where(self.model.label == label))
         return api.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateDictData) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateDictDataParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictData) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictDataParam) -> int:
         return await self.update_(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:

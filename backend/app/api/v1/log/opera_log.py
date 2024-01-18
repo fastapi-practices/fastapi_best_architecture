@@ -10,7 +10,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.opera_log import GetAllOperaLog
+from backend.app.schemas.opera_log import GetOperaLogListDetails
 from backend.app.services.opera_log_service import OperaLogService
 
 router = APIRouter()
@@ -31,7 +31,7 @@ async def get_all_opera_logs(
     ip: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     log_select = await OperaLogService.get_select(username=username, status=status, ip=ip)
-    page_data = await paging_data(db, log_select, GetAllOperaLog)
+    page_data = await paging_data(db, log_select, GetOperaLogListDetails)
     return await response_base.success(data=page_data)
 
 

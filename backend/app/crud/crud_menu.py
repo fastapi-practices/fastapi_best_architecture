@@ -7,10 +7,10 @@ from sqlalchemy.orm import selectinload
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Menu
-from backend.app.schemas.menu import CreateMenu, UpdateMenu
+from backend.app.schemas.menu import CreateMenuParam, UpdateMenuParam
 
 
-class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
+class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
     async def get(self, db, menu_id: int) -> Menu | None:
         return await self.get_(db, pk=menu_id)
 
@@ -39,10 +39,10 @@ class CRUDMenu(CRUDBase[Menu, CreateMenu, UpdateMenu]):
         menu = await db.execute(se)
         return menu.scalars().all()
 
-    async def create(self, db, obj_in: CreateMenu) -> None:
+    async def create(self, db, obj_in: CreateMenuParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db, menu_id: int, obj_in: UpdateMenu) -> int:
+    async def update(self, db, menu_id: int, obj_in: UpdateMenuParam) -> int:
         count = await self.update_(db, menu_id, obj_in)
         return count
 

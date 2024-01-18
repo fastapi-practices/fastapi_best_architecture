@@ -7,7 +7,7 @@ from pydantic import ConfigDict
 from backend.app.schemas.base import SchemaBase
 
 
-class LoginLogBase(SchemaBase):
+class LoginLogSchemaBase(SchemaBase):
     user_uuid: str
     username: str
     status: int
@@ -23,15 +23,15 @@ class LoginLogBase(SchemaBase):
     login_time: datetime
 
 
-class CreateLoginLog(LoginLogBase):
+class CreateLoginLogParam(LoginLogSchemaBase):
     pass
 
 
-class UpdateLoginLog(LoginLogBase):
+class UpdateLoginLogParam(LoginLogSchemaBase):
     pass
 
 
-class GetAllLoginLog(LoginLogBase):
+class GetLoginLogListDetails(LoginLogSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

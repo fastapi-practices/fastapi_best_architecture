@@ -14,12 +14,19 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import AddUser, Avatar, RegisterUser, ResetPassword, UpdateUser, UpdateUserRole
+from backend.app.schemas.user import (
+    AddUserParam,
+    AvatarParam,
+    RegisterUserParam,
+    ResetPasswordParam,
+    UpdateUserParam,
+    UpdateUserRoleParam,
+)
 
 
 class UserService:
     @staticmethod
-    async def register(*, obj: RegisterUser) -> None:
+    async def register(*, obj: RegisterUserParam) -> None:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -34,7 +41,7 @@ class UserService:
             await UserDao.create(db, obj)
 
     @staticmethod
-    async def add(*, request: Request, obj: AddUser) -> None:
+    async def add(*, request: Request, obj: AddUserParam) -> None:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             username = await UserDao.get_by_username(db, obj.username)
@@ -57,7 +64,7 @@ class UserService:
             await UserDao.add(db, obj)
 
     @staticmethod
-    async def pwd_reset(*, request: Request, obj: ResetPassword) -> int:
+    async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
         async with async_db_session.begin() as db:
             op = obj.old_password
             if not await password_verify(op + request.user.salt, request.user.password):
@@ -84,7 +91,7 @@ class UserService:
             return user
 
     @staticmethod
-    async def update(*, request: Request, username: str, obj: UpdateUser) -> int:
+    async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -108,7 +115,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_roles(*, request: Request, username: str, obj: UpdateUserRole) -> None:
+    async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -124,7 +131,7 @@ class UserService:
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
 
     @staticmethod
-    async def update_avatar(*, request: Request, username: str, avatar: Avatar) -> int:
+    async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:

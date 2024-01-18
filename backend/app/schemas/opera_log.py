@@ -8,7 +8,7 @@ from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
 
 
-class OperaLogBase(SchemaBase):
+class OperaLogSchemaBase(SchemaBase):
     username: str | None = None
     method: str
     title: str
@@ -29,15 +29,15 @@ class OperaLogBase(SchemaBase):
     opera_time: datetime
 
 
-class CreateOperaLog(OperaLogBase):
+class CreateOperaLogParam(OperaLogSchemaBase):
     pass
 
 
-class UpdateOperaLog(OperaLogBase):
+class UpdateOperaLogParam(OperaLogSchemaBase):
     pass
 
 
-class GetAllOperaLog(OperaLogBase):
+class GetOperaLogListDetails(OperaLogSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

@@ -11,13 +11,13 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.casbin_rule import (
-    CreatePolicy,
-    CreateUserRole,
-    DeleteAllPolicies,
-    DeletePolicy,
-    DeleteUserRole,
-    GetAllPolicy,
-    UpdatePolicy,
+    CreatePolicyParam,
+    CreateUserRoleParam,
+    DeleteAllPoliciesParam,
+    DeletePolicyParam,
+    DeleteUserRoleParam,
+    GetPolicyListDetails,
+    UpdatePolicyParam,
 )
 from backend.app.services.casbin_service import CasbinService
 
@@ -38,7 +38,7 @@ async def get_all_casbin(
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
 ) -> ResponseModel:
     casbin_select = await CasbinService.get_casbin_list(ptype=ptype, sub=sub)
-    page_data = await paging_data(db, casbin_select, GetAllPolicy)
+    page_data = await paging_data(db, casbin_select, GetPolicyListDetails)
     return await response_base.success(data=page_data)
 
 
@@ -62,7 +62,7 @@ async def get_role_policies(role: Annotated[str, Path(description='角色ID')]) 
         DependsRBAC,
     ],
 )
-async def create_policy(p: CreatePolicy) -> ResponseModel:
+async def create_policy(p: CreatePolicyParam) -> ResponseModel:
     """
     p 规则:
 
@@ -84,7 +84,7 @@ async def create_policy(p: CreatePolicy) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_policies(ps: list[CreatePolicy]) -> ResponseModel:
+async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
     data = await CasbinService.create_policies(ps=ps)
     return await response_base.success(data=data)
 
@@ -97,7 +97,7 @@ async def create_policies(ps: list[CreatePolicy]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_policy(old: UpdatePolicy, new: UpdatePolicy) -> ResponseModel:
+async def update_policy(old: UpdatePolicyParam, new: UpdatePolicyParam) -> ResponseModel:
     data = await CasbinService.update_policy(old=old, new=new)
     return await response_base.success(data=data)
 
@@ -110,7 +110,7 @@ async def update_policy(old: UpdatePolicy, new: UpdatePolicy) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_policies(old: list[UpdatePolicy], new: list[UpdatePolicy]) -> ResponseModel:
+async def update_policies(old: list[UpdatePolicyParam], new: list[UpdatePolicyParam]) -> ResponseModel:
     data = await CasbinService.update_policies(old=old, new=new)
     return await response_base.success(data=data)
 
@@ -123,7 +123,7 @@ async def update_policies(old: list[UpdatePolicy], new: list[UpdatePolicy]) -> R
         DependsRBAC,
     ],
 )
-async def delete_policy(p: DeletePolicy) -> ResponseModel:
+async def delete_policy(p: DeletePolicyParam) -> ResponseModel:
     data = await CasbinService.delete_policy(p=p)
     return await response_base.success(data=data)
 
@@ -136,7 +136,7 @@ async def delete_policy(p: DeletePolicy) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_policies(ps: list[DeletePolicy]) -> ResponseModel:
+async def delete_policies(ps: list[DeletePolicyParam]) -> ResponseModel:
     data = await CasbinService.delete_policies(ps=ps)
     return await response_base.success(data=data)
 
@@ -149,7 +149,7 @@ async def delete_policies(ps: list[DeletePolicy]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_all_policies(sub: DeleteAllPolicies) -> ResponseModel:
+async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
     count = await CasbinService.delete_all_policies(sub=sub)
     if count > 0:
         return await response_base.success()
@@ -170,7 +170,7 @@ async def get_all_groups() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_group(g: CreateUserRole) -> ResponseModel:
+async def create_group(g: CreateUserRoleParam) -> ResponseModel:
     """
     g 规则 (**依赖 p 规则**):
 
@@ -192,7 +192,7 @@ async def create_group(g: CreateUserRole) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_groups(gs: list[CreateUserRole]) -> ResponseModel:
+async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseModel:
     data = await CasbinService.create_groups(gs=gs)
     return await response_base.success(data=data)
 
@@ -205,7 +205,7 @@ async def create_groups(gs: list[CreateUserRole]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_group(g: DeleteUserRole) -> ResponseModel:
+async def delete_group(g: DeleteUserRoleParam) -> ResponseModel:
     data = await CasbinService.delete_group(g=g)
     return await response_base.success(data=data)
 
@@ -218,7 +218,7 @@ async def delete_group(g: DeleteUserRole) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_groups(gs: list[DeleteUserRole]) -> ResponseModel:
+async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseModel:
     data = await CasbinService.delete_groups(gs=gs)
     return await response_base.success(data=data)
 

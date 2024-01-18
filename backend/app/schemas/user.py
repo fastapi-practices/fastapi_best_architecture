@@ -6,32 +6,32 @@ from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
-from backend.app.schemas.dept import GetAllDept
-from backend.app.schemas.role import GetAllRole
+from backend.app.schemas.dept import GetDeptListDetails
+from backend.app.schemas.role import GetRoleListDetails
 
 
-class Auth(SchemaBase):
+class AuthSchemaBase(SchemaBase):
     username: str
     password: str
 
 
-class AuthLogin(Auth):
+class AuthLoginParam(AuthSchemaBase):
     captcha: str
 
 
-class RegisterUser(Auth):
+class RegisterUserParam(AuthSchemaBase):
     nickname: str | None = None
     email: EmailStr = Field(..., example='user@example.com')
 
 
-class AddUser(Auth):
+class AddUserParam(AuthSchemaBase):
     dept_id: int
     roles: list[int]
     nickname: str | None = None
     email: EmailStr = Field(..., example='user@example.com')
 
 
-class _UserInfoBase(SchemaBase):
+class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = None
     username: str
     nickname: str
@@ -39,19 +39,19 @@ class _UserInfoBase(SchemaBase):
     phone: CustomPhoneNumber | None = None
 
 
-class UpdateUser(_UserInfoBase):
+class UpdateUserParam(UserInfoSchemaBase):
     pass
 
 
-class UpdateUserRole(SchemaBase):
+class UpdateUserRoleParam(SchemaBase):
     roles: list[int]
 
 
-class Avatar(SchemaBase):
+class AvatarParam(SchemaBase):
     url: HttpUrl = Field(..., description='头像 http 地址')
 
 
-class GetUserInfoNoRelation(_UserInfoBase):
+class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     dept_id: int | None = None
@@ -66,18 +66,18 @@ class GetUserInfoNoRelation(_UserInfoBase):
     last_login_time: datetime | None = None
 
 
-class GetAllUserInfo(GetUserInfoNoRelation):
+class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetAllDept | None = None
-    roles: list[GetAllRole]
+    dept: GetDeptListDetails | None = None
+    roles: list[GetRoleListDetails]
 
 
-class GetCurrentUserInfo(GetAllUserInfo):
+class GetCurrentUserInfoDetail(GetUserInfoListDetails):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetAllDept | str | None = None
-    roles: list[GetAllRole] | list[str] | None = None
+    dept: GetDeptListDetails | str | None = None
+    roles: list[GetRoleListDetails] | list[str] | None = None
 
     @model_validator(mode='after')
     def handel(self, values):
@@ -91,7 +91,7 @@ class GetCurrentUserInfo(GetAllUserInfo):
         return values
 
 
-class ResetPassword(SchemaBase):
+class ResetPasswordParam(SchemaBase):
     old_password: str
     new_password: str
     confirm_password: str

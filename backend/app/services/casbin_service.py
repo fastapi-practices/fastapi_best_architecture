@@ -7,12 +7,12 @@ from backend.app.common.rbac import RBAC
 from backend.app.crud.crud_casbin import CasbinDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.schemas.casbin_rule import (
-    CreatePolicy,
-    CreateUserRole,
-    DeleteAllPolicies,
-    DeletePolicy,
-    DeleteUserRole,
-    UpdatePolicy,
+    CreatePolicyParam,
+    CreateUserRoleParam,
+    DeleteAllPoliciesParam,
+    DeletePolicyParam,
+    DeleteUserRoleParam,
+    UpdatePolicyParam,
 )
 
 
@@ -34,7 +34,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_policy(*, p: CreatePolicy) -> bool:
+    async def create_policy(*, p: CreatePolicyParam) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.add_policy(p.sub, p.path, p.method)
         if not data:
@@ -42,7 +42,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_policies(*, ps: list[CreatePolicy]) -> bool:
+    async def create_policies(*, ps: list[CreatePolicyParam]) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.add_policies([list(p.model_dump().values()) for p in ps])
         if not data:
@@ -50,7 +50,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def update_policy(*, old: UpdatePolicy, new: UpdatePolicy) -> bool:
+    async def update_policy(*, old: UpdatePolicyParam, new: UpdatePolicyParam) -> bool:
         enforcer = await RBAC.enforcer()
         _p = enforcer.has_policy(old.sub, old.path, old.method)
         if not _p:
@@ -59,7 +59,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def update_policies(*, old: list[UpdatePolicy], new: list[UpdatePolicy]) -> bool:
+    async def update_policies(*, old: list[UpdatePolicyParam], new: list[UpdatePolicyParam]) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.update_policies(
             [list(o.model_dump().values()) for o in old], [list(n.model_dump().values()) for n in new]
@@ -67,7 +67,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_policy(*, p: DeletePolicy) -> bool:
+    async def delete_policy(*, p: DeletePolicyParam) -> bool:
         enforcer = await RBAC.enforcer()
         _p = enforcer.has_policy(p.sub, p.path, p.method)
         if not _p:
@@ -76,7 +76,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_policies(*, ps: list[DeletePolicy]) -> bool:
+    async def delete_policies(*, ps: list[DeletePolicyParam]) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.remove_policies([list(p.model_dump().values()) for p in ps])
         if not data:
@@ -84,7 +84,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_all_policies(*, sub: DeleteAllPolicies) -> int:
+    async def delete_all_policies(*, sub: DeleteAllPoliciesParam) -> int:
         async with async_db_session.begin() as db:
             count = await CasbinDao.delete_policies_by_sub(db, sub)
         return count
@@ -96,7 +96,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_group(*, g: CreateUserRole) -> bool:
+    async def create_group(*, g: CreateUserRoleParam) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.add_grouping_policy(g.uuid, g.role)
         if not data:
@@ -104,7 +104,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_groups(*, gs: list[CreateUserRole]) -> bool:
+    async def create_groups(*, gs: list[CreateUserRoleParam]) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.add_grouping_policies([list(g.model_dump().values()) for g in gs])
         if not data:
@@ -112,7 +112,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_group(*, g: DeleteUserRole) -> bool:
+    async def delete_group(*, g: DeleteUserRoleParam) -> bool:
         enforcer = await RBAC.enforcer()
         _g = enforcer.has_grouping_policy(g.uuid, g.role)
         if not _g:
@@ -121,7 +121,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_groups(*, gs: list[DeleteUserRole]) -> bool:
+    async def delete_groups(*, gs: list[DeleteUserRoleParam]) -> bool:
         enforcer = await RBAC.enforcer()
         data = await enforcer.remove_grouping_policies([list(g.model_dump().values()) for g in gs])
         if not data:

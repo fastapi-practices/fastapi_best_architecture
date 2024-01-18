@@ -10,7 +10,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.dict_data import CreateDictData, GetAllDictData, UpdateDictData
+from backend.app.schemas.dict_data import CreateDictDataParam, GetDictDataListDetails, UpdateDictDataParam
 from backend.app.services.dict_data_service import DictDataService
 from backend.app.utils.serializers import select_as_dict
 
@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: int) -> ResponseModel:
     dict_data = await DictDataService.get(pk=pk)
-    data = GetAllDictData(**await select_as_dict(dict_data))
+    data = GetDictDataListDetails(**await select_as_dict(dict_data))
     return await response_base.success(data=data)
 
 
@@ -39,7 +39,7 @@ async def get_all_dict_datas(
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
     dict_data_select = await DictDataService.get_select(label=label, value=value, status=status)
-    page_data = await paging_data(db, dict_data_select, GetAllDictData)
+    page_data = await paging_data(db, dict_data_select, GetDictDataListDetails)
     return await response_base.success(data=page_data)
 
 
@@ -51,7 +51,7 @@ async def get_all_dict_datas(
         DependsRBAC,
     ],
 )
-async def create_dict_data(obj: CreateDictData) -> ResponseModel:
+async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     await DictDataService.create(obj=obj)
     return await response_base.success()
 
@@ -64,7 +64,7 @@ async def create_dict_data(obj: CreateDictData) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dict_data(pk: int, obj: UpdateDictData) -> ResponseModel:
+async def update_dict_data(pk: int, obj: UpdateDictDataParam) -> ResponseModel:
     count = await DictDataService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

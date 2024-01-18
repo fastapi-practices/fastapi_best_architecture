@@ -6,10 +6,10 @@ from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import StatusType
 from backend.app.schemas.base import SchemaBase
-from backend.app.schemas.dict_type import GetAllDictType
+from backend.app.schemas.dict_type import GetDictTypeListDetails
 
 
-class DictDataBase(SchemaBase):
+class DictDataSchemaBase(SchemaBase):
     type_id: int
     label: str
     value: str
@@ -18,18 +18,18 @@ class DictDataBase(SchemaBase):
     remark: str | None = None
 
 
-class CreateDictData(DictDataBase):
+class CreateDictDataParam(DictDataSchemaBase):
     pass
 
 
-class UpdateDictData(DictDataBase):
+class UpdateDictDataParam(DictDataSchemaBase):
     pass
 
 
-class GetAllDictData(DictDataBase):
+class GetDictDataListDetails(DictDataSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    type: GetAllDictType
+    type: GetDictTypeListDetails
     created_time: datetime
     updated_time: datetime | None = None

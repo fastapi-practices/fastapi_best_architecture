@@ -73,18 +73,18 @@ class ResponseBase:
         return ResponseModel(code=res.code, msg=res.msg, data=data)
 
     async def success(
-            self,
-            *,
-            res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
-            data: Any | None = None,
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+        data: Any | None = None,
     ) -> ResponseModel:
         return await self.__response(res=res, data=data)
 
     async def fail(
-            self,
-            *,
-            res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
-            data: Any = None,
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
+        data: Any = None,
     ) -> ResponseModel:
         return await self.__response(res=res, data=data)
 

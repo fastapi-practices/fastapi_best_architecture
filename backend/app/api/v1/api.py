@@ -10,7 +10,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.api import CreateApi, GetAllApi, UpdateApi
+from backend.app.schemas.api import CreateApiParam, GetApiListDetails, UpdateApiParam
 from backend.app.services.api_service import ApiService
 
 router = APIRouter()
@@ -43,7 +43,7 @@ async def get_api_list(
     path: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     api_select = await ApiService.get_select(name=name, method=method, path=path)
-    page_data = await paging_data(db, api_select, GetAllApi)
+    page_data = await paging_data(db, api_select, GetApiListDetails)
     return await response_base.success(data=page_data)
 
 
@@ -55,7 +55,7 @@ async def get_api_list(
         DependsRBAC,
     ],
 )
-async def create_api(obj: CreateApi) -> ResponseModel:
+async def create_api(obj: CreateApiParam) -> ResponseModel:
     await ApiService.create(obj=obj)
     return await response_base.success()
 
@@ -68,7 +68,7 @@ async def create_api(obj: CreateApi) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_api(pk: int, obj: UpdateApi) -> ResponseModel:
+async def update_api(pk: int, obj: UpdateApiParam) -> ResponseModel:
     count = await ApiService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

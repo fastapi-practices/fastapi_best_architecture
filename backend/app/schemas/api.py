@@ -8,7 +8,7 @@ from backend.app.common.enums import MethodType
 from backend.app.schemas.base import SchemaBase
 
 
-class ApiBase(SchemaBase):
+class ApiSchemaBase(SchemaBase):
     name: str
     method: MethodType = Field(default=MethodType.GET, description='请求方法')
     path: str = Field(..., description='api路径')
@@ -22,15 +22,15 @@ class ApiBase(SchemaBase):
         return v
 
 
-class CreateApi(ApiBase):
+class CreateApiParam(ApiSchemaBase):
     pass
 
 
-class UpdateApi(ApiBase):
+class UpdateApiParam(ApiSchemaBase):
     pass
 
 
-class GetAllApi(ApiBase):
+class GetApiListDetails(ApiSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

@@ -3,13 +3,13 @@
 from datetime import datetime
 
 from backend.app.schemas.base import SchemaBase
-from backend.app.schemas.user import GetUserInfoNoRelation
+from backend.app.schemas.user import GetUserInfoNoRelationDetail
 
 
 class GetSwaggerToken(SchemaBase):
     access_token: str
     token_type: str = 'Bearer'
-    user: GetUserInfoNoRelation
+    user: GetUserInfoNoRelationDetail
 
 
 class AccessTokenBase(SchemaBase):
@@ -22,7 +22,7 @@ class GetLoginToken(AccessTokenBase):
     refresh_token: str
     refresh_token_type: str = 'Bearer'
     refresh_token_expire_time: datetime
-    user: GetUserInfoNoRelation
+    user: GetUserInfoNoRelationDetail
 
 
 class GetNewToken(AccessTokenBase):

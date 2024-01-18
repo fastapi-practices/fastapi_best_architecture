@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Api
-from backend.app.schemas.api import CreateApi, UpdateApi
+from backend.app.schemas.api import CreateApiParam, UpdateApiParam
 
 
-class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
+class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
     async def get(self, db: AsyncSession, pk: int) -> Api | None:
         return await self.get_(db, pk=pk)
 
@@ -35,10 +35,10 @@ class CRUDApi(CRUDBase[Api, CreateApi, UpdateApi]):
         api = await db.execute(select(self.model).where(self.model.name == name))
         return api.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: CreateApi) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateApiParam) -> None:
         await self.create_(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApi) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApiParam) -> int:
         return await self.update_(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:

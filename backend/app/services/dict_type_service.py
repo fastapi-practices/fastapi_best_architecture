@@ -5,7 +5,7 @@ from sqlalchemy import Select
 from backend.app.common.exception import errors
 from backend.app.crud.crud_dict_type import DictTypeDao
 from backend.app.database.db_mysql import async_db_session
-from backend.app.schemas.dict_type import CreateDictType, UpdateDictType
+from backend.app.schemas.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
 
 class DictTypeService:
@@ -14,7 +14,7 @@ class DictTypeService:
         return await DictTypeDao.get_all(name=name, code=code, status=status)
 
     @staticmethod
-    async def create(*, obj: CreateDictType) -> None:
+    async def create(*, obj: CreateDictTypeParam) -> None:
         async with async_db_session.begin() as db:
             dict_type = await DictTypeDao.get_by_code(db, obj.code)
             if dict_type:
@@ -22,7 +22,7 @@ class DictTypeService:
             await DictTypeDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateDictType) -> int:
+    async def update(*, pk: int, obj: UpdateDictTypeParam) -> int:
         async with async_db_session.begin() as db:
             dict_type = await DictTypeDao.get(db, pk)
             if not dict_type:

@@ -8,7 +8,7 @@ from backend.app.common.exception import errors
 from backend.app.crud.crud_api import ApiDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import Api
-from backend.app.schemas.api import CreateApi, UpdateApi
+from backend.app.schemas.api import CreateApiParam, UpdateApiParam
 
 
 class ApiService:
@@ -31,7 +31,7 @@ class ApiService:
             return apis
 
     @staticmethod
-    async def create(*, obj: CreateApi) -> None:
+    async def create(*, obj: CreateApiParam) -> None:
         async with async_db_session.begin() as db:
             api = await ApiDao.get_by_name(db, obj.name)
             if api:
@@ -39,7 +39,7 @@ class ApiService:
             await ApiDao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateApi) -> int:
+    async def update(*, pk: int, obj: UpdateApiParam) -> int:
         async with async_db_session.begin() as db:
             count = await ApiDao.update(db, pk, obj)
             return count

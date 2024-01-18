@@ -11,14 +11,14 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.user import (
-    AddUser,
-    Avatar,
-    GetAllUserInfo,
-    GetCurrentUserInfo,
-    RegisterUser,
-    ResetPassword,
-    UpdateUser,
-    UpdateUserRole,
+    AddUserParam,
+    AvatarParam,
+    GetCurrentUserInfoDetail,
+    GetUserInfoListDetails,
+    RegisterUserParam,
+    ResetPasswordParam,
+    UpdateUserParam,
+    UpdateUserRoleParam,
 )
 from backend.app.services.user_service import UserService
 from backend.app.utils.serializers import select_as_dict
@@ -27,21 +27,21 @@ router = APIRouter()
 
 
 @router.post('/register', summary='用户注册')
-async def user_register(obj: RegisterUser) -> ResponseModel:
+async def user_register(obj: RegisterUserParam) -> ResponseModel:
     await UserService.register(obj=obj)
     return await response_base.success()
 
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
-async def add_user(request: Request, obj: AddUser):
+async def add_user(request: Request, obj: AddUserParam):
     await UserService.add(request=request, obj=obj)
     current_user = await UserService.get_userinfo(username=obj.username)
-    data = GetAllUserInfo(**await select_as_dict(current_user))
+    data = GetUserInfoListDetails(**await select_as_dict(current_user))
     return await response_base.success(data=data)
 
 
 @router.post('/password/reset', summary='密码重置', dependencies=[DependsJwtAuth])
-async def password_reset(request: Request, obj: ResetPassword):
+async def password_reset(request: Request, obj: ResetPasswordParam):
     count = await UserService.pwd_reset(request=request, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -50,19 +50,19 @@ async def password_reset(request: Request, obj: ResetPassword):
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
 async def get_current_userinfo(request: Request):
-    data = GetCurrentUserInfo(**await select_as_dict(request.user))
+    data = GetCurrentUserInfoDetail(**await select_as_dict(request.user))
     return await response_base.success(data=data)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: str):
     current_user = await UserService.get_userinfo(username=username)
-    data = GetAllUserInfo(**await select_as_dict(current_user))
+    data = GetUserInfoListDetails(**await select_as_dict(current_user))
     return await response_base.success(data=data)
 
 
 @router.put('/{username}', summary='更新用户信息', dependencies=[DependsJwtAuth])
-async def update_userinfo(request: Request, username: str, obj: UpdateUser):
+async def update_userinfo(request: Request, username: str, obj: UpdateUserParam):
     count = await UserService.update(request=request, username=username, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -77,13 +77,13 @@ async def update_userinfo(request: Request, username: str, obj: UpdateUser):
         DependsRBAC,
     ],
 )
-async def update_user_role(request: Request, username: str, obj: UpdateUserRole):
+async def update_user_role(request: Request, username: str, obj: UpdateUserRoleParam):
     await UserService.update_roles(request=request, username=username, obj=obj)
     return await response_base.success()
 
 
 @router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsJwtAuth])
-async def update_avatar(request: Request, username: str, avatar: Avatar):
+async def update_avatar(request: Request, username: str, avatar: AvatarParam):
     count = await UserService.update_avatar(request=request, username=username, avatar=avatar)
     if count > 0:
         return await response_base.success()
@@ -106,7 +106,7 @@ async def get_all_users(
     status: Annotated[int | None, Query()] = None,
 ):
     user_select = await UserService.get_select(dept=dept, username=username, phone=phone, status=status)
-    page_data = await paging_data(db, user_select, GetAllUserInfo)
+    page_data = await paging_data(db, user_select, GetUserInfoListDetails)
     return await response_base.success(data=page_data)
 
 
