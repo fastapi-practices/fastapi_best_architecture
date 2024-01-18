@@ -9,7 +9,7 @@
 > 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
 > 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
 
-Pydantic-V2 完工 🎉
+Pydantic-V2 已完工 🎉
 
 简体中文 | [English](./README.md)
 
@@ -17,7 +17,7 @@ Pydantic-V2 完工 🎉
 
 它的目的是让你可以直接用它作为你新项目的基础架构，本仓库作为模板库公开，任何人或企业均可免费使用
 
-**持续更新维护中**
+**🔥持续更新维护中🔥**
 
 ## 伪三层架构
 
@@ -223,20 +223,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 赞助我们
 
-如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励 :coffee:
-
-<table>
-  <tr>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="Wechat"/>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px" alt="Alipay"/>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/ERC20.jpg?raw=true" width="180px" alt="0x40D5e2304b452256afD9CE2d3d5531dc8d293138"/>
-  </tr>
-  <tr>
-    <td align="center">微信</td>
-    <td align="center">支付宝</td>
-    <td align="center">ERC20</td>
-  </tr>
-</table>
+如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励：[:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
 
 ## 许可证
 
