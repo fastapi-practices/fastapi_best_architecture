@@ -80,6 +80,8 @@ class MenuService:
                 parent_menu = await MenuDao.get(db, obj.parent_id)
                 if not parent_menu:
                     raise errors.NotFoundError(msg='父级菜单不存在')
+            if obj.parent_id == menu.id:
+                raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await MenuDao.update(db, pk, obj)
             await redis_client.delete_prefix(settings.PERMISSION_REDIS_PREFIX)
             return count
