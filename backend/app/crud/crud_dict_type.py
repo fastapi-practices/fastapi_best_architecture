@@ -40,4 +40,4 @@ class CRUDDictType(CRUDBase[DictType, CreateDictTypeParam, UpdateDictTypeParam])
         return apis.rowcount
 
 
-DictTypeDao: CRUDDictType = CRUDDictType(DictType)
+dict_type_dao: CRUDDictType = CRUDDictType(DictType)

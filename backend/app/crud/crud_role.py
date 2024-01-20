@@ -64,4 +64,4 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         return roles.rowcount
 
 
-RoleDao: CRUDRole = CRUDRole(Role)
+role_dao: CRUDRole = CRUDRole(Role)

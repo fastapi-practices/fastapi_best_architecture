@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.login_log import GetLoginLogListDetails
-from backend.app.services.login_log_service import LoginLogService
+from backend.app.services.login_log_service import login_log_service
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ async def get_pagination_login_logs(
     status: Annotated[int | None, Query()] = None,
     ip: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
-    log_select = await LoginLogService.get_select(username=username, status=status, ip=ip)
+    log_select = await login_log_service.get_select(username=username, status=status, ip=ip)
     page_data = await paging_data(db, log_select, GetLoginLogListDetails)
     return await response_base.success(data=page_data)
 
@@ -44,7 +44,7 @@ async def get_pagination_login_logs(
     ],
 )
 async def delete_login_log(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await LoginLogService.delete(pk=pk)
+    count = await login_log_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -59,7 +59,7 @@ async def delete_login_log(pk: Annotated[list[int], Query(...)]) -> ResponseMode
     ],
 )
 async def delete_all_login_logs() -> ResponseModel:
-    count = await LoginLogService.delete_all()
+    count = await login_log_service.delete_all()
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

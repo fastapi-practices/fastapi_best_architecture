@@ -164,4 +164,4 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         return user.scalars().first()
 
 
-UserDao: CRUDUser = CRUDUser(User)
+user_dao: CRUDUser = CRUDUser(User)

@@ -46,4 +46,4 @@ class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
         return apis.rowcount
 
 
-ApiDao: CRUDApi = CRUDApi(Api)
+api_dao: CRUDApi = CRUDApi(Api)

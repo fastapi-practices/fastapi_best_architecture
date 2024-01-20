@@ -9,7 +9,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.menu import CreateMenuParam, GetMenuListDetails, UpdateMenuParam
-from backend.app.services.menu_service import MenuService
+from backend.app.services.menu_service import menu_service
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
@@ -17,13 +17,13 @@ router = APIRouter()
 
 @router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
 async def get_user_menus(request: Request) -> ResponseModel:
-    menu = await MenuService.get_user_menu_tree(request=request)
+    menu = await menu_service.get_user_menu_tree(request=request)
     return await response_base.success(data=menu)
 
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    menu = await MenuService.get(pk=pk)
+    menu = await menu_service.get(pk=pk)
     data = GetMenuListDetails(**await select_as_dict(menu))
     return await response_base.success(data=data)
 
@@ -32,7 +32,7 @@ async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
 async def get_all_menus(
     title: Annotated[str | None, Query()] = None, status: Annotated[int | None, Query()] = None
 ) -> ResponseModel:
-    menu = await MenuService.get_menu_tree(title=title, status=status)
+    menu = await menu_service.get_menu_tree(title=title, status=status)
     return await response_base.success(data=menu)
 
 
@@ -45,7 +45,7 @@ async def get_all_menus(
     ],
 )
 async def create_menu(obj: CreateMenuParam) -> ResponseModel:
-    await MenuService.create(obj=obj)
+    await menu_service.create(obj=obj)
     return await response_base.success()
 
 
@@ -58,7 +58,7 @@ async def create_menu(obj: CreateMenuParam) -> ResponseModel:
     ],
 )
 async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> ResponseModel:
-    count = await MenuService.update(pk=pk, obj=obj)
+    count = await menu_service.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -73,7 +73,7 @@ async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> Re
     ],
 )
 async def delete_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    count = await MenuService.delete(pk=pk)
+    count = await menu_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

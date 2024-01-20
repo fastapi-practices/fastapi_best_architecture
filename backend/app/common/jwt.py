@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.common.exception.errors import AuthorizationError, TokenError
 from backend.app.common.redis import redis_client
 from backend.app.core.conf import settings
-from backend.app.crud.crud_user import UserDao
+from backend.app.crud.crud_user import user_dao
 from backend.app.models import User
 from backend.app.utils.timezone import timezone
 
@@ -182,7 +182,7 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     :return:
     """
     user_id = data.get('sub')
-    user = await UserDao.get_with_relation(db, user_id=user_id)
+    user = await user_dao.get_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError(msg='Token 无效')
     if not user.status:

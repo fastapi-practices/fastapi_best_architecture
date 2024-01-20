@@ -20,7 +20,7 @@ from backend.app.schemas.casbin_rule import (
     GetPolicyListDetails,
     UpdatePolicyParam,
 )
-from backend.app.services.casbin_service import CasbinService
+from backend.app.services.casbin_service import casbin_service
 
 router = APIRouter()
 
@@ -38,14 +38,14 @@ async def get_pagination_casbin(
     ptype: Annotated[str | None, Query(description='规则类型, p / g')] = None,
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
 ) -> ResponseModel:
-    casbin_select = await CasbinService.get_casbin_list(ptype=ptype, sub=sub)
+    casbin_select = await casbin_service.get_casbin_list(ptype=ptype, sub=sub)
     page_data = await paging_data(db, casbin_select, GetPolicyListDetails)
     return await response_base.success(data=page_data)
 
 
 @router.get('/policies', summary='获取所有P权限规则', dependencies=[DependsJwtAuth])
 async def get_all_policies(role: Annotated[int | None, Query(description='角色ID')] = None) -> ResponseModel:
-    policies = await CasbinService.get_policy_list(role=role)
+    policies = await casbin_service.get_policy_list(role=role)
     return await response_base.success(data=policies)
 
 
@@ -67,7 +67,7 @@ async def create_policy(p: CreatePolicyParam) -> ResponseModel:
     - 如果添加基于用户的访问权限, 不需配合添加 g 规则就能真正拥有权限，适合配置指定用户接口访问策略<br>
     **格式**: 用户 uuid + 访问路径 path + 访问方法 method
     """
-    data = await CasbinService.create_policy(p=p)
+    data = await casbin_service.create_policy(p=p)
     return await response_base.success(data=data)
 
 
@@ -80,7 +80,7 @@ async def create_policy(p: CreatePolicyParam) -> ResponseModel:
     ],
 )
 async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
-    data = await CasbinService.create_policies(ps=ps)
+    data = await casbin_service.create_policies(ps=ps)
     return await response_base.success(data=data)
 
 
@@ -93,7 +93,7 @@ async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
     ],
 )
 async def update_policy(old: UpdatePolicyParam, new: UpdatePolicyParam) -> ResponseModel:
-    data = await CasbinService.update_policy(old=old, new=new)
+    data = await casbin_service.update_policy(old=old, new=new)
     return await response_base.success(data=data)
 
 
@@ -106,7 +106,7 @@ async def update_policy(old: UpdatePolicyParam, new: UpdatePolicyParam) -> Respo
     ],
 )
 async def update_policies(old: list[UpdatePolicyParam], new: list[UpdatePolicyParam]) -> ResponseModel:
-    data = await CasbinService.update_policies(old=old, new=new)
+    data = await casbin_service.update_policies(old=old, new=new)
     return await response_base.success(data=data)
 
 
@@ -119,7 +119,7 @@ async def update_policies(old: list[UpdatePolicyParam], new: list[UpdatePolicyPa
     ],
 )
 async def delete_policy(p: DeletePolicyParam) -> ResponseModel:
-    data = await CasbinService.delete_policy(p=p)
+    data = await casbin_service.delete_policy(p=p)
     return await response_base.success(data=data)
 
 
@@ -132,7 +132,7 @@ async def delete_policy(p: DeletePolicyParam) -> ResponseModel:
     ],
 )
 async def delete_policies(ps: list[DeletePolicyParam]) -> ResponseModel:
-    data = await CasbinService.delete_policies(ps=ps)
+    data = await casbin_service.delete_policies(ps=ps)
     return await response_base.success(data=data)
 
 
@@ -145,7 +145,7 @@ async def delete_policies(ps: list[DeletePolicyParam]) -> ResponseModel:
     ],
 )
 async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
-    count = await CasbinService.delete_all_policies(sub=sub)
+    count = await casbin_service.delete_all_policies(sub=sub)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -153,7 +153,7 @@ async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
 
 @router.get('/groups', summary='获取所有G权限规则', dependencies=[DependsJwtAuth])
 async def get_all_groups() -> ResponseModel:
-    data = await CasbinService.get_group_list()
+    data = await casbin_service.get_group_list()
     return await response_base.success(data=data)
 
 
@@ -175,7 +175,7 @@ async def create_group(g: CreateUserRoleParam) -> ResponseModel:
     - 如果在 p 策略中添加了基于用户的访问权限, 则不添加相应的 g 规则能直接拥有访问权限<br>
     但是拥有的不是用户角色的所有权限, 而只是单一的对应的 p 规则所添加的访问权限
     """
-    data = await CasbinService.create_group(g=g)
+    data = await casbin_service.create_group(g=g)
     return await response_base.success(data=data)
 
 
@@ -188,7 +188,7 @@ async def create_group(g: CreateUserRoleParam) -> ResponseModel:
     ],
 )
 async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseModel:
-    data = await CasbinService.create_groups(gs=gs)
+    data = await casbin_service.create_groups(gs=gs)
     return await response_base.success(data=data)
 
 
@@ -201,7 +201,7 @@ async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseModel:
     ],
 )
 async def delete_group(g: DeleteUserRoleParam) -> ResponseModel:
-    data = await CasbinService.delete_group(g=g)
+    data = await casbin_service.delete_group(g=g)
     return await response_base.success(data=data)
 
 
@@ -214,7 +214,7 @@ async def delete_group(g: DeleteUserRoleParam) -> ResponseModel:
     ],
 )
 async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseModel:
-    data = await CasbinService.delete_groups(gs=gs)
+    data = await casbin_service.delete_groups(gs=gs)
     return await response_base.success(data=data)
 
 
@@ -227,7 +227,7 @@ async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseModel:
     ],
 )
 async def delete_all_groups(uuid: Annotated[UUID, Query(...)]) -> ResponseModel:
-    count = await CasbinService.delete_all_groups(uuid=uuid)
+    count = await casbin_service.delete_all_groups(uuid=uuid)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

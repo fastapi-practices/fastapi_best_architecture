@@ -46,4 +46,4 @@ class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam])
         return dict_data.scalars().first()
 
 
-DictDataDao: CRUDDictData = CRUDDictData(DictData)
+dict_data_dao: CRUDDictData = CRUDDictData(DictData)
