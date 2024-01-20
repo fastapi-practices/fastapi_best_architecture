@@ -23,7 +23,7 @@ router = APIRouter()
     deprecated=True,
 )
 async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> GetSwaggerToken:
-    token, user = await auth_service().swagger_login(form_data=form_data)
+    token, user = await auth_service.swagger_login(form_data=form_data)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore
 
 
@@ -34,7 +34,7 @@ async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def user_login(request: Request, obj: AuthLoginParam, background_tasks: BackgroundTasks) -> ResponseModel:
-    access_token, refresh_token, access_expire, refresh_expire, user = await auth_service().login(
+    access_token, refresh_token, access_expire, refresh_expire, user = await auth_service.login(
         request=request, obj=obj, background_tasks=background_tasks
     )
     data = GetLoginToken(
