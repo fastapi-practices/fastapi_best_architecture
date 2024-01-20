@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/routers',
+    '/routes',
     summary='获取所有路由',
     dependencies=[
         Depends(RequestPermission('sys:route:list')),

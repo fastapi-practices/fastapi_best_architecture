@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from uuid import UUID
+
 from sqlalchemy import Select, and_, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,8 +30,8 @@ class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicyParam, UpdatePolicyParam]):
         result = await db.execute(delete(self.model).where(or_(*where_list)))
         return result.rowcount
 
-    async def delete_groups_by_uuid(self, db: AsyncSession, uuid: str) -> int:
-        result = await db.execute(delete(self.model).where(self.model.v0 == uuid))
+    async def delete_groups_by_uuid(self, db: AsyncSession, uuid: UUID) -> int:
+        result = await db.execute(delete(self.model).where(self.model.v0 == str(uuid)))
         return result.rowcount
 
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -18,12 +18,12 @@ router = APIRouter()
 
 @router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
 async def get_all_apis() -> ResponseModel:
-    data = await ApiService.get_all()
+    data = await ApiService.get_api_list()
     return await response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
-async def get_api(pk: int) -> ResponseModel:
+async def get_api(pk: Annotated[int, Path(...)]) -> ResponseModel:
     api = await ApiService.get(pk=pk)
     return await response_base.success(data=api)
 
@@ -36,7 +36,7 @@ async def get_api(pk: int) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_api_list(
+async def get_pagination_apis(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,
@@ -68,7 +68,7 @@ async def create_api(obj: CreateApiParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_api(pk: int, obj: UpdateApiParam) -> ResponseModel:
+async def update_api(pk: Annotated[int, Path(...)], obj: UpdateApiParam) -> ResponseModel:
     count = await ApiService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

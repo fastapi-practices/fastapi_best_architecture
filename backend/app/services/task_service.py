@@ -19,7 +19,7 @@ class TaskService:
         return result
 
     @staticmethod
-    def gets() -> dict:
+    def get_task_list() -> dict:
         filtered_tasks = {}
         tasks = celery_app.tasks
         for key, value in tasks.items():

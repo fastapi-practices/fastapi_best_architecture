@@ -31,7 +31,7 @@ class RoleService:
             return roles
 
     @staticmethod
-    async def get_user_all(*, pk: int) -> Sequence[Role]:
+    async def get_user_roles(*, pk: int) -> Sequence[Role]:
         async with async_db_session() as db:
             roles = await RoleDao.get_user_all(db, user_id=pk)
             return roles
@@ -62,7 +62,7 @@ class RoleService:
             return count
 
     @staticmethod
-    async def update_menus(*, request: Request, pk: int, menu_ids: UpdateRoleMenuParam) -> int:
+    async def update_role_menu(*, request: Request, pk: int, menu_ids: UpdateRoleMenuParam) -> int:
         async with async_db_session.begin() as db:
             role = await RoleDao.get(db, pk)
             if not role:
