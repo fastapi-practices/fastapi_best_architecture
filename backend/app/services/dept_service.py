@@ -53,6 +53,8 @@ class DeptService:
                 parent_dept = await DeptDao.get(db, obj.parent_id)
                 if not parent_dept:
                     raise errors.NotFoundError(msg='父级部门不存在')
+            if obj.parent_id == dept.id:
+                raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await DeptDao.update(db, pk, obj)
             return count
 
