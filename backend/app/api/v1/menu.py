@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
@@ -22,7 +22,7 @@ async def get_user_menus(request: Request) -> ResponseModel:
 
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
-async def get_menu(pk: int) -> ResponseModel:
+async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
     menu = await MenuService.get(pk=pk)
     data = GetMenuListDetails(**await select_as_dict(menu))
     return await response_base.success(data=data)
@@ -30,8 +30,7 @@ async def get_menu(pk: int) -> ResponseModel:
 
 @router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
 async def get_all_menus(
-    title: Annotated[str | None, Query()] = None,
-    status: Annotated[int | None, Query()] = None,
+    title: Annotated[str | None, Query()] = None, status: Annotated[int | None, Query()] = None
 ) -> ResponseModel:
     menu = await MenuService.get_menu_tree(title=title, status=status)
     return await response_base.success(data=menu)
@@ -58,7 +57,7 @@ async def create_menu(obj: CreateMenuParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_menu(pk: int, obj: UpdateMenuParam) -> ResponseModel:
+async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> ResponseModel:
     count = await MenuService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -73,7 +72,7 @@ async def update_menu(pk: int, obj: UpdateMenuParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_menu(pk: int) -> ResponseModel:
+async def delete_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await MenuService.delete(pk=pk)
     if count > 0:
         return await response_base.success()

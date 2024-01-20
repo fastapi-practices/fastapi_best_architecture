@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -24,7 +24,7 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_all_dict_types(
+async def get_pagination_dict_types(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     code: Annotated[str | None, Query()] = None,
@@ -56,7 +56,7 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dict_type(pk: int, obj: UpdateDictTypeParam) -> ResponseModel:
+async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypeParam) -> ResponseModel:
     count = await DictTypeService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

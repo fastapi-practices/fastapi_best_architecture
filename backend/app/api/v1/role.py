@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -26,20 +26,20 @@ async def get_all_roles() -> ResponseModel:
 
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
-async def get_user_all_roles(pk: int) -> ResponseModel:
-    roles = await RoleService.get_user_all(pk=pk)
+async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    roles = await RoleService.get_user_roles(pk=pk)
     data = await select_list_serialize(roles)
     return await response_base.success(data=data)
 
 
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
-async def get_role_all_menus(pk: int) -> ResponseModel:
+async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseModel:
     menu = await MenuService.get_role_menu_tree(pk=pk)
     return await response_base.success(data=menu)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
-async def get_role(pk: int) -> ResponseModel:
+async def get_role(pk: Annotated[int, Path(...)]) -> ResponseModel:
     role = await RoleService.get(pk=pk)
     data = GetRoleListDetails(**await select_as_dict(role))
     return await response_base.success(data=data)
@@ -53,7 +53,7 @@ async def get_role(pk: int) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_all_role_list(
+async def get_pagination_roles(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     data_scope: Annotated[int | None, Query()] = None,
@@ -85,7 +85,7 @@ async def create_role(obj: CreateRoleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_role(pk: int, obj: UpdateRoleParam) -> ResponseModel:
+async def update_role(pk: Annotated[int, Path(...)], obj: UpdateRoleParam) -> ResponseModel:
     count = await RoleService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -100,8 +100,10 @@ async def update_role(pk: int, obj: UpdateRoleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_role_menu(request: Request, pk: int, menu_ids: UpdateRoleMenuParam) -> ResponseModel:
-    count = await RoleService.update_menus(request=request, pk=pk, menu_ids=menu_ids)
+async def update_role_menus(
+    request: Request, pk: Annotated[int, Path(...)], menu_ids: UpdateRoleMenuParam
+) -> ResponseModel:
+    count = await RoleService.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

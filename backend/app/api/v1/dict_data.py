@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
-async def get_dict_data(pk: int) -> ResponseModel:
+async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dict_data = await DictDataService.get(pk=pk)
     data = GetDictDataListDetails(**await select_as_dict(dict_data))
     return await response_base.success(data=data)
@@ -32,7 +32,7 @@ async def get_dict_data(pk: int) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_all_dict_datas(
+async def get_pagination_dict_datas(
     db: CurrentSession,
     label: Annotated[str | None, Query()] = None,
     value: Annotated[str | None, Query()] = None,
@@ -64,7 +64,7 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dict_data(pk: int, obj: UpdateDictDataParam) -> ResponseModel:
+async def update_dict_data(pk: Annotated[int, Path(...)], obj: UpdateDictDataParam) -> ResponseModel:
     count = await DictDataService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()

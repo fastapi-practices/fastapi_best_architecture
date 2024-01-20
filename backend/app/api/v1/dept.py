@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.permission import RequestPermission
@@ -16,14 +16,14 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
-async def get_dept(pk: int) -> ResponseModel:
+async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dept = await DeptService.get(pk=pk)
     data = GetDeptListDetails(**await select_as_dict(dept))
     return await response_base.success(data=data)
 
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
-async def get_all_depts(
+async def get_all_depts_tree(
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
@@ -54,7 +54,7 @@ async def create_dept(obj: CreateDeptParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dept(pk: int, obj: UpdateDeptParam) -> ResponseModel:
+async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> ResponseModel:
     count = await DeptService.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
@@ -62,14 +62,14 @@ async def update_dept(pk: int, obj: UpdateDeptParam) -> ResponseModel:
 
 
 @router.delete(
-    '{pk}',
+    '/{pk}',
     summary='删除部门',
     dependencies=[
         Depends(RequestPermission('sys:dept:del')),
         DependsRBAC,
     ],
 )
-async def delete_dept(pk: int) -> ResponseModel:
+async def delete_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await DeptService.delete(pk=pk)
     if count > 0:
         return await response_base.success()

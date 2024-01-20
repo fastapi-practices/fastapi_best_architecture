@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Query
 
 from backend.app.common.jwt import DependsJwtAuth
 from backend.app.common.pagination import DependsPagination, paging_data
@@ -32,7 +33,7 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_all_casbin(
+async def get_pagination_casbin(
     db: CurrentSession,
     ptype: Annotated[str | None, Query(description='规则类型, p / g')] = None,
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
@@ -42,15 +43,9 @@ async def get_all_casbin(
     return await response_base.success(data=page_data)
 
 
-@router.get('/policy', summary='获取所有P权限规则', dependencies=[DependsJwtAuth])
-async def get_all_policies() -> ResponseModel:
-    policies = await CasbinService.get_policy_list()
-    return await response_base.success(data=policies)
-
-
-@router.get('/policy/{role}/all', summary='获取指定角色的所有P权限规则', dependencies=[DependsJwtAuth])
-async def get_role_policies(role: Annotated[str, Path(description='角色ID')]) -> ResponseModel:
-    policies = await CasbinService.get_policy_list_by_role(role=role)
+@router.get('/policies', summary='获取所有P权限规则', dependencies=[DependsJwtAuth])
+async def get_all_policies(role: Annotated[int | None, Query(description='角色ID')] = None) -> ResponseModel:
+    policies = await CasbinService.get_policy_list(role=role)
     return await response_base.success(data=policies)
 
 
@@ -156,7 +151,7 @@ async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
     return await response_base.fail()
 
 
-@router.get('/group', summary='获取所有G权限规则', dependencies=[DependsJwtAuth])
+@router.get('/groups', summary='获取所有G权限规则', dependencies=[DependsJwtAuth])
 async def get_all_groups() -> ResponseModel:
     data = await CasbinService.get_group_list()
     return await response_base.success(data=data)
@@ -231,7 +226,7 @@ async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_all_groups(uuid: str) -> ResponseModel:
+async def delete_all_groups(uuid: Annotated[UUID, Query(...)]) -> ResponseModel:
     count = await CasbinService.delete_all_groups(uuid=uuid)
     if count > 0:
         return await response_base.success()

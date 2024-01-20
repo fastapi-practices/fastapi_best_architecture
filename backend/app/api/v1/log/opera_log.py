@@ -24,7 +24,7 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_all_opera_logs(
+async def get_pagination_opera_logs(
     db: CurrentSession,
     username: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,

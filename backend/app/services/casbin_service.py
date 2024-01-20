@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from uuid import UUID
+
 from sqlalchemy import Select
 
 from backend.app.common.exception import errors
@@ -22,9 +24,12 @@ class CasbinService:
         return await CasbinDao.get_all_policy(ptype, sub)
 
     @staticmethod
-    async def get_policy_list() -> list:
+    async def get_policy_list(self, *, role: int | None = None) -> list:
         enforcer = await RBAC.enforcer()
-        data = enforcer.get_policy()
+        if role is not None:
+            data = enforcer.get_filtered_named_policy('p', 0, str(role))
+        else:
+            data = enforcer.get_policy()
         return data
 
     @staticmethod
@@ -129,7 +134,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_all_groups(*, uuid: str) -> int:
+    async def delete_all_groups(*, uuid: UUID) -> int:
         async with async_db_session.begin() as db:
             count = await CasbinDao.delete_groups_by_uuid(db, uuid)
         return count

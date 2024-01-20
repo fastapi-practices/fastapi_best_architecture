@@ -17,11 +17,6 @@ class ResponseModel(BaseModel):
     """
     统一返回模型
 
-    .. tip::
-
-        如果你不想使用 ResponseBase 中的自定义编码器，可以使用此模型，返回数据将通过 fastapi 内部的编码器自动解析并返回；
-        此返回模型会生成 openapi schema 文档
-
     E.g. ::
 
         @router.get('/test', response_model=ResponseModel)
@@ -36,7 +31,7 @@ class ResponseModel(BaseModel):
         def test() -> ResponseModel:
             res = CustomResponseCode.HTTP_200
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
-    """  # noqa: E501
+    """
 
     # TODO: json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
     model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
@@ -52,7 +47,7 @@ class ResponseBase:
 
     .. tip::
 
-        此类中的返回方法将返回 ResponseModel 模型，作为一种编码风格而存在；
+        此类中的方法将返回 ResponseModel 模型，作为一种编码风格而存在；
 
     E.g. ::
 
