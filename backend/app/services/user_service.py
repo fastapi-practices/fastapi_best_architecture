@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import random
 
-from abc import ABC, abstractmethod
-
 from fastapi import Request
 from sqlalchemy import Select
 
@@ -16,166 +14,19 @@ from backend.app.crud.crud_role import RoleDao
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import AddUser, Avatar, RegisterUser, ResetPassword, UpdateUser, UpdateUserRole
+from backend.app.schemas.user import (
+    AddUserParam,
+    AvatarParam,
+    RegisterUserParam,
+    ResetPasswordParam,
+    UpdateUserParam,
+    UpdateUserRoleParam,
+)
 
 
-class UserServiceABC(ABC):
-    """
-    用户服务基类
-    """
-
-    @abstractmethod
-    async def register(self, *, obj: RegisterUser) -> None:
-        """
-        注册用户
-
-        :param obj:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def add(self, *, request: Request, obj: AddUser) -> None:
-        """
-        添加用户
-
-        :param request:
-        :param obj:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def pwd_reset(self, *, request: Request, obj: ResetPassword) -> int:
-        """
-        密码重置
-
-        :param request:
-        :param obj:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def get_userinfo(self, *, username: str) -> User:
-        """
-        获取用户信息
-
-        :param username:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update(self, *, request: Request, username: str, obj: UpdateUser) -> int:
-        """
-        更新用户信息
-
-        :param request:
-        :param username:
-        :param obj:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_roles(self, *, request: Request, username: str, obj: UpdateUserRole) -> None:
-        """
-        更新用户角色
-
-        :param request:
-        :param username:
-        :param obj:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_avatar(self, *, request: Request, username: str, avatar: Avatar) -> int:
-        """
-        更新用户头像
-
-        :param request:
-        :param username:
-        :param avatar:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def get_select(self, *, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
-        """
-        获取用户分页查询
-
-        :param dept:
-        :param username:
-        :param phone:
-        :param status:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_permission(self, *, request: Request, pk: int) -> int:
-        """
-        更新用户超级权限
-
-        :param request:
-        :param pk:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_staff(self, *, request: Request, pk: int) -> int:
-        """
-        更新用户后台权限
-
-        :param request:
-        :param pk:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_status(self, *, request: Request, pk: int) -> int:
-        """
-        更新用户状态
-
-        :param request:
-        :param pk:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def update_multi_login(self, *, request: Request, pk: int) -> int:
-        """
-        更新用户多点登录
-
-        :param request:
-        :param pk:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    async def delete(self, *, username: str) -> int:
-        """
-        删除用户
-
-        :param username:
-        :return:
-        """
-        pass
-
-
-class UserServiceImpl(UserServiceABC):
-    """
-    用户服务实现类
-    """
-
-    async def register(self, *, obj: RegisterUser) -> None:
+class UserService:
+    @staticmethod
+    async def register(*, obj: RegisterUserParam) -> None:
         async with async_db_session.begin() as db:
             username = await UserDao.get_by_username(db, obj.username)
             if username:
@@ -189,7 +40,8 @@ class UserServiceImpl(UserServiceABC):
                 raise errors.ForbiddenError(msg='该邮箱已注册')
             await UserDao.create(db, obj)
 
-    async def add(self, *, request: Request, obj: AddUser) -> None:
+    @staticmethod
+    async def add(*, request: Request, obj: AddUserParam) -> None:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             username = await UserDao.get_by_username(db, obj.username)
@@ -211,7 +63,8 @@ class UserServiceImpl(UserServiceABC):
                 raise errors.ForbiddenError(msg='该邮箱已注册')
             await UserDao.add(db, obj)
 
-    async def pwd_reset(self, *, request: Request, obj: ResetPassword) -> int:
+    @staticmethod
+    async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
         async with async_db_session.begin() as db:
             op = obj.old_password
             if not await password_verify(op + request.user.salt, request.user.password):
@@ -229,14 +82,16 @@ class UserServiceImpl(UserServiceABC):
                 await redis_client.delete_prefix(i)
             return count
 
-    async def get_userinfo(self, *, username: str) -> User:
+    @staticmethod
+    async def get_userinfo(*, username: str) -> User:
         async with async_db_session() as db:
             user = await UserDao.get_with_relation(db, username=username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             return user
 
-    async def update(self, *, request: Request, username: str, obj: UpdateUser) -> int:
+    @staticmethod
+    async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -259,7 +114,8 @@ class UserServiceImpl(UserServiceABC):
             count = await UserDao.update_userinfo(db, input_user, obj)
             return count
 
-    async def update_roles(self, *, request: Request, username: str, obj: UpdateUserRole) -> None:
+    @staticmethod
+    async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -274,7 +130,8 @@ class UserServiceImpl(UserServiceABC):
             await UserDao.update_role(db, input_user, obj)
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
 
-    async def update_avatar(self, *, request: Request, username: str, avatar: Avatar) -> int:
+    @staticmethod
+    async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -285,10 +142,12 @@ class UserServiceImpl(UserServiceABC):
             count = await UserDao.update_avatar(db, input_user, avatar)
             return count
 
-    async def get_select(self, *, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
+    @staticmethod
+    async def get_select(*, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
         return await UserDao.get_all(dept=dept, username=username, phone=phone, status=status)
 
-    async def update_permission(self, *, request: Request, pk: int) -> int:
+    @staticmethod
+    async def update_permission(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             if not await UserDao.get(db, pk):
@@ -299,7 +158,8 @@ class UserServiceImpl(UserServiceABC):
                 count = await UserDao.set_super(db, pk)
                 return count
 
-    async def update_staff(self, *, request: Request, pk: int) -> int:
+    @staticmethod
+    async def update_staff(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             if not await UserDao.get(db, pk):
@@ -310,7 +170,8 @@ class UserServiceImpl(UserServiceABC):
                 count = await UserDao.set_staff(db, pk)
                 return count
 
-    async def update_status(self, *, request: Request, pk: int) -> int:
+    @staticmethod
+    async def update_status(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             if not await UserDao.get(db, pk):
@@ -321,7 +182,8 @@ class UserServiceImpl(UserServiceABC):
                 count = await UserDao.set_status(db, pk)
                 return count
 
-    async def update_multi_login(self, *, request: Request, pk: int) -> int:
+    @staticmethod
+    async def update_multi_login(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             await superuser_verify(request)
             if not await UserDao.get(db, pk):
@@ -344,7 +206,8 @@ class UserServiceImpl(UserServiceABC):
                         await redis_client.delete_prefix(prefix)
                 return count
 
-    async def delete(self, *, username: str) -> int:
+    @staticmethod
+    async def delete(*, username: str) -> int:
         async with async_db_session.begin() as db:
             input_user = await UserDao.get_by_username(db, username)
             if not input_user:
@@ -357,6 +220,3 @@ class UserServiceImpl(UserServiceABC):
             for i in prefix:
                 await redis_client.delete_prefix(i)
             return count
-
-
-UserService: UserServiceABC = UserServiceImpl()

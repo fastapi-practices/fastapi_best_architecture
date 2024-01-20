@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.crud.base import CRUDBase
 from backend.app.models import LoginLog
-from backend.app.schemas.login_log import CreateLoginLog, UpdateLoginLog
+from backend.app.schemas.login_log import CreateLoginLogParam, UpdateLoginLogParam
 
 
-class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
+class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLogParam, UpdateLoginLogParam]):
     async def get_all(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
         se = select(self.model).order_by(desc(self.model.created_time))
         where_list = []
@@ -22,7 +22,7 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLog, UpdateLoginLog]):
             se = se.where(and_(*where_list))
         return se
 
-    async def create(self, db: AsyncSession, obj_in: CreateLoginLog):
+    async def create(self, db: AsyncSession, obj_in: CreateLoginLogParam):
         await self.create_(db, obj_in)
         await db.commit()
 

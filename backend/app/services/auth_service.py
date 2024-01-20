@@ -17,7 +17,7 @@ from backend.app.core.conf import settings
 from backend.app.crud.crud_user import UserDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.user import AuthLogin
+from backend.app.schemas.user import AuthLoginParam
 from backend.app.services.login_log_service import LoginLogService
 from backend.app.utils.timezone import timezone
 
@@ -98,7 +98,7 @@ class AuthServiceImpl(AuthServiceABC):
             return access_token, user
 
     async def login(
-        self, *, request: Request, obj: AuthLogin, background_tasks: BackgroundTasks
+        self, *, request: Request, obj: AuthLoginParam, background_tasks: BackgroundTasks
     ) -> tuple[str, str, datetime, datetime, User]:
         async with async_db_session() as db:
             try:

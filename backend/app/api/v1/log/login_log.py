@@ -10,7 +10,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
-from backend.app.schemas.login_log import GetAllLoginLog
+from backend.app.schemas.login_log import GetLoginLogListDetails
 from backend.app.services.login_log_service import LoginLogService
 
 router = APIRouter()
@@ -31,7 +31,7 @@ async def get_pagination_login_logs(
     ip: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     log_select = await LoginLogService.get_select(username=username, status=status, ip=ip)
-    page_data = await paging_data(db, log_select, GetAllLoginLog)
+    page_data = await paging_data(db, log_select, GetLoginLogListDetails)
     return await response_base.success(data=page_data)
 
 

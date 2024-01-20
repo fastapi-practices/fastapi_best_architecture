@@ -14,22 +14,14 @@ from backend.app.services.task_service import TaskService
 router = APIRouter()
 
 
-@router.get(
-    '',
-    summary='获取所有可执行任务模块',
-    dependencies=[DependsJwtAuth],
-)
+@router.get('', summary='获取所有可执行任务模块', dependencies=[DependsJwtAuth])
 async def get_all_tasks() -> ResponseModel:
     tasks = TaskService.get_task_list()
     return await response_base.success(data=tasks)
 
 
-@router.get(
-    '/{pk}',
-    summary='获取任务结果',
-    dependencies=[DependsJwtAuth],
-)
-async def get_task_result(pk: str = Path(description='任务ID')) -> ResponseModel:
+@router.get('/{pk}', summary='获取任务结果', dependencies=[DependsJwtAuth])
+async def get_task_result(pk: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
     task = TaskService.get(pk)
     if not task:
         return await response_base.fail(res=CustomResponseCode.HTTP_204, data=pk)

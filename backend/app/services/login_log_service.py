@@ -11,7 +11,7 @@ from backend.app.common.log import log
 from backend.app.crud.crud_login_log import LoginLogDao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
-from backend.app.schemas.login_log import CreateLoginLog
+from backend.app.schemas.login_log import CreateLoginLogParam
 
 
 class LoginLogServiceABC(ABC):
@@ -81,7 +81,7 @@ class LoginLogServiceImpl(LoginLogServiceABC):
     ) -> None:
         try:
             # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
-            obj_in = CreateLoginLog(
+            obj_in = CreateLoginLogParam(
                 user_uuid=user.uuid,
                 username=user.username,
                 status=status,

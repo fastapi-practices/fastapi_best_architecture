@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractmethod
-
 from celery.exceptions import BackendGetMetaError, NotRegistered
 from celery.result import AsyncResult
 
@@ -9,49 +7,9 @@ from backend.app.common.celery import celery_app
 from backend.app.common.exception.errors import NotFoundError
 
 
-class TaskServiceABC(ABC):
-    """
-    任务服务基类
-    """
-
-    @abstractmethod
-    def get(self, pk: str) -> AsyncResult | None:
-        """
-        获取任务详情
-
-        :param pk:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def get_task_list(self) -> dict:
-        """
-        获取任务列表
-
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def run(self, *, module: str, args: list | None = None, kwargs: dict | None = None) -> AsyncResult:
-        """
-        运行任务
-
-        :param module:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        pass
-
-
-class TaskServiceImpl(TaskServiceABC):
-    """
-    任务服务实现类
-    """
-
-    def get(self, pk: str) -> AsyncResult | None:
+class TaskService:
+    @staticmethod
+    def get(pk: str) -> AsyncResult | None:
         try:
             result = celery_app.AsyncResult(pk)
         except (BackendGetMetaError, NotRegistered):
@@ -60,18 +18,16 @@ class TaskServiceImpl(TaskServiceABC):
             return None
         return result
 
-    def get_task_list(self) -> list:
-        task_list = []
+    @staticmethod
+    def get_task_list() -> dict:
+        filtered_tasks = {}
         tasks = celery_app.tasks
         for key, value in tasks.items():
             if not key.startswith('celery.'):
-                filtered_tasks = {key: value}
-                task_list.append(filtered_tasks)
-        return task_list
+                filtered_tasks[key] = value
+        return filtered_tasks
 
-    def run(self, *, module: str, args: list | None = None, kwargs: dict | None = None) -> AsyncResult:
+    @staticmethod
+    def run(*, module: str, args: list | None = None, kwargs: dict | None = None) -> AsyncResult:
         task = celery_app.send_task(module, args, kwargs)
         return task
-
-
-TaskService: TaskServiceABC = TaskServiceImpl()
