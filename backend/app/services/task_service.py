@@ -31,3 +31,6 @@ class TaskService:
     def run(*, module: str, args: list | None = None, kwargs: dict | None = None) -> AsyncResult:
         task = celery_app.send_task(module, args, kwargs)
         return task
+
+
+task_service: TaskService = TaskService()

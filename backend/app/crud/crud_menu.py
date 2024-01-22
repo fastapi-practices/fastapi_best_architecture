@@ -57,4 +57,4 @@ class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
         return menu.children
 
 
-MenuDao: CRUDMenu = CRUDMenu(Menu)
+menu_dao: CRUDMenu = CRUDMenu(Menu)

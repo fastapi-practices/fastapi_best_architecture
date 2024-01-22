@@ -13,7 +13,7 @@ from backend.app.common.jwt import get_token
 from backend.app.common.redis import redis_client
 from backend.app.common.response.response_code import CustomErrorCode
 from backend.app.core.conf import settings
-from backend.app.crud.crud_user import UserDao
+from backend.app.crud.crud_user import user_dao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.user import AuthLoginParam
@@ -26,7 +26,7 @@ class AuthService:
 
     async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm) -> tuple[str, User]:
         async with async_db_session() as db:
-            current_user = await UserDao.get_by_username(db, form_data.username)
+            current_user = await user_dao.get_by_username(db, form_data.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not await jwt.password_verify(form_data.password + current_user.salt, current_user.password):
@@ -34,9 +34,9 @@ class AuthService:
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
-            await UserDao.update_login_time(db, form_data.username, self.login_time)
+            await user_dao.update_login_time(db, form_data.username, self.login_time)
             # 获取最新用户信息
-            user = await UserDao.get(db, current_user.id)
+            user = await user_dao.get(db, current_user.id)
             # 创建token
             access_token, _ = await jwt.create_access_token(str(user.id), multi_login=user.is_multi_login)
             return access_token, user
@@ -46,7 +46,7 @@ class AuthService:
     ) -> tuple[str, str, datetime, datetime, User]:
         async with async_db_session() as db:
             try:
-                current_user = await UserDao.get_by_username(db, obj.username)
+                current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户不存在')
                 elif not await jwt.password_verify(obj.password + current_user.salt, current_user.password):
@@ -58,8 +58,8 @@ class AuthService:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-                await UserDao.update_login_time(db, obj.username, self.login_time)
-                user = await UserDao.get(db, current_user.id)
+                await user_dao.update_login_time(db, obj.username, self.login_time)
+                user = await user_dao.get(db, current_user.id)
                 access_token, access_token_expire_time = await jwt.create_access_token(
                     str(user.id), multi_login=user.is_multi_login
                 )
@@ -100,7 +100,7 @@ class AuthService:
         if request.user.id != user_id:
             raise errors.TokenError(msg='刷新 token 无效')
         async with async_db_session() as db:
-            current_user = await UserDao.get(db, user_id)
+            current_user = await user_dao.get(db, user_id)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not current_user.status:
@@ -125,3 +125,6 @@ class AuthService:
         else:
             prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
             await redis_client.delete_prefix(prefix)
+
+
+auth_service: AuthService = AuthService()

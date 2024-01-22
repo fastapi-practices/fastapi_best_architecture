@@ -68,4 +68,4 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         return dept.children
 
 
-DeptDao: CRUDDept = CRUDDept(Dept)
+dept_dao: CRUDDept = CRUDDept(Dept)

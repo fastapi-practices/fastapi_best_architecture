@@ -35,4 +35,4 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLogParam, UpdateLoginLogParam])
         return logs.rowcount
 
 
-LoginLogDao: CRUDLoginLog = CRUDLoginLog(LoginLog)
+login_log_dao: CRUDLoginLog = CRUDLoginLog(LoginLog)

@@ -7,7 +7,7 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.common.log import log
-from backend.app.crud.crud_login_log import LoginLogDao
+from backend.app.crud.crud_login_log import login_log_dao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
 from backend.app.schemas.login_log import CreateLoginLogParam
@@ -16,7 +16,7 @@ from backend.app.schemas.login_log import CreateLoginLogParam
 class LoginLogService:
     @staticmethod
     async def get_select(*, username: str, status: int, ip: str) -> Select:
-        return await LoginLogDao.get_all(username=username, status=status, ip=ip)
+        return await login_log_dao.get_all(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(
@@ -39,18 +39,21 @@ class LoginLogService:
                 msg=msg,
                 login_time=login_time,
             )
-            await LoginLogDao.create(db, obj_in)
+            await login_log_dao.create(db, obj_in)
         except Exception as e:
             log.exception(f'登录日志创建失败: {e}')
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         async with async_db_session.begin() as db:
-            count = await LoginLogDao.delete(db, pk)
+            count = await login_log_dao.delete(db, pk)
             return count
 
     @staticmethod
     async def delete_all() -> int:
         async with async_db_session.begin() as db:
-            count = await LoginLogDao.delete_all(db)
+            count = await login_log_dao.delete_all(db)
             return count
+
+
+login_log_service: LoginLogService = LoginLogService()

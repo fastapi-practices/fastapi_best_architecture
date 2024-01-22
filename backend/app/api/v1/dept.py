@@ -9,7 +9,7 @@ from backend.app.common.permission import RequestPermission
 from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.schemas.dept import CreateDeptParam, GetDeptListDetails, UpdateDeptParam
-from backend.app.services.dept_service import DeptService
+from backend.app.services.dept_service import dept_service
 from backend.app.utils.serializers import select_as_dict
 
 router = APIRouter()
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    dept = await DeptService.get(pk=pk)
+    dept = await dept_service.get(pk=pk)
     data = GetDeptListDetails(**await select_as_dict(dept))
     return await response_base.success(data=data)
 
@@ -29,7 +29,7 @@ async def get_all_depts_tree(
     phone: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
-    dept = await DeptService.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
+    dept = await dept_service.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
     return await response_base.success(data=dept)
 
 
@@ -42,7 +42,7 @@ async def get_all_depts_tree(
     ],
 )
 async def create_dept(obj: CreateDeptParam) -> ResponseModel:
-    await DeptService.create(obj=obj)
+    await dept_service.create(obj=obj)
     return await response_base.success()
 
 
@@ -55,7 +55,7 @@ async def create_dept(obj: CreateDeptParam) -> ResponseModel:
     ],
 )
 async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> ResponseModel:
-    count = await DeptService.update(pk=pk, obj=obj)
+    count = await dept_service.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -70,7 +70,7 @@ async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> Re
     ],
 )
 async def delete_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    count = await DeptService.delete(pk=pk)
+    count = await dept_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()

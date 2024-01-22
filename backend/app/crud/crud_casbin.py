@@ -35,4 +35,4 @@ class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicyParam, UpdatePolicyParam]):
         return result.rowcount
 
 
-CasbinDao: CRUDCasbin = CRUDCasbin(CasbinRule)
+casbin_dao: CRUDCasbin = CRUDCasbin(CasbinRule)

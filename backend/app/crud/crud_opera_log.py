@@ -34,4 +34,4 @@ class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLogParam, UpdateOperaLogPara
         return logs.rowcount
 
 
-OperaLogDao: CRUDOperaLogDao = CRUDOperaLogDao(OperaLog)
+opera_log_dao: CRUDOperaLogDao = CRUDOperaLogDao(OperaLog)

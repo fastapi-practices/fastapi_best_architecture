@@ -11,7 +11,7 @@ from backend.app.common.rbac import DependsRBAC
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.database.db_mysql import CurrentSession
 from backend.app.schemas.dict_type import CreateDictTypeParam, GetDictTypeListDetails, UpdateDictTypeParam
-from backend.app.services.dict_type_service import DictTypeService
+from backend.app.services.dict_type_service import dict_type_service
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ async def get_pagination_dict_types(
     code: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
-    dict_type_select = await DictTypeService.get_select(name=name, code=code, status=status)
+    dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select, GetDictTypeListDetails)
     return await response_base.success(data=page_data)
 
@@ -44,7 +44,7 @@ async def get_pagination_dict_types(
     ],
 )
 async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
-    await DictTypeService.create(obj=obj)
+    await dict_type_service.create(obj=obj)
     return await response_base.success()
 
 
@@ -57,7 +57,7 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
     ],
 )
 async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypeParam) -> ResponseModel:
-    count = await DictTypeService.update(pk=pk, obj=obj)
+    count = await dict_type_service.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
@@ -72,7 +72,7 @@ async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypePar
     ],
 )
 async def delete_dict_type(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await DictTypeService.delete(pk=pk)
+    count = await dict_type_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
     return await response_base.fail()
