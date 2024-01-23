@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, EmailStr, validate_email
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 # 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
@@ -140,6 +141,12 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
 
 class CustomPhoneNumber(PhoneNumber):
     default_region_code = 'CN'
+
+
+class CustomEmailStr(EmailStr):
+    @classmethod
+    def _validate(cls, __input_value: str) -> str:
+        return None if __input_value == '' else validate_email(__input_value)[1]
 
 
 class SchemaBase(BaseModel):

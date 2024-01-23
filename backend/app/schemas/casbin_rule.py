@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import MethodType
 from backend.app.schemas.base import SchemaBase
@@ -10,13 +10,6 @@ class CreatePolicyParam(SchemaBase):
     sub: str = Field(..., description='用户uuid / 角色ID')
     path: str = Field(..., description='api 路径')
     method: MethodType = Field(default=MethodType.GET, description='请求方法')
-
-    @field_validator('method')
-    @classmethod
-    def method_validator(cls, v):
-        if not v.isupper():
-            raise ValueError('请求方式必须大写')
-        return v
 
 
 class UpdatePolicyParam(CreatePolicyParam):
