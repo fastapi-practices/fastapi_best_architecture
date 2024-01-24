@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict, EmailStr, Field
+from pydantic import ConfigDict, Field
 
 from backend.app.common.enums import StatusType
-from backend.app.schemas.base import CustomPhoneNumber, SchemaBase
+from backend.app.schemas.base import CustomEmailStr, CustomPhoneNumber, SchemaBase
 
 
 class DeptSchemaBase(SchemaBase):
@@ -14,7 +14,7 @@ class DeptSchemaBase(SchemaBase):
     sort: int = Field(default=0, ge=0, description='排序')
     leader: str | None = None
     phone: CustomPhoneNumber | None = None
-    email: EmailStr | None = None
+    email: CustomEmailStr | None = None
     status: StatusType = Field(default=StatusType.enable)
 
 
