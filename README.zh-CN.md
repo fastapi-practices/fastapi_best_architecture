@@ -215,11 +215,8 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 互动
 
-有且仅有当前一个频道，请注意辨别真伪
-
-| [直链跳转](https://t.me/+ZlPhIFkPp7E4NGI1) |
-|----------------------------------------|
-| Telegram（科学上网）                         |
+- [Telegram](https://t.me/+ZlPhIFkPp7E4NGI1)
+- [QQ](https://pd.qq.com/s/8rwhzt4ox)
 
 ## 赞助我们
 

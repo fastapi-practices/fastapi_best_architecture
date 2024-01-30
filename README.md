@@ -221,11 +221,8 @@ Execute unittests via pytest
 
 ## Interactivity
 
-We only have one current channel.
-
-| [Jump](https://t.me/+ZlPhIFkPp7E4NGI1) |
-|----------------------------------------|
-| Telegram                               |
+- [Telegram](https://t.me/+ZlPhIFkPp7E4NGI1)
+- [QQ](https://pd.qq.com/s/8rwhzt4ox)
 
 ## Sponsor us
 
