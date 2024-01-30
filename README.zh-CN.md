@@ -2,6 +2,7 @@
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > [!CAUTION]
 > **2023-12-21 (公告)**
@@ -24,6 +25,8 @@ Pydantic-V2 已完工 🎉
 mvc 架构作为常规设计模式，在 python web 中也很常见，但是三层架构更令人着迷
 
 在 python web 开发中，三层架构的概念并没有通用标准，所以这里我们称之为伪三层架构
+
+但请注意，我们并没有传统的多应用程序结构（django、springBoot...），如果您不喜欢这种模式，可以使用模板对其进行随意改造！
 
 | 工作流程 | java           | fastapi_best_architecture |
 |------|----------------|---------------------------|

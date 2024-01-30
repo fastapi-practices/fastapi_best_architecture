@@ -2,6 +2,7 @@
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > [!CAUTION]
 > **For 2023-12-21 (announcement)**
@@ -25,10 +26,13 @@ library open to any person or enterprise can be used for free!
 
 ## Pseudo three-tier architecture
 
-The mvc architecture is a common design pattern in python web, but the three-tier architecture is even more fascinating.
+The mvc architecture is a common design pattern in python web, but the three-tier architecture is even more fascinating
 
 In python web development, there is no common standard for the concept of three-tier architecture, so we'll call it a
 pseudo three-tier architecture here
+
+But please note that we don't have a traditional multi-app structure (django, springBoot...) If you don't like this
+pattern, use templates to transform it to your heart's content!
 
 | workflow       | java           | fastapi_best_architecture |
 |----------------|----------------|---------------------------|
