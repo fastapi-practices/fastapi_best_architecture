@@ -43,6 +43,41 @@ services:
         supervisord -c /fba/deploy/supervisor.conf
         supervisorctl restart fastapi_server
 
+  # For use fastapi_best_architecture_ui
+  fba_ui:
+    build:
+      context: ⚠️ your fba_ui folder directory ⚠️
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    container_name: fba_ui
+    restart: always
+    depends_on:
+      - fba_server
+    command:
+      - nginx
+      - -g
+      - daemon off;
+    volumes:
+      - fba_static:/www/fba_server/backend/app/static
+    networks:
+      - fba_network
+
+#  # If you use fba_ui, don't use fba_nginx
+#  fba_nginx:
+#    image: nginx
+#    ports:
+#      - "8000:80"
+#    container_name: fba_nginx
+#    restart: always
+#    depends_on:
+#      - fba_server
+#    volumes:
+#      - ../nginx.conf:/etc/nginx/nginx.conf:ro
+#      - fba_static:/www/fba_server/backend/app/static
+#    networks:
+#      - fba_network
+
   fba_mysql:
     image: mysql:8.0.29
     ports:
@@ -73,20 +108,6 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - fba_redis:/var/lib/redis
-    networks:
-      - fba_network
-
-  fba_nginx:
-    image: nginx
-    ports:
-      - "8000:80"
-    container_name: fba_nginx
-    restart: always
-    depends_on:
-      - fba_server
-    volumes:
-      - ../nginx.conf:/etc/nginx/nginx.conf:ro
-      - fba_static:/www/fba/backend/app/static
     networks:
       - fba_network
 
