@@ -43,6 +43,39 @@ services:
         supervisord -c /fba/deploy/supervisor.conf
         supervisorctl restart fastapi_server
 
+  fba_mysql:
+    image: mysql:8.0.29
+    ports:
+      - "${DOCKER_DB_MAP_PORT:-3306}:3306"
+    container_name: fba_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: fba
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - fba_mysql:/var/lib/mysql
+    networks:
+      - fba_network
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --lower_case_table_names=1
+
+  fba_redis:
+    image: redis:6.2.7
+    ports:
+      - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
+    container_name: fba_redis
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - fba_redis:/var/lib/redis
+    networks:
+      - fba_network
+
   # For use fastapi_best_architecture_ui
   fba_ui:
     build:
@@ -77,39 +110,6 @@ services:
 #      - fba_static:/www/fba_server/backend/app/static
 #    networks:
 #      - fba_network
-
-  fba_mysql:
-    image: mysql:8.0.29
-    ports:
-      - "${DOCKER_DB_MAP_PORT:-3306}:3306"
-    container_name: fba_mysql
-    restart: always
-    environment:
-      MYSQL_DATABASE: fba
-      MYSQL_ROOT_PASSWORD: 123456
-      TZ: Asia/Shanghai
-    volumes:
-      - fba_mysql:/var/lib/mysql
-    networks:
-      - fba_network
-    command:
-      --default-authentication-plugin=mysql_native_password
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --lower_case_table_names=1
-
-  fba_redis:
-    image: redis:6.2.7
-    ports:
-      - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
-    container_name: fba_redis
-    restart: always
-    environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - fba_redis:/var/lib/redis
-    networks:
-      - fba_network
 
   fba_rabbitmq:
     hostname: fba_rabbitmq
