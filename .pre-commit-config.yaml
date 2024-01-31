@@ -4,8 +4,8 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: end-of-file-fixer
-      - id: requirements-txt-fixer
       - id: check-yaml
+      - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.1.15
@@ -17,3 +17,14 @@ repos:
           - '--fix'
           - '--unsafe-fixes'
       - id: ruff-format
+
+  - repo: https://github.com/pdm-project/pdm
+    rev: 2.12.2
+    hooks:
+      - id: pdm-export
+        args:
+          - -o
+          - 'requirements.txt'
+          - '--without-hashes'
+        files: ^pdm.lock$
+      - id: pdm-lock-check
