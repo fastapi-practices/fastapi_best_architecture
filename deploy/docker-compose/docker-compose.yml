@@ -76,40 +76,41 @@ services:
     networks:
       - fba_network
 
-  # For use fastapi_best_architecture_ui
-  fba_ui:
-    build:
-      context: ⚠️ your fba_ui folder directory ⚠️
-      dockerfile: Dockerfile
-    ports:
-      - "8000:80"
-    container_name: fba_ui
-    restart: always
-    depends_on:
-      - fba_server
-    command:
-      - nginx
-      - -g
-      - daemon off;
-    volumes:
-      - fba_static:/www/fba_server/backend/app/static
-    networks:
-      - fba_network
-
-#  # If you use fba_ui, don't use fba_nginx
-#  fba_nginx:
-#    image: nginx
+#  # For use fastapi_best_architecture_ui, or online/pro env
+#  fba_ui:
+#    build:
+#      context: ⚠️ your fba_ui folder directory ⚠️
+#      dockerfile: Dockerfile
 #    ports:
-#      - "8000:80"
-#    container_name: fba_nginx
+#      - "80:80"
+#      - "443:443"
+#    container_name: fba_ui
 #    restart: always
 #    depends_on:
 #      - fba_server
+#    command:
+#      - nginx
+#      - -g
+#      - daemon off;
 #    volumes:
-#      - ../nginx.conf:/etc/nginx/nginx.conf:ro
 #      - fba_static:/www/fba_server/backend/app/static
 #    networks:
 #      - fba_network
+
+  # Good for server dev env
+  fba_nginx:
+    image: nginx
+    ports:
+      - "8000:80"
+    container_name: fba_nginx
+    restart: always
+    depends_on:
+      - fba_server
+    volumes:
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
+      - fba_static:/www/fba_server/backend/app/static
+    networks:
+      - fba_network
 
   fba_rabbitmq:
     hostname: fba_rabbitmq
