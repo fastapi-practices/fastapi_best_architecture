@@ -225,7 +225,7 @@ Execute unittests via pytest
 
 ## Interactivity
 
-[TG / WeChat / QQ](https://github.com/wu-clan)
+[WeChat / QQ](https://github.com/wu-clan)
 
 ## Sponsor us
 
