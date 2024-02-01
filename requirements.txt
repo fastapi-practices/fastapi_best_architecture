@@ -58,7 +58,7 @@ packaging==23.2
 passlib==1.7.4
 path==15.1.2
 phonenumbers==8.13.27
-pillow==9.5.0
+pillow==10.2.0
 platformdirs==4.2.0
 pluggy==1.4.0
 pre-commit==3.2.2
