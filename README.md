@@ -225,8 +225,7 @@ Execute unittests via pytest
 
 ## Interactivity
 
-- [Telegram](https://t.me/+ZlPhIFkPp7E4NGI1)
-- [QQ](https://pd.qq.com/s/8rwhzt4ox)
+[WeChat / QQ](https://github.com/wu-clan)
 
 ## Sponsor us
 
