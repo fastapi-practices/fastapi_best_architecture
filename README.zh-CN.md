@@ -38,9 +38,10 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 在线预览
 
-遗憾的是，我们没有资金提供在线预览，您可以通过查看[本地开发](#本地开发)进行部署，或直接使用 [Docker](#docker-部署)
-进行部署，或者在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
-查看部分截图预览
+你可以在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 中查看部分预览截图
+
+幸运的是，我们现在有一个演示站点: [FBA UI](https://fba.xwboy.top/)
+> 账号 / 密码: admin / 123456
 
 ## 特征
 

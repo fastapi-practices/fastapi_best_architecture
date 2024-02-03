@@ -42,12 +42,13 @@ pattern, use templates to transform it to your heart's content!
 | data access    | dao / mapper   | crud                      |
 | model          | model / entity | model                     |
 
-## Online preview
+## Online Demo
 
-Unfortunately, we don't have the funds to provide an online preview, you can deploy by checking
-out [local-development](#local-development), or directly using [Docker](#docker-deploy)
-to deploy, or at [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
-See a preview of some of the screenshots
+You can view some of the preview screenshots
+in [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
+
+Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
+> username / password: admin / 123456
 
 ## Features
 
