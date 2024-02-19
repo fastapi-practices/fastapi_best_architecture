@@ -46,9 +46,11 @@ async def _validation_exception_handler(request: Request, e: RequestValidationEr
         message = 'json解析失败'
     else:
         error_input = error.get('input')
+        # TODO: 通过 schema Field(title=xxx) 更换 field 为直译内容，使报错信息更友好
+        # 但目前这无法实现：https://github.com/pydantic/pydantic/issues/7224
         field = str(error.get('loc')[-1])
         error_msg = error.get('msg')
-        message = f'{field} {error_msg}，输入：{error_input}'
+        message = f'{error_msg}{field}，输入：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
     msg = f'请求参数非法: {message}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
     content = {
