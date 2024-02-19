@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database.db_mysql import uuid4_str
 from backend.app.models.base import Base, id_key
+from backend.app.models.sys_user_oauth2 import sys_user_oauth2
 from backend.app.models.sys_user_role import sys_user_role
 from backend.app.utils.timezone import timezone
 
@@ -40,4 +41,8 @@ class User(Base):
     # 用户角色多对多
     roles: Mapped[list['Role']] = relationship(  # noqa: F821
         init=False, secondary=sys_user_role, back_populates='users'
+    )
+    # 用户 OAuth2 多对多
+    oauth2: Mapped[list['SocialUser']] = relationship(  # noqa: F821
+        init=False, secondary=sys_user_oauth2, back_populates='users'
     )

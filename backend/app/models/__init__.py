@@ -15,3 +15,4 @@ from backend.app.models.sys_menu import Menu
 from backend.app.models.sys_opera_log import OperaLog
 from backend.app.models.sys_role import Role
 from backend.app.models.sys_user import User
+from backend.app.models.sys_social_user import SocialUser
