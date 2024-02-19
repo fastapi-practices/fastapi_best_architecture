@@ -22,5 +22,5 @@ class SocialUser(Base):
     code: Mapped[str] = mapped_column(String(50), default=None, comment='用户的授权 code')
     # 用户 OAuth2 多对多
     users: Mapped[list['User']] = relationship(  # noqa: F821
-        init=False, secondary=sys_user_oauth2, back_populates='oauth2'
+        init=False, secondary=sys_user_oauth2, back_populates='social_user'
     )
