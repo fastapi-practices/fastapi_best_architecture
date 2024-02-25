@@ -43,6 +43,6 @@ class User(Base):
         init=False, secondary=sys_user_role, back_populates='users'
     )
     # 用户 OAuth2 多对多
-    oauth2: Mapped[list['SocialUser']] = relationship(  # noqa: F821
+    social_user: Mapped[list['SocialUser']] = relationship(  # noqa: F821
         init=False, secondary=sys_user_oauth2, back_populates='users'
     )

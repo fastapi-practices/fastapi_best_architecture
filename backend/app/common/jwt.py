@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from asgiref.sync import sync_to_async
 from fastapi import Depends, Request
-from fastapi.security import HTTPBearer, OAuth2PasswordBearer
+from fastapi.security import HTTPBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from passlib.context import CryptContext
@@ -19,8 +19,6 @@ from backend.app.utils.timezone import timezone
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-# Deprecated, may be enabled when oauth2 is actually integrated
-oauth2_schema = OAuth2PasswordBearer(tokenUrl=settings.TOKEN_URL_SWAGGER)
 
 # JWT authorizes dependency injection
 DependsJwtAuth = Depends(HTTPBearer())

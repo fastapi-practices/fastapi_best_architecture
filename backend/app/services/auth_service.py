@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from fastapi import Request
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import HTTPBasicCredentials
 from starlette.background import BackgroundTask, BackgroundTasks
 
 from backend.app.common import jwt
@@ -24,17 +24,17 @@ from backend.app.utils.timezone import timezone
 class AuthService:
     login_time = timezone.now()
 
-    async def swagger_login(self, *, form_data: OAuth2PasswordRequestForm) -> tuple[str, User]:
+    async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
         async with async_db_session() as db:
-            current_user = await user_dao.get_by_username(db, form_data.username)
+            current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not await jwt.password_verify(form_data.password + current_user.salt, current_user.password):
+            elif not await jwt.password_verify(obj.password + current_user.salt, current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
             # 更新登陆时间
-            await user_dao.update_login_time(db, form_data.username, self.login_time)
+            await user_dao.update_login_time(db, obj.username, self.login_time)
             # 获取最新用户信息
             user = await user_dao.get(db, current_user.id)
             # 创建token

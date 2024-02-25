@@ -3,7 +3,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import HTTPBasicCredentials
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
@@ -16,14 +16,9 @@ from backend.app.services.auth_service import auth_service
 router = APIRouter()
 
 
-@router.post(
-    '/swagger_login',
-    summary='swagger 表单登录',
-    description='form 格式登录，用于 swagger 文档调试以及获取 JWT Auth',
-    deprecated=True,
-)
-async def swagger_user_login(form_data: OAuth2PasswordRequestForm = Depends()) -> GetSwaggerToken:
-    token, user = await auth_service.swagger_login(form_data=form_data)
+@router.post('/swagger_login', summary='swagger 登录', description='用于快捷获取 token 进行 swagger 认证')
+async def swagger_user_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetSwaggerToken:
+    token, user = await auth_service.swagger_login(obj=obj)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore
 
 
