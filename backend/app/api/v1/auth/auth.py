@@ -16,7 +16,7 @@ from backend.app.services.auth_service import auth_service
 router = APIRouter()
 
 
-@router.post('/swagger_login', summary='swagger 登录', description='用于快捷获取 token 进行 swagger 认证')
+@router.post('/login/swagger', summary='swagger 调试专用', description='用于快捷获取 token 进行 swagger 认证')
 async def swagger_user_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetSwaggerToken:
     token, user = await auth_service.swagger_login(obj=obj)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore

@@ -8,7 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database.db_mysql import uuid4_str
 from backend.app.models.base import Base, id_key
-from backend.app.models.sys_user_oauth2 import sys_user_oauth2
 from backend.app.models.sys_user_role import sys_user_role
 from backend.app.utils.timezone import timezone
 
@@ -22,7 +21,7 @@ class User(Base):
     uuid: Mapped[str] = mapped_column(String(50), init=False, default_factory=uuid4_str, unique=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='用户名')
     nickname: Mapped[str] = mapped_column(String(20), unique=True, comment='昵称')
-    password: Mapped[str] = mapped_column(String(255), comment='密码')
+    password: Mapped[str | None] = mapped_column(String(255), comment='密码')
     salt: Mapped[str] = mapped_column(String(5), comment='加密盐')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
@@ -42,7 +41,5 @@ class User(Base):
     roles: Mapped[list['Role']] = relationship(  # noqa: F821
         init=False, secondary=sys_user_role, back_populates='users'
     )
-    # 用户 OAuth2 多对多
-    social_user: Mapped[list['SocialUser']] = relationship(  # noqa: F821
-        init=False, secondary=sys_user_oauth2, back_populates='users'
-    )
+    # 用户 OAuth2 一对多
+    socials: Mapped[list['UserSocial']] = relationship(init=False, back_populates='user')  # noqa: F821

@@ -38,6 +38,10 @@ class UserService:
             email = await user_dao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='该邮箱已注册')
+            if not obj.social and not obj.password:
+                raise errors.ForbiddenError(msg='密码为空')
+            elif obj.social and obj.password:
+                raise errors.ForbiddenError(msg='OAuth 2.0 不支持提供密码')
             await user_dao.create(db, obj)
 
     @staticmethod
@@ -51,6 +55,11 @@ class UserService:
             nickname = await user_dao.get_by_nickname(db, obj.nickname)
             if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
+            if not obj.password:
+                raise errors.ForbiddenError(msg='密码为空')
+            email = await user_dao.check_email(db, obj.email)
+            if email:
+                raise errors.ForbiddenError(msg='该邮箱已注册')
             dept = await dept_dao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -58,9 +67,6 @@ class UserService:
                 role = await role_dao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
-            email = await user_dao.check_email(db, obj.email)
-            if email:
-                raise errors.ForbiddenError(msg='该邮箱已注册')
             await user_dao.add(db, obj)
 
     @staticmethod

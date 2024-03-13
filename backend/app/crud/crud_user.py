@@ -34,17 +34,21 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         return user.rowcount
 
     async def create(self, db: AsyncSession, obj: RegisterUserParam) -> None:
-        salt = text_captcha(5)
-        obj.password = await jwt.get_hash_password(obj.password + salt)
-        dict_obj = obj.model_dump()
-        dict_obj.update({'salt': salt})
-        new_user = self.model(**dict_obj)
-        db.add(new_user)
+        if not obj.social:
+            salt = text_captcha(5)
+            obj.password = await jwt.get_hash_password(obj.password + salt)
+            dict_obj = obj.model_dump(exclude={'social'})
+            dict_obj.update({'salt': salt})
+            new_user = self.model(**dict_obj)
+            db.add(new_user)
+        else:
+            dict_obj = obj.model_dump()
+            # TODO
 
     async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         salt = text_captcha(5)
         obj.password = await jwt.get_hash_password(obj.password + salt)
-        dict_obj = obj.model_dump(exclude={'roles'})
+        dict_obj = obj.model_dump(exclude={'roles', 'social'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
         role_list = []

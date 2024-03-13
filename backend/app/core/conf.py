@@ -46,8 +46,8 @@ class Settings(BaseSettings):
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # OAuth2
-    OAUTH2_GOOGLE_CLIENT_ID: str
-    OAUTH2_GOOGLE_CLIENT_SECRET: str
+    OAUTH2_GITHUB_CLIENT_ID: str
+    OAUTH2_GITHUB_CLIENT_SECRET: str
 
     # FastAPI
     API_V1_STR: str = '/api/v1'
@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     }
 
     # OAuth2
-    OAUTH2_GOOGLE_REDIRECT_URI: str = 'http://localhost:8000/auth/google'
+    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/auth/github/callback'
 
     # Uvicorn
     UVICORN_HOST: str = '127.0.0.1'
