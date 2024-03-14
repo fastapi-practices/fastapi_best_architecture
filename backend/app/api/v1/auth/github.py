@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
-from starlette.responses import RedirectResponse
 
 from app.services.github_service import github_service
 from backend.app.common.response.response_schema import ResponseModel, response_base
@@ -27,7 +26,7 @@ async def auth_github() -> ResponseModel:
 )
 async def login_github(
     request: Request, background_tasks: BackgroundTasks, oauth: FastAPIOAuth20 = Depends(github_oauth2)
-) -> ResponseModel | RedirectResponse:
+) -> ResponseModel:
     token, state = oauth
     access_token = token['access_token']
     user = await github_client.get_userinfo(access_token)
