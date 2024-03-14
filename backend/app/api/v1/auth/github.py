@@ -4,7 +4,6 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
 from starlette.responses import RedirectResponse
 
-from app.common.response.response_code import StandardResponseCode
 from app.services.github_service import github_service
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.core.conf import settings
@@ -33,6 +32,4 @@ async def login_github(
     access_token = token['access_token']
     user = await github_client.get_userinfo(access_token)
     data = await github_service.add_with_login(request, background_tasks, user)
-    if not data:
-        return RedirectResponse(url='/', status_code=StandardResponseCode.HTTP_302)
-    return await response_base.success(data=user)
+    return await response_base.success(data=data)

@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks, Request
 
 from app.common import jwt
 from app.common.enums import LoginLogStatusType, UserSocialType
+from app.common.exception.errors import AuthorizationError
 from app.common.redis import redis_client
 from app.core.conf import settings
 from app.crud.crud_user import user_dao
@@ -23,7 +24,7 @@ class GithubService:
         async with async_db_session.begin() as db:
             email = user['email']
             if not email:
-                return None
+                raise AuthorizationError(msg='授权失败，GitHub 账户未绑定邮箱')
             username = user['login']
             nickname = user['name']
             sys_user = await user_dao.get_by_username(db, username)
