@@ -37,14 +37,18 @@ class GithubService:
                 sys_user = await user_dao.get_by_nickname(db, github_nickname)
                 if sys_user:
                     github_nickname = f'{github_nickname}{text_captcha(5)}'
-                new_sys_user = RegisterUserParam(username=github_username, password=None, nickname=github_nickname, email=github_email)
-                await user_dao.create(db, new_sys_user)
+                new_sys_user = RegisterUserParam(
+                    username=github_username, password=None, nickname=github_nickname, email=github_email
+                )
+                await user_dao.create(db, new_sys_user, social=True)
                 await db.flush()
                 sys_user = await user_dao.check_email(db, github_email)
             # 绑定社交用户
             user_social = await user_social_dao.get(db, sys_user.id, UserSocialType.github)
             if not user_social:
-                new_user_social = CreateUserSocialParam(source=UserSocialType.github, uid=str(github_id), user_id=sys_user.id)
+                new_user_social = CreateUserSocialParam(
+                    source=UserSocialType.github, uid=str(github_id), user_id=sys_user.id
+                )
                 await user_social_dao.create(db, new_user_social)
             # 创建 token
             access_token, access_token_expire_time = await jwt.create_access_token(

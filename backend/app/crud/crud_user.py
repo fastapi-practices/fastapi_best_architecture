@@ -31,11 +31,15 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         )
         return user.rowcount
 
-    async def create(self, db: AsyncSession, obj: RegisterUserParam) -> None:
-        salt = text_captcha(5)
-        obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
-        dict_obj = obj.model_dump()
-        dict_obj.update({'salt': salt})
+    async def create(self, db: AsyncSession, obj: RegisterUserParam, *, social: bool = False) -> None:
+        if not social:
+            salt = text_captcha(5)
+            obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
+            dict_obj = obj.model_dump()
+            dict_obj.update({'salt': salt})
+        else:
+            dict_obj = obj.model_dump()
+            dict_obj.update({'salt': None})
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
