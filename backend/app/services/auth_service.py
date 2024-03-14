@@ -22,7 +22,7 @@ from backend.app.utils.timezone import timezone
 class AuthService:
     @staticmethod
     async def swagger_login(obj: HTTPBasicCredentials) -> tuple[str, User]:
-        async with async_db_session() as db:
+        async with async_db_session.begin() as db:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -34,12 +34,12 @@ class AuthService:
                 str(current_user.id), multi_login=current_user.is_multi_login
             )
             await user_dao.update_login_time(db, obj.username)
-            user = await user_dao.get(db, current_user.id)
-            return access_token, user
+            await db.refresh(current_user)
+            return access_token, current_user
 
     @staticmethod
     async def login(*, request: Request, obj: AuthLoginParam, background_tasks: BackgroundTasks) -> GetLoginToken:
-        async with async_db_session() as db:
+        async with async_db_session.begin() as db:
             try:
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
@@ -60,7 +60,7 @@ class AuthService:
                     str(current_user.id), access_token_expire_time, multi_login=current_user.is_multi_login
                 )
                 await user_dao.update_login_time(db, obj.username)
-                user = await user_dao.get(db, current_user.id)
+                await db.refresh(current_user)
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
@@ -80,7 +80,7 @@ class AuthService:
                 login_log = dict(
                     db=db,
                     request=request,
-                    user=user,
+                    user=current_user,
                     login_time=timezone.now(),
                     status=LoginLogStatusType.success.value,
                     msg='登录成功',
@@ -92,7 +92,7 @@ class AuthService:
                     refresh_token=refresh_token,
                     access_token_expire_time=access_token_expire_time,
                     refresh_token_expire_time=refresh_token_expire_time,
-                    user=user,  # type: ignore
+                    user=current_user,  # type: ignore
                 )
                 return data
 

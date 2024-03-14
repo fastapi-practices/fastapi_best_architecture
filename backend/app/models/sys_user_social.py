@@ -14,12 +14,12 @@ class UserSocial(Base):
     __tablename__ = 'sys_user_social'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    source: Mapped[str] = mapped_column(String(20), default=None, comment='第三方用户来源')
-    open_id: Mapped[str] = mapped_column(String(20), default=None, comment='第三方用户的 open id')
-    uid: Mapped[str] = mapped_column(String(20), default=None, comment='第三方用户的 ID')
-    union_id: Mapped[str] = mapped_column(String(20), default=None, comment='第三方用户的 union id')
-    scope: Mapped[str] = mapped_column(String(120), default=None, comment='第三方用户授予的权限')
-    code: Mapped[str] = mapped_column(String(50), default=None, comment='用户的授权 code')
+    source: Mapped[str] = mapped_column(String(20), comment='第三方用户来源')
+    open_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 open id')
+    uid: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 ID')
+    union_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 union id')
+    scope: Mapped[str | None] = mapped_column(String(120), default=None, comment='第三方用户授予的权限')
+    code: Mapped[str | None] = mapped_column(String(50), default=None, comment='用户的授权 code')
     # 用户 OAuth2 一对多
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_user.id', ondelete='SET NULL'), default=None, comment='用户关联ID'

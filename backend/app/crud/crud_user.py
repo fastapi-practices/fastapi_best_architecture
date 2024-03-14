@@ -29,7 +29,6 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         user = await db.execute(
             update(self.model).where(self.model.username == username).values(last_login_time=timezone.now())
         )
-        await db.commit()
         return user.rowcount
 
     async def create(self, db: AsyncSession, obj: RegisterUserParam) -> None:
