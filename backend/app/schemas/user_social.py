@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from app.common.enums import UserSocialType
-from app.schemas.base import SchemaBase
+from backend.app.common.enums import UserSocialType
+from backend.app.schemas.base import SchemaBase
 
 
 class UserSocialSchemaBase(SchemaBase):

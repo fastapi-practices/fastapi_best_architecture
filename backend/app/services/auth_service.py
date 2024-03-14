@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from fastapi import Request
 from fastapi.security import HTTPBasicCredentials
 from starlette.background import BackgroundTask, BackgroundTasks
 
-from app.schemas.token import GetLoginToken, GetNewToken
 from backend.app.common import jwt
 from backend.app.common.enums import LoginLogStatusType
 from backend.app.common.exception import errors
@@ -15,6 +13,7 @@ from backend.app.core.conf import settings
 from backend.app.crud.crud_user import user_dao
 from backend.app.database.db_mysql import async_db_session
 from backend.app.models import User
+from backend.app.schemas.token import GetLoginToken, GetNewToken
 from backend.app.schemas.user import AuthLoginParam
 from backend.app.services.login_log_service import LoginLogService
 from backend.app.utils.timezone import timezone

@@ -3,9 +3,9 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
 
-from app.services.github_service import github_service
 from backend.app.common.response.response_schema import ResponseModel, response_base
 from backend.app.core.conf import settings
+from backend.app.services.github_service import github_service
 
 router = APIRouter()
 
@@ -23,6 +23,7 @@ async def auth_github() -> ResponseModel:
     '/github/callback',
     summary='Github 授权重定向',
     description='Github 授权后，自动重定向到当前地址并获取用户信息，通过用户信息自动创建系统用户',
+    response_model=None,
 )
 async def login_github(
     request: Request, background_tasks: BackgroundTasks, oauth: FastAPIOAuth20 = Depends(github_oauth2)

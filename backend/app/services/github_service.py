@@ -3,19 +3,19 @@
 from fast_captcha import text_captcha
 from fastapi import BackgroundTasks, Request
 
-from app.common import jwt
-from app.common.enums import LoginLogStatusType, UserSocialType
-from app.common.exception.errors import AuthorizationError
-from app.common.redis import redis_client
-from app.core.conf import settings
-from app.crud.crud_user import user_dao
-from app.crud.crud_user_social import user_social_dao
-from app.database.db_mysql import async_db_session
-from app.schemas.token import GetLoginToken
-from app.schemas.user import RegisterUserParam
-from app.schemas.user_social import CreateUserSocialParam
-from app.services.login_log_service import LoginLogService
-from app.utils.timezone import timezone
+from backend.app.common import jwt
+from backend.app.common.enums import LoginLogStatusType, UserSocialType
+from backend.app.common.exception.errors import AuthorizationError
+from backend.app.common.redis import redis_client
+from backend.app.core.conf import settings
+from backend.app.crud.crud_user import user_dao
+from backend.app.crud.crud_user_social import user_social_dao
+from backend.app.database.db_mysql import async_db_session
+from backend.app.schemas.token import GetLoginToken
+from backend.app.schemas.user import RegisterUserParam
+from backend.app.schemas.user_social import CreateUserSocialParam
+from backend.app.services.login_log_service import LoginLogService
+from backend.app.utils.timezone import timezone
 
 
 class GithubService:

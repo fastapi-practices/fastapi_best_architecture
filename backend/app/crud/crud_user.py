@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from fast_captcha import text_captcha
 from sqlalchemy import and_, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
 
-from app.utils.timezone import timezone
 from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Role, User
 from backend.app.schemas.user import AddUserParam, AvatarParam, RegisterUserParam, UpdateUserParam, UpdateUserRoleParam
+from backend.app.utils.timezone import timezone
 
 
 class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.base import CRUDBase
-from app.models import UserSocial
-from app.schemas.user_social import CreateUserSocialParam, UpdateUserSocialParam
+from backend.app.crud.base import CRUDBase
+from backend.app.models import UserSocial
+from backend.app.schemas.user_social import CreateUserSocialParam, UpdateUserSocialParam
 
 
 class CRUDOUserSocial(CRUDBase[UserSocial, CreateUserSocialParam, UpdateUserSocialParam]):
