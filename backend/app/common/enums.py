@@ -81,3 +81,9 @@ class StatusType(IntEnum):
 
     disable = 0
     enable = 1
+
+
+class UserSocialType(StrEnum):
+    """用户社交类型"""
+
+    github = 'GitHub'

@@ -15,4 +15,4 @@ class CRUDOUserSocial(CRUDBase[UserSocial, CreateUserSocialParam, UpdateUserSoci
         return await self.delete_(db, social_id)
 
 
-crud_user_social: CRUDOUserSocial = CRUDOUserSocial(UserSocial)
+user_social_dao: CRUDOUserSocial = CRUDOUserSocial(UserSocial)

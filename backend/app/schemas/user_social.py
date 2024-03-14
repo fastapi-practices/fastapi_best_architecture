@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from app.common.enums import UserSocialType
 from app.schemas.base import SchemaBase
 
 
 class UserSocialSchemaBase(SchemaBase):
-    source: str
+    source: UserSocialType
     open_id: str | None = None
     uid: str | None = None
     union_id: str | None = None

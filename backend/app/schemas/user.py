@@ -22,7 +22,6 @@ class AuthLoginParam(AuthSchemaBase):
 class RegisterUserParam(AuthSchemaBase):
     nickname: str | None = None
     email: EmailStr = Field(..., example='user@example.com')
-    social: str | None = None
 
 
 class AddUserParam(AuthSchemaBase):
