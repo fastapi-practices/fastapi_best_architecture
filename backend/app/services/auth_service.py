@@ -34,7 +34,6 @@ class AuthService:
                 str(current_user.id), multi_login=current_user.is_multi_login
             )
             await user_dao.update_login_time(db, obj.username)
-            await db.refresh(current_user)
             return access_token, current_user
 
     @staticmethod
