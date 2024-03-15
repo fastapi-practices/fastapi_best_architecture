@@ -6,7 +6,7 @@ cache-dir = "./.ruff_cache"
 "backend/app/api/v1/*.py" = ["TCH"]
 "backend/app/models/*.py" = ["TCH003"]
 "backend/app/**/__init__.py" = ["F401"]
-"backend/app/tests/*.py" = ["E402"]
+"backend/app/**/tests/*.py" = ["E402"]
 
 [lint]
 select = [

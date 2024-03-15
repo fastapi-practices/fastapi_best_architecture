@@ -4,9 +4,9 @@ __pycache__/
 venv/
 .venv/
 .mypy_cache/
-backend/app/log/
-backend/app/alembic/versions/
-backend/app/static/media/
+backend/log/
+backend/alembic/versions/
+backend/static/media/
 .ruff_cache/
 .pytest_cache/
 .pdm-python
