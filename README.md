@@ -173,19 +173,13 @@ Initialize the test data using the `backend/sql/init_test_data.sql` file
 
 ## Development process
 
-For reference only
-
-### BackEnd
+(For reference only)
 
 1. Define the database model (model) and remember to perform database migration for each change
 2. Define the data validation model (schema)
 3. Define routes (router) and views (api)
 4. Define the business logic (service)
 5. Write database operations (crud)
-
-### Front
-
-Go to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
 
 ## Test
 

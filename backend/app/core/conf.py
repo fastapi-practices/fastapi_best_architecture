@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     # Env Opera Log
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
-    # OAuth2
+    # OAuth2：https://github.com/fastapi-practices/fastapi_oauth20
     OAUTH2_GITHUB_CLIENT_ID: str
     OAUTH2_GITHUB_CLIENT_SECRET: str
 
