@@ -5,7 +5,7 @@
 groups = ["default", "deploy"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:4dec29a5afb6315a1fb1ec1782576c9e54e27104b7e883525cc65cd097a39430"
+content_hash = "sha256:06e039c331218934838e6c6865b0c78b8cb14142c3f90f23f7d36844f9a20a09"
 
 [[package]]
 name = "aiofiles"
@@ -531,6 +531,21 @@ dependencies = [
 files = [
     {file = "fastapi_limiter-0.1.6-py3-none-any.whl", hash = "sha256:2e53179a4208b8f2c8795e38bb001324d3dc37d2800ff49fd28ec5caabf7a240"},
     {file = "fastapi_limiter-0.1.6.tar.gz", hash = "sha256:6f5fde8efebe12eb33861bdffb91009f699369a3c2862cdc7c1d9acf912ff443"},
+]
+
+[[package]]
+name = "fastapi-oauth20"
+version = "0.0.1a1"
+requires_python = ">=3.10"
+summary = "在 FastAPI 中异步授权 OAuth2 客户端"
+groups = ["default"]
+dependencies = [
+    "fastapi>=0.100.0",
+    "httpx>=0.18.0",
+]
+files = [
+    {file = "fastapi_oauth20-0.0.1a1-py3-none-any.whl", hash = "sha256:02247a49f1c9ffc364d13857dc29abf49783f36bbefa4632e196aca778f58ede"},
+    {file = "fastapi_oauth20-0.0.1a1.tar.gz", hash = "sha256:f3d2eda24c10fdfe81735859f0346a8bdb687246193134bc285c8110daf1c221"},
 ]
 
 [[package]]

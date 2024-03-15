@@ -166,19 +166,13 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 开发流程
 
-仅供参考
-
-### 后端：
+（仅供参考）
 
 1. 定义数据库模型（model），每次变化记得执行数据库迁移
 2. 定义数据验证模型（schema）
 3. 定义路由（router）和视图（api）
 4. 定义业务逻辑（service）
 5. 编写数据库操作（crud）
-
-### 前端
-
-跳转 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
 ## 测试
 

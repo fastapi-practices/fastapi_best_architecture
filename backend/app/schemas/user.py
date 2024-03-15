@@ -12,7 +12,7 @@ from backend.app.schemas.role import GetRoleListDetails
 
 class AuthSchemaBase(SchemaBase):
     username: str
-    password: str
+    password: str | None
 
 
 class AuthLoginParam(AuthSchemaBase):

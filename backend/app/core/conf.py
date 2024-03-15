@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     # Env Opera Log
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
+    # OAuth2：https://github.com/fastapi-practices/fastapi_oauth20
+    OAUTH2_GITHUB_CLIENT_ID: str
+    OAUTH2_GITHUB_CLIENT_SECRET: str
+
     # FastAPI
     API_V1_STR: str = '/api/v1'
     TITLE: str = 'FastAPI'
@@ -69,6 +73,9 @@ class Settings(BaseSettings):
         ('POST', f'{API_V1_STR}/auth/logout'),
         ('GET', f'{API_V1_STR}/auth/captcha'),
     }
+
+    # OAuth2
+    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/auth/github/callback'
 
     # Uvicorn
     UVICORN_HOST: str = '127.0.0.1'

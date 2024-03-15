@@ -46,6 +46,7 @@ dependencies = [
     "user-agents==2.2.0",
     "uvicorn[standard]==0.24.0",
     "XdbSearchIP==1.0.2",
+    "fastapi-oauth20>=0.0.1a1",
 ]
 requires-python = ">=3.10"
 readme = "README.md"

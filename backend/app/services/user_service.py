@@ -28,6 +28,8 @@ class UserService:
     @staticmethod
     async def register(*, obj: RegisterUserParam) -> None:
         async with async_db_session.begin() as db:
+            if not obj.password:
+                raise errors.ForbiddenError(msg='密码为空')
             username = await user_dao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='该用户名已注册')
@@ -51,6 +53,11 @@ class UserService:
             nickname = await user_dao.get_by_nickname(db, obj.nickname)
             if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
+            if not obj.password:
+                raise errors.ForbiddenError(msg='密码为空')
+            email = await user_dao.check_email(db, obj.email)
+            if email:
+                raise errors.ForbiddenError(msg='该邮箱已注册')
             dept = await dept_dao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -58,16 +65,12 @@ class UserService:
                 role = await role_dao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
-            email = await user_dao.check_email(db, obj.email)
-            if email:
-                raise errors.ForbiddenError(msg='该邮箱已注册')
             await user_dao.add(db, obj)
 
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
         async with async_db_session.begin() as db:
-            op = obj.old_password
-            if not await password_verify(op + request.user.salt, request.user.password):
+            if not await password_verify(f'{obj.old_password}{request.user.salt}', request.user.password):
                 raise errors.ForbiddenError(msg='旧密码错误')
             np1 = obj.new_password
             np2 = obj.confirm_password

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime
-
 from fast_captcha import text_captcha
 from sqlalchemy import and_, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +10,7 @@ from backend.app.common import jwt
 from backend.app.crud.base import CRUDBase
 from backend.app.models import Role, User
 from backend.app.schemas.user import AddUserParam, AvatarParam, RegisterUserParam, UpdateUserParam, UpdateUserRoleParam
+from backend.app.utils.timezone import timezone
 
 
 class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
@@ -26,24 +25,27 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         user = await db.execute(select(self.model).where(self.model.nickname == nickname))
         return user.scalars().first()
 
-    async def update_login_time(self, db: AsyncSession, username: str, login_time: datetime) -> int:
+    async def update_login_time(self, db: AsyncSession, username: str) -> int:
         user = await db.execute(
-            update(self.model).where(self.model.username == username).values(last_login_time=login_time)
+            update(self.model).where(self.model.username == username).values(last_login_time=timezone.now())
         )
-        await db.commit()
         return user.rowcount
 
-    async def create(self, db: AsyncSession, obj: RegisterUserParam) -> None:
-        salt = text_captcha(5)
-        obj.password = await jwt.get_hash_password(obj.password + salt)
-        dict_obj = obj.model_dump()
-        dict_obj.update({'salt': salt})
+    async def create(self, db: AsyncSession, obj: RegisterUserParam, *, social: bool = False) -> None:
+        if not social:
+            salt = text_captcha(5)
+            obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
+            dict_obj = obj.model_dump()
+            dict_obj.update({'salt': salt})
+        else:
+            dict_obj = obj.model_dump()
+            dict_obj.update({'salt': None})
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
     async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         salt = text_captcha(5)
-        obj.password = await jwt.get_hash_password(obj.password + salt)
+        obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)

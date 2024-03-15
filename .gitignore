@@ -2,6 +2,7 @@ __pycache__/
 .idea/
 .env
 venv/
+.venv/
 .mypy_cache/
 backend/app/log/
 backend/app/alembic/versions/
