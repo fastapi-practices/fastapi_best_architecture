@@ -228,3 +228,5 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 ## 许可证
 
 本项目根据 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
+
+[![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)

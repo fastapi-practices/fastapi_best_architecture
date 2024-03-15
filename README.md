@@ -237,3 +237,5 @@ beans: [:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
 
 This project is licensed under the terms of
 the [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) license
+
+[![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)
