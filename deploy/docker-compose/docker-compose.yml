@@ -76,29 +76,8 @@ services:
     networks:
       - fba_network
 
-  #  # If you choose to use fastapi_best_architecture_ui (fba_ui), you can open this annotation
-  #  fba_ui:
-  #    build:
-  #      context: ⚠️ fba_ui folder directory
-  #      dockerfile: Dockerfile
-  #    ports:
-  #      - "80:80"
-  #      - "443:443"
-  #    container_name: fba_ui
-  #    restart: always
-  #    depends_on:
-  #      - fba_server
-  #    command:
-  #      - nginx
-  #      - -g
-  #      - daemon off;
-  #    volumes:
-  #      - fba_static:/www/fba_server/backend/app/static
-  #    networks:
-  #      - fba_network
-
   # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
-  # you should stop using this container
+  # you should stop using fba_nginx container
   fba_nginx:
     image: nginx
     ports:
