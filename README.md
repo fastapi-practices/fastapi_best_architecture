@@ -4,8 +4,7 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-> [!CAUTION]
-> **For 2023-12-21 (announcement)**
+> [!CAUTION] > **For 2023-12-21 (announcement)**
 >
 > The master branch has been fully migrated to pydantic-v2, please pay extra attention to sync fork operations to avoid
 > irreparable damage!
@@ -35,7 +34,7 @@ But please note that we don't have a traditional multi-app structure (django, sp
 pattern, use templates to transform it to your heart's content!
 
 | workflow       | java           | fastapi_best_architecture |
-|----------------|----------------|---------------------------|
+| -------------- | -------------- | ------------------------- |
 | view           | controller     | api                       |
 | data transmit  | dto            | schema                    |
 | business logic | service + impl | service                   |
@@ -48,6 +47,7 @@ You can view some of the preview screenshots
 in [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
 
 Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
+
 > username / password: admin / 123456
 
 ## Features
@@ -81,33 +81,30 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
 ## Local development
 
-* Python: 3.10+
-* Mysql: 8.0+
-* Redis: The latest stable version is recommended
-* Nodejs: 14.0+
+- Python: 3.10+
+- Mysql: 8.0+
+- Redis: The latest stable version is recommended
+- Nodejs: 14.0+
 
 ### BackEnd
 
 1. Install dependencies
 
-    ```shell
-    pip install -r requirements.txt
-    ```
+   ```shell
+   pip install -r requirements.txt
+   ```
 
 2. Create a database `fba`, choose utf8mb4 encoding
 3. Install and start Redis
 4. Create a `.env` file in the `backend/app/` directory
 
-    ```shell
-    cd backend/app/
-    touch .env
-    ```
-
-5. Copy `.env.example` to `.env`
-
    ```shell
+   cd backend/app/
+   touch .env
    cp .env.example .env
    ```
+
+5. Modify the configuration file as needed
 
 6. Database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
@@ -119,7 +116,8 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
    # Execute the migration
    alembic upgrade head
-    ```
+   ```
+
 7. Start celery worker and beat
 
    ```shell
@@ -128,9 +126,10 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
    celery -A tasks beat --loglevel=INFO
    ```
 
-8. Modify the configuration file as needed
-9. Execute the `backend/app/main.py` file to start the service
-10. Browser access: http://127.0.0.1:8000/api/v1/docs
+8. Execute the `backend/app/main.py` file to start the service
+9. Browser access: http://127.0.0.1:8000/api/v1/docs
+10. initialize test data [Optional]  
+    By default, there is no user. You need to use the SQL file under /backend/ sql/ to initialize the test data. Later, you can modify the SQL or initialize the data according to your own needs.
 
 ---
 
@@ -145,14 +144,14 @@ Go to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastap
 >
 > As a best practice, shut down on-premises services before deployment：mysql，redis，rabbitmq...
 
-1. Go to the directory where the ``docker-compose.yml`` file is located and create the environment variable
-   file ``.env``
+1. Go to the directory where the `docker-compose.yml` file is located and create the environment variable
+   file `.env`
 
    ```shell
    cd deploy/docker-compose/
-   
+
    cp .env.server ../../backend/app/.env
-   
+
    # This command is optional
    cp .env.docker .env
    ```
@@ -208,12 +207,12 @@ Execute unittests via pytest
 
 ## Status
 
-![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg "Repo beats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg 'Repo beats analytics image')
 
 ## Contributors
 
-<span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
-<span style="margin: 0 5px;" ><a href="https://github.com/downdawn" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
+` <span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" >``<img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a> `
+` <span style="margin: 0 5px;" ><a href="https://github.com/downdawn" >``<img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a> `
 
 ## Special thanks
 
@@ -231,7 +230,7 @@ Execute unittests via pytest
 ## Sponsor us
 
 If this program has helped you, you can sponsor us with some coffee
-beans: [:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
+beans: [☕️ Sponsor ☕️](https://wu-clan.github.io/sponsor/)
 
 ## License
 

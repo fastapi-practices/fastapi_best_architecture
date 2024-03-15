@@ -4,8 +4,7 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-> [!CAUTION]
-> **2023-12-21 (公告)**
+> [!CAUTION] > **2023-12-21 (公告)**
 >
 > 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
 > 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
@@ -18,7 +17,7 @@ Pydantic-V2 已完工 🎉
 
 它的目的是让你可以直接用它作为你新项目的基础架构，本仓库作为模板库公开，任何人或企业均可免费使用
 
-**🔥持续更新维护中🔥**
+**🔥 持续更新维护中 🔥**
 
 ## 伪三层架构
 
@@ -29,18 +28,19 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 但请注意，我们并没有传统的多应用程序结构（django、springBoot...），如果您不喜欢这种模式，可以使用模板对其进行随意改造！
 
 | 工作流程 | java           | fastapi_best_architecture |
-|------|----------------|---------------------------|
-| 视图   | controller     | api                       |
+| -------- | -------------- | ------------------------- |
+| 视图     | controller     | api                       |
 | 数据传输 | dto            | schema                    |
 | 业务逻辑 | service + impl | service                   |
 | 数据访问 | dao / mapper   | crud                      |
-| 模型   | model / entity | model                     |
+| 模型     | model / entity | model                     |
 
 ## 在线预览
 
 你可以在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 中查看部分预览截图
 
 幸运的是，我们现在有一个演示站点: [FBA UI](https://fba.xwboy.top/)
+
 > 账号 / 密码: admin / 123456
 
 ## 特征
@@ -74,33 +74,30 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 本地开发
 
-* Python 3.10+
-* Mysql 8.0+
-* Redis 推荐最新稳定版
-* Nodejs 14.0+
+- Python 3.10+
+- Mysql 8.0+
+- Redis 推荐最新稳定版
+- Nodejs 14.0+
 
 ### 后端
 
 1. 安装依赖项
 
-    ```shell
-    pip install -r requirements.txt
-    ```
+   ```shell
+   pip install -r requirements.txt
+   ```
 
 2. 创建一个数据库 `fba`，选择 utf8mb4 编码
 3. 安装并启动 Redis
 4. 在 `backend/app/` 目录下创建一个 `.env` 文件
 
-    ```shell
-    cd backend/app/
-    touch .env
-    ```
-
-5. 复制 `.env.example` 到 `.env`
-
    ```shell
+   cd backend/app/
+   touch .env
    cp .env.example .env
    ```
+
+5. 按需修改配置文件
 
 6. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
@@ -112,7 +109,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
    # 执行迁移
    alembic upgrade head
-    ```
+   ```
 
 7. 启动 celery worker 和 beat
 
@@ -122,9 +119,10 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    celery -A tasks beat --loglevel=INFO
    ```
 
-8. 按需修改配置文件
-9. 执行 `backend/app/main.py` 文件启动服务
-10. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+8. 执行 `backend/app/main.py` 文件启动服务
+9. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+10. 【可选步骤】初始化测试数据
+    默认没有初始数据和用户。为了测试，可以使用 backend/sql 下的文件初始化数据。
 
 ---
 
@@ -143,9 +141,9 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
    ```shell
    cd deploy/docker-compose/
-   
+
    cp .env.server ../../backend/app/.env
-   
+
    # 此命令为可选
    cp .env.docker .env
    ```
@@ -187,7 +185,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 1. 创建测试数据库 `fba_test`，选择 utf8mb4 编码
 2. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
 3. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
-4. 进入app目录
+4. 进入 app 目录
 
    ```shell
    cd backend/app/
@@ -201,7 +199,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 状态
 
-![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg "Repo beats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg 'Repo beats analytics image')
 
 ## 贡献者
 
