@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/captcha',
+    '',
     summary='获取登录验证码',
     dependencies=[Depends(RateLimiter(times=5, seconds=10))],
 )

@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/server',
+    '',
     summary='server 监控',
     dependencies=[
         Depends(RequestPermission('sys:monitor:server')),

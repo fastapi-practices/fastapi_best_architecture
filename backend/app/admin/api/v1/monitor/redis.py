@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/redis',
+    '',
     summary='redis 监控',
     dependencies=[
         Depends(RequestPermission('sys:monitor:redis')),

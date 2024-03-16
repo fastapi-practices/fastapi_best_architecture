@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
-from backend.app.api.v1.log.login_log import router as login_log
-from backend.app.api.v1.log.opera_log import router as opera_log
+from backend.app.admin.api.v1.log.login_log import router as login_log
+from backend.app.admin.api.v1.log.opera_log import router as opera_log
 
 router = APIRouter(prefix='/logs')
 
