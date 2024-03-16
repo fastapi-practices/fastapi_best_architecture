@@ -46,7 +46,7 @@ dependencies = [
     "user-agents==2.2.0",
     "uvicorn[standard]==0.24.0",
     "XdbSearchIP==1.0.2",
-    "fastapi-oauth20>=0.0.1a1",
+    "fastapi_oauth20>=0.0.1a1",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
@@ -58,5 +58,8 @@ deploy = [
     "wait-for-it==2.2.2",
 ]
 
+[tool.pdm.scripts]
+lint = "pre-commit run --all-files"
+
 [tool.pdm]
-package-type = "application"
+distribution = false

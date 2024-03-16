@@ -22,7 +22,7 @@ volumes:
 services:
   fba_server:
     build:
-      context: ../../
+      context: ../../../backend/
       dockerfile: backend.dockerfile
     container_name: fba_server
     restart: always
@@ -40,7 +40,7 @@ services:
       - |
         wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
         mkdir -p /var/log/supervisor/
-        supervisord -c /fba/deploy/supervisor.conf
+        supervisord -c /fba/deploy/backend/supervisor.conf
         supervisorctl restart fastapi_server
 
   fba_mysql:
@@ -88,7 +88,7 @@ services:
       - fba_server
     volumes:
       - ../nginx.conf:/etc/nginx/nginx.conf:ro
-      - fba_static:/www/fba_server/backend/app/static
+      - fba_static:/www/fba_server/backend/static
     networks:
       - fba_network
 
@@ -110,7 +110,7 @@ services:
 
   fba_celery:
     build:
-      context: ../../
+      context: ../../../backend/
       dockerfile: celery.dockerfile
     container_name: fba_celery
     restart: always
@@ -124,6 +124,6 @@ services:
       - |
         wait-for-it -s fba_rabbitmq:5672 -t 300
         mkdir -p /var/log/supervisor/
-        supervisord -c /fba/deploy/supervisor.conf
+        supervisord -c /fba/deploy/backend/supervisor.conf
         supervisorctl restart celery_worker
         supervisorctl restart celery_beat

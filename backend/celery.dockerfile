@@ -18,7 +18,7 @@ ENV TZ = Asia/Shanghai
 
 RUN mkdir -p /var/log/celery
 
-COPY ./deploy/celery.conf /etc/supervisor/conf.d/
+COPY ../deploy/backend/celery.conf /etc/supervisor/conf.d/
 
 WORKDIR /fba/backend/app
 

@@ -36,7 +36,7 @@ def _get_exception_code(status_code: int):
     """
     try:
         STATUS_PHRASES[status_code]
-    except Exception:  # noqa: ignore
+    except Exception:  # noqa: B
         code = StandardResponseCode.HTTP_400
     else:
         code = status_code

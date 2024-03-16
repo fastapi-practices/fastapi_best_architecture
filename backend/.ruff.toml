@@ -3,9 +3,8 @@ target-version = "py310"
 cache-dir = "./.ruff_cache"
 
 [per-file-ignores]
-"backend/app/api/v1/*.py" = ["TCH"]
-"backend/app/models/*.py" = ["TCH003"]
-"backend/app/**/__init__.py" = ["F401"]
+"backend/app/**/api/v1/*.py" = ["TCH"]
+"backend/app/**/model/*.py" = ["TCH003"]
 "backend/app/**/tests/*.py" = ["E402"]
 
 [lint]
