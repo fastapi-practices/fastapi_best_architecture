@@ -92,17 +92,15 @@ class ServerInfo:
         disk_info = []
         for disk in psutil.disk_partitions():
             usage = psutil.disk_usage(disk.mountpoint)
-            disk_info.append(
-                {
-                    'dir': disk.mountpoint,
-                    'type': disk.fstype,
-                    'device': disk.device,
-                    'total': ServerInfo.format_bytes(usage.total),
-                    'free': ServerInfo.format_bytes(usage.free),
-                    'used': ServerInfo.format_bytes(usage.used),
-                    'usage': f'{round(usage.percent, 2)} %',
-                }
-            )
+            disk_info.append({
+                'dir': disk.mountpoint,
+                'type': disk.fstype,
+                'device': disk.device,
+                'total': ServerInfo.format_bytes(usage.total),
+                'free': ServerInfo.format_bytes(usage.free),
+                'used': ServerInfo.format_bytes(usage.used),
+                'usage': f'{round(usage.percent, 2)} %',
+            })
         return disk_info
 
     @staticmethod

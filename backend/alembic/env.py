@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 sys.path.append('../')
 
-from backend.app.core import path_conf  # noqa: E402
+from backend.core import path_conf  # noqa: E402
 
 if not os.path.exists(path_conf.Versions):
     os.makedirs(path_conf.Versions)
@@ -26,12 +26,12 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from backend.app.models import MappedBase  # noqa: E402
+from backend.common.msd.model import MappedBase  # noqa: E402
 
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-from backend.app.database.db_mysql import SQLALCHEMY_DATABASE_URL  # noqa: E402
+from backend.database.db_mysql import SQLALCHEMY_DATABASE_URL  # noqa: E402
 
 config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
 

@@ -53,14 +53,12 @@ class _Page(AbstractPage[T], Generic[T]):
         page = params.page
         size = params.size
         total_pages = math.ceil(total / params.size)
-        links = create_links(
-            **{
-                'first': {'page': 1, 'size': f'{size}'},
-                'last': {'page': f'{math.ceil(total / params.size)}', 'size': f'{size}'} if total > 0 else None,
-                'next': {'page': f'{page + 1}', 'size': f'{size}'} if (page + 1) <= total_pages else None,
-                'prev': {'page': f'{page - 1}', 'size': f'{size}'} if (page - 1) >= 1 else None,
-            }
-        ).model_dump()
+        links = create_links(**{
+            'first': {'page': 1, 'size': f'{size}'},
+            'last': {'page': f'{math.ceil(total / params.size)}', 'size': f'{size}'} if total > 0 else None,
+            'next': {'page': f'{page + 1}', 'size': f'{size}'} if (page + 1) <= total_pages else None,
+            'prev': {'page': f'{page - 1}', 'size': f'{size}'} if (page - 1) >= 1 else None,
+        }).model_dump()
 
         return cls(items=items, total=total, page=params.page, size=params.size, total_pages=total_pages, links=links)
 

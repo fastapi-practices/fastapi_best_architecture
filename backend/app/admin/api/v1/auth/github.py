@@ -28,7 +28,7 @@ async def auth_github() -> ResponseModel:
 async def login_github(
     request: Request, background_tasks: BackgroundTasks, oauth: FastAPIOAuth20 = Depends(github_oauth2)
 ) -> ResponseModel:
-    token, state = oauth
+    token, _state = oauth
     access_token = token['access_token']
     user = await github_client.get_userinfo(access_token)
     data = await github_service.add_with_login(request, background_tasks, user)

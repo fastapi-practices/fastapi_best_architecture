@@ -23,9 +23,11 @@ class ResponseModel(BaseModel):
         def test():
             return ResponseModel(data={'test': 'test'})
 
+
         @router.get('/test')
         def test() -> ResponseModel:
             return ResponseModel(data={'test': 'test'})
+
 
         @router.get('/test')
         def test() -> ResponseModel:

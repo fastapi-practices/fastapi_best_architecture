@@ -1,28 +1,33 @@
 line-length = 120
+unsafe-fixes = true
+cache-dir = ".ruff_cache"
 target-version = "py310"
-cache-dir = "./.ruff_cache"
-
-[per-file-ignores]
-"backend/app/**/api/v1/*.py" = ["TCH"]
-"backend/app/**/model/*.py" = ["TCH003"]
-"backend/app/**/tests/*.py" = ["E402"]
 
 [lint]
 select = [
     "E",
     "F",
     "I",
+    "TCH",
+    # W
     "W505",
+    # PT
     "PT018",
+    # SIM
     "SIM101",
     "SIM114",
+    # PGH
     "PGH004",
+    # PL
     "PLE1142",
+    # RUF
     "RUF100",
-    "F404",
-    "TCH",
+    # UP
     "UP007"
 ]
+preview = true
+ignore-init-module-imports = true
+ignore = ["FURB101"]
 
 [lint.flake8-pytest-style]
 mark-parentheses = false
@@ -37,5 +42,12 @@ ignore-variadic-names = true
 lines-between-types = 1
 order-by-type = true
 
+[lint.per-file-ignores]
+"backend/app/**/api/v1/*.py" = ["TCH"]
+"backend/app/**/model/*.py" = ["TCH003"]
+"backend/app/**/tests/*.py" = ["E402"]
+
 [format]
+preview = true
 quote-style = "single"
+docstring-code-format = true

@@ -1,8 +1,7 @@
 [project]
 name = "fastapi_best_architecture"
 version = "0.0.1"
-description = """FastAPI based on the construction of the front and back of the separation of rights control system,
-using a unique pseudo three-tier architecture model design, and as a template library free open source"""
+description = "基于 FastAPI 构建的前后端分离 RBAC 权限控制系统，采用独特的伪三层架构模型设计，内置 fastapi-admin 基本实现"
 authors = [
     { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
@@ -41,7 +40,6 @@ dependencies = [
     "python-multipart==0.0.6",
     "pytz==2023.3",
     "redis[hiredis]==5.0.1",
-    "ruff==0.1.8",
     "SQLAlchemy==2.0.23",
     "user-agents==2.2.0",
     "uvicorn[standard]==0.24.0",
@@ -52,14 +50,17 @@ requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
 
-[project.optional-dependencies]
-deploy = [
-    "supervisor==4.2.5",
-    "wait-for-it==2.2.2",
+[tool.pdm.dev-dependencies]
+lint = [
+    "ruff>=0.3.3",
 ]
+deploy = [
+    "supervisor>=4.2.5",
+    "wait-for-it>=2.2.2",
+]
+
+[tool.pdm]
+package-type = "application"
 
 [tool.pdm.scripts]
 lint = "pre-commit run --all-files"
-
-[tool.pdm]
-distribution = false
