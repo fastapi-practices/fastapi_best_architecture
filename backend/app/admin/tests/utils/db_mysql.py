@@ -5,14 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.conf import settings
 from backend.database.db_mysql import create_engine_and_session
 
-TEST_DB_DATABASE = settings.DB_DATABASE + '_test'
-
 TEST_SQLALCHEMY_DATABASE_URL = (
     f'mysql+asyncmy://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:'
-    f'{settings.DB_PORT}/{TEST_DB_DATABASE}?charset={settings.DB_CHARSET}'
+    f'{settings.DB_PORT}/{settings.DB_DATABASE}_test?charset={settings.DB_CHARSET}'
 )
 
-test_async_engine, test_async_db_session = create_engine_and_session(TEST_SQLALCHEMY_DATABASE_URL)
+_, test_async_db_session = create_engine_and_session(TEST_SQLALCHEMY_DATABASE_URL)
 
 
 async def override_get_db() -> AsyncSession:

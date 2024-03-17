@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import Select, and_, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.model.sys_casbin_rule import CasbinRule
+from backend.app.admin.model import CasbinRule
 from backend.app.admin.schema.casbin_rule import CreatePolicyParam, DeleteAllPoliciesParam, UpdatePolicyParam
 from backend.common.msd.crud import CRUDBase
 

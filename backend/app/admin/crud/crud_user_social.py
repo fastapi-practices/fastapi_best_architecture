@@ -3,7 +3,7 @@
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.model.sys_user_social import UserSocial
+from backend.app.admin.model import UserSocial
 from backend.app.admin.schema.user_social import CreateUserSocialParam, UpdateUserSocialParam
 from backend.common.enums import UserSocialType
 from backend.common.msd.crud import CRUDBase

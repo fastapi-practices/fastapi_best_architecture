@@ -3,7 +3,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
 
-from backend.app.admin.service.github_service import github_service
+from backend.app.admin.services.github_service import github_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.core.conf import settings
 

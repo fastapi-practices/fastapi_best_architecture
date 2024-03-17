@@ -9,8 +9,8 @@ from fastapi import Depends
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from backend.common.base import MappedBase
 from backend.common.log import log
+from backend.common.msd.model import MappedBase
 from backend.core.conf import settings
 
 

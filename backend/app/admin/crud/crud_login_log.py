@@ -3,7 +3,7 @@
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.model.sys_login_log import LoginLog
+from backend.app.admin.model import LoginLog
 from backend.app.admin.schema.login_log import CreateLoginLogParam, UpdateLoginLogParam
 from backend.common.msd.crud import CRUDBase
 

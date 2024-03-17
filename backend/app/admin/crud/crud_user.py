@@ -6,8 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
 
-from backend.app.admin.model.sys_role import Role
-from backend.app.admin.model.sys_user import User
+from backend.app.admin.model import Role, User
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,

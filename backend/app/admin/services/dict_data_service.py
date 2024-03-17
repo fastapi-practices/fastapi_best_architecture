@@ -4,7 +4,7 @@ from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_dict_data import dict_data_dao
 from backend.app.admin.crud.crud_dict_type import dict_type_dao
-from backend.app.admin.model.sys_dict_data import DictData
+from backend.app.admin.model import DictData
 from backend.app.admin.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session

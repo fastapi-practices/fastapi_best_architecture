@@ -6,8 +6,7 @@ from sqlalchemy import and_, asc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.app.admin.model.sys_dept import Dept
-from backend.app.admin.model.sys_user import User
+from backend.app.admin.model import Dept, User
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.common.msd.crud import CRUDBase
 

@@ -33,4 +33,4 @@ class TaskService:
         return task
 
 
-task_service: TaskService = TaskService()
+task_service = TaskService()

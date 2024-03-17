@@ -3,7 +3,7 @@
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.model.sys_opera_log import OperaLog
+from backend.app.admin.model import OperaLog
 from backend.app.admin.schema.opera_log import CreateOperaLogParam, UpdateOperaLogParam
 from backend.common.msd.crud import CRUDBase
 

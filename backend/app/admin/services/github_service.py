@@ -8,7 +8,7 @@ from backend.app.admin.crud.crud_user_social import user_social_dao
 from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import RegisterUserParam
 from backend.app.admin.schema.user_social import CreateUserSocialParam
-from backend.app.admin.service.login_log_service import LoginLogService
+from backend.app.admin.services.login_log_service import LoginLogService
 from backend.common import jwt
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.exception.errors import AuthorizationError

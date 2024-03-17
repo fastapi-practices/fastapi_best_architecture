@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.menu import CreateMenuParam, GetMenuListDetails, UpdateMenuParam
-from backend.app.admin.service.menu_service import menu_service
+from backend.app.admin.services.menu_service import menu_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.permission import RequestPermission
 from backend.common.rbac import DependsRBAC
