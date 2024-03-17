@@ -7,8 +7,8 @@ from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
-from backend.app.admin.models import Role
-from backend.app.admin.schemas.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.model import Role
+from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
 from backend.common.exception import errors
 from backend.common.redis import redis_client
 from backend.core.conf import settings

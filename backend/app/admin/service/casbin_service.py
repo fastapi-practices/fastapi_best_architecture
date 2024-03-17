@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_casbin import casbin_dao
-from backend.app.admin.schemas.casbin_rule import (
+from backend.app.admin.schema.casbin_rule import (
     CreatePolicyParam,
     CreateUserRoleParam,
     DeleteAllPoliciesParam,

@@ -4,8 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schemas.dict_type import CreateDictTypeParam, GetDictTypeListDetails, UpdateDictTypeParam
-from backend.app.admin.services.dict_type_service import dict_type_service
+from backend.app.admin.schema.dict_type import CreateDictTypeParam, GetDictTypeListDetails, UpdateDictTypeParam
+from backend.app.admin.service.dict_type_service import dict_type_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

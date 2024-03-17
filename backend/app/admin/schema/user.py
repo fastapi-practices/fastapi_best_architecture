@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 
-from backend.app.admin.schemas.dept import GetDeptListDetails
-from backend.app.admin.schemas.role import GetRoleListDetails
+from backend.app.admin.schema.dept import GetDeptListDetails
+from backend.app.admin.schema.role import GetRoleListDetails
 from backend.common.enums import StatusType
 from backend.common.msd.schema import CustomPhoneNumber, SchemaBase
 

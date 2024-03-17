@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from backend.app.admin.schemas.user import GetUserInfoNoRelationDetail
+from backend.app.admin.schema.user import GetUserInfoNoRelationDetail
 from backend.common.msd.schema import SchemaBase
 
 

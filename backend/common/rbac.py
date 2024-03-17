@@ -5,7 +5,7 @@ import casbin_async_sqlalchemy_adapter
 
 from fastapi import Depends, Request
 
-from backend.app.admin.models.sys_casbin_rule import CasbinRule
+from backend.app.admin.model.sys_casbin_rule import CasbinRule
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.common.jwt import DependsJwtAuth

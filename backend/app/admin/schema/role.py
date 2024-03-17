@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.schemas.menu import GetMenuListDetails
+from backend.app.admin.schema.menu import GetMenuListDetails
 from backend.common.enums import RoleDataScopeType, StatusType
 from backend.common.msd.schema import SchemaBase
 

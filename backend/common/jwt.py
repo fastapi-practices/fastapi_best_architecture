@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_user import user_dao
-from backend.app.admin.models.sys_user import User
+from backend.app.admin.model.sys_user import User
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.common.redis import redis_client
 from backend.core.conf import settings

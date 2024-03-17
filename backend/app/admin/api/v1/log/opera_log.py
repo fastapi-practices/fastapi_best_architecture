@@ -4,8 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schemas.opera_log import GetOperaLogListDetails
-from backend.app.admin.services.opera_log_service import opera_log_service
+from backend.app.admin.schema.opera_log import GetOperaLogListDetails
+from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

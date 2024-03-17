@@ -3,8 +3,8 @@
 from sqlalchemy import Select, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.models.sys_dict_type import DictType
-from backend.app.admin.schemas.dict_type import CreateDictTypeParam, UpdateDictTypeParam
+from backend.app.admin.model.sys_dict_type import DictType
+from backend.app.admin.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 from backend.common.msd.crud import CRUDBase
 
 

@@ -5,8 +5,8 @@ from typing import Sequence
 from sqlalchemy import and_, asc, select
 from sqlalchemy.orm import selectinload
 
-from backend.app.admin.models.sys_menu import Menu
-from backend.app.admin.schemas.menu import CreateMenuParam, UpdateMenuParam
+from backend.app.admin.model.sys_menu import Menu
+from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.common.msd.crud import CRUDBase
 
 

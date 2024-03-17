@@ -4,8 +4,8 @@ from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.app.admin.models.sys_dict_data import DictData
-from backend.app.admin.schemas.dict_data import CreateDictDataParam, UpdateDictDataParam
+from backend.app.admin.model.sys_dict_data import DictData
+from backend.app.admin.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 from backend.common.msd.crud import CRUDBase
 
 

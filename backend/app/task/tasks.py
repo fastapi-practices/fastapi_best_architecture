@@ -5,7 +5,7 @@ import uuid
 
 sys.path.append('../../../')
 
-from backend.app.task.celery import celery_app  # noqa: E402
+from backend.app.task.celery import celery_app
 
 
 @celery_app.task

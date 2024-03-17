@@ -5,8 +5,8 @@ from typing import Sequence
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_api import api_dao
-from backend.app.admin.models.sys_api import Api
-from backend.app.admin.schemas.api import CreateApiParam, UpdateApiParam
+from backend.app.admin.model.sys_api import Api
+from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
 from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session
 

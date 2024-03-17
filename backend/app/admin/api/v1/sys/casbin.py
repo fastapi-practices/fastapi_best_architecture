@@ -5,7 +5,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schemas.casbin_rule import (
+from backend.app.admin.schema.casbin_rule import (
     CreatePolicyParam,
     CreateUserRoleParam,
     DeleteAllPoliciesParam,
@@ -14,7 +14,7 @@ from backend.app.admin.schemas.casbin_rule import (
     GetPolicyListDetails,
     UpdatePolicyParam,
 )
-from backend.app.admin.services.casbin_service import casbin_service
+from backend.app.admin.service.casbin_service import casbin_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

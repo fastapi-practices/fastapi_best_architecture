@@ -4,8 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schemas.api import CreateApiParam, GetApiListDetails, UpdateApiParam
-from backend.app.admin.services.api_service import api_service
+from backend.app.admin.schema.api import CreateApiParam, GetApiListDetails, UpdateApiParam
+from backend.app.admin.service.api_service import api_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

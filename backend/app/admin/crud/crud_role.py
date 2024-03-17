@@ -5,10 +5,10 @@ from typing import Sequence
 from sqlalchemy import Select, delete, desc, select
 from sqlalchemy.orm import selectinload
 
-from backend.app.admin.models.sys_menu import Menu
-from backend.app.admin.models.sys_role import Role
-from backend.app.admin.models.sys_user import User
-from backend.app.admin.schemas.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.model.sys_menu import Menu
+from backend.app.admin.model.sys_role import Role
+from backend.app.admin.model.sys_user import User
+from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
 from backend.common.msd.crud import CRUDBase
 
 

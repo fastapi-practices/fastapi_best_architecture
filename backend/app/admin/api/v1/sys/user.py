@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schemas.user import (
+from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
     GetCurrentUserInfoDetail,
@@ -14,7 +14,7 @@ from backend.app.admin.schemas.user import (
     UpdateUserParam,
     UpdateUserRoleParam,
 )
-from backend.app.admin.services.user_service import user_service
+from backend.app.admin.service.user_service import user_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

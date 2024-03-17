@@ -4,9 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schemas.role import CreateRoleParam, GetRoleListDetails, UpdateRoleMenuParam, UpdateRoleParam
-from backend.app.admin.services.menu_service import menu_service
-from backend.app.admin.services.role_service import role_service
+from backend.app.admin.schema.role import CreateRoleParam, GetRoleListDetails, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.service.menu_service import menu_service
+from backend.app.admin.service.role_service import role_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

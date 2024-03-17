@@ -6,8 +6,8 @@ from fastapi import Request
 
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
-from backend.app.admin.models.sys_menu import Menu
-from backend.app.admin.schemas.menu import CreateMenuParam, UpdateMenuParam
+from backend.app.admin.model.sys_menu import Menu
+from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.common.exception import errors
 from backend.common.redis import redis_client
 from backend.core.conf import settings

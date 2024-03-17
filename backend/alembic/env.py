@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 sys.path.append('../')
 
-from backend.core import path_conf  # noqa: E402
+from backend.core import path_conf
 
 if not os.path.exists(path_conf.Versions):
     os.makedirs(path_conf.Versions)
