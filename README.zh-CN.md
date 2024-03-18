@@ -81,84 +81,88 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ### 后端
 
-1. 安装依赖项
-
-    ```shell
-    pip install -r requirements.txt
-    ```
-
-2. 创建一个数据库 `fba`，选择 utf8mb4 编码
-3. 安装并启动 Redis
-4. 在 `backend/app/` 目录下创建一个 `.env` 文件
-
-    ```shell
-    cd backend/app/
-    touch .env
-    ```
-
-5. 复制 `.env.example` 到 `.env`
+1. 进入 `backend` 目录
 
    ```shell
+   cd backend
+   ```
+
+2. 安装依赖包
+
+   ```shell
+   pip install -r requirements.txt
+   ```
+
+3. 创建一个数据库 `fba`，选择 utf8mb4 编码
+4. 安装并启动 Redis
+5. 在 `backend` 目录下创建 `.env` 文件
+
+   ```shell
+   touch .env
+   
    cp .env.example .env
    ```
 
-6. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+6. 按需修改配置文件 `core/conf.py` 和 `.env`
+7. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
    ```shell
-   cd backend/app/
-
    # 生成迁移文件
    alembic revision --autogenerate
-
+   
    # 执行迁移
    alembic upgrade head
-    ```
+   ```
 
-7. 启动 celery worker 和 beat
+8. 启动 celery worker 和 beat
 
    ```shell
    celery -A tasks worker --loglevel=INFO
+   
    # 可选，如果您不需要使用计划任务
    celery -A tasks beat --loglevel=INFO
    ```
 
-8. 按需修改配置文件
-9. 执行 `backend/app/main.py` 文件启动服务
-10. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
-
----
+9. [初始化测试数据](#测试数据)（可选）
+10. 执行 `main.py` 文件启动服务
+11. 打开浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ### 前端
 
 跳转 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
+---
+
 ### Docker 部署
 
 > [!WARNING]
+>
 > 默认端口冲突：8000，3306，6379，5672
 >
-> 最佳做法是在部署之前关闭本地服务：mysql，redis，rabbitmq...
+> 建议在部署前关闭本地服务：mysql，redis，rabbitmq...
 
-1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
+1. 进入 `deploy/backend/docker-compose` 目录，创建环境变量文件`.env`
 
    ```shell
-   cd deploy/docker-compose/
+   cd deploy/backend/docker-compose
    
-   cp .env.server ../../backend/app/.env
+   touch .env.server ../../../backend/.env
    
-   # 此命令为可选
-   cp .env.docker .env
+   cp .env.server ../../../backend/.env
+   
+   # 可选
+   cp .env.docker ../../../backend/.env
    ```
 
-2. 按需修改配置文件
+2. 按需修改配置文件 `backend/core/conf.py` 和 `.env`
 3. 执行一键启动命令
 
    ```shell
    docker-compose up -d --build
    ```
 
-4. 等待命令自动完成
-5. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+4. 等待命令执行完成
+5. 打开浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ## 测试数据
 
@@ -168,28 +172,24 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 （仅供参考）
 
-1. 定义数据库模型（model），每次变化记得执行数据库迁移
+1. 定义数据库模型（model）
 2. 定义数据验证模型（schema）
-3. 定义路由（router）和视图（api）
-4. 定义业务逻辑（service）
+3. 定义视图（api）和路由（router）
+4. 编写业务（service）
 5. 编写数据库操作（crud）
 
 ## 测试
 
-通过 pytest 执行单元测试
+通过 `pytest` 执行单元测试
 
 1. 创建测试数据库 `fba_test`，选择 utf8mb4 编码
 2. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
 3. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
-4. 进入app目录
+4. 进入 `backend` 目录，执行测试命令
 
    ```shell
-   cd backend/app/
-   ```
-
-5. 执行测试命令
-
-   ```shell
+   cd backend/
+   
    pytest -vs --disable-warnings
    ```
 
@@ -221,6 +221,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 许可证
 
-本项目根据 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
+本项目由 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
 
 [![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)
