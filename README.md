@@ -156,9 +156,6 @@ Jump to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fast
    touch .env.server ../../../backend/.env
    
    cp .env.server ../../../backend/.env
-   
-   # Optional
-   cp .env.docker ../../../backend/.env
    ```
 
 2. Modify the configuration files `backend/core/conf.py` and `.env` as needed.

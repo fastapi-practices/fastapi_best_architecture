@@ -20,7 +20,7 @@ RUN mkdir -p /var/log/celery
 
 COPY ../deploy/backend/celery.conf /etc/supervisor/conf.d/
 
-WORKDIR /fba/backend/app
+WORKDIR /fba/backend/
 
 RUN chmod +x celery-start.sh
 

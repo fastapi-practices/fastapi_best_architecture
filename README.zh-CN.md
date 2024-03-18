@@ -149,9 +149,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    touch .env.server ../../../backend/.env
    
    cp .env.server ../../../backend/.env
-   
-   # 可选
-   cp .env.docker ../../../backend/.env
    ```
 
 2. 按需修改配置文件 `backend/core/conf.py` 和 `.env`

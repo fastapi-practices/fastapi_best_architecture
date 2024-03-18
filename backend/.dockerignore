@@ -1,4 +1,4 @@
 __pycache__/
-.env
 venv/
 .venv/
+.pdm-python
