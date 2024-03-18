@@ -13,7 +13,7 @@ repos:
       - id: ruff
         args:
           - '--config'
-          - './backend/.ruff.toml'
+          - 'backend/.ruff.toml'
           - '--fix'
           - '--unsafe-fixes'
       - id: ruff-format
@@ -24,9 +24,13 @@ repos:
       - id: pdm-export
         args:
           - '-p'
-          - './backend'
+          - 'backend'
           - '-o'
-          - './backend/requirements.txt'
+          - 'backend/requirements.txt'
           - '--without-hashes'
-        files: ^pdm.lock$
+        files: backend/pdm\.lock$
       - id: pdm-lock-check
+        args:
+          - '-p'
+          - 'backend'
+        files: backend/pdm\.lock$
