@@ -10,7 +10,6 @@ from jose import jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.common.redis import redis_client
@@ -180,6 +179,8 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     :return:
     """
     user_id = data.get('sub')
+    from backend.app.admin.crud.crud_user import user_dao
+
     user = await user_dao.get_with_relation(db, user_id=user_id)
     if not user:
         raise TokenError(msg='Token 无效')

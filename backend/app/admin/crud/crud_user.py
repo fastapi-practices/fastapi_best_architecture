@@ -14,7 +14,7 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
     UpdateUserRoleParam,
 )
-from backend.common import jwt
+from backend.common.jwt import get_hash_password
 from backend.common.msd.crud import CRUDBase
 from backend.utils.timezone import timezone
 
@@ -76,7 +76,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         """
         if not social:
             salt = text_captcha(5)
-            obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
+            obj.password = await get_hash_password(f'{obj.password}{salt}')
             dict_obj = obj.model_dump()
             dict_obj.update({'salt': salt})
         else:
@@ -94,7 +94,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         salt = text_captcha(5)
-        obj.password = await jwt.get_hash_password(f'{obj.password}{salt}')
+        obj.password = await get_hash_password(f'{obj.password}{salt}')
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
@@ -179,7 +179,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         user = await db.execute(
-            update(self.model).where(self.model.id == pk).values(password=await jwt.get_hash_password(password + salt))
+            update(self.model).where(self.model.id == pk).values(password=await get_hash_password(password + salt))
         )
         return user.rowcount
 

@@ -9,9 +9,16 @@ from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import LoginLogService
-from backend.common import jwt
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
+from backend.common.jwt import (
+    create_access_token,
+    create_new_token,
+    create_refresh_token,
+    get_token,
+    jwt_decode,
+    password_verify,
+)
 from backend.common.redis import redis_client
 from backend.common.response.response_code import CustomErrorCode
 from backend.core.conf import settings
@@ -26,13 +33,11 @@ class AuthService:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not await jwt.password_verify(f'{obj.password}{current_user.salt}', current_user.password):
+            elif not await password_verify(f'{obj.password}{current_user.salt}', current_user.password):
                 raise errors.AuthorizationError(msg='密码错误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
-            access_token, _ = await jwt.create_access_token(
-                str(current_user.id), multi_login=current_user.is_multi_login
-            )
+            access_token, _ = await create_access_token(str(current_user.id), multi_login=current_user.is_multi_login)
             await user_dao.update_login_time(db, obj.username)
             return access_token, current_user
 
@@ -43,7 +48,7 @@ class AuthService:
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户不存在')
-                elif not await jwt.password_verify(obj.password + current_user.salt, current_user.password):
+                elif not await password_verify(obj.password + current_user.salt, current_user.password):
                     raise errors.AuthorizationError(msg='密码错误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
@@ -52,10 +57,10 @@ class AuthService:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-                access_token, access_token_expire_time = await jwt.create_access_token(
+                access_token, access_token_expire_time = await create_access_token(
                     str(current_user.id), multi_login=current_user.is_multi_login
                 )
-                refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
+                refresh_token, refresh_token_expire_time = await create_refresh_token(
                     str(current_user.id), access_token_expire_time, multi_login=current_user.is_multi_login
                 )
                 await user_dao.update_login_time(db, obj.username)
@@ -97,7 +102,7 @@ class AuthService:
 
     @staticmethod
     async def new_token(*, request: Request, refresh_token: str) -> GetNewToken:
-        user_id = await jwt.jwt_decode(refresh_token)
+        user_id = await jwt_decode(refresh_token)
         if request.user.id != user_id:
             raise errors.TokenError(msg='刷新 token 无效')
         async with async_db_session() as db:
@@ -106,13 +111,13 @@ class AuthService:
                 raise errors.NotFoundError(msg='用户不存在')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定，操作失败')
-            current_token = await jwt.get_token(request)
+            current_token = await get_token(request)
             (
                 new_access_token,
                 new_refresh_token,
                 new_access_token_expire_time,
                 new_refresh_token_expire_time,
-            ) = await jwt.create_new_token(
+            ) = await create_new_token(
                 str(current_user.id), current_token, refresh_token, multi_login=current_user.is_multi_login
             )
             data = GetNewToken(
@@ -125,7 +130,7 @@ class AuthService:
 
     @staticmethod
     async def logout(*, request: Request) -> None:
-        token = await jwt.get_token(request)
+        token = await get_token(request)
         if request.user.is_multi_login:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)
