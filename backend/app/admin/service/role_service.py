@@ -33,7 +33,7 @@ class RoleService:
     @staticmethod
     async def get_user_roles(*, pk: int) -> Sequence[Role]:
         async with async_db_session() as db:
-            roles = await role_dao.get_user_all(db, user_id=pk)
+            roles = await role_dao.get_user_roles(db, user_id=pk)
             return roles
 
     @staticmethod

@@ -26,8 +26,8 @@ from backend.utils.serializers import select_as_dict
 router = APIRouter()
 
 
-@router.post('/register', summary='用户注册')
-async def user_register(obj: RegisterUserParam) -> ResponseModel:
+@router.post('/create', summary='用户注册')
+async def create_user(obj: RegisterUserParam) -> ResponseModel:
     await user_service.register(obj=obj)
     return await response_base.success()
 
@@ -49,7 +49,7 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
 
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
-async def get_current_userinfo(request: Request) -> ResponseModel:
+async def get_current_user(request: Request) -> ResponseModel:
     data = GetCurrentUserInfoDetail(**await select_as_dict(request.user))
     return await response_base.success(data=data)
 
@@ -62,7 +62,7 @@ async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
 
 
 @router.put('/{username}', summary='更新用户信息', dependencies=[DependsJwtAuth])
-async def update_userinfo(request: Request, username: Annotated[str, Path(...)], obj: UpdateUserParam) -> ResponseModel:
+async def update_user(request: Request, username: Annotated[str, Path(...)], obj: UpdateUserParam) -> ResponseModel:
     count = await user_service.update(request=request, username=username, obj=obj)
     if count > 0:
         return await response_base.success()

@@ -13,14 +13,38 @@ from backend.common.msd.crud import CRUDBase
 
 class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
     async def get(self, db: AsyncSession, dept_id: int) -> Dept | None:
+        """
+        获取部门
+
+        :param db:
+        :param dept_id:
+        :return:
+        """
         return await self.get_(db, pk=dept_id, del_flag=0)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Dept | None:
+        """
+        通过 name 获取 API
+
+        :param db:
+        :param name:
+        :return:
+        """
         return await self.get_(db, name=name, del_flag=0)
 
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
     ) -> Sequence[Dept]:
+        """
+        获取所有部门
+
+        :param db:
+        :param name:
+        :param leader:
+        :param phone:
+        :param status:
+        :return:
+        """
         se = select(self.model).order_by(asc(self.model.sort))
         where_list = [self.model.del_flag == 0]
         conditions = []
@@ -45,15 +69,44 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         return dept.scalars().all()
 
     async def create(self, db: AsyncSession, obj_in: CreateDeptParam) -> None:
+        """
+        创建部门
+
+        :param db:
+        :param obj_in:
+        :return:
+        """
         await self.create_(db, obj_in)
 
     async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDeptParam) -> int:
+        """
+        更新部门
+
+        :param db:
+        :param dept_id:
+        :param obj_in:
+        :return:
+        """
         return await self.update_(db, dept_id, obj_in)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
+        """
+        删除部门
+
+        :param db:
+        :param dept_id:
+        :return:
+        """
         return await self.delete_(db, dept_id, del_flag=1)
 
-    async def get_user_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
+    async def get_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
+        """
+        获取关联
+
+        :param db:
+        :param dept_id:
+        :return:
+        """
         result = await db.execute(
             select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
         )
@@ -61,6 +114,13 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         return user_relation.users
 
     async def get_children(self, db: AsyncSession, dept_id: int) -> list[Dept]:
+        """
+        获取子部门
+
+        :param db:
+        :param dept_id:
+        :return:
+        """
         result = await db.execute(
             select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
         )

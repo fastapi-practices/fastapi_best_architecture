@@ -25,7 +25,7 @@ class ApiService:
         return await api_dao.get_list(name=name, method=method, path=path)
 
     @staticmethod
-    async def get_api_list() -> Sequence[Api]:
+    async def get_all() -> Sequence[Api]:
         async with async_db_session() as db:
             apis = await api_dao.get_all(db)
             return apis

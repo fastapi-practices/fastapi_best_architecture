@@ -11,7 +11,7 @@ from backend.database.db_mysql import async_db_session
 class DictTypeService:
     @staticmethod
     async def get_select(*, name: str = None, code: str = None, status: int = None) -> Select:
-        return await dict_type_dao.get_all(name=name, code=code, status=status)
+        return await dict_type_dao.get_list(name=name, code=code, status=status)
 
     @staticmethod
     async def create(*, obj: CreateDictTypeParam) -> None:

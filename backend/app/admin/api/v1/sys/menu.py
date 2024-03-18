@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
-async def get_user_menus(request: Request) -> ResponseModel:
+async def get_user_sidebar_tree(request: Request) -> ResponseModel:
     menu = await menu_service.get_user_menu_tree(request=request)
     return await response_base.success(data=menu)
 

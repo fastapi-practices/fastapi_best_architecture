@@ -21,7 +21,7 @@ from backend.database.db_mysql import async_db_session
 class CasbinService:
     @staticmethod
     async def get_casbin_list(*, ptype: str, sub: str) -> Select:
-        return await casbin_dao.get_all_policy(ptype, sub)
+        return await casbin_dao.get_list(ptype, sub)
 
     @staticmethod
     async def get_policy_list(*, role: int | None = None) -> list:
@@ -30,12 +30,6 @@ class CasbinService:
             data = enforcer.get_filtered_named_policy('p', 0, str(role))
         else:
             data = enforcer.get_policy()
-        return data
-
-    @staticmethod
-    async def get_policy_list_by_role(*, role: str) -> list:
-        enforcer = await rbac.enforcer()
-        data = enforcer.get_filtered_named_policy('p', 0, role)
         return data
 
     @staticmethod

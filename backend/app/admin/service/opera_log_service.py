@@ -10,7 +10,7 @@ from backend.database.db_mysql import async_db_session
 class OperaLogService:
     @staticmethod
     async def get_select(*, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
-        return await opera_log_dao.get_all(username=username, status=status, ip=ip)
+        return await opera_log_dao.get_list(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(*, obj_in: CreateOperaLogParam):

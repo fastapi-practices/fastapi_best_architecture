@@ -16,7 +16,7 @@ from backend.database.db_mysql import async_db_session
 class LoginLogService:
     @staticmethod
     async def get_select(*, username: str, status: int, ip: str) -> Select:
-        return await login_log_dao.get_all(username=username, status=status, ip=ip)
+        return await login_log_dao.get_list(username=username, status=status, ip=ip)
 
     @staticmethod
     async def create(

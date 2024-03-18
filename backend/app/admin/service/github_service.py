@@ -20,7 +20,9 @@ from backend.utils.timezone import timezone
 
 class GithubService:
     @staticmethod
-    async def add_with_login(request: Request, background_tasks: BackgroundTasks, user: dict) -> GetLoginToken | None:
+    async def create_with_login(
+        request: Request, background_tasks: BackgroundTasks, user: dict
+    ) -> GetLoginToken | None:
         async with async_db_session.begin() as db:
             github_email = user['email']
             if not github_email:

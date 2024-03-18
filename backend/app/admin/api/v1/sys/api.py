@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
 async def get_all_apis() -> ResponseModel:
-    data = await api_service.get_api_list()
+    data = await api_service.get_all()
     return await response_base.success(data=data)
 
 

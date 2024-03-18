@@ -21,7 +21,7 @@ class DictDataService:
 
     @staticmethod
     async def get_select(*, label: str = None, value: str = None, status: int = None) -> Select:
-        return await dict_data_dao.get_all(label=label, value=value, status=status)
+        return await dict_data_dao.get_list(label=label, value=value, status=status)
 
     @staticmethod
     async def create(*, obj: CreateDictDataParam) -> None:

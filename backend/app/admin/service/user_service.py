@@ -147,7 +147,7 @@ class UserService:
 
     @staticmethod
     async def get_select(*, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
-        return await user_dao.get_all(dept=dept, username=username, phone=phone, status=status)
+        return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:
