@@ -140,4 +140,4 @@ class CasbinService:
         return count
 
 
-casbin_service: CasbinService = CasbinService()
+casbin_service = CasbinService()

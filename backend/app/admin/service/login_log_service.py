@@ -56,4 +56,4 @@ class LoginLogService:
             return count
 
 
-login_log_service: LoginLogService = LoginLogService()
+login_log_service = LoginLogService()

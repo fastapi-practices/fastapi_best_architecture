@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.dict_data import CreateDictDataParam, GetDictDataListDetails, UpdateDictDataParam
-from backend.app.admin.services.dict_data_service import dict_data_service
+from backend.app.admin.service.dict_data_service import dict_data_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.permission import RequestPermission

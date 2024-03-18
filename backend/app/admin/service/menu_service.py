@@ -96,4 +96,4 @@ class MenuService:
             return count
 
 
-menu_service: MenuService = MenuService()
+menu_service = MenuService()

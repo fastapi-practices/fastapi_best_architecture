@@ -82,4 +82,4 @@ class RoleService:
             return count
 
 
-role_service: RoleService = RoleService()
+role_service = RoleService()

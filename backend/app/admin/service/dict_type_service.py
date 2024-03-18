@@ -40,4 +40,4 @@ class DictTypeService:
             return count
 
 
-dict_type_service: DictTypeService = DictTypeService()
+dict_type_service = DictTypeService()

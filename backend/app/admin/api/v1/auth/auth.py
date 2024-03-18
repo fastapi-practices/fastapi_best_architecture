@@ -9,7 +9,7 @@ from starlette.background import BackgroundTasks
 
 from backend.app.admin.schema.token import GetSwaggerToken
 from backend.app.admin.schema.user import AuthLoginParam
-from backend.app.admin.services.auth_service import auth_service
+from backend.app.admin.service.auth_service import auth_service
 from backend.common.jwt import DependsJwtAuth
 from backend.common.response.response_schema import ResponseModel, response_base
 

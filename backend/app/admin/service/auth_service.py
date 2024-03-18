@@ -8,7 +8,7 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
-from backend.app.admin.services.login_log_service import LoginLogService
+from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common import jwt
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -134,4 +134,4 @@ class AuthService:
             await redis_client.delete_prefix(prefix)
 
 
-auth_service: AuthService = AuthService()
+auth_service = AuthService()

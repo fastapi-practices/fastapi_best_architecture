@@ -8,7 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
-from backend.app.admin.services.opera_log_service import OperaLogService
+from backend.app.admin.service.opera_log_service import OperaLogService
 from backend.common.enums import OperaLogCipherType
 from backend.common.log import log
 from backend.core.conf import settings
