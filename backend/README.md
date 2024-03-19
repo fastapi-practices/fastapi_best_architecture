@@ -3,8 +3,7 @@
 ## Docker
 
 > [!IMPORTANT]
-> Due to Docker context limitations, you cannot successfully build a standalone application
-> using a Dockerfile in the current directory
+> Due to Docker context limitations, you cannot successfully build a image using a Dockerfile in the current directory
 
 1. Make sure you're at the root of the project
 2. Run the following Docker command to build a image:
@@ -16,7 +15,7 @@
 3. Start decker image
 
    ```shell
-   docker run fba_backend_independent
+   docker run -d fba_backend_independent -p 8000:8000 --name fba_app
    ```
 
 ## Contributing
