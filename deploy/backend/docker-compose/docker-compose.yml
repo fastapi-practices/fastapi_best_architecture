@@ -22,8 +22,8 @@ volumes:
 services:
   fba_server:
     build:
-      context: ../../../backend/
-      dockerfile: backend.dockerfile
+      context: ../../../
+      dockerfile: backend/backend.dockerfile
     container_name: fba_server
     restart: always
     depends_on:
@@ -110,8 +110,8 @@ services:
 
   fba_celery:
     build:
-      context: ../../../backend/
-      dockerfile: celery.dockerfile
+      context: ../../../
+      dockerfile: backend/celery.dockerfile
     container_name: fba_celery
     restart: always
     depends_on:

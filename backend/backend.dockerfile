@@ -13,14 +13,17 @@ RUN apt-get update \
 
 # 某些包可能存在同步不及时导致安装失败的情况，可更改为官方源：https://pypi.org/simple
 RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-    && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+    && pip install -r backend/requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
 ENV TZ = Asia/Shanghai
 
 RUN mkdir -p /var/log/fastapi_server
 
-COPY ../deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
+COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
 
 EXPOSE 8001
 
-CMD ["uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000"]
+WORKDIR /fba/backend/
+
+# TODO: No module error：https://www.cnblogs.com/duanweishi/p/15987693.html
+CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"]

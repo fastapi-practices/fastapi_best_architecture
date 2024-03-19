@@ -12,13 +12,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-    && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+    && pip install -r backend/requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
 ENV TZ = Asia/Shanghai
 
 RUN mkdir -p /var/log/celery
 
-COPY ../deploy/backend/celery.conf /etc/supervisor/conf.d/
+COPY deploy/backend/celery.conf /etc/supervisor/conf.d/
 
 WORKDIR /fba/backend/
 
