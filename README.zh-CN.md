@@ -6,8 +6,9 @@
 
 > [!CAUTION]
 > **2024-3-22 (公告)**
-> 
+>
 > 主分支已完成 app 架构重构，请格外注意 sync fork 操作，以免造成不可挽回的损失！
+> 
 > 我们保留并锁定了原始分支（legacy-single-app-pydantic-v2），您可以在分支选择器中找到它
 
 简体中文 | [English](./README.md)
