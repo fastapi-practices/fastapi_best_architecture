@@ -3,19 +3,19 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
 
+from backend.app.admin.conf import admin_settings
 from backend.app.admin.service.github_service import github_service
 from backend.common.response.response_schema import ResponseModel, response_base
-from backend.core.conf import settings
 
 router = APIRouter()
 
-github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_GITHUB_CLIENT_SECRET)
-github_oauth2 = FastAPIOAuth20(github_client, settings.OAUTH2_GITHUB_REDIRECT_URI)
+github_client = GitHubOAuth20(admin_settings.OAUTH2_GITHUB_CLIENT_ID, admin_settings.OAUTH2_GITHUB_CLIENT_SECRET)
+github_oauth2 = FastAPIOAuth20(github_client, admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
 
 
 @router.get('', summary='获取 Github 授权链接')
 async def github_auth2() -> ResponseModel:
-    auth_url = await github_client.get_authorization_url(redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI)
+    auth_url = await github_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
     return await response_base.success(data=auth_url)
 
 

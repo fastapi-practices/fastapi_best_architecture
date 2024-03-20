@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from celery import Celery
 
+from backend.app.task.conf import task_settings
 from backend.core.conf import settings
 
 __all__ = ['celery_app']
@@ -15,39 +16,37 @@ def make_celery(main_name: str) -> Celery:
     :return:
     """
     app = Celery(main_name)
-    app.autodiscover_tasks(packages=['backend.app'])
+    app.autodiscover_tasks(packages=['backend.app.task'])
 
     # Celery Config
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
+    _redis_connection = f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}'
+
+    # Broker
     app.conf.broker_url = (
-        (
-            f'redis://:{settings.CELERY_REDIS_PASSWORD}@{settings.CELERY_REDIS_HOST}:'
-            f'{settings.CELERY_REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
-        )
-        if settings.CELERY_BROKER == 'redis'
-        else (
-            f'amqp://{settings.RABBITMQ_USERNAME}:{settings.RABBITMQ_PASSWORD}@{settings.RABBITMQ_HOST}:'
-            f'{settings.RABBITMQ_PORT}'
-        )
+        f'{_redis_connection}/{task_settings.CELERY_BROKER_REDIS_DATABASE}'
+        if task_settings.CELERY_BROKER == 'redis'
+        else f'amqp://{task_settings.RABBITMQ_USERNAME}:{task_settings.RABBITMQ_PASSWORD}@{task_settings.RABBITMQ_HOST}:{task_settings.RABBITMQ_PORT}'
     )
-    app.conf.result_backend = (
-        f'redis://:{settings.CELERY_REDIS_PASSWORD}@{settings.CELERY_REDIS_HOST}:'
-        f'{settings.CELERY_REDIS_PORT}/{settings.CELERY_BACKEND_REDIS_DATABASE}'
-    )
+
+    # Result Backend
+    app.conf.result_backend = f'{_redis_connection}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
     app.conf.result_backend_transport_options = {
-        'global_keyprefix': settings.CELERY_BACKEND_REDIS_PREFIX,
+        'global_keyprefix': task_settings.CELERY_BACKEND_REDIS_PREFIX,
         'retry_policy': {
-            'timeout': settings.CELERY_BACKEND_REDIS_TIMEOUT,
+            'timeout': task_settings.CELERY_BACKEND_REDIS_TIMEOUT,
         },
-        'result_chord_ordered': settings.CELERY_BACKEND_REDIS_ORDERED,
+        'result_chord_ordered': task_settings.CELERY_BACKEND_REDIS_ORDERED,
     }
+
+    # Extra Conf
     app.conf.timezone = settings.DATETIME_TIMEZONE
     app.conf.task_track_started = True
 
     # Celery Schedule Tasks
     # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
-    app.conf.beat_schedule = settings.CELERY_BEAT_SCHEDULE
-    app.conf.beat_schedule_filename = settings.CELERY_BEAT_SCHEDULE_FILENAME
+    app.conf.beat_schedule = task_settings.CELERY_BEAT_SCHEDULE
+    app.conf.beat_schedule_filename = task_settings.CELERY_BEAT_SCHEDULE_FILENAME
 
     return app
 

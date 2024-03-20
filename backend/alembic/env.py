@@ -13,8 +13,8 @@ sys.path.append('../')
 
 from backend.core import path_conf
 
-if not os.path.exists(path_conf.Versions):
-    os.makedirs(path_conf.Versions)
+if not os.path.exists(path_conf.ALEMBIC_Versions_DIR):
+    os.makedirs(path_conf.ALEMBIC_Versions_DIR)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -46,7 +46,7 @@ services:
   fba_mysql:
     image: mysql:8.0.29
     ports:
-      - "${DOCKER_DB_MAP_PORT:-3306}:3306"
+      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
     container_name: fba_mysql
     restart: always
     environment:

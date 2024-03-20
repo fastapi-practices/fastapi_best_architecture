@@ -8,16 +8,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    """Global Settings"""
+
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='allow')
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
 
     # Env MySQL
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASSWORD: str
+    MYSQL_HOST: str
+    MYSQL_PORT: int
+    MYSQL_USER: str
+    MYSQL_PASSWORD: str
 
     # Env Redis
     REDIS_HOST: str
@@ -25,29 +27,11 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
     REDIS_DATABASE: int
 
-    # Env Celery
-    CELERY_REDIS_HOST: str
-    CELERY_REDIS_PORT: int
-    CELERY_REDIS_PASSWORD: str
-    CELERY_BROKER_REDIS_DATABASE: int  # 仅当使用 redis 作为 broker 时生效, 更适用于测试环境
-    CELERY_BACKEND_REDIS_DATABASE: int
-
-    # Env Rabbitmq
-    # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
-    RABBITMQ_HOST: str
-    RABBITMQ_PORT: int
-    RABBITMQ_USERNAME: str
-    RABBITMQ_PASSWORD: str
-
     # Env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
 
     # Env Opera Log
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
-
-    # OAuth2：https://github.com/fastapi-practices/fastapi_oauth20
-    OAUTH2_GITHUB_CLIENT_ID: str
-    OAUTH2_GITHUB_CLIENT_SECRET: str
 
     # FastAPI
     API_V1_STR: str = '/api/v1'
@@ -74,9 +58,6 @@ class Settings(BaseSettings):
         ('GET', f'{API_V1_STR}/auth/captcha'),
     }
 
-    # OAuth2
-    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/auth/github/callback'
-
     # Uvicorn
     UVICORN_HOST: str = '127.0.0.1'
     UVICORN_PORT: int = 8000
@@ -96,9 +77,9 @@ class Settings(BaseSettings):
     DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
 
     # MySQL
-    DB_ECHO: bool = False
-    DB_DATABASE: str = 'fba'
-    DB_CHARSET: str = 'utf8mb4'
+    MYSQL_ECHO: bool = False
+    MYSQL_DATABASE: str = 'fba'
+    MYSQL_CHARSET: str = 'utf8mb4'
 
     # Redis
     REDIS_TIMEOUT: int = 5
@@ -107,16 +88,11 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
-    TOKEN_URL_SWAGGER: str = f'{API_V1_STR}/auth/swagger_login'
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
     TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{API_V1_STR}/auth/login',
     ]
-
-    # Captcha
-    CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba_login_captcha'
-    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 过期时间，单位：秒
 
     # Log
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
@@ -166,29 +142,10 @@ class Settings(BaseSettings):
     IP_LOCATION_REDIS_PREFIX: str = 'fba_ip_location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
 
-    # Celery
-    CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
-    CELERY_BACKEND_REDIS_PREFIX: str = 'fba_celery'
-    CELERY_BACKEND_REDIS_TIMEOUT: float = 5.0
-    CELERY_BACKEND_REDIS_ORDERED: bool = True
-    CELERY_BEAT_SCHEDULE_FILENAME: str = './log/celery_beat-schedule'
-    CELERY_BEAT_SCHEDULE: dict = {
-        'task_demo_async': {
-            'task': 'tasks.task_demo_async',
-            'schedule': 5.0,
-        },
-    }
-
-    @model_validator(mode='before')
-    def validate_celery_broker(cls, values):
-        if values['ENVIRONMENT'] == 'pro':
-            values['CELERY_BROKER'] = 'rabbitmq'
-        return values
-
 
 @lru_cache
-def get_settings():
-    """读取配置优化"""
+def get_settings() -> Settings:
+    """获取全局配置"""
     return Settings()
 
 

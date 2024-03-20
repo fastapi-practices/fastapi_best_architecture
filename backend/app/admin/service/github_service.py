@@ -3,6 +3,7 @@
 from fast_captcha import text_captcha
 from fastapi import BackgroundTasks, Request
 
+from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.crud.crud_user_social import user_social_dao
 from backend.app.admin.schema.token import GetLoginToken
@@ -12,7 +13,6 @@ from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.exception.errors import AuthorizationError
 from backend.common.security import jwt
-from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
@@ -70,7 +70,7 @@ class GithubService:
                 msg='登录成功（OAuth2）',
             )
             background_tasks.add_task(LoginLogService.create, **login_log)
-            await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+            await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             data = GetLoginToken(
                 access_token=access_token,
                 refresh_token=refresh_token,

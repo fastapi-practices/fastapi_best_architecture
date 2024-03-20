@@ -10,6 +10,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
 from backend.core.conf import settings
+from backend.core.path_conf import STATIC_DIR
 from backend.database.db_mysql import create_table
 from backend.database.db_redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -85,9 +86,9 @@ def register_static_file(app: FastAPI):
 
         from fastapi.staticfiles import StaticFiles
 
-        if not os.path.exists('./static'):
-            os.mkdir('./static')
-        app.mount('/static', StaticFiles(directory='static'), name='static')
+        if not os.path.exists(STATIC_DIR):
+            os.mkdir(STATIC_DIR)
+        app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 
 
 def register_middleware(app: FastAPI):

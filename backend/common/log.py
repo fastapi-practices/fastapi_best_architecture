@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class Logger:
     def __init__(self):
-        self.log_path = path_conf.LogPath
+        self.log_path = path_conf.LOG_DIR
 
     def log(self) -> loguru.Logger:
         if not os.path.exists(self.log_path):
