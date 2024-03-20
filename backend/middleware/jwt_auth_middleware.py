@@ -6,9 +6,9 @@ from fastapi import Request, Response
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
 
-from backend.common import jwt
 from backend.common.exception.errors import TokenError
 from backend.common.log import log
+from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.utils.serializers import MsgSpecJSONResponse

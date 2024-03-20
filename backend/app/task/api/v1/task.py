@@ -5,11 +5,11 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Path
 
 from backend.app.task.service.task_service import task_service
-from backend.common.jwt import DependsJwtAuth
-from backend.common.permission import RequestPermission
-from backend.common.rbac import DependsRBAC
 from backend.common.response.response_code import CustomResponseCode
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 
 router = APIRouter()
 

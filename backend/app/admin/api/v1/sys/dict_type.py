@@ -6,11 +6,11 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.dict_type import CreateDictTypeParam, GetDictTypeListDetails, UpdateDictTypeParam
 from backend.app.admin.service.dict_type_service import dict_type_service
-from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
-from backend.common.permission import RequestPermission
-from backend.common.rbac import DependsRBAC
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
 
 router = APIRouter()

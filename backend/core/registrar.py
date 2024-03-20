@@ -9,9 +9,9 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
-from backend.common.redis import redis_client
 from backend.core.conf import settings
 from backend.database.db_mysql import create_table
+from backend.database.db_redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.utils.demo_site import demo_site

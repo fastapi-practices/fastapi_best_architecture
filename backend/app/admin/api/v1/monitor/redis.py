@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
 
-from backend.common.jwt import DependsJwtAuth
-from backend.common.permission import RequestPermission
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
 from backend.utils.redis_info import redis_info
 
 router = APIRouter()

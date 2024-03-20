@@ -11,7 +11,8 @@ from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
-from backend.common.jwt import (
+from backend.common.response.response_code import CustomErrorCode
+from backend.common.security.jwt import (
     create_access_token,
     create_new_token,
     create_refresh_token,
@@ -19,10 +20,9 @@ from backend.common.jwt import (
     jwt_decode,
     password_verify,
 )
-from backend.common.redis import redis_client
-from backend.common.response.response_code import CustomErrorCode
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
+from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
 
 

@@ -8,9 +8,9 @@ from user_agents import parse
 from XdbSearchIP.xdbSearcher import XdbSearcher
 
 from backend.common.log import log
-from backend.common.redis import redis_client
 from backend.core.conf import settings
 from backend.core.path_conf import IP2REGION_XDB
+from backend.database.db_redis import redis_client
 
 
 @sync_to_async

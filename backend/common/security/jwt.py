@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
 from backend.common.exception.errors import AuthorizationError, TokenError
-from backend.common.redis import redis_client
 from backend.core.conf import settings
+from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')

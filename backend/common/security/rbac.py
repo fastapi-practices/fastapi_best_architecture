@@ -8,10 +8,10 @@ from fastapi import Depends, Request
 from backend.app.admin.model import CasbinRule
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception.errors import AuthorizationError, TokenError
-from backend.common.jwt import DependsJwtAuth
-from backend.common.redis import redis_client
+from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
 from backend.database.db_mysql import async_engine
+from backend.database.db_redis import redis_client
 
 
 class RBAC:
@@ -89,15 +89,11 @@ class RBAC:
                 user_menu_perms = []
                 user_forbid_menu_perms = []
                 for role in user_roles:
-                    user_menus = role.menus
-                    if user_menus:
-                        for menu in user_menus:
-                            perms = menu.perms
-                            if perms:
-                                if menu.status == StatusType.enable:
-                                    user_menu_perms.extend(perms.split(','))
-                                else:
-                                    user_forbid_menu_perms.extend(perms.split(','))
+                    for menu in role.menus:
+                        if menu.status == StatusType.enable:
+                            user_menu_perms.extend(menu.perms.split(','))
+                        else:
+                            user_forbid_menu_perms.extend(menu.perms.split(','))
                 await redis_client.set(
                     f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:enable', ','.join(user_menu_perms)
                 )
@@ -116,13 +112,9 @@ class RBAC:
             if not user_forbid_menu_perms:
                 user_forbid_menu_perms = []
                 for role in user_roles:
-                    user_menus = role.menus
-                    if user_menus:
-                        for menu in user_menus:
-                            perms = menu.perms
-                            if perms:
-                                if menu.status == StatusType.disable:
-                                    user_forbid_menu_perms.extend(perms.split(','))
+                    for menu in role.menus:
+                        if menu.status == StatusType.disable:
+                            user_forbid_menu_perms.extend(menu.perms.split(','))
                 await redis_client.set(
                     f'{settings.PERMISSION_REDIS_PREFIX}:{user_uuid}:disable', ','.join(user_forbid_menu_perms)
                 )

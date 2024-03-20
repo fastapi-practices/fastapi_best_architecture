@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, Request
 from fastapi_limiter.depends import RateLimiter
 from starlette.concurrency import run_in_threadpool
 
-from backend.common.redis import redis_client
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.core.conf import settings
+from backend.database.db_redis import redis_client
 
 router = APIRouter()
 

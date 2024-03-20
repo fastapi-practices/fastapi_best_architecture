@@ -15,11 +15,11 @@ from backend.app.admin.schema.user import (
     UpdateUserRoleParam,
 )
 from backend.app.admin.service.user_service import user_service
-from backend.common.jwt import DependsJwtAuth
 from backend.common.pagination import DependsPagination, paging_data
-from backend.common.permission import RequestPermission
-from backend.common.rbac import DependsRBAC
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
 from backend.utils.serializers import select_as_dict
 

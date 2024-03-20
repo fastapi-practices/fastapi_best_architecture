@@ -14,8 +14,8 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
     UpdateUserRoleParam,
 )
-from backend.common.jwt import get_hash_password
 from backend.common.msd.crud import CRUDBase
+from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
 
 

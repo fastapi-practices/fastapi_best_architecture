@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.menu import CreateMenuParam, GetMenuListDetails, UpdateMenuParam
 from backend.app.admin.service.menu_service import menu_service
-from backend.common.jwt import DependsJwtAuth
-from backend.common.permission import RequestPermission
-from backend.common.rbac import DependsRBAC
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 from backend.utils.serializers import select_as_dict
 
 router = APIRouter()

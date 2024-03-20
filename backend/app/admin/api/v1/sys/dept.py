@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptListDetails, UpdateDeptParam
 from backend.app.admin.service.dept_service import dept_service
-from backend.common.jwt import DependsJwtAuth
-from backend.common.permission import RequestPermission
-from backend.common.rbac import DependsRBAC
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 from backend.utils.serializers import select_as_dict
 
 router = APIRouter()

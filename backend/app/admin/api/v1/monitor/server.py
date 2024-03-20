@@ -3,9 +3,9 @@
 from fastapi import APIRouter, Depends
 from starlette.concurrency import run_in_threadpool
 
-from backend.common.jwt import DependsJwtAuth
-from backend.common.permission import RequestPermission
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
 from backend.utils.server_info import server_info
 
 router = APIRouter()
