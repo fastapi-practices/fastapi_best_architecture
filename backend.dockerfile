@@ -23,4 +23,6 @@ COPY ./deploy/fastapi_server.conf /etc/supervisor/conf.d/
 
 EXPOSE 8001
 
-CMD ["uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000"]
+WORKDIR /fba/backend/app
+
+CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"]
