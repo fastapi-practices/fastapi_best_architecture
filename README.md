@@ -6,6 +6,7 @@
 
 > [!CAUTION]
 > **For 2023-12-22 (announcement)**
+> 
 > The main branch has completed the app architecture refactoring, please pay extra attention to sync fork operations to
 > avoid irreparable damage!
 > We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
