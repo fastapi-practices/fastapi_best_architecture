@@ -10,7 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Global Settings"""
 
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='allow')
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']

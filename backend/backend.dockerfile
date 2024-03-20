@@ -23,7 +23,4 @@ COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
 
 EXPOSE 8001
 
-WORKDIR /fba/backend/
-
-# TODO: No module error：https://www.cnblogs.com/duanweishi/p/15987693.html
-CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "8000"]

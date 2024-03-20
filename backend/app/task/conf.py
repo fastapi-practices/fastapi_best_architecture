@@ -6,11 +6,16 @@ from typing import Literal
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from backend.core.path_conf import BasePath
+
 
 class TaskSettings(BaseSettings):
     """Task Settings"""
 
-    model_config = SettingsConfigDict(env_file='../../.env', env_file_encoding='utf-8', extra='allow')
+    model_config = SettingsConfigDict(env_file=f'{BasePath}/.env', env_file_encoding='utf-8', extra='ignore')
+
+    # Env Config
+    ENVIRONMENT: Literal['dev', 'pro']
 
     # Env Celery
     CELERY_BROKER_REDIS_DATABASE: int  # 仅当使用 redis 作为 broker 时生效, 更适用于测试环境
