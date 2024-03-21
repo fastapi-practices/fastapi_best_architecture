@@ -33,7 +33,7 @@ async def user_login(request: Request, obj: AuthLoginParam, background_tasks: Ba
     return await response_base.success(data=data)
 
 
-@router.post('/new_token', summary='创建新 token', dependencies=[DependsJwtAuth])
+@router.post('/token/new', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]) -> ResponseModel:
     data = await auth_service.new_token(request=request, refresh_token=refresh_token)
     return await response_base.success(data=data)

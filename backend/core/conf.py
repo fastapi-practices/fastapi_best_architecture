@@ -6,11 +6,13 @@ from typing import Literal
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from backend.core.path_conf import BasePath
+
 
 class Settings(BaseSettings):
     """Global Settings"""
 
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
+    model_config = SettingsConfigDict(env_file=f'{BasePath}/.env', env_file_encoding='utf-8', extra='ignore')
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
@@ -109,11 +111,8 @@ class Settings(BaseSettings):
 
     # Casbin Auth
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', f'{API_V1_STR}/auth/swagger_login'),
-        ('POST', f'{API_V1_STR}/auth/login'),
         ('POST', f'{API_V1_STR}/auth/logout'),
-        ('POST', f'{API_V1_STR}/auth/register'),
-        ('GET', f'{API_V1_STR}/auth/captcha'),
+        ('POST', f'{API_V1_STR}/auth/token/new'),
     }
 
     # Role Menu Auth
@@ -128,7 +127,8 @@ class Settings(BaseSettings):
         DOCS_URL,
         REDOCS_URL,
         OPENAPI_URL,
-        f'{API_V1_STR}/auth/swagger_login',
+        f'{API_V1_STR}/auth/login/swagger',
+        f'{API_V1_STR}/auth/github/callback',
     ]
     OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = [
