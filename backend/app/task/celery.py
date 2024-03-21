@@ -8,39 +8,38 @@ from backend.core.conf import settings
 __all__ = ['celery_app']
 
 
-def make_celery(main_name: str) -> Celery:
-    """
-    创建 celery 应用
-
-    :param main_name: __main__ module name
-    :return:
-    """
-    app = Celery(main_name)
-    app.autodiscover_tasks(packages=['backend.app.task'])
+def init_celery() -> Celery:
+    """创建 celery 应用"""
+    app = Celery('fba_app')
+    app.autodiscover_tasks(packages=['tasks'])
 
     # Celery Config
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
-    _redis_connection = f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}'
-
-    # Broker
-    app.conf.broker_url = (
-        f'{_redis_connection}/{task_settings.CELERY_BROKER_REDIS_DATABASE}'
-        if task_settings.CELERY_BROKER == 'redis'
-        else f'amqp://{task_settings.RABBITMQ_USERNAME}:{task_settings.RABBITMQ_PASSWORD}@{task_settings.RABBITMQ_HOST}:{task_settings.RABBITMQ_PORT}'
+    _redis_broker = (
+        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
+        f'{settings.REDIS_PORT}/{task_settings.CELERY_BROKER_REDIS_DATABASE}'
     )
-
-    # Result Backend
-    app.conf.result_backend = f'{_redis_connection}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
-    app.conf.result_backend_transport_options = {
+    _amqp_broker = (
+        f'amqp://{task_settings.RABBITMQ_USERNAME}:{task_settings.RABBITMQ_PASSWORD}@'
+        f'{task_settings.RABBITMQ_HOST}:{task_settings.RABBITMQ_PORT}'
+    )
+    _result_backend = (
+        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
+        f'{settings.REDIS_PORT}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
+    )
+    # TODO
+    _result_backend_transport_options = {
         'global_keyprefix': task_settings.CELERY_BACKEND_REDIS_PREFIX,
         'retry_policy': {
             'timeout': task_settings.CELERY_BACKEND_REDIS_TIMEOUT,
         },
         'result_chord_ordered': task_settings.CELERY_BACKEND_REDIS_ORDERED,
     }
-
-    # Extra Conf
+    app.conf.broker_url = _redis_broker if task_settings.CELERY_BROKER == 'redis' else _amqp_broker
+    app.conf.result_backend = _result_backend
+    app.conf.result_backend_transport_options = _result_backend_transport_options
     app.conf.timezone = settings.DATETIME_TIMEZONE
+    app.conf.enable_utc = False
     app.conf.task_track_started = True
 
     # Celery Schedule Tasks
@@ -51,4 +50,4 @@ def make_celery(main_name: str) -> Celery:
     return app
 
 
-celery_app = make_celery('celery_app')
+celery_app = init_celery()

@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ruff: noqa: E402
-import sys
 import uuid
 
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-
+# sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from backend.app.task.celery import celery_app
 
 
