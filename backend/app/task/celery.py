@@ -10,8 +10,9 @@ __all__ = ['celery_app']
 
 def init_celery() -> Celery:
     """创建 celery 应用"""
-    app = Celery('fba_app')
-    app.autodiscover_tasks(packages=['tasks'])
+
+    app = Celery('fba_celery')
+    app.autodiscover_tasks(packages=['app.task'])
 
     # Celery Config
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
@@ -27,13 +28,11 @@ def init_celery() -> Celery:
         f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
         f'{settings.REDIS_PORT}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
     )
-    # TODO
     _result_backend_transport_options = {
-        'global_keyprefix': task_settings.CELERY_BACKEND_REDIS_PREFIX,
+        'global_keyprefix': f'{task_settings.CELERY_BACKEND_REDIS_PREFIX}_',
         'retry_policy': {
             'timeout': task_settings.CELERY_BACKEND_REDIS_TIMEOUT,
         },
-        'result_chord_ordered': task_settings.CELERY_BACKEND_REDIS_ORDERED,
     }
     app.conf.broker_url = _redis_broker if task_settings.CELERY_BROKER == 'redis' else _amqp_broker
     app.conf.result_backend = _result_backend
@@ -45,7 +44,6 @@ def init_celery() -> Celery:
     # Celery Schedule Tasks
     # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
     app.conf.beat_schedule = task_settings.CELERY_BEAT_SCHEDULE
-    app.conf.beat_schedule_filename = task_settings.CELERY_BEAT_SCHEDULE_FILENAME
 
     return app
 

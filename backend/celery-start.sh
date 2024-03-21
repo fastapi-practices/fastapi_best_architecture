@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-celery -A tasks worker --loglevel=INFO -B
+celery -A app.task.tasks worker -l info -B

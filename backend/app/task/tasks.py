@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ruff: noqa: E402
+import sys
 import uuid
 
-# sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent))
+
 from backend.app.task.celery import celery_app
 
 
@@ -12,3 +16,6 @@ def task_demo_async() -> str:
     uid = uuid.uuid4().hex
     print(f'异步任务 {uid} 执行成功')
     return uid
+
+
+# TODO: 添加一个定时清理数据库日志的任务
