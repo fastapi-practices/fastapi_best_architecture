@@ -4,12 +4,10 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-> [!CAUTION]
+> [!Tip]
 > **2024-3-22 (公告)**
 >
-> 主分支已完成 app 架构重构，请格外注意 sync fork 操作，以免造成不可挽回的损失！
-> 
-> 我们保留并锁定了原始分支（legacy-single-app-pydantic-v2），您可以在分支选择器中找到它
+> 你正在查看 legacy-single-app-pydantic-v2 分支，此分支已被锁定，不再提供任何更新和修复
 
 简体中文 | [English](./README.md)
 

@@ -4,12 +4,11 @@
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-> [!CAUTION]
-> **For 2023-12-22 (announcement)**
+> [!Tip]
+> **2024-3-22 (公告)**
 >
-> The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
-> to avoid irreparable damage!
-> We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
+> You're looking at the legacy-single-app-pydantic-v2 branch, which has been locked and no longer provides any updates
+> and fixes
 
 English | [简体中文](./README.zh-CN.md)
 
