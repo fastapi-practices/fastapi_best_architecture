@@ -26,8 +26,8 @@ from backend.utils.serializers import select_as_dict
 router = APIRouter()
 
 
-@router.post('/create', summary='用户注册')
-async def create_user(obj: RegisterUserParam) -> ResponseModel:
+@router.post('/register', summary='注册用户')
+async def register_user(obj: RegisterUserParam) -> ResponseModel:
     await user_service.register(obj=obj)
     return await response_base.success()
 
