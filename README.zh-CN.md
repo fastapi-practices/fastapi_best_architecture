@@ -6,12 +6,11 @@
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
 > [!CAUTION]
-> **2023-12-21 (公告)**
+> **2024-3-22 (公告)**
 >
-> 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
-> 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
-
-Pydantic-V2 已完工 🎉
+> 主分支已完成 app 架构重构，请格外注意 sync fork 操作，以免造成不可挽回的损失！
+>
+> 我们保留并锁定了原始分支（legacy-single-app-pydantic-v2），您可以在分支选择器中找到它
 
 简体中文 | [English](./README.md)
 

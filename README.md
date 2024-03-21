@@ -6,13 +6,12 @@
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
 > [!CAUTION]
-> **For 2023-12-21 (announcement)**
+> **For 2023-12-22 (announcement)**
 >
-> The master branch has been fully migrated to pydantic-v2, please pay extra attention to sync fork operations to avoid
-> irreparable damage!
-> We have kept and locked the original branch (pydantic-v1), which you can get in the branch selector
-
-Pydantic-V2 Completed 🎉
+> The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
+> to avoid irreparable damage!
+> 
+> We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
 
 English | [简体中文](./README.zh-CN.md)
 
