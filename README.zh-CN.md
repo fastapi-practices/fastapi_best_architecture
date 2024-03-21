@@ -5,12 +5,11 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > [!CAUTION]
-> **2023-12-21 (公告)**
+> **2024-3-22 (公告)**
 >
-> 主分支已完全迁移到 pydantic-v2，请格外注意 sync fork 操作，以免造成不可挽回的损失！
-> 我们保留并锁定了原始分支（pydantic-v1），您可以在分支选择器中找到它
-
-Pydantic-V2 已完工 🎉
+> 主分支已完成 app 架构重构，请格外注意 sync fork 操作，以免造成不可挽回的损失！
+> 
+> 我们保留并锁定了原始分支（legacy-single-app-pydantic-v2），您可以在分支选择器中找到它
 
 简体中文 | [English](./README.md)
 
@@ -102,7 +101,8 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    cp .env.example .env
    ```
 
-6. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+6. 按需修改配置文件
+7. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
    ```shell
    cd backend/app/
@@ -114,7 +114,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    alembic upgrade head
     ```
 
-7. 启动 celery worker 和 beat
+8. 启动 celery worker 和 beat
 
    ```shell
    celery -A tasks worker --loglevel=INFO
@@ -122,7 +122,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    celery -A tasks beat --loglevel=INFO
    ```
 
-8. 按需修改配置文件
 9. 执行 `backend/app/main.py` 文件启动服务
 10. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
