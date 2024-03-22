@@ -31,7 +31,7 @@ ecdsa==0.18.0
 email-validator==2.0.0
 exceptiongroup==1.2.0; python_version < "3.11"
 fast-captcha==0.2.1
-fastapi==0.108.0
+fastapi==0.109.1
 fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a1
 fastapi-pagination==0.12.13
