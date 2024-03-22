@@ -1,0 +1,67 @@
+[project]
+name = "fastapi_best_architecture"
+version = "0.0.1"
+description = "基于 FastAPI 构建的前后端分离 RBAC 权限控制系统，采用独特的伪三层架构模型设计，内置 fastapi-admin 基本实现"
+authors = [
+    { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
+]
+dependencies = [
+    "aiofiles==23.2.1",
+    "aiosmtplib==3.0.1",
+    "alembic==1.13.0",
+    "asgiref==3.7.2",
+    "asyncmy==0.2.9",
+    "bcrypt==4.0.1",
+    "casbin==1.34.0",
+    "casbin_async_sqlalchemy_adapter==1.4.0",
+    "celery==5.3.6",
+    "cryptography==41.0.7",
+    "email-validator==2.0.0",
+    "fast-captcha==0.2.1",
+    "fastapi==0.108.0",
+    "fastapi-limiter==0.1.6",
+    "fastapi-pagination==0.12.13",
+    "gunicorn==21.2.0",
+    "httpx==0.25.2",
+    "itsdangerous==2.1.2",
+    "loguru==0.7.2",
+    "msgspec==0.18.5",
+    "passlib==1.7.4",
+    "path==15.1.2",
+    "phonenumbers==8.13.27",
+    "pre-commit==3.2.2",
+    "psutil==5.9.6",
+    "pydantic==2.5.2",
+    "pydantic-extra-types==2.2.0",
+    "pydantic-settings==2.1.0",
+    "pytest==7.2.2",
+    "pytest-pretty==1.2.0",
+    "python-jose==3.3.0",
+    "python-multipart==0.0.6",
+    "pytz==2023.3",
+    "redis[hiredis]==5.0.1",
+    "SQLAlchemy==2.0.23",
+    "user-agents==2.2.0",
+    "uvicorn[standard]==0.24.0",
+    "XdbSearchIP==1.0.2",
+    "fastapi_oauth20>=0.0.1a1",
+    "flower==2.0.1",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+
+[tool.pdm.dev-dependencies]
+lint = [
+    "ruff>=0.3.3",
+]
+deploy = [
+    "supervisor>=4.2.5",
+    "wait-for-it>=2.2.2",
+]
+
+[tool.pdm]
+package-type = "application"
+
+[tool.pdm.scripts]
+lint = "pre-commit run --all-files"

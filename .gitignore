@@ -1,12 +1,2 @@
-__pycache__/
 .idea/
-.env
-venv/
-.venv/
-.mypy_cache/
-backend/app/log/
-backend/app/alembic/versions/
-backend/app/static/media/
-.ruff_cache/
-.pytest_cache/
-.pdm-python
+.vscode/

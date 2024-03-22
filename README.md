@@ -3,12 +3,15 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-> [!Tip]
-> **2024-3-22 (公告)**
+> [!CAUTION]
+> **For 2023-12-22 (announcement)**
 >
-> You're looking at the legacy-single-app-pydantic-v2 branch, which has been locked and no longer provides any updates
-> and fixes
+> The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
+> to avoid irreparable damage!
+>
+> We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -83,117 +86,117 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 * Redis: The latest stable version is recommended
 * Nodejs: 14.0+
 
-### BackEnd
+### Backend
 
-1. Install dependencies
-
-    ```shell
-    pip install -r requirements.txt
-    ```
-
-2. Create a database `fba`, choose utf8mb4 encoding
-3. Install and start Redis
-4. Create a `.env` file in the `backend/app/` directory
-
-    ```shell
-    cd backend/app/
-    touch .env
-    ```
-
-5. Copy `.env.example` to `.env`
+1. Enter the `backend` directory
 
    ```shell
+   cd backend
+   ```
+
+2. Install the dependencies
+
+   ```shell
+   pip install -r requirements.txt
+   ```
+
+3. Create a database `fba` with utf8mb4 encoding.
+4. Install and start Redis
+5. Create a `.env` file in the `backend` directory.
+
+   ```shell
+   touch .env
+   
    cp .env.example .env
    ```
 
-6. Modify the configuration file as needed
-7. Database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+6. Modify the configuration files `core/conf.py` and `.env` as needed.
+7. database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
    ```shell
-   cd backend/app/
-
-   # Generate migration file
+   # Generate the migration file
    alembic revision --autogenerate
-
+   
    # Execute the migration
    alembic upgrade head
-    ```
-8. Start celery worker and beat
-
-   ```shell
-   celery -A tasks worker --loglevel=INFO
-   # Optional, if you don't need to use the scheduled task
-   celery -A tasks beat --loglevel=INFO
    ```
 
-9. Execute the `backend/app/main.py` file to start the service
-10. Browser access: http://127.0.0.1:8000/api/v1/docs
+8. Start celery worker, beat and flower
+
+   ```shell
+   celery -A app.task.celery worker -l info
+   
+   # Scheduled tasks (optional)
+   celery -A app.task.celery beat -l info
+   
+   # Web monitor (optional)
+   celery -A app.task.celery flower --port=8555 --basic-auth=admin:123456
+   ```
+
+9. [Initialize test data](#test-data) (Optional)
+10. Execute the `main.py` file to start the service
+11. Open a browser and visit: http://127.0.0.1:8000/api/v1/docs
+
+### Front end
+
+Jump to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) View details
 
 ---
 
-### Front
-
-Go to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) for details
-
-### Docker deploy
+### Docker Deployment
 
 > [!WARNING]
-> Default port conflict：8000，3306，6379，5672
 >
-> As a best practice, shut down on-premises services before deployment：mysql，redis，rabbitmq...
+> Default port conflicts: 8000, 3306, 6379, 5672.
+>
+> It is recommended to shut down local services: mysql, redis, rabbitmq... before deployment.
 
-1. Go to the directory where the ``docker-compose.yml`` file is located and create the environment variable
-   file ``.env``
+1. Go to the `deploy/backend/docker-compose` directory, and create the environment variable file `.env`.
 
    ```shell
-   cd deploy/docker-compose/
+   cd deploy/backend/docker-compose
    
-   cp .env.server ../../backend/app/.env
+   touch .env.server ../../../backend/.env
    
-   # This command is optional
-   cp .env.docker .env
+   cp .env.server ../../../backend/.env
    ```
 
-2. Modify the configuration file as needed
-3. Execute the one-click boot command
+2. Modify the configuration files `backend/core/conf.py` and `.env` as needed.
+3. Execute the one-click startup command
 
    ```shell
    docker-compose up -d --build
    ```
 
-4. Wait for the command to complete automatically
-5. Visit the browser: http://127.0.0.1:8000/api/v1/docs
+4. Wait for the command to complete.
+5. Open a browser and visit: http://127.0.0.1:8000/api/v1/docs
 
 ## Test data
 
-Initialize the test data using the `backend/sql/init_test_data.sql` file
+Initialize the test data using the `backend/sql/init_test_data.sql` file.
 
-## Development process
+## Development Process
 
 (For reference only)
 
-1. Define the database model (model) and remember to perform database migration for each change
-2. Define the data validation model (schema)
-3. Define routes (router) and views (api)
-4. Define the business logic (service)
-5. Write database operations (crud)
+1. define the database model (model)
+2. define the data validation model (schema)
+3. define the view (api) and routing (router)
+4. write business (service)
+5. write database operations (crud)
 
-## Test
+## Testing
 
-Execute unittests via pytest
+Execute unit tests through `pytest`.
 
-1. Create the test database `fba_test`, select utf8mb4 encoding
-2. Using `backend/sql/create_tables.sql` file to create database tables
-3. Initialize the test data using the `backend/sql/init_pytest_data.sql` file
-4. Enter the app directory
-
-   ```shell
-   cd backend/app/
-   ```
-
-5. Execute the test command
+1. create a test database `fba_test` with utf8mb4 encoding
+2. create database tables using the `backend/sql/create_tables.sql` file
+3. initialize the test data using the `backend/sql/init_pytest_data.sql` file
+4. Go to the `backend` directory and execute the test commands.
 
    ```shell
+   cd backend/
+   
    pytest -vs --disable-warnings
    ```
 
@@ -203,8 +206,9 @@ Execute unittests via pytest
 
 ## Contributors
 
-<span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
-<span style="margin: 0 5px;" ><a href="https://github.com/downdawn" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
+<a href="https://github.com/fastapi-practices/fastapi_best_architecture/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fastapi-practices/fastapi_best_architecture"/>
+</a>
 
 ## Special thanks
 
@@ -226,7 +230,7 @@ beans: [:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
 
 ## License
 
-This project is licensed under the terms of
+This project is licensed by the terms of
 the [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) license
 
 [![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)

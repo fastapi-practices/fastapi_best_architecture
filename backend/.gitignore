@@ -1,0 +1,12 @@
+__pycache__/
+.env
+venv/
+.venv/
+.mypy_cache/
+log/
+alembic/versions/
+static/media/
+.ruff_cache/
+.pytest_cache/
+.pdm-python
+celerybeat-schedule.*

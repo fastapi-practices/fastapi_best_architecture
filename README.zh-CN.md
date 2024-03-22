@@ -3,11 +3,14 @@
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-> [!Tip]
+> [!CAUTION]
 > **2024-3-22 (公告)**
 >
-> 你正在查看 legacy-single-app-pydantic-v2 分支，此分支已被锁定，不再提供任何更新和修复
+> 主分支已完成 app 架构重构，请格外注意 sync fork 操作，以免造成不可挽回的损失！
+>
+> 我们保留并锁定了原始分支（legacy-single-app-pydantic-v2），您可以在分支选择器中找到它
 
 简体中文 | [English](./README.md)
 
@@ -78,84 +81,88 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ### 后端
 
-1. 安装依赖项
-
-    ```shell
-    pip install -r requirements.txt
-    ```
-
-2. 创建一个数据库 `fba`，选择 utf8mb4 编码
-3. 安装并启动 Redis
-4. 在 `backend/app/` 目录下创建一个 `.env` 文件
-
-    ```shell
-    cd backend/app/
-    touch .env
-    ```
-
-5. 复制 `.env.example` 到 `.env`
+1. 进入 `backend` 目录
 
    ```shell
+   cd backend
+   ```
+
+2. 安装依赖包
+
+   ```shell
+   pip install -r requirements.txt
+   ```
+
+3. 创建一个数据库 `fba`，选择 utf8mb4 编码
+4. 安装并启动 Redis
+5. 在 `backend` 目录下创建 `.env` 文件
+
+   ```shell
+   touch .env
+   
    cp .env.example .env
    ```
 
-6. 按需修改配置文件
+6. 按需修改配置文件 `core/conf.py` 和 `.env`
 7. 数据库迁移 [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
 
    ```shell
-   cd backend/app/
-
    # 生成迁移文件
    alembic revision --autogenerate
-
+   
    # 执行迁移
    alembic upgrade head
-    ```
-
-8. 启动 celery worker 和 beat
-
-   ```shell
-   celery -A tasks worker --loglevel=INFO
-   # 可选，如果您不需要使用计划任务
-   celery -A tasks beat --loglevel=INFO
    ```
 
-9. 执行 `backend/app/main.py` 文件启动服务
-10. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+8. 启动 celery worker, beat 和 flower
 
----
+   ```shell
+   celery -A app.task.celery worker -l info
+   
+   # 定时任务（可选）
+   celery -A app.task.celery beat -l info
+   
+   # web 监控（可选）
+   celery -A app.task.celery flower --port=8555 --basic-auth=admin:123456
+   ```
+
+9. [初始化测试数据](#测试数据)（可选）
+10. 执行 `main.py` 文件启动服务
+11. 打开浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ### 前端
 
 跳转 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 查看详情
 
+---
+
 ### Docker 部署
 
 > [!WARNING]
+>
 > 默认端口冲突：8000，3306，6379，5672
 >
-> 最佳做法是在部署之前关闭本地服务：mysql，redis，rabbitmq...
+> 建议在部署前关闭本地服务：mysql，redis，rabbitmq...
 
-1. 进入 `docker-compose.yml` 文件所在目录，创建环境变量文件`.env`
+1. 进入 `deploy/backend/docker-compose` 目录，创建环境变量文件`.env`
 
    ```shell
-   cd deploy/docker-compose/
+   cd deploy/backend/docker-compose
    
-   cp .env.server ../../backend/app/.env
+   touch .env.server ../../../backend/.env
    
-   # 此命令为可选
-   cp .env.docker .env
+   cp .env.server ../../../backend/.env
    ```
 
-2. 按需修改配置文件
+2. 按需修改配置文件 `backend/core/conf.py` 和 `.env`
 3. 执行一键启动命令
 
    ```shell
    docker-compose up -d --build
    ```
 
-4. 等待命令自动完成
-5. 浏览器访问：http://127.0.0.1:8000/api/v1/docs
+4. 等待命令执行完成
+5. 打开浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ## 测试数据
 
@@ -165,28 +172,24 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 （仅供参考）
 
-1. 定义数据库模型（model），每次变化记得执行数据库迁移
+1. 定义数据库模型（model）
 2. 定义数据验证模型（schema）
-3. 定义路由（router）和视图（api）
-4. 定义业务逻辑（service）
+3. 定义视图（api）和路由（router）
+4. 编写业务（service）
 5. 编写数据库操作（crud）
 
 ## 测试
 
-通过 pytest 执行单元测试
+通过 `pytest` 执行单元测试
 
 1. 创建测试数据库 `fba_test`，选择 utf8mb4 编码
 2. 使用 `backend/sql/create_tables.sql` 文件创建数据库表
 3. 使用 `backend/sql/init_pytest_data.sql` 文件初始化测试数据
-4. 进入app目录
+4. 进入 `backend` 目录，执行测试命令
 
    ```shell
-   cd backend/app/
-   ```
-
-5. 执行测试命令
-
-   ```shell
+   cd backend/
+   
    pytest -vs --disable-warnings
    ```
 
@@ -196,8 +199,9 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 贡献者
 
-<span style="margin: 0 5px;" ><a href="https://github.com/wu-clan" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/52145145?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
-<span style="margin: 0 5px;" ><a href="https://github.com/downdawn" ><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/41266749?v=4&h=60&w=60&fit=cover&mask=circle&maxage=7d" /></a></span>
+<a href="https://github.com/fastapi-practices/fastapi_best_architecture/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fastapi-practices/fastapi_best_architecture"/>
+</a>
 
 ## 特别鸣谢
 
@@ -218,6 +222,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 许可证
 
-本项目根据 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
+本项目由 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
 
 [![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)

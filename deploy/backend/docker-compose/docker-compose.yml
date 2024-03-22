@@ -1,0 +1,132 @@
+version: "3.10"
+
+networks:
+  fba_network:
+    name: fba_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.10.10.0/24
+
+volumes:
+  fba_mysql:
+    name: fba_mysql
+  fba_redis:
+    name: fba_redis
+  fba_static:
+    name: fba_static
+  fba_rabbitmq:
+    name: fba_rabbitmq
+
+services:
+  fba_server:
+    build:
+      context: ../../../
+      dockerfile: backend/backend.dockerfile
+    container_name: fba_server
+    restart: always
+    depends_on:
+      - fba_mysql
+      - fba_redis
+      - fba_celery
+    volumes:
+      - fba_static:/fba/backend/app/static
+    networks:
+      - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
+        mkdir -p /var/log/supervisor/
+        supervisord -c /fba/deploy/backend/supervisor.conf
+        supervisorctl restart fastapi_server
+
+  fba_mysql:
+    image: mysql:8.0.29
+    ports:
+      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
+    container_name: fba_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: fba
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - fba_mysql:/var/lib/mysql
+    networks:
+      - fba_network
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --lower_case_table_names=1
+
+  fba_redis:
+    image: redis:6.2.7
+    ports:
+      - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
+    container_name: fba_redis
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - fba_redis:/var/lib/redis
+    networks:
+      - fba_network
+
+  # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
+  # you should stop using fba_nginx container
+  fba_nginx:
+    image: nginx
+    ports:
+      - "8000:80"
+    container_name: fba_nginx
+    restart: always
+    depends_on:
+      - fba_server
+    volumes:
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
+      - fba_static:/www/fba_server/backend/static
+    networks:
+      - fba_network
+
+  fba_rabbitmq:
+    hostname: fba_rabbitmq
+    image: rabbitmq:3.12.7
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    container_name: fba_rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - fba_rabbitmq:/var/lib/rabbitmq
+    networks:
+      - fba_network
+
+  fba_celery:
+    build:
+      context: ../../../
+      dockerfile: backend/celery.dockerfile
+    ports:
+      - "8555:8555"
+    container_name: fba_celery
+    restart: always
+    depends_on:
+      - fba_rabbitmq
+    networks:
+      - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s fba_rabbitmq:5672 -t 300
+        mkdir -p /var/log/supervisor/
+        supervisord -c /fba/deploy/backend/supervisor.conf
+        supervisorctl restart celery_worker
+        supervisorctl restart celery_beat
+        supervisorctl restart celery_flower
