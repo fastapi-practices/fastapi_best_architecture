@@ -117,10 +117,10 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 8. 启动 celery worker 和 beat
 
    ```shell
-   celery -A tasks worker --loglevel=INFO
+   celery -A app.task.celery worker -l info
    
-   # 可选，如果您不需要使用计划任务
-   celery -A tasks beat --loglevel=INFO
+   # 定时任务（可选）
+   celery -A app.task.celery beat -l info
    ```
 
 9. [初始化测试数据](#测试数据)（可选）

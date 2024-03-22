@@ -149,4 +149,5 @@ def get_settings() -> Settings:
     return Settings()
 
 
+# 创建配置实例
 settings = get_settings()

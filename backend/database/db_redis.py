@@ -60,5 +60,5 @@ class RedisCli(Redis):
             await self.delete(key)
 
 
-# 创建redis连接对象
+# 创建 redis 客户端实例
 redis_client = RedisCli()

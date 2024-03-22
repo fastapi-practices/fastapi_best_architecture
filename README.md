@@ -10,7 +10,7 @@
 >
 > The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
 > to avoid irreparable damage!
-> 
+>
 > We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
 
 English | [简体中文](./README.zh-CN.md)
@@ -124,10 +124,10 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 8. Start celery worker and beat
 
    ```shell
-   celery -A tasks worker --loglevel=INFO
+   celery -A app.task.celery worker -l info
    
-   # Optional, if you don't need to use scheduled tasks
-   celery -A tasks beat --loglevel=INFO
+   # Scheduled tasks (optional)
+   celery -A app.task.celery beat -l info
    ```
 
 9. [Initialize test data](#test-data) (Optional)

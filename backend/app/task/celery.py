@@ -12,7 +12,6 @@ def init_celery() -> Celery:
     """创建 celery 应用"""
 
     app = Celery('fba_celery')
-    app.autodiscover_tasks(packages=['app.task'])
 
     # Celery Config
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
@@ -34,18 +33,27 @@ def init_celery() -> Celery:
             'timeout': task_settings.CELERY_BACKEND_REDIS_TIMEOUT,
         },
     }
-    app.conf.broker_url = _redis_broker if task_settings.CELERY_BROKER == 'redis' else _amqp_broker
-    app.conf.result_backend = _result_backend
-    app.conf.result_backend_transport_options = _result_backend_transport_options
-    app.conf.timezone = settings.DATETIME_TIMEZONE
-    app.conf.enable_utc = False
-    app.conf.task_track_started = True
 
     # Celery Schedule Tasks
     # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
-    app.conf.beat_schedule = task_settings.CELERY_BEAT_SCHEDULE
+    _beat_schedule = task_settings.CELERY_SCHEDULE
+
+    # Update celery settings
+    app.conf.update(
+        broker_url=_redis_broker if task_settings.CELERY_BROKER == 'redis' else _amqp_broker,
+        result_backend=_result_backend,
+        result_backend_transport_options=_result_backend_transport_options,
+        timezone=settings.DATETIME_TIMEZONE,
+        enable_utc=False,
+        task_track_started=True,
+        beat_schedule=_beat_schedule,
+    )
+
+    # Load task modules
+    app.autodiscover_tasks(task_settings.CELERY_TASKS_PACKAGES)
 
     return app
 
 
+# 创建 celery 实例
 celery_app = init_celery()

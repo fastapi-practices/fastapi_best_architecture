@@ -32,7 +32,11 @@ class TaskSettings(BaseSettings):
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
     CELERY_BACKEND_REDIS_PREFIX: str = 'fba_celery'
     CELERY_BACKEND_REDIS_TIMEOUT: float = 5.0
-    CELERY_BEAT_SCHEDULE: dict = {
+    CELERY_TASKS_PACKAGES: list[str] = [
+        'app.task.celery_task',
+        'app.task.celery_task.db_log',
+    ]
+    CELERY_SCHEDULE: dict = {
         'exec-every-10-seconds': {
             'task': 'task_demo_async',
             'schedule': 10.0,
