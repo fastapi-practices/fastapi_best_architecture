@@ -3,6 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
+from celery.schedules import crontab
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,10 +37,19 @@ class TaskSettings(BaseSettings):
         'app.task.celery_task',
         'app.task.celery_task.db_log',
     ]
+    CELERY_TASK_MAX_RETRIES: int = 5
     CELERY_SCHEDULE: dict = {
         'exec-every-10-seconds': {
             'task': 'task_demo_async',
-            'schedule': 10.0,
+            'schedule': 10,
+        },
+        'exec-every-sunday': {
+            'task': 'auto_delete_db_opera_log',
+            'schedule': crontab(0, 0, day_of_week='6'),  # type: ignore
+        },
+        'exec-every-15-of-month': {
+            'task': 'auto_delete_db_login_log',
+            'schedule': crontab(0, 0, day_of_month='15'),  # type: ignore
         },
     }
 
