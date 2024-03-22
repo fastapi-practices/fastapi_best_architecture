@@ -6,7 +6,7 @@
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
 > [!CAUTION]
-> **For 2023-12-22 (announcement)**
+> **For 2024-3-22 (announcement)**
 >
 > The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
 > to avoid irreparable damage!
