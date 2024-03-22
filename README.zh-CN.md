@@ -114,13 +114,16 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    alembic upgrade head
    ```
 
-8. 启动 celery worker 和 beat
+8. 启动 celery worker, beat 和 flower
 
    ```shell
    celery -A app.task.celery worker -l info
    
    # 定时任务（可选）
    celery -A app.task.celery beat -l info
+   
+   # web 监控（可选）
+   celery -A app.task.celery flower --port=8555 --basic-auth=admin:123456
    ```
 
 9. [初始化测试数据](#测试数据)（可选）

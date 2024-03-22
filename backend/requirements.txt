@@ -36,6 +36,7 @@ fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a1
 fastapi-pagination==0.12.13
 filelock==3.13.1
+flower==2.0.1
 greenlet==3.0.3; platform_machine == "win32" or platform_machine == "WIN32" or platform_machine == "AMD64" or platform_machine == "amd64" or platform_machine == "x86_64" or platform_machine == "ppc64le" or platform_machine == "aarch64"
 gunicorn==21.2.0
 h11==0.14.0
@@ -43,6 +44,7 @@ hiredis==2.3.2
 httpcore==1.0.4
 httptools==0.6.1
 httpx==0.25.2
+humanize==4.9.0
 identify==2.5.35
 idna==3.6
 iniconfig==2.0.0
@@ -63,6 +65,7 @@ pillow==9.5.0
 platformdirs==4.2.0
 pluggy==1.4.0
 pre-commit==3.2.2
+prometheus-client==0.20.0
 prompt-toolkit==3.0.43
 psutil==5.9.6
 pyasn1==0.5.1
@@ -92,6 +95,7 @@ sqlalchemy==2.0.23
 starlette==0.32.0.post1
 supervisor==4.2.5
 tomli==2.0.1; python_version < "3.11"
+tornado==6.4
 typing-extensions==4.10.0
 tzdata==2024.1
 ua-parser==0.18.0

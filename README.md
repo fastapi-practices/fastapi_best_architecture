@@ -121,13 +121,16 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
    alembic upgrade head
    ```
 
-8. Start celery worker and beat
+8. Start celery worker, beat and flower
 
    ```shell
    celery -A app.task.celery worker -l info
    
    # Scheduled tasks (optional)
    celery -A app.task.celery beat -l info
+   
+   # Web monitor (optional)
+   celery -A app.task.celery flower --port=8555 --basic-auth=admin:123456
    ```
 
 9. [Initialize test data](#test-data) (Optional)

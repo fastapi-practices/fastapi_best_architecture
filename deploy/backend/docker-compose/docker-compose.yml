@@ -112,6 +112,8 @@ services:
     build:
       context: ../../../
       dockerfile: backend/celery.dockerfile
+    ports:
+      - "8555:8555"
     container_name: fba_celery
     restart: always
     depends_on:
@@ -127,3 +129,4 @@ services:
         supervisord -c /fba/deploy/backend/supervisor.conf
         supervisorctl restart celery_worker
         supervisorctl restart celery_beat
+        supervisorctl restart celery_flower
