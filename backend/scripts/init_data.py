@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# ruff: noqa: I001
 import logging
+import sys
 
 from anyio import run
+
+sys.path.append('../')
 
 from backend.database.db_mysql import create_table
 
