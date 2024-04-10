@@ -61,7 +61,7 @@ deploy = [
 ]
 
 [tool.pdm]
-package-type = "application"
+distribution = false
 
 [tool.pdm.scripts]
 lint = "pre-commit run --all-files"

@@ -8,10 +8,11 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.1.15
+    rev: v0.3.3
     hooks:
       - id: ruff
         args:
+          # https://github.com/astral-sh/ruff-pre-commit/issues/64
           - '--config'
           - 'backend/.ruff.toml'
           - '--fix'
