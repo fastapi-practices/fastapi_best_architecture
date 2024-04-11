@@ -58,3 +58,21 @@
 5. Commit and push your changes
 
    Commit your changes, push your branch to GitHub, and create a pull request.
+
+## Scripts
+
+> [!WARNING]
+>
+> The following script may not apply to the Windows platform
+>
+> It is recommended to execute under the backend directory, and chmod authorization may be required
+
+- `pre_start.sh`: Perform automatic database migration and create database tables
+
+- `celery-start.sh`: For celery docker script, implementation is not recommended
+
+- `format.sh`: Perform ruff format check
+
+- `lint.sh`: Perform pre-commit formatting
+
+- `pdm_export.sh`: Execute pdm export dependency package
