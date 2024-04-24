@@ -5,6 +5,7 @@ from sqlalchemy import and_, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Role, User
 from backend.app.admin.schema.user import (
@@ -14,12 +15,11 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
     UpdateUserRoleParam,
 )
-from backend.common.msd.crud import CRUDBase
 from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
 
 
-class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
+class CRUDUser(CRUDPlus[User]):
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
         """
         获取用户
@@ -28,7 +28,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param user_id:
         :return:
         """
-        return await self.get_(db, pk=user_id)
+        return await self.select_model_by_id(db, user_id)
 
     async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
         """
@@ -38,8 +38,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param username:
         :return:
         """
-        user = await db.execute(select(self.model).where(self.model.username == username))
-        return user.scalars().first()
+        return await self.select_model_by_column(db, 'username', username)
 
     async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
         """
@@ -49,8 +48,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param nickname:
         :return:
         """
-        user = await db.execute(select(self.model).where(self.model.nickname == nickname))
-        return user.scalars().first()
+        return await self.select_model_by_column(db, 'nickname', nickname)
 
     async def update_login_time(self, db: AsyncSession, username: str) -> int:
         """
@@ -113,8 +111,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param obj:
         :return:
         """
-        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.model_dump()))
-        return user.rowcount
+        return await self.update_model(db, input_user.id, obj)
 
     @staticmethod
     async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
@@ -155,7 +152,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param user_id:
         :return:
         """
-        return await self.delete_(db, user_id)
+        return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
         """
@@ -165,8 +162,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param email:
         :return:
         """
-        mail = await db.execute(select(self.model).where(self.model.email == email))
-        return mail.scalars().first()
+        return await self.select_model_by_column(db, 'email', email)
 
     async def reset_password(self, db: AsyncSession, pk: int, password: str, salt: str) -> int:
         """

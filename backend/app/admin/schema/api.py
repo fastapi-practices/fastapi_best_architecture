@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import ConfigDict, Field
 
 from backend.common.enums import MethodType
-from backend.common.msd.schema import SchemaBase
+from backend.common.schema import SchemaBase
 
 
 class ApiSchemaBase(SchemaBase):

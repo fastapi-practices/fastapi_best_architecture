@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import LoginLog
-from backend.app.admin.schema.login_log import CreateLoginLogParam, UpdateLoginLogParam
-from backend.common.msd.crud import CRUDBase
+from backend.app.admin.schema.login_log import CreateLoginLogParam
 
 
-class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLogParam, UpdateLoginLogParam]):
+class CRUDLoginLog(CRUDPlus[LoginLog]):
     async def get_list(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
         """
         获取登录日志列表
@@ -38,7 +38,7 @@ class CRUDLoginLog(CRUDBase[LoginLog, CreateLoginLogParam, UpdateLoginLogParam])
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
         await db.commit()
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:

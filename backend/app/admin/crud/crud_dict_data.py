@@ -3,13 +3,13 @@
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DictData
 from backend.app.admin.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam]):
+class CRUDDictData(CRUDPlus[DictData]):
     async def get(self, db: AsyncSession, pk: int) -> DictData | None:
         """
         获取字典数据
@@ -18,7 +18,7 @@ class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam])
         :param pk:
         :return:
         """
-        return await self.get_(db, pk=pk)
+        return await self.select_model_by_id(db, pk)
 
     async def get_list(self, label: str = None, value: str = None, status: int = None) -> Select:
         """
@@ -49,8 +49,7 @@ class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam])
         :param label:
         :return:
         """
-        api = await db.execute(select(self.model).where(self.model.label == label))
-        return api.scalars().first()
+        return await self.select_model_by_column(db, 'label', label)
 
     async def create(self, db: AsyncSession, obj_in: CreateDictDataParam) -> None:
         """
@@ -60,7 +59,7 @@ class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam])
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictDataParam) -> int:
         """
@@ -71,7 +70,7 @@ class CRUDDictData(CRUDBase[DictData, CreateDictDataParam, UpdateDictDataParam])
         :param obj_in:
         :return:
         """
-        return await self.update_(db, pk, obj_in)
+        return await self.update_model(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

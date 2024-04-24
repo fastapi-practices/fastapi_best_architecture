@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import UserSocial
-from backend.app.admin.schema.user_social import CreateUserSocialParam, UpdateUserSocialParam
+from backend.app.admin.schema.user_social import CreateUserSocialParam
 from backend.common.enums import UserSocialType
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDOUserSocial(CRUDBase[UserSocial, CreateUserSocialParam, UpdateUserSocialParam]):
+class CRUDOUserSocial(CRUDPlus[UserSocial]):
     async def get(self, db: AsyncSession, pk: int, source: UserSocialType) -> UserSocial | None:
         """
         获取用户社交账号绑定
@@ -31,7 +31,7 @@ class CRUDOUserSocial(CRUDBase[UserSocial, CreateUserSocialParam, UpdateUserSoci
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def delete(self, db: AsyncSession, social_id: int) -> int:
         """
@@ -41,7 +41,7 @@ class CRUDOUserSocial(CRUDBase[UserSocial, CreateUserSocialParam, UpdateUserSoci
         :param social_id:
         :return:
         """
-        return await self.delete_(db, social_id)
+        return await self.delete_model(db, social_id)
 
 
 user_social_dao: CRUDOUserSocial = CRUDOUserSocial(UserSocial)

@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.msd.model import MappedBase, id_key
+from backend.common.model import MappedBase, id_key
 
 
 class CasbinRule(MappedBase):

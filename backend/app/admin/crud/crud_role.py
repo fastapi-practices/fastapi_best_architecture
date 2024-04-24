@@ -4,13 +4,13 @@ from typing import Sequence
 
 from sqlalchemy import Select, delete, desc, select
 from sqlalchemy.orm import selectinload
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Menu, Role, User
 from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
+class CRUDRole(CRUDPlus[Role]):
     async def get(self, db, role_id: int) -> Role | None:
         """
         获取角色
@@ -19,7 +19,7 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         :param role_id:
         :return:
         """
-        return await self.get_(db, pk=role_id)
+        return await self.select_model_by_id(db, role_id)
 
     async def get_with_relation(self, db, role_id: int) -> Role | None:
         """
@@ -41,8 +41,7 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         :param db:
         :return:
         """
-        roles = await db.execute(select(self.model))
-        return roles.scalars().all()
+        return await self.select_models(db)
 
     async def get_user_roles(self, db, user_id: int) -> Sequence[Role]:
         """
@@ -84,8 +83,7 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         :param name:
         :return:
         """
-        role = await db.execute(select(self.model).where(self.model.name == name))
-        return role.scalars().first()
+        return await self.select_model_by_column(db, 'name', name)
 
     async def create(self, db, obj_in: CreateRoleParam) -> None:
         """
@@ -95,7 +93,7 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def update(self, db, role_id: int, obj_in: UpdateRoleParam) -> int:
         """
@@ -106,7 +104,7 @@ class CRUDRole(CRUDBase[Role, CreateRoleParam, UpdateRoleParam]):
         :param obj_in:
         :return:
         """
-        rowcount = await self.update_(db, pk=role_id, obj_in=obj_in)
+        rowcount = await self.update_model(db, pk=role_id, obj_in=obj_in)
         return rowcount
 
     async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:

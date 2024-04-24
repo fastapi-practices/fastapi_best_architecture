@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from backend.app.admin.schema.user import GetUserInfoNoRelationDetail
-from backend.common.msd.schema import SchemaBase
+from backend.common.schema import SchemaBase
 
 
 class GetSwaggerToken(SchemaBase):

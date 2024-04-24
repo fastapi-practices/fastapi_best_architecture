@@ -6,7 +6,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.msd.model import DataClassBase, id_key
+from backend.common.model import DataClassBase, id_key
 from backend.utils.timezone import timezone
 
 

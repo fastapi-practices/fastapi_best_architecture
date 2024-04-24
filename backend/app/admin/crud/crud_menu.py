@@ -4,13 +4,13 @@ from typing import Sequence
 
 from sqlalchemy import and_, asc, select
 from sqlalchemy.orm import selectinload
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
+class CRUDMenu(CRUDPlus[Menu]):
     async def get(self, db, menu_id: int) -> Menu | None:
         """
         获取菜单
@@ -19,7 +19,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
         :param menu_id:
         :return:
         """
-        return await self.get_(db, pk=menu_id)
+        return await self.select_model_by_id(db, menu_id)
 
     async def get_by_title(self, db, title: str) -> Menu | None:
         """
@@ -77,7 +77,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def update(self, db, menu_id: int, obj_in: UpdateMenuParam) -> int:
         """
@@ -88,7 +88,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
         :param obj_in:
         :return:
         """
-        count = await self.update_(db, menu_id, obj_in)
+        count = await self.update_model(db, menu_id, obj_in)
         return count
 
     async def delete(self, db, menu_id: int) -> int:
@@ -99,7 +99,7 @@ class CRUDMenu(CRUDBase[Menu, CreateMenuParam, UpdateMenuParam]):
         :param menu_id:
         :return:
         """
-        return await self.delete_(db, menu_id)
+        return await self.delete_model(db, menu_id)
 
     async def get_children(self, db, menu_id: int) -> list[Menu]:
         """

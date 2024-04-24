@@ -4,13 +4,13 @@ from typing import Sequence
 
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Api
 from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
+class CRUDApi(CRUDPlus[Api]):
     async def get(self, db: AsyncSession, pk: int) -> Api | None:
         """
         获取 API
@@ -19,7 +19,7 @@ class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
         :param pk:
         :return:
         """
-        return await self.get_(db, pk=pk)
+        return await self.select_model_by_id(db, pk)
 
     async def get_list(self, name: str = None, method: str = None, path: str = None) -> Select:
         """
@@ -49,8 +49,7 @@ class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
         :param db:
         :return:
         """
-        apis = await db.execute(select(self.model))
-        return apis.scalars().all()
+        return await self.select_models(db)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Api | None:
         """
@@ -71,7 +70,7 @@ class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApiParam) -> int:
         """
@@ -82,7 +81,7 @@ class CRUDApi(CRUDBase[Api, CreateApiParam, UpdateApiParam]):
         :param obj_in:
         :return:
         """
-        return await self.update_(db, pk, obj_in)
+        return await self.update_model(db, pk, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

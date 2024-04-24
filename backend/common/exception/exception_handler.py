@@ -11,12 +11,12 @@ from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.common.log import log
-from backend.common.msd.schema import (
+from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
+from backend.common.response.response_schema import response_base
+from backend.common.schema import (
     CUSTOM_USAGE_ERROR_MESSAGES,
     CUSTOM_VALIDATION_ERROR_MESSAGES,
 )
-from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
-from backend.common.response.response_schema import response_base
 from backend.core.conf import settings
 from backend.utils.serializers import MsgSpecJSONResponse
 

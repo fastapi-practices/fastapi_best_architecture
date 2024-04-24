@@ -4,13 +4,13 @@ from uuid import UUID
 
 from sqlalchemy import Select, and_, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import CasbinRule
-from backend.app.admin.schema.casbin_rule import CreatePolicyParam, DeleteAllPoliciesParam, UpdatePolicyParam
-from backend.common.msd.crud import CRUDBase
+from backend.app.admin.schema.casbin_rule import DeleteAllPoliciesParam
 
 
-class CRUDCasbin(CRUDBase[CasbinRule, CreatePolicyParam, UpdatePolicyParam]):
+class CRUDCasbin(CRUDPlus[CasbinRule]):
     async def get_list(self, ptype: str, sub: str) -> Select:
         """
         获取策略列表
