@@ -5,7 +5,7 @@ from typing import Union
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.common.msd.model import Base, id_key
+from backend.common.model import Base, id_key
 
 
 class UserSocial(Base):

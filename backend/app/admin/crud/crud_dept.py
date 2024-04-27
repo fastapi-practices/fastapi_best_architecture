@@ -5,13 +5,13 @@ from typing import Sequence
 from sqlalchemy import and_, asc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept, User
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
-from backend.common.msd.crud import CRUDBase
 
 
-class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
+class CRUDDept(CRUDPlus[Dept]):
     async def get(self, db: AsyncSession, dept_id: int) -> Dept | None:
         """
         获取部门
@@ -20,7 +20,7 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         :param dept_id:
         :return:
         """
-        return await self.get_(db, pk=dept_id, del_flag=0)
+        return await self.select_model_by_columns(db, id=dept_id, del_flag=0)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Dept | None:
         """
@@ -30,7 +30,7 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         :param name:
         :return:
         """
-        return await self.get_(db, name=name, del_flag=0)
+        return await self.select_model_by_columns(db, name=name, del_flag=0)
 
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
@@ -76,7 +76,7 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDeptParam) -> int:
         """
@@ -87,7 +87,7 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         :param obj_in:
         :return:
         """
-        return await self.update_(db, dept_id, obj_in)
+        return await self.update_model(db, dept_id, obj_in)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
         """
@@ -97,7 +97,7 @@ class CRUDDept(CRUDBase[Dept, CreateDeptParam, UpdateDeptParam]):
         :param dept_id:
         :return:
         """
-        return await self.delete_(db, dept_id, del_flag=1)
+        return await self.delete_model(db, dept_id, del_flag=1)
 
     async def get_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
         """

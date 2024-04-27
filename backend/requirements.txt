@@ -92,6 +92,7 @@ simpleeval==0.9.13
 six==1.16.0
 sniffio==1.3.1
 sqlalchemy==2.0.23
+sqlalchemy-crud-plus==0.0.2
 starlette==0.32.0.post1
 supervisor==4.2.5
 tomli==2.0.1; python_version < "3.11"

@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select, and_, delete, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import OperaLog
-from backend.app.admin.schema.opera_log import CreateOperaLogParam, UpdateOperaLogParam
-from backend.common.msd.crud import CRUDBase
+from backend.app.admin.schema.opera_log import CreateOperaLogParam
 
 
-class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLogParam, UpdateOperaLogParam]):
+class CRUDOperaLogDao(CRUDPlus[OperaLog]):
     async def get_list(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
         """
         获取操作日志列表
@@ -38,7 +38,7 @@ class CRUDOperaLogDao(CRUDBase[OperaLog, CreateOperaLogParam, UpdateOperaLogPara
         :param obj_in:
         :return:
         """
-        await self.create_(db, obj_in)
+        await self.create_model(db, obj_in)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

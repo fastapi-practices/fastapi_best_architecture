@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.sys_role_menu import sys_role_menu
 from backend.app.admin.model.sys_user_role import sys_user_role
-from backend.common.msd.model import Base, id_key
+from backend.common.model import Base, id_key
 
 
 class Role(Base):

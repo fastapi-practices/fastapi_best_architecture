@@ -5,6 +5,7 @@ from sqlalchemy import and_, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Select
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Role, User
 from backend.app.admin.schema.user import (
@@ -14,12 +15,11 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
     UpdateUserRoleParam,
 )
-from backend.common.msd.crud import CRUDBase
 from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
 
 
-class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
+class CRUDUser(CRUDPlus[User]):
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
         """
         获取用户
@@ -28,7 +28,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param user_id:
         :return:
         """
-        return await self.get_(db, pk=user_id)
+        return await self.select_model_by_id(db, user_id)
 
     async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
         """
@@ -38,8 +38,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param username:
         :return:
         """
-        user = await db.execute(select(self.model).where(self.model.username == username))
-        return user.scalars().first()
+        return await self.select_model_by_column(db, 'username', username)
 
     async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
         """
@@ -49,8 +48,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param nickname:
         :return:
         """
-        user = await db.execute(select(self.model).where(self.model.nickname == nickname))
-        return user.scalars().first()
+        return await self.select_model_by_column(db, 'nickname', nickname)
 
     async def update_login_time(self, db: AsyncSession, username: str) -> int:
         """
@@ -113,8 +111,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param obj:
         :return:
         """
-        user = await db.execute(update(self.model).where(self.model.id == input_user.id).values(**obj.model_dump()))
-        return user.rowcount
+        return await self.update_model(db, input_user.id, obj)
 
     @staticmethod
     async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
@@ -144,8 +141,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param avatar:
         :return:
         """
-        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar.url))
-        return user.rowcount
+        return await self.update_model(db, current_user.id, {'avatar': avatar.url})
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -155,7 +151,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param user_id:
         :return:
         """
-        return await self.delete_(db, user_id)
+        return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
         """
@@ -165,8 +161,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param email:
         :return:
         """
-        mail = await db.execute(select(self.model).where(self.model.email == email))
-        return mail.scalars().first()
+        return await self.select_model_by_column(db, 'email', email)
 
     async def reset_password(self, db: AsyncSession, pk: int, password: str, salt: str) -> int:
         """
@@ -178,10 +173,8 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :param salt:
         :return:
         """
-        user = await db.execute(
-            update(self.model).where(self.model.id == pk).values(password=await get_hash_password(password + salt))
-        )
-        return user.rowcount
+        new_pwd = await get_hash_password(f'{password}{salt}')
+        return await self.update_model(db, pk, {'password': new_pwd})
 
     async def get_list(self, dept: int = None, username: str = None, phone: str = None, status: int = None) -> Select:
         """
@@ -265,10 +258,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         super_status = await self.get_super(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_superuser=False if super_status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_superuser': False if super_status else True})
 
     async def set_staff(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -279,10 +269,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         staff_status = await self.get_staff(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_staff=False if staff_status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_staff': False if staff_status else True})
 
     async def set_status(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -293,10 +280,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         status = await self.get_status(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(status=False if status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'status': False if status else True})
 
     async def set_multi_login(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -307,10 +291,7 @@ class CRUDUser(CRUDBase[User, RegisterUserParam, UpdateUserParam]):
         :return:
         """
         multi_login = await self.get_multi_login(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_multi_login=False if multi_login else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_multi_login': False if multi_login else True})
 
     async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
         """

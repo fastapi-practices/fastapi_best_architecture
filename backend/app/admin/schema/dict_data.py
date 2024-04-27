@@ -6,7 +6,7 @@ from pydantic import ConfigDict, Field
 
 from backend.app.admin.schema.dict_type import GetDictTypeListDetails
 from backend.common.enums import StatusType
-from backend.common.msd.schema import SchemaBase
+from backend.common.schema import SchemaBase
 
 
 class DictDataSchemaBase(SchemaBase):
