@@ -5,7 +5,7 @@
 groups = ["default", "lint", "deploy"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:f855f5439c6810f86ac84ebd4ddecdd78068ff978ace88713d184cc603fe271f"
+content_hash = "sha256:b67b86e4bf27c72aa5b06f77e3eec479a555c5ba560d82ca8d23a8b98edc901d"
 
 [[package]]
 name = "aiofiles"
@@ -1629,17 +1629,17 @@ files = [
 
 [[package]]
 name = "sqlalchemy-crud-plus"
-version = "0.0.1"
-requires_python = ">=3.8"
-path = "/Users/wjh/Downloads/Github/sqlalchemy-crud-plus/dist/sqlalchemy_crud_plus-0.0.1-py3-none-any.whl"
-summary = "Asynchronous CRUD Operation based on SQLAlChemy Model"
+version = "0.0.2"
+requires_python = ">=3.10"
+summary = "Asynchronous CRUD operation based on SQLAlchemy2 model"
 groups = ["default"]
 dependencies = [
     "pydantic>=2.0",
     "sqlalchemy>=2.0.0",
 ]
 files = [
-    {file = "sqlalchemy_crud_plus-0.0.1-py3-none-any.whl", hash = "sha256:f287475fda1a0f88eda5c06fc8e5234351cfeaa4a2a9e620ceea89bb0394c392"},
+    {file = "sqlalchemy_crud_plus-0.0.2-py3-none-any.whl", hash = "sha256:e4f297e000f6e125f26f2c85b9284b6509433aef4e54bb8eab1c624aee019664"},
+    {file = "sqlalchemy_crud_plus-0.0.2.tar.gz", hash = "sha256:7dacada2c79204b113a9c8fc4bcf4797bfcb245604c1171b27e87d6ad9e4bb9a"},
 ]
 
 [[package]]

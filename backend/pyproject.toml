@@ -46,7 +46,7 @@ dependencies = [
     "XdbSearchIP==1.0.2",
     "fastapi_oauth20>=0.0.1a1",
     "flower==2.0.1",
-    "sqlalchemy-crud-plus @ file:///Users/wjh/Downloads/Github/sqlalchemy-crud-plus/dist/sqlalchemy_crud_plus-0.0.1-py3-none-any.whl",
+    "sqlalchemy-crud-plus==0.0.2",
 ]
 requires-python = ">=3.10"
 readme = "README.md"

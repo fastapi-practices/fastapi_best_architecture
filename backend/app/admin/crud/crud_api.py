@@ -59,8 +59,7 @@ class CRUDApi(CRUDPlus[Api]):
         :param name:
         :return:
         """
-        api = await db.execute(select(self.model).where(self.model.name == name))
-        return api.scalars().first()
+        return await self.select_model_by_column(db, 'name', name)
 
     async def create(self, db: AsyncSession, obj_in: CreateApiParam) -> None:
         """

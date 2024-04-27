@@ -141,8 +141,7 @@ class CRUDUser(CRUDPlus[User]):
         :param avatar:
         :return:
         """
-        user = await db.execute(update(self.model).where(self.model.id == current_user.id).values(avatar=avatar.url))
-        return user.rowcount
+        return await self.update_model(db, current_user.id, {'avatar': avatar.url})
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -174,10 +173,8 @@ class CRUDUser(CRUDPlus[User]):
         :param salt:
         :return:
         """
-        user = await db.execute(
-            update(self.model).where(self.model.id == pk).values(password=await get_hash_password(password + salt))
-        )
-        return user.rowcount
+        new_pwd = await get_hash_password(f'{password}{salt}')
+        return await self.update_model(db, pk, {'password': new_pwd})
 
     async def get_list(self, dept: int = None, username: str = None, phone: str = None, status: int = None) -> Select:
         """
@@ -261,10 +258,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         super_status = await self.get_super(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_superuser=False if super_status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_superuser': False if super_status else True})
 
     async def set_staff(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -275,10 +269,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         staff_status = await self.get_staff(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_staff=False if staff_status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_staff': False if staff_status else True})
 
     async def set_status(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -289,10 +280,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         status = await self.get_status(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(status=False if status else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'status': False if status else True})
 
     async def set_multi_login(self, db: AsyncSession, user_id: int) -> int:
         """
@@ -303,10 +291,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         multi_login = await self.get_multi_login(db, user_id)
-        user = await db.execute(
-            update(self.model).where(self.model.id == user_id).values(is_multi_login=False if multi_login else True)
-        )
-        return user.rowcount
+        return await self.update_model(db, user_id, {'is_multi_login': False if multi_login else True})
 
     async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
         """

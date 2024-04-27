@@ -104,7 +104,7 @@ class CRUDRole(CRUDPlus[Role]):
         :param obj_in:
         :return:
         """
-        rowcount = await self.update_model(db, pk=role_id, obj_in=obj_in)
+        rowcount = await self.update_model(db, role_id, obj_in)
         return rowcount
 
     async def update_menus(self, db, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:

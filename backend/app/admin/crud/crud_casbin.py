@@ -19,7 +19,7 @@ class CRUDCasbin(CRUDPlus[CasbinRule]):
         :param sub:
         :return:
         """
-        se = select(self.model).order_by(self.model.id)
+        se = select(self.model).order_by(self.model.id.desc())
         where_list = []
         if ptype:
             where_list.append(self.model.ptype == ptype)

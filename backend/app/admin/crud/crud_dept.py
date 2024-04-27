@@ -20,8 +20,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        dept = await db.execute(select(self.model).where(and_(self.model.id == dept_id, self.model.del_flag == 0)))
-        return dept.scalars().first()
+        return await self.select_model_by_columns(db, id=dept_id, del_flag=0)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Dept | None:
         """
@@ -31,8 +30,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param name:
         :return:
         """
-        dept = await db.execute(select(self.model).where(and_(self.model.name == name, self.model.del_flag == 0)))
-        return dept.scalars().first()
+        return await self.select_model_by_columns(db, name=name, del_flag=0)
 
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None

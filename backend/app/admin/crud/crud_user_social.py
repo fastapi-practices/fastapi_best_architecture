@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -19,9 +18,7 @@ class CRUDOUserSocial(CRUDPlus[UserSocial]):
         :param source:
         :return:
         """
-        se = select(self.model).where(and_(self.model.id == pk, self.model.source == source))
-        user_social = await db.execute(se)
-        return user_social.scalars().first()
+        return await self.select_model_by_columns(db, id=pk, source=source)
 
     async def create(self, db: AsyncSession, obj_in: CreateUserSocialParam) -> None:
         """

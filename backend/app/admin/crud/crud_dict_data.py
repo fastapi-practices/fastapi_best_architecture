@@ -91,8 +91,9 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param pk:
         :return:
         """
-        where = [self.model.id == pk]
-        dict_data = await db.execute(select(self.model).options(selectinload(self.model.type)).where(*where))
+        dict_data = await db.execute(
+            select(self.model).options(selectinload(self.model.type)).where(self.model.id == pk)
+        )
         return dict_data.scalars().first()
 
 
