@@ -47,6 +47,7 @@ dependencies = [
     "fastapi_oauth20>=0.0.1a1",
     "flower==2.0.1",
     "sqlalchemy-crud-plus==0.0.2",
+    "jinja2>=3.1.3",
 ]
 requires-python = ">=3.10"
 readme = "README.md"

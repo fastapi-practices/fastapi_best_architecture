@@ -19,3 +19,6 @@ IP2REGION_XDB = os.path.join(BasePath, 'static', 'ip2region.xdb')
 
 # 挂载静态目录
 STATIC_DIR = os.path.join(BasePath, 'static')
+
+# jinja2 模版文件路径
+JINJA2_TEMPLATE_DIR = os.path.join(BasePath, 'templates')
