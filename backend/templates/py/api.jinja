@@ -12,16 +12,14 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
-from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取{{ model_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
 async def get_{{ model_name }}(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    dict_data = await {{ model_name }}_service.get(pk=pk)
-    data = GetDictDataListDetails(**await select_as_dict(dict_data))
-    return await response_base.success(data=data)
+    {{ model_name }} = await {{ model_name }}_service.get(pk=pk)
+    return await response_base.success(data={{ model_name }})
 
 
 @router.get(
