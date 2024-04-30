@@ -22,9 +22,9 @@ class GenBusiness(Base):
     relate_model_fk: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表外键')
     schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称')
     gen_type: Mapped[int] = mapped_column(
-        default=1, comment='生成代码方式（1：自定义路径, 2：内部写入，3：tar.gz 压缩包）'
+        default=1, comment='代码生成方式（1：自定义路径, 2：内部写入，3：tar.gz 压缩包）'
     )
-    gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='生成代码路径（默认为项目根路径）')
+    gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为项目根路径）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     # 代码生成业务model一对一
     gen_model: Mapped['GenModel'] = relationship(back_populates='gen_business')
@@ -46,5 +46,7 @@ class GenModel(DataClassBase):
     is_nullable = mapped_column(default=False, comment='是否可为空')
 
     # 代码生成业务model一对一
-    gen_business_id: Mapped[int] = mapped_column(ForeignKey('sys_gen_business.id'))
+    gen_business_id: Mapped[int] = mapped_column(
+        ForeignKey('sys_gen_business.id', default=None, comment='代码生成业务ID')
+    )
     gen_business: Mapped['GenBusiness'] = relationship(back_populates='gen_model', single_parent=True)
