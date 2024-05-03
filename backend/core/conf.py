@@ -60,11 +60,6 @@ class Settings(BaseSettings):
         ('GET', f'{API_V1_STR}/auth/captcha'),
     }
 
-    # Uvicorn
-    UVICORN_HOST: str = '127.0.0.1'
-    UVICORN_PORT: int = 8000
-    UVICORN_RELOAD: bool = True
-
     # Static Server
     STATIC_FILES: bool = False
 

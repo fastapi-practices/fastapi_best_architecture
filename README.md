@@ -134,7 +134,16 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
    ```
 
 9. [Initialize test data](#test-data) (Optional)
-10. Execute the `main.py` file to start the service
+10. Start fastapi service
+
+   ```shell
+   # Help
+   fastapi --help
+   
+   # dev mode
+   fastapi dev main.py
+   ```
+
 11. Open a browser and visit: http://127.0.0.1:8000/api/v1/docs
 
 ### Front end

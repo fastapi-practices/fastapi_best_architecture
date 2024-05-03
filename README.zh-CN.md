@@ -127,7 +127,16 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
    ```
 
 9. [初始化测试数据](#测试数据)（可选）
-10. 执行 `main.py` 文件启动服务
+10. 启动 fastapi 服务
+
+   ```shell
+   # 帮助
+   fastapi --help
+   
+   # 开发模式
+   fastapi dev main.py
+   ```
+
 11. 打开浏览器访问：http://127.0.0.1:8000/api/v1/docs
 
 ### 前端
