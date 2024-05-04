@@ -5,7 +5,7 @@
 groups = ["default", "lint", "deploy"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:c2a3e19bef234f542b76f4874890f8452272fafc6b2fa06dca7ca6a0a3a74f3a"
+content_hash = "sha256:2a2deb7179c7e6eefc4370036ae06edbf34bbb7cb5f43601d52f8f0f45d2d607"
 
 [[package]]
 name = "alembic"
