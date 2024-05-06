@@ -19,7 +19,7 @@ class GenBusiness(Base):
     model_simple_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文简称）')
     model_comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='表描述')
     relate_model_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表名称')
-    relate_model_fk: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表外键')
+    relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
     schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称')
     gen_type: Mapped[int] = mapped_column(
         default=1, comment='代码生成方式（1：自定义路径, 2：内部写入，3：tar.gz 压缩包）'
@@ -43,7 +43,7 @@ class GenModel(DataClassBase):
     default: Mapped[str | None] = mapped_column(default=None, comment='列默认值')
     length: Mapped[int] = mapped_column(default=0, comment='列长度')
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
-    is_nullable = mapped_column(default=False, comment='是否可为空')
+    is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
 
     # 代码生成业务model一对一
     gen_business_id: Mapped[int] = mapped_column(
