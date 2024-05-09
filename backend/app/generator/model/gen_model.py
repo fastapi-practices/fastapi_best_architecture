@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.common.model import DataClassBase, id_key
+
+
+class GenModel(DataClassBase):
+    """代码生成model表"""
+
+    __tablename__ = 'sys_gen_model'
+    __table_args__ = UniqueConstraint('gen_business_id')
+
+    id: Mapped[id_key] = mapped_column(init=False)
+    name: Mapped[str] = mapped_column(String(50), comment='列名称')
+    comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='列描述')
+    type: Mapped[str] = mapped_column(String(20), default='string', comment='列类型')
+    default: Mapped[str | None] = mapped_column(default=None, comment='列默认值')
+    length: Mapped[int] = mapped_column(default=0, comment='列长度')
+    is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
+    is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
+
+    # 代码生成业务model一对一
+    gen_business_id: Mapped[int] = mapped_column(
+        ForeignKey('sys_gen_business.id', default=None, comment='代码生成业务ID')
+    )
+    gen_business: Mapped['GenBusiness'] = relationship(back_populates='gen_model', single_parent=True)  # noqa: F821
