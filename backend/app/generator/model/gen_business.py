@@ -14,7 +14,7 @@ class GenBusiness(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     app_name: Mapped[str] = mapped_column(String(50), comment='应用名称（英文）')
-    model_name: Mapped[str] = mapped_column(String(255), comment='表名称（英文）')
+    model_name: Mapped[str] = mapped_column(String(255), unique=True, comment='表名称（英文）')
     model_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文）')
     model_simple_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文简称）')
     model_comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='表描述')
@@ -26,5 +26,5 @@ class GenBusiness(Base):
     )
     gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为项目根路径）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
-    # 代码生成业务model一对一
-    gen_model: Mapped['GenModel'] = relationship(back_populates='gen_business')  # noqa: F821
+    # 代码生成业务模型一对多
+    gen_model: Mapped[list['GenModel']] = relationship(init=False, back_populates='gen_business')  # noqa: F821

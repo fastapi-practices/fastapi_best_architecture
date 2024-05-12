@@ -10,6 +10,7 @@ class GenModelSchemaBase(SchemaBase):
     comment: str | None = None
     type: str
     default: str | None = None
+    sort: int
     length: int
     is_pk: bool
     is_nullable: bool
