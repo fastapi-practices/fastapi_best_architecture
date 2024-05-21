@@ -6,7 +6,6 @@ from backend.core.path_conf import JINJA2_TEMPLATE_DIR
 
 
 class GenTemplate:
-
     @staticmethod
     def get_template(jinja_file: str) -> 'Template':
         """
