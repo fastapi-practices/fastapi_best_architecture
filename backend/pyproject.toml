@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "alembic>=1.13.0",
-    "asgiref==3.7.2",
+    "asgiref>=3.8.0",
     "asyncmy==0.2.9",
     "bcrypt==4.0.1",
     "casbin==1.34.0",

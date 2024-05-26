@@ -60,9 +60,9 @@ async def update_model() -> ResponseModel: ...
 async def delete_model() -> ResponseModel: ...
 
 
-@router.get('/preview', summary='生成代码预览', dependencies=[DependsJwtAuth])
-async def preview_code() -> ResponseModel:
-    data = await gen_service.preview()
+@router.get('/preview/{pk}', summary='生成代码预览', dependencies=[DependsJwtAuth])
+async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
+    data = await gen_service.preview(pk=pk)
     return await response_base.success(data=data)
 
 

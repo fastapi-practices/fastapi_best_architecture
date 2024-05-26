@@ -5,7 +5,7 @@ alembic==1.13.1
 amqp==5.2.0
 annotated-types==0.6.0
 anyio==4.3.0
-asgiref==3.7.2
+asgiref==3.8.1
 async-timeout==4.0.3; python_full_version <= "3.11.2"
 asyncmy==0.2.9
 attrs==23.2.0

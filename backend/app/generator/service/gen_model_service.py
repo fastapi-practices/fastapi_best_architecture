@@ -9,9 +9,9 @@ from backend.database.db_mysql import async_db_session
 
 class GenModelService:
     @staticmethod
-    async def get_with_relation(*, business_id: int) -> Sequence[GenModel]:
+    async def get_by_business(*, business_id: int) -> Sequence[GenModel]:
         async with async_db_session() as db:
-            gen_model = await gen_model_dao.get_with_relation(db, business_id)
+            gen_model = await gen_model_dao.get_by_business_id(db, business_id)
             return gen_model
 
     @staticmethod

@@ -14,7 +14,7 @@ class GenModelSchemaBase(SchemaBase):
     length: int
     is_pk: bool
     is_nullable: bool
-    gen_business_id: int
+    gen_business_id: int | None
 
 
 class CreateGenModel(GenModelSchemaBase):

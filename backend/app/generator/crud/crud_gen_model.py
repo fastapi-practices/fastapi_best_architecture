@@ -10,8 +10,10 @@ from backend.app.generator.model import GenModel
 
 
 class CRUDGenModel(CRUDPlus[GenModel]):
-    async def get_with_relation(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
-        gen_model = await db.execute(select(self.model).where(self.model.gen_business_id == business_id))
+    async def get_by_business_id(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
+        gen_model = await db.execute(
+            select(self.model).where(self.model.gen_business_id == business_id).order_by(self.model.sort)
+        )
         return gen_model.scalars().all()
 
 
