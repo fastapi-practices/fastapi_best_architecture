@@ -6,4 +6,4 @@ from backend.app.task.api.v1.task import router as task_router
 
 v1 = APIRouter()
 
-v1.include_router(task_router, prefix='/tasks', tags=['任务管理'])
+v1.include_router(task_router, prefix='/tasks', tags=['任务'])
