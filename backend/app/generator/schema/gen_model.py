@@ -17,11 +17,11 @@ class GenModelSchemaBase(SchemaBase):
     gen_business_id: int | None
 
 
-class CreateGenModel(GenModelSchemaBase):
+class CreateGenModelParam(GenModelSchemaBase):
     pass
 
 
-class UpdateGenModel(GenModelSchemaBase):
+class UpdateGenModelParam(GenModelSchemaBase):
     pass
 
 

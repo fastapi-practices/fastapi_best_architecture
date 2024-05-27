@@ -5,7 +5,9 @@ from typing import Annotated
 from fastapi import APIRouter, Path, Query
 
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
+from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
+from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.app.generator.service.gen_service import gen_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -49,15 +51,25 @@ async def delete_business(pk: Annotated[int, Query(...)]) -> ResponseModel:
 
 
 @router.post('/models', summary='创建代码生成模型', dependencies=[DependsRBAC])
-async def create_model() -> ResponseModel: ...
+async def create_model(obj: CreateGenModelParam) -> ResponseModel:
+    await gen_model_service.create(obj)
+    return await response_base.success()
 
 
-@router.put('/models', summary='更新代码生成模型', dependencies=[DependsRBAC])
-async def update_model() -> ResponseModel: ...
+@router.put('/models/{pk}', summary='更新代码生成模型', dependencies=[DependsRBAC])
+async def update_model(pk: Annotated[int, Path(...)], obj: UpdateGenModelParam) -> ResponseModel:
+    count = await gen_model_service.update(pk=pk, obj=obj)
+    if count > 0:
+        return await response_base.success()
+    return await response_base.fail()
 
 
-@router.delete('/models', summary='删除代码生成模型', dependencies=[DependsRBAC])
-async def delete_model() -> ResponseModel: ...
+@router.delete('/models/{pk}', summary='删除代码生成模型', dependencies=[DependsRBAC])
+async def delete_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    count = await gen_model_service.delete(pk=pk)
+    if count > 0:
+        return await response_base.success()
+    return await response_base.fail()
 
 
 @router.get('/preview/{pk}', summary='生成代码预览', dependencies=[DependsJwtAuth])
@@ -66,7 +78,7 @@ async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) ->
     return await response_base.success(data=data)
 
 
-@router.post('/generate', summary='生成代码', dependencies=[DependsRBAC])
+@router.post('/generate', summary='生成代码', description='此接口会写入文件，请谨慎操作', dependencies=[DependsRBAC])
 async def generate_code() -> ResponseModel:
     await gen_service.generate()
     return await response_base.success()
@@ -75,4 +87,4 @@ async def generate_code() -> ResponseModel:
 @router.post('/download', summary='下载代码', dependencies=[DependsRBAC])
 async def download_code() -> ResponseModel:
     await gen_service.download()
-    ...
+    return await response_base.success()
