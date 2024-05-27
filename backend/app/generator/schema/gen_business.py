@@ -9,10 +9,10 @@ from backend.common.schema import SchemaBase
 
 class GenBusinessSchemaBase(SchemaBase):
     app_name: str
-    model_name: str
-    model_name_zh: str
-    model_simple_name_zh: str
-    model_comment: str | None = None
+    table_name: str
+    table_name_zh: str
+    table_simple_name_zh: str
+    table_comment: str | None = None
     relate_model_name: str | None = None
     relate_model_fk: int | None = None
     schema_name: str | None = None
