@@ -14,15 +14,15 @@ class GenBusiness(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     app_name: Mapped[str] = mapped_column(String(50), comment='应用名称（英文）')
-    table_name: Mapped[str] = mapped_column(String(255), unique=True, comment='表名称（英文）')
+    table_name_en: Mapped[str] = mapped_column(String(255), unique=True, comment='表名称（英文）')
     table_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文）')
     table_simple_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文简称）')
     table_comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='表描述')
-    relate_model_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表名称')
-    relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
-    schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称')
+    # relate_model_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表名称')
+    # relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
+    schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称 (默认为英文表名称)')
     gen_type: Mapped[int] = mapped_column(
-        default=1, comment='代码生成方式（1：自定义路径, 2：内部写入，3：tar.gz 压缩包）'
+        default=1, comment='代码生成方式（0：自定义路径, 1：内部写入，2：tar.gz 压缩包）'
     )
     gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为项目根路径）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')

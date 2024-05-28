@@ -87,3 +87,11 @@ class UserSocialType(StrEnum):
     """用户社交类型"""
 
     github = 'GitHub'
+
+
+class GenType(IntEnum):
+    """代码生成类型"""
+
+    custom = 0
+    internal = 1
+    gz = 2
