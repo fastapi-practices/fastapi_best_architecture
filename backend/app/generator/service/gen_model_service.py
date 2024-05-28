@@ -17,7 +17,7 @@ class GenModelService:
             return gen_model
 
     @staticmethod
-    async def create(obj: CreateGenModelParam) -> None:
+    async def create(*, obj: CreateGenModelParam) -> None:
         async with async_db_session.begin() as db:
             gen_models = await gen_model_dao.get_by_business_id(obj.gen_business_id)
             if gen_models:
@@ -26,7 +26,7 @@ class GenModelService:
             await gen_model_dao.create(db, obj)
 
     @staticmethod
-    async def update(pk: int, obj: UpdateGenModelParam) -> int:
+    async def update(*, pk: int, obj: UpdateGenModelParam) -> int:
         async with async_db_session.begin() as db:
             gen_models = await gen_model_dao.get_by_business_id(obj.gen_business_id)
             if gen_models:
@@ -36,7 +36,7 @@ class GenModelService:
             return count
 
     @staticmethod
-    async def delete(pk: int) -> int:
+    async def delete(*, pk: int) -> int:
         async with async_db_session.begin() as db:
             count = await gen_model_dao.delete(db, pk)
             return count

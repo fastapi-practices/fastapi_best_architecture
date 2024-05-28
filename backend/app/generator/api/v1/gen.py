@@ -12,19 +12,21 @@ from backend.app.generator.service.gen_service import gen_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
+from backend.utils.serializers import select_list_serialize
 
 router = APIRouter()
 
 
 @router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseModel:
-    data = await gen_business_service.get_all()
+    businesses = await gen_business_service.get_all()
+    data = await select_list_serialize(businesses)
     return await response_base.success(data=data)
 
 
 @router.get('/businesses/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    data = await gen_service.get_business_and_model(pk)
+    data = await gen_service.get_business_and_model(pk=pk)
     return await response_base.success(data=data)
 
 
@@ -52,7 +54,7 @@ async def delete_business(pk: Annotated[int, Query(...)]) -> ResponseModel:
 
 @router.post('/models', summary='创建代码生成模型', dependencies=[DependsRBAC])
 async def create_model(obj: CreateGenModelParam) -> ResponseModel:
-    await gen_model_service.create(obj)
+    await gen_model_service.create(obj=obj)
     return await response_base.success()
 
 

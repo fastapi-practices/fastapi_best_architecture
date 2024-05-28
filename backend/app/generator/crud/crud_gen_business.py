@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -26,9 +28,9 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         :param name:
         :return:
         """
-        return await self.select_model_by_column(db, 'name', name)
+        return await self.select_model_by_column(db, 'table_name_en', name)
 
-    async def get_all(self, db: AsyncSession):
+    async def get_all(self, db: AsyncSession) -> Sequence[GenBusiness]:
         """
         获取所有代码生成业务表
 

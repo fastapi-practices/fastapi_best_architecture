@@ -15,7 +15,7 @@ class GenService:
     @staticmethod
     async def get_business_and_model(*, pk: int) -> dict:
         gen_business = await gen_business_service.get(pk=pk)
-        gen_models = await gen_model_service.get_by_business(pk=pk)
+        gen_models = await gen_model_service.get_by_business(business_id=pk)
         business_data = await select_as_dict(gen_business)
         if gen_models:
             model_data = await select_list_serialize(gen_models)
@@ -23,8 +23,8 @@ class GenService:
         return business_data
 
     @staticmethod
-    async def render_tpl_code(business: GenBusiness) -> dict:
-        gen_models = await gen_model_dao.get_by_business(business.id)
+    async def render_tpl_code(*, business: GenBusiness) -> dict:
+        gen_models = await gen_model_service.get_by_business(business_id=business.id)
         if not gen_models:
             raise errors.NotFoundError(msg='代码生成模型表为空')
         gen_vars = gen_template.get_vars(business, gen_models)
@@ -38,7 +38,7 @@ class GenService:
             business = await gen_business_dao.get(db, pk)
             if not business:
                 raise errors.NotFoundError(msg='业务不存在')
-            tpl_code_map = await self.render_tpl_code(business)
+            tpl_code_map = await self.render_tpl_code(business=business)
             return {tpl.replace('.tpl', ''): code for tpl, code in tpl_code_map.items()}
 
     @staticmethod

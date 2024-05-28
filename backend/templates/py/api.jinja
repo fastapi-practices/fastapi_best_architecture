@@ -4,8 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.{{ app_name }}.admin.schema.{{ table_name }} import Create{{ schema_name }}Param, Get{{ schema_name }}ListDetails, Update{{ schema_name }}Param
-from backend.{{ app_name }}.admin.service.{{ table_name }}_service import {{ table_name }}_service
+from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Get{{ schema_name }}ListDetails, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.service.{{ table_name }}_service import {{ table_name }}_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
