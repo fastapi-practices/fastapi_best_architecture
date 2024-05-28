@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
-from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenBusiness
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
@@ -30,7 +29,7 @@ class GenService:
         gen_vars = gen_template.get_vars(business, gen_models)
         tpl_code_map = {}
         for tpl_path in gen_template.get_template_paths():
-            tpl_code_map[tpl_path] = await gen_template.get_template(tpl_path).render(**gen_vars)
+            tpl_code_map[tpl_path] = await gen_template.get_template(tpl_path).render_async(**gen_vars)
         return tpl_code_map
 
     async def preview(self, *, pk: int) -> dict:
@@ -39,7 +38,10 @@ class GenService:
             if not business:
                 raise errors.NotFoundError(msg='业务不存在')
             tpl_code_map = await self.render_tpl_code(business=business)
-            return {tpl.replace('.tpl', ''): code for tpl, code in tpl_code_map.items()}
+            return {
+                tpl.replace('.jinja', '.py') if tpl.startswith('py') else tpl.replace('.jinja', ''): code
+                for tpl, code in tpl_code_map.items()
+            }
 
     @staticmethod
     async def generate() -> dict: ...

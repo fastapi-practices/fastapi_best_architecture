@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
+from backend.common.enums import GenModelType
 from backend.common.schema import SchemaBase
 
 
 class GenModelSchemaBase(SchemaBase):
     name: str
     comment: str | None = None
-    type: str
+    type: GenModelType = Field(GenModelType.String, description='模型 column 类型')
     default: str | None = None
     sort: int
     length: int
-    is_pk: bool
-    is_nullable: bool
-    gen_business_id: int | None
+    is_pk: bool = Field(default=False)
+    is_nullable: bool = Field(default=False)
+    gen_business_id: int | None = Field(ge=1)
 
 
 class CreateGenModelParam(GenModelSchemaBase):

@@ -11,7 +11,9 @@ class GenTemplate:
         self.env = Environment(
             loader=FileSystemLoader(JINJA2_TEMPLATE_DIR),
             autoescape=select_autoescape(['html', 'xml', 'jinja']),
-            keep_trailing_newline=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
+            enable_async=True,
         )
 
     def get_template(self, jinja_file: str) -> Template:
@@ -25,7 +27,7 @@ class GenTemplate:
         return self.env.get_template(jinja_file)
 
     @staticmethod
-    def get_template_paths(self) -> list[str]:
+    def get_template_paths() -> list[str]:
         """
         获取模版文件路径
 
@@ -52,9 +54,9 @@ class GenTemplate:
             pass
         return {
             'app_name': business.app_name,
-            'model_name': business.model_name,
+            'table_name_en': business.table_name_en,
             'schema_name': business.schema_name,
-            'model_simple_name_zh': business.model_simple_name_zh,
+            'table_simple_name_zh': business.table_simple_name_zh,
             'permission_sign': str(business.__tablename__.replace('_', ':')),
             # TODO
         }

@@ -95,3 +95,19 @@ class GenType(IntEnum):
     custom = 0
     internal = 1
     gz = 2
+
+
+class GenModelType(StrEnum):
+    """代码生成模型类型"""
+
+    Integer = 'Integer'
+    String = 'String'
+    Text = 'Text'
+    Float = 'Float'
+    Boolean = 'Boolean'
+    Date = 'Date'
+    DateTime = 'DateTime'
+    Time = 'Time'
+    Numeric = 'Numeric'
+    LargeBinary = 'LargeBinary'
+    UUID = 'UUID'
