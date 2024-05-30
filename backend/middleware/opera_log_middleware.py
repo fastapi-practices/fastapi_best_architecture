@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
+
 from asgiref.sync import sync_to_async
 from fastapi import Response
-from starlette.background import BackgroundTask
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -77,8 +78,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             cost_time=cost_time,
             opera_time=start_time,
         )
-        back = BackgroundTask(OperaLogService.create, obj_in=opera_log_in)
-        await back()
+        task = asyncio.create_task(OperaLogService.create(obj_in=opera_log_in))
+        await task
 
         # 错误抛出
         if err:
