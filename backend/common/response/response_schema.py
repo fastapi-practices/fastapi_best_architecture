@@ -3,10 +3,13 @@
 from datetime import datetime
 from typing import Any
 
+from asgiref.sync import sync_to_async
+from fastapi import Response
 from pydantic import BaseModel, ConfigDict
 
 from backend.common.response.response_code import CustomResponse, CustomResponseCode
 from backend.core.conf import settings
+from backend.utils.serializers import MsgSpecJSONResponse
 
 _ExcludeData = set[int | str] | dict[int | str, Any]
 
@@ -59,7 +62,8 @@ class ResponseBase:
     """
 
     @staticmethod
-    async def __response(*, res: CustomResponseCode | CustomResponse = None, data: Any | None = None) -> ResponseModel:
+    @sync_to_async
+    def __response(*, res: CustomResponseCode | CustomResponse = None, data: Any | None = None) -> ResponseModel:
         """
         请求成功返回通用方法
 
@@ -84,6 +88,26 @@ class ResponseBase:
         data: Any = None,
     ) -> ResponseModel:
         return await self.__response(res=res, data=data)
+
+    @staticmethod
+    @sync_to_async
+    def fast_success(
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+        data: Any | None = None,
+    ) -> Response:
+        """
+        此方法是为了提高接口响应速度而创建的，如果返回数据无需进行 pydantic 解析和验证，则推荐使用，相反，请不要使用！
+
+        .. warning::
+
+            使用此返回方法时，不要指定接口参数 response_model，也不要在接口函数后添加箭头返回类型
+
+        :param res:
+        :param data:
+        :return:
+        """
+        return MsgSpecJSONResponse({'code': res.code, 'msg': res.msg, 'data': data})
 
 
 response_base = ResponseBase()
