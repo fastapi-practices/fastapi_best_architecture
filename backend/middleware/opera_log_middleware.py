@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
+from asyncio import create_task
 
 from asgiref.sync import sync_to_async
 from fastapi import Response
@@ -78,8 +78,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             cost_time=cost_time,
             opera_time=start_time,
         )
-        task = asyncio.create_task(OperaLogService.create(obj_in=opera_log_in))
-        await task
+        create_task(OperaLogService.create(obj_in=opera_log_in))  # noqa: ignore
 
         # 错误抛出
         if err:
