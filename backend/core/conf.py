@@ -97,7 +97,6 @@ class Settings(BaseSettings):
 
     # Middleware
     MIDDLEWARE_CORS: bool = True
-    MIDDLEWARE_GZIP: bool = True
     MIDDLEWARE_ACCESS: bool = False
 
     # RBAC Permission

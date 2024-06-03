@@ -98,11 +98,6 @@ def register_middleware(app: FastAPI):
     :param app:
     :return:
     """
-    # Gzip: Always at the top
-    if settings.MIDDLEWARE_GZIP:
-        from fastapi.middleware.gzip import GZipMiddleware
-
-        app.add_middleware(GZipMiddleware)
     # Opera log
     app.add_middleware(OperaLogMiddleware)
     # JWT auth, required
