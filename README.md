@@ -48,7 +48,10 @@ You can view some of the preview screenshots
 in [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
 
 Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
-> username / password: admin / 123456
+
+> tester: test / 123456
+>
+> super: admin / 123456
 
 ## Features
 
@@ -135,12 +138,11 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
 9. [Initialize test data](#test-data) (Optional)
 10. Start fastapi service
-
    ```shell
    # Help
    fastapi --help
    
-   # dev mode
+   # Dev mode
    fastapi dev main.py
    ```
 
