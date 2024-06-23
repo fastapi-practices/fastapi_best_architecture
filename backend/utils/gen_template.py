@@ -52,13 +52,23 @@ class GenTemplate:
         """
         for model in models:
             pass
+        # python 类型对应的 sqla 类型
+        model_type_map = {
+            'str', 'String',
+            'float', 'Float',
+            'int', 'Integer',
+            'bool', 'Boolean',
+        }
         return {
             'app_name': business.app_name,
             'table_name_en': business.table_name_en,
-            'schema_name': business.schema_name,
+            'table_name_zh': business.table_name_zh,
             'table_simple_name_zh': business.table_simple_name_zh,
+            'table_comment': business.table_comment,
+            'schema_name': business.schema_name,
             'permission_sign': str(business.__tablename__.replace('_', ':')),
-            # TODO
+            'models': models,
+            'model_type_map': model_type_map,
         }
 
 
