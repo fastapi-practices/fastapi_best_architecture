@@ -54,10 +54,10 @@ class GenTemplate:
             pass
         # python 类型对应的 sqla 类型
         model_type_map = {
-            'str', 'String',
-            'float', 'Float',
-            'int', 'Integer',
-            'bool', 'Boolean',
+            'str': 'String',
+            'float': 'Float',
+            'int': 'Integer',
+            'bool': 'Boolean',
         }
         return {
             'app_name': business.app_name,
