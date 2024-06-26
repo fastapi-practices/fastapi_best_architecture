@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import {% if model.have_datetime_column %}Base{% else %}MappedBase, id_key
+from backend.common.model import {% if model.have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
 
-class {{ table_name_en }}({% if model.have_datetime_column %}Base{% else %}MappedBase):
+class {{ table_name_en }}({% if model.have_datetime_column %}Base{% else %}MappedBase{% endif %}):
     """{{ table_name_zh }}"""
 
     __tablename__ = '{{ table_name_en }}'
