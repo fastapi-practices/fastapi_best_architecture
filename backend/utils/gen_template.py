@@ -50,10 +50,8 @@ class GenTemplate:
         :param models:
         :return:
         """
-        for model in models:
-            pass
-        # python 类型对应的 sqla 类型
-        model_type_map = {
+        # python 类型对应的 sqlalchemy 类型
+        model_type_mapping = {
             'str': 'String',
             'float': 'Float',
             'int': 'Integer',
@@ -66,9 +64,10 @@ class GenTemplate:
             'table_simple_name_zh': business.table_simple_name_zh,
             'table_comment': business.table_comment,
             'schema_name': business.schema_name,
+            'have_datetime_column': business.have_datetime_column,
             'permission_sign': str(business.__tablename__.replace('_', ':')),
             'models': models,
-            'model_type_map': model_type_map,
+            'model_type_mapping': model_type_mapping,
         }
 
 

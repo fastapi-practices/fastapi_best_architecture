@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,6 +21,7 @@ class GenBusiness(Base):
     # relate_model_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表名称')
     # relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
     schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称 (默认为英文表名称)')
+    have_datetime_column: Mapped[bool] = mapped_column(default=True, comment='存在默认时间列')
     gen_type: Mapped[int] = mapped_column(
         default=1, comment='代码生成方式（0：自定义路径, 1：内部写入，2：tar.gz 压缩包）'
     )

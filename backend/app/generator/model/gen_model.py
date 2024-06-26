@@ -22,7 +22,6 @@ class GenModel(DataClassBase):
     length: Mapped[int] = mapped_column(default=0, comment='列长度')
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
     is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
-    have_datetime_column: Mapped[bool] = mapped_column(default=True, comment='存在默认时间列')
 
     # 代码生成业务model一对多
     gen_business_id: Mapped[int | None] = mapped_column(
