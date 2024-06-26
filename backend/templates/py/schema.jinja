@@ -8,7 +8,10 @@ from backend.common.schema import SchemaBase
 
 
 class {{ schema_name }}SchemaBase(SchemaBase):
-    # todo
+    {% for model in models %}
+    {{ model.name }}: {% if model.nullable %}{{ model.type }} | None = None{% else %}{{ model.type }}{% endif %}
+    {% endfor %}
+
 
 
 class Create{{ schema_name }}Param({{ schema_name }}SchemaBase):
@@ -23,5 +26,7 @@ class Get{{ schema_name }}ListDetails({{ schema_name }}SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    {% if model.have_datetime_column %}
     created_time: datetime
     updated_time: datetime | None = None
+    {% endif %}
