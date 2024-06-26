@@ -94,7 +94,7 @@ class GenType(IntEnum):
 
     custom = 0
     internal = 1
-    gz = 2
+    zip = 2
 
 
 class GenModelType(StrEnum):
