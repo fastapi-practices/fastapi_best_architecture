@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
+from pydantic.alias_generators import to_pascal, to_snake
 
 from backend.app.generator.model import GenBusiness, GenModel
 from backend.core.path_conf import JINJA2_TEMPLATE_DIR
@@ -59,11 +60,12 @@ class GenTemplate:
         }
         return {
             'app_name': business.app_name,
-            'table_name_en': business.table_name_en,
+            'table_name_en': to_snake(business.table_name_en),
+            'table_name_class': to_pascal(business.table_name_en),
             'table_name_zh': business.table_name_zh,
             'table_simple_name_zh': business.table_simple_name_zh,
             'table_comment': business.table_comment,
-            'schema_name': business.schema_name,
+            'schema_name': to_pascal(business.schema_name),
             'have_datetime_column': business.have_datetime_column,
             'permission_sign': str(business.__tablename__.replace('_', ':')),
             'models': models,

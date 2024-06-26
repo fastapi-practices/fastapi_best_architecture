@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import {% if have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
 
-class {{ table_name_en }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
+class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
     """{{ table_name_zh }}"""
 
     __tablename__ = '{{ table_name_en }}'
