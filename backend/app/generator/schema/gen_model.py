@@ -15,6 +15,7 @@ class GenModelSchemaBase(SchemaBase):
     length: int
     is_pk: bool = Field(default=False)
     is_nullable: bool = Field(default=False)
+    have_datetime_column: bool = Field(default=False)
     gen_business_id: int | None = Field(ge=1)
 
 
