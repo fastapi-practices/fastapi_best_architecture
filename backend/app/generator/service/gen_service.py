@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import io
+import zipfile
+
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.model import GenBusiness
 from backend.app.generator.service.gen_business_service import gen_business_service
@@ -39,15 +42,28 @@ class GenService:
                 raise errors.NotFoundError(msg='业务不存在')
             tpl_code_map = await self.render_tpl_code(business=business)
             return {
-                tpl.replace('.jinja', '.py') if tpl.startswith('py') else tpl.replace('.jinja', ''): code
+                tpl.replace('.jinja', '.py') if tpl.startswith('py') else ...: code
                 for tpl, code in tpl_code_map.items()
             }
 
     @staticmethod
     async def generate() -> dict: ...
 
-    @staticmethod
-    async def download() -> dict: ...
+    async def download(self, *, pk: int) -> io.BytesIO:
+        async with async_db_session() as db:
+            business = await gen_business_dao.get(db, pk)
+            if not business:
+                raise errors.NotFoundError(msg='业务不存在')
+        bio = io.BytesIO()
+        zf = zipfile.ZipFile(bio, 'w')
+        app_name = business.app_name
+        tpl_code_map = await self.render_tpl_code(business=business)
+        for code_path, code in tpl_code_map.items():
+            new_code_path = gen_template.get_code_gen_path(code_path, app_name)
+            zf.writestr(new_code_path, code)
+        zf.close()
+        bio.seek(0)
+        return bio
 
 
 gen_service = GenService()

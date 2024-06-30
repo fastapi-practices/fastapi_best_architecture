@@ -92,9 +92,8 @@ class UserSocialType(StrEnum):
 class GenType(IntEnum):
     """代码生成类型"""
 
-    custom = 0
-    internal = 1
-    zip = 2
+    path = 0
+    zip = 1
 
 
 class GenModelType(StrEnum):

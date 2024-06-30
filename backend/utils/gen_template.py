@@ -43,6 +43,22 @@ class GenTemplate:
         ]
 
     @staticmethod
+    def get_code_gen_path(tpl_path: str, app_name: str) -> str:
+        """
+        获取代码生成路径
+
+        :return:
+        """
+        code_gen_path_mapping = {
+            'py/api.jinja': f'py/{app_name}/api.py',
+            'py/crud.jinja': f'py/{app_name}/crud.py',
+            'py/model.jinja': f'py/{app_name}/model.py',
+            'py/schema.jinja': f'py/{app_name}/schema.py',
+            'py/service.jinja': f'py/{app_name}/service.py',
+        }
+        return code_gen_path_mapping.get(tpl_path)
+
+    @staticmethod
     def get_vars(business: GenBusiness, models: list[GenModel]) -> dict:
         """
         获取模版变量

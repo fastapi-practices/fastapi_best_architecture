@@ -3,6 +3,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Path, Query
+from fastapi.responses import StreamingResponse
 
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
@@ -86,7 +87,11 @@ async def generate_code() -> ResponseModel:
     return await response_base.success()
 
 
-@router.post('/download', summary='下载代码', dependencies=[DependsRBAC])
-async def download_code() -> ResponseModel:
-    await gen_service.download()
-    return await response_base.success()
+@router.post('/download/{pk}', summary='下载代码', dependencies=[DependsRBAC])
+async def download_code(pk: Annotated[int, Path(..., description='业务ID')]):
+    bio = await gen_service.download(pk=pk)
+    return StreamingResponse(
+        bio,
+        media_type='application/x-zip-compressed',
+        headers={'Content-Disposition': 'attachment; filename=fba_generator.zip'},
+    )
