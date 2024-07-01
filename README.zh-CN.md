@@ -41,7 +41,10 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 你可以在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 中查看部分预览截图
 
 幸运的是，我们现在有一个演示站点: [FBA UI](https://fba.xwboy.top/)
-> 账号 / 密码: admin / 123456
+
+> 测试员：tester / 123456
+>
+> 管理员：admin / 123456
 
 ## 特征
 
@@ -128,7 +131,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 9. [初始化测试数据](#测试数据)（可选）
 10. 启动 fastapi 服务
-
    ```shell
    # 帮助
    fastapi --help
