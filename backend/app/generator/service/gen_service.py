@@ -42,7 +42,7 @@ class GenService:
                 raise errors.NotFoundError(msg='业务不存在')
             tpl_code_map = await self.render_tpl_code(business=business)
             return {
-                tpl.replace('.jinja', '.py') if tpl.startswith('py') else ...: code.encode("utf-8")
+                tpl.replace('.jinja', '.py') if tpl.startswith('py') else ...: code.encode('utf-8')
                 for tpl, code in tpl_code_map.items()
             }
 
