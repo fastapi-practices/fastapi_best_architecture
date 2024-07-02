@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Path, Query
 from fastapi.responses import StreamingResponse
 
+from backend.app.generator.conf import generator_settings
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
@@ -81,9 +82,9 @@ async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) ->
     return await response_base.success(data=data)
 
 
-@router.post('/generate', summary='生成代码', description='此接口会写入文件，请谨慎操作', dependencies=[DependsRBAC])
-async def generate_code() -> ResponseModel:
-    await gen_service.generate()
+@router.post('/generate/{pk}', summary='生成代码', description='文件磁盘写入，请谨慎操作', dependencies=[DependsRBAC])
+async def generate_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
+    await gen_service.generate(pk=pk)
     return await response_base.success()
 
 
@@ -93,5 +94,5 @@ async def download_code(pk: Annotated[int, Path(..., description='业务ID')]):
     return StreamingResponse(
         bio,
         media_type='application/x-zip-compressed',
-        headers={'Content-Disposition': 'attachment; filename=fba_generator.zip'},
+        headers={'Content-Disposition': f'attachment; filename={generator_settings.ZIP_FILENAME}.zip'},
     )
