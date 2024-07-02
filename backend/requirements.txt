@@ -71,8 +71,8 @@ prompt-toolkit==3.0.43
 psutil==5.9.6
 pyasn1==0.5.1
 pycparser==2.21
-pydantic==2.5.2
-pydantic-core==2.14.5
+pydantic==2.8.0
+pydantic-core==2.20.0
 pydantic-extra-types==2.2.0
 pydantic-settings==2.1.0
 pygments==2.17.2
@@ -100,7 +100,7 @@ supervisor==4.2.5
 tomli==2.0.1; python_version < "3.11"
 tornado==6.4
 typer==0.12.3
-typing-extensions==4.10.0
+typing-extensions==4.12.2
 tzdata==2024.1
 ua-parser==0.18.0
 ujson==5.9.0
