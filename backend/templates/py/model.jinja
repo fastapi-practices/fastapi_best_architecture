@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from backend.common.model import {% if have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+
+class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
+    """{{ table_name_zh }}"""
+
+    __tablename__ = '{{ table_name_en }}'
+
+    id: Mapped[id_key] = mapped_column(init=False)
+    {% for model in models %}
+    {{ model.name }}: {% if model.is_nullable %}Mapped[{{ model.type | None }}]{% else %}Mapped[{{ model.type }}]{% endif %} = mapped_column({% if model.type == 'str' %}{{ model_type_mapping.get(model.type) }}({{ model.length }}){% else %}{{ model_type_mapping.get(model.type) or model.type}}(){% endif %}, default={{ model.default }}, sort_order={{ model.sort }}, comment={{ model.comment }})
+    {% endfor %}
