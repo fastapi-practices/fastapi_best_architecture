@@ -4,6 +4,8 @@ import io
 import os.path
 import zipfile
 
+from pathlib import Path
+
 import aiofiles
 
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
@@ -50,7 +52,6 @@ class GenService:
                 for tpl, code in tpl_code_map.items()
             }
 
-    @staticmethod
     async def generate(self, *, pk: int) -> None:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
@@ -63,10 +64,11 @@ class GenService:
             for tpl_path, code in tpl_code_map.items():
                 code_filepath = os.path.join(
                     gen_path,
-                    gen_template.get_code_gen_path(tpl_path, business.app_name, business.api_version).split('/')[1:],
+                    *gen_template.get_code_gen_path(tpl_path, business).split('/')[1:],
                 )
-                if not os.path.exists(code_filepath):
-                    os.makedirs(code_filepath, exist_ok=True)
+                code_folder = Path(str(code_filepath)).parent
+                if not code_folder.exists():
+                    code_folder.mkdir(parents=True, exist_ok=True)
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
 
@@ -77,10 +79,9 @@ class GenService:
                 raise errors.NotFoundError(msg='业务不存在')
         bio = io.BytesIO()
         zf = zipfile.ZipFile(bio, 'w')
-        app_name = business.app_name
         tpl_code_map = await self.render_tpl_code(business=business)
         for tpl_path, code in tpl_code_map.items():
-            new_code_path = gen_template.get_code_gen_path(tpl_path, app_name, business.api_version)
+            new_code_path = gen_template.get_code_gen_path(tpl_path, business)
             zf.writestr(new_code_path, code)
         zf.close()
         bio.seek(0)
