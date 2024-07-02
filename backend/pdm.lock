@@ -5,7 +5,18 @@
 groups = ["default", "lint", "deploy"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:931bd86972c2e8eb16efd53edb7dab0753b4ece67357035b00fd0ef3f0582418"
+content_hash = "sha256:04116a878cef951f3a27a703a9e0f80caaa1db69b3984613b17f8860d0f77fbc"
+
+[[package]]
+name = "aiofiles"
+version = "24.1.0"
+requires_python = ">=3.8"
+summary = "File support for asyncio."
+groups = ["default"]
+files = [
+    {file = "aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5"},
+    {file = "aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c"},
+]
 
 [[package]]
 name = "alembic"

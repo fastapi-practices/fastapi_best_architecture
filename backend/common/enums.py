@@ -89,13 +89,6 @@ class UserSocialType(StrEnum):
     github = 'GitHub'
 
 
-class GenType(IntEnum):
-    """代码生成类型"""
-
-    path = 0
-    zip = 1
-
-
 class GenModelType(StrEnum):
     """代码生成模型类型"""
 

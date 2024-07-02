@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import io
+import os.path
 import zipfile
+
+import aiofiles
 
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.model import GenBusiness
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.exception import errors
+from backend.core.path_conf import BasePath
 from backend.database.db_mysql import async_db_session
 from backend.utils.gen_template import gen_template
 from backend.utils.serializers import select_as_dict, select_list_serialize
@@ -47,7 +51,24 @@ class GenService:
             }
 
     @staticmethod
-    async def generate() -> dict: ...
+    async def generate(self, *, pk: int) -> None:
+        async with async_db_session() as db:
+            business = await gen_business_dao.get(db, pk)
+            if not business:
+                raise errors.NotFoundError(msg='业务不存在')
+            tpl_code_map = await self.render_tpl_code(business=business)
+            gen_path = business.gen_path
+            if not gen_path:
+                gen_path = os.path.join(BasePath, 'app')
+            for tpl_path, code in tpl_code_map.items():
+                code_filepath = os.path.join(
+                    gen_path,
+                    gen_template.get_code_gen_path(tpl_path, business.app_name, business.api_version).split('/')[1:],
+                )
+                if not os.path.exists(code_filepath):
+                    os.makedirs(code_filepath, exist_ok=True)
+                async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
+                    await f.write(code)
 
     async def download(self, *, pk: int) -> io.BytesIO:
         async with async_db_session() as db:
@@ -58,8 +79,8 @@ class GenService:
         zf = zipfile.ZipFile(bio, 'w')
         app_name = business.app_name
         tpl_code_map = await self.render_tpl_code(business=business)
-        for code_path, code in tpl_code_map.items():
-            new_code_path = gen_template.get_code_gen_path(code_path, app_name)
+        for tpl_path, code in tpl_code_map.items():
+            new_code_path = gen_template.get_code_gen_path(tpl_path, app_name, business.api_version)
             zf.writestr(new_code_path, code)
         zf.close()
         bio.seek(0)

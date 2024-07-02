@@ -22,8 +22,8 @@ class GenBusiness(Base):
     # relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
     schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称 (默认为英文表名称)')
     have_datetime_column: Mapped[bool] = mapped_column(default=True, comment='存在默认时间列')
-    gen_type: Mapped[int] = mapped_column(default=1, comment='代码生成方式（0：路径写入，1：zip 压缩包）')
-    gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为项目根路径）')
+    api_version: Mapped[str] = mapped_column(default='v1', comment='代码生成 api 版本，默认为 v1')
+    gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为 app 根路径）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
     # 代码生成业务模型一对多
     gen_model: Mapped[list['GenModel']] = relationship(init=False, back_populates='gen_business')  # noqa: F821

@@ -4,7 +4,6 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.common.enums import GenType
 from backend.common.schema import SchemaBase
 
 
@@ -18,7 +17,7 @@ class GenBusinessSchemaBase(SchemaBase):
     # relate_model_fk: int | None = None
     schema_name: str | None = None
     have_datetime_column: bool = Field(default=False)
-    gen_type: GenType = Field(default=GenType.zip)
+    api_version: str = Field(default='v1')
     gen_path: str | None = None
     remark: str | None = None
 
