@@ -5,8 +5,11 @@ import os.path
 import zipfile
 
 from pathlib import Path
+from typing import Sequence
 
 import aiofiles
+
+from sqlalchemy import text
 
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.model import GenBusiness
@@ -29,6 +32,18 @@ class GenService:
             model_data = await select_list_serialize(gen_models)
             business_data.update({'models': model_data})
         return business_data
+
+    @staticmethod
+    async def get_all(*, table_schema: str) -> Sequence[str]:
+        async with async_db_session() as db:
+            stmt = await db.execute(
+                text(
+                    'select table_name as table_name, table_comment as table_comment '
+                    'from information_schema.tables '
+                    f"where table_name not like 'sys_gen_%' and table_schema = '{table_schema}';"
+                )
+            )
+            return stmt.scalars().all()
 
     @staticmethod
     async def import_bm(*, tables: list): ...
