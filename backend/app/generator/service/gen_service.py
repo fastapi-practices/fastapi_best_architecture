@@ -31,6 +31,9 @@ class GenService:
         return business_data
 
     @staticmethod
+    async def import_bm(*, tables: list): ...
+
+    @staticmethod
     async def render_tpl_code(*, business: GenBusiness) -> dict:
         gen_models = await gen_model_service.get_by_business(business_id=business.id)
         if not gen_models:
