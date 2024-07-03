@@ -77,15 +77,14 @@ async def delete_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
 
 
 @router.get('/tables', summary='获取数据库表', dependencies=[DependsRBAC])
-async def get_all_tables(table_schema: Annotated[str, Query('fba', description='数据库名')]) -> ResponseModel:
-    tables = await gen_service.get_all(table_schema=table_schema)
-    data = await select_list_serialize(tables)
+async def get_all_tables(table_schema: Annotated[str | None, Query(description='数据库名')] = 'fba') -> ResponseModel:
+    data = await gen_service.get_tables(table_schema=table_schema)
     return await response_base.success(data=data)
 
 
-@router.post('/import', summary='导入数据库代码生成业务和模型列', dependencies=[DependsRBAC])
+@router.post('/import', summary='导入代码生成业务和模型列', dependencies=[DependsRBAC])
 async def import_table(tables: Annotated[list, Query(..., description='数据库表名')]) -> ResponseModel:
-    await gen_service.import_bm(tables=tables)
+    await gen_service.import_business_and_model(tables=tables)
     return await response_base.success()
 
 

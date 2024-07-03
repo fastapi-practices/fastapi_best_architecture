@@ -34,19 +34,18 @@ class GenService:
         return business_data
 
     @staticmethod
-    async def get_all(*, table_schema: str) -> Sequence[str]:
+    async def get_tables(*, table_schema: str) -> Sequence[str]:
         async with async_db_session() as db:
             stmt = await db.execute(
                 text(
-                    'select table_name as table_name, table_comment as table_comment '
-                    'from information_schema.tables '
+                    'select table_name as table_name from information_schema.tables '
                     f"where table_name not like 'sys_gen_%' and table_schema = '{table_schema}';"
                 )
             )
             return stmt.scalars().all()
 
     @staticmethod
-    async def import_bm(*, tables: list): ...
+    async def import_business_and_model(*, tables: list): ...
 
     @staticmethod
     async def render_tpl_code(*, business: GenBusiness) -> dict:
