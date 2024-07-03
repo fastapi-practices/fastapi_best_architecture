@@ -23,8 +23,8 @@ class GenModel(DataClassBase):
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
     is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
 
-    # 代码生成业务model一对多
-    gen_business_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_gen_business.id', ondelete='CASCADE'), default=None, comment='代码生成业务ID'
+    # 代码生成业务模型一对多
+    gen_business_id: Mapped[int] = mapped_column(
+        ForeignKey('sys_gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
     )
     gen_business: Mapped[Union['GenBusiness', None]] = relationship(init=False, back_populates='gen_model')  # noqa: F821
