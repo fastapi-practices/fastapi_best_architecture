@@ -72,8 +72,8 @@ prompt-toolkit==3.0.43
 psutil==5.9.6
 pyasn1==0.5.1
 pycparser==2.21
-pydantic==2.8.0
-pydantic-core==2.20.0
+pydantic==2.8.1
+pydantic-core==2.20.1
 pydantic-extra-types==2.2.0
 pydantic-settings==2.1.0
 pygments==2.17.2
