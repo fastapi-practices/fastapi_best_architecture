@@ -14,7 +14,7 @@ billiard==4.2.0
 casbin==1.34.0
 casbin-async-sqlalchemy-adapter==1.4.0
 celery==5.3.6
-certifi==2024.2.2
+certifi==2024.7.4
 cffi==1.16.0
 cfgv==3.4.0
 click==8.1.7
