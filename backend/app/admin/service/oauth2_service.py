@@ -24,17 +24,20 @@ class OAuth2Service:
         *, request: Request, background_tasks: BackgroundTasks, user: dict, social: UserSocialType
     ) -> GetLoginToken | None:
         async with async_db_session.begin() as db:
-            _email = user.get('email')
-            if not _email:
-                raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
+            # 获取 OAuth2 平台用户信息
             _id = user.get('id')
             _username = user.get('username')
             if social == UserSocialType.github:
                 _username = user.get('login')
             _nickname = user.get('name')
+            _email = user.get('email')
+            if not _email:
+                if social == UserSocialType.linuxdo:
+                    _email = f'{_username}@linux.do'
+                raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
+            # 创建系统用户
             sys_user = await user_dao.check_email(db, _email)
             if not sys_user:
-                # 创建系统用户
                 sys_user = await user_dao.get_by_username(db, _username)
                 if sys_user:
                     _username = f'{_username}#{text_captcha(5)}'
@@ -65,7 +68,7 @@ class OAuth2Service:
                 user=sys_user,
                 login_time=timezone.now(),
                 status=LoginLogStatusType.success.value,
-                msg='OAuth2 登录成功',
+                msg='登录成功（OAuth2）',
             )
             background_tasks.add_task(LoginLogService.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
