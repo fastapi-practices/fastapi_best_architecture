@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pprint import pp
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_limiter.depends import RateLimiter
@@ -38,7 +37,6 @@ async def linux_do_login(
     token, _state = oauth2
     access_token = token['access_token']
     user = await _linux_do_client.get_userinfo(access_token)
-    pp(user)
     data = await oauth2_service.create_with_login(
         request=request,
         background_tasks=background_tasks,
