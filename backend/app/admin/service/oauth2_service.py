@@ -31,9 +31,9 @@ class OAuth2Service:
                 _username = user.get('login')
             _nickname = user.get('name')
             _email = user.get('email')
+            if social == UserSocialType.linuxdo:
+                _email = f'{_username}@linux.do'
             if not _email:
-                if social == UserSocialType.linuxdo:
-                    _email = f'{_username}@linux.do'
                 raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
             # 创建系统用户
             sys_user = await user_dao.check_email(db, _email)
