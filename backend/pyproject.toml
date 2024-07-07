@@ -38,7 +38,7 @@ dependencies = [
     "user-agents==2.2.0",
     "uvicorn[standard]==0.29.0",
     "XdbSearchIP==1.0.2",
-    "fastapi_oauth20>=0.0.1a1",
+    "fastapi_oauth20>=0.0.1a2",
     "flower==2.0.1",
     "sqlalchemy-crud-plus==0.0.2",
 ]

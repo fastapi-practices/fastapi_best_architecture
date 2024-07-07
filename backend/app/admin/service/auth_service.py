@@ -29,7 +29,7 @@ from backend.utils.timezone import timezone
 
 class AuthService:
     @staticmethod
-    async def swagger_login(obj: HTTPBasicCredentials) -> tuple[str, User]:
+    async def swagger_login(*, obj: HTTPBasicCredentials) -> tuple[str, User]:
         async with async_db_session.begin() as db:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
