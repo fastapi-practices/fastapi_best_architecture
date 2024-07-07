@@ -18,39 +18,37 @@ from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
 
 
-class GithubService:
+class OAuth2Service:
     @staticmethod
     async def create_with_login(
-        request: Request, background_tasks: BackgroundTasks, user: dict
+        *, request: Request, background_tasks: BackgroundTasks, user: dict, social: UserSocialType
     ) -> GetLoginToken | None:
         async with async_db_session.begin() as db:
-            github_email = user['email']
-            if not github_email:
-                raise AuthorizationError(msg='授权失败，GitHub 账户未绑定邮箱')
-            github_id = user['id']
-            github_username = user['login']
-            github_nickname = user['name']
-            sys_user = await user_dao.check_email(db, github_email)
+            _email = user.get('email')
+            if not _email:
+                raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
+            _id = user.get('id')
+            _username = user.get('username')
+            if social == UserSocialType.github:
+                _username = user.get('login')
+            _nickname = user.get('name')
+            sys_user = await user_dao.check_email(db, _email)
             if not sys_user:
                 # 创建系统用户
-                sys_user = await user_dao.get_by_username(db, github_username)
+                sys_user = await user_dao.get_by_username(db, _username)
                 if sys_user:
-                    github_username = f'{github_username}{text_captcha(5)}'
-                sys_user = await user_dao.get_by_nickname(db, github_nickname)
+                    _username = f'{_username}#{text_captcha(5)}'
+                sys_user = await user_dao.get_by_nickname(db, _nickname)
                 if sys_user:
-                    github_nickname = f'{github_nickname}{text_captcha(5)}'
-                new_sys_user = RegisterUserParam(
-                    username=github_username, password=None, nickname=github_nickname, email=github_email
-                )
+                    _nickname = f'{_nickname}#{text_captcha(5)}'
+                new_sys_user = RegisterUserParam(username=_username, password=None, nickname=_nickname, email=_email)
                 await user_dao.create(db, new_sys_user, social=True)
                 await db.flush()
-                sys_user = await user_dao.check_email(db, github_email)
+                sys_user = await user_dao.check_email(db, _email)
             # 绑定社交用户
             user_social = await user_social_dao.get(db, sys_user.id, UserSocialType.github)
             if not user_social:
-                new_user_social = CreateUserSocialParam(
-                    source=UserSocialType.github, uid=str(github_id), user_id=sys_user.id
-                )
+                new_user_social = CreateUserSocialParam(source=social.value, uid=str(_id), user_id=sys_user.id)
                 await user_social_dao.create(db, new_user_social)
             # 创建 token
             access_token, access_token_expire_time = await jwt.create_access_token(
@@ -67,7 +65,7 @@ class GithubService:
                 user=sys_user,
                 login_time=timezone.now(),
                 status=LoginLogStatusType.success.value,
-                msg='登录成功（OAuth2）',
+                msg='OAuth2 登录成功',
             )
             background_tasks.add_task(LoginLogService.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
@@ -81,4 +79,4 @@ class GithubService:
             return data
 
 
-github_service = GithubService()
+oauth2_service = OAuth2Service()
