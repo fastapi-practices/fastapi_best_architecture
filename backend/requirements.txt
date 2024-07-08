@@ -30,11 +30,11 @@ ecdsa==0.18.0
 email-validator==2.0.0
 exceptiongroup==1.2.0; python_version < "3.11"
 fast-captcha==0.2.1
-fastapi==0.111.0
 fastapi-cli==0.0.2
 fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a2
 fastapi-pagination==0.12.13
+fastapi[all]==0.111.0
 filelock==3.13.1
 flower==2.0.1
 greenlet==3.0.3; platform_machine == "win32" or platform_machine == "WIN32" or platform_machine == "AMD64" or platform_machine == "amd64" or platform_machine == "x86_64" or platform_machine == "ppc64le" or platform_machine == "aarch64"
@@ -85,10 +85,10 @@ python-jose==3.3.0
 python-multipart==0.0.9
 pytz==2023.3
 pyyaml==6.0.1
-redis==5.0.1
+redis[hiredis]==5.0.1
 rich==13.7.1
 rsa==4.9
-ruff==0.4.4
+ruff==0.5.1
 setuptools==69.2.0
 shellingham==1.5.4
 simpleeval==0.9.13
@@ -106,7 +106,7 @@ tzdata==2024.1
 ua-parser==0.18.0
 ujson==5.9.0
 user-agents==2.2.0
-uvicorn==0.29.0
+uvicorn[standard]==0.29.0
 uvloop==0.19.0; (sys_platform != "cygwin" and sys_platform != "win32") and platform_python_implementation != "PyPy"
 vine==5.1.0
 virtualenv==20.25.1
