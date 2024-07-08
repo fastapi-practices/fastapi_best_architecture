@@ -49,7 +49,7 @@ class OAuth2Service:
                 await db.flush()
                 sys_user = await user_dao.check_email(db, _email)
             # 绑定社交用户
-            user_social = await user_social_dao.get(db, sys_user.id, UserSocialType.github)
+            user_social = await user_social_dao.get(db, sys_user.id, social.value)
             if not user_social:
                 new_user_social = CreateUserSocialParam(source=social.value, uid=str(_id), user_id=sys_user.id)
                 await user_social_dao.create(db, new_user_social)
