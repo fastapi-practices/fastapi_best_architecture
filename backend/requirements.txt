@@ -33,7 +33,7 @@ fast-captcha==0.2.1
 fastapi==0.111.0
 fastapi-cli==0.0.2
 fastapi-limiter==0.1.6
-fastapi-oauth20==0.0.1a1
+fastapi-oauth20==0.0.1a2
 fastapi-pagination==0.12.13
 filelock==3.13.1
 flower==2.0.1

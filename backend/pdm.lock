@@ -548,7 +548,7 @@ files = [
 
 [[package]]
 name = "fastapi-oauth20"
-version = "0.0.1a1"
+version = "0.0.1a2"
 requires_python = ">=3.10"
 summary = "在 FastAPI 中异步授权 OAuth2 客户端"
 groups = ["default"]
@@ -557,8 +557,8 @@ dependencies = [
     "httpx>=0.18.0",
 ]
 files = [
-    {file = "fastapi_oauth20-0.0.1a1-py3-none-any.whl", hash = "sha256:02247a49f1c9ffc364d13857dc29abf49783f36bbefa4632e196aca778f58ede"},
-    {file = "fastapi_oauth20-0.0.1a1.tar.gz", hash = "sha256:f3d2eda24c10fdfe81735859f0346a8bdb687246193134bc285c8110daf1c221"},
+    {file = "fastapi_oauth20-0.0.1a2-py3-none-any.whl", hash = "sha256:2567ad6129646a775f949e78ec33ea1d14de9db4e63572e2424ba4fdb5b6d18f"},
+    {file = "fastapi_oauth20-0.0.1a2.tar.gz", hash = "sha256:516ddd5c631f4efc918d863a26e923318f7b4ada80335666cd42b83a761625a7"},
 ]
 
 [[package]]
