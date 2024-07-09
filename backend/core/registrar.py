@@ -56,6 +56,9 @@ def register_app():
         lifespan=register_init,
     )
 
+    # 日志
+    register_logger(app)
+
     # 静态文件
     register_static_file(app)
 
@@ -72,6 +75,17 @@ def register_app():
     register_exception(app)
 
     return app
+
+
+def register_logger(app: FastAPI) -> None:
+    """
+    处理日志的【】配置初始化操作
+    :param app:
+    :return:
+    """
+    from backend.common.log import setup_logging, set_customize_logfile
+    setup_logging("INFO")
+    set_customize_logfile()
 
 
 def register_static_file(app: FastAPI):
