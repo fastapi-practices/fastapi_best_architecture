@@ -64,7 +64,8 @@ def setup_logging(log_level: str = 'INFO'):
     # https://segmentfault.com/a/1190000042197982
     # uvicorn的两种方式启动,命令行正常,代码方式启动uvicorn.access可能会缺失
     # 如果缺失则添加
-    # if "uvicorn.error" in logging.root.manager.loggerDict.keys() and "uvicorn.access" not in logging.root.manager.loggerDict.keys():
+    # if "uvicorn.error" in logging.root.manager.loggerDict.keys()
+    #    and "uvicorn.access" not in logging.root.manager.loggerDict.keys():
     #     uvicorn_access_logger = logging.getLogger("uvicorn.access")
     #     uvicorn_access_logger.handlers = []
 
