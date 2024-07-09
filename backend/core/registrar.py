@@ -9,6 +9,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
+from backend.common.log import set_customize_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR
 from backend.database.db_mysql import create_table
@@ -56,6 +57,9 @@ def register_app():
         lifespan=register_init,
     )
 
+    # 日志
+    register_logger()
+
     # 静态文件
     register_static_file(app)
 
@@ -72,6 +76,16 @@ def register_app():
     register_exception(app)
 
     return app
+
+
+def register_logger() -> None:
+    """
+    系统日志
+
+    :return:
+    """
+    setup_logging()
+    set_customize_logfile()
 
 
 def register_static_file(app: FastAPI):
