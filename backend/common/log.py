@@ -2,19 +2,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import logging
 import inspect
+import logging
 import os
-
-from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from backend.core import path_conf
 from backend.core.conf import settings
-
-if TYPE_CHECKING:
-    import loguru
 
 
 class InterceptHandler(logging.Handler):
@@ -44,20 +39,19 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level, record.getMessage()
-        )
+        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def setup_logging(log_level: str = "INFO"):
+def setup_logging(log_level: str = 'INFO'):
     """
     from https://pawamoy.github.io/posts/unify-logging-for-a-gunicorn-uvicorn-app/
     https://github.com/pawamoy/pawamoy.github.io/issues/17
     """
 
     from sys import stderr, stdout
-    logger.configure(handlers=[{"sink": stdout, "serialize": 0, "level": log_level}])
-    logger.configure(handlers=[{"sink": stderr, "serialize": 0, "level": log_level}])
+
+    logger.configure(handlers=[{'sink': stdout, 'serialize': 0, 'level': log_level}])
+    logger.configure(handlers=[{'sink': stderr, 'serialize': 0, 'level': log_level}])
 
     # intercept everything at the root logger
     logging.root.handlers = [InterceptHandler()]
@@ -81,18 +75,16 @@ def setup_logging(log_level: str = "INFO"):
         # 设置1，传给loguru
 
         # logging.info(f"{logging.getLogger(name)}, {logging.getLogger(name).propagate}")
-        if "uvicorn.access" in name:
-            logging.getLogger(name).propagate = False
-        elif "watchfiles.main" in name:
+        if 'uvicorn.access' in name or 'watchfiles.main' in name:
             logging.getLogger(name).propagate = False
         else:
             logging.getLogger(name).propagate = True
 
-        logging.debug(f"{logging.getLogger(name)}, {logging.getLogger(name).propagate}")
-    
+        logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
+
     logger.remove()
-    logger.configure(handlers=[{"sink": stdout, "serialize": 0, "level": log_level}])
-    logger.configure(handlers=[{"sink": stderr, "serialize": 0, "level": log_level}])
+    logger.configure(handlers=[{'sink': stdout, 'serialize': 0, 'level': log_level}])
+    logger.configure(handlers=[{'sink': stderr, 'serialize': 0, 'level': log_level}])
 
 
 def set_customize_logfile():
@@ -105,15 +97,12 @@ def set_customize_logfile():
     log_stderr_file = os.path.join(log_path, settings.LOG_STDERR_FILENAME)
 
     # loguru 日志: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
-    log_config = dict(
-        rotation="10 MB", retention="15 days", compression="tar.gz", enqueue=True
-    )
+    log_config = dict(rotation='10 MB', retention='15 days', compression='tar.gz', enqueue=True)
     # stdout
     logger.add(
         log_stdout_file,
-        level="INFO",
-        filter=lambda record: record["level"].name == "INFO"
-        or record["level"].no <= 25,
+        level='INFO',
+        filter=lambda record: record['level'].name == 'INFO' or record['level'].no <= 25,
         **log_config,
         backtrace=False,
         diagnose=False,
@@ -121,12 +110,12 @@ def set_customize_logfile():
     # stderr
     logger.add(
         log_stderr_file,
-        level="ERROR",
-        filter=lambda record: record["level"].name == "ERROR"
-        or record["level"].no >= 30,
+        level='ERROR',
+        filter=lambda record: record['level'].name == 'ERROR' or record['level'].no >= 30,
         **log_config,
         backtrace=True,
         diagnose=True,
     )
+
 
 log = logger

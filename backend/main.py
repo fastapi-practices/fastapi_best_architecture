@@ -16,7 +16,8 @@ if __name__ == '__main__':
         config = uvicorn.Config(app=f'{Path(__file__).stem}:app', reload=True)
         server = uvicorn.Server(config)
         from backend.common.log import setup_logging
-        setup_logging("INFO")
+
+        setup_logging('INFO')
         server.run()
     except Exception as e:
         raise e

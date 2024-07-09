@@ -83,8 +83,9 @@ def register_logger(app: FastAPI) -> None:
     :param app:
     :return:
     """
-    from backend.common.log import setup_logging, set_customize_logfile
-    setup_logging("INFO")
+    from backend.common.log import set_customize_logfile, setup_logging
+
+    setup_logging('INFO')
     set_customize_logfile()
 
 
