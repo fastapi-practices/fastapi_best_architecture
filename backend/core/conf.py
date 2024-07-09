@@ -92,6 +92,8 @@ class Settings(BaseSettings):
     ]
 
     # Log
+    LOG_LEVEL: str = 'INFO'
+    LOG_FORMAT: str = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <lvl>{message}</>'
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'
 
