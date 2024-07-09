@@ -71,7 +71,14 @@ def set_customize_logfile():
     log_stderr_file = os.path.join(log_path, settings.LOG_STDERR_FILENAME)
 
     # loguru logger: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
-    log_config = dict(rotation='10 MB', retention='15 days', compression='tar.gz', enqueue=True)
+    log_config = {
+        'rotation': '10 MB',
+        'retention': '15 days',
+        'compression': 'tar.gz',
+        'enqueue': True,
+        'format': settings.LOG_FORMAT,
+    }
+
     # stdout
     logger.add(
         log_stdout_file,
@@ -81,6 +88,7 @@ def set_customize_logfile():
         backtrace=False,
         diagnose=False,
     )
+
     # stderr
     logger.add(
         log_stderr_file,
