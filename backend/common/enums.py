@@ -93,6 +93,8 @@ class UserSocialType(StrEnum):
 class GenModelType(StrEnum):
     """代码生成模型类型"""
 
+    # 待优化
+    # https://github.com/zy7y/dfs-generate/blob/master/dfs_generate/types_map.py
     ARRAY = 'array'
     BIGINT = 'bigint'
     BigInteger = 'biginteger'
