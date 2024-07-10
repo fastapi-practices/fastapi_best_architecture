@@ -32,7 +32,7 @@ async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     return await response_base.success(data=data)
 
 
-@router.post('/businesses', summary='创建代码生成业务', dependencies=[DependsRBAC])
+@router.post('/businesses', summary='创建代码生成业务', deprecated=True, dependencies=[DependsRBAC])
 async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
     await gen_business_service.create(obj=obj)
     return await response_base.success()
