@@ -37,4 +37,4 @@
 
 1. 访问 `tables` 接口，获取数据库表名列表
 2. 通过 `import` 接口，导入数据库已有的数据库表数据，将自动创建业务表数据和模型表数据
-3. 访问 `preview`，`generate`，`download`下载接口，生成相应后端代码
+3. 访问 `preview`，`generate`，`download`接口，生成相应后端代码
