@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from typing import Sequence
+
+from sqlalchemy import delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
+
+from backend.app.{{ app_name }}.model import {{ table_name_class }}
+from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+
+
+class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
+    async def get(self, db: AsyncSession, pk: int) -> {{ table_name_class }} | None:
+        """
+        获取 {{ schema_name }}
+
+        :param db:
+        :param pk:
+        :return:
+        """
+        return await self.select_model_by_id(db, pk)
+
+    async def get_all(self, db: AsyncSession) -> Sequence[{{ schema_name }}]:
+        """
+        获取所有 {{ schema_name }}
+
+        :param db:
+        :return:
+        """
+        return await self.select_models(db)
+
+    async def create(self, db: AsyncSession, obj_in: Create{{ schema_name }}Param) -> None:
+        """
+        创建 {{ schema_name }}
+
+        :param db:
+        :param obj_in:
+        :return:
+        """
+        await self.create_model(db, obj_in)
+
+    async def update(self, db: AsyncSession, pk: int, obj_in: Update{{ schema_name }}Param) -> int:
+        """
+        更新 {{ schema_name }}
+
+        :param db:
+        :param pk:
+        :param obj_in:
+        :return:
+        """
+        return await self.update_model(db, pk, obj_in)
+
+    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+        """
+        删除 {{ schema_name }}
+
+        :param db:
+        :param pk:
+        :return:
+        """
+        {{ table_name_en }}s = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
+        return {{ table_name_en }}s.rowcount
+
+
+{{ table_name_en }}_dao: CRUD{{ schema_name }} = CRUD{{ schema_name }}({{ schema_name }})

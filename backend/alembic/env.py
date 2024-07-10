@@ -30,9 +30,11 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # https://alembic.sqlalchemy.org/en/latest/autogenerate.html#autogenerating-multiple-metadata-collections
 from backend.app.admin.model import MappedBase as AdminBase
+from backend.app.generator.model import MappedBase as GeneratorBase
 
 target_metadata = [
     AdminBase.metadata,
+    GeneratorBase.metadata,
 ]
 
 # other values from the config, defined by the needs of env.py,

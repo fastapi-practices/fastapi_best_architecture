@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from typing import Sequence
+
+from backend.app.{{ app_name }}.crud.crud_{{ table_name_en }} import {{ table_name_en }}_dao
+from backend.app.{{ app_name }}.model import {{ table_name_class }}
+from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+from backend.common.exception import errors
+from backend.database.db_mysql import async_db_session
+
+
+class {{ schema_name }}Service:
+    @staticmethod
+    async def get(*, pk: int) -> {{ table_name_class }}:
+        async with async_db_session() as db:
+            {{ table_name_en }} = await {{ table_name_en }}_dao.get(db, pk)
+            if not {{ table_name_en }}:
+                raise errors.NotFoundError(msg='接口不存在')
+            return {{ table_name_en }}
+
+    @staticmethod
+    async def get_all() -> Sequence[{{ table_name_class }}]:
+        async with async_db_session() as db:
+            {{ table_name_en }}s = await {{ table_name_en }}_dao.get_all(db)
+            return {{ table_name_en }}s
+
+    @staticmethod
+    async def create(*, obj: Create{{ schema_name }}Param) -> None:
+        async with async_db_session.begin() as db:
+            {{ table_name_en }} = await {{ table_name_en }}_dao.get_by_name(db, obj.name)
+            if {{ table_name_en }}:
+                raise errors.ForbiddenError(msg='{{ table_simple_name_zh }}已存在')
+            await {{ table_name_en }}_dao.create(db, obj)
+
+    @staticmethod
+    async def update(*, pk: int, obj: Update{{ schema_name }}Param) -> int:
+        async with async_db_session.begin() as db:
+            count = await {{ table_name_en }}_dao.update(db, pk, obj)
+            return count
+
+    @staticmethod
+    async def delete(*, pk: list[int]) -> int:
+        async with async_db_session.begin() as db:
+            count = await {{ table_name_en }}_dao.delete(db, pk)
+            return count
+
+
+{{ table_name_en }}_service = {{ schema_name }}Service()

@@ -70,17 +70,18 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
 ## Built-in features
 
-1. [x] User management: system user role management, permission assignment
-2. [x] Department Management: Configure the system organization (company, department, group...)
-3. [x] Menu Management: Configuration of system menus, user menus, button privilege identification
-4. [x] Role Management: Assign role menu privileges, assign role routing privileges
-5. [x] Dictionary Management: Maintain common fixed data or parameters within the system.
-6. [x] Operation Logs: logging and querying of normal and abnormal system operations.
-7. [x] Login Authentication: graphical authentication code background authentication login
-8. [x] Login Logs: Logging and querying of normal and abnormal user logins
-9. [x] Service Monitoring: server hardware device information and status
-10. [x] Scheduled tasks: automated tasks, asynchronous tasks, and function invocation are supported
-11. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
+1. [x] User management: management of system user roles, assignment of permissions
+2. [x] Departmental management: Configuration of the system organization (company, department, group, ...)
+3. [x] Menu management: Configuration of system menus, user menus, button permission labels
+4. [x] Role management: assignment of role menu privileges, assignment of role routing privileges
+5. [x] Dictionary management: maintenance of commonly used fixed data or parameters within the system
+6. [x] Code generation: back-end code is automatically generated, supporting preview, write and download.
+7. [x] Operation log: logging and querying of normal and abnormal system operations.
+8. [x] Login authentication: graphical captcha backend authentication login
+9. [x] Logging: logging and querying of normal and abnormal user logins
+10. [x] Service monitoring: server hardware device information and status
+11. [x] Timed tasks: automated tasks, asynchronous tasks, support for function calls
+12. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
 
 ## Local development
 
