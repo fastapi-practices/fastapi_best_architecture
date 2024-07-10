@@ -48,27 +48,9 @@ CREATE TABLE `sys_dept`
     `created_time` datetime    NOT NULL COMMENT '创建时间',
     `updated_time` datetime    DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY `ix_sys_dept_parent_id` (`parent_id`),
     KEY `ix_sys_dept_id` (`id`),
+    KEY `ix_sys_dept_parent_id` (`parent_id`),
     CONSTRAINT `sys_dept_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
-
--- sys_dict_type: table
-CREATE TABLE `sys_dict_type`
-(
-    `id`           int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
-    `name`         varchar(32) NOT NULL COMMENT '字典类型名称',
-    `code`         varchar(32) NOT NULL COMMENT '字典类型编码',
-    `status`       int         NOT NULL COMMENT '状态（0停用 1正常）',
-    `remark`       longtext COMMENT '备注',
-    `created_time` datetime    NOT NULL COMMENT '创建时间',
-    `updated_time` datetime DEFAULT NULL COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `name` (`name`),
-    UNIQUE KEY `code` (`code`),
-    KEY `ix_sys_dict_type_id` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
@@ -91,6 +73,68 @@ CREATE TABLE `sys_dict_data`
     KEY `type_id` (`type_id`),
     KEY `ix_sys_dict_data_id` (`id`),
     CONSTRAINT `sys_dict_data_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `sys_dict_type` (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+-- sys_dict_type: table
+CREATE TABLE `sys_dict_type`
+(
+    `id`           int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `name`         varchar(32) NOT NULL COMMENT '字典类型名称',
+    `code`         varchar(32) NOT NULL COMMENT '字典类型编码',
+    `status`       int         NOT NULL COMMENT '状态（0停用 1正常）',
+    `remark`       longtext COMMENT '备注',
+    `created_time` datetime    NOT NULL COMMENT '创建时间',
+    `updated_time` datetime DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `name` (`name`),
+    UNIQUE KEY `code` (`code`),
+    KEY `ix_sys_dict_type_id` (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+-- sys_gen_business: table
+CREATE TABLE `sys_gen_business`
+(
+    `id`                   int          NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `app_name`             varchar(50)  NOT NULL COMMENT '应用名称（英文）',
+    `table_name_en`        varchar(255) NOT NULL COMMENT '表名称（英文）',
+    `table_name_zh`        varchar(255) NOT NULL COMMENT '表名称（中文）',
+    `table_simple_name_zh` varchar(255) NOT NULL COMMENT '表名称（中文简称）',
+    `table_comment`        varchar(255) DEFAULT NULL COMMENT '表描述',
+    `schema_name`          varchar(255) DEFAULT NULL COMMENT 'Schema 名称 (默认为英文表驼峰)',
+    `have_datetime_column` tinyint(1)   NOT NULL COMMENT '是否存在默认时间列',
+    `api_version`          varchar(20)  NOT NULL COMMENT '代码生成 api 版本，默认为 v1',
+    `gen_path`             varchar(255) DEFAULT NULL COMMENT '代码生成路径（默认为 app 根路径）',
+    `remark`               longtext COMMENT '备注',
+    `created_time`         datetime     NOT NULL COMMENT '创建时间',
+    `updated_time`         datetime     DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `table_name_en` (`table_name_en`),
+    KEY `ix_sys_gen_business_id` (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+-- sys_gen_model: table
+CREATE TABLE `sys_gen_model`
+(
+    `id`              int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `name`            varchar(50) NOT NULL COMMENT '列名称',
+    `comment`         varchar(255) DEFAULT NULL COMMENT '列描述',
+    `type`            varchar(20) NOT NULL COMMENT '列类型',
+    `default`         varchar(50)  DEFAULT NULL COMMENT '列默认值',
+    `sort`            int          DEFAULT NULL COMMENT '列排序',
+    `length`          int         NOT NULL COMMENT '列长度',
+    `is_pk`           tinyint(1)  NOT NULL COMMENT '是否主键',
+    `is_nullable`     tinyint(1)  NOT NULL COMMENT '是否可为空',
+    `gen_business_id` int         NOT NULL COMMENT '代码生成业务ID',
+    PRIMARY KEY (`id`),
+    KEY `gen_business_id` (`gen_business_id`),
+    KEY `ix_sys_gen_model_id` (`id`),
+    CONSTRAINT `sys_gen_model_ibfk_1` FOREIGN KEY (`gen_business_id`) REFERENCES `sys_gen_business` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
@@ -233,8 +277,8 @@ CREATE TABLE `sys_user`
     PRIMARY KEY (`id`),
     UNIQUE KEY `uuid` (`uuid`),
     UNIQUE KEY `nickname` (`nickname`),
-    UNIQUE KEY `ix_sys_user_username` (`username`),
     UNIQUE KEY `ix_sys_user_email` (`email`),
+    UNIQUE KEY `ix_sys_user_username` (`username`),
     KEY `dept_id` (`dept_id`),
     KEY `ix_sys_user_id` (`id`),
     CONSTRAINT `sys_user_ibfk_1` FOREIGN KEY (`dept_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
