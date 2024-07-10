@@ -9,8 +9,7 @@ from typing import Sequence
 
 import aiofiles
 
-from sqlalchemy import text
-
+from backend.app.generator.crud.crud_gen import gen_dao
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenBusiness
@@ -40,24 +39,12 @@ class GenService:
     @staticmethod
     async def get_tables(*, table_schema: str) -> Sequence[str]:
         async with async_db_session() as db:
-            stmt = await db.execute(
-                text(
-                    'select table_name as table_name from information_schema.tables '
-                    f"where table_name not like 'sys_gen_%' and table_schema = '{table_schema}';"
-                )
-            )
-            return stmt.scalars().all()
+            return await gen_dao.get_all_tables(db, table_schema)
 
     @staticmethod
-    async def import_business_and_model(*, app: str, table: str) -> None:
+    async def import_business_and_model(*, app: str, table_name: str) -> None:
         async with async_db_session.begin() as db:
-            stmt = await db.execute(
-                text(
-                    'select table_name as table_name, table_comment as table_comment from information_schema.tables '
-                    f"where table_name not like 'sys_gen_%' and table_name = '{table}';"
-                )
-            )
-            table_info = stmt.fetchone()
+            table_info = await gen_dao.get_table(db, table_name)
             if not table_info:
                 raise errors.NotFoundError(msg='数据库表不存在')
             table_name = table_info[0]
@@ -71,17 +58,7 @@ class GenService:
             new_business = GenBusiness(**CreateGenBusinessParam(**business_data).model_dump())
             db.add(new_business)
             await db.flush()
-            stmt = await db.execute(
-                text(
-                    'select column_name AS column_name, '
-                    'case when column_key = "PRI" then 1 else 0 end as is_pk, '
-                    'case when is_nullable = "NO" or column_key = "PRI" then 0 else 1 end as is_nullable, '
-                    'ordinal_position as sort, column_comment as column_comment, column_type as column_type '
-                    f'from information_schema.columns where table_name = "{table}" and column_name != "id" '
-                    'order by sort;'
-                )
-            )
-            column_info = stmt.fetchall()
+            column_info = await gen_dao.get_all_columns(db, table_name)
             for column in column_info:
                 column_type = column[-1].split('(')[0].lower()
                 model_data = {

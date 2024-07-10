@@ -85,9 +85,9 @@ async def get_all_tables(table_schema: Annotated[str | None, Query(description='
 @router.post('/import', summary='导入代码生成业务和模型列', dependencies=[DependsRBAC])
 async def import_table(
     app: Annotated[str, Query(..., description='应用名称，用于代码生成到指定 app')],
-    table: Annotated[str, Query(..., description='数据库表名')],
+    table_name: Annotated[str, Query(..., description='数据库表名')],
 ) -> ResponseModel:
-    await gen_service.import_business_and_model(app=app, table=table)
+    await gen_service.import_business_and_model(app=app, table_name=table_name)
     return await response_base.success()
 
 
