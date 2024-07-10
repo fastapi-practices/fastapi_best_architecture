@@ -14,8 +14,6 @@ class GenBusinessSchemaBase(SchemaBase):
     table_name_zh: str
     table_simple_name_zh: str
     table_comment: str | None = None
-    # relate_model_name: str | None = None
-    # relate_model_fk: int | None = None
     schema_name: str | None = None
     have_datetime_column: bool = Field(default=False)
     api_version: str = Field(default='v1')

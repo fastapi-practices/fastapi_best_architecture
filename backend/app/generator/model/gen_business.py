@@ -18,7 +18,6 @@ class GenBusiness(Base):
     table_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文）')
     table_simple_name_zh: Mapped[str] = mapped_column(String(255), comment='表名称（中文简称）')
     table_comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='表描述')
-    # relate_model_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='关联表名称')
     # relate_model_fk: Mapped[int | None] = mapped_column(default=None, comment='关联表外键')
     schema_name: Mapped[str | None] = mapped_column(String(255), default=None, comment='Schema 名称 (默认为英文表驼峰)')
     have_datetime_column: Mapped[bool] = mapped_column(default=True, comment='是否存在默认时间列')
