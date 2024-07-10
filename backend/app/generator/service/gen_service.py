@@ -65,7 +65,7 @@ class GenService:
                     'name': column[0],
                     'comment': column[-2],
                     'type': column_type,
-                    'sort': column[-2],
+                    'sort': column[-3],
                     'length': column[-1].split('(')[1][:-1]
                     if column_type == GenModelType.CHAR or column_type == GenModelType.VARCHAR
                     else 0,
