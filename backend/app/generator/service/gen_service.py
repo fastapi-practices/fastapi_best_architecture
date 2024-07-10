@@ -42,7 +42,7 @@ class GenService:
             return await gen_dao.get_all_tables(db, table_schema)
 
     @staticmethod
-    async def import_business_and_model(*, app: str, table_name: str) -> None:
+    async def import_business_and_model(*, app: str, table_schema: str, table_name: str) -> None:
         async with async_db_session.begin() as db:
             table_info = await gen_dao.get_table(db, table_name)
             if not table_info:
@@ -58,7 +58,7 @@ class GenService:
             new_business = GenBusiness(**CreateGenBusinessParam(**business_data).model_dump())
             db.add(new_business)
             await db.flush()
-            column_info = await gen_dao.get_all_columns(db, table_name)
+            column_info = await gen_dao.get_all_columns(db, table_schema, table_name)
             for column in column_info:
                 column_type = column[-1].split('(')[0].lower()
                 model_data = {
