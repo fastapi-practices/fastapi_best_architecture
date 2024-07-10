@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from backend.common.schema import SchemaBase
 
@@ -20,6 +20,12 @@ class GenBusinessSchemaBase(SchemaBase):
     api_version: str = Field(default='v1')
     gen_path: str | None = None
     remark: str | None = None
+
+    @model_validator(mode='after')
+    def check_schema_name(self):
+        if self.schema_name is None:
+            self.schema_name = self.table_name_en
+        return self
 
 
 class CreateGenBusinessParam(GenBusinessSchemaBase):

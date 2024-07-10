@@ -12,9 +12,13 @@ import aiofiles
 from sqlalchemy import text
 
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
+from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenBusiness
+from backend.app.generator.schema.gen_business import CreateGenBusinessParam
+from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
+from backend.common.enums import GenModelType
 from backend.common.exception import errors
 from backend.core.path_conf import BasePath
 from backend.database.db_mysql import async_db_session
@@ -45,7 +49,54 @@ class GenService:
             return stmt.scalars().all()
 
     @staticmethod
-    async def import_business_and_model(*, tables: list): ...
+    async def import_business_and_model(*, app: str, table: str) -> None:
+        async with async_db_session.begin() as db:
+            stmt = await db.execute(
+                text(
+                    'select table_name as table_name, table_comment as table_comment from information_schema.tables '
+                    f"where table_name not like 'sys_gen_%' and table_name = '{table}';"
+                )
+            )
+            table_info = stmt.fetchone()
+            if not table_info:
+                raise errors.NotFoundError(msg='数据库表不存在')
+            table_name = table_info[0]
+            business_data = {
+                'app_name': app,
+                'table_name_en': table_name,
+                'table_name_zh': table_info[1] or ' '.join(table_name.split('_')),
+                'table_simple_name_zh': table_info[1] or table_name.split('_')[-1],
+                'table_comment': table_info[1],
+            }
+            new_business = GenBusiness(**CreateGenBusinessParam(**business_data).model_dump())
+            db.add(new_business)
+            await db.flush()
+            stmt = await db.execute(
+                text(
+                    'select column_name AS column_name, '
+                    'case when column_key = "PRI" then 1 else 0 end as is_pk, '
+                    'case when is_nullable = "NO" or column_key = "PRI" then 0 else 1 end as is_nullable, '
+                    'ordinal_position as sort, column_comment as column_comment, column_type as column_type '
+                    f'from information_schema.columns where table_name = "{table}" and column_name != "id" '
+                    'order by sort;'
+                )
+            )
+            column_info = stmt.fetchall()
+            for column in column_info:
+                column_type = column[-1].split('(')[0].lower()
+                model_data = {
+                    'name': column[0],
+                    'comment': column[-2],
+                    'type': column_type,
+                    'sort': column[-2],
+                    'length': column[-1].split('(')[1][:-1]
+                    if column_type == GenModelType.CHAR or column_type == GenModelType.VARCHAR
+                    else 0,
+                    'is_pk': column[1],
+                    'is_nullable': column[2],
+                    'gen_business_id': new_business.id,
+                }
+                await gen_model_dao.create(db, CreateGenModelParam(**model_data))
 
     @staticmethod
     async def render_tpl_code(*, business: GenBusiness) -> dict:

@@ -26,7 +26,6 @@ select = [
     "UP007"
 ]
 preview = true
-ignore-init-module-imports = true
 ignore = ["FURB101"]
 
 [lint.flake8-pytest-style]

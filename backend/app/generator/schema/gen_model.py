@@ -21,6 +21,8 @@ class GenModelSchemaBase(SchemaBase):
     @classmethod
     def sql_type_to_python(cls, v: GenModelType):
         type_mapping = {
+            GenModelType.CHAR: 'str',
+            GenModelType.VARCHAR: 'str',
             GenModelType.String: 'str',
             GenModelType.TEXT: 'str',
             GenModelType.Text: 'str',
