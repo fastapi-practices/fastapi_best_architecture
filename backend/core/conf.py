@@ -99,7 +99,7 @@ class Settings(BaseSettings):
 
     # Middleware
     MIDDLEWARE_CORS: bool = True
-    MIDDLEWARE_ACCESS: bool = False
+    MIDDLEWARE_ACCESS: bool = True
 
     # RBAC Permission
     PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
