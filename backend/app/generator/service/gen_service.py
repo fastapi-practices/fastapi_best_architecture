@@ -47,6 +47,9 @@ class GenService:
             table_info = await gen_dao.get_table(db, table_name)
             if not table_info:
                 raise errors.NotFoundError(msg='数据库表不存在')
+            business_info = await gen_business_dao.get_by_name(db, table_name)
+            if business_info:
+                raise errors.ForbiddenError(msg='已存在相同数据库表业务')
             table_name = table_info[0]
             business_data = {
                 'app_name': app,
@@ -122,15 +125,15 @@ class GenService:
             business = await gen_business_dao.get(db, pk)
             if not business:
                 raise errors.NotFoundError(msg='业务不存在')
-        bio = io.BytesIO()
-        zf = zipfile.ZipFile(bio, 'w')
-        tpl_code_map = await self.render_tpl_code(business=business)
-        for tpl_path, code in tpl_code_map.items():
-            new_code_path = gen_template.get_code_gen_path(tpl_path, business)
-            zf.writestr(new_code_path, code)
-        zf.close()
-        bio.seek(0)
-        return bio
+            bio = io.BytesIO()
+            zf = zipfile.ZipFile(bio, 'w')
+            tpl_code_map = await self.render_tpl_code(business=business)
+            for tpl_path, code in tpl_code_map.items():
+                new_code_path = gen_template.get_code_gen_path(tpl_path, business)
+                zf.writestr(new_code_path, code)
+            zf.close()
+            bio.seek(0)
+            return bio
 
 
 gen_service = GenService()
