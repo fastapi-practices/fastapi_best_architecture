@@ -12,5 +12,5 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
 
     id: Mapped[id_key] = mapped_column(init=False)
     {% for model in models %}
-    {{ model.name }}: {% if model.is_nullable %}Mapped[{{ model.type | None }}]{% else %}Mapped[{{ model.type }}]{% endif %} = mapped_column({% if model.type == 'str' %}{{ model_type_mapping.get(model.type) }}({{ model.length }}){% else %}{{ model_type_mapping.get(model.type) or model.type}}(){% endif %}, default={{ model.default }}, sort_order={{ model.sort }}, comment={{ model.comment }})
+    {{ model.name }}: {% if model.is_nullable %}Mapped[{{ model.type }} | None]{% else %}Mapped[{{ model.type }}]{% endif %} = mapped_column({% if model.type == 'str' and model.length != 0 %}{{ model_type_mapping.get(model.type) }}({{ model.length }}){% else %}{{ model_type_mapping.get(model.type) or model.type}}(){% endif %}, default={{ model.default }}, sort_order={{ model.sort }}, comment={{ model.comment }})
     {% endfor %}
