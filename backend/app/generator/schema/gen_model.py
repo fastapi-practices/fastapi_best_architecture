@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 from pydantic import ConfigDict, Field, field_validator
 
-from backend.common.enums import GenModelType
+from backend.common.enums import GenModelColumnType
 from backend.common.schema import SchemaBase
+from backend.utils.type_conversion import sql_type_to_sqlalchemy
 
 
 class GenModelSchemaBase(SchemaBase):
     name: str
     comment: str | None = None
-    type: GenModelType = Field(GenModelType.String, description='模型 column 类型')
+    type: GenModelColumnType = Field(GenModelColumnType.VARCHAR)
     default: str | None = None
     sort: int
     length: int
@@ -19,30 +20,8 @@ class GenModelSchemaBase(SchemaBase):
 
     @field_validator('type')
     @classmethod
-    def sql_type_to_python(cls, v: GenModelType):
-        type_mapping = {
-            GenModelType.CHAR: 'str',
-            GenModelType.VARCHAR: 'str',
-            GenModelType.String: 'str',
-            GenModelType.TEXT: 'str',
-            GenModelType.Text: 'str',
-            GenModelType.LONGTEXT: 'str',
-            GenModelType.UnicodeText: 'str',
-            GenModelType.INT: 'int',
-            GenModelType.INTEGER: 'int',
-            GenModelType.Integer: 'int',
-            GenModelType.BigInteger: 'int',
-            GenModelType.SmallInteger: 'int',
-            GenModelType.BIGINT: 'int',
-            GenModelType.SMALLINT: 'int',
-            GenModelType.FLOAT: 'float',
-            GenModelType.Float: 'float',
-            GenModelType.Boolean: 'bool',
-            GenModelType.DECIMAL: 'decimal',
-            GenModelType.UUID: 'UUID',
-            GenModelType.Uuid: 'UUID',
-        }
-        return type_mapping.get(v) or v
+    def type_update(cls, v):
+        return sql_type_to_sqlalchemy(v)
 
 
 class CreateGenModelParam(GenModelSchemaBase):
@@ -57,3 +36,4 @@ class GetGenModelListDetails(GenModelSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    pd_type: str

@@ -69,13 +69,6 @@ class GenTemplate:
         :param models:
         :return:
         """
-        # python 类型对应的 sqlalchemy 类型
-        model_type_mapping = {
-            'str': 'String',
-            'float': 'Float',
-            'int': 'Integer',
-            'bool': 'Boolean',
-        }
         return {
             'app_name': business.app_name,
             'table_name_en': to_snake(business.table_name_en),
@@ -87,7 +80,6 @@ class GenTemplate:
             'have_datetime_column': business.have_datetime_column,
             'permission_sign': str(business.__tablename__.replace('_', ':')),
             'models': models,
-            'model_type_mapping': model_type_mapping,
         }
 
 

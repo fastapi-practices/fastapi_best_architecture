@@ -17,7 +17,7 @@ from backend.app.generator.schema.gen_business import CreateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
-from backend.common.enums import GenModelType
+from backend.common.enums import GenModelColumnType
 from backend.common.exception import errors
 from backend.core.path_conf import BasePath
 from backend.database.db_mysql import async_db_session
@@ -63,14 +63,14 @@ class GenService:
             await db.flush()
             column_info = await gen_dao.get_all_columns(db, table_schema, table_name)
             for column in column_info:
-                column_type = column[-1].split('(')[0].lower()
+                column_type = column[-1].split('(')[0].upper()
                 model_data = {
                     'name': column[0],
                     'comment': column[-2],
                     'type': column_type,
                     'sort': column[-3],
                     'length': column[-1].split('(')[1][:-1]
-                    if column_type == GenModelType.CHAR or column_type == GenModelType.VARCHAR
+                    if column_type == GenModelColumnType.CHAR or column_type == GenModelColumnType.VARCHAR
                     else 0,
                     'is_pk': column[1],
                     'is_nullable': column[2],
