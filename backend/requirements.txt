@@ -89,7 +89,7 @@ redis[hiredis]==5.0.1
 rich==13.7.1
 rsa==4.9
 ruff==0.5.1
-setuptools==69.2.0
+setuptools==70.0.0
 shellingham==1.5.4
 simpleeval==0.9.13
 six==1.16.0
