@@ -24,7 +24,8 @@ class GenModelService:
             if gen_models:
                 if obj.name in [model.name for model in gen_models]:
                     raise errors.ForbiddenError(msg='禁止添加相同列到模型表')
-            await gen_model_dao.create(db, obj, {'pd_type': sql_type_to_pydantic(obj.type)})
+            pd_type = sql_type_to_pydantic(obj.type)
+            await gen_model_dao.create(db, obj, {'pd_type': pd_type})
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateGenModelParam) -> int:
@@ -33,7 +34,8 @@ class GenModelService:
             if gen_models:
                 if obj.name in [model.name for model in gen_models]:
                     raise errors.ForbiddenError(msg='禁止添加相同列到模型表')
-            count = await gen_model_dao.update(db, pk, obj, {'pd_type': sql_type_to_pydantic(obj.type)})
+            pd_type = sql_type_to_pydantic(obj.type)
+            count = await gen_model_dao.update(db, pk, obj, {'pd_type': pd_type})
             return count
 
     @staticmethod
