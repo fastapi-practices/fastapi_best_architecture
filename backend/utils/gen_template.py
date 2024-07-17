@@ -11,9 +11,10 @@ class GenTemplate:
     def __init__(self):
         self.env = Environment(
             loader=FileSystemLoader(JINJA2_TEMPLATE_DIR),
-            autoescape=select_autoescape(['html', 'xml', 'jinja']),
+            autoescape=select_autoescape(enabled_extensions=['jinja']),
             trim_blocks=True,
             lstrip_blocks=True,
+            keep_trailing_newline=True,
             enable_async=True,
         )
 
