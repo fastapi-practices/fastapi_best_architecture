@@ -3,7 +3,6 @@
 from datetime import datetime
 
 from pydantic import ConfigDict, Field, model_validator
-from pydantic.alias_generators import to_pascal
 
 from backend.common.schema import SchemaBase
 
