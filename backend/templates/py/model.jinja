@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import String
+import sqlalchemy as sa
+
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import {% if have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+
 
 class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
     """{{ table_name_zh }}"""
@@ -12,5 +14,40 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
 
     id: Mapped[id_key] = mapped_column(init=False)
     {% for model in models %}
-    {{ model.name }}: {% if model.is_nullable %}Mapped[{{ model.pd_type }} | None]{% else %}Mapped[{{ model.pd_type }}]{% endif %} = mapped_column({% if model.type == 'String' %}String({{ model.length }}){% else %}{{ model.type}}(){% endif %}, default={{ model.default }}, sort_order={{ model.sort }}, comment={{ model.comment }})
+    {{ model.name }}:
+    {%- if model.is_nullable %} Mapped[{{ model.pd_type }} | None]
+    {%- else %} Mapped[{{ model.pd_type }}]
+    {%- endif %} = mapped_column(
+    {%- if model.type == 'String' -%}
+        sa.String({{ model.length }})
+    {%- else -%}
+        sa.{{ model.type }}()
+    {%- endif -%}, default=
+    {%- if model.is_nullable and model.default == None -%}
+        None
+    {%- else -%}
+        {%- if model.default != None -%}
+            {{ model.default }}
+        {%- else -%}
+            {%- if model.pd_type == 'str' -%}
+                ''
+            {%- elif model.pd_type == 'int' -%}
+                0
+            {%- elif model.pd_type == 'bytes' -%}
+                b''
+            {%- elif model.pd_type == 'bool' -%}
+                True
+            {%- elif model.pd_type == 'float' -%}
+                0.0
+            {%- elif model.pd_type == 'dict' -%}
+                {}
+            {%- elif model.pd_type == 'date' or model.pd_type == 'datetime' -%}
+                timezone.now()
+            {%- elif model.pd_type == 'List[str]' -%}
+                ()
+            {%- else -%}
+                ''
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}, sort_order={{ model.sort }}, comment='{{ model.comment }}')
     {% endfor %}
