@@ -77,7 +77,7 @@ services:
       - fba_network
 
   # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
-  # you should stop using fba_nginx container and open fba_ui container
+  # you should stop using fba_nginx container and use fba_ui container
   fba_nginx:
     image: nginx
     ports:
