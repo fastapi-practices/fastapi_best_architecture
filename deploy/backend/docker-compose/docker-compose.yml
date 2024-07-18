@@ -77,7 +77,7 @@ services:
       - fba_network
 
   # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
-  # you should stop using fba_nginx container
+  # you should stop using fba_nginx container and open fba_ui container
   fba_nginx:
     image: nginx
     ports:
@@ -91,6 +91,28 @@ services:
       - fba_static:/www/fba_server/backend/static
     networks:
       - fba_network
+
+#  # If the server memory is less than 4GB and CPU less than four cores
+#  # it is recommended to build this container separately with fba_ui/deploy/docker_run.sh
+#  fba_ui:
+#    build:
+#      context: /root/fastapi_best_architecture_ui
+#      dockerfile: Dockerfile
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    container_name: fba_ui
+#    restart: always
+#    depends_on:
+#      - fba_server
+#    command:
+#      - nginx
+#      - -g
+#      - daemon off;
+#    volumes:
+#      - fba_static:/www/fba_server/backend/static
+#    networks:
+#      - fba_network
 
   fba_rabbitmq:
     hostname: fba_rabbitmq
