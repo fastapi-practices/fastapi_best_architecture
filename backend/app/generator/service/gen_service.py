@@ -117,7 +117,6 @@ class GenService:
                     *gen_template.get_code_gen_path(tpl_path, business).split('/')[1:],
                 )
                 code_folder = Path(str(code_filepath)).parent
-                code_folder_name = code_folder.name
                 if not code_folder.exists():
                     code_folder.mkdir(parents=True, exist_ok=True)
                 # 写入 init 文件
@@ -125,13 +124,11 @@ class GenService:
                 if not init_filepath.exists():
                     async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
-                        if code_folder_name == 'model':
-                            await f.write(gen_template.model_content)
                 # 写入代码文件呢
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
                 # model init 文件补充
-                if code_folder_name == 'model':
+                if code_folder.name == 'model':
                     async with aiofiles.open(init_filepath, 'a', encoding='utf-8') as f:
                         await f.write(
                             f'from backend.app.{business.app_name}.model.{business.table_name_en} '
@@ -157,7 +154,7 @@ class GenService:
                 else:
                     zf.writestr(
                         init_filepath,
-                        f'{gen_template.init_content}{gen_template.model_content}'
+                        f'{gen_template.init_content}'
                         f'from backend.app.{business.app_name}.model.{business.table_name_en} '
                         f'import {to_pascal(business.table_name_en)}\n',
                     )

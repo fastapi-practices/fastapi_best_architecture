@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from backend.common.model import MappedBase  # noqa: I001
 from backend.app.admin.model.sys_api import Api
 from backend.app.admin.model.sys_casbin_rule import CasbinRule
 from backend.app.admin.model.sys_dept import Dept
