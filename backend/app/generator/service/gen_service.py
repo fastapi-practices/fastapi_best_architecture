@@ -9,6 +9,8 @@ from typing import Sequence
 
 import aiofiles
 
+from pydantic.alias_generators import to_pascal
+
 from backend.app.generator.crud.crud_gen import gen_dao
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.crud.crud_gen_model import gen_model_dao
@@ -115,10 +117,26 @@ class GenService:
                     *gen_template.get_code_gen_path(tpl_path, business).split('/')[1:],
                 )
                 code_folder = Path(str(code_filepath)).parent
+                code_folder_name = code_folder.name
                 if not code_folder.exists():
                     code_folder.mkdir(parents=True, exist_ok=True)
+                # 写入 init 文件
+                init_filepath = code_folder.joinpath('__init__.py')
+                if not init_filepath.exists():
+                    async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
+                        await f.write(gen_template.init_content)
+                        if code_folder_name == 'model':
+                            await f.write(gen_template.model_content)
+                # 写入代码文件呢
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
+                # model init 文件补充
+                if code_folder_name == 'model':
+                    async with aiofiles.open(init_filepath, 'a', encoding='utf-8') as f:
+                        await f.write(
+                            f'from backend.app.{business.app_name}.model.{business.table_name_en} '
+                            f'import {to_pascal(business.table_name_en)}\n',
+                        )
 
     async def download(self, *, pk: int) -> io.BytesIO:
         async with async_db_session() as db:
@@ -129,8 +147,20 @@ class GenService:
             zf = zipfile.ZipFile(bio, 'w')
             tpl_code_map = await self.render_tpl_code(business=business)
             for tpl_path, code in tpl_code_map.items():
+                # 写入代码文件
                 new_code_path = gen_template.get_code_gen_path(tpl_path, business)
                 zf.writestr(new_code_path, code)
+                # 写入 init 文件
+                init_filepath = os.path.join(*new_code_path.split('/')[:-1], '__init__.py')
+                if 'model' not in new_code_path.split('/'):
+                    zf.writestr(init_filepath, gen_template.init_content)
+                else:
+                    zf.writestr(
+                        init_filepath,
+                        f'{gen_template.init_content}{gen_template.model_content}'
+                        f'from backend.app.{business.app_name}.model.{business.table_name_en} '
+                        f'import {to_pascal(business.table_name_en)}\n',
+                    )
             zf.close()
             bio.seek(0)
             return bio

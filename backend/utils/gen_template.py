@@ -17,6 +17,8 @@ class GenTemplate:
             keep_trailing_newline=True,
             enable_async=True,
         )
+        self.init_content = '#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n'
+        self.model_content = 'from backend.common.model import MappedBase  # noqa: I001\n'
 
     def get_template(self, jinja_file: str) -> Template:
         """
