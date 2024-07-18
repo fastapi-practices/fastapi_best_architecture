@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# ruff: noqa: E402
+# ruff: noqa: E402, F403, I001, RUF100
 import asyncio
 import os
 import sys
@@ -28,14 +28,13 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# https://alembic.sqlalchemy.org/en/latest/autogenerate.html#autogenerating-multiple-metadata-collections
-from backend.app.admin.model import MappedBase as AdminBase
-from backend.app.generator.model import MappedBase as GeneratorBase
+from backend.common.model import MappedBase
 
-target_metadata = [
-    AdminBase.metadata,
-    GeneratorBase.metadata,
-]
+# if add new app, do like this
+from backend.app.admin.model import *  # noqa: F401
+from backend.app.generator.model import *  # noqa: F401
+
+target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 from backend.database.db_mysql import SQLALCHEMY_DATABASE_URL
@@ -58,7 +57,7 @@ def run_migrations_offline():
     url = config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
-        target_metadata=target_metadata,  # type: ignore
+        target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={'paramstyle': 'named'},
     )
@@ -68,7 +67,10 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)  # type: ignore
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
