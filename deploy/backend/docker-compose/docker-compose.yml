@@ -96,6 +96,10 @@ services:
 #  # it is recommended to build this container separately with fba_ui/deploy/docker_run.sh
 #  fba_ui:
 #    image: fba_ui:latest
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    restart: always
 #
 #  # If the server has sufficient resources
 #  fba_ui:
