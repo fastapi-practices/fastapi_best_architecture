@@ -95,7 +95,8 @@ services:
 
 #  # If the server memory is less than 4GB and CPU less than four cores
 #  # it is recommended to build this container separately: docker-compose build fba_ui
-#  # Of course, you can also go to fba_ui project and build it individually
+#  # You can also go to fba_ui project and build it individually，however,
+#  # that make sure to create the docker network before the build: docker network create fba_network
 #  fba_ui:
 #    build:
 #      context: /root/fastapi_best_architecture_ui
