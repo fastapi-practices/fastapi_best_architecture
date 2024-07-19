@@ -24,6 +24,7 @@ services:
     build:
       context: ../../../
       dockerfile: backend/backend.dockerfile
+    image: fba_server:latest
     container_name: fba_server
     restart: always
     depends_on:
@@ -139,6 +140,7 @@ services:
     build:
       context: ../../../
       dockerfile: backend/celery.dockerfile
+    image: fba_celery:latest
     ports:
       - "8555:8555"
     container_name: fba_celery
