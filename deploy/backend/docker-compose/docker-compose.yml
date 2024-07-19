@@ -93,15 +93,7 @@ services:
       - fba_network
 
 #  # If the server memory is less than 4GB and CPU less than four cores
-#  # it is recommended to build this container separately with fba_ui/deploy/docker_run.sh
-#  fba_ui:
-#    image: fba_ui:latest
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    restart: always
-#
-#  # If the server has sufficient resources
+#  # it is recommended to build this container separately: docker-compose build fba_ui
 #  fba_ui:
 #    build:
 #      context: /root/fastapi_best_architecture_ui
