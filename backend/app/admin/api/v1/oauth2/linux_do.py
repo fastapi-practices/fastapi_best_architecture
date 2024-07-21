@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, LinuxDoOAuth20
