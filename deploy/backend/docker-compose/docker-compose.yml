@@ -24,6 +24,7 @@ services:
     build:
       context: ../../../
       dockerfile: backend/backend.dockerfile
+    image: fba_server:latest
     container_name: fba_server
     restart: always
     depends_on:
@@ -77,7 +78,7 @@ services:
       - fba_network
 
   # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
-  # you should stop using fba_nginx container
+  # you should stop using fba_nginx container and use fba_ui container
   fba_nginx:
     image: nginx
     ports:
@@ -91,6 +92,36 @@ services:
       - fba_static:/www/fba_server/backend/static
     networks:
       - fba_network
+
+#  # If the server memory is less than 4GB and CPU less than four cores
+#  # it is recommended to build this container separately: docker-compose build fba_ui
+#  # You can also go to fba_ui project and build it individually，however,
+#  # that make sure to create the docker network before the build: docker network create fba_network
+#  fba_ui:
+#    build:
+#      context: /root/fastapi_best_architecture_ui
+#      dockerfile: Dockerfile
+#    image: fba_ui:latest
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    container_name: fba_ui
+#    restart: always
+#    depends_on:
+#      - fba_server
+#    command:
+#      - nginx
+#      - -g
+#      - daemon off;
+#    volumes:
+#      # nginx https conf
+#      # When deploying through docker, you need to open this configuration item and
+#      # ensure that the docker_ssl path is consistent with that in nginx conf
+#      # - local_ssl_pem_path:/etc/ssl/xxx.pem
+#      # - local_ssl_key_path:/etc/ssl/xxx.key
+#      - fba_static:/www/fba_server/backend/static
+#    networks:
+#      - fba_network
 
   fba_rabbitmq:
     hostname: fba_rabbitmq
@@ -112,6 +143,7 @@ services:
     build:
       context: ../../../
       dockerfile: backend/celery.dockerfile
+    image: fba_celery:latest
     ports:
       - "8555:8555"
     container_name: fba_celery
