@@ -16,12 +16,15 @@ class AdminSettings(BaseSettings):
     # GitHub
     OAUTH2_GITHUB_CLIENT_ID: str
     OAUTH2_GITHUB_CLIENT_SECRET: str
-    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/auth2/github/callback'
+    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/github/callback'
 
     # Linux Do
     OAUTH2_LINUX_DO_CLIENT_ID: str
     OAUTH2_LINUX_DO_CLIENT_SECRET: str
-    OAUTH2_LINUX_DO_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/auth2/linuxdo/callback'
+    OAUTH2_LINUX_DO_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/linux-do/callback'
+
+    # Front-end redirect address
+    OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
     # Captcha
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba_login_captcha'
