@@ -29,7 +29,7 @@ dnspython==2.6.1
 ecdsa==0.18.0
 email-validator==2.0.0
 exceptiongroup==1.2.0; python_version < "3.11"
-fast-captcha==0.2.1
+fast-captcha==0.3.2
 fastapi-cli==0.0.2
 fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a2
@@ -63,7 +63,7 @@ packaging==24.0
 passlib==1.7.4
 path==15.1.2
 phonenumbers==8.13.27
-pillow==9.5.0
+pillow==10.4.0
 platformdirs==4.2.0
 pluggy==1.4.0
 pre-commit==3.2.2

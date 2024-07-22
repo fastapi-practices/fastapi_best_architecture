@@ -14,7 +14,7 @@ dependencies = [
     "casbin_async_sqlalchemy_adapter==1.4.0",
     "celery==5.3.6",
     "cryptography==41.0.7",
-    "fast-captcha==0.2.1",
+    "fast-captcha==0.3.2",
     "fastapi[all]==0.111.0",
     "fastapi-limiter==0.1.6",
     "fastapi-pagination==0.12.13",
