@@ -160,7 +160,7 @@ class UserService:
                 user_id = request.user.id
                 if pk == user_id:
                     raise errors.ForbiddenError(msg='禁止修改自身管理员权限')
-                super_status = await user_dao.get_super(db, request.user.id)
+                super_status = await user_dao.get_super(db, user_id)
                 count = await user_dao.set_super(db, pk, False if super_status else True)
                 return count
 
@@ -174,7 +174,7 @@ class UserService:
                 user_id = request.user.id
                 if pk == user_id:
                     raise errors.ForbiddenError(msg='禁止修改自身后台管理登陆权限')
-                staff_status = await user_dao.get_staff(db, request.user.id)
+                staff_status = await user_dao.get_staff(db, user_id)
                 count = await user_dao.set_staff(db, pk, False if staff_status else True)
                 return count
 
