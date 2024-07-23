@@ -18,7 +18,7 @@ from backend.app.admin.schema.user import (
     UpdateUserRoleParam,
 )
 from backend.common.exception import errors
-from backend.common.security.jwt import get_token, password_verify, superuser_verify
+from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
@@ -76,7 +76,8 @@ class UserService:
             np2 = obj.confirm_password
             if np1 != np2:
                 raise errors.ForbiddenError(msg='两次密码输入不一致')
-            count = await user_dao.reset_password(db, request.user.id, obj.new_password, request.user.salt)
+            new_pwd = await get_hash_password(f'{obj.new_password}{request.user.salt}')
+            count = await user_dao.reset_password(db, request.user.id, new_pwd)
             prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
@@ -156,9 +157,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                if pk == request.user.id:
+                user_id = request.user.id
+                if pk == user_id:
                     raise errors.ForbiddenError(msg='禁止修改自身管理员权限')
-                count = await user_dao.set_super(db, pk)
+                super_status = await user_dao.get_super(db, user_id)
+                count = await user_dao.set_super(db, pk, False if super_status else True)
                 return count
 
     @staticmethod
@@ -168,9 +171,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                if pk == request.user.id:
+                user_id = request.user.id
+                if pk == user_id:
                     raise errors.ForbiddenError(msg='禁止修改自身后台管理登陆权限')
-                count = await user_dao.set_staff(db, pk)
+                staff_status = await user_dao.get_staff(db, user_id)
+                count = await user_dao.set_staff(db, pk, False if staff_status else True)
                 return count
 
     @staticmethod
@@ -180,9 +185,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                if pk == request.user.id:
+                user_id = request.user.id
+                if pk == user_id:
                     raise errors.ForbiddenError(msg='禁止修改自身状态')
-                count = await user_dao.set_status(db, pk)
+                status = await user_dao.get_status(db, user_id)
+                count = await user_dao.set_status(db, pk, False if status else True)
                 return count
 
     @staticmethod
