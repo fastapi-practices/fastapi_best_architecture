@@ -27,7 +27,7 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
         None
     {%- else -%}
         {%- if model.default != None -%}
-            {{ model.default }}
+            '{{ model.default }}'
         {%- else -%}
             {%- if model.pd_type == 'str' -%}
                 ''
@@ -49,5 +49,5 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
                 ''
             {%- endif -%}
         {%- endif -%}
-    {%- endif -%}, sort_order={{ model.sort }}, comment='{{ model.comment }}')
+    {%- endif -%}{% if model.sort != 0 %}, sort_order={{ model.sort }}{% endif %}, comment='{{ model.comment }}')
     {% endfor %}
