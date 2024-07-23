@@ -76,10 +76,10 @@ class CRUDUser(CRUDPlus[User]):
             salt = text_captcha(5)
             obj.password = await get_hash_password(f'{obj.password}{salt}')
             dict_obj = obj.model_dump()
-            dict_obj.update({'salt': salt})
+            dict_obj.update({'is_staff': True, 'salt': salt})
         else:
             dict_obj = obj.model_dump()
-            dict_obj.update({'salt': None})
+            dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
         db.add(new_user)
 
@@ -163,17 +163,15 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.select_model_by_column(db, 'email', email)
 
-    async def reset_password(self, db: AsyncSession, pk: int, password: str, salt: str) -> int:
+    async def reset_password(self, db: AsyncSession, pk: int, new_pwd: str) -> int:
         """
         重置用户密码
 
         :param db:
         :param pk:
-        :param password:
-        :param salt:
+        :param new_pwd:
         :return:
         """
-        new_pwd = await get_hash_password(f'{password}{salt}')
         return await self.update_model(db, pk, {'password': new_pwd})
 
     async def get_list(self, dept: int = None, username: str = None, phone: str = None, status: int = None) -> Select:
@@ -249,38 +247,38 @@ class CRUDUser(CRUDPlus[User]):
         user = await self.get(db, user_id)
         return user.is_multi_login
 
-    async def set_super(self, db: AsyncSession, user_id: int) -> int:
+    async def set_super(self, db: AsyncSession, user_id: int, _super: bool) -> int:
         """
         设置用户超级管理员
 
         :param db:
         :param user_id:
+        :param _super:
         :return:
         """
-        super_status = await self.get_super(db, user_id)
-        return await self.update_model(db, user_id, {'is_superuser': False if super_status else True})
+        return await self.update_model(db, user_id, {'is_superuser': _super})
 
-    async def set_staff(self, db: AsyncSession, user_id: int) -> int:
+    async def set_staff(self, db: AsyncSession, user_id: int, staff: bool) -> int:
         """
         设置用户后台登录
 
         :param db:
         :param user_id:
+        :param staff:
         :return:
         """
-        staff_status = await self.get_staff(db, user_id)
-        return await self.update_model(db, user_id, {'is_staff': False if staff_status else True})
+        return await self.update_model(db, user_id, {'is_staff': staff})
 
-    async def set_status(self, db: AsyncSession, user_id: int) -> int:
+    async def set_status(self, db: AsyncSession, user_id: int, status: bool) -> int:
         """
         设置用户状态
 
         :param db:
         :param user_id:
+        :param status:
         :return:
         """
-        status = await self.get_status(db, user_id)
-        return await self.update_model(db, user_id, {'status': False if status else True})
+        return await self.update_model(db, user_id, {'status': status})
 
     async def set_multi_login(self, db: AsyncSession, user_id: int) -> int:
         """
