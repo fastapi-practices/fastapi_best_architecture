@@ -9,7 +9,7 @@ from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session
 
 
-class {{ schema_name }}Service:
+class {{ table_name_class }}Service:
     @staticmethod
     async def get(*, pk: int) -> {{ table_name_class }}:
         async with async_db_session() as db:
@@ -45,4 +45,4 @@ class {{ schema_name }}Service:
             return count
 
 
-{{ table_name_en }}_service = {{ schema_name }}Service()
+{{ table_name_en }}_service = {{ table_name_class }}Service()

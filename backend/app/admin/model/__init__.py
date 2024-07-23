@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from backend.app.admin.model.sys_api import Api
 from backend.app.admin.model.sys_casbin_rule import CasbinRule
+from backend.app.admin.model.sys_config import Config
 from backend.app.admin.model.sys_dept import Dept
 from backend.app.admin.model.sys_dict_data import DictData
 from backend.app.admin.model.sys_dict_type import DictType
