@@ -19,7 +19,10 @@ class ConfigService:
                 config = await config_dao.get_one(db)
                 if not config:
                     raise errors.NotFoundError(msg='系统配置不存在')
-                await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=await select_as_dict(config))
+                data_map = await select_as_dict(config)
+                del data_map['created_time']
+                del data_map['updated_time']
+                await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=data_map)
                 return config
             else:
                 return cache_config
@@ -30,8 +33,8 @@ class ConfigService:
             config = await config_dao.get_one(db)
             if config:
                 raise errors.ForbiddenError(msg='系统配置已存在')
-            await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=await select_as_dict(config))
             await config_dao.create(db, obj)
+            await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=obj.model_dump())
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateConfigParam) -> int:
