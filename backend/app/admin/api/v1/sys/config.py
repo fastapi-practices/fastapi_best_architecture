@@ -15,8 +15,8 @@ router = APIRouter()
 
 
 @router.get('', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
-async def get_config(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    config = await config_service.get(pk=pk)
+async def get_config() -> ResponseModel:
+    config = await config_service.get()
     return await response_base.success(data=config)
 
 
