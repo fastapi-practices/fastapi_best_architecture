@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -11,15 +11,15 @@ from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
 
 
 class CRUDConfig(CRUDPlus[Config]):
-    async def get(self, db: AsyncSession, pk: int) -> Config | None:
+    async def get_one(self, db: AsyncSession) -> Config | None:
         """
         获取 Config
 
         :param db:
-        :param pk:
         :return:
         """
-        return await self.select_model_by_id(db, pk)
+        query = await db.execute(select(self.model).limit(1))
+        return query.scalars().first()
 
     async def get_all(self, db: AsyncSession) -> Sequence[Config]:
         """
@@ -59,8 +59,8 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pk:
         :return:
         """
-        sys_configs = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return sys_configs.rowcount
+        configs = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
+        return configs.rowcount
 
 
 config_dao: CRUDConfig = CRUDConfig(Config)

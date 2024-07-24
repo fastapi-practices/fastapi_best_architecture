@@ -1,48 +1,54 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Sequence
-
+from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_config import config_dao
 from backend.app.admin.model import Config
 from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
 from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session
+from backend.database.db_redis import redis_client
+from backend.utils.serializers import select_as_dict
 
 
 class ConfigService:
     @staticmethod
-    async def get(*, pk: int) -> Config:
+    async def get() -> Config | dict:
         async with async_db_session() as db:
-            sys_config = await config_dao.get(db, pk)
-            if not sys_config:
-                raise errors.NotFoundError(msg='接口不存在')
-            return sys_config
-
-    @staticmethod
-    async def get_all() -> Sequence[Config]:
-        async with async_db_session() as db:
-            sys_configs = await config_dao.get_all(db)
-            return sys_configs
+            cache_config = await redis_client.hgetall(admin_settings.CONFIG_REDIS_KEY)
+            if not cache_config:
+                config = await config_dao.get_one(db)
+                if not config:
+                    raise errors.NotFoundError(msg='系统配置不存在')
+                await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=await select_as_dict(config))
+                return config
+            else:
+                return cache_config
 
     @staticmethod
     async def create(*, obj: CreateConfigParam) -> None:
         async with async_db_session.begin() as db:
-            sys_config = await config_dao.get_by_name(db, obj.name)
-            if sys_config:
+            config = await config_dao.get_one(db)
+            if config:
                 raise errors.ForbiddenError(msg='系统配置已存在')
+            await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=await select_as_dict(config))
             await config_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateConfigParam) -> int:
         async with async_db_session.begin() as db:
             count = await config_dao.update(db, pk, obj)
+            await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=obj.model_dump())
             return count
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         async with async_db_session.begin() as db:
+            configs = await config_dao.get_all(db)
+            if len(configs) == 1:
+                raise errors.ForbiddenError(msg='系统配置无法彻底删除')
             count = await config_dao.delete(db, pk)
+            await redis_client.delete(admin_settings.CONFIG_REDIS_KEY)
             return count
 
 
-sys_config_service = ConfigService()
+config_service = ConfigService()

@@ -30,6 +30,9 @@ class AdminSettings(BaseSettings):
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba_login_captcha'
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 过期时间，单位：秒
 
+    # Config
+    CONFIG_REDIS_KEY: str = 'fba_config'
+
 
 @lru_cache
 def get_admin_settings() -> AdminSettings:
