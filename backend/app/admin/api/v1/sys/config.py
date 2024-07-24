@@ -14,7 +14,7 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
+@router.get('', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
 async def get_config(pk: Annotated[int, Path(...)]) -> ResponseModel:
     config = await config_service.get(pk=pk)
     return await response_base.success(data=config)
