@@ -21,7 +21,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         """
         return await self.select_model_by_id(db, pk)
 
-    async def get_all(self, db: AsyncSession) -> Sequence[{{ schema_name }}]:
+    async def get_all(self, db: AsyncSession) -> Sequence[{{ table_name_class }}]:
         """
         获取所有 {{ schema_name }}
 
@@ -63,4 +63,4 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         return {{ table_name_en }}s.rowcount
 
 
-{{ table_name_en }}_dao: CRUD{{ schema_name }} = CRUD{{ schema_name }}({{ schema_name }})
+{{ table_name_en }}_dao: CRUD{{ table_name_class }} = CRUD{{ table_name_class }}({{ table_name_class }})
