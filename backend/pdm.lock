@@ -5,7 +5,7 @@
 groups = ["default", "lint", "deploy"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:02649a2b53ed4be3d13cad6b44d191eb98d3f6a404815e12dc8df1c0e85dd14e"
+content_hash = "sha256:f47f1c2393a99ade8265506d6df9f4ff8acac1ecd6a19a05afd4755e346dde98"
 
 [[package]]
 name = "aiofiles"
@@ -243,6 +243,20 @@ dependencies = [
 files = [
     {file = "celery-5.3.6-py3-none-any.whl", hash = "sha256:9da4ea0118d232ce97dff5ed4974587fb1c0ff5c10042eb15278487cdd27d1af"},
     {file = "celery-5.3.6.tar.gz", hash = "sha256:870cc71d737c0200c397290d730344cc991d13a057534353d124c9380267aab9"},
+]
+
+[[package]]
+name = "celery-aio-pool"
+version = "0.1.0rc6"
+requires_python = ">=3.8,<3.13"
+summary = "Celery worker pool with support for asyncio coroutines as tasks"
+groups = ["default"]
+dependencies = [
+    "celery<6,>=5",
+]
+files = [
+    {file = "celery_aio_pool-0.1.0rc6-py3-none-any.whl", hash = "sha256:ad3820a2906cfa3215d1a3b9012c84e437181ab509626459e15c724c3c72945e"},
+    {file = "celery_aio_pool-0.1.0rc6.tar.gz", hash = "sha256:7bca528e2c4a377defdd87d6817e3bc946c4b8b5ee21f9fe16d1a0f2b2573c1a"},
 ]
 
 [[package]]
@@ -1316,7 +1330,6 @@ groups = ["default"]
 dependencies = [
     "annotated-types>=0.4.0",
     "pydantic-core==2.20.1",
-    "typing-extensions>=4.12.2; python_version >= \"3.13\"",
     "typing-extensions>=4.6.1; python_version < \"3.13\"",
 ]
 files = [

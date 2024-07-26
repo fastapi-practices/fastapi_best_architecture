@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from celery import Celery
+import celery
+import celery_aio_pool
 
 from backend.app.task.conf import task_settings
 from backend.core.conf import settings
@@ -8,10 +9,21 @@ from backend.core.conf import settings
 __all__ = ['celery_app']
 
 
-def init_celery() -> Celery:
+def init_celery() -> celery.Celery:
     """创建 celery 应用"""
 
-    app = Celery('fba_celery')
+    # TODO: Update this work if celery version >= 6.0.0
+    # https://github.com/fastapi-practices/fastapi_best_architecture/issues/321
+    # https://github.com/celery/celery/issues/7874
+    celery.app.trace.build_tracer = celery_aio_pool.build_async_tracer
+    celery.app.trace.reset_worker_optimizations()
+
+    app = celery.Celery(
+        'fba_celery',
+        broker_connection_retry_on_startup=True,
+        worker_pool=celery_aio_pool.pool.AsyncIOPool,
+        trace=celery_aio_pool.build_async_tracer,
+    )
 
     # Celery Config
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
