@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import dataclasses
 
 import httpx
 
@@ -13,6 +12,7 @@ from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import IP2REGION_XDB
 from backend.database.db_redis import redis_client
+from backend.dataclasses import IpInfo, UserAgentInfo
 
 
 @sync_to_async
@@ -77,14 +77,6 @@ def get_location_offline(ip: str) -> dict | None:
         return None
 
 
-@dataclasses.dataclass
-class IpInfo:
-    ip: str
-    country: str | None
-    region: str | None
-    city: str | None
-
-
 async def parse_ip_info(request: Request) -> IpInfo:
     country, region, city = None, None, None
     ip = await get_request_ip(request)
@@ -108,14 +100,6 @@ async def parse_ip_info(request: Request) -> IpInfo:
             ex=settings.IP_LOCATION_EXPIRE_SECONDS,
         )
     return IpInfo(ip=ip, country=country, region=region, city=city)
-
-
-@dataclasses.dataclass
-class UserAgentInfo:
-    user_agent: str
-    os: str | None
-    browser: str | None
-    device: str | None
 
 
 @sync_to_async
