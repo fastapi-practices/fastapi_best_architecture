@@ -43,8 +43,11 @@ dependencies = [
     "sqlalchemy-crud-plus==0.0.2",
     "jinja2==3.1.4",
     "aiofiles==24.1.0",
+    # When celery version < 6.0.0
+    # https://github.com/celery/celery/issues/7874
+    "celery-aio-pool==0.1.0rc6",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 readme = "README.md"
 license = { text = "MIT" }
 
