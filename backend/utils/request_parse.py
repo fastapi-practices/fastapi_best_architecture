@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import dataclasses
+
 import httpx
 
 from asgiref.sync import sync_to_async
@@ -75,13 +77,21 @@ def get_location_offline(ip: str) -> dict | None:
         return None
 
 
-async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
+@dataclasses.dataclass
+class IpInfo:
+    ip: str
+    country: str | None
+    region: str | None
+    city: str | None
+
+
+async def parse_ip_info(request: Request) -> IpInfo:
     country, region, city = None, None, None
     ip = await get_request_ip(request)
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
         country, region, city = location.split(' ')
-        return ip, country, region, city
+        return IpInfo(ip=ip, country=country, region=region, city=city)
     if settings.LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
     elif settings.LOCATION_PARSE == 'offline':
@@ -97,14 +107,22 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
             f'{country} {region} {city}',
             ex=settings.IP_LOCATION_EXPIRE_SECONDS,
         )
-    return ip, country, region, city
+    return IpInfo(ip=ip, country=country, region=region, city=city)
+
+
+@dataclasses.dataclass
+class UserAgentInfo:
+    user_agent: str
+    os: str | None
+    browser: str | None
+    device: str | None
 
 
 @sync_to_async
-def parse_user_agent_info(request: Request) -> tuple[str, str, str, str]:
+def parse_user_agent_info(request: Request) -> UserAgentInfo:
     user_agent = request.headers.get('User-Agent')
     _user_agent = parse(user_agent)
-    device = _user_agent.get_device()
     os = _user_agent.get_os()
     browser = _user_agent.get_browser()
-    return user_agent, device, os, browser
+    device = _user_agent.get_device()
+    return UserAgentInfo(user_agent=user_agent, device=device, os=os, browser=browser)
