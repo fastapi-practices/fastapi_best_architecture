@@ -30,32 +30,33 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         # 请求解析
         user_agent, device, os, browser = await parse_user_agent_info(request)
         ip, country, region, city = await parse_ip_info(request)
-        try:
-            # 此信息依赖于 jwt 中间件
-            username = request.user.username
-        except AttributeError:
-            username = None
-        method = request.method
-        router = request.scope.get('route')
-        summary = getattr(router, 'summary', None) or ''
-        args = await self.get_request_args(request)
-        args = await self.desensitization(args)
 
         # 设置附加请求信息
+        request.state.user_agent = user_agent
+        request.state.device = device
+        request.state.os = os
+        request.state.browser = browser
         request.state.ip = ip
         request.state.country = country
         request.state.region = region
         request.state.city = city
-        request.state.user_agent = user_agent
-        request.state.os = os
-        request.state.browser = browser
-        request.state.device = device
 
         # 执行请求
         start_time = timezone.now()
         code, msg, status, err, response = await self.execute_request(request, call_next)
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
+
+        try:
+            # 此信息依赖于 jwt 中间件
+            username = request.user.username
+        except AttributeError:
+            username = None
+        method = request.method
+        _route = request.scope.get('route')
+        summary = getattr(_route, 'summary', None) or ''
+        args = await self.get_request_args(request)
+        args = await self.desensitization(args)
 
         # 日志创建
         opera_log_in = CreateOperaLogParam(
