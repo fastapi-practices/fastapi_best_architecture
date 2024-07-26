@@ -8,11 +8,11 @@ from fastapi import Request
 from user_agents import parse
 from XdbSearchIP.xdbSearcher import XdbSearcher
 
+from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import IP2REGION_XDB
 from backend.database.db_redis import redis_client
-from backend.dataclasses import IpInfo, UserAgentInfo
 
 
 @sync_to_async

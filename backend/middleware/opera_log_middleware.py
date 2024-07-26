@@ -10,10 +10,10 @@ from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import OperaLogService
+from backend.common.dataclasses import RequestCallNextReturn
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.core.conf import settings
-from backend.dataclasses import RequestCallNextReturn
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 from backend.utils.timezone import timezone
