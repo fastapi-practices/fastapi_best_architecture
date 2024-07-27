@@ -13,9 +13,9 @@ class Config(Base):
     __tablename__ = 'sys_config'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    login_title: Mapped[str] = mapped_column(String(20), default='登陆 FBA', comment='登陆页面标题')
+    login_title: Mapped[str] = mapped_column(String(20), default='登录 FBA', comment='登录页面标题')
     login_sub_title: Mapped[str] = mapped_column(
-        String(50), default='fastapi_best_architecture', comment='登陆页面子标题'
+        String(50), default='fastapi_best_architecture', comment='登录页面子标题'
     )
     footer: Mapped[str] = mapped_column(String(50), default='FBA', comment='页脚标题')
     logo: Mapped[str] = mapped_column(LONGTEXT, default='Arco', comment='Logo')

@@ -16,6 +16,6 @@ class AccessMiddleware(BaseHTTPMiddleware):
         end_time = timezone.now()
         log.info(
             f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
-            f'{request.url.path} | {(end_time - start_time).total_seconds() * 1000.0}ms'
+            f'{request.url.path} | {round((end_time - start_time).total_seconds(), 3) * 1000.0}ms'
         )
         return response
