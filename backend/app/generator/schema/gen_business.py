@@ -14,7 +14,7 @@ class GenBusinessSchemaBase(SchemaBase):
     table_simple_name_zh: str
     table_comment: str | None = None
     schema_name: str | None = None
-    have_datetime_column: bool = Field(default=False)
+    default_datetime_column: bool = Field(default=True)
     api_version: str = Field(default='v1')
     gen_path: str | None = None
     remark: str | None = None
