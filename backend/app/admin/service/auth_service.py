@@ -62,7 +62,9 @@ class AuthService:
                     str(current_user.id), multi_login=current_user.is_multi_login
                 )
                 refresh_token, refresh_token_expire_time = await create_refresh_token(
-                    str(current_user.id), access_token_expire_time, multi_login=current_user.is_multi_login
+                    str(current_user.id),
+                    access_token_expire_time,
+                    multi_login=current_user.is_multi_login,
                 )
                 await user_dao.update_login_time(db, obj.username)
                 await db.refresh(current_user)
@@ -113,19 +115,17 @@ class AuthService:
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已锁定，操作失败')
             current_token = await get_token(request)
-            (
-                new_access_token,
-                new_refresh_token,
-                new_access_token_expire_time,
-                new_refresh_token_expire_time,
-            ) = await create_new_token(
-                str(current_user.id), current_token, refresh_token, multi_login=current_user.is_multi_login
+            new_token = await create_new_token(
+                str(current_user.id),
+                current_token,
+                refresh_token,
+                multi_login=current_user.is_multi_login,
             )
             data = GetNewToken(
-                access_token=new_access_token,
-                access_token_expire_time=new_access_token_expire_time,
-                refresh_token=new_refresh_token,
-                refresh_token_expire_time=new_refresh_token_expire_time,
+                access_token=new_token.new_access_token,
+                access_token_expire_time=new_token.new_access_token_expire_time,
+                refresh_token=new_token.new_refresh_token,
+                refresh_token_expire_time=new_token.new_refresh_token_expire_time,
             )
             return data
 

@@ -18,14 +18,11 @@ class AccessTokenBase(SchemaBase):
     access_token_expire_time: datetime
 
 
-class GetLoginToken(AccessTokenBase):
-    refresh_token: str
-    refresh_token_type: str = 'Bearer'
-    refresh_token_expire_time: datetime
-    user: GetUserInfoNoRelationDetail
-
-
 class GetNewToken(AccessTokenBase):
     refresh_token: str
     refresh_token_type: str = 'Bearer'
     refresh_token_expire_time: datetime
+
+
+class GetLoginToken(GetNewToken):
+    user: GetUserInfoNoRelationDetail

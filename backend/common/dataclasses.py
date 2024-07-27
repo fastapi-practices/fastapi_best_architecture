@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import dataclasses
 
+from datetime import datetime
+
 from fastapi import Response
 
 from backend.common.enums import StatusType
@@ -30,3 +32,11 @@ class RequestCallNextReturn:
     status: StatusType
     err: Exception | None
     response: Response
+
+
+@dataclasses.dataclass
+class NewTokenReturn:
+    new_access_token: str
+    new_refresh_token: str
+    new_access_token_expire_time: datetime
+    new_refresh_token_expire_time: datetime
