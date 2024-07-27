@@ -11,6 +11,7 @@ from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
+from backend.common.dataclasses import NewTokenReturn
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.core.conf import settings
 from backend.database.db_redis import redis_client
@@ -100,7 +101,7 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     return refresh_token, expire
 
 
-async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -> tuple[str, str, datetime, datetime]:
+async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -> NewTokenReturn:
     """
     Generate new token
 
@@ -118,7 +119,12 @@ async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -
     refresh_token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.delete(token_key)
     await redis_client.delete(refresh_token_key)
-    return new_access_token, new_refresh_token, new_access_token_expire_time, new_refresh_token_expire_time
+    return NewTokenReturn(
+        new_access_token=new_access_token,
+        new_refresh_token=new_refresh_token,
+        new_access_token_expire_time=new_access_token_expire_time,
+        new_refresh_token_expire_time=new_refresh_token_expire_time,
+    )
 
 
 @sync_to_async
