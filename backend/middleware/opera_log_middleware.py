@@ -10,7 +10,8 @@ from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import OperaLogService
-from backend.common.enums import OperaLogCipherType
+from backend.common.dataclasses import RequestCallNextReturn
+from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
@@ -28,34 +29,36 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # 请求解析
-        user_agent, device, os, browser = await parse_user_agent_info(request)
-        ip, country, region, city = await parse_ip_info(request)
+        ip_info = await parse_ip_info(request)
+        ua_info = await parse_user_agent_info(request)
         try:
             # 此信息依赖于 jwt 中间件
             username = request.user.username
         except AttributeError:
             username = None
         method = request.method
-        router = request.scope.get('route')
-        summary = getattr(router, 'summary', None) or ''
         args = await self.get_request_args(request)
         args = await self.desensitization(args)
 
         # 设置附加请求信息
-        request.state.ip = ip
-        request.state.country = country
-        request.state.region = region
-        request.state.city = city
-        request.state.user_agent = user_agent
-        request.state.os = os
-        request.state.browser = browser
-        request.state.device = device
+        request.state.ip = ip_info.ip
+        request.state.country = ip_info.country
+        request.state.region = ip_info.region
+        request.state.city = ip_info.city
+        request.state.user_agent = ua_info.user_agent
+        request.state.os = ua_info.os
+        request.state.browser = ua_info.browser
+        request.state.device = ua_info.device
 
         # 执行请求
         start_time = timezone.now()
-        code, msg, status, err, response = await self.execute_request(request, call_next)
+        res = await self.execute_request(request, call_next)
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
+
+        # 此信息只能在请求后获取
+        _route = request.scope.get('route')
+        summary = getattr(_route, 'summary', None) or ''
 
         # 日志创建
         opera_log_in = CreateOperaLogParam(
@@ -63,53 +66,54 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             method=method,
             title=summary,
             path=path,
-            ip=ip,
-            country=country,
-            region=region,
-            city=city,
-            user_agent=user_agent,
-            os=os,
-            browser=browser,
-            device=device,
+            ip=request.state.ip,
+            country=request.state.country,
+            region=request.state.region,
+            city=request.state.city,
+            user_agent=request.state.user_agent,
+            os=request.state.os,
+            browser=request.state.browser,
+            device=request.state.device,
             args=args,
-            status=status,
-            code=code,
-            msg=msg,
+            status=res.status,
+            code=res.code,
+            msg=res.msg,
             cost_time=cost_time,
             opera_time=start_time,
         )
         create_task(OperaLogService.create(obj_in=opera_log_in))  # noqa: ignore
 
         # 错误抛出
+        err = res.err
         if err:
             raise err from None
 
-        return response
+        return res.response
 
-    async def execute_request(self, request: Request, call_next) -> tuple:
+    async def execute_request(self, request: Request, call_next) -> RequestCallNextReturn:
         """执行请求"""
+        code = 200
+        msg = 'Success'
+        status = StatusType.enable
         err = None
         response = None
         try:
             response = await call_next(request)
-            code, msg, status = await self.request_exception_handler(request)
         except Exception as e:
             log.exception(e)
+            code, msg = await self.request_exception_handler(request, code, msg)
             # code 处理包含 SQLAlchemy 和 Pydantic
-            code = getattr(e, 'code', None) or 500
-            msg = getattr(e, 'msg', None) or 'Internal Server Error'
-            status = 0
+            code = getattr(e, 'code', None) or code
+            msg = getattr(e, 'msg', None) or msg
+            status = StatusType.disable
             err = e
 
-        return str(code), msg, status, err, response
+        return RequestCallNextReturn(code=str(code), msg=msg, status=status, err=err, response=response)
 
     @staticmethod
     @sync_to_async
-    def request_exception_handler(request: Request) -> tuple:
+    def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
         """请求异常处理器"""
-        code = 200
-        msg = 'Success'
-        status = 1
         try:
             http_exception = request.state.__request_http_exception__
         except AttributeError:
@@ -117,7 +121,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         else:
             code = http_exception.get('code', 500)
             msg = http_exception.get('msg', 'Internal Server Error')
-            status = 0
         try:
             validation_exception = request.state.__request_validation_exception__
         except AttributeError:
@@ -125,8 +128,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         else:
             code = validation_exception.get('code', 400)
             msg = validation_exception.get('msg', 'Bad Request')
-            status = 0
-        return code, msg, status
+        return code, msg
 
     @staticmethod
     async def get_request_args(request: Request) -> dict:

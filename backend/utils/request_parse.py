@@ -7,6 +7,7 @@ from fastapi import Request
 from user_agents import parse
 from XdbSearchIP.xdbSearcher import XdbSearcher
 
+from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import IP2REGION_XDB
@@ -75,13 +76,13 @@ def get_location_offline(ip: str) -> dict | None:
         return None
 
 
-async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
+async def parse_ip_info(request: Request) -> IpInfo:
     country, region, city = None, None, None
     ip = await get_request_ip(request)
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
         country, region, city = location.split(' ')
-        return ip, country, region, city
+        return IpInfo(ip=ip, country=country, region=region, city=city)
     if settings.LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
     elif settings.LOCATION_PARSE == 'offline':
@@ -97,14 +98,14 @@ async def parse_ip_info(request: Request) -> tuple[str, str, str, str]:
             f'{country} {region} {city}',
             ex=settings.IP_LOCATION_EXPIRE_SECONDS,
         )
-    return ip, country, region, city
+    return IpInfo(ip=ip, country=country, region=region, city=city)
 
 
 @sync_to_async
-def parse_user_agent_info(request: Request) -> tuple[str, str, str, str]:
+def parse_user_agent_info(request: Request) -> UserAgentInfo:
     user_agent = request.headers.get('User-Agent')
     _user_agent = parse(user_agent)
-    device = _user_agent.get_device()
     os = _user_agent.get_os()
     browser = _user_agent.get_browser()
-    return user_agent, device, os, browser
+    device = _user_agent.get_device()
+    return UserAgentInfo(user_agent=user_agent, device=device, os=os, browser=browser)
