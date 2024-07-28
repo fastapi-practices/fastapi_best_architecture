@@ -79,7 +79,7 @@ class GenTemplate:
             'table_simple_name_zh': business.table_simple_name_zh,
             'table_comment': business.table_comment,
             'schema_name': to_pascal(business.schema_name),
-            'have_datetime_column': business.have_datetime_column,
+            'have_datetime_column': business.default_datetime_column,
             'permission_sign': str(business.table_name_en.replace('_', ':')),
             'models': models,
         }
