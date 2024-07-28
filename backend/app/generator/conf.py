@@ -12,6 +12,9 @@ class GeneratorSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=f'{BasePath}/.env', env_file_encoding='utf-8', extra='ignore')
 
+    # 模版目录
+    TEMPLATE_BACKEND_DIR_NAME: str = 'py'
+
     # 代码下载
     ZIP_FILENAME: str = 'fba_generator'
 
