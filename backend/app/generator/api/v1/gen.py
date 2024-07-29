@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, Body, Path, Query
 from fastapi.responses import StreamingResponse
 
 from backend.app.generator.conf import generator_settings
@@ -19,7 +19,7 @@ from backend.utils.serializers import select_list_serialize
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
+@router.get('/businesses/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseModel:
     businesses = await gen_business_service.get_all()
     data = await select_list_serialize(businesses)
@@ -46,8 +46,8 @@ async def update_business(pk: Annotated[int, Path(...)], obj: UpdateGenBusinessP
     return await response_base.fail()
 
 
-@router.delete('/businesses', summary='删除代码生成业务', dependencies=[DependsRBAC])
-async def delete_business(pk: Annotated[int, Query(...)]) -> ResponseModel:
+@router.delete('/businesses/{pk}', summary='删除代码生成业务', dependencies=[DependsRBAC])
+async def delete_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await gen_business_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
@@ -84,9 +84,9 @@ async def get_all_tables(table_schema: Annotated[str, Query(..., description='�
 
 @router.post('/import', summary='导入代码生成业务和模型列', dependencies=[DependsRBAC])
 async def import_table(
-    app: Annotated[str, Query(..., description='应用名称，用于代码生成到指定 app')],
-    table_name: Annotated[str, Query(..., description='数据库表名')],
-    table_schema: Annotated[str, Query(..., description='数据库名')] = 'fba',
+    app: Annotated[str, Body(..., description='应用名称，用于代码生成到指定 app')],
+    table_name: Annotated[str, Body(..., description='数据库表名')],
+    table_schema: Annotated[str, Body(..., description='数据库名')] = 'fba',
 ) -> ResponseModel:
     await gen_service.import_business_and_model(app=app, table_schema=table_schema, table_name=table_name)
     return await response_base.success()
