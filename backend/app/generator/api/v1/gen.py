@@ -6,7 +6,11 @@ from fastapi import APIRouter, Body, Path, Query
 from fastapi.responses import StreamingResponse
 
 from backend.app.generator.conf import generator_settings
-from backend.app.generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
+from backend.app.generator.schema.gen_business import (
+    CreateGenBusinessParam,
+    GetGenBusinessListDetails,
+    UpdateGenBusinessParam,
+)
 from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
@@ -14,7 +18,7 @@ from backend.app.generator.service.gen_service import gen_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.serializers import select_list_serialize
+from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
@@ -28,7 +32,8 @@ async def get_all_businesses() -> ResponseModel:
 
 @router.get('/businesses/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    data = await gen_service.get_business_and_model(pk=pk)
+    business = await gen_service.get_business_with_model(pk=pk)
+    data = GetGenBusinessListDetails(**await select_as_dict(business))
     return await response_base.success(data=data)
 
 

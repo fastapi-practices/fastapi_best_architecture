@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sqlalchemy as sa
+from sqlalchemy.dialects import mysql
 
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,10 +19,10 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
     {%- if model.is_nullable %} Mapped[{{ model.pd_type }} | None]
     {%- else %} Mapped[{{ model.pd_type }}]
     {%- endif %} = mapped_column(
-    {%- if model.type == 'String' -%}
+    {%- if model.type == 'VARCHAR' -%}
         sa.String({{ model.length }})
     {%- else -%}
-        sa.{{ model.type }}()
+        mysql.{{ model.type }}()
     {%- endif -%}, default=
     {%- if model.is_nullable and model.default == None -%}
         None

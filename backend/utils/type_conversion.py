@@ -43,10 +43,10 @@ def sql_type_to_sqlalchemy(typing: str) -> str:
         GenModelColumnType.TINYINT: 'TINYINT',
         GenModelColumnType.TINYTEXT: 'TINYTEXT',
         GenModelColumnType.VARBINARY: 'VARBINARY',
-        GenModelColumnType.VARCHAR: 'String',
+        GenModelColumnType.VARCHAR: 'VARCHAR',
         GenModelColumnType.YEAR: 'YEAR',
     }
-    return type_mapping.get(typing, 'String')
+    return type_mapping.get(typing, 'VARCHAR')
 
 
 def sql_type_to_pydantic(typing: str) -> str:
