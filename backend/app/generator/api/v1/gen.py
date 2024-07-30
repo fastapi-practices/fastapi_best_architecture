@@ -11,7 +11,7 @@ from backend.app.generator.schema.gen_business import (
     GetGenBusinessListDetails,
     UpdateGenBusinessParam,
 )
-from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
+from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam, GetGenModelListDetails
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.app.generator.service.gen_service import gen_service
@@ -39,8 +39,9 @@ async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
 
 @router.get('/businesses/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
 async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    models = await gen_model_service.get_by_business(pk=pk)
-    return await response_base.success(data=models)
+    models = await gen_model_service.get_by_business(business_id=pk)
+    data = await select_list_serialize(models)
+    return await response_base.success(data=data)
 
 
 @router.post('/businesses', summary='创建代码生成业务', deprecated=True, dependencies=[DependsRBAC])
