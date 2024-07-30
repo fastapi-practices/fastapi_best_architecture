@@ -37,6 +37,12 @@ async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     return await response_base.success(data=data)
 
 
+@router.get('/businesses/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
+async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    models = await gen_model_service.get_by_business(pk=pk)
+    return await response_base.success(data=models)
+
+
 @router.post('/businesses', summary='创建代码生成业务', deprecated=True, dependencies=[DependsRBAC])
 async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
     await gen_business_service.create(obj=obj)
