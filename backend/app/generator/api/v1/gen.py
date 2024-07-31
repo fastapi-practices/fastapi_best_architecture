@@ -122,7 +122,7 @@ async def generate_code(pk: Annotated[int, Path(..., description='业务ID')]) -
     return await response_base.success()
 
 
-@router.post('/download/{pk}', summary='下载代码', dependencies=[DependsRBAC])
+@router.get('/download/{pk}', summary='下载代码', dependencies=[DependsRBAC])
 async def download_code(pk: Annotated[int, Path(..., description='业务ID')]):
     bio = await gen_service.download(pk=pk)
     return StreamingResponse(
