@@ -11,7 +11,7 @@ from backend.app.generator.schema.gen_business import (
     GetGenBusinessListDetails,
     UpdateGenBusinessParam,
 )
-from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam, GetGenModelListDetails
+from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.app.generator.service.gen_service import gen_service
@@ -110,7 +110,13 @@ async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) ->
     return await response_base.success(data=data)
 
 
-@router.post('/generate/{pk}', summary='生成代码', description='文件磁盘写入，请谨慎操作', dependencies=[DependsRBAC])
+@router.get('/generate/{pk}/path', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
+async def generate_path(pk: Annotated[int, Path(..., description='业务ID')]):
+    data = await gen_service.get_generate_path(pk=pk)
+    return await response_base.success(data=data)
+
+
+@router.post('/generate/{pk}', summary='代码生成', description='文件磁盘写入，请谨慎操作', dependencies=[DependsRBAC])
 async def generate_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
     await gen_service.generate(pk=pk)
     return await response_base.success()

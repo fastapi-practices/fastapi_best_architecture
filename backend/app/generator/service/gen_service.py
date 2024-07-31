@@ -96,6 +96,22 @@ class GenService:
                 for tpl, code in tpl_code_map.items()
             }
 
+    @staticmethod
+    async def get_generate_path(*, pk: int) -> list:
+        async with async_db_session() as db:
+            business = await gen_business_dao.get(db, pk)
+            if not business:
+                raise errors.NotFoundError(msg='业务不存在')
+            gen_path = business.gen_path
+            if not gen_path:
+                # 伪加密路径
+                gen_path = 'current-backend-path'
+            target_files = gen_template.get_code_gen_paths(business)
+            code_gen_paths = []
+            for target_file in target_files:
+                code_gen_paths.append(os.path.join(gen_path, 'backend', 'app', *target_file.split('/')[1:]))
+            return code_gen_paths
+
     async def generate(self, *, pk: int) -> None:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)

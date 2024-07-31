@@ -45,10 +45,12 @@ class GenTemplate:
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/service.jinja',
         ]
 
-    def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
+    @staticmethod
+    def get_code_gen_paths(business: GenBusiness) -> list[str]:
         """
-        获取代码生成路径
+        获取代码生成路径列表
 
+        :param business:
         :return:
         """
         app_name = business.app_name
@@ -60,6 +62,17 @@ class GenTemplate:
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/schema/{module_name}.py',
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/service/{module_name}_service.py',
         ]
+        return target_files
+
+    def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
+        """
+        获取代码生成路径
+
+        :param tpl_path:
+        :param business:
+        :return:
+        """
+        target_files = self.get_code_gen_paths(business)
         code_gen_path_mapping = dict(zip(self.get_template_paths(), target_files))
         return code_gen_path_mapping[tpl_path]
 
