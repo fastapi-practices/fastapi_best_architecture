@@ -61,4 +61,4 @@ class CRUDGen:
         return result.fetchall()
 
 
-gen_dao = CRUDGen()
+gen_dao: CRUDGen = CRUDGen()

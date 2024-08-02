@@ -70,4 +70,4 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         return await self.delete_model(db, pk)
 
 
-gen_business_dao = CRUDGenBusiness(GenBusiness)
+gen_business_dao: CRUDGenBusiness = CRUDGenBusiness(GenBusiness)
