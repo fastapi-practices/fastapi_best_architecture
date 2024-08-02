@@ -12,6 +12,12 @@ from backend.utils.type_conversion import sql_type_to_pydantic
 
 class GenModelService:
     @staticmethod
+    async def get(*, pk: int) -> GenModel:
+        async with async_db_session() as db:
+            gen_model = await gen_model_dao.get(db, pk)
+            return gen_model
+
+    @staticmethod
     async def get_by_business(*, business_id: int) -> Sequence[GenModel]:
         async with async_db_session() as db:
             gen_model = await gen_model_dao.get_all_by_business_id(db, business_id)

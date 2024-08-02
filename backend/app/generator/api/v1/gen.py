@@ -66,6 +66,12 @@ async def delete_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     return await response_base.fail()
 
 
+@router.get('/models/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
+async def get_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    data = await gen_model_service.get(pk=pk)
+    return await response_base.success(data=data)
+
+
 @router.post('/models', summary='创建代码生成模型', dependencies=[DependsRBAC])
 async def create_model(obj: CreateGenModelParam) -> ResponseModel:
     await gen_model_service.create(obj=obj)
