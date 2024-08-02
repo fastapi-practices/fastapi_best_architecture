@@ -36,7 +36,7 @@ class GenModelService:
     @staticmethod
     async def update(*, pk: int, obj: UpdateGenModelParam) -> int:
         async with async_db_session.begin() as db:
-            gen_models = await gen_model_dao.get_all_by_business_id(obj.gen_business_id)
+            gen_models = await gen_model_dao.get_all_by_business_id(db, obj.gen_business_id)
             if gen_models:
                 if obj.name in [model.name for model in gen_models]:
                     raise errors.ForbiddenError(msg='禁止添加相同列到模型表')
