@@ -15,7 +15,7 @@ class GenModel(DataClassBase):
     __tablename__ = 'sys_gen_model'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(50), comment='列名称')
+    name: Mapped[str] = mapped_column(String(50), unique=True, comment='列名称')
     comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='列描述')
     type: Mapped[str] = mapped_column(String(20), default='str', comment='SQLA 模型列类型')
     pd_type: Mapped[str] = mapped_column(String(20), default='str', comment='列类型对应的 pydantic 类型')
