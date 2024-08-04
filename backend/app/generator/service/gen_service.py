@@ -105,11 +105,11 @@ class GenService:
             gen_path = business.gen_path
             if not gen_path:
                 # 伪加密路径
-                gen_path = 'current-backend-path'
+                gen_path = 'current-backend-app-path'
             target_files = gen_template.get_code_gen_paths(business)
             code_gen_paths = []
             for target_file in target_files:
-                code_gen_paths.append(os.path.join(gen_path, 'backend', 'app', *target_file.split('/')[1:]))
+                code_gen_paths.append(os.path.join(gen_path, *target_file.split('/')[1:]))
             return code_gen_paths
 
     async def generate(self, *, pk: int) -> None:
