@@ -22,6 +22,8 @@ class GenBusinessService:
     async def get_all() -> Sequence[GenBusiness]:
         async with async_db_session() as db:
             businesses = await gen_business_dao.get_all(db)
+            if not businesses:
+                raise errors.NotFoundError(msg='代码生成业务不存在')
             return businesses
 
     @staticmethod
