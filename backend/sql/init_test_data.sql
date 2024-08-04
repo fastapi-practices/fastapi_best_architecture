@@ -33,7 +33,11 @@ VALUES  (1, '测试', 'test', 0, 0, '', null, 0, null, null, 0, 0, 1, null, null
         (29, '删除', '', 0, 0, null, null, 2, null, 'sys:menu:del', 1, 1, 1, null, 26, '2024-01-07 12:01:48', null),
         (30, '系统监控', 'monitor', 0, 88, 'IconComputer', 'monitor', 0, null, null, 1, 1, 1, null, null, '2023-07-27 19:27:08', null),
         (31, 'Redis监控', 'Redis', 0, 0, null, 'redis', 1, '/monitor/redis/index.vue', 'sys:monitor:redis', 1, 1, 1, null, 30, '2023-07-27 19:28:03', null),
-        (32, '服务器监控', 'Server', 0, 0, null, 'server', 1, '/monitor/server/index.vue', 'sys:monitor:server', 1, 1, 1, null, 30, '2023-07-27 19:28:29', null);
+        (32, '服务器监控', 'Server', 0, 0, null, 'server', 1, '/monitor/server/index.vue', 'sys:monitor:server', 1, 1, 1, null, 30, '2023-07-27 19:28:29', null),
+        (33, '系统自动化', 'automation', 0, 777, 'IconCodeSquare', 'automation', 0, null, null, 1, 1, 1, null, null, '2024-07-27 02:06:20', '2024-07-27 02:18:52'),
+        (34, '代码生成', 'CodeGenerator', 0, 0, null, 'code-generator', 1, '/automation/generator/index.vue', null, 1, 1, 1, null, 33, '2024-07-27 02:24:54', null),
+        (35, 'GitHub', 'github', 0, 8888, 'IconGithub', 'https://github.com/wu-clan', 0, null, null, 1, 1, 1, null, null, '2024-07-27 02:32:46', '2024-07-27 02:36:37'),
+        (36, '赞助', 'sponsor', 0, 9999, 'IconFire', 'https://wu-clan.github.io/sponsor/', 0, null, null, 1, 1, 1, null, null, '2024-07-27 02:39:57', '2024-07-28 14:19:07');
 
 INSERT INTO fba.sys_role (id, name, data_scope, status, remark, created_time, updated_time)
 VALUES (1, 'test', 2, 1, null, '2023-06-26 17:13:45', null);
