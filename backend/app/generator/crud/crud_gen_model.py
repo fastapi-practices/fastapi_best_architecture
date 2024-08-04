@@ -11,9 +11,18 @@ from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGe
 
 
 class CRUDGenModel(CRUDPlus[GenModel]):
+    async def get(self, db: AsyncSession, pk: int) -> GenModel | None:
+        """
+        获取代码生成模型列
+
+        :return:
+        """
+        return await self.select_model_by_id(db, pk)
+
     async def get_by_name(self, db: AsyncSession, name: str) -> GenModel | None:
         """
         通过 name 获取代码生成模型表
+
         :param db:
         :param name:
         :return:
@@ -58,4 +67,4 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         return await self.delete_model(db, pk)
 
 
-gen_model_dao = CRUDGenModel(GenModel)
+gen_model_dao: CRUDGenModel = CRUDGenModel(GenModel)

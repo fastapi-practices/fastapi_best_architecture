@@ -17,26 +17,20 @@ from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenBusiness
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam
-from backend.app.generator.service.gen_business_service import gen_business_service
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.enums import GenModelColumnType
 from backend.common.exception import errors
 from backend.core.path_conf import BasePath
 from backend.database.db_mysql import async_db_session
 from backend.utils.gen_template import gen_template
-from backend.utils.serializers import select_as_dict, select_list_serialize
 
 
 class GenService:
     @staticmethod
-    async def get_business_and_model(*, pk: int) -> dict:
-        gen_business = await gen_business_service.get(pk=pk)
-        gen_models = await gen_model_service.get_by_business(business_id=pk)
-        business_data = await select_as_dict(gen_business)
-        if gen_models:
-            model_data = await select_list_serialize(gen_models)
-            business_data.update({'models': model_data})
-        return business_data
+    async def get_business_with_model(*, pk: int) -> GenBusiness:
+        async with async_db_session() as db:
+            business = await gen_dao.get_business_with_model(db, pk)
+        return business
 
     @staticmethod
     async def get_tables(*, table_schema: str) -> Sequence[str]:
@@ -101,6 +95,22 @@ class GenService:
                 tpl.replace('.jinja', '.py') if tpl.startswith('py') else ...: code.encode('utf-8')
                 for tpl, code in tpl_code_map.items()
             }
+
+    @staticmethod
+    async def get_generate_path(*, pk: int) -> list:
+        async with async_db_session() as db:
+            business = await gen_business_dao.get(db, pk)
+            if not business:
+                raise errors.NotFoundError(msg='业务不存在')
+            gen_path = business.gen_path
+            if not gen_path:
+                # 伪加密路径
+                gen_path = 'current-backend-app-path'
+            target_files = gen_template.get_code_gen_paths(business)
+            code_gen_paths = []
+            for target_file in target_files:
+                code_gen_paths.append(os.path.join(gen_path, *target_file.split('/')[1:]))
+            return code_gen_paths
 
     async def generate(self, *, pk: int) -> None:
         async with async_db_session() as db:
