@@ -149,7 +149,7 @@ async def get_all_tables(table_schema: Annotated[str, Query(..., description='�
     '/import',
     summary='导入代码生成业务和模型列',
     dependencies=[
-        Depends(RequestPermission('')),
+        Depends(RequestPermission('gen:code:import')),
         DependsRBAC,
     ],
 )
