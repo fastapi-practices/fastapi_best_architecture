@@ -32,14 +32,14 @@ class UserService:
                 raise errors.ForbiddenError(msg='密码为空')
             username = await user_dao.get_by_username(db, obj.username)
             if username:
-                raise errors.ForbiddenError(msg='该用户名已注册')
-            obj.nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+                raise errors.ForbiddenError(msg='用户已注册')
+            obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
             nickname = await user_dao.get_by_nickname(db, obj.nickname)
             if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
             email = await user_dao.check_email(db, obj.email)
             if email:
-                raise errors.ForbiddenError(msg='该邮箱已注册')
+                raise errors.ForbiddenError(msg='邮箱已注册')
             await user_dao.create(db, obj)
 
     @staticmethod
@@ -48,8 +48,8 @@ class UserService:
             await superuser_verify(request)
             username = await user_dao.get_by_username(db, obj.username)
             if username:
-                raise errors.ForbiddenError(msg='此用户名已注册')
-            obj.nickname = obj.nickname if obj.nickname else f'用户{random.randrange(10000, 99999)}'
+                raise errors.ForbiddenError(msg='用户已注册')
+            obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(88888, 99999)}'
             nickname = await user_dao.get_by_nickname(db, obj.nickname)
             if nickname:
                 raise errors.ForbiddenError(msg='昵称已注册')
@@ -57,7 +57,7 @@ class UserService:
                 raise errors.ForbiddenError(msg='密码为空')
             email = await user_dao.check_email(db, obj.email)
             if email:
-                raise errors.ForbiddenError(msg='该邮箱已注册')
+                raise errors.ForbiddenError(msg='邮箱已注册')
             dept = await dept_dao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -71,11 +71,11 @@ class UserService:
     async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
         async with async_db_session.begin() as db:
             if not await password_verify(f'{obj.old_password}{request.user.salt}', request.user.password):
-                raise errors.ForbiddenError(msg='旧密码错误')
+                raise errors.ForbiddenError(msg='原密码错误')
             np1 = obj.new_password
             np2 = obj.confirm_password
             if np1 != np2:
-                raise errors.ForbiddenError(msg='两次密码输入不一致')
+                raise errors.ForbiddenError(msg='密码输入不一致')
             new_pwd = await get_hash_password(f'{obj.new_password}{request.user.salt}')
             count = await user_dao.reset_password(db, request.user.id, new_pwd)
             prefix = [
@@ -106,15 +106,15 @@ class UserService:
             if input_user.username != obj.username:
                 _username = await user_dao.get_by_username(db, obj.username)
                 if _username:
-                    raise errors.ForbiddenError(msg='该用户名已存在')
+                    raise errors.ForbiddenError(msg='用户名已注册')
             if input_user.nickname != obj.nickname:
                 nickname = await user_dao.get_by_nickname(db, obj.nickname)
                 if nickname:
-                    raise errors.ForbiddenError(msg='改昵称已存在')
+                    raise errors.ForbiddenError(msg='昵称已注册')
             if input_user.email != obj.email:
                 email = await user_dao.check_email(db, obj.email)
                 if email:
-                    raise errors.ForbiddenError(msg='该邮箱已注册')
+                    raise errors.ForbiddenError(msg='邮箱已注册')
             count = await user_dao.update_userinfo(db, input_user, obj)
             return count
 
@@ -123,7 +123,7 @@ class UserService:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
-                    raise errors.ForbiddenError(msg='你只能修改自己的角色')
+                    raise errors.AuthorizationError
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -139,7 +139,7 @@ class UserService:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
-                    raise errors.ForbiddenError(msg='你只能修改自己的头像')
+                    raise errors.AuthorizationError
             input_user = await user_dao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -159,7 +159,7 @@ class UserService:
             else:
                 user_id = request.user.id
                 if pk == user_id:
-                    raise errors.ForbiddenError(msg='禁止修改自身管理员权限')
+                    raise errors.ForbiddenError(msg='非法操作')
                 super_status = await user_dao.get_super(db, user_id)
                 count = await user_dao.set_super(db, pk, False if super_status else True)
                 return count
@@ -173,7 +173,7 @@ class UserService:
             else:
                 user_id = request.user.id
                 if pk == user_id:
-                    raise errors.ForbiddenError(msg='禁止修改自身后台管理登陆权限')
+                    raise errors.ForbiddenError(msg='非法操作')
                 staff_status = await user_dao.get_staff(db, user_id)
                 count = await user_dao.set_staff(db, pk, False if staff_status else True)
                 return count
@@ -187,7 +187,7 @@ class UserService:
             else:
                 user_id = request.user.id
                 if pk == user_id:
-                    raise errors.ForbiddenError(msg='禁止修改自身状态')
+                    raise errors.ForbiddenError(msg='非法操作')
                 status = await user_dao.get_status(db, user_id)
                 count = await user_dao.set_status(db, pk, False if status else True)
                 return count
