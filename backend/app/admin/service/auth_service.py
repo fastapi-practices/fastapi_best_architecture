@@ -33,11 +33,11 @@ class AuthService:
         async with async_db_session.begin() as db:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
+                raise errors.NotFoundError(msg='用户名或密码有误')
             elif not await password_verify(f'{obj.password}{current_user.salt}', current_user.password):
-                raise errors.AuthorizationError(msg='密码错误')
+                raise errors.AuthorizationError(msg='用户名或密码有误')
             elif not current_user.status:
-                raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
+                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             access_token, _ = await create_access_token(str(current_user.id), multi_login=current_user.is_multi_login)
             await user_dao.update_login_time(db, obj.username)
             return access_token, current_user
@@ -48,11 +48,11 @@ class AuthService:
             try:
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
-                    raise errors.NotFoundError(msg='用户不存在')
+                    raise errors.NotFoundError(msg='用户名或密码有误')
                 elif not await password_verify(obj.password + current_user.salt, current_user.password):
-                    raise errors.AuthorizationError(msg='密码错误')
+                    raise errors.AuthorizationError(msg='用户名或密码有误')
                 elif not current_user.status:
-                    raise errors.AuthorizationError(msg='用户已锁定, 登陆失败')
+                    raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
                 captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
@@ -107,13 +107,13 @@ class AuthService:
     async def new_token(*, request: Request, refresh_token: str) -> GetNewToken:
         user_id = await jwt_decode(refresh_token)
         if request.user.id != user_id:
-            raise errors.TokenError(msg='刷新 token 无效')
+            raise errors.TokenError(msg='Refresh Token 无效')
         async with async_db_session() as db:
             current_user = await user_dao.get(db, user_id)
             if not current_user:
-                raise errors.NotFoundError(msg='用户不存在')
+                raise errors.NotFoundError(msg='用户名或密码有误')
             elif not current_user.status:
-                raise errors.AuthorizationError(msg='用户已锁定，操作失败')
+                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             current_token = await get_token(request)
             new_token = await create_new_token(
                 sub=str(current_user.id),

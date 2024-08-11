@@ -85,7 +85,7 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
         expire_datetime = timezone.f_datetime(expire_time)
         current_datetime = timezone.now()
         if expire_datetime < current_datetime:
-            raise TokenError(msg='Refresh Token 过期时间无效')
+            raise TokenError(msg='Refresh Token 已过期')
         expire_seconds = int((expire_datetime - current_datetime).total_seconds())
     else:
         expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
@@ -191,7 +191,7 @@ async def get_current_user(db: AsyncSession, data: dict) -> User:
     if not user:
         raise TokenError(msg='Token 无效')
     if not user.status:
-        raise AuthorizationError(msg='用户已锁定')
+        raise AuthorizationError(msg='用户已被锁定，请联系系统管理员')
     if user.dept_id:
         if not user.dept.status:
             raise AuthorizationError(msg='用户所属部门已锁定')
@@ -212,9 +212,7 @@ def superuser_verify(request: Request) -> bool:
     :param request:
     :return:
     """
-    is_superuser = request.user.is_superuser
-    if not is_superuser:
-        raise AuthorizationError(msg='仅管理员有权操作')
-    if not request.user.is_staff:
-        raise AuthorizationError(msg='此管理员已被禁止后台管理操作')
-    return is_superuser
+    superuser = request.user.is_superuser
+    if not superuser or not request.user.is_staff:
+        raise AuthorizationError
+    return superuser
