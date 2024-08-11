@@ -19,16 +19,6 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         return await self.select_model_by_id(db, pk)
 
-    async def get_by_name(self, db: AsyncSession, name: str) -> GenModel | None:
-        """
-        通过 name 获取代码生成模型表
-
-        :param db:
-        :param name:
-        :return:
-        """
-        return await self.select_model_by_column(db, 'name', name)
-
     async def get_all_by_business_id(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
         gen_model = await db.execute(
             select(self.model).where(self.model.gen_business_id == business_id).order_by(self.model.sort)
