@@ -70,18 +70,54 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
 ## Built-in features
 
-1. [x] User management: management of system user roles, assignment of permissions
-2. [x] Departmental management: Configuration of the system organization (company, department, group, ...)
-3. [x] Menu management: Configuration of system menus, user menus, button permission labels
-4. [x] Role management: assignment of role menu privileges, assignment of role routing privileges
-5. [x] Dictionary management: maintenance of commonly used fixed data or parameters within the system
-6. [x] Code generation: back-end code is automatically generated, supporting preview, write and download.
-7. [x] Operation log: logging and querying of normal and abnormal system operations.
-8. [x] Login authentication: graphical captcha backend authentication login
-9. [x] Logging: logging and querying of normal and abnormal user logins
-10. [x] Service monitoring: server hardware device information and status
-11. [x] Timed tasks: automated tasks, asynchronous tasks, support for function calls
-12. [x] Interface Documentation: Automatically generate online interactive API interface documentation.
+- [x] User management: management of system user roles, assignment of permissions
+- [x] Departmental management: Configuration of the system organization (company, department, group, ...)
+- [x] Menu management: Configuration of system menus, user menus, button permission labels
+- [x] Role management: assignment of role menu privileges, assignment of role routing privileges
+- [x] Dictionary management: maintenance of commonly used fixed data or parameters within the system
+- [x] Code generation: back-end code is automatically generated, supporting preview, write and download.
+- [x] Operation log: logging and querying of normal and abnormal system operations.
+- [x] Login authentication: graphical captcha backend authentication login
+- [x] Logging: logging and querying of normal and abnormal user logins
+- [x] Service monitoring: server hardware device information and status
+- [x] Timed tasks: automated tasks, asynchronous tasks, support for function calls
+- [x] Interface Documentation: Automatically generate online interactive API interface documentation.
+
+## Project structure
+
+```
+├─📁 backend--------------- # Backend
+│ ├─📁 alembic------------- # Database Migrations
+│ ├─📁 app----------------- # Application
+│ │ ├─📁 admin------------- # Admin Panel
+│ │ │ ├─📁 api------------- # API
+│ │ │ │ └─📁 v1------------ # API Version
+│ │ │ ├─📁 crud------------ # CRUD Operations
+│ │ │ ├─📁 model----------- # Models
+│ │ │ ├─📁 schema---------- # Data Transfers
+│ │ │ ├─📁 service--------- # Services
+│ │ │ └─📁 tests----------- # Tests
+│ │ ├─📁 generator--------- # Code Generator
+│ │ └─📁 task-------------- # Task Application
+│ │   └─📁 celery_task----- # Task Layers
+│ ├─📁 common-------------- # Common Resources
+│ │ ├─📁 exception--------- # Exceptions
+│ │ ├─📁 response---------- # Responses
+│ │ └─📁 security---------- # Security
+│ ├─📁 core---------------- # Core Configuration
+│ ├─📁 database------------ # Database Connection
+│ ├─📁 log----------------- # Log Storage
+│ ├─📁 middleware---------- # Middleware
+│ ├─📁 scripts------------- # Scripts
+│ ├─📁 sql----------------- # SQL Files
+│ ├─📁 static-------------- # Static Files
+│ ├─📁 templates----------- # Templates
+│ │ └─📁 py---------------- # Python Code Generation
+│ └─📁 utils--------------- # Utilities
+└─📁 deploy---------------- # Deployment
+  └─📁 backend------------- # Backend Deployment
+    └─📁 docker-compose---- # Docker Deployment
+```
 
 ## Local development
 
