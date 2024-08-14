@@ -20,10 +20,10 @@ router = APIRouter()
 )
 async def get_server_info() -> ResponseModel:
     data = {
-        'cpu': await server_info.get_cpu_info(),
-        'mem': await server_info.get_mem_info(),
-        'sys': await server_info.get_sys_info(),
-        'disk': await server_info.get_disk_info(),
-        'service': await server_info.get_service_info(),
+        'cpu': server_info.get_cpu_info(),
+        'mem': server_info.get_mem_info(),
+        'sys': server_info.get_sys_info(),
+        'disk': server_info.get_disk_info(),
+        'service': server_info.get_service_info(),
     }
     return await response_base.success(data=data)
