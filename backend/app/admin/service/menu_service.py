@@ -28,7 +28,7 @@ class MenuService:
     async def get_menu_tree(*, title: str | None = None, status: int | None = None) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             menu_select = await menu_dao.get_all(db, title=title, status=status)
-            menu_tree = await get_tree_data(menu_select)
+            menu_tree = get_tree_data(menu_select)
             return menu_tree
 
     @staticmethod
@@ -39,7 +39,7 @@ class MenuService:
                 raise errors.NotFoundError(msg='角色不存在')
             menu_ids = [menu.id for menu in role.menus]
             menu_select = await menu_dao.get_role_menus(db, False, menu_ids)
-            menu_tree = await get_tree_data(menu_select)
+            menu_tree = get_tree_data(menu_select)
             return menu_tree
 
     @staticmethod
@@ -52,7 +52,7 @@ class MenuService:
                 for role in roles:
                     menu_ids.extend([menu.id for menu in role.menus])
                 menu_select = await menu_dao.get_role_menus(db, request.user.is_superuser, menu_ids)
-                menu_tree = await get_tree_data(menu_select)
+                menu_tree = get_tree_data(menu_select)
             return menu_tree
 
     @staticmethod

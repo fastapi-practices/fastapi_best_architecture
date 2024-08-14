@@ -21,14 +21,14 @@ router = APIRouter()
 @router.get('/all', summary='获取所有角色', dependencies=[DependsJwtAuth])
 async def get_all_roles() -> ResponseModel:
     roles = await role_service.get_all()
-    data = await select_list_serialize(roles)
+    data = select_list_serialize(roles)
     return await response_base.success(data=data)
 
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
     roles = await role_service.get_user_roles(pk=pk)
-    data = await select_list_serialize(roles)
+    data = select_list_serialize(roles)
     return await response_base.success(data=data)
 
 

@@ -27,7 +27,7 @@ router = APIRouter()
 @router.get('/businesses/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseModel:
     businesses = await gen_business_service.get_all()
-    data = await select_list_serialize(businesses)
+    data = select_list_serialize(businesses)
     return await response_base.success(data=data)
 
 
@@ -41,7 +41,7 @@ async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
 @router.get('/businesses/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
 async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
     models = await gen_model_service.get_by_business(business_id=pk)
-    data = await select_list_serialize(models)
+    data = select_list_serialize(models)
     return await response_base.success(data=data)
 
 
