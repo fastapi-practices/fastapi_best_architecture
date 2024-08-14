@@ -24,7 +24,7 @@ async def get_user_sidebar_tree(request: Request) -> ResponseModel:
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
     menu = await menu_service.get(pk=pk)
-    data = GetMenuListDetails(**await select_as_dict(menu))
+    data = GetMenuListDetails(**select_as_dict(menu))
     return await response_base.success(data=data)
 
 

@@ -8,7 +8,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.5.1
+    rev: v0.5.7
     hooks:
       - id: ruff
         args:
@@ -20,7 +20,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pdm-project/pdm
-    rev: 2.16.1
+    rev: 2.17.3
     hooks:
       - id: pdm-export
         args:

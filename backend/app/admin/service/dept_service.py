@@ -25,7 +25,7 @@ class DeptService:
     ) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             dept_select = await dept_dao.get_all(db=db, name=name, leader=leader, phone=phone, status=status)
-            tree_data = await get_tree_data(dept_select)
+            tree_data = get_tree_data(dept_select)
             return tree_data
 
     @staticmethod

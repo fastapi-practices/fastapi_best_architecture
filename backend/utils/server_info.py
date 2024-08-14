@@ -9,6 +9,8 @@ from typing import List
 
 import psutil
 
+from asgiref.sync import sync_to_async
+
 from backend.utils.timezone import timezone
 
 
@@ -49,6 +51,7 @@ class ServerInfo:
         return ServerInfo.fmt_seconds(total_seconds)
 
     @staticmethod
+    @sync_to_async(thread_sensitive=False)
     def get_cpu_info() -> dict:
         """获取 CPU 信息"""
         cpu_info = {'usage': round(psutil.cpu_percent(interval=1, percpu=False), 2)}  # %
@@ -65,6 +68,7 @@ class ServerInfo:
         return cpu_info
 
     @staticmethod
+    @sync_to_async(thread_sensitive=False)
     def get_mem_info() -> dict:
         """获取内存信息"""
         mem = psutil.virtual_memory()
@@ -76,6 +80,7 @@ class ServerInfo:
         }
 
     @staticmethod
+    @sync_to_async(thread_sensitive=False)
     def get_sys_info() -> dict:
         """获取服务器信息"""
         try:
@@ -87,6 +92,7 @@ class ServerInfo:
         return {'name': socket.gethostname(), 'ip': ip, 'os': platform.system(), 'arch': platform.machine()}
 
     @staticmethod
+    @sync_to_async(thread_sensitive=False)
     def get_disk_info() -> List[dict]:
         """获取磁盘信息"""
         disk_info = []
@@ -104,6 +110,7 @@ class ServerInfo:
         return disk_info
 
     @staticmethod
+    @sync_to_async(thread_sensitive=False)
     def get_service_info():
         """获取服务信息"""
         process = psutil.Process(os.getpid())

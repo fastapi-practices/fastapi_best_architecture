@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dept = await dept_service.get(pk=pk)
-    data = GetDeptListDetails(**await select_as_dict(dept))
+    data = GetDeptListDetails(**select_as_dict(dept))
     return await response_base.success(data=data)
 
 

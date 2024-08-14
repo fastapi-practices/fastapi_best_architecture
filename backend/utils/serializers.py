@@ -14,7 +14,7 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def select_columns_serialize(row: R) -> dict:
     """
     Serialize SQLAlchemy select table columns, does not contain relational columns
@@ -44,7 +44,6 @@ async def select_list_serialize(row: Sequence[R]) -> list:
     return ret_list
 
 
-@sync_to_async
 def select_as_dict(row: R) -> dict:
     """
     Converting SQLAlchemy select to dict, which can contain relational data,

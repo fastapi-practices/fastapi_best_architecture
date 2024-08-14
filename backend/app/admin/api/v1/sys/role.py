@@ -41,7 +41,7 @@ async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseModel:
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(pk: Annotated[int, Path(...)]) -> ResponseModel:
     role = await role_service.get(pk=pk)
-    data = GetRoleListDetails(**await select_as_dict(role))
+    data = GetRoleListDetails(**select_as_dict(role))
     return await response_base.success(data=data)
 
 

@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dict_data = await dict_data_service.get(pk=pk)
-    data = GetDictDataListDetails(**await select_as_dict(dict_data))
+    data = GetDictDataListDetails(**select_as_dict(dict_data))
     return await response_base.success(data=data)
 
 

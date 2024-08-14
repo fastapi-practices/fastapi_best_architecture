@@ -36,7 +36,7 @@ async def register_user(obj: RegisterUserParam) -> ResponseModel:
 async def add_user(request: Request, obj: AddUserParam) -> ResponseModel:
     await user_service.add(request=request, obj=obj)
     current_user = await user_service.get_userinfo(username=obj.username)
-    data = GetUserInfoListDetails(**await select_as_dict(current_user))
+    data = GetUserInfoListDetails(**select_as_dict(current_user))
     return await response_base.success(data=data)
 
 
@@ -50,14 +50,14 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
 async def get_current_user(request: Request) -> ResponseModel:
-    data = GetCurrentUserInfoDetail(**await select_as_dict(request.user))
+    data = GetCurrentUserInfoDetail(**select_as_dict(request.user))
     return await response_base.success(data=data)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
     current_user = await user_service.get_userinfo(username=username)
-    data = GetUserInfoListDetails(**await select_as_dict(current_user))
+    data = GetUserInfoListDetails(**select_as_dict(current_user))
     return await response_base.success(data=data)
 
 
