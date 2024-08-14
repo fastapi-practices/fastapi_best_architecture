@@ -20,7 +20,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pdm-project/pdm
-    rev: 2.17.3
+    rev: 2.18.0
     hooks:
       - id: pdm-export
         args:
