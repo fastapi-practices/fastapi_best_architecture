@@ -27,4 +27,4 @@ async def get_captcha(request: Request) -> ResponseModel:
     await redis_client.set(
         f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ip}', code, ex=admin_settings.CAPTCHA_LOGIN_EXPIRE_SECONDS
     )
-    return await response_base.success(data={'image_type': img_type, 'image': img})
+    return response_base.success(data={'image_type': img_type, 'image': img})

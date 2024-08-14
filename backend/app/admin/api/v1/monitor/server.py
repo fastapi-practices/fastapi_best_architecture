@@ -26,4 +26,4 @@ async def get_server_info() -> ResponseModel:
         'disk': server_info.get_disk_info(),
         'service': server_info.get_service_info(),
     }
-    return await response_base.success(data=data)
+    return response_base.success(data=data)

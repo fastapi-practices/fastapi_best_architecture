@@ -19,7 +19,7 @@ _github_oauth2 = FastAPIOAuth20(_github_client, admin_settings.OAUTH2_GITHUB_RED
 @router.get('', summary='获取 Github 授权链接')
 async def github_auth2() -> ResponseModel:
     auth_url = await _github_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
-    return await response_base.success(data=auth_url)
+    return response_base.success(data=auth_url)
 
 
 @router.get(

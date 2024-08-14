@@ -24,7 +24,6 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 DependsJwtAuth = Depends(HTTPBearer())
 
 
-@sync_to_async
 def get_hash_password(password: str) -> str:
     """
     Encrypt passwords using the hash algorithm
@@ -35,7 +34,6 @@ def get_hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-@sync_to_async
 def password_verify(plain_password: str, hashed_password: str) -> bool:
     """
     Password verification
@@ -141,7 +139,6 @@ def get_token(request: Request) -> str:
     return token
 
 
-@sync_to_async
 def jwt_decode(token: str) -> int:
     """
     Decode token
@@ -168,7 +165,7 @@ async def jwt_authentication(token: str) -> dict[str, int]:
     :param token:
     :return:
     """
-    user_id = await jwt_decode(token)
+    user_id = jwt_decode(token)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:

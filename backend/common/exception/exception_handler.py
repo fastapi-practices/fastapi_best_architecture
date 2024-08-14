@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from asgiref.sync import sync_to_async
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
@@ -21,7 +20,6 @@ from backend.core.conf import settings
 from backend.utils.serializers import MsgSpecJSONResponse
 
 
-@sync_to_async
 def _get_exception_code(status_code: int):
     """
     获取返回状态码, OpenAPI, Uvicorn... 可用状态码基于 RFC 定义, 详细代码见下方链接
@@ -101,11 +99,11 @@ def register_exception(app: FastAPI):
                 'data': None,
             }
         else:
-            res = await response_base.fail(res=CustomResponseCode.HTTP_400)
+            res = response_base.fail(res=CustomResponseCode.HTTP_400)
             content = res.model_dump()
         request.state.__request_http_exception__ = content  # 用于在中间件中获取异常信息
         return MsgSpecJSONResponse(
-            status_code=await _get_exception_code(exc.status_code),
+            status_code=_get_exception_code(exc.status_code),
             content=content,
             headers=exc.headers,
         )
@@ -166,7 +164,7 @@ def register_exception(app: FastAPI):
                 'data': None,
             }
         else:
-            res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+            res = response_base.fail(res=CustomResponseCode.HTTP_500)
             content = res.model_dump()
         return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
@@ -184,7 +182,7 @@ def register_exception(app: FastAPI):
         """
         if isinstance(exc, BaseExceptionMixin):
             return MsgSpecJSONResponse(
-                status_code=await _get_exception_code(exc.code),
+                status_code=_get_exception_code(exc.code),
                 content={
                     'code': exc.code,
                     'msg': str(exc.msg),
@@ -204,7 +202,7 @@ def register_exception(app: FastAPI):
                     'data': None,
                 }
             else:
-                res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+                res = response_base.fail(res=CustomResponseCode.HTTP_500)
                 content = res.model_dump()
             return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_500, content=content)
 
@@ -235,7 +233,7 @@ def register_exception(app: FastAPI):
                         'data': None,
                     }
                 else:
-                    res = await response_base.fail(res=CustomResponseCode.HTTP_500)
+                    res = response_base.fail(res=CustomResponseCode.HTTP_500)
                     content = res.model_dump()
             response = MsgSpecJSONResponse(
                 status_code=exc.code if isinstance(exc, BaseExceptionMixin) else StandardResponseCode.HTTP_500,

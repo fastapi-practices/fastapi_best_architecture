@@ -30,16 +30,16 @@ async def swagger_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
 )
 async def user_login(request: Request, obj: AuthLoginParam, background_tasks: BackgroundTasks) -> ResponseModel:
     data = await auth_service.login(request=request, obj=obj, background_tasks=background_tasks)
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.post('/token/new', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]) -> ResponseModel:
     data = await auth_service.new_token(request=request, refresh_token=refresh_token)
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request) -> ResponseModel:
     await auth_service.logout(request=request)
-    return await response_base.success()
+    return response_base.success()
