@@ -24,8 +24,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pdm install -p ./backend
+          cd backend
+          pdm install
 
       - name: Run lint
         run: |
+          cd backend
           pdm lint
