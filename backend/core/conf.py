@@ -91,6 +91,10 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/auth/login',
     ]
 
+    # Sys User
+    USER_REDIS_PREFIX: str = 'fba_user'
+    USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
+
     # Log
     LOG_LEVEL: str = 'INFO'
     LOG_FORMAT: str = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <lvl>{message}</>'

@@ -225,7 +225,7 @@ class CRUDUser(CRUDPlus[User]):
         user = await self.get(db, user_id)
         return user.is_staff
 
-    async def get_status(self, db: AsyncSession, user_id: int) -> bool:
+    async def get_status(self, db: AsyncSession, user_id: int) -> int:
         """
         获取用户状态
 

@@ -3,15 +3,18 @@
 from typing import Any
 
 from fastapi import Request, Response
+from pydantic_core import from_json
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
 
+from backend.app.admin.schema.user import CurrentUserIns
 from backend.common.exception.errors import TokenError
 from backend.common.log import log
 from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
-from backend.utils.serializers import MsgSpecJSONResponse
+from backend.database.db_redis import redis_client
+from backend.utils.serializers import MsgSpecJSONResponse, select_as_dict
 
 
 class _AuthenticationError(AuthenticationError):
@@ -45,8 +48,20 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
         try:
             sub = await jwt.jwt_authentication(token)
-            async with async_db_session() as db:
-                user = await jwt.get_current_user(db, data=sub)
+            cache_user = await redis_client.get(f'{settings.USER_REDIS_PREFIX}:{sub}')
+            if not cache_user:
+                async with async_db_session() as db:
+                    current_user = await jwt.get_current_user(db, sub)
+                    user = CurrentUserIns(**select_as_dict(current_user))
+                    await redis_client.setex(
+                        f'{settings.USER_REDIS_PREFIX}:{sub}',
+                        settings.USER_REDIS_EXPIRE_SECONDS,
+                        user.model_dump_json(),
+                    )
+            else:
+                # 在恰当的时机，应替换为使用 model_validate_json
+                # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
+                user = CurrentUserIns.model_validate(from_json(cache_user, allow_partial=True))
         except TokenError as exc:
             raise _AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
         except Exception as e:

@@ -91,6 +91,10 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
         return values
 
 
+class CurrentUserIns(GetUserInfoListDetails):
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ResetPasswordParam(SchemaBase):
     old_password: str
     new_password: str

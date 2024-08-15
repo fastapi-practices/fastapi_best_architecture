@@ -78,12 +78,13 @@ class UserService:
                 raise errors.ForbiddenError(msg='密码输入不一致')
             new_pwd = get_hash_password(f'{obj.new_password}{request.user.salt}')
             count = await user_dao.reset_password(db, request.user.id, new_pwd)
-            prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
+            key_prefix = [
+                f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}',
+                f'{settings.USER_REDIS_PREFIX}:{request.user.id}',
             ]
-            for i in prefix:
-                await redis_client.delete_prefix(i)
+            for key in key_prefix:
+                await redis_client.delete_prefix(key)
             return count
 
     @staticmethod
@@ -116,6 +117,7 @@ class UserService:
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
             count = await user_dao.update_userinfo(db, input_user, obj)
+            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod
@@ -133,6 +135,7 @@ class UserService:
                     raise errors.NotFoundError(msg='角色不存在')
             await user_dao.update_role(db, input_user, obj)
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
@@ -144,6 +147,7 @@ class UserService:
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.update_avatar(db, input_user, avatar)
+            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod
@@ -162,6 +166,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 super_status = await user_dao.get_super(db, user_id)
                 count = await user_dao.set_super(db, pk, False if super_status else True)
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
                 return count
 
     @staticmethod
@@ -176,6 +181,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 staff_status = await user_dao.get_staff(db, user_id)
                 count = await user_dao.set_staff(db, pk, False if staff_status else True)
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
                 return count
 
     @staticmethod
@@ -190,6 +196,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 status = await user_dao.get_status(db, user_id)
                 count = await user_dao.set_status(db, pk, False if status else True)
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
                 return count
 
     @staticmethod
@@ -200,6 +207,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             else:
                 count = await user_dao.set_multi_login(db, pk)
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
                 token = await get_token(request)
                 user_id = request.user.id
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
@@ -207,13 +215,13 @@ class UserService:
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:
-                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
-                        await redis_client.delete_prefix(prefix, exclude=prefix + token)
+                        key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
+                        await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token}')
                 # 超级用户修改他人时，他人token将全部失效
                 else:
                     if not latest_multi_login:
-                        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}:'
-                        await redis_client.delete_prefix(prefix)
+                        key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
+                        await redis_client.delete_prefix(key_prefix)
                 return count
 
     @staticmethod
@@ -223,12 +231,12 @@ class UserService:
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.delete(db, input_user.id)
-            prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{input_user.id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{input_user.id}:',
+            key_prefix = [
+                f'{settings.TOKEN_REDIS_PREFIX}:{input_user.id}',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{input_user.id}',
             ]
-            for i in prefix:
-                await redis_client.delete_prefix(i)
+            for key in key_prefix:
+                await redis_client.delete_prefix(key)
             return count
 
 
