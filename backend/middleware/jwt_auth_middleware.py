@@ -34,7 +34,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
         """覆盖内部认证错误处理"""
         return MsgSpecJSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
-    async def authenticate(self, request: Request):
+    async def authenticate(self, request: Request) -> tuple[AuthCredentials, CurrentUserIns] | None:
         auth = request.headers.get('Authorization')
         if not auth:
             return
@@ -59,7 +59,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
                         user.model_dump_json(),
                     )
             else:
-                # 在恰当的时机，应替换为使用 model_validate_json
+                # TODO: 在恰当的时机，应替换为使用 model_validate_json
                 # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
                 user = CurrentUserIns.model_validate(from_json(cache_user, allow_partial=True))
         except TokenError as exc:
