@@ -56,7 +56,8 @@ class RedisCli(Redis):
                     keys.append(key)
             else:
                 keys.append(key)
-        await self.delete(*keys)
+        if keys:
+            await self.delete(*keys)
 
 
 # 创建 redis 客户端实例

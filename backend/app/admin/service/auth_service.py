@@ -136,8 +136,8 @@ class AuthService:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)
         else:
-            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
-            await redis_client.delete_prefix(prefix)
+            key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
+            await redis_client.delete_prefix(key_prefix)
 
 
 auth_service = AuthService()
