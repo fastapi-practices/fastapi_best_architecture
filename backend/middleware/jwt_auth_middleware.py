@@ -3,6 +3,7 @@
 from typing import Any
 
 from fastapi import Request, Response
+from fastapi.security.utils import get_authorization_scheme_param
 from pydantic_core import from_json
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
@@ -35,14 +36,14 @@ class JwtAuthMiddleware(AuthenticationBackend):
         return MsgSpecJSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
     async def authenticate(self, request: Request) -> tuple[AuthCredentials, CurrentUserIns] | None:
-        auth = request.headers.get('Authorization')
-        if not auth:
+        token = request.headers.get('Authorization')
+        if not token:
             return
 
         if request.url.path in settings.TOKEN_EXCLUDE:
             return
 
-        scheme, token = auth.split()
+        scheme, token = get_authorization_scheme_param(token)
         if scheme.lower() != 'bearer':
             return
 
