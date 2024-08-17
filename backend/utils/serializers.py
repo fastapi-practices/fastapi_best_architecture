@@ -5,7 +5,6 @@ from typing import Any, Sequence, TypeVar
 
 import msgspec
 
-from asgiref.sync import sync_to_async
 from sqlalchemy import Row, RowMapping
 from starlette.responses import JSONResponse
 
@@ -14,7 +13,6 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
-@sync_to_async
 def select_columns_serialize(row: R) -> dict:
     """
     Serialize SQLAlchemy select table columns, does not contain relational columns
@@ -33,18 +31,17 @@ def select_columns_serialize(row: R) -> dict:
     return obj_dict
 
 
-async def select_list_serialize(row: Sequence[R]) -> list:
+def select_list_serialize(row: Sequence[R]) -> list:
     """
     Serialize SQLAlchemy select list
 
     :param row:
     :return:
     """
-    ret_list = [await select_columns_serialize(_) for _ in row]
+    ret_list = [select_columns_serialize(_) for _ in row]
     return ret_list
 
 
-@sync_to_async
 def select_as_dict(row: R) -> dict:
     """
     Converting SQLAlchemy select to dict, which can contain relational data,

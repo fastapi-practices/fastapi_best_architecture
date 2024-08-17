@@ -27,22 +27,22 @@ router = APIRouter()
 @router.get('/businesses/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseModel:
     businesses = await gen_business_service.get_all()
-    data = await select_list_serialize(businesses)
-    return await response_base.success(data=data)
+    data = select_list_serialize(businesses)
+    return response_base.success(data=data)
 
 
 @router.get('/businesses/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     business = await gen_service.get_business_with_model(pk=pk)
-    data = GetGenBusinessListDetails(**await select_as_dict(business))
-    return await response_base.success(data=data)
+    data = GetGenBusinessListDetails(**select_as_dict(business))
+    return response_base.success(data=data)
 
 
 @router.get('/businesses/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
 async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
     models = await gen_model_service.get_by_business(business_id=pk)
-    data = await select_list_serialize(models)
-    return await response_base.success(data=data)
+    data = select_list_serialize(models)
+    return response_base.success(data=data)
 
 
 @router.post(
@@ -56,7 +56,7 @@ async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
 )
 async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
     await gen_business_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -70,8 +70,8 @@ async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
 async def update_business(pk: Annotated[int, Path(...)], obj: UpdateGenBusinessParam) -> ResponseModel:
     count = await gen_business_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -85,15 +85,15 @@ async def update_business(pk: Annotated[int, Path(...)], obj: UpdateGenBusinessP
 async def delete_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await gen_business_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.get('/models/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
 async def get_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
     model = await gen_model_service.get(pk=pk)
-    data = GetGenModelListDetails(**await select_as_dict(model))
-    return await response_base.success(data=data)
+    data = GetGenModelListDetails(**select_as_dict(model))
+    return response_base.success(data=data)
 
 
 @router.post(
@@ -106,7 +106,7 @@ async def get_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
 )
 async def create_model(obj: CreateGenModelParam) -> ResponseModel:
     await gen_model_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -120,8 +120,8 @@ async def create_model(obj: CreateGenModelParam) -> ResponseModel:
 async def update_model(pk: Annotated[int, Path(...)], obj: UpdateGenModelParam) -> ResponseModel:
     count = await gen_model_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -135,14 +135,14 @@ async def update_model(pk: Annotated[int, Path(...)], obj: UpdateGenModelParam) 
 async def delete_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await gen_model_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.get('/tables', summary='获取数据库表', dependencies=[DependsRBAC])
 async def get_all_tables(table_schema: Annotated[str, Query(..., description='数据库名')] = 'fba') -> ResponseModel:
     data = await gen_service.get_tables(table_schema=table_schema)
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.post(
@@ -159,19 +159,19 @@ async def import_table(
     table_schema: Annotated[str, Body(..., description='数据库名')] = 'fba',
 ) -> ResponseModel:
     await gen_service.import_business_and_model(app=app, table_schema=table_schema, table_name=table_name)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.get('/preview/{pk}', summary='生成代码预览', dependencies=[DependsJwtAuth])
 async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
     data = await gen_service.preview(pk=pk)
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.get('/generate/{pk}/path', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
 async def generate_path(pk: Annotated[int, Path(..., description='业务ID')]):
     data = await gen_service.get_generate_path(pk=pk)
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.post(
@@ -185,7 +185,7 @@ async def generate_path(pk: Annotated[int, Path(..., description='业务ID')]):
 )
 async def generate_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
     await gen_service.generate(pk=pk)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.get('/download/{pk}', summary='下载代码', dependencies=[DependsJwtAuth])

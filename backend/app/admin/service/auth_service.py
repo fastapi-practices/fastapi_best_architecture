@@ -34,7 +34,7 @@ class AuthService:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户名或密码有误')
-            elif not await password_verify(f'{obj.password}{current_user.salt}', current_user.password):
+            elif not password_verify(f'{obj.password}{current_user.salt}', current_user.password):
                 raise errors.AuthorizationError(msg='用户名或密码有误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -49,7 +49,7 @@ class AuthService:
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户名或密码有误')
-                elif not await password_verify(obj.password + current_user.salt, current_user.password):
+                elif not password_verify(obj.password + current_user.salt, current_user.password):
                     raise errors.AuthorizationError(msg='用户名或密码有误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -105,7 +105,7 @@ class AuthService:
 
     @staticmethod
     async def new_token(*, request: Request, refresh_token: str) -> GetNewToken:
-        user_id = await jwt_decode(refresh_token)
+        user_id = jwt_decode(refresh_token)
         if request.user.id != user_id:
             raise errors.TokenError(msg='Refresh Token 无效')
         async with async_db_session() as db:
@@ -136,8 +136,8 @@ class AuthService:
             key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
             await redis_client.delete(key)
         else:
-            prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
-            await redis_client.delete_prefix(prefix)
+            key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
+            await redis_client.delete_prefix(key_prefix)
 
 
 auth_service = AuthService()

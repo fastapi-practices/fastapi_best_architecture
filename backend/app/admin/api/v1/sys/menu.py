@@ -18,14 +18,14 @@ router = APIRouter()
 @router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
 async def get_user_sidebar_tree(request: Request) -> ResponseModel:
     menu = await menu_service.get_user_menu_tree(request=request)
-    return await response_base.success(data=menu)
+    return response_base.success(data=menu)
 
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
     menu = await menu_service.get(pk=pk)
-    data = GetMenuListDetails(**await select_as_dict(menu))
-    return await response_base.success(data=data)
+    data = GetMenuListDetails(**select_as_dict(menu))
+    return response_base.success(data=data)
 
 
 @router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
@@ -33,7 +33,7 @@ async def get_all_menus(
     title: Annotated[str | None, Query()] = None, status: Annotated[int | None, Query()] = None
 ) -> ResponseModel:
     menu = await menu_service.get_menu_tree(title=title, status=status)
-    return await response_base.success(data=menu)
+    return response_base.success(data=menu)
 
 
 @router.post(
@@ -46,7 +46,7 @@ async def get_all_menus(
 )
 async def create_menu(obj: CreateMenuParam) -> ResponseModel:
     await menu_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -60,8 +60,8 @@ async def create_menu(obj: CreateMenuParam) -> ResponseModel:
 async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> ResponseModel:
     count = await menu_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -75,5 +75,5 @@ async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> Re
 async def delete_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await menu_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()

@@ -19,13 +19,13 @@ router = APIRouter()
 @router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
 async def get_all_apis() -> ResponseModel:
     data = await api_service.get_all()
-    return await response_base.success(data=data)
+    return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
 async def get_api(pk: Annotated[int, Path(...)]) -> ResponseModel:
     api = await api_service.get(pk=pk)
-    return await response_base.success(data=api)
+    return response_base.success(data=api)
 
 
 @router.get(
@@ -44,7 +44,7 @@ async def get_pagination_apis(
 ) -> ResponseModel:
     api_select = await api_service.get_select(name=name, method=method, path=path)
     page_data = await paging_data(db, api_select, GetApiListDetails)
-    return await response_base.success(data=page_data)
+    return response_base.success(data=page_data)
 
 
 @router.post(
@@ -57,7 +57,7 @@ async def get_pagination_apis(
 )
 async def create_api(obj: CreateApiParam) -> ResponseModel:
     await api_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -71,8 +71,8 @@ async def create_api(obj: CreateApiParam) -> ResponseModel:
 async def update_api(pk: Annotated[int, Path(...)], obj: UpdateApiParam) -> ResponseModel:
     count = await api_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -86,5 +86,5 @@ async def update_api(pk: Annotated[int, Path(...)], obj: UpdateApiParam) -> Resp
 async def delete_api(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await api_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()

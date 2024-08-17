@@ -2,20 +2,17 @@
 # -*- coding: utf-8 -*-
 from typing import Any, Sequence
 
-from asgiref.sync import sync_to_async
-
 from backend.common.enums import BuildTreeType
 from backend.utils.serializers import RowData, select_list_serialize
 
 
-async def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
+def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
     """获取所有树形结构节点"""
-    tree_nodes = await select_list_serialize(row)
+    tree_nodes = select_list_serialize(row)
     tree_nodes.sort(key=lambda x: x['sort'])
     return tree_nodes
 
 
-@sync_to_async
 def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     通过遍历算法构造树形结构
@@ -44,9 +41,9 @@ def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return tree
 
 
-async def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = None) -> list[dict[str, Any]]:
+def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = None) -> list[dict[str, Any]]:
     """
-    通过递归算法构造树形结构
+    通过递归算法构造树形结构（性能影响较大）
 
     :param nodes:
     :param parent_id:
@@ -55,14 +52,14 @@ async def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | Non
     tree = []
     for node in nodes:
         if node['parent_id'] == parent_id:
-            child_node = await recursive_to_tree(nodes, parent_id=node['id'])
+            child_node = recursive_to_tree(nodes, parent_id=node['id'])
             if child_node:
                 node['children'] = child_node
             tree.append(node)
     return tree
 
 
-async def get_tree_data(
+def get_tree_data(
     row: Sequence[RowData], build_type: BuildTreeType = BuildTreeType.traversal, *, parent_id: int | None = None
 ) -> list[dict[str, Any]]:
     """
@@ -73,12 +70,12 @@ async def get_tree_data(
     :param parent_id:
     :return:
     """
-    nodes = await get_tree_nodes(row)
+    nodes = get_tree_nodes(row)
     match build_type:
         case BuildTreeType.traversal:
-            tree = await traversal_to_tree(nodes)
+            tree = traversal_to_tree(nodes)
         case BuildTreeType.recursive:
-            tree = await recursive_to_tree(nodes, parent_id=parent_id)
+            tree = recursive_to_tree(nodes, parent_id=parent_id)
         case _:
             raise ValueError(f'无效的算法类型：{build_type}')
     return tree

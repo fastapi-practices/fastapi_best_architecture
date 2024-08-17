@@ -72,7 +72,9 @@ class RoleService:
                 if not menu:
                     raise errors.NotFoundError(msg='菜单不存在')
             count = await role_dao.update_menus(db, pk, menu_ids)
-            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+            if pk in [role.id for role in request.user.roles]:
+                await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod

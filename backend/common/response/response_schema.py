@@ -3,7 +3,6 @@
 from datetime import datetime
 from typing import Any
 
-from asgiref.sync import sync_to_async
 from fastapi import Response
 from pydantic import BaseModel, ConfigDict
 
@@ -62,7 +61,6 @@ class ResponseBase:
     """
 
     @staticmethod
-    @sync_to_async
     def __response(*, res: CustomResponseCode | CustomResponse = None, data: Any | None = None) -> ResponseModel:
         """
         请求成功返回通用方法
@@ -73,24 +71,23 @@ class ResponseBase:
         """
         return ResponseModel(code=res.code, msg=res.msg, data=data)
 
-    async def success(
+    def success(
         self,
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
         data: Any | None = None,
     ) -> ResponseModel:
-        return await self.__response(res=res, data=data)
+        return self.__response(res=res, data=data)
 
-    async def fail(
+    def fail(
         self,
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
         data: Any = None,
     ) -> ResponseModel:
-        return await self.__response(res=res, data=data)
+        return self.__response(res=res, data=data)
 
     @staticmethod
-    @sync_to_async
     def fast_success(
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,

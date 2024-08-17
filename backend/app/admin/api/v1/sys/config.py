@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get('', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
 async def get_config() -> ResponseModel:
     config = await config_service.get()
-    return await response_base.success(data=config)
+    return response_base.success(data=config)
 
 
 @router.post(
@@ -30,7 +30,7 @@ async def get_config() -> ResponseModel:
 )
 async def create_config(obj: CreateConfigParam) -> ResponseModel:
     await config_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -44,8 +44,8 @@ async def create_config(obj: CreateConfigParam) -> ResponseModel:
 async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -> ResponseModel:
     count = await config_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -59,5 +59,5 @@ async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -
 async def delete_config(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await config_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()

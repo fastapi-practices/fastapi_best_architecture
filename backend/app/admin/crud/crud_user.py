@@ -74,7 +74,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         if not social:
             salt = text_captcha(5)
-            obj.password = await get_hash_password(f'{obj.password}{salt}')
+            obj.password = get_hash_password(f'{obj.password}{salt}')
             dict_obj = obj.model_dump()
             dict_obj.update({'is_staff': True, 'salt': salt})
         else:
@@ -92,7 +92,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         salt = text_captcha(5)
-        obj.password = await get_hash_password(f'{obj.password}{salt}')
+        obj.password = get_hash_password(f'{obj.password}{salt}')
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
@@ -225,7 +225,7 @@ class CRUDUser(CRUDPlus[User]):
         user = await self.get(db, user_id)
         return user.is_staff
 
-    async def get_status(self, db: AsyncSession, user_id: int) -> bool:
+    async def get_status(self, db: AsyncSession, user_id: int) -> int:
         """
         获取用户状态
 

@@ -17,18 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v5
+      - name: Setup pdm
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r ./backend/requirements.txt
+          cd backend
+          pdm install
 
-      - name: pre-commit
-        uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: --all-files --verbose
+      - name: Run lint
+        run: |
+          cd backend
+          pdm lint

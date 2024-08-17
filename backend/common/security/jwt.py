@@ -24,7 +24,6 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 DependsJwtAuth = Depends(HTTPBearer())
 
 
-@sync_to_async
 def get_hash_password(password: str) -> str:
     """
     Encrypt passwords using the hash algorithm
@@ -35,7 +34,6 @@ def get_hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-@sync_to_async
 def password_verify(plain_password: str, hashed_password: str) -> bool:
     """
     Password verification
@@ -65,8 +63,8 @@ async def create_access_token(sub: str, expires_delta: timedelta | None = None, 
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if multi_login is False:
-        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:'
-        await redis_client.delete_prefix(prefix)
+        key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}'
+        await redis_client.delete_prefix(key_prefix)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
     await redis_client.setex(key, expire_seconds, token)
     return token, expire
@@ -94,8 +92,8 @@ async def create_refresh_token(sub: str, expire_time: datetime | None = None, **
     to_encode = {'exp': expire, 'sub': sub, **kwargs}
     refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
     if multi_login is False:
-        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
-        await redis_client.delete_prefix(prefix)
+        key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}'
+        await redis_client.delete_prefix(key_prefix)
     key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.setex(key, expire_seconds, refresh_token)
     return refresh_token, expire
@@ -141,7 +139,6 @@ def get_token(request: Request) -> str:
     return token
 
 
-@sync_to_async
 def jwt_decode(token: str) -> int:
     """
     Decode token
@@ -161,33 +158,32 @@ def jwt_decode(token: str) -> int:
     return user_id
 
 
-async def jwt_authentication(token: str) -> dict[str, int]:
+async def jwt_authentication(token: str) -> int:
     """
     JWT authentication
 
     :param token:
     :return:
     """
-    user_id = await jwt_decode(token)
+    user_id = jwt_decode(token)
     key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
     token_verify = await redis_client.get(key)
     if not token_verify:
         raise TokenError(msg='Token 已过期')
-    return {'sub': user_id}
+    return user_id
 
 
-async def get_current_user(db: AsyncSession, data: dict) -> User:
+async def get_current_user(db: AsyncSession, pk: int) -> User:
     """
     Get the current user through token
 
     :param db:
-    :param data:
+    :param pk:
     :return:
     """
-    user_id = data.get('sub')
     from backend.app.admin.crud.crud_user import user_dao
 
-    user = await user_dao.get_with_relation(db, user_id=user_id)
+    user = await user_dao.get_with_relation(db, user_id=pk)
     if not user:
         raise TokenError(msg='Token 无效')
     if not user.status:

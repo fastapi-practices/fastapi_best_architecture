@@ -20,8 +20,8 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dict_data = await dict_data_service.get(pk=pk)
-    data = GetDictDataListDetails(**await select_as_dict(dict_data))
-    return await response_base.success(data=data)
+    data = GetDictDataListDetails(**select_as_dict(dict_data))
+    return response_base.success(data=data)
 
 
 @router.get(
@@ -40,7 +40,7 @@ async def get_pagination_dict_datas(
 ) -> ResponseModel:
     dict_data_select = await dict_data_service.get_select(label=label, value=value, status=status)
     page_data = await paging_data(db, dict_data_select, GetDictDataListDetails)
-    return await response_base.success(data=page_data)
+    return response_base.success(data=page_data)
 
 
 @router.post(
@@ -53,7 +53,7 @@ async def get_pagination_dict_datas(
 )
 async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     await dict_data_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -67,8 +67,8 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
 async def update_dict_data(pk: Annotated[int, Path(...)], obj: UpdateDictDataParam) -> ResponseModel:
     count = await dict_data_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -82,5 +82,5 @@ async def update_dict_data(pk: Annotated[int, Path(...)], obj: UpdateDictDataPar
 async def delete_dict_data(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await dict_data_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()

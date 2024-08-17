@@ -19,7 +19,7 @@ class ConfigService:
                 config = await config_dao.get_one(db)
                 if not config:
                     raise errors.NotFoundError(msg='系统配置不存在')
-                data_map = await select_as_dict(config)
+                data_map = select_as_dict(config)
                 del data_map['created_time']
                 del data_map['updated_time']
                 await redis_client.hset(admin_settings.CONFIG_REDIS_KEY, mapping=data_map)

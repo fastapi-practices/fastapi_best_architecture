@@ -32,7 +32,7 @@ async def get_pagination_dict_types(
 ) -> ResponseModel:
     dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select, GetDictTypeListDetails)
-    return await response_base.success(data=page_data)
+    return response_base.success(data=page_data)
 
 
 @router.post(
@@ -45,7 +45,7 @@ async def get_pagination_dict_types(
 )
 async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
     await dict_type_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -59,8 +59,8 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
 async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypeParam) -> ResponseModel:
     count = await dict_type_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -74,5 +74,5 @@ async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypePar
 async def delete_dict_type(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await dict_type_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()

@@ -18,8 +18,8 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
     dept = await dept_service.get(pk=pk)
-    data = GetDeptListDetails(**await select_as_dict(dept))
-    return await response_base.success(data=data)
+    data = GetDeptListDetails(**select_as_dict(dept))
+    return response_base.success(data=data)
 
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
@@ -30,7 +30,7 @@ async def get_all_depts_tree(
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
     dept = await dept_service.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
-    return await response_base.success(data=dept)
+    return response_base.success(data=dept)
 
 
 @router.post(
@@ -43,7 +43,7 @@ async def get_all_depts_tree(
 )
 async def create_dept(obj: CreateDeptParam) -> ResponseModel:
     await dept_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -57,8 +57,8 @@ async def create_dept(obj: CreateDeptParam) -> ResponseModel:
 async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> ResponseModel:
     count = await dept_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.delete(
@@ -72,5 +72,5 @@ async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> Re
 async def delete_dept(pk: Annotated[int, Path(...)]) -> ResponseModel:
     count = await dept_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
-    return await response_base.fail()
+        return response_base.success()
+    return response_base.fail()
