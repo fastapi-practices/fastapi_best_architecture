@@ -65,7 +65,13 @@ class ServerInfo:
                 cpu_info['max_freq'] = round(cpu_freq.max, 2)  # MHz
                 cpu_info['min_freq'] = round(cpu_freq.min, 2)  # MHz
                 cpu_info['current_freq'] = round(cpu_freq.current, 2)  # MHz
+            except FileNotFoundError:
+                # 处理无法获取频率的情况
+                cpu_info['max_freq'] = 0
+                cpu_info['min_freq'] = 0
+                cpu_info['current_freq'] = 0
             except AttributeError:
+                # 处理属性不存在的情况（更安全的做法）
                 cpu_info['max_freq'] = 0
                 cpu_info['min_freq'] = 0
                 cpu_info['current_freq'] = 0
