@@ -54,7 +54,7 @@ class ServerInfo:
         cpu_info = {'usage': round(psutil.cpu_percent(interval=1, percpu=False), 2)}  # %
 
         # 检查是否是 Apple M系列芯片
-        if platform.system() == "Darwin" and "arm" in platform.machine().lower():
+        if platform.system() == 'Darwin' and 'arm' in platform.machine().lower():
             cpu_info['max_freq'] = 0
             cpu_info['min_freq'] = 0
             cpu_info['current_freq'] = 0
