@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
     TOKEN_REDIS_PREFIX: str = 'fba:token'
-    TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
+    TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:token:refresh'
     TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{API_V1_STR}/auth/login',
     ]
