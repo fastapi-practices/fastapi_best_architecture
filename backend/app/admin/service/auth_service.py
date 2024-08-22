@@ -49,7 +49,9 @@ class AuthService:
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
                     raise errors.NotFoundError(msg='用户名或密码有误')
-                elif not password_verify(obj.password + current_user.salt, current_user.password):
+                user_uuid = current_user.uuid
+                username = current_user.username
+                if not password_verify(obj.password + current_user.salt, current_user.password):
                     raise errors.AuthorizationError(msg='用户名或密码有误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -58,42 +60,49 @@ class AuthService:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+                current_user_id = current_user.id
                 access_token, access_token_expire_time = await create_access_token(
-                    str(current_user.id), multi_login=current_user.is_multi_login
+                    str(current_user_id), multi_login=current_user.is_multi_login
                 )
                 refresh_token, refresh_token_expire_time = await create_refresh_token(
-                    sub=str(current_user.id),
+                    sub=str(current_user_id),
                     expire_time=access_token_expire_time,
                     multi_login=current_user.is_multi_login,
                 )
-                await user_dao.update_login_time(db, obj.username)
-                await db.refresh(current_user)
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
-                err_log_info = dict(
-                    db=db,
-                    request=request,
-                    user=current_user,
-                    login_time=timezone.now(),
-                    status=LoginLogStatusType.fail.value,
-                    msg=e.msg,
+                task = BackgroundTask(
+                    LoginLogService.create,
+                    **dict(
+                        db=db,
+                        request=request,
+                        user_uuid=user_uuid,
+                        username=username,
+                        login_time=timezone.now(),
+                        status=LoginLogStatusType.fail.value,
+                        msg=e.msg,
+                    ),
                 )
-                task = BackgroundTask(LoginLogService.create, **err_log_info)
                 raise errors.AuthorizationError(msg=e.msg, background=task)
             except Exception as e:
                 raise e
             else:
-                login_log = dict(
-                    db=db,
-                    request=request,
-                    user=current_user,
-                    login_time=timezone.now(),
-                    status=LoginLogStatusType.success.value,
-                    msg='登录成功',
+                background_tasks.add_task(
+                    LoginLogService.create,
+                    **dict(
+                        db=db,
+                        request=request,
+                        user_uuid=user_uuid,
+                        username=username,
+                        login_time=timezone.now(),
+                        status=LoginLogStatusType.success.value,
+                        msg='登录成功',
+                    ),
                 )
-                background_tasks.add_task(LoginLogService.create, **login_log)
                 await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                await user_dao.update_login_time(db, obj.username)
+                await db.refresh(current_user)
                 data = GetLoginToken(
                     access_token=access_token,
                     refresh_token=refresh_token,
