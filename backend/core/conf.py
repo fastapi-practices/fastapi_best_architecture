@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
 
     # Limiter
-    LIMITER_REDIS_PREFIX: str = 'fba_limiter'
+    LIMITER_REDIS_PREFIX: str = 'fba:limiter'
 
     # DateTime
     DATETIME_TIMEZONE: str = 'Asia/Shanghai'
@@ -85,14 +85,14 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
-    TOKEN_REDIS_PREFIX: str = 'fba_token'
-    TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
+    TOKEN_REDIS_PREFIX: str = 'fba:token'
+    TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:token:refresh'
     TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{API_V1_STR}/auth/login',
     ]
 
     # Sys User
-    USER_REDIS_PREFIX: str = 'fba_user'
+    USER_REDIS_PREFIX: str = 'fba:user'
     USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
 
     # Log
@@ -107,7 +107,7 @@ class Settings(BaseSettings):
 
     # RBAC Permission
     PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
-    PERMISSION_REDIS_PREFIX: str = 'fba_permission'
+    PERMISSION_REDIS_PREFIX: str = 'fba:permission'
 
     # Casbin Auth
     CASBIN_EXCLUDE: set[tuple[str, str]] = {
@@ -139,7 +139,7 @@ class Settings(BaseSettings):
     ]
 
     # Ip location
-    IP_LOCATION_REDIS_PREFIX: str = 'fba_ip_location'
+    IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
 
 
