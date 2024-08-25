@@ -4,8 +4,7 @@
 from time import perf_counter
 from typing import Any, Dict
 from urllib.parse import urlencode
-
-import shortuuid
+from uuid import uuid4
 
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -18,7 +17,8 @@ from backend.utils.json_control import dict_to_json_ensure_ascii, is_dict, json_
 class LogHandler:
     @staticmethod
     async def add_log_record(
-        request: Request, event_type: str | None = None, msg: Dict[str, Any] | None = None, remarks: str | None = None
+            request: Request, event_type: str | None = None, msg: Dict[str, Any] | None = None,
+            remarks: str | None = None
     ):
         """添加日志记录"""
         if msg is None:
@@ -49,7 +49,7 @@ class LogHandler:
         if path_info not in ['/favicon.ico'] and 'websocket' not in path_info:
             if request.method != 'OPTIONS':
                 request.state.trace_links_index = 0
-                request.state.traceid = shortuuid.uuid()
+                request.state.traceid = uuid4().hex[:16]
                 request.state.start_time = perf_counter()
                 ip, method, url = request.client.host, request.method, request.url.path
 
