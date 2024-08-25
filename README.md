@@ -87,36 +87,28 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 
 ```
 ├─📁 backend--------------- # Backend
-│ ├─📁 alembic------------- # Database Migrations
+│ ├─📁 alembic------------- # DB migration
 │ ├─📁 app----------------- # Application
-│ │ ├─📁 admin------------- # Admin Panel
-│ │ │ ├─📁 api------------- # API
-│ │ │ │ └─📁 v1------------ # API Version
-│ │ │ ├─📁 crud------------ # CRUD Operations
-│ │ │ ├─📁 model----------- # Models
-│ │ │ ├─📁 schema---------- # Data Transfers
-│ │ │ ├─📁 service--------- # Services
-│ │ │ └─📁 tests----------- # Tests
-│ │ ├─📁 generator--------- # Code Generator
-│ │ └─📁 task-------------- # Task Application
-│ │   └─📁 celery_task----- # Task Layers
-│ ├─📁 common-------------- # Common Resources
-│ │ ├─📁 exception--------- # Exceptions
-│ │ ├─📁 response---------- # Responses
-│ │ └─📁 security---------- # Security
-│ ├─📁 core---------------- # Core Configuration
-│ ├─📁 database------------ # Database Connection
-│ ├─📁 log----------------- # Log Storage
-│ ├─📁 middleware---------- # Middleware
+│ │ ├─📁 admin------------- # System admin
+│ │ │ ├─📁 api------------- # Interface
+│ │ │ ├─📁 crud------------ # CRUD
+│ │ │ ├─📁 model----------- # SQLA model
+│ │ │ ├─📁 schema---------- # Data transmit
+│ │ │ ├─📁 service--------- # Service
+│ │ │ └─📁 tests----------- # Pytest
+│ │ ├─📁 generator--------- # Code generate
+│ │ └─📁 task-------------- # Celery task
+│ ├─📁 common-------------- # public resources
+│ ├─📁 core---------------- # Core configuration
+│ ├─📁 database------------ # Database connection
+│ ├─📁 log----------------- # Log
+│ ├─📁 middleware---------- # Middlewares
 │ ├─📁 scripts------------- # Scripts
-│ ├─📁 sql----------------- # SQL Files
-│ ├─📁 static-------------- # Static Files
-│ ├─📁 templates----------- # Templates
-│ │ └─📁 py---------------- # Python Code Generation
-│ └─📁 utils--------------- # Utilities
-└─📁 deploy---------------- # Deployment
-  └─📁 backend------------- # Backend Deployment
-    └─📁 docker-compose---- # Docker Deployment
+│ ├─📁 sql----------------- # SQL files
+│ ├─📁 static-------------- # Static files
+│ ├─📁 templates----------- # Template files
+│ └─📁 utils--------------- # Toolkit
+└─📁 deploy---------------- # Server deployment
 ```
 
 ## Local development

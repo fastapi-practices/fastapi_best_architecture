@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, and_, delete, desc, select
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -19,7 +19,7 @@ class CRUDApi(CRUDPlus[Api]):
         :param pk:
         :return:
         """
-        return await self.select_model_by_id(db, pk)
+        return await self.select_model(db, pk)
 
     async def get_list(self, name: str = None, method: str = None, path: str = None) -> Select:
         """
@@ -30,17 +30,14 @@ class CRUDApi(CRUDPlus[Api]):
         :param path:
         :return:
         """
-        se = select(self.model).order_by(desc(self.model.created_time))
-        where_list = []
-        if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
-        if method:
-            where_list.append(self.model.method == method)
-        if path:
-            where_list.append(self.model.path.like(f'%{path}%', escape='/'))
-        if where_list:
-            se = se.where(and_(*where_list))
-        return se
+        filters = {}
+        if name is not None:
+            filters.update(name__like=f'%{name}%')
+        if method is not None:
+            filters.update(method=method)
+        if path is not None:
+            filters.update(path__like=f'%{path}%')
+        return await self.select_order('created_time', 'desc', **filters)
 
     async def get_all(self, db: AsyncSession) -> Sequence[Api]:
         """
@@ -59,7 +56,7 @@ class CRUDApi(CRUDPlus[Api]):
         :param name:
         :return:
         """
-        return await self.select_model_by_column(db, 'name', name)
+        return await self.select_model_by_column(db, name=name)
 
     async def create(self, db: AsyncSession, obj_in: CreateApiParam) -> None:
         """
@@ -90,8 +87,7 @@ class CRUDApi(CRUDPlus[Api]):
         :param pk:
         :return:
         """
-        apis = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return apis.rowcount
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
 
 api_dao: CRUDApi = CRUDApi(Api)

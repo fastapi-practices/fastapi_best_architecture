@@ -12,9 +12,8 @@ from backend.app.generator.model import GenBusiness
 class CRUDGen:
     @staticmethod
     async def get_business_with_model(db: AsyncSession, business_id: int) -> GenBusiness:
-        result = await db.execute(
-            select(GenBusiness).options(selectinload(GenBusiness.gen_model)).where(GenBusiness.id == business_id)
-        )
+        stmt = select(GenBusiness).options(selectinload(GenBusiness.gen_model)).where(GenBusiness.id == business_id)
+        result = await db.execute(stmt)
         data = result.scalars().first()
         return data
 

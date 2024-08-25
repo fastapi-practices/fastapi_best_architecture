@@ -117,7 +117,7 @@ class UserService:
                 email = await user_dao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
-            count = await user_dao.update_userinfo(db, input_user, obj)
+            count = await user_dao.update_userinfo(db, input_user.id, obj)
             await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
@@ -147,7 +147,7 @@ class UserService:
             input_user = await user_dao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
-            count = await user_dao.update_avatar(db, input_user, avatar)
+            count = await user_dao.update_avatar(db, input_user.id, avatar)
             await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
@@ -207,10 +207,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                count = await user_dao.set_multi_login(db, pk)
+                user_id = request.user.id
+                multi_login = await user_dao.get_multi_login(db, pk) if pk != user_id else request.user.is_multi_login
+                count = await user_dao.set_multi_login(db, pk, False if multi_login else True)
                 await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
                 token = await get_token(request)
-                user_id = request.user.id
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
                 # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现
                 # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
