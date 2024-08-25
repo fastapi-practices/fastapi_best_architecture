@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import and_, asc, or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
@@ -20,7 +20,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        return await self.select_model_by_columns(db, id=dept_id, del_flag=0)
+        return await self.select_model_by_column(db, id=dept_id, del_flag=0)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Dept | None:
         """
@@ -30,7 +30,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param name:
         :return:
         """
-        return await self.select_model_by_columns(db, name=name, del_flag=0)
+        return await self.select_model_by_column(db, name=name, del_flag=0)
 
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
@@ -45,28 +45,16 @@ class CRUDDept(CRUDPlus[Dept]):
         :param status:
         :return:
         """
-        se = select(self.model).order_by(asc(self.model.sort))
-        where_list = [self.model.del_flag == 0]
-        conditions = []
-        if name:
-            conditions.append(self.model.name.like(f'%{name}%'))
-        if leader:
-            conditions.append(self.model.leader.like(f'%{leader}%'))
-        if phone:
-            se_phone = self.model.phone.startswith(phone)
-            dept_select = await db.execute(se.where(se_phone))
-            dept_likes = dept_select.scalars().all()
-            where_list.append(or_(se_phone, self.model.id.in_([dept.parent_id for dept in dept_likes])))
+        filters = {'del_flag__eq': 0}
+        if name is not None:
+            filters.update(name__like=f'%{name}%')
+        if leader is not None:
+            filters.update(leader__like=f'%{leader}%')
+        if phone is not None:
+            filters.update(phone__startswith=phone)
         if status is not None:
-            where_list.append(self.model.status == status)
-        if conditions:
-            dept_select = await db.execute(se.where(and_(*conditions)))
-            dept_likes = dept_select.scalars().all()
-            where_list.append(or_(*conditions, self.model.id.in_([dept.parent_id for dept in dept_likes])))
-        if where_list:
-            se = se.where(and_(*where_list))
-        dept = await db.execute(se)
-        return dept.scalars().all()
+            filters.update(status=status)
+        return await self.select_models_order(db, sort_columns='sort', **filters)
 
     async def create(self, db: AsyncSession, obj_in: CreateDeptParam) -> None:
         """
@@ -97,9 +85,9 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        return await self.delete_model(db, dept_id, del_flag=1)
+        return await self.delete_model_by_column(db, id=dept_id, logical_deletion=True, deleted_flag_column='del_flag')
 
-    async def get_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
+    async def get_with_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
         """
         获取关联
 
@@ -107,9 +95,8 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        result = await db.execute(
-            select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
-        )
+        stmt = select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
+        result = await db.execute(stmt)
         user_relation = result.scalars().first()
         return user_relation.users
 
@@ -121,9 +108,8 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        result = await db.execute(
-            select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
-        )
+        stmt = select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
+        result = await db.execute(stmt)
         dept = result.scalars().first()
         return dept.children
 
