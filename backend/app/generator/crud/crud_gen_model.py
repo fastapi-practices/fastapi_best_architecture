@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -17,15 +16,19 @@ class CRUDGenModel(CRUDPlus[GenModel]):
 
         :return:
         """
-        return await self.select_model_by_id(db, pk)
+        return await self.select_model(db, pk)
 
     async def get_all_by_business_id(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
-        gen_model = await db.execute(
-            select(self.model).where(self.model.gen_business_id == business_id).order_by(self.model.sort)
-        )
-        return gen_model.scalars().all()
+        """
+        获取所有代码生成模型列
 
-    async def create(self, db: AsyncSession, obj_in: CreateGenModelParam, **kwargs) -> None:
+        :param db:
+        :param business_id:
+        :return:
+        """
+        return await self.select_models_order(db, sort_columns='sort', gen_business_id=business_id)
+
+    async def create(self, db: AsyncSession, obj_in: CreateGenModelParam, pd_type: str | None = None) -> None:
         """
         创建代码生成模型表
 
@@ -33,9 +36,9 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         :param obj_in:
         :return:
         """
-        return await self.create_model(db, obj_in, **kwargs)
+        await self.create_model(db, obj_in, pd_type=pd_type)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateGenModelParam, **kwargs) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateGenModelParam, pd_type: str | None = None) -> int:
         """
         更细代码生成模型表
 
@@ -44,7 +47,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         :param obj_in:
         :return:
         """
-        return await self.update_model(db, pk, obj_in, **kwargs)
+        return await self.update_model_by_column(db, obj_in, id=pk, pd_type=pd_type)
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """

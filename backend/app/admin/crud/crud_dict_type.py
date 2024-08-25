@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, delete, desc, select
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -17,7 +17,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param pk:
         :return:
         """
-        return await self.select_model_by_id(db, pk)
+        return await self.select_model(db, pk)
 
     async def get_list(self, *, name: str = None, code: str = None, status: int = None) -> Select:
         """
@@ -28,17 +28,14 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param status:
         :return:
         """
-        se = select(self.model).order_by(desc(self.model.created_time))
-        where_list = []
-        if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
-        if code:
-            where_list.append(self.model.code.like(f'%{code}%'))
+        filters = {}
+        if name is not None:
+            filters.update(name__like=f'%{name}%')
+        if code is not None:
+            filters.update(code__like=f'%{code}%')
         if status is not None:
-            where_list.append(self.model.status == status)
-        if where_list:
-            se = se.where(*where_list)
-        return se
+            filters.update(status=status)
+        return await self.select_order('created_time', 'desc', **filters)
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """
@@ -48,7 +45,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param code:
         :return:
         """
-        return await self.select_model_by_column(db, 'code', code)
+        return await self.select_model_by_column(db, code=code)
 
     async def create(self, db: AsyncSession, obj_in: CreateDictTypeParam) -> None:
         """
@@ -79,8 +76,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param pk:
         :return:
         """
-        apis = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return apis.rowcount
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
 
 dict_type_dao: CRUDDictType = CRUDDictType(DictType)
