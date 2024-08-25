@@ -63,6 +63,12 @@ class Settings(BaseSettings):
     # Static Server
     STATIC_FILES: bool = False
 
+    # 数据库调试模式
+    DB_DEBUG: bool = False
+
+    # 调试模式
+    DEBUG: bool = False
+
     # Location Parse
     LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
 

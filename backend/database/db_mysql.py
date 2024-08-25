@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from backend.common.log import log
 from backend.common.model import MappedBase
 from backend.core.conf import settings
+from backend.utils.SQLAlchemy_log import setup_sqlalchemy_logging
 
 
 def create_engine_and_session(url: str | URL):
@@ -33,6 +34,9 @@ SQLALCHEMY_DATABASE_URL = (
 )
 
 async_engine, async_db_session = create_engine_and_session(SQLALCHEMY_DATABASE_URL)
+
+# 初始化 SQLAlchemy 日志记录
+setup_sqlalchemy_logging(async_engine.sync_engine, enable_logging=settings.DB_DEBUG)
 
 
 async def get_db() -> AsyncSession:
