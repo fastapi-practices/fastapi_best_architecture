@@ -17,8 +17,7 @@ from backend.utils.json_control import dict_to_json_ensure_ascii, is_dict, json_
 class LogHandler:
     @staticmethod
     async def add_log_record(
-            request: Request, event_type: str | None = None, msg: Dict[str, Any] | None = None,
-            remarks: str | None = None
+        request: Request, event_type: str | None = None, msg: Dict[str, Any] | None = None, remarks: str | None = None
     ):
         """添加日志记录"""
         if msg is None:
