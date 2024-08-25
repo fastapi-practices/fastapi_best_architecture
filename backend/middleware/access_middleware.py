@@ -2,17 +2,6 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
-"""
-@Author         :  Kimani
-@Version        :  V2.0.0
-------------------------------------
-@File           :  access_middleware.py
-@Description    :
-@CreateTime     :  2024/08/21 下午10:18
-@Software       :  PyCharm
-------------------------------------
-@ModifyTime     :  2024/08/23 上午12:22
-"""
 
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint

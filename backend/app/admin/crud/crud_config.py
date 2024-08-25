@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -59,8 +59,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pk:
         :return:
         """
-        configs = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return configs.rowcount
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
 
 config_dao: CRUDConfig = CRUDConfig(Config)

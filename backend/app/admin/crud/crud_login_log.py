@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, and_, delete, desc, select
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -18,17 +18,14 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         :param ip:
         :return:
         """
-        se = select(self.model).order_by(desc(self.model.created_time))
-        where_list = []
-        if username:
-            where_list.append(self.model.username.like(f'%{username}%'))
+        filters = {}
+        if username is not None:
+            filters.update(username__like=f'%{username}%')
         if status is not None:
-            where_list.append(self.model.status == status)
-        if ip:
-            where_list.append(self.model.ip.like(f'%{ip}%'))
-        if where_list:
-            se = se.where(and_(*where_list))
-        return se
+            filters.update(status=status)
+        if ip is not None:
+            filters.update(ip__like=f'%{ip}%')
+        return await self.select_order('created_time', 'desc', **filters)
 
     async def create(self, db: AsyncSession, obj_in: CreateLoginLogParam) -> None:
         """
@@ -38,8 +35,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         :param obj_in:
         :return:
         """
-        await self.create_model(db, obj_in)
-        await db.commit()
+        await self.create_model(db, obj_in, commit=True)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
@@ -49,8 +45,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         :param pk:
         :return:
         """
-        logs = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return logs.rowcount
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
     async def delete_all(self, db: AsyncSession) -> int:
         """
@@ -59,8 +54,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         :param db:
         :return:
         """
-        logs = await db.execute(delete(self.model))
-        return logs.rowcount
+        return await self.delete_model_by_column(db, allow_multiple=True)
 
 
 login_log_dao: CRUDLoginLog = CRUDLoginLog(LoginLog)
