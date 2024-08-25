@@ -61,7 +61,7 @@ class DeptService:
     @staticmethod
     async def delete(*, pk: int) -> int:
         async with async_db_session.begin() as db:
-            dept_user = await dept_dao.get_relation(db, pk)
+            dept_user = await dept_dao.get_with_relation(db, pk)
             if dept_user:
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
             children = await dept_dao.get_children(db, pk)
