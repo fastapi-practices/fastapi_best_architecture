@@ -14,8 +14,6 @@ FastAPI framework based on the front-end and back-end separation of the middle a
 the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, support for **python3.10** and above
 versions
 
-Its purpose is to allow you to use it directly as the infrastructure of your new project,
-
 **🔥Continuously updated and maintained🔥**
 
 ## Pseudo three-tier architecture
