@@ -5,13 +5,8 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-> [!CAUTION]
-> **For 2024-3-22 (announcement)**
->
-> The master branch has completed the app architecture refactoring, please pay extra attention to sync fork operations
-> to avoid irreparable damage!
->
-> We have kept and locked the original branch (legacy-single-app-pydantic-v2), which you can get in the branch selector
+> [!NOTE]
+> This repository as a template library open to any person or enterprise can be used for free!
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -19,8 +14,7 @@ FastAPI framework based on the front-end and back-end separation of the middle a
 the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, support for **python3.10** and above
 versions
 
-Its purpose is to allow you to use it directly as the infrastructure of your new project, this repository as a template
-library open to any person or enterprise can be used for free!
+Its purpose is to allow you to use it directly as the infrastructure of your new project,
 
 **🔥Continuously updated and maintained🔥**
 
