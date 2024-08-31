@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取{{ table_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
 async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseModel:
     {{ table_name_en }} = await {{ table_name_en }}_service.get(pk=pk)
-    return await response_base.success(data={{ table_name_en }})
+    return response_base.success(data={{ table_name_en }})
 
 
 @router.get(
@@ -33,7 +33,7 @@ async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseMode
 async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseModel:
     {{ table_name_en }}_select = await {{ table_name_en }}_service.get_select()
     page_data = await paging_data(db, {{ table_name_en }}_select, Get{{ schema_name }}ListDetails)
-    return await response_base.success(data=page_data)
+    return response_base.success(data=page_data)
 
 
 @router.post(
@@ -46,7 +46,7 @@ async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseMode
 )
 async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> ResponseModel:
     await {{ table_name_en }}_service.create(obj=obj)
-    return await response_base.success()
+    return response_base.success()
 
 
 @router.put(
@@ -61,7 +61,7 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
     count = await {{ table_name_en }}_service.update(pk=pk, obj=obj)
     if count > 0:
         return await response_base.success()
-    return await response_base.fail()
+    return response_base.fail()
 
 
 @router.delete(
@@ -76,4 +76,4 @@ async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(...)]) -> Re
     count = await {{ table_name_en }}_service.delete(pk=pk)
     if count > 0:
         return await response_base.success()
-    return await response_base.fail()
+    return response_base.fail()
