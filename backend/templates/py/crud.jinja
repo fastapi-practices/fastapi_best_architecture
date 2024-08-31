@@ -19,7 +19,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         :param pk:
         :return:
         """
-        return await self.select_model_by_id(db, pk)
+        return await self.select_model(db, pk)
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ table_name_class }}]:
         """
@@ -59,8 +59,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         :param pk:
         :return:
         """
-        {{ table_name_en }}s = await db.execute(delete(self.model).where(self.model.id.in_(pk)))
-        return {{ table_name_en }}s.rowcount
+        return  await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
 
 {{ table_name_en }}_dao: CRUD{{ table_name_class }} = CRUD{{ table_name_class }}({{ table_name_class }})
