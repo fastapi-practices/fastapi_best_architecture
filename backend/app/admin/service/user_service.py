@@ -162,12 +162,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                user_id = request.user.id
-                if pk == user_id:
+                if pk == request.user.id:
                     raise errors.ForbiddenError(msg='非法操作')
-                super_status = await user_dao.get_super(db, user_id)
+                super_status = await user_dao.get_super(db, pk)
                 count = await user_dao.set_super(db, pk, False if super_status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
@@ -177,12 +176,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                user_id = request.user.id
-                if pk == user_id:
+                if pk == request.user.id:
                     raise errors.ForbiddenError(msg='非法操作')
-                staff_status = await user_dao.get_staff(db, user_id)
+                staff_status = await user_dao.get_staff(db, pk)
                 count = await user_dao.set_staff(db, pk, False if staff_status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
@@ -192,12 +190,11 @@ class UserService:
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
-                user_id = request.user.id
-                if pk == user_id:
+                if pk == request.user.id:
                     raise errors.ForbiddenError(msg='非法操作')
-                status = await user_dao.get_status(db, user_id)
+                status = await user_dao.get_status(db, pk)
                 count = await user_dao.set_status(db, pk, False if status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
