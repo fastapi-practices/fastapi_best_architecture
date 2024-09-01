@@ -18,7 +18,7 @@ class CRUDOUserSocial(CRUDPlus[UserSocial]):
         :param source:
         :return:
         """
-        return await self.select_model_by_column(db, id=pk, source=source)
+        return await self.select_model_by_column(db, user_id=pk, source=source)
 
     async def create(self, db: AsyncSession, obj_in: CreateUserSocialParam) -> None:
         """
