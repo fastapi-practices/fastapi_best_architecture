@@ -248,7 +248,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 
 ## 互动
 
-[微信 / 扣扣](https://github.com/wu-clan)
+[微信 / 扣扣](https://wu-clan.github.io/homepage/)
 
 ## 赞助我们
 
