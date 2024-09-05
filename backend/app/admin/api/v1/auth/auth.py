@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import HTTPBasicCredentials
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
@@ -28,18 +28,20 @@ async def swagger_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
     description='json 格式登录, 仅支持在第三方api工具调试, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
-async def user_login(request: Request, obj: AuthLoginParam, background_tasks: BackgroundTasks) -> ResponseModel:
-    data = await auth_service.login(request=request, obj=obj, background_tasks=background_tasks)
+async def user_login(
+    request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+) -> ResponseModel:
+    data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)
 
 
 @router.post('/token/new', summary='创建新 token', dependencies=[DependsJwtAuth])
-async def create_new_token(request: Request, refresh_token: Annotated[str, Query(...)]) -> ResponseModel:
-    data = await auth_service.new_token(request=request, refresh_token=refresh_token)
+async def create_new_token(request: Request, response: Response) -> ResponseModel:
+    data = await auth_service.new_token(request=request, response=response)
     return response_base.success(data=data)
 
 
 @router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
-async def user_logout(request: Request) -> ResponseModel:
-    await auth_service.logout(request=request)
+async def user_logout(request: Request, response: Response) -> ResponseModel:
+    await auth_service.logout(request=request, response=response)
     return response_base.success()

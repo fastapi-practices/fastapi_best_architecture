@@ -84,12 +84,16 @@ class Settings(BaseSettings):
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
-    TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
+    TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # refresh token 过期时间，单位：秒
     TOKEN_REDIS_PREFIX: str = 'fba:token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:token:refresh'
     TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{API_V1_STR}/auth/login',
     ]
+
+    # Cookies
+    COOKIE_REFRESH_TOKEN_KEY: str = 'fba_refresh_token'
+    COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = TOKEN_REFRESH_EXPIRE_SECONDS
 
     # Sys User
     USER_REDIS_PREFIX: str = 'fba:user'

@@ -10,7 +10,7 @@ from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import OperaLogService
-from backend.common.dataclasses import RequestCallNextReturn
+from backend.common.dataclasses import RequestCallNext
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.core.conf import settings
@@ -90,7 +90,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         return res.response
 
-    async def execute_request(self, request: Request, call_next) -> RequestCallNextReturn:
+    async def execute_request(self, request: Request, call_next) -> RequestCallNext:
         """执行请求"""
         code = 200
         msg = 'Success'
@@ -108,7 +108,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             status = StatusType.disable
             err = e
 
-        return RequestCallNextReturn(code=str(code), msg=msg, status=status, err=err, response=response)
+        return RequestCallNext(code=str(code), msg=msg, status=status, err=err, response=response)
 
     @staticmethod
     @sync_to_async

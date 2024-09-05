@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from asgiref.sync import sync_to_async
 from fastapi import Depends, Request
@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
-from backend.common.dataclasses import NewTokenReturn
+from backend.common.dataclasses import AccessToken, NewToken, RefreshToken
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.core.conf import settings
 from backend.database.db_redis import redis_client
@@ -45,83 +45,78 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def create_access_token(sub: str, expires_delta: timedelta | None = None, **kwargs) -> tuple[str, datetime]:
+async def create_access_token(sub: str, multi_login: bool) -> AccessToken:
     """
     Generate encryption token
 
     :param sub: The subject/userid of the JWT
-    :param expires_delta: Increased expiry time
+    :param multi_login: multipoint login for user
     :return:
     """
-    if expires_delta:
-        expire = timezone.now() + expires_delta
-        expire_seconds = int(expires_delta.total_seconds())
-    else:
-        expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = settings.TOKEN_EXPIRE_SECONDS
-    multi_login = kwargs.pop('multi_login', None)
-    to_encode = {'exp': expire, 'sub': sub, **kwargs}
-    token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
+    expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
+    expire_seconds = settings.TOKEN_EXPIRE_SECONDS
+
+    to_encode = {'exp': expire, 'sub': sub}
+    access_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
+
     if multi_login is False:
         key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{sub}'
         await redis_client.delete_prefix(key_prefix)
-    key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
-    await redis_client.setex(key, expire_seconds, token)
-    return token, expire
+
+    key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{access_token}'
+    await redis_client.setex(key, expire_seconds, access_token)
+    return AccessToken(access_token=access_token, access_token_expire_time=expire)
 
 
-async def create_refresh_token(sub: str, expire_time: datetime | None = None, **kwargs) -> tuple[str, datetime]:
+async def create_refresh_token(sub: str, multi_login: bool) -> RefreshToken:
     """
     Generate encryption refresh token, only used to create a new token
 
     :param sub: The subject/userid of the JWT
-    :param expire_time: expiry time
+    :param multi_login: multipoint login for user
     :return:
     """
-    if expire_time:
-        expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire_datetime = timezone.f_datetime(expire_time)
-        current_datetime = timezone.now()
-        if expire_datetime < current_datetime:
-            raise TokenError(msg='Refresh Token 已过期')
-        expire_seconds = int((expire_datetime - current_datetime).total_seconds())
-    else:
-        expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
-    multi_login = kwargs.pop('multi_login', None)
-    to_encode = {'exp': expire, 'sub': sub, **kwargs}
+    expire = timezone.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+    expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
+
+    to_encode = {'exp': expire, 'sub': sub}
     refresh_token = jwt.encode(to_encode, settings.TOKEN_SECRET_KEY, settings.TOKEN_ALGORITHM)
+
     if multi_login is False:
         key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}'
         await redis_client.delete_prefix(key_prefix)
+
     key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.setex(key, expire_seconds, refresh_token)
-    return refresh_token, expire
+    return RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=expire)
 
 
-async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -> NewTokenReturn:
+async def create_new_token(sub: str, token: str, refresh_token: str, multi_login: bool) -> NewToken:
     """
     Generate new token
 
     :param sub:
     :param token
     :param refresh_token:
+    :param multi_login:
     :return:
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
         raise TokenError(msg='Refresh Token 已过期')
-    new_access_token, new_access_token_expire_time = await create_access_token(sub, **kwargs)
-    new_refresh_token, new_refresh_token_expire_time = await create_refresh_token(sub, **kwargs)
+
+    new_access_token = await create_access_token(sub, multi_login)
+    new_refresh_token = await create_refresh_token(sub, multi_login)
+
     token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
     refresh_token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.delete(token_key)
     await redis_client.delete(refresh_token_key)
-    return NewTokenReturn(
-        new_access_token=new_access_token,
-        new_refresh_token=new_refresh_token,
-        new_access_token_expire_time=new_access_token_expire_time,
-        new_refresh_token_expire_time=new_refresh_token_expire_time,
+    return NewToken(
+        new_access_token=new_access_token.access_token,
+        new_access_token_expire_time=new_access_token.access_token_expire_time,
+        new_refresh_token=new_refresh_token.refresh_token,
+        new_refresh_token_expire_time=new_refresh_token.refresh_token_expire_time,
     )
 
 
