@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from fast_captcha import text_captcha
-from fastapi import BackgroundTasks, Request
+from fastapi import BackgroundTasks, Request, Response
 
 from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
@@ -13,6 +13,7 @@ from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.exception.errors import AuthorizationError
 from backend.common.security import jwt
+from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
@@ -21,7 +22,7 @@ from backend.utils.timezone import timezone
 class OAuth2Service:
     @staticmethod
     async def create_with_login(
-        *, request: Request, background_tasks: BackgroundTasks, user: dict, social: UserSocialType
+        *, request: Request, response: Response, background_tasks: BackgroundTasks, user: dict, social: UserSocialType
     ) -> GetLoginToken | None:
         async with async_db_session.begin() as db:
             # 获取 OAuth2 平台用户信息
@@ -54,12 +55,8 @@ class OAuth2Service:
                 new_user_social = CreateUserSocialParam(source=social.value, uid=str(_id), user_id=sys_user.id)
                 await user_social_dao.create(db, new_user_social)
             # 创建 token
-            access_token, access_token_expire_time = await jwt.create_access_token(
-                str(sys_user.id), multi_login=sys_user.is_multi_login
-            )
-            refresh_token, refresh_token_expire_time = await jwt.create_refresh_token(
-                str(sys_user.id), access_token_expire_time, multi_login=sys_user.is_multi_login
-            )
+            access_token = await jwt.create_access_token(str(sys_user.id), sys_user.is_multi_login)
+            refresh_token = await jwt.create_refresh_token(str(sys_user.id), multi_login=sys_user.is_multi_login)
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
             login_log = dict(
@@ -72,11 +69,15 @@ class OAuth2Service:
             )
             background_tasks.add_task(LoginLogService.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+            response.set_cookie(
+                settings.COOKIE_REFRESH_TOKEN_KEY,
+                refresh_token.refresh_token,
+                settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                refresh_token.refresh_token_expire_time,
+            )
             data = GetLoginToken(
-                access_token=access_token,
-                refresh_token=refresh_token,
-                access_token_expire_time=access_token_expire_time,
-                refresh_token_expire_time=refresh_token_expire_time,
+                access_token=access_token.access_token,
+                access_token_expire_time=access_token.access_token_expire_time,
                 user=sys_user,  # type: ignore
             )
             return data

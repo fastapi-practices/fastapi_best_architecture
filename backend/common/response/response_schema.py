@@ -57,7 +57,7 @@ class ResponseBase:
 
         @router.get('/test')
         def test() -> ResponseModel:
-            return await response_base.success(data={'test': 'test'})
+            return response_base.success(data={'test': 'test'})
     """
 
     @staticmethod
