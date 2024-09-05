@@ -51,7 +51,7 @@ class ServerInfo:
     @staticmethod
     def get_cpu_info() -> dict:
         """获取 CPU 信息"""
-        cpu_info = {'usage': round(psutil.cpu_percent(interval=1, percpu=False), 2)}  # %
+        cpu_info = {'usage': round(psutil.cpu_percent(percpu=False), 2)}  # %
 
         # 检查是否是 Apple M系列芯片
         if platform.system() == 'Darwin' and 'arm' in platform.machine().lower():
@@ -101,7 +101,12 @@ class ServerInfo:
                 ip = sk.getsockname()[0]
         except socket.gaierror:
             ip = '127.0.0.1'
-        return {'name': socket.gethostname(), 'ip': ip, 'os': platform.system(), 'arch': platform.machine()}
+        return {
+            'name': socket.gethostname(),
+            'ip': ip,
+            'os': platform.system(),
+            'arch': platform.machine(),
+        }
 
     @staticmethod
     def get_disk_info() -> List[dict]:
