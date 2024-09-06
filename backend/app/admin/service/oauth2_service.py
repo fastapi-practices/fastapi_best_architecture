@@ -73,7 +73,7 @@ class OAuth2Service:
                 settings.COOKIE_REFRESH_TOKEN_KEY,
                 refresh_token.refresh_token,
                 settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                refresh_token.refresh_token_expire_time,
+                timezone.f_utc(refresh_token.refresh_token_expire_time),
             )
             data = GetLoginToken(
                 access_token=access_token.access_token,

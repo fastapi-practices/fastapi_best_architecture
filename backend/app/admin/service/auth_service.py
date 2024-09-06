@@ -102,7 +102,7 @@ class AuthService:
                     settings.COOKIE_REFRESH_TOKEN_KEY,
                     refresh_token.refresh_token,
                     settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    refresh_token.refresh_token_expire_time,
+                    timezone.f_utc(refresh_token.refresh_token_expire_time),
                 )
                 await db.refresh(current_user)
                 data = GetLoginToken(
@@ -140,7 +140,7 @@ class AuthService:
                 settings.COOKIE_REFRESH_TOKEN_KEY,
                 new_token.new_refresh_token,
                 settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                new_token.new_refresh_token_expire_time,
+                timezone.f_utc(new_token.new_refresh_token_expire_time),
             )
             data = GetNewToken(
                 access_token=new_token.new_access_token,
