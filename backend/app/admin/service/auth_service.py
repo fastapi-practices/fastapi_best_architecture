@@ -99,10 +99,11 @@ class AuthService:
                 await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 await user_dao.update_login_time(db, obj.username)
                 response.set_cookie(
-                    settings.COOKIE_REFRESH_TOKEN_KEY,
-                    refresh_token.refresh_token,
-                    settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    timezone.f_utc(refresh_token.refresh_token_expire_time),
+                    key=settings.COOKIE_REFRESH_TOKEN_KEY,
+                    value=refresh_token.refresh_token,
+                    max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                    expires=timezone.f_utc(refresh_token.refresh_token_expire_time),
+                    httponly=True,
                 )
                 await db.refresh(current_user)
                 data = GetLoginToken(
@@ -137,10 +138,11 @@ class AuthService:
                 multi_login=current_user.is_multi_login,
             )
             response.set_cookie(
-                settings.COOKIE_REFRESH_TOKEN_KEY,
-                new_token.new_refresh_token,
-                settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                timezone.f_utc(new_token.new_refresh_token_expire_time),
+                key=settings.COOKIE_REFRESH_TOKEN_KEY,
+                value=new_token.new_refresh_token,
+                max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                expires=timezone.f_utc(new_token.new_refresh_token_expire_time),
+                httponly=True,
             )
             data = GetNewToken(
                 access_token=new_token.new_access_token,

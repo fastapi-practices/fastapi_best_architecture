@@ -112,9 +112,9 @@ def register_middleware(app: FastAPI):
     :param app:
     :return:
     """
-    # Opera log
+    # Opera log (required)
     app.add_middleware(OperaLogMiddleware)
-    # JWT auth, required
+    # JWT auth (required)
     app.add_middleware(
         AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
     )
@@ -129,7 +129,7 @@ def register_middleware(app: FastAPI):
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=['*'],
+            allow_origins=settings.CORS_ALLOWED_ORIGINS,
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*'],

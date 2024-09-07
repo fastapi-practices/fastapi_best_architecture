@@ -70,10 +70,11 @@ class OAuth2Service:
             background_tasks.add_task(LoginLogService.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             response.set_cookie(
-                settings.COOKIE_REFRESH_TOKEN_KEY,
-                refresh_token.refresh_token,
-                settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                timezone.f_utc(refresh_token.refresh_token_expire_time),
+                key=settings.COOKIE_REFRESH_TOKEN_KEY,
+                value=refresh_token.refresh_token,
+                max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                expires=timezone.f_utc(refresh_token.refresh_token_expire_time),
+                httponly=True,
             )
             data = GetLoginToken(
                 access_token=access_token.access_token,

@@ -109,6 +109,11 @@ class Settings(BaseSettings):
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_ACCESS: bool = True
 
+    # CORS
+    CORS_ALLOWED_ORIGINS: list[str] = [
+        'http://localhost:5173/',  # 前端地址
+    ]
+
     # RBAC Permission
     PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
     PERMISSION_REDIS_PREFIX: str = 'fba:permission'
