@@ -25,7 +25,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         # 排除记录白名单
         path = request.url.path
-        if path in settings.OPERA_LOG_EXCLUDE or not path.startswith(f'{settings.API_V1_STR}'):
+        if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
             return await call_next(request)
 
         # 请求解析
@@ -165,23 +165,23 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         if not args:
             args = None
         else:
-            match settings.OPERA_LOG_ENCRYPT:
+            match settings.OPERA_LOG_ENCRYPT_TYPE:
                 case OperaLogCipherType.aes:
                     for key in args.keys():
-                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                        if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
                             args[key] = (AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(args[key])).hex()
                 case OperaLogCipherType.md5:
                     for key in args.keys():
-                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                        if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
                             args[key] = Md5Cipher.encrypt(args[key])
                 case OperaLogCipherType.itsdangerous:
                     for key in args.keys():
-                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                        if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
                             args[key] = ItsDCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(args[key])
                 case OperaLogCipherType.plan:
                     pass
                 case _:
                     for key in args.keys():
-                        if key in settings.OPERA_LOG_ENCRYPT_INCLUDE:
+                        if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
                             args[key] = '******'
         return args

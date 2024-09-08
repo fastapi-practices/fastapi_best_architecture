@@ -54,6 +54,7 @@ class TaskSettings(BaseSettings):
     }
 
     @model_validator(mode='before')
+    @classmethod
     def validate_celery_broker(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['CELERY_BROKER'] = 'rabbitmq'
