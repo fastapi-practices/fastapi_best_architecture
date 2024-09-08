@@ -1,7 +1,11 @@
 [project]
 name = "fastapi_best_architecture"
 version = "0.0.1"
-description = "基于 FastAPI 构建的前后端分离 RBAC 权限控制系统，采用独特的伪三层架构模型设计，内置 fastapi-admin 基本实现"
+description = """
+FastAPI based on the construction of the front and back end separation of RBAC privilege control system,
+using a unique pseudo three-tier architecture model design, built-in fastapi-admin basic implementation,
+and as a template library free open source.
+"""
 authors = [
     { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
