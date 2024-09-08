@@ -100,8 +100,19 @@ class Settings(BaseSettings):
     USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
 
     # Log
-    LOG_LEVEL: str = 'INFO'
-    LOG_FORMAT: str = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <lvl>{message}</>'
+    LOG_ROOT_LEVEL: str = 'NOTSET'
+    LOG_STD_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
+        '<cyan> {correlation_id} </> | <lvl>{message}</>'
+    )
+    LOG_LOGURU_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
+        '<cyan> {correlation_id} </> | <lvl>{message}</>'
+    )
+    LOG_CID_DEFAULT_VALUE: str = '-'
+    LOG_CID_UUID_LENGTH: int = 32  # must <= 32
+    LOG_STDOUT_LEVEL: str = 'INFO'
+    LOG_STDERR_LEVEL: str = 'ERROR'
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'
 
@@ -109,9 +120,15 @@ class Settings(BaseSettings):
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_ACCESS: bool = True
 
+    # Trace ID
+    TRACE_ID_REQUEST_HEADER_KEY: str = 'X-Request-ID'
+
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [
-        'http://localhost:5173/',  # 前端地址
+        'http://localhost:5173',  # 前端地址，末尾不要带 '/'
+    ]
+    CORS_EXPOSE_HEADERS: list[str] = [
+        TRACE_ID_REQUEST_HEADER_KEY,
     ]
 
     # RBAC Permission
@@ -137,7 +154,8 @@ class Settings(BaseSettings):
         REDOCS_URL,
         OPENAPI_URL,
         f'{API_V1_STR}/auth/login/swagger',
-        f'{API_V1_STR}/auth/github/callback',
+        f'{API_V1_STR}/oauth2/github/callback',
+        f'{API_V1_STR}/oauth2/linux-do/callback',
     ]
     OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
     OPERA_LOG_ENCRYPT_INCLUDE: list[str] = [

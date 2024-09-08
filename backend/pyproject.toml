@@ -45,6 +45,7 @@ dependencies = [
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool==0.1.0rc6",
+    "asgi-correlation-id>=4.3.3",
 ]
 requires-python = ">=3.10,<3.13"
 readme = "README.md"
