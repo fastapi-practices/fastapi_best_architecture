@@ -53,7 +53,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         # 执行请求
         start_time = timezone.now()
-        res = await self.execute_request(request, call_next)
+        request_next = await self.execute_request(request, call_next)
         end_time = timezone.now()
         cost_time = (end_time - start_time).total_seconds() * 1000.0
 
@@ -77,20 +77,20 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             browser=request.state.browser,
             device=request.state.device,
             args=args,
-            status=res.status,
-            code=res.code,
-            msg=res.msg,
+            status=request_next.status,
+            code=request_next.code,
+            msg=request_next.msg,
             cost_time=cost_time,
             opera_time=start_time,
         )
         create_task(OperaLogService.create(obj_in=opera_log_in))  # noqa: ignore
 
         # 错误抛出
-        err = res.err
+        err = request_next.err
         if err:
             raise err from None
 
-        return res.response
+        return request_next.response
 
     async def execute_request(self, request: Request, call_next) -> RequestCallNext:
         """执行请求"""
@@ -101,7 +101,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         response = None
         try:
             response = await call_next(request)
-            code, msg = self.validation_exception_handler(request, code, msg)
+            code, msg = self.request_exception_handler(request, code, msg)
         except Exception as e:
             log.error(f'请求异常: {e}')
             # code 处理包含 SQLAlchemy 和 Pydantic
@@ -113,22 +113,24 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         return RequestCallNext(code=str(code), msg=msg, status=status, err=err, response=response)
 
     @staticmethod
-    def validation_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
+    def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
         """请求异常处理器"""
-        try:
-            http_exception = request.state.__request_http_exception__
-        except AttributeError:
-            pass
-        else:
-            code = http_exception.get('code', 500)
-            msg = http_exception.get('msg', 'Internal Server Error')
-        try:
-            validation_exception = request.state.__request_validation_exception__
-        except AttributeError:
-            pass
-        else:
-            code = validation_exception.get('code', 400)
-            msg = validation_exception.get('msg', 'Bad Request')
+        exception_states = [
+            '__request_http_exception__',
+            '__request_validation_exception__',
+            '__request_pydantic_user_error__',
+            '__request_assertion_error__',
+            '__request_custom_exception__',
+            '__request_all_unknown_exception__',
+            '__request_cors_500_exception__',
+        ]
+        for state in exception_states:
+            exception = getattr(request.state, state, None)
+            if exception:
+                code = exception.get('code')
+                msg = exception.get('msg')
+                break
+        log.error(f'请求异常: {msg}')
         return code, msg
 
     @staticmethod
