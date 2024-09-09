@@ -4,7 +4,7 @@
 全局业务异常类
 
 业务代码执行异常时，可以使用 raise xxxError 触发内部错误，它尽可能实现带有后台任务的异常，但它不适用于**自定义响应状态码**
-如果要求使用**自定义响应状态码**，则可以通过 return await response_base.fail(res=CustomResponseCode.xxx) 直接返回
+如果要求使用**自定义响应状态码**，则可以通过 return response_base.fail(res=CustomResponseCode.xxx) 直接返回
 """  # noqa: E501
 
 from typing import Any

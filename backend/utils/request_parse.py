@@ -14,7 +14,6 @@ from backend.core.path_conf import IP2REGION_XDB
 from backend.database.db_redis import redis_client
 
 
-@sync_to_async
 def get_request_ip(request: Request) -> str:
     """获取请求的 ip 地址"""
     real = request.headers.get('X-Real-IP')
@@ -78,7 +77,7 @@ def get_location_offline(ip: str) -> dict | None:
 
 async def parse_ip_info(request: Request) -> IpInfo:
     country, region, city = None, None, None
-    ip = await get_request_ip(request)
+    ip = get_request_ip(request)
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
         country, region, city = location.split(' ')
