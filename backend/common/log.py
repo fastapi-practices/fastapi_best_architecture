@@ -72,13 +72,13 @@ def setup_logging():
             {
                 'sink': stdout,
                 'level': settings.LOG_STDOUT_LEVEL,
-                'filter': correlation_id_filter,
+                'filter': lambda record: record['level'].no <= 25 and correlation_id_filter(record),
                 'format': settings.LOG_STD_FORMAT,
             },
             {
                 'sink': stderr,
                 'level': settings.LOG_STDERR_LEVEL,
-                'filter': correlation_id_filter,
+                'filter': lambda record: record['level'].no >= 30 and correlation_id_filter(record),
                 'format': settings.LOG_STD_FORMAT,
             },
         ]
