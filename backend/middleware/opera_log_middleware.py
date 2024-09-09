@@ -17,6 +17,7 @@ from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 from backend.utils.timezone import timezone
+from backend.utils.trace_id import get_request_trace_id
 
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
@@ -62,7 +63,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         # 日志创建
         opera_log_in = CreateOperaLogParam(
-            trace_id=request.headers.get(settings.TRACE_ID_REQUEST_HEADER_KEY) or '-',
+            trace_id=get_request_trace_id(request),
             username=username,
             method=method,
             title=summary,
@@ -100,9 +101,9 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         response = None
         try:
             response = await call_next(request)
+            code, msg = self.validation_exception_handler(request, code, msg)
         except Exception as e:
             log.exception(e)
-            code, msg = await self.request_exception_handler(request, code, msg)
             # code 处理包含 SQLAlchemy 和 Pydantic
             code = getattr(e, 'code', None) or code
             msg = getattr(e, 'msg', None) or msg
@@ -112,8 +113,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         return RequestCallNext(code=str(code), msg=msg, status=status, err=err, response=response)
 
     @staticmethod
-    @sync_to_async
-    def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
+    def validation_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
         """请求异常处理器"""
         try:
             http_exception = request.state.__request_http_exception__
