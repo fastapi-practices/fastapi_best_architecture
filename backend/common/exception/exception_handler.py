@@ -249,6 +249,7 @@ def register_exception(app: FastAPI):
                     allow_credentials=True,
                     allow_methods=['*'],
                     allow_headers=['*'],
+                    expose_headers=settings.CORS_EXPOSE_HEADERS,
                 )
                 response.headers.update(cors.simple_headers)
                 has_cookie = 'cookie' in request.headers

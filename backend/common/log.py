@@ -6,6 +6,7 @@ import os
 
 from sys import stderr, stdout
 
+from asgi_correlation_id import correlation_id
 from loguru import logger
 
 from backend.core import path_conf
@@ -41,7 +42,7 @@ def setup_logging():
     """
     # Intercept everything at the root logger
     logging.root.handlers = [InterceptHandler()]
-    logging.root.setLevel(settings.LOG_LEVEL)
+    logging.root.setLevel(settings.LOG_ROOT_LEVEL)
 
     # Remove all log handlers and propagate to root logger
     for name in logging.root.manager.loggerDict.keys():
@@ -51,14 +52,37 @@ def setup_logging():
         else:
             logging.getLogger(name).propagate = True
 
-        logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
+        # Debug log handlers
+        # logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
 
     # Remove every other logger's handlers
     logger.remove()
 
-    # Configure logger before starts logging
-    logger.configure(handlers=[{'sink': stdout, 'level': settings.LOG_LEVEL, 'format': settings.LOG_FORMAT}])
-    logger.configure(handlers=[{'sink': stderr, 'level': settings.LOG_LEVEL, 'format': settings.LOG_FORMAT}])
+    # Define the correlation_id filter function
+    # https://github.com/snok/asgi-correlation-id?tab=readme-ov-file#configure-logging
+    # https://github.com/snok/asgi-correlation-id/issues/7
+    def correlation_id_filter(record) -> bool:
+        cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
+        record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
+        return True
+
+    # Configure loguru logger before starts logging
+    logger.configure(
+        handlers=[
+            {
+                'sink': stdout,
+                'level': settings.LOG_STDOUT_LEVEL,
+                'filter': correlation_id_filter,
+                'format': settings.LOG_STD_FORMAT,
+            },
+            {
+                'sink': stderr,
+                'level': settings.LOG_STDERR_LEVEL,
+                'filter': correlation_id_filter,
+                'format': settings.LOG_STD_FORMAT,
+            },
+        ]
+    )
 
 
 def set_customize_logfile():
@@ -76,24 +100,22 @@ def set_customize_logfile():
         'retention': '15 days',
         'compression': 'tar.gz',
         'enqueue': True,
-        'format': settings.LOG_FORMAT,
+        'format': settings.LOG_LOGURU_FORMAT,
     }
 
-    # stdout
+    # stdout file
     logger.add(
-        log_stdout_file,
-        level='INFO',
-        filter=lambda record: record['level'].name == 'INFO' or record['level'].no <= 25,
+        str(log_stdout_file),
+        level=settings.LOG_STDOUT_LEVEL,
         **log_config,
         backtrace=False,
         diagnose=False,
     )
 
-    # stderr
+    # stderr file
     logger.add(
-        log_stderr_file,
-        level='ERROR',
-        filter=lambda record: record['level'].name == 'ERROR' or record['level'].no >= 30,
+        str(log_stderr_file),
+        level=settings.LOG_STDERR_LEVEL,
         **log_config,
         backtrace=True,
         diagnose=True,
