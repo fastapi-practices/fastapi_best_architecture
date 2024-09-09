@@ -16,7 +16,7 @@ class GeneratorSettings(BaseSettings):
     TEMPLATE_BACKEND_DIR_NAME: str = 'py'
 
     # 代码下载
-    ZIP_FILENAME: str = 'fba_generator'
+    DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'
 
 
 @lru_cache

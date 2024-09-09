@@ -36,13 +36,14 @@ class Settings(BaseSettings):
     OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
 
     # FastAPI
-    API_V1_STR: str = '/api/v1'
-    TITLE: str = 'FastAPI'
-    VERSION: str = '0.0.1'
-    DESCRIPTION: str = 'FastAPI Best Architecture'
-    DOCS_URL: str | None = f'{API_V1_STR}/docs'
-    REDOCS_URL: str | None = f'{API_V1_STR}/redocs'
-    OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
+    FASTAPI_API_V1_PATH: str = '/api/v1'
+    FASTAPI_TITLE: str = 'FastAPI'
+    FASTAPI_VERSION: str = '0.0.1'
+    FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
+    FASTAPI_DOCS_URL: str | None = f'{FASTAPI_API_V1_PATH}/docs'
+    FASTAPI_REDOCS_URL: str | None = f'{FASTAPI_API_V1_PATH}/redocs'
+    FASTAPI_OPENAPI_URL: str | None = f'{FASTAPI_API_V1_PATH}/openapi'
+    FASTAPI_STATIC_FILES: bool = False
 
     @model_validator(mode='before')
     @classmethod
@@ -50,28 +51,6 @@ class Settings(BaseSettings):
         if values['ENVIRONMENT'] == 'pro':
             values['OPENAPI_URL'] = None
         return values
-
-    # Demo mode
-    # Only GET, OPTIONS requests are allowed
-    DEMO_MODE: bool = False
-    DEMO_MODE_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', f'{API_V1_STR}/auth/login'),
-        ('POST', f'{API_V1_STR}/auth/logout'),
-        ('GET', f'{API_V1_STR}/auth/captcha'),
-    }
-
-    # Static Server
-    STATIC_FILES: bool = False
-
-    # Location Parse
-    LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
-
-    # Limiter
-    LIMITER_REDIS_PREFIX: str = 'fba:limiter'
-
-    # DateTime
-    DATETIME_TIMEZONE: str = 'Asia/Shanghai'
-    DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
 
     # MySQL
     MYSQL_ECHO: bool = False
@@ -87,17 +66,34 @@ class Settings(BaseSettings):
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # refresh token 过期时间，单位：秒
     TOKEN_REDIS_PREFIX: str = 'fba:token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
-    TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
-        f'{API_V1_STR}/auth/login',
+    TOKEN_REQUEST_PATH_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
+        f'{FASTAPI_API_V1_PATH}/auth/login',
+    ]
+
+    # JWT
+    JWT_USER_REDIS_PREFIX: str = 'fba:user'
+    JWT_USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
+
+    # Permission (RBAC)
+    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
+    PERMISSION_REDIS_PREFIX: str = 'fba:permission'
+
+    # RBAC
+    # Casbin
+    RBAC_CASBIN_EXCLUDE: set[tuple[str, str]] = {
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/token/new'),
+    }
+
+    # Role-Menu
+    RBAC_ROLE_MENU_EXCLUDE: list[str] = [
+        'sys:monitor:redis',
+        'sys:monitor:server',
     ]
 
     # Cookies
     COOKIE_REFRESH_TOKEN_KEY: str = 'fba_refresh_token'
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = TOKEN_REFRESH_EXPIRE_SECONDS
-
-    # Sys User
-    USER_REDIS_PREFIX: str = 'fba:user'
-    USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
 
     # Log
     LOG_ROOT_LEVEL: str = 'NOTSET'
@@ -131,43 +127,43 @@ class Settings(BaseSettings):
         TRACE_ID_REQUEST_HEADER_KEY,
     ]
 
-    # RBAC Permission
-    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
-    PERMISSION_REDIS_PREFIX: str = 'fba:permission'
+    # DateTime
+    DATETIME_TIMEZONE: str = 'Asia/Shanghai'
+    DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
 
-    # Casbin Auth
-    CASBIN_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', f'{API_V1_STR}/auth/logout'),
-        ('POST', f'{API_V1_STR}/auth/token/new'),
+    # Request limiter
+    REQUEST_LIMITER_REDIS_PREFIX: str = 'fba:limiter'
+
+    # Demo mode (Only GET, OPTIONS requests are allowed)
+    DEMO_MODE: bool = False
+    DEMO_MODE_EXCLUDE: set[tuple[str, str]] = {
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/login'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
+        ('GET', f'{FASTAPI_API_V1_PATH}/auth/captcha'),
     }
 
-    # Role Menu Auth
-    ROLE_MENU_EXCLUDE: list[str] = [
-        'sys:monitor:redis',
-        'sys:monitor:server',
-    ]
+    # Ip location
+    IP_LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
+    IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
+    IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
 
     # Opera log
-    OPERA_LOG_EXCLUDE: list[str] = [
+    OPERA_LOG_PATH_EXCLUDE: list[str] = [
         '/favicon.ico',
-        DOCS_URL,
-        REDOCS_URL,
-        OPENAPI_URL,
-        f'{API_V1_STR}/auth/login/swagger',
-        f'{API_V1_STR}/oauth2/github/callback',
-        f'{API_V1_STR}/oauth2/linux-do/callback',
+        FASTAPI_DOCS_URL,
+        FASTAPI_REDOCS_URL,
+        FASTAPI_OPENAPI_URL,
+        f'{FASTAPI_API_V1_PATH}/auth/login/swagger',
+        f'{FASTAPI_API_V1_PATH}/oauth2/github/callback',
+        f'{FASTAPI_API_V1_PATH}/oauth2/linux-do/callback',
     ]
-    OPERA_LOG_ENCRYPT: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
-    OPERA_LOG_ENCRYPT_INCLUDE: list[str] = [
+    OPERA_LOG_ENCRYPT_TYPE: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
+    OPERA_LOG_ENCRYPT_KEY_INCLUDE: list[str] = [  # 将加密接口入参参数对应的值
         'password',
         'old_password',
         'new_password',
         'confirm_password',
     ]
-
-    # Ip location
-    IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
-    IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
 
 
 @lru_cache

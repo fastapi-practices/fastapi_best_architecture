@@ -74,7 +74,7 @@ class RoleService:
             count = await role_dao.update_menus(db, pk, menu_ids)
             if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod
