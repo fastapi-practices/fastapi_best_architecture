@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
 
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
@@ -125,6 +126,8 @@ def register_middleware(app: FastAPI):
         from backend.middleware.access_middleware import AccessMiddleware
 
         app.add_middleware(AccessMiddleware)
+    # Trace ID (required)
+    app.add_middleware(CorrelationIdMiddleware, validator=False)
     # CORS: Always at the end
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
@@ -135,6 +138,7 @@ def register_middleware(app: FastAPI):
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*'],
+            expose_headers=settings.CORS_EXPOSE_HEADERS,
         )
 
 

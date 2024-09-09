@@ -9,6 +9,7 @@ from backend.common.schema import SchemaBase
 
 
 class OperaLogSchemaBase(SchemaBase):
+    trace_id: str
     username: str | None = None
     method: str
     title: str

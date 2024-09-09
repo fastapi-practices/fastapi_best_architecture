@@ -95,13 +95,36 @@ class Settings(BaseSettings):
     COOKIE_REFRESH_TOKEN_KEY: str = 'fba_refresh_token'
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = TOKEN_REFRESH_EXPIRE_SECONDS
 
+    # Log
+    LOG_ROOT_LEVEL: str = 'NOTSET'
+    LOG_STD_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
+        '<cyan> {correlation_id} </> | <lvl>{message}</>'
+    )
+    LOG_LOGURU_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
+        '<cyan> {correlation_id} </> | <lvl>{message}</>'
+    )
+    LOG_CID_DEFAULT_VALUE: str = '-'
+    LOG_CID_UUID_LENGTH: int = 32  # must <= 32
+    LOG_STDOUT_LEVEL: str = 'INFO'
+    LOG_STDERR_LEVEL: str = 'ERROR'
+    LOG_STDOUT_FILENAME: str = 'fba_access.log'
+    LOG_STDERR_FILENAME: str = 'fba_error.log'
+
     # Middleware
     MIDDLEWARE_CORS: bool = True
     MIDDLEWARE_ACCESS: bool = True
 
+    # Trace ID
+    TRACE_ID_REQUEST_HEADER_KEY: str = 'X-Request-ID'
+
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [
-        'http://localhost:5173/',  # 前端地址
+        'http://localhost:5173',  # 前端地址，末尾不要带 '/'
+    ]
+    CORS_EXPOSE_HEADERS: list[str] = [
+        TRACE_ID_REQUEST_HEADER_KEY,
     ]
 
     # DateTime
@@ -123,12 +146,6 @@ class Settings(BaseSettings):
     IP_LOCATION_PARSE: Literal['online', 'offline', 'false'] = 'offline'
     IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
-
-    # Log
-    LOG_LEVEL: str = 'INFO'
-    LOG_FORMAT: str = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <lvl>{message}</>'
-    LOG_STDOUT_FILENAME: str = 'fba_access.log'
-    LOG_STDERR_FILENAME: str = 'fba_error.log'
 
     # Opera log
     OPERA_LOG_PATH_EXCLUDE: list[str] = [

@@ -62,6 +62,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         # 日志创建
         opera_log_in = CreateOperaLogParam(
+            trace_id=request.headers.get(settings.TRACE_ID_REQUEST_HEADER_KEY) or '-',
             username=username,
             method=method,
             title=summary,
