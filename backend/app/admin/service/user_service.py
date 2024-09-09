@@ -82,7 +82,7 @@ class UserService:
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}',
-                f'{settings.USER_REDIS_PREFIX}:{request.user.id}',
+                f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}',
             ]
             for key in key_prefix:
                 await redis_client.delete_prefix(key)
@@ -118,7 +118,7 @@ class UserService:
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
             count = await user_dao.update_userinfo(db, input_user.id, obj)
-            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod
@@ -136,7 +136,7 @@ class UserService:
                     raise errors.NotFoundError(msg='角色不存在')
             await user_dao.update_role(db, input_user, obj)
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
-            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
@@ -148,7 +148,7 @@ class UserService:
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.update_avatar(db, input_user.id, avatar)
-            await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
     @staticmethod
@@ -166,7 +166,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 super_status = await user_dao.get_super(db, pk)
                 count = await user_dao.set_super(db, pk, False if super_status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
@@ -180,7 +180,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 staff_status = await user_dao.get_staff(db, pk)
                 count = await user_dao.set_staff(db, pk, False if staff_status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
@@ -194,7 +194,7 @@ class UserService:
                     raise errors.ForbiddenError(msg='非法操作')
                 status = await user_dao.get_status(db, pk)
                 count = await user_dao.set_status(db, pk, False if status else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{pk}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
                 return count
 
     @staticmethod
@@ -207,7 +207,7 @@ class UserService:
                 user_id = request.user.id
                 multi_login = await user_dao.get_multi_login(db, pk) if pk != user_id else request.user.is_multi_login
                 count = await user_dao.set_multi_login(db, pk, False if multi_login else True)
-                await redis_client.delete(f'{settings.USER_REDIS_PREFIX}:{request.user.id}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
                 token = await get_token(request)
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
                 # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现

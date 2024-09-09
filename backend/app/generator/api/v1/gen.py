@@ -194,5 +194,5 @@ async def download_code(pk: Annotated[int, Path(..., description='业务ID')]):
     return StreamingResponse(
         bio,
         media_type='application/x-zip-compressed',
-        headers={'Content-Disposition': f'attachment; filename={generator_settings.ZIP_FILENAME}.zip'},
+        headers={'Content-Disposition': f'attachment; filename={generator_settings.DOWNLOAD_ZIP_FILENAME}.zip'},
     )

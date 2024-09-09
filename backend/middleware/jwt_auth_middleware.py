@@ -40,7 +40,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
         if not token:
             return
 
-        if request.url.path in settings.TOKEN_EXCLUDE:
+        if request.url.path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
             return
 
         scheme, token = get_authorization_scheme_param(token)
@@ -49,14 +49,14 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
         try:
             sub = await jwt.jwt_authentication(token)
-            cache_user = await redis_client.get(f'{settings.USER_REDIS_PREFIX}:{sub}')
+            cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{sub}')
             if not cache_user:
                 async with async_db_session() as db:
                     current_user = await jwt.get_current_user(db, sub)
                     user = CurrentUserIns(**select_as_dict(current_user))
                     await redis_client.setex(
-                        f'{settings.USER_REDIS_PREFIX}:{sub}',
-                        settings.USER_REDIS_EXPIRE_SECONDS,
+                        f'{settings.JWT_USER_REDIS_PREFIX}:{sub}',
+                        settings.JWT_USER_REDIS_EXPIRE_SECONDS,
                         user.model_dump_json(),
                     )
             else:

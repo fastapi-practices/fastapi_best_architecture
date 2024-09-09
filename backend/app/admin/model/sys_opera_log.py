@@ -16,6 +16,7 @@ class OperaLog(DataClassBase):
     __tablename__ = 'sys_opera_log'
 
     id: Mapped[id_key] = mapped_column(init=False)
+    trace_id: Mapped[str] = mapped_column(String(32), comment='请求跟踪 ID')
     username: Mapped[str | None] = mapped_column(String(20), comment='用户名')
     method: Mapped[str] = mapped_column(String(20), comment='请求类型')
     title: Mapped[str] = mapped_column(String(255), comment='操作模块')
@@ -32,6 +33,6 @@ class OperaLog(DataClassBase):
     status: Mapped[int] = mapped_column(comment='操作状态（0异常 1正常）')
     code: Mapped[str] = mapped_column(String(20), insert_default='200', comment='操作状态码')
     msg: Mapped[str | None] = mapped_column(LONGTEXT, comment='提示消息')
-    cost_time: Mapped[float] = mapped_column(insert_default=0.0, comment='请求耗时ms')
+    cost_time: Mapped[float] = mapped_column(insert_default=0.0, comment='请求耗时（ms）')
     opera_time: Mapped[datetime] = mapped_column(comment='操作时间')
     created_time: Mapped[datetime] = mapped_column(init=False, default_factory=timezone.now, comment='创建时间')

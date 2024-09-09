@@ -209,11 +209,12 @@ def register_exception(app: FastAPI):
     if settings.MIDDLEWARE_CORS:
 
         @app.exception_handler(StandardResponseCode.HTTP_500)
-        async def cors_status_code_500_exception_handler(request, exc):
+        async def cors_custom_code_500_exception_handler(request, exc):
             """
-            跨域 500 异常处理
+            跨域自定义 500 异常处理
 
             `Related issue <https://github.com/encode/starlette/issues/1175>`_
+            `Solution <https://github.com/fastapi/fastapi/discussions/7847#discussioncomment-5144709>`_
 
             :param request:
             :param exc:
@@ -244,10 +245,11 @@ def register_exception(app: FastAPI):
             if origin:
                 cors = CORSMiddleware(
                     app=app,
-                    allow_origins=['*'],
+                    allow_origins=settings.CORS_ALLOWED_ORIGINS,
                     allow_credentials=True,
                     allow_methods=['*'],
                     allow_headers=['*'],
+                    expose_headers=settings.CORS_EXPOSE_HEADERS,
                 )
                 response.headers.update(cors.simple_headers)
                 has_cookie = 'cookie' in request.headers

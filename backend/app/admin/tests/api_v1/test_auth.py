@@ -6,6 +6,6 @@ from backend.core.conf import settings
 
 
 def test_logout(client: TestClient, token_headers: dict[str, str]) -> None:
-    response = client.post(f'{settings.API_V1_STR}/auth/logout', headers=token_headers)
+    response = client.post(f'{settings.FASTAPI_API_V1_PATH}/auth/logout', headers=token_headers)
     assert response.status_code == 200
     assert response.json()['code'] == 200

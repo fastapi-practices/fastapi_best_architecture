@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
 
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
@@ -34,7 +35,9 @@ async def register_init(app: FastAPI):
     # 连接 redis
     await redis_client.open()
     # 初始化 limiter
-    await FastAPILimiter.init(redis_client, prefix=settings.LIMITER_REDIS_PREFIX, http_callback=http_limit_callback)
+    await FastAPILimiter.init(
+        redis=redis_client, prefix=settings.REQUEST_LIMITER_REDIS_PREFIX, http_callback=http_limit_callback
+    )
 
     yield
 
@@ -47,12 +50,12 @@ async def register_init(app: FastAPI):
 def register_app():
     # FastAPI
     app = FastAPI(
-        title=settings.TITLE,
-        version=settings.VERSION,
-        description=settings.DESCRIPTION,
-        docs_url=settings.DOCS_URL,
-        redoc_url=settings.REDOCS_URL,
-        openapi_url=settings.OPENAPI_URL,
+        title=settings.FASTAPI_TITLE,
+        version=settings.FASTAPI_VERSION,
+        description=settings.FASTAPI_DESCRIPTION,
+        docs_url=settings.FASTAPI_DOCS_URL,
+        redoc_url=settings.FASTAPI_REDOCS_URL,
+        openapi_url=settings.FASTAPI_OPENAPI_URL,
         default_response_class=MsgSpecJSONResponse,
         lifespan=register_init,
     )
@@ -95,7 +98,7 @@ def register_static_file(app: FastAPI):
     :param app:
     :return:
     """
-    if settings.STATIC_FILES:
+    if settings.FASTAPI_STATIC_FILES:
         import os
 
         from fastapi.staticfiles import StaticFiles
@@ -112,9 +115,9 @@ def register_middleware(app: FastAPI):
     :param app:
     :return:
     """
-    # Opera log
+    # Opera log (required)
     app.add_middleware(OperaLogMiddleware)
-    # JWT auth, required
+    # JWT auth (required)
     app.add_middleware(
         AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
     )
@@ -123,16 +126,19 @@ def register_middleware(app: FastAPI):
         from backend.middleware.access_middleware import AccessMiddleware
 
         app.add_middleware(AccessMiddleware)
+    # Trace ID (required)
+    app.add_middleware(CorrelationIdMiddleware, validator=False)
     # CORS: Always at the end
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=['*'],
+            allow_origins=settings.CORS_ALLOWED_ORIGINS,
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*'],
+            expose_headers=settings.CORS_EXPOSE_HEADERS,
         )
 
 

@@ -1,7 +1,11 @@
 [project]
 name = "fastapi_best_architecture"
 version = "0.0.1"
-description = "基于 FastAPI 构建的前后端分离 RBAC 权限控制系统，采用独特的伪三层架构模型设计，内置 fastapi-admin 基本实现"
+description = """
+FastAPI based on the construction of the front and back end separation of RBAC privilege control system,
+using a unique pseudo three-tier architecture model design, built-in fastapi-admin basic implementation,
+and as a template library free open source.
+"""
 authors = [
     { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
@@ -32,7 +36,6 @@ dependencies = [
     "pytest==7.2.2",
     "pytest-pretty==1.2.0",
     "python-jose==3.3.0",
-    "pytz==2023.3",
     "redis[hiredis]==5.0.1",
     "SQLAlchemy==2.0.30",
     "user-agents==2.2.0",
@@ -46,6 +49,7 @@ dependencies = [
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool==0.1.0rc6",
+    "asgi-correlation-id>=4.3.3",
 ]
 requires-python = ">=3.10,<3.13"
 readme = "README.md"

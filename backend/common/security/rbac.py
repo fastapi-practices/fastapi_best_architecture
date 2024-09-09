@@ -54,7 +54,7 @@ class RBAC:
         """
         path = request.url.path
         # 鉴权白名单
-        if path in settings.TOKEN_EXCLUDE:
+        if path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
             return
         # JWT 授权状态强制校验
         if not request.auth.scopes:
@@ -83,7 +83,7 @@ class RBAC:
             # 没有菜单权限标识不校验
             if not path_auth_perm:
                 return
-            if path_auth_perm in set(settings.ROLE_MENU_EXCLUDE):
+            if path_auth_perm in set(settings.RBAC_ROLE_MENU_EXCLUDE):
                 return
             allow_perms = []
             for role in user_roles:
@@ -94,7 +94,7 @@ class RBAC:
                 raise AuthorizationError
         else:
             # casbin 权限校验
-            if (method, path) in settings.CASBIN_EXCLUDE:
+            if (method, path) in settings.RBAC_CASBIN_EXCLUDE:
                 return
             enforcer = await self.enforcer()
             if not enforcer.enforce(user_uuid, path, method):
