@@ -52,8 +52,8 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
         {%- endif -%}
     {%- endif -%}{% if model.sort != 0 %}, sort_order={{ model.sort }}{% endif %}, comment=
     {%- if model.comment != None -%}
-        {{ model.comment }})
-    {%- else -%}
+        '{{ model.comment }}')
+    {% else -%}
         None)
     {%- endif -%}
     {% endfor %}
