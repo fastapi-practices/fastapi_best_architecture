@@ -129,8 +129,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             if exception:
                 code = exception.get('code')
                 msg = exception.get('msg')
+                log.error(f'请求异常: {msg}')
                 break
-        log.error(f'请求异常: {msg}')
         return code, msg
 
     @staticmethod
