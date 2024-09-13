@@ -109,7 +109,7 @@ async def create_new_token(sub: str, token: str, refresh_token: str, multi_login
     new_refresh_token = await create_refresh_token(sub, multi_login)
 
     token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
-    refresh_token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{refresh_token}'
+    refresh_token_key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
     await redis_client.delete(token_key)
     await redis_client.delete(refresh_token_key)
     return NewToken(
