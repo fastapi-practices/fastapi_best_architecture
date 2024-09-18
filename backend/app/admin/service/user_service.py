@@ -210,17 +210,24 @@ class UserService:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
                 token = await get_token(request)
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
-                # TODO: 删除用户 refresh token, 此操作需要传参，暂时不考虑实现
-                # 当前用户修改自身时（普通/超级），除当前token外，其他token失效
+                # 超级用户修改自身时，除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:
                         key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
                         await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token}')
-                # 超级用户修改他人时，他人token将全部失效
+                        refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
+                        if refresh_token:
+                            key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}'
+                            await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{refresh_token}')
+                # 超级用户修改他人时，其他token将全部失效
                 else:
                     if not latest_multi_login:
-                        key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
-                        await redis_client.delete_prefix(key_prefix)
+                        key_prefix = [f'{settings.TOKEN_REDIS_PREFIX}:{pk}']
+                        refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
+                        if refresh_token:
+                            key_prefix.append(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}')
+                        for key in key_prefix:
+                            await redis_client.delete_prefix(key)
                 return count
 
     @staticmethod
