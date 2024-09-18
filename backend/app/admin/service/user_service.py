@@ -45,7 +45,7 @@ class UserService:
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            superuser_verify(request)
             username = await user_dao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='用户已注册')
@@ -158,7 +158,7 @@ class UserService:
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            superuser_verify(request)
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -172,7 +172,7 @@ class UserService:
     @staticmethod
     async def update_staff(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            superuser_verify(request)
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -186,7 +186,7 @@ class UserService:
     @staticmethod
     async def update_status(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            superuser_verify(request)
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -200,7 +200,7 @@ class UserService:
     @staticmethod
     async def update_multi_login(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
-            await superuser_verify(request)
+            superuser_verify(request)
             if not await user_dao.get(db, pk):
                 raise errors.NotFoundError(msg='用户不存在')
             else:
@@ -208,7 +208,7 @@ class UserService:
                 multi_login = await user_dao.get_multi_login(db, pk) if pk != user_id else request.user.is_multi_login
                 count = await user_dao.set_multi_login(db, pk, False if multi_login else True)
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
-                token = await get_token(request)
+                token = get_token(request)
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
                 # 超级用户修改自身时，除当前token外，其他token失效
                 if pk == user_id:

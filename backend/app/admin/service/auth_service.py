@@ -130,7 +130,7 @@ class AuthService:
                 raise errors.NotFoundError(msg='用户名或密码有误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-            current_token = await get_token(request)
+            current_token = get_token(request)
             new_token = await create_new_token(
                 sub=str(current_user.id),
                 token=current_token,
@@ -152,7 +152,7 @@ class AuthService:
 
     @staticmethod
     async def logout(*, request: Request, response: Response) -> None:
-        token = await get_token(request)
+        token = get_token(request)
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
         if request.user.is_multi_login:

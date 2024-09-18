@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 
-from asgiref.sync import sync_to_async
 from fastapi import Depends, Request
 from fastapi.security import HTTPBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -120,7 +119,6 @@ async def create_new_token(sub: str, token: str, refresh_token: str, multi_login
     )
 
 
-@sync_to_async
 def get_token(request: Request) -> str:
     """
     Get token for request header
@@ -195,7 +193,6 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
     return user
 
 
-@sync_to_async
 def superuser_verify(request: Request) -> bool:
     """
     Verify the current user permissions through token
