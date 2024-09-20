@@ -17,6 +17,7 @@ from backend.database.db_mysql import create_table
 from backend.database.db_redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
+from backend.middleware.state_middleware import StateMiddleware
 from backend.utils.demo_site import demo_site
 from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.utils.openapi import simplify_operation_ids
@@ -126,6 +127,8 @@ def register_middleware(app: FastAPI):
         from backend.middleware.access_middleware import AccessMiddleware
 
         app.add_middleware(AccessMiddleware)
+    # State
+    app.add_middleware(StateMiddleware)
     # Trace ID (required)
     app.add_middleware(CorrelationIdMiddleware, validator=False)
     # CORS: Always at the end

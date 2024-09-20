@@ -15,7 +15,6 @@ from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
-from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 from backend.utils.timezone import timezone
 from backend.utils.trace_id import get_request_trace_id
 
@@ -30,8 +29,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # 请求解析
-        ip_info = await parse_ip_info(request)
-        ua_info = await parse_user_agent_info(request)
         try:
             # 此信息依赖于 jwt 中间件
             username = request.user.username
@@ -40,16 +37,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         method = request.method
         args = await self.get_request_args(request)
         args = await self.desensitization(args)
-
-        # 设置附加请求信息
-        request.state.ip = ip_info.ip
-        request.state.country = ip_info.country
-        request.state.region = ip_info.region
-        request.state.city = ip_info.city
-        request.state.user_agent = ua_info.user_agent
-        request.state.os = ua_info.os
-        request.state.browser = ua_info.browser
-        request.state.device = ua_info.device
 
         # 执行请求
         start_time = timezone.now()

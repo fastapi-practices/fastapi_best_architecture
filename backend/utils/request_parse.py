@@ -100,7 +100,6 @@ async def parse_ip_info(request: Request) -> IpInfo:
     return IpInfo(ip=ip, country=country, region=region, city=city)
 
 
-@sync_to_async
 def parse_user_agent_info(request: Request) -> UserAgentInfo:
     user_agent = request.headers.get('User-Agent')
     _user_agent = parse(user_agent)

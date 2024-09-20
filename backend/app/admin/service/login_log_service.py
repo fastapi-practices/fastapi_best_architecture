@@ -29,7 +29,6 @@ class LoginLogService:
         msg: str,
     ) -> None:
         try:
-            # request.state 来自 opera log 中间件定义的扩展参数，详见 opera_log_middleware.py
             obj_in = CreateLoginLogParam(
                 user_uuid=user_uuid,
                 username=username,
