@@ -22,7 +22,12 @@ from backend.utils.timezone import timezone
 class OAuth2Service:
     @staticmethod
     async def create_with_login(
-        *, request: Request, response: Response, background_tasks: BackgroundTasks, user: dict, social: UserSocialType
+        *,
+        request: Request,
+        response: Response,
+        background_tasks: BackgroundTasks,
+        user: dict,
+        social: UserSocialType,
     ) -> GetLoginToken | None:
         async with async_db_session.begin() as db:
             # 获取 OAuth2 平台用户信息
