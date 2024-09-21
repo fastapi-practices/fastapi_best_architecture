@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
+from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptListDetails
 from backend.app.admin.schema.role import GetRoleListDetails
@@ -21,21 +22,21 @@ class AuthLoginParam(AuthSchemaBase):
 
 class RegisterUserParam(AuthSchemaBase):
     nickname: str | None = None
-    email: EmailStr = Field(..., example='user@example.com')
+    email: EmailStr = Field(..., examples=['user@example.com'])
 
 
 class AddUserParam(AuthSchemaBase):
     dept_id: int
     roles: list[int]
     nickname: str | None = None
-    email: EmailStr = Field(..., example='user@example.com')
+    email: EmailStr = Field(..., examples=['user@example.com'])
 
 
 class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = None
     username: str
     nickname: str
-    email: EmailStr = Field(..., example='user@example.com')
+    email: EmailStr = Field(..., examples=['user@example.com'])
     phone: CustomPhoneNumber | None = None
 
 
@@ -80,7 +81,7 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
     roles: list[GetRoleListDetails] | list[str] | None = None
 
     @model_validator(mode='after')
-    def handel(self, values):
+    def handel(self) -> Self:
         """处理部门和角色"""
         dept = self.dept
         if dept:
@@ -88,7 +89,7 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
         roles = self.roles
         if roles:
             self.roles = [role.name for role in roles]  # type: ignore
-        return values
+        return self
 
 
 class CurrentUserIns(GetUserInfoListDetails):
