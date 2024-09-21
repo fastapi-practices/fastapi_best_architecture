@@ -21,7 +21,7 @@ _linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, admin_settings.OAUTH2_LINUX_
 
 @router.get('', summary='获取 Linux Do 授权链接')
 async def linux_do_auth2() -> ResponseModel:
-    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
+    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
     return response_base.success(data=auth_url)
 
 
