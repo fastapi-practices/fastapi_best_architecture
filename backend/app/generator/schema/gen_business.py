@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from pydantic import ConfigDict, Field, model_validator
+from typing_extensions import Self
 
 from backend.app.generator.schema.gen_model import GetGenModelListDetails
 from backend.common.schema import SchemaBase
@@ -21,7 +22,7 @@ class GenBusinessSchemaBase(SchemaBase):
     remark: str | None = None
 
     @model_validator(mode='after')
-    def check_schema_name(self):
+    def check_schema_name(self) -> Self:
         if self.schema_name is None:
             self.schema_name = self.table_name_en
         return self
