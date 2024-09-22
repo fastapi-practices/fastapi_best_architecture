@@ -103,105 +103,10 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 └─📁 deploy---------------- # Server deployment
 ```
 
-## Local development
+## Local development / Docker deployment
 
-* Python: 3.10+
-* Mysql: 8.0+
-* Redis: The latest stable version is recommended
-* Nodejs: 14.0+
-
-### Backend
-
-1. Enter the `backend` directory
-
-   ```shell
-   cd backend
-   ```
-
-2. Install the dependencies
-
-   ```shell
-   pip install -r requirements.txt
-   ```
-
-3. Create a database `fba` with utf8mb4 encoding.
-4. Install and start Redis
-5. Create a `.env` file in the `backend` directory.
-
-   ```shell
-   touch .env
-   
-   cp .env.example .env
-   ```
-
-6. Modify the configuration files `core/conf.py` and `.env` as needed.
-7. database migration [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
-
-   ```shell
-   # Generate the migration file
-   alembic revision --autogenerate
-   
-   # Execute the migration
-   alembic upgrade head
-   ```
-
-8. Start celery worker, beat and flower
-
-   ```shell
-   celery -A app.task.celery worker -l info
-   
-   # Scheduled tasks (optional)
-   celery -A app.task.celery beat -l info
-   
-   # Web monitor (optional)
-   celery -A app.task.celery flower --port=8555 --basic-auth=admin:123456
-   ```
-
-9. [Initialize test data](#test-data) (Optional)
-10. Start fastapi service
-   ```shell
-   # Help
-   fastapi --help
-   
-   # Dev mode
-   fastapi dev main.py
-   ```
-
-11. Open a browser and visit: http://127.0.0.1:8000/api/v1/docs
-
-### Front end
-
-Jump to [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) View details
-
----
-
-### Docker Deployment
-
-> [!WARNING]
->
-> Default port conflicts: 8000, 3306, 6379, 5672.
->
-> It is recommended to shut down local services: mysql, redis, rabbitmq... before deployment.
-
-1. Go to the `deploy/backend/docker-compose` directory, and create the environment variable file `.env`.
-
-   ```shell
-   cd deploy/backend/docker-compose
-   
-   touch .env.server ../../../backend/.env
-   
-   cp .env.server ../../../backend/.env
-   ```
-
-2. Modify the configuration files `backend/core/conf.py` and `.env` as needed.
-3. Execute the one-click startup command
-
-   ```shell
-   docker-compose up -d --build
-   ```
-
-4. Wait for the command to complete.
-5. Open a browser and visit: http://127.0.0.1:8000/api/v1/docs
+For more details, please check
+the [official documentation](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
 
 ## Test data
 
