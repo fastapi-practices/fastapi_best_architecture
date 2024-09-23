@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from pydantic import ConfigDict, Field, field_validator
 
-from backend.common.enums import GenModelColumnType
 from backend.common.schema import SchemaBase
 from backend.utils.type_conversion import sql_type_to_sqlalchemy
 
@@ -10,7 +9,7 @@ from backend.utils.type_conversion import sql_type_to_sqlalchemy
 class GenModelSchemaBase(SchemaBase):
     name: str
     comment: str | None = None
-    type: GenModelColumnType = Field(GenModelColumnType.VARCHAR)
+    type: str
     default: str | None = None
     sort: int
     length: int

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -34,6 +35,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
 
         :param db:
         :param obj_in:
+        :param pd_type:
         :return:
         """
         await self.create_model(db, obj_in, pd_type=pd_type)
@@ -45,9 +47,12 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         :param db:
         :param pk:
         :param obj_in:
+        :param pd_type:
         :return:
         """
-        return await self.update_model_by_column(db, obj_in, id=pk, pd_type=pd_type)
+        stmt = update(self.model).where(self.model.id == pk).values(**obj_in.model_dump(), pd_type=pd_type)
+        result = await db.execute(stmt)
+        return result.rowcount
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """

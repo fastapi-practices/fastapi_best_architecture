@@ -33,7 +33,7 @@ async def get_all_businesses() -> ResponseModel:
 
 @router.get('/businesses/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    business = await gen_service.get_business_with_model(pk=pk)
+    business = await gen_business_service.get(pk=pk)
     data = GetGenBusinessListDetails(**select_as_dict(business))
     return response_base.success(data=data)
 
@@ -87,6 +87,12 @@ async def delete_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     if count > 0:
         return response_base.success()
     return response_base.fail()
+
+
+@router.get('/models/types', summary='获取代码生成模型列类型', dependencies=[DependsJwtAuth])
+async def get_model_types() -> ResponseModel:
+    model_types = await gen_model_service.get_types()
+    return response_base.success(data=model_types)
 
 
 @router.get('/models/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])

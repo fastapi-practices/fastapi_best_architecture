@@ -18,20 +18,14 @@ from backend.app.generator.model import GenBusiness
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_model_service import gen_model_service
-from backend.common.enums import GenModelColumnType
 from backend.common.exception import errors
 from backend.core.path_conf import BasePath
 from backend.database.db_mysql import async_db_session
 from backend.utils.gen_template import gen_template
+from backend.utils.type_conversion import sql_type_to_pydantic
 
 
 class GenService:
-    @staticmethod
-    async def get_business_with_model(*, pk: int) -> GenBusiness:
-        async with async_db_session() as db:
-            business = await gen_dao.get_business_with_model(db, pk)
-        return business
-
     @staticmethod
     async def get_tables(*, table_schema: str) -> Sequence[str]:
         async with async_db_session() as db:
@@ -60,19 +54,18 @@ class GenService:
             column_info = await gen_dao.get_all_columns(db, table_schema, table_name)
             for column in column_info:
                 column_type = column[-1].split('(')[0].upper()
+                pd_type = sql_type_to_pydantic(column_type)
                 model_data = {
                     'name': column[0],
                     'comment': column[-2],
                     'type': column_type,
                     'sort': column[-3],
-                    'length': column[-1].split('(')[1][:-1]
-                    if column_type == GenModelColumnType.CHAR or column_type == GenModelColumnType.VARCHAR
-                    else 0,
+                    'length': column[-1].split('(')[1][:-1] if pd_type == 'str' and '(' in column[-1] else 0,
                     'is_pk': column[1],
                     'is_nullable': column[2],
                     'gen_business_id': new_business.id,
                 }
-                await gen_model_dao.create(db, CreateGenModelParam(**model_data))
+                await gen_model_dao.create(db, CreateGenModelParam(**model_data), pd_type=pd_type)
 
     @staticmethod
     async def render_tpl_code(*, business: GenBusiness) -> dict:

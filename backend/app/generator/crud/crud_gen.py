@@ -2,21 +2,11 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Row, select, text
+from sqlalchemy import Row, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
-from backend.app.generator.model import GenBusiness
 
 
 class CRUDGen:
-    @staticmethod
-    async def get_business_with_model(db: AsyncSession, business_id: int) -> GenBusiness:
-        stmt = select(GenBusiness).options(selectinload(GenBusiness.gen_model)).where(GenBusiness.id == business_id)
-        result = await db.execute(stmt)
-        data = result.scalars().first()
-        return data
-
     @staticmethod
     async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[str]:
         stmt = text(
