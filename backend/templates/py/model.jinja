@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from uuid import UUID
+
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
@@ -19,10 +21,13 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
     {%- if model.is_nullable %} Mapped[{{ model.pd_type }} | None]
     {%- else %} Mapped[{{ model.pd_type }}]
     {%- endif %} = mapped_column(
-    {%- if model.type == 'VARCHAR' -%}
+    {%- if model.type in ['NVARCHAR', 'String', 'Unicode', 'VARCHAR'] -%}
         sa.String({{ model.length }})
-    {%- else -%}
+    {%- elif model.type in ['BIT', 'ENUM', 'LONGBLOB', 'LONGTEXT', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'SET',
+    'TINYBLOB', 'TINYINT', 'TINYTEXT', 'YEAR'] -%}
         mysql.{{ model.type }}()
+    {%- else -%}
+        sa.{{ model.type }}()
     {%- endif -%}, default=
     {%- if model.is_nullable and model.default == None -%}
         None
@@ -44,7 +49,7 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
                 {}
             {%- elif model.pd_type == 'date' or model.pd_type == 'datetime' -%}
                 timezone.now()
-            {%- elif model.pd_type == 'List[str]' -%}
+            {%- elif model.pd_type == 'list[str]' -%}
                 ()
             {%- else -%}
                 ''

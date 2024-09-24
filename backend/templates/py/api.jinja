@@ -60,7 +60,7 @@ async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> Respo
 async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{{ schema_name }}Param) -> ResponseModel:
     count = await {{ table_name_en }}_service.update(pk=pk, obj=obj)
     if count > 0:
-        return await response_base.success()
+        return response_base.success()
     return response_base.fail()
 
 
@@ -75,5 +75,5 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
 async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
     count = await {{ table_name_en }}_service.delete(pk=pk)
     if count > 0:
-        return await response_base.success()
+        return response_base.success()
     return response_base.fail()

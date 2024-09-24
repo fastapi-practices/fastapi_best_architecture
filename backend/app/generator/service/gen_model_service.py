@@ -5,6 +5,7 @@ from typing import Sequence
 from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenModel
 from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
+from backend.common.enums import GenModelMySQLColumnType
 from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session
 from backend.utils.type_conversion import sql_type_to_pydantic
@@ -16,6 +17,12 @@ class GenModelService:
         async with async_db_session() as db:
             gen_model = await gen_model_dao.get(db, pk)
             return gen_model
+
+    @staticmethod
+    async def get_types() -> list[str]:
+        types = GenModelMySQLColumnType.get_member_keys()
+        types.sort()
+        return types
 
     @staticmethod
     async def get_by_business(*, business_id: int) -> Sequence[GenModel]:
