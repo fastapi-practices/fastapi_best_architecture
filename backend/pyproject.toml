@@ -36,7 +36,7 @@ dependencies = [
     "pytest==7.2.2",
     "pytest-pretty==1.2.0",
     "python-jose==3.3.0",
-    "redis[hiredis]==5.0.1",
+    "redis[hiredis]==5.1.0",
     "SQLAlchemy==2.0.30",
     "user-agents==2.2.0",
     "uvicorn[standard]==0.29.0",
