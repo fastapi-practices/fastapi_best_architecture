@@ -5,7 +5,7 @@
 groups = ["default", "deploy", "lint"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:0fd85e63a57538dc5a853da057530726ead9eb79c4eb0b65636491c116b561c5"
+content_hash = "sha256:2bef5b0723b1e6cb29b285c0a6445d9b8f57b39d8aeb6bab0b63cae5073e6f05"
 
 [[metadata.targets]]
 requires_python = ">=3.10,<3.13"
@@ -118,7 +118,7 @@ version = "4.0.3"
 requires_python = ">=3.7"
 summary = "Timeout context manager for asyncio programs"
 groups = ["default"]
-marker = "python_full_version <= \"3.11.2\""
+marker = "python_full_version < \"3.11.3\""
 dependencies = [
     "typing-extensions>=3.6.5; python_version < \"3.8\"",
 ]
@@ -1550,34 +1550,32 @@ files = [
 
 [[package]]
 name = "redis"
-version = "5.0.1"
-requires_python = ">=3.7"
+version = "5.1.0"
+requires_python = ">=3.8"
 summary = "Python client for Redis database and key-value store"
 groups = ["default"]
 dependencies = [
-    "async-timeout>=4.0.2; python_full_version <= \"3.11.2\"",
-    "importlib-metadata>=1.0; python_version < \"3.8\"",
-    "typing-extensions; python_version < \"3.8\"",
+    "async-timeout>=4.0.3; python_full_version < \"3.11.3\"",
 ]
 files = [
-    {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
-    {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
+    {file = "redis-5.1.0-py3-none-any.whl", hash = "sha256:fd4fccba0d7f6aa48c58a78d76ddb4afc698f5da4a2c1d03d916e4fd7ab88cdd"},
+    {file = "redis-5.1.0.tar.gz", hash = "sha256:b756df1e4a3858fcc0ef861f3fc53623a96c41e2b1f5304e09e0fe758d333d40"},
 ]
 
 [[package]]
 name = "redis"
-version = "5.0.1"
+version = "5.1.0"
 extras = ["hiredis"]
-requires_python = ">=3.7"
+requires_python = ">=3.8"
 summary = "Python client for Redis database and key-value store"
 groups = ["default"]
 dependencies = [
-    "hiredis>=1.0.0",
-    "redis==5.0.1",
+    "hiredis>=3.0.0",
+    "redis==5.1.0",
 ]
 files = [
-    {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
-    {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
+    {file = "redis-5.1.0-py3-none-any.whl", hash = "sha256:fd4fccba0d7f6aa48c58a78d76ddb4afc698f5da4a2c1d03d916e4fd7ab88cdd"},
+    {file = "redis-5.1.0.tar.gz", hash = "sha256:b756df1e4a3858fcc0ef861f3fc53623a96c41e2b1f5304e09e0fe758d333d40"},
 ]
 
 [[package]]

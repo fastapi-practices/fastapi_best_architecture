@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from redis.asyncio.client import Redis
+from redis.asyncio import Redis
 from redis.exceptions import AuthenticationError, TimeoutError
 
 from backend.common.log import log
