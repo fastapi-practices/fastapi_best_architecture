@@ -158,7 +158,7 @@ Execute unit tests through `pytest`.
 
 ## Interactivity
 
-[WeChat / QQ](https://wu-clan.github.io/homepage/)
+[TG / Discord](https://wu-clan.github.io/homepage/)
 
 ## Sponsor us
 
