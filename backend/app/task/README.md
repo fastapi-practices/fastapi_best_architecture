@@ -1,6 +1,7 @@
 ## 任务介绍
 
-当前任务使用 Celery 实现，实施方案请查看 [#225](https://github.com/orgs/fastapi-practices/discussions/225)
+当前任务使用 Celery
+实现，实施方案请查看 [#225](https://github.com/fastapi-practices/fastapi_best_architecture/discussions/225)
 
 ## 添加任务
 

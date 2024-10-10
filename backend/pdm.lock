@@ -5,7 +5,7 @@
 groups = ["default", "deploy", "lint"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:2bef5b0723b1e6cb29b285c0a6445d9b8f57b39d8aeb6bab0b63cae5073e6f05"
+content_hash = "sha256:e463c8ac45c077b3d1992be208a8f3ac70b1687c4e539a659a0a32df6d4d03b4"
 
 [[metadata.targets]]
 requires_python = ">=3.10,<3.13"
@@ -188,6 +188,17 @@ files = [
     {file = "bcrypt-4.0.1-cp36-abi3-win32.whl", hash = "sha256:2caffdae059e06ac23fce178d31b4a702f2a3264c20bfb5ff541b338194d8fab"},
     {file = "bcrypt-4.0.1-cp36-abi3-win_amd64.whl", hash = "sha256:8a68f4341daf7522fe8d73874de8906f3a339048ba406be6ddc1b3ccb16fc0d9"},
     {file = "bcrypt-4.0.1.tar.gz", hash = "sha256:27d375903ac8261cfe4047f6709d16f7d18d39b1ec92aaf72af989552a650ebd"},
+]
+
+[[package]]
+name = "bidict"
+version = "0.23.1"
+requires_python = ">=3.8"
+summary = "The bidirectional mapping library for Python."
+groups = ["default"]
+files = [
+    {file = "bidict-0.23.1-py3-none-any.whl", hash = "sha256:5dae8d4d79b552a71cbabc7deb25dfe8ce710b17ff41711e13010ead2abfc3e5"},
+    {file = "bidict-0.23.1.tar.gz", hash = "sha256:03069d763bc387bbd20e7d49914e75fc4132a41937fa3405417e1a5a2d006d71"},
 ]
 
 [[package]]
@@ -1476,6 +1487,20 @@ files = [
 ]
 
 [[package]]
+name = "python-engineio"
+version = "4.9.1"
+requires_python = ">=3.6"
+summary = "Engine.IO server and client for Python"
+groups = ["default"]
+dependencies = [
+    "simple-websocket>=0.10.0",
+]
+files = [
+    {file = "python_engineio-4.9.1-py3-none-any.whl", hash = "sha256:f995e702b21f6b9ebde4e2000cd2ad0112ba0e5116ec8d22fe3515e76ba9dddd"},
+    {file = "python_engineio-4.9.1.tar.gz", hash = "sha256:7631cf5563086076611e494c643b3fa93dd3a854634b5488be0bba0ef9b99709"},
+]
+
+[[package]]
 name = "python-jose"
 version = "3.3.0"
 summary = "JOSE implementation in Python"
@@ -1499,6 +1524,36 @@ groups = ["default"]
 files = [
     {file = "python_multipart-0.0.9-py3-none-any.whl", hash = "sha256:97ca7b8ea7b05f977dc3849c3ba99d51689822fab725c3703af7c866a0c2b215"},
     {file = "python_multipart-0.0.9.tar.gz", hash = "sha256:03f54688c663f1b7977105f021043b0793151e4cb1c1a9d4a11fc13d622c4026"},
+]
+
+[[package]]
+name = "python-socketio"
+version = "5.11.4"
+requires_python = ">=3.8"
+summary = "Socket.IO server and client for Python"
+groups = ["default"]
+dependencies = [
+    "bidict>=0.21.0",
+    "python-engineio>=4.8.0",
+]
+files = [
+    {file = "python_socketio-5.11.4-py3-none-any.whl", hash = "sha256:42efaa3e3e0b166fc72a527488a13caaac2cefc76174252486503bd496284945"},
+    {file = "python_socketio-5.11.4.tar.gz", hash = "sha256:8b0b8ff2964b2957c865835e936310190639c00310a47d77321a594d1665355e"},
+]
+
+[[package]]
+name = "python-socketio"
+version = "5.11.4"
+extras = ["asyncio"]
+requires_python = ">=3.8"
+summary = "Socket.IO server and client for Python"
+groups = ["default"]
+dependencies = [
+    "python-socketio==5.11.4",
+]
+files = [
+    {file = "python_socketio-5.11.4-py3-none-any.whl", hash = "sha256:42efaa3e3e0b166fc72a527488a13caaac2cefc76174252486503bd496284945"},
+    {file = "python_socketio-5.11.4.tar.gz", hash = "sha256:8b0b8ff2964b2957c865835e936310190639c00310a47d77321a594d1665355e"},
 ]
 
 [[package]]
@@ -1655,6 +1710,20 @@ groups = ["default"]
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
+]
+
+[[package]]
+name = "simple-websocket"
+version = "1.0.0"
+requires_python = ">=3.6"
+summary = "Simple WebSocket server and client for Python"
+groups = ["default"]
+dependencies = [
+    "wsproto",
+]
+files = [
+    {file = "simple-websocket-1.0.0.tar.gz", hash = "sha256:17d2c72f4a2bd85174a97e3e4c88b01c40c3f81b7b648b0cc3ce1305968928c8"},
+    {file = "simple_websocket-1.0.0-py3-none-any.whl", hash = "sha256:1d5bf585e415eaa2083e2bcf02a3ecf91f9712e7b3e6b9fa0b461ad04e0837bc"},
 ]
 
 [[package]]
@@ -2149,6 +2218,20 @@ marker = "sys_platform == \"win32\""
 files = [
     {file = "win32_setctime-1.1.0-py3-none-any.whl", hash = "sha256:231db239e959c2fe7eb1d7dc129f11172354f98361c4fa2d6d2d7e278baa8aad"},
     {file = "win32_setctime-1.1.0.tar.gz", hash = "sha256:15cf5750465118d6929ae4de4eb46e8edae9a5634350c01ba582df868e932cb2"},
+]
+
+[[package]]
+name = "wsproto"
+version = "1.2.0"
+requires_python = ">=3.7.0"
+summary = "WebSockets state-machine based protocol implementation"
+groups = ["default"]
+dependencies = [
+    "h11<1,>=0.9.0",
+]
+files = [
+    {file = "wsproto-1.2.0-py3-none-any.whl", hash = "sha256:b9acddd652b585d75b20477888c56642fdade28bdfd3579aa24a4d2c037dd736"},
+    {file = "wsproto-1.2.0.tar.gz", hash = "sha256:ad565f26ecb92588a3e43bc3d96164de84cd9902482b130d0ddbaa9664a85065"},
 ]
 
 [[package]]
