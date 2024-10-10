@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
 
+import socketio
+
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
@@ -11,6 +13,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
+from backend.common.socket import sio
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR
 from backend.database.db_mysql import create_table
@@ -79,6 +82,9 @@ def register_app():
     # 全局异常处理
     register_exception(app)
 
+    # socket 应用
+    register_socket_app(app)
+
     return app
 
 
@@ -106,6 +112,7 @@ def register_static_file(app: FastAPI):
 
         if not os.path.exists(STATIC_DIR):
             os.mkdir(STATIC_DIR)
+
         app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 
 
@@ -170,3 +177,14 @@ def register_page(app: FastAPI):
     :return:
     """
     add_pagination(app)
+
+
+def register_socket_app(app: FastAPI):
+    """
+    socketio
+
+    :param app:
+    :return:
+    """
+    socket_app = socketio.ASGIApp(sio, app)
+    app.mount('/ws', socket_app)
