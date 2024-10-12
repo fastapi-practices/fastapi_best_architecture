@@ -25,7 +25,7 @@ dependencies = [
     "fastapi[all]==0.111.0",
     "fastapi-limiter==0.1.6",
     "fastapi-pagination==0.12.13",
-    "gunicorn==21.2.0",
+    "gunicorn==22.0.0",
     "httpx==0.25.2",
     "itsdangerous==2.1.2",
     "loguru==0.7.2",
