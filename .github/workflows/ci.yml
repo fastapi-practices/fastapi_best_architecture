@@ -32,6 +32,6 @@ jobs:
       - name: Run lint
         run: |
           cd backend
-          source ./venv/bin/activate
+          source .venv/bin/activate
           chmod 755 scripts/lint.sh
           ./scripts/lint.sh
