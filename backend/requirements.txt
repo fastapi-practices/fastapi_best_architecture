@@ -39,7 +39,7 @@ fastapi-pagination==0.12.13
 filelock==3.16.1
 flower==2.0.1
 greenlet==3.1.1 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
-gunicorn==21.2.0
+gunicorn==22.0.0
 h11==0.14.0
 hiredis==3.0.0
 httpcore==1.0.6
