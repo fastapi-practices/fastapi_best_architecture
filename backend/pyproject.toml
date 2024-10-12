@@ -9,6 +9,9 @@ and as a template library free open source.
 authors = [
     { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "alembic>=1.13.0",
     "asgiref>=3.8.0",
@@ -51,21 +54,12 @@ dependencies = [
     "celery-aio-pool==0.1.0rc6",
     "asgi-correlation-id>=4.3.3",
 ]
-requires-python = ">=3.10,<3.13"
-readme = "README.md"
-license = { text = "MIT" }
 
-[tool.pdm.dev-dependencies]
-lint = [
+[tool.uv]
+package = false
+python-downloads = "manual"
+dev-dependencies = [
     "ruff>=0.5.0",
-]
-deploy = [
     "supervisor>=4.2.5",
     "wait-for-it>=2.2.2",
 ]
-
-[tool.pdm]
-distribution = false
-
-[tool.pdm.scripts]
-lint = "pre-commit run --all-files"
