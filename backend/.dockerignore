@@ -1,4 +1,4 @@
 __pycache__/
 venv/
 .venv/
-.pdm-python
+.python-version

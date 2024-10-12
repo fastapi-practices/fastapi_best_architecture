@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-pdm lint
+pre-commit run --all-files
