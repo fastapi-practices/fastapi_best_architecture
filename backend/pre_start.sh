@@ -4,4 +4,4 @@ alembic revision --autogenerate
 
 alembic upgrade head
 
-python ./scripts/init_data.py
+python3 ./scripts/init_data.py

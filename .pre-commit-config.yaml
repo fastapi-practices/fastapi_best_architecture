@@ -19,19 +19,19 @@ repos:
           - '--unsafe-fixes'
       - id: ruff-format
 
-  - repo: https://github.com/pdm-project/pdm
-    rev: 2.18.1
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.4.20
     hooks:
-      - id: pdm-export
+      - id: uv-lock
         args:
-          - '-p'
+          - '--directory'
+          - 'backend'
+        files: backend/uv\.lock$
+      - id: uv-export
+        args:
+          - '--directory'
           - 'backend'
           - '-o'
-          - 'backend/requirements.txt'
-          - '--without-hashes'
-        files: backend/pdm\.lock$
-      - id: pdm-lock-check
-        args:
-          - '-p'
-          - 'backend'
-        files: backend/pdm\.lock$
+          - 'requirements.txt'
+          - '--no-hashes'
+        files: backend/uv\.lock$
