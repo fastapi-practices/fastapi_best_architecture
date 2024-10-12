@@ -10,8 +10,6 @@ sio = socketio.AsyncServer(
     cors_credentials=True,
     cors_allowed_origins=settings.CORS_ALLOWED_ORIGINS,
     namespaces=['/ws'],
-    logger=True,
-    engineio_logger=True
 )
 
 
