@@ -13,7 +13,6 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
-from backend.common.socket import sio
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR
 from backend.database.db_mysql import create_table
@@ -82,7 +81,7 @@ def register_app():
     # 全局异常处理
     register_exception(app)
 
-    # socket 应用
+    # socketio
     register_socket_app(app)
 
     return app
@@ -181,10 +180,12 @@ def register_page(app: FastAPI):
 
 def register_socket_app(app: FastAPI):
     """
-    socketio
+    socket 应用
 
     :param app:
     :return:
     """
+    from backend.common.socket import sio
+
     socket_app = socketio.ASGIApp(sio, app)
     app.mount('/ws', socket_app)
