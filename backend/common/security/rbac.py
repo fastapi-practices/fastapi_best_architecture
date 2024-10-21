@@ -68,22 +68,21 @@ class RBAC:
             raise AuthorizationError(msg='用户未分配角色，授权失败')
         if not any(len(role.menus) > 0 for role in user_roles):
             raise AuthorizationError(msg='用户所属角色未分配菜单，授权失败')
+        # 检测后台管理操作权限
         method = request.method
         if method != MethodType.GET or method != MethodType.OPTIONS:
             if not request.user.is_staff:
-                raise AuthorizationError(msg='此用户已被禁止后台管理操作')
+                raise AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
         # 数据权限范围
-        data_scope = any(role.data_scope == 1 for role in user_roles)
-        if data_scope:
+        if any(role.data_scope == 1 for role in user_roles):
             return
-        user_uuid = request.user.uuid
+        # RBAC 鉴权
         if settings.PERMISSION_MODE == 'role-menu':
-            # 角色菜单权限校验
             path_auth_perm = getattr(request.state, 'permission', None)
             # 没有菜单权限标识不校验
             if not path_auth_perm:
                 return
-            if path_auth_perm in set(settings.RBAC_ROLE_MENU_EXCLUDE):
+            if path_auth_perm in settings.RBAC_ROLE_MENU_EXCLUDE:
                 return
             allow_perms = []
             for role in user_roles:
@@ -93,7 +92,7 @@ class RBAC:
             if path_auth_perm not in allow_perms:
                 raise AuthorizationError
         else:
-            # casbin 权限校验
+            user_uuid = request.user.uuid
             if (method, path) in settings.RBAC_CASBIN_EXCLUDE:
                 return
             enforcer = await self.enforcer()
