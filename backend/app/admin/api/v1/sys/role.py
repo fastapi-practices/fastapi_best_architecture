@@ -4,7 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.role import CreateRoleParam, GetRoleListDetails, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import CreateRoleParam, GetRoleListDetails, UpdateRoleMenuParam, UpdateRoleParam, \
+    UpdateRoleDeptParam
 from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -104,6 +105,23 @@ async def update_role_menus(
     request: Request, pk: Annotated[int, Path(...)], menu_ids: UpdateRoleMenuParam
 ) -> ResponseModel:
     count = await role_service.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.put(
+    '/{pk}/dept',
+    summary='更新角色部门',
+    dependencies=[
+        Depends(RequestPermission('sys:role:dept:edit')),
+        DependsRBAC,
+    ],
+)
+async def update_role_depts(
+    request: Request, pk: Annotated[int, Path(...)], dept_ids: UpdateRoleDeptParam
+) -> ResponseModel:
+    count = await role_service.update_role_dept(request=request, pk=pk, menu_ids=dept_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()
