@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import Request
+from typing import Any
 
+from fastapi import Request
+from sqlalchemy import Select, select
+
+from backend.app.admin.model import User
+from backend.app.admin.model.m2m import sys_role_dept
 from backend.common.exception.errors import ServerError
 from backend.core.conf import settings
 
@@ -24,3 +29,45 @@ class RequestPermission:
                 raise ServerError
             # 附加权限标识
             request.state.permission = self.value
+
+
+def filter_user_data_scope(request: Request, model: Any, stmt: Select) -> Select:
+    """
+    获取用户数据范围
+
+    使用场景：对于非后台管理数据，需要在前端界面向用户进行展示的数据
+
+    :param request:
+    :param model:
+    :param stmt:
+    :return:
+    """
+    user_roles = request.user.roles
+    dept_roles = request.user.dept.roles
+    user_roles.extend(dept_roles)
+    data_scope = min(role.data_scope for role in set(user_roles))
+
+    # 全部数据
+    if data_scope == 0:
+        stmt = stmt
+    # 自定义数据
+    elif data_scope == 1:
+        stmt = stmt.where(
+            model.create_user.in_(
+                select(User.id)
+                .select_from(sys_role_dept)
+                .join(User, User.dept_id == sys_role_dept.c.dept_id)
+                .where(sys_role_dept.c.role_id.in_(user_roles))
+            )
+        )
+    # 所在部门及以下数据
+    elif data_scope == 2:
+        ...  # TODO
+    # 所在部门数据
+    elif data_scope == 3:
+        stmt = stmt.where(select(User.id).where(User.dept_id == request.user.dept_id))
+    # 仅本人数据
+    elif data_scope == 4:
+        stmt = stmt.where(model.create_user == request.user.id)
+
+    return stmt

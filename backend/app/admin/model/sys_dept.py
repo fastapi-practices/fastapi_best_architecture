@@ -32,3 +32,6 @@ class Dept(Base):
 
     # 部门用户一对多
     users: Mapped[list['User']] = relationship(init=False, back_populates='dept')  # noqa: F821
+
+    # 部门角色多对多
+    roles: Mapped[list['Role']] = relationship(init=False, back_populates='dept')  # noqa: F821

@@ -5,10 +5,11 @@ from typing import Sequence
 from fastapi import Request
 from sqlalchemy import Select
 
+from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleDeptParam, UpdateRoleMenuParam, UpdateRoleParam
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
@@ -74,6 +75,21 @@ class RoleService:
             count = await role_dao.update_menus(db, pk, menu_ids)
             if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            return count
+
+    @staticmethod
+    async def update_role_dept(*, request: Request, pk: int, dept_ids: UpdateRoleDeptParam) -> int:
+        async with async_db_session.begin() as db:
+            role = await role_dao.get(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            for dept_id in dept_ids.depts:
+                dept = await dept_dao.get(db, dept_id)
+                if not dept:
+                    raise errors.NotFoundError(msg='部门不存在')
+            count = await role_dao.update_depts(db, pk, dept_ids)
+            if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 

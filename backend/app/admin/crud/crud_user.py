@@ -183,8 +183,10 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.dept))
-            .options(selectinload(self.model.roles).selectinload(Role.menus))
+            .options(
+                selectinload(self.model.dept),
+                selectinload(self.model.roles).selectinload(Role.menus),
+            )
             .order_by(desc(self.model.join_time))
         )
         where_list = []
@@ -297,10 +299,10 @@ class CRUDUser(CRUDPlus[User]):
         :param username:
         :return:
         """
-        stmt = (
-            select(self.model)
-            .options(selectinload(self.model.dept))
-            .options(selectinload(self.model.roles).joinedload(Role.menus))
+        stmt = select(self.model).options(
+            selectinload(self.model.dept),
+            selectinload(self.model.roles).joinedload(Role.menus),
+            selectinload(self.model.roles).joinedload(Role.depts),
         )
         filters = []
         if user_id:

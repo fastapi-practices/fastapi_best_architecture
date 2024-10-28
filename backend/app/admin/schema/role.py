@@ -30,6 +30,10 @@ class UpdateRoleMenuParam(SchemaBase):
     menus: list[int]
 
 
+class UpdateRoleDeptParam(SchemaBase):
+    depts: list[int]
+
+
 class GetRoleListDetails(RoleSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 

@@ -81,10 +81,6 @@ class RBAC:
             if not request.user.is_staff:
                 raise AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
 
-        # 数据权限范围
-        if any(role.data_scope == 1 for role in user_roles):
-            return
-
         # RBAC 鉴权
         if settings.PERMISSION_MODE == 'role-menu':
             path_auth_perm = getattr(request.state, 'permission', None)
