@@ -63,6 +63,9 @@ def register_app():
         lifespan=register_init,
     )
 
+    # socketio
+    register_socket_app(app)
+
     # 日志
     register_logger()
 
@@ -81,9 +84,6 @@ def register_app():
     # 全局异常处理
     register_exception(app)
 
-    # socketio
-    register_socket_app(app)
-
     return app
 
 
@@ -99,18 +99,13 @@ def register_logger() -> None:
 
 def register_static_file(app: FastAPI):
     """
-    静态文件交互开发模式, 生产使用 nginx 静态资源服务
+    静态文件交互开发模式, 生产将自动关闭，生产必须使用 nginx 静态资源服务
 
     :param app:
     :return:
     """
     if settings.FASTAPI_STATIC_FILES:
-        import os
-
         from fastapi.staticfiles import StaticFiles
-
-        if not os.path.exists(STATIC_DIR):
-            os.mkdir(STATIC_DIR)
 
         app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 
@@ -185,7 +180,12 @@ def register_socket_app(app: FastAPI):
     :param app:
     :return:
     """
-    from backend.common.socket import sio
+    from backend.common.socketio.server import sio
 
-    socket_app = socketio.ASGIApp(sio, app)
+    socket_app = socketio.ASGIApp(
+        socketio_server=sio,
+        other_asgi_app=app,
+        # 切勿删除此配置：https://github.com/pyropy/fastapi-socketio/issues/51
+        socketio_path='/ws/socket.io',
+    )
     app.mount('/ws', socket_app)
