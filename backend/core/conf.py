@@ -43,13 +43,14 @@ class Settings(BaseSettings):
     FASTAPI_DOCS_URL: str | None = f'{FASTAPI_API_V1_PATH}/docs'
     FASTAPI_REDOCS_URL: str | None = f'{FASTAPI_API_V1_PATH}/redocs'
     FASTAPI_OPENAPI_URL: str | None = f'{FASTAPI_API_V1_PATH}/openapi'
-    FASTAPI_STATIC_FILES: bool = False
+    FASTAPI_STATIC_FILES: bool = True
 
     @model_validator(mode='before')
     @classmethod
     def validate_openapi_url(cls, values):
         if values['ENVIRONMENT'] == 'pro':
             values['OPENAPI_URL'] = None
+            values['FASTAPI_STATIC_FILES'] = False
         return values
 
     # MySQL
@@ -101,7 +102,7 @@ class Settings(BaseSettings):
         '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
         '<cyan> {correlation_id} </> | <lvl>{message}</>'
     )
-    LOG_LOGURU_FORMAT: str = (
+    LOG_FILE_FORMAT: str = (
         '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
         '<cyan> {correlation_id} </> | <lvl>{message}</>'
     )
@@ -121,6 +122,7 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [
+        'http://127.0.0.1:8000',
         'http://localhost:5173',  # 前端地址，末尾不要带 '/'
     ]
     CORS_EXPOSE_HEADERS: list[str] = [

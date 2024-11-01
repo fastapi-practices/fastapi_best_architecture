@@ -100,7 +100,7 @@ def set_customize_logfile():
         'retention': '15 days',
         'compression': 'tar.gz',
         'enqueue': True,
-        'format': settings.LOG_LOGURU_FORMAT,
+        'format': settings.LOG_FILE_FORMAT,
     }
 
     # stdout file

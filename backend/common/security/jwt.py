@@ -7,13 +7,17 @@ from fastapi.security import HTTPBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
+from pydantic_core import from_json
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
+from backend.app.admin.schema.user import CurrentUserIns
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.core.conf import settings
+from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
+from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -151,21 +155,6 @@ def jwt_decode(token: str) -> int:
     return user_id
 
 
-async def jwt_authentication(token: str) -> int:
-    """
-    JWT authentication
-
-    :param token:
-    :return:
-    """
-    user_id = jwt_decode(token)
-    key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
-    token_verify = await redis_client.get(key)
-    if not token_verify:
-        raise TokenError(msg='Token 已过期')
-    return user_id
-
-
 async def get_current_user(db: AsyncSession, pk: int) -> User:
     """
     Get the current user through token
@@ -204,3 +193,32 @@ def superuser_verify(request: Request) -> bool:
     if not superuser or not request.user.is_staff:
         raise AuthorizationError
     return superuser
+
+
+async def jwt_authentication(token: str) -> CurrentUserIns:
+    """
+    JWT authentication
+
+    :param token:
+    :return:
+    """
+    user_id = jwt_decode(token)
+    key = f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token}'
+    token_verify = await redis_client.get(key)
+    if not token_verify:
+        raise TokenError(msg='Token 已过期')
+    cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
+    if not cache_user:
+        async with async_db_session() as db:
+            current_user = await get_current_user(db, user_id)
+            user = CurrentUserIns(**select_as_dict(current_user))
+            await redis_client.setex(
+                f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
+                settings.JWT_USER_REDIS_EXPIRE_SECONDS,
+                user.model_dump_json(),
+            )
+    else:
+        # TODO: 在恰当的时机，应替换为使用 model_validate_json
+        # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
+        user = CurrentUserIns.model_validate(from_json(cache_user, allow_partial=True))
+    return user
