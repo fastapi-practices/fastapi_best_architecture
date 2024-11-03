@@ -2,9 +2,8 @@
 name = "fastapi_best_architecture"
 version = "0.0.1"
 description = """
-FastAPI based on the construction of the front and back end separation of RBAC privilege control system,
-using a unique pseudo three-tier architecture model design, built-in fastapi-admin basic implementation,
-and as a template library free open source.
+A RBAC (Role-Based Access Control) permission control system built on FastAPI, featuring a unique pseudo-three-tier
+architecture design, with built-in basic implementation of fastapi admin as a template library, free and open-source.
 """
 authors = [
     { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
@@ -33,7 +32,6 @@ dependencies = [
     "passlib==1.7.4",
     "path==15.1.2",
     "phonenumbers==8.13.27",
-    "pre-commit==3.2.2",
     "psutil==5.9.6",
     "pydantic==2.9.1",
     "pytest==7.2.2",
@@ -56,11 +54,17 @@ dependencies = [
     "python-socketio[asyncio]>=5.11.4",
 ]
 
-[tool.uv]
-package = false
-python-downloads = "manual"
-dev-dependencies = [
-    "ruff>=0.5.0",
+[dependency-groups]
+lint = [
+    "ruff>=0.7.0",
+    "pre-commit>=4.0.0",
+]
+server = [
     "supervisor>=4.2.5",
     "wait-for-it>=2.2.2",
 ]
+
+[tool.uv]
+package = false
+python-downloads = "manual"
+default-groups = ['lint']
