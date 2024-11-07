@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends
 
-from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
 from backend.app.admin.service.config_service import config_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -14,50 +12,58 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
-async def get_config() -> ResponseModel:
-    config = await config_service.get()
+@router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
+async def get_website_config() -> ResponseModel:
+    config = config_service.get_website()
     return response_base.success(data=config)
 
 
 @router.post(
-    '',
-    summary='创建系统配置',
+    '/website',
+    summary='保存网站配置信息',
     dependencies=[
         Depends(RequestPermission('sys:config:add')),
         DependsRBAC,
     ],
 )
-async def create_config(obj: CreateConfigParam) -> ResponseModel:
-    await config_service.create(obj=obj)
+async def save_website_config() -> ResponseModel:
+    await config_service.save_website()
     return response_base.success()
 
 
-@router.put(
-    '/{pk}',
-    summary='更新系统配置',
+@router.get('/protocol', summary='获取用户协议', dependencies=[DependsJwtAuth])
+async def get_protocol_config() -> ResponseModel:
+    config = config_service.get_protocol()
+    return response_base.success(data=config)
+
+
+@router.post(
+    '/protocol',
+    summary='保存用户协议',
     dependencies=[
-        Depends(RequestPermission('sys:config:edit')),
+        Depends(RequestPermission('sys:config:protocol:add')),
         DependsRBAC,
     ],
 )
-async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -> ResponseModel:
-    count = await config_service.update(pk=pk, obj=obj)
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
+async def save_protocol_config() -> ResponseModel:
+    await config_service.save_protocol()
+    return response_base.success()
 
 
-@router.delete(
-    '',
-    summary='（批量）删除系统配置',
+@router.get('/policy', summary='获取用户政策', dependencies=[DependsJwtAuth])
+async def get_policy_config() -> ResponseModel:
+    config = config_service.get_policy()
+    return response_base.success(data=config)
+
+
+@router.post(
+    '/policy',
+    summary='保存用户政策',
     dependencies=[
-        Depends(RequestPermission('sys:config:del')),
+        Depends(RequestPermission('sys:config:policy:add')),
         DependsRBAC,
     ],
 )
-async def delete_config(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await config_service.delete(pk=pk)
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
+async def save_policy_config() -> ResponseModel:
+    await config_service.save_policy()
+    return response_base.success()

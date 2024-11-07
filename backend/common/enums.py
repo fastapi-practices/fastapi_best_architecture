@@ -94,6 +94,8 @@ class ConfigType(StrEnum):
     """系统配置类型"""
 
     website = 'website'
+    protocol = 'protocol'
+    policy = 'policy'
 
 
 class GenModelMySQLColumnType(StrEnum):
