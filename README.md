@@ -39,7 +39,8 @@ pattern, use templates to transform it to your heart's content!
 You can view some of the preview screenshots
 in [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
 
-Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
+For the demo entrance, please refer
+to [Official documentation](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
 
 > tester: test / 123456
 >
@@ -75,71 +76,10 @@ Luckily, we now have a demo site: [FBA UI](https://fba.xwboy.top/)
 - [x] Timed tasks: automated tasks, asynchronous tasks, support for function calls
 - [x] Interface Documentation: Automatically generate online interactive API interface documentation.
 
-## Project structure
-
-```
-├─📁 backend--------------- # Backend
-│ ├─📁 alembic------------- # DB migration
-│ ├─📁 app----------------- # Application
-│ │ ├─📁 admin------------- # System admin
-│ │ │ ├─📁 api------------- # Interface
-│ │ │ ├─📁 crud------------ # CRUD
-│ │ │ ├─📁 model----------- # SQLA model
-│ │ │ ├─📁 schema---------- # Data transmit
-│ │ │ ├─📁 service--------- # Service
-│ │ │ └─📁 tests----------- # Pytest
-│ │ ├─📁 generator--------- # Code generate
-│ │ └─📁 task-------------- # Celery task
-│ ├─📁 common-------------- # public resources
-│ ├─📁 core---------------- # Core configuration
-│ ├─📁 database------------ # Database connection
-│ ├─📁 log----------------- # Log
-│ ├─📁 middleware---------- # Middlewares
-│ ├─📁 scripts------------- # Scripts
-│ ├─📁 sql----------------- # SQL files
-│ ├─📁 static-------------- # Static files
-│ ├─📁 templates----------- # Template files
-│ └─📁 utils--------------- # Toolkit
-└─📁 deploy---------------- # Server deployment
-```
-
-## Local development / Docker deployment
+## Development and deployment
 
 For more details, please check
 the [official documentation](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
-
-## Test data
-
-Initialize the test data using the `backend/sql/init_test_data.sql` file.
-
-## Development Process
-
-(For reference only)
-
-1. define the database model (model)
-2. define the data validation model (schema)
-3. define the view (api) and routing (router)
-4. write business (service)
-5. write database operations (crud)
-
-## Testing
-
-Execute unit tests through `pytest`.
-
-1. create a test database `fba_test` with utf8mb4 encoding
-2. create database tables using the `backend/sql/create_tables.sql` file
-3. initialize the test data using the `backend/sql/init_pytest_data.sql` file
-4. Go to the `backend` directory and execute the test commands.
-
-   ```shell
-   cd backend/
-   
-   pytest -vs --disable-warnings
-   ```
-
-## Status
-
-![Alt](https://repobeats.axiom.co/api/embed/b2174ef1abbebaea309091f1c998fc97d0c1536a.svg "Repo beats analytics image")
 
 ## Contributors
 
