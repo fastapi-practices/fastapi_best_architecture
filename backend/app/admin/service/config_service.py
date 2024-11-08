@@ -54,4 +54,4 @@ class ConfigService:
             return count
 
 
-config_service = ConfigService()
+config_service: ConfigService = ConfigService()

@@ -90,14 +90,6 @@ class UserSocialType(StrEnum):
     linuxdo = 'LinuxDo'
 
 
-class ConfigType(StrEnum):
-    """系统配置类型"""
-
-    website = 'website'
-    protocol = 'protocol'
-    policy = 'policy'
-
-
 class GenModelMySQLColumnType(StrEnum):
     """代码生成模型列类型（MySQL）"""
 
