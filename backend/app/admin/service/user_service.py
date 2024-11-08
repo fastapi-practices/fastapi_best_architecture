@@ -246,4 +246,4 @@ class UserService:
             return count
 
 
-user_service = UserService()
+user_service: UserService = UserService()

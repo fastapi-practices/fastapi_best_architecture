@@ -107,4 +107,4 @@ class ResponseBase:
         return MsgSpecJSONResponse({'code': res.code, 'msg': res.msg, 'data': data})
 
 
-response_base = ResponseBase()
+response_base: ResponseBase = ResponseBase()

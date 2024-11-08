@@ -30,4 +30,4 @@ class RedisInfo:
         return stats_list
 
 
-redis_info = RedisInfo()
+redis_info: RedisInfo = RedisInfo()
