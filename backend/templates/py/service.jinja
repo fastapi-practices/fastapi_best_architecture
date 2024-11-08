@@ -45,4 +45,4 @@ class {{ table_name_class }}Service:
             return count
 
 
-{{ table_name_en }}_service = {{ table_name_class }}Service()
+{{ table_name_en }}_service: {{ table_name_class }}Service = {{ table_name_class }}Service()

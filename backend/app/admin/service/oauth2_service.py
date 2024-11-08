@@ -91,4 +91,4 @@ class OAuth2Service:
             return data
 
 
-oauth2_service = OAuth2Service()
+oauth2_service: OAuth2Service = OAuth2Service()

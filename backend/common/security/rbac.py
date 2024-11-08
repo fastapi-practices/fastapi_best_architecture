@@ -101,6 +101,6 @@ class RBAC:
                 raise AuthorizationError
 
 
-rbac = RBAC()
+rbac: RBAC = RBAC()
 # RBAC 授权依赖注入
 DependsRBAC = Depends(rbac.rbac_verify)

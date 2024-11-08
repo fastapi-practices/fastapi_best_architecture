@@ -168,4 +168,4 @@ class AuthService:
             await redis_client.delete_prefix(key_prefix)
 
 
-auth_service = AuthService()
+auth_service: AuthService = AuthService()

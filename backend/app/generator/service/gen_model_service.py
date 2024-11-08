@@ -58,4 +58,4 @@ class GenModelService:
             return count
 
 
-gen_model_service = GenModelService()
+gen_model_service: GenModelService = GenModelService()

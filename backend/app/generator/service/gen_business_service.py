@@ -45,4 +45,4 @@ class GenBusinessService:
             return count
 
 
-gen_business_service = GenBusinessService()
+gen_business_service: GenBusinessService = GenBusinessService()

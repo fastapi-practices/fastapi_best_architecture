@@ -50,4 +50,4 @@ class TimeZone:
         return dt.astimezone(datetime_timezone.utc)
 
 
-timezone = TimeZone()
+timezone: TimeZone = TimeZone()

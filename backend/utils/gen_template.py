@@ -99,4 +99,4 @@ class GenTemplate:
         }
 
 
-gen_template = GenTemplate()
+gen_template: GenTemplate = GenTemplate()
