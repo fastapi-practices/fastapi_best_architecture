@@ -4,19 +4,26 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
+from backend.app.admin.schema.config import (
+    CreateAnyConfigParam,
+    GetAnyConfigListDetails,
+    SaveConfigParam,
+    UpdateAnyConfigParam,
+)
 from backend.app.admin.service.config_service import config_service
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.database.db_mysql import CurrentSession
 
 router = APIRouter()
 
 
 @router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
 async def get_website_config() -> ResponseModel:
-    config = config_service.get_website()
+    config = await config_service.get_website()
     return response_base.success(data=config)
 
 
@@ -24,18 +31,18 @@ async def get_website_config() -> ResponseModel:
     '/website',
     summary='保存网站配置信息',
     dependencies=[
-        Depends(RequestPermission('sys:config:add')),
+        Depends(RequestPermission('sys:config:website:add')),
         DependsRBAC,
     ],
 )
-async def save_website_config() -> ResponseModel:
-    await config_service.save_website()
+async def save_website_config(obj: SaveConfigParam) -> ResponseModel:
+    await config_service.save_website(obj)
     return response_base.success()
 
 
 @router.get('/protocol', summary='获取用户协议', dependencies=[DependsJwtAuth])
 async def get_protocol_config() -> ResponseModel:
-    config = config_service.get_protocol()
+    config = await config_service.get_protocol()
     return response_base.success(data=config)
 
 
@@ -47,14 +54,14 @@ async def get_protocol_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_protocol_config() -> ResponseModel:
-    await config_service.save_protocol()
+async def save_protocol_config(obj: SaveConfigParam) -> ResponseModel:
+    await config_service.save_protocol(obj)
     return response_base.success()
 
 
 @router.get('/policy', summary='获取用户政策', dependencies=[DependsJwtAuth])
 async def get_policy_config() -> ResponseModel:
-    config = config_service.get_policy()
+    config = await config_service.get_policy()
     return response_base.success(data=config)
 
 
@@ -66,39 +73,57 @@ async def get_policy_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_policy_config() -> ResponseModel:
-    await config_service.save_policy()
+async def save_policy_config(obj: SaveConfigParam) -> ResponseModel:
+    await config_service.save_policy(obj)
     return response_base.success()
 
 
-@router.get('/{pk}', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='获取系统参数配置详情', dependencies=[DependsJwtAuth])
 async def get_config(pk: Annotated[int, Path(...)]) -> ResponseModel:
     config = await config_service.get(pk)
     return response_base.success(data=config)
 
 
+@router.get(
+    '',
+    summary='（模糊条件）分页获取所有系统参数配置',
+    dependencies=[
+        DependsJwtAuth,
+        DependsPagination,
+    ],
+)
+async def get_pagination_config(
+    db: CurrentSession,
+    name: Annotated[str | None, Query()] = None,
+    type: Annotated[str | None, Query()] = None,
+) -> ResponseModel:
+    config_select = await config_service.get_select(name=name, type=type)
+    page_data = await paging_data(db, config_select, GetAnyConfigListDetails)
+    return response_base.success(data=page_data)
+
+
 @router.post(
     '',
-    summary='创建系统配置',
+    summary='创建系统参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:add')),
         DependsRBAC,
     ],
 )
-async def create_config(obj: CreateConfigParam) -> ResponseModel:
+async def create_config(obj: CreateAnyConfigParam) -> ResponseModel:
     await config_service.create(obj=obj)
     return response_base.success()
 
 
 @router.put(
     '/{pk}',
-    summary='更新系统配置',
+    summary='更新系统参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:edit')),
         DependsRBAC,
     ],
 )
-async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -> ResponseModel:
+async def update_config(pk: Annotated[int, Path(...)], obj: UpdateAnyConfigParam) -> ResponseModel:
     count = await config_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -107,7 +132,7 @@ async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -
 
 @router.delete(
     '',
-    summary='（批量）删除系统配置',
+    summary='（批量）删除系统参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:del')),
         DependsRBAC,

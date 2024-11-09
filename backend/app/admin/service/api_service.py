@@ -41,6 +41,9 @@ class ApiService:
     @staticmethod
     async def update(*, pk: int, obj: UpdateApiParam) -> int:
         async with async_db_session.begin() as db:
+            api = await api_dao.get(db, pk)
+            if not api:
+                raise errors.NotFoundError(msg='接口不存在')
             count = await api_dao.update(db, pk, obj)
             return count
 

@@ -2,35 +2,62 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
+from backend.app.admin.conf import admin_settings
 from backend.app.admin.model import Config
-from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
+from backend.app.admin.schema.config import CreateAnyConfigParam, UpdateAnyConfigParam
 
 
 class CRUDConfig(CRUDPlus[Config]):
-    async def get_one(self, db: AsyncSession) -> Config | None:
+    async def get(self, db: AsyncSession, pk: int) -> Config | None:
         """
-        获取 Config
+        获取系统参数配置
 
         :param db:
+        :param pk:
         :return:
         """
-        query = await db.execute(select(self.model).limit(1))
-        return query.scalars().first()
+        return await self.select_model_by_column(db, id=pk, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
 
-    async def get_all(self, db: AsyncSession) -> Sequence[Config]:
+    async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config]:
         """
-        获取所有 Config
+        通过 type 获取系统配置参数
 
         :param db:
+        :param type:
         :return:
         """
-        return await self.select_models(db)
+        return await self.select_models(db, type=type)
 
-    async def create(self, db: AsyncSession, obj_in: CreateConfigParam) -> None:
+    async def get_by_name(self, db: AsyncSession, name: str) -> Config | None:
+        """
+        通过 name 获取系统配置参数
+
+        :param db:
+        :param name:
+        :return:
+        """
+        return await self.select_model_by_column(db, name=name, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
+
+    async def get_list(self, name: str = None, type: str = None) -> Select:
+        """
+        获取系统参数配置列表
+
+        :param name:
+        :param type:
+        :return:
+        """
+        filters = {'name__not_in': admin_settings.CONFIG_BUILT_IN_TYPES}
+        if name is not None:
+            filters.update(name__like=f'%{name}%')
+        if type is not None:
+            filters.update(type__like=f'%{type}%')
+        return await self.select_order('created_time', 'desc', **filters)
+
+    async def create(self, db: AsyncSession, obj_in: CreateAnyConfigParam) -> None:
         """
         创建 Config
 
@@ -40,7 +67,7 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         await self.create_model(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateConfigParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateAnyConfigParam) -> int:
         """
         更新 Config
 
