@@ -30,4 +30,4 @@ class OperaLogService:
             return count
 
 
-opera_log_service = OperaLogService()
+opera_log_service: OperaLogService = OperaLogService()

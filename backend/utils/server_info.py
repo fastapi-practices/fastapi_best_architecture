@@ -144,4 +144,4 @@ class ServerInfo:
         }
 
 
-server_info = ServerInfo()
+server_info: ServerInfo = ServerInfo()

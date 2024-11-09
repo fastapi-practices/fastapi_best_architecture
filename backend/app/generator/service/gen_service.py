@@ -166,4 +166,4 @@ class GenService:
             return bio
 
 
-gen_service = GenService()
+gen_service: GenService = GenService()

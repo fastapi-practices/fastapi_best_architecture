@@ -54,4 +54,4 @@ class ApiService:
             return count
 
 
-api_service = ApiService()
+api_service: ApiService = ApiService()

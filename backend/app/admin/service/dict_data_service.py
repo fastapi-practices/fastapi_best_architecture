@@ -56,4 +56,4 @@ class DictDataService:
             return count
 
 
-dict_data_service = DictDataService()
+dict_data_service: DictDataService = DictDataService()
