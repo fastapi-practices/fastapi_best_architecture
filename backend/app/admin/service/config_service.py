@@ -18,34 +18,19 @@ from backend.database.db_mysql import async_db_session
 
 class ConfigService:
     @staticmethod
-    async def get_website() -> Sequence[Config]:
+    async def get_built_in_config(type: str) -> Sequence[Config]:
         async with async_db_session() as db:
-            return await config_dao.get_by_type(db, 'website')
+            return await config_dao.get_by_type(db, type)
 
     @staticmethod
-    async def save_website(obj: SaveConfigParam):
+    async def save_built_in_config(objs: list[SaveConfigParam], type: str) -> None:
         async with async_db_session.begin() as db:
-            config = await config_dao.get_by_name(db, obj.name)
-            if config is None:
-                await config_dao.create_models()
-
-    @staticmethod
-    async def get_protocol() -> Sequence[Config]:
-        async with async_db_session() as db:
-            return await config_dao.get_by_type(db, 'protocol')
-
-    @staticmethod
-    async def save_protocol(obj: SaveConfigParam):
-        pass
-
-    @staticmethod
-    async def get_policy() -> Sequence[Config]:
-        async with async_db_session() as db:
-            return await config_dao.get_by_type(db, 'policy')
-
-    @staticmethod
-    async def save_policy(obj: SaveConfigParam):
-        pass
+            for obj in objs:
+                config = await config_dao.get_by_name(db, obj.name)
+                if config is None:
+                    await config_dao.create_model(db, obj, type=type)
+                else:
+                    await config_dao.update_model(db, config.id, obj, type=type)
 
     @staticmethod
     async def get(pk) -> Config | dict:
@@ -62,7 +47,7 @@ class ConfigService:
     @staticmethod
     async def create(*, obj: CreateAnyConfigParam) -> None:
         async with async_db_session.begin() as db:
-            config = await config_dao.get_by_name(db, obj.name)
+            config = await config_dao.get_by_name(db, obj.name) or config_dao.get_by_key(db, obj.key)
             if config:
                 raise errors.ForbiddenError(msg='参数配置已存在')
             if obj.type in admin_settings.CONFIG_BUILT_IN_TYPES:

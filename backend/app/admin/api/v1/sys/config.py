@@ -23,7 +23,7 @@ router = APIRouter()
 
 @router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
 async def get_website_config() -> ResponseModel:
-    config = await config_service.get_website()
+    config = await config_service.get_built_in_config('website')
     return response_base.success(data=config)
 
 
@@ -35,14 +35,14 @@ async def get_website_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_website_config(obj: SaveConfigParam) -> ResponseModel:
-    await config_service.save_website(obj)
+async def save_website_config(objs: list[SaveConfigParam]) -> ResponseModel:
+    await config_service.save_built_in_config(objs, 'website')
     return response_base.success()
 
 
 @router.get('/protocol', summary='获取用户协议', dependencies=[DependsJwtAuth])
 async def get_protocol_config() -> ResponseModel:
-    config = await config_service.get_protocol()
+    config = await config_service.get_built_in_config('protocol')
     return response_base.success(data=config)
 
 
@@ -54,14 +54,14 @@ async def get_protocol_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_protocol_config(obj: SaveConfigParam) -> ResponseModel:
-    await config_service.save_protocol(obj)
+async def save_protocol_config(objs: list[SaveConfigParam]) -> ResponseModel:
+    await config_service.save_built_in_config(objs, 'protocol')
     return response_base.success()
 
 
 @router.get('/policy', summary='获取用户政策', dependencies=[DependsJwtAuth])
 async def get_policy_config() -> ResponseModel:
-    config = await config_service.get_policy()
+    config = await config_service.get_built_in_config('policy')
     return response_base.success(data=config)
 
 
@@ -73,8 +73,8 @@ async def get_policy_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_policy_config(obj: SaveConfigParam) -> ResponseModel:
-    await config_service.save_policy(obj)
+async def save_policy_config(objs: list[SaveConfigParam]) -> ResponseModel:
+    await config_service.save_built_in_config(objs, 'policy')
     return response_base.success()
 
 

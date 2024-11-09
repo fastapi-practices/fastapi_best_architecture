@@ -42,6 +42,16 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.select_model_by_column(db, name=name, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
 
+    async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
+        """
+        通过 key 获取系统配置参数
+
+        :param db:
+        :param key:
+        :return:
+        """
+        return await self.select_model_by_column(db, key=key, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
+
     async def get_list(self, name: str = None, type: str = None) -> Select:
         """
         获取系统参数配置列表
