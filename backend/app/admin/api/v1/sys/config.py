@@ -71,9 +71,9 @@ async def save_policy_config() -> ResponseModel:
     return response_base.success()
 
 
-@router.get('', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
-async def get_config() -> ResponseModel:
-    config = await config_service.get()
+@router.get('/{pk}', summary='获取系统配置详情', dependencies=[DependsJwtAuth])
+async def get_config(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    config = await config_service.get(pk)
     return response_base.success(data=config)
 
 
