@@ -31,7 +31,7 @@ class AdminSettings(BaseSettings):
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 过期时间，单位：秒
 
     # Config
-    CONFIG_REDIS_KEY: str = 'fba:config'
+    CONFIG_BUILT_IN_TYPES: list = ['website', 'protocol', 'policy']
 
 
 @lru_cache

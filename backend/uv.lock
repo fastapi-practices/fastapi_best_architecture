@@ -561,7 +561,7 @@ requires-dist = [
     { name = "python-socketio", extras = ["asyncio"], specifier = ">=5.11.4" },
     { name = "redis", extras = ["hiredis"], specifier = "==5.1.0" },
     { name = "sqlalchemy", specifier = "==2.0.30" },
-    { name = "sqlalchemy-crud-plus", specifier = "==1.5.0" },
+    { name = "sqlalchemy-crud-plus", specifier = "==1.6.0" },
     { name = "user-agents", specifier = "==2.2.0" },
     { name = "uvicorn", extras = ["standard"], specifier = "==0.29.0" },
     { name = "xdbsearchip", specifier = "==1.0.2" },
@@ -1641,15 +1641,15 @@ wheels = [
 
 [[package]]
 name = "sqlalchemy-crud-plus"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1b/33/473fae4602b7f124b4b2052165bfb6088e8c3be23197ddc3bd7a054ae7e6/sqlalchemy_crud_plus-1.5.0.tar.gz", hash = "sha256:3d4cbdf2bd7638115a48536d11a0f7abfd1ebb64bb86036297239c0ca224c377", size = 41040 }
+sdist = { url = "https://files.pythonhosted.org/packages/37/6a/99d1908c96ba13da4941e7fa6e254220a14332a2dce244fa423487ea7759/sqlalchemy_crud_plus-1.6.0.tar.gz", hash = "sha256:a09a56c4a9dd909800b4be5868a72b985b1cffd548aa734e3e2199c3395d2a55", size = 41713 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/28/c0023025415d27c9a703ff6de3a116bfc57f2a94600138a540ed959acdfa/sqlalchemy_crud_plus-1.5.0-py3-none-any.whl", hash = "sha256:adec688680e90c83ff789286632b6d74c1934f494af68f3370feb0ddd622d7f4", size = 8325 },
+    { url = "https://files.pythonhosted.org/packages/d0/e9/0996d7e9be20473f4a80a1f8a5d679bfcbc2e5a567b2f0ca488ccaa2b475/sqlalchemy_crud_plus-1.6.0-py3-none-any.whl", hash = "sha256:b2c77957716023f1ab4beac27588c448b9f9fba12657aa4013b1946d26fffd84", size = 8380 },
 ]
 
 [[package]]
