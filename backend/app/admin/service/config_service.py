@@ -26,9 +26,11 @@ class ConfigService:
     async def save_built_in_config(objs: list[SaveConfigParam], type: str) -> None:
         async with async_db_session.begin() as db:
             for obj in objs:
-                config = await config_dao.get_by_name(db, obj.name)
+                config = await config_dao.get_by_key_and_type(db, obj.key, type)
                 if config is None:
-                    await config_dao.create_model(db, obj, type=type)
+                    if await config_dao.get_by_key(db, obj.key, built_in=True):
+                        raise errors.ForbiddenError(msg=f'参数配置 {obj.key} 已存在')
+                    await config_dao.create_model(db, obj, flush=True, type=type)
                 else:
                     await config_dao.update_model(db, config.id, obj, type=type)
 
@@ -47,11 +49,11 @@ class ConfigService:
     @staticmethod
     async def create(*, obj: CreateAnyConfigParam) -> None:
         async with async_db_session.begin() as db:
-            config = await config_dao.get_by_name(db, obj.name) or config_dao.get_by_key(db, obj.key)
-            if config:
-                raise errors.ForbiddenError(msg='参数配置已存在')
             if obj.type in admin_settings.CONFIG_BUILT_IN_TYPES:
                 raise errors.ForbiddenError(msg='非法类型参数')
+            config = await config_dao.get_by_key(db, obj.key)
+            if config:
+                raise errors.ForbiddenError(msg=f'参数配置 {obj.key} 已存在')
             await config_dao.create(db, obj)
 
     @staticmethod

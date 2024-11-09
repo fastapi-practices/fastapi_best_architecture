@@ -99,7 +99,7 @@ simpleeval==1.0.0
 six==1.16.0
 sniffio==1.3.1
 sqlalchemy==2.0.30
-sqlalchemy-crud-plus==1.5.0
+sqlalchemy-crud-plus==1.6.0
 starlette==0.37.2
 tomli==2.0.2 ; python_full_version < '3.11'
 tornado==6.4.1

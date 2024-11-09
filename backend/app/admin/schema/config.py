@@ -19,7 +19,7 @@ class AnyConfigSchemaBase(SchemaBase):
     key: str
     value: str
     is_frontend: bool
-    remark: str
+    remark: str | None
 
 
 class CreateAnyConfigParam(AnyConfigSchemaBase):

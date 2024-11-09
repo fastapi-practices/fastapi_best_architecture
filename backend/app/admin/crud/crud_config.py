@@ -24,7 +24,7 @@ class CRUDConfig(CRUDPlus[Config]):
 
     async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config]:
         """
-        通过 type 获取系统配置参数
+        通过 type 获取内置系统配置
 
         :param db:
         :param type:
@@ -32,25 +32,30 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.select_models(db, type=type)
 
-    async def get_by_name(self, db: AsyncSession, name: str) -> Config | None:
+    async def get_by_key_and_type(self, db: AsyncSession, key: str, type: str) -> Config | None:
         """
-        通过 name 获取系统配置参数
+        通过 name 和 type 获取内置系统配置
 
         :param db:
-        :param name:
+        :param key:
+        :param type:
         :return:
         """
-        return await self.select_model_by_column(db, name=name, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
+        return await self.select_model_by_column(db, key=key, type=type)
 
-    async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
+    async def get_by_key(self, db: AsyncSession, key: str, built_in: bool = False) -> Config | None:
         """
         通过 key 获取系统配置参数
 
         :param db:
         :param key:
+        :param built_in:
         :return:
         """
-        return await self.select_model_by_column(db, key=key, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
+        filters = {'key': key}
+        if not built_in:
+            filters.update({'type__not_in': admin_settings.CONFIG_BUILT_IN_TYPES})
+        return await self.select_model_by_column(db, **filters)
 
     async def get_list(self, name: str = None, type: str = None) -> Select:
         """
@@ -60,7 +65,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param type:
         :return:
         """
-        filters = {'name__not_in': admin_settings.CONFIG_BUILT_IN_TYPES}
+        filters = {'type__not_in': admin_settings.CONFIG_BUILT_IN_TYPES}
         if name is not None:
             filters.update(name__like=f'%{name}%')
         if type is not None:
@@ -96,7 +101,9 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pk:
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(
+            db, allow_multiple=True, id__in=pk, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES
+        )
 
 
 config_dao: CRUDConfig = CRUDConfig(Config)

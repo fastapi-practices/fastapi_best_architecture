@@ -44,7 +44,7 @@ dependencies = [
     "XdbSearchIP==1.0.2",
     "fastapi_oauth20>=0.0.1a2",
     "flower==2.0.1",
-    "sqlalchemy-crud-plus==1.5.0",
+    "sqlalchemy-crud-plus==1.6.0",
     "jinja2==3.1.4",
     "aiofiles==24.1.0",
     # When celery version < 6.0.0
