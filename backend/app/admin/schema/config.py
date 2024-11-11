@@ -15,11 +15,11 @@ class SaveConfigParam(SchemaBase):
 
 class AnyConfigSchemaBase(SchemaBase):
     name: str
-    type: str | None
+    type: str | None = None
     key: str
     value: str
     is_frontend: bool
-    remark: str | None
+    remark: str | None = None
 
 
 class CreateAnyConfigParam(AnyConfigSchemaBase):
