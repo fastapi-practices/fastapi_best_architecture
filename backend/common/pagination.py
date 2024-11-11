@@ -22,10 +22,12 @@ DataT = TypeVar('DataT')
 SchemaT = TypeVar('SchemaT')
 
 
-class _Params(BaseModel, AbstractParams):
+class PageParams(BaseModel):
     page: int = Query(1, ge=1, description='Page number')
     size: int = Query(20, gt=0, le=100, description='Page size')  # 默认 20 条记录
 
+
+class _PageParams(PageParams, AbstractParams):
     def to_raw_params(self) -> RawParams:
         return RawParams(
             limit=self.size,
@@ -33,7 +35,7 @@ class _Params(BaseModel, AbstractParams):
         )
 
 
-class _Page(AbstractPage[T], Generic[T]):
+class _CustomPage(AbstractPage[T], Generic[T]):
     items: Sequence[T]  # 数据
     total: int  # 总数据数
     page: int  # 第n页
@@ -41,15 +43,15 @@ class _Page(AbstractPage[T], Generic[T]):
     total_pages: int  # 总页数
     links: Dict[str, str | None]  # 跳转链接
 
-    __params_type__ = _Params  # 使用自定义的Params
+    __params_type__ = _PageParams
 
     @classmethod
     def create(
         cls,
         items: Sequence[T],
+        params: _PageParams,
         total: int,
-        params: _Params,
-    ) -> _Page[T]:
+    ) -> _CustomPage[T]:
         page = params.page
         size = params.size
         total_pages = math.ceil(total / params.size)
@@ -64,7 +66,7 @@ class _Page(AbstractPage[T], Generic[T]):
 
 
 class _PageData(BaseModel, Generic[DataT]):
-    page_data: DataT | None = None
+    data: DataT | None = None
 
 
 async def paging_data(db: AsyncSession, select: Select, page_data_schema: SchemaT) -> dict:
@@ -76,10 +78,11 @@ async def paging_data(db: AsyncSession, select: Select, page_data_schema: Schema
     :param page_data_schema:
     :return:
     """
-    _paginate = await paginate(db, select)
-    page_data = _PageData[_Page[page_data_schema]](page_data=_paginate).model_dump()['page_data']
+    paginated_data = await paginate(db, select)
+    # 参考：https://docs.pydantic.dev/dev/concepts/models/#generic-models
+    page_data = _PageData[_CustomPage[page_data_schema]](page_data=paginated_data).model_dump()['data']
     return page_data
 
 
 # 分页依赖注入
-DependsPagination = Depends(pagination_ctx(_Page))
+DependsPagination = Depends(pagination_ctx(_CustomPage))
