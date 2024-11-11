@@ -3,10 +3,8 @@
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import Select, select
+from sqlalchemy import Select
 
-from backend.app.admin.model import User
-from backend.app.admin.model.m2m import sys_role_dept
 from backend.common.exception.errors import ServerError
 from backend.core.conf import settings
 
@@ -33,13 +31,13 @@ class RequestPermission:
 
 def filter_user_data_scope(request: Request, model: Any, stmt: Select) -> Select:
     """
-    获取用户数据范围
+    筛选用户数据范围
 
     使用场景：对于非后台管理数据，需要在前端界面向用户进行展示的数据
 
-    :param request:
-    :param model:
-    :param stmt:
+    :param request: 接口请求对象
+    :param model: 当前需要进行数据过滤的 sqlalchemy 模型
+    :param stmt: 需要进行数据筛选的 stmt（select） 语句
     :return:
     """
     user_roles = request.user.roles
@@ -50,22 +48,15 @@ def filter_user_data_scope(request: Request, model: Any, stmt: Select) -> Select
     # 全部数据
     if data_scope == 0:
         stmt = stmt
-    # 自定义数据
+    # 自定义数据（自选部门）
     elif data_scope == 1:
-        stmt = stmt.where(
-            model.create_user.in_(
-                select(User.id)
-                .select_from(sys_role_dept)
-                .join(User, User.dept_id == sys_role_dept.c.dept_id)
-                .where(sys_role_dept.c.role_id.in_(user_roles))
-            )
-        )
+        ...
     # 所在部门及以下数据
     elif data_scope == 2:
         ...  # TODO
     # 所在部门数据
     elif data_scope == 3:
-        stmt = stmt.where(select(User.id).where(User.dept_id == request.user.dept_id))
+        ...
     # 仅本人数据
     elif data_scope == 4:
         stmt = stmt.where(model.create_user == request.user.id)
