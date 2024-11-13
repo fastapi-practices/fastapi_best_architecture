@@ -7,6 +7,7 @@ from backend.app.{{ app_name }}.model import {{ table_name_class }}
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
 from backend.database.db_mysql import async_db_session
+from sqlalchemy import Select
 
 
 class {{ table_name_class }}Service:
@@ -19,6 +20,10 @@ class {{ table_name_class }}Service:
             return {{ table_name_en }}
 
     @staticmethod
+    async def get_select() -> Select:
+        return await {{ table_name_en }}_dao.get_list()
+
+    @staticmethod
     async def get_all() -> Sequence[{{ table_name_class }}]:
         async with async_db_session() as db:
             {{ table_name_en }}s = await {{ table_name_en }}_dao.get_all(db)
@@ -27,9 +32,6 @@ class {{ table_name_class }}Service:
     @staticmethod
     async def create(*, obj: Create{{ schema_name }}Param) -> None:
         async with async_db_session.begin() as db:
-            {{ table_name_en }} = await {{ table_name_en }}_dao.get_by_name(db, obj.name)
-            if {{ table_name_en }}:
-                raise errors.ForbiddenError(msg='{{ table_simple_name_zh }}已存在')
             await {{ table_name_en }}_dao.create(db, obj)
 
     @staticmethod

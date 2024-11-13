@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
-
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}ListDetails, Update{{ schema_name }}Param
 from backend.app.{{ app_name }}.service.{{ table_name_en }}_service import {{ table_name_en }}_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -12,6 +10,7 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
+from fastapi import APIRouter, Depends, Path, Query
 
 router = APIRouter()
 

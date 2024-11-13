@@ -127,6 +127,17 @@ class GenService:
                 if not init_filepath.exists():
                     async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
+                if 'api' in str(code_folder):
+                    # api __init__.py
+                    api_init_filepath = code_folder.parent.joinpath('__init__.py')
+                    if not api_init_filepath.exists():
+                        async with aiofiles.open(api_init_filepath, 'w', encoding='utf-8') as f:
+                            await f.write(gen_template.init_content)
+                    # app __init__.py
+                    app_init_filepath = api_init_filepath.parent.joinpath('__init__.py')
+                    if not app_init_filepath:
+                        async with aiofiles.open(app_init_filepath, 'w', encoding='utf-8') as f:
+                            await f.write(gen_template.init_content)
                 # 写入代码文件呢
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
@@ -161,6 +172,10 @@ class GenService:
                         f'from backend.app.{business.app_name}.model.{business.table_name_en} '
                         f'import {to_pascal(business.table_name_en)}\n',
                     )
+                if 'api' in new_code_path:
+                    # api __init__.py
+                    api_init_filepath = os.path.join(*new_code_path.split('/')[:-2], '__init__.py')
+                    zf.writestr(api_init_filepath, gen_template.init_content)
             zf.close()
             bio.seek(0)
             return bio

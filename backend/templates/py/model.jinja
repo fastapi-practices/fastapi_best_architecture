@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import mysql
-
-from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import {% if have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+from sqlalchemy.dialects import mysql
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
