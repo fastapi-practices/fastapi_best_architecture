@@ -48,7 +48,7 @@
             reconnectionDelay: 1000,
             transports: ['websocket'],
             auth: {
-                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzE2NjQ5ODksInN1YiI6IjEifQ.5m5_3kMERAl-pNlQqlb95XmJ1zIXAv682Cv1IiL_tBw'
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzE2OTM1NzIsInN1YiI6IjEifQ.8rARu8C3Yx2bh5-jQQAJLgDiMJViVrO-R9NaZbJBKd0'
             }
         });
 
@@ -62,7 +62,7 @@
             notificationDiv.classList.add('notification', 'new');
             notificationDiv.innerHTML = `
                 <strong>Task Notification:</strong>
-                <p>${data.message}</p>
+                <p>${data.msg}</p>
                 <small>Received at: ${new Date().toLocaleTimeString()}</small>
             `;
 
