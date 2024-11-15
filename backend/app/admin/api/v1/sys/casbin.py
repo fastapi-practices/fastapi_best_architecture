@@ -12,6 +12,7 @@ from backend.app.admin.schema.casbin_rule import (
     DeletePolicyParam,
     DeleteUserRoleParam,
     GetPolicyListDetails,
+    UpdatePoliciesParam,
     UpdatePolicyParam,
 )
 from backend.app.admin.service.casbin_service import casbin_service
@@ -92,8 +93,8 @@ async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_policy(old: UpdatePolicyParam, new: UpdatePolicyParam) -> ResponseModel:
-    data = await casbin_service.update_policy(old=old, new=new)
+async def update_policy(obj: UpdatePolicyParam) -> ResponseModel:
+    data = await casbin_service.update_policy(obj=obj)
     return response_base.success(data=data)
 
 
@@ -105,8 +106,8 @@ async def update_policy(old: UpdatePolicyParam, new: UpdatePolicyParam) -> Respo
         DependsRBAC,
     ],
 )
-async def update_policies(old: list[UpdatePolicyParam], new: list[UpdatePolicyParam]) -> ResponseModel:
-    data = await casbin_service.update_policies(old=old, new=new)
+async def update_policies(obj: UpdatePoliciesParam) -> ResponseModel:
+    data = await casbin_service.update_policies(obj=obj)
     return response_base.success(data=data)
 
 

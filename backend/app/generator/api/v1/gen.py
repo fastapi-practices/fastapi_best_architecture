@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query
 from fastapi.responses import StreamingResponse
 
 from backend.app.generator.conf import generator_settings
+from backend.app.generator.schema.gen import ImportParam
 from backend.app.generator.service.gen_service import gen_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -29,12 +30,8 @@ async def get_all_tables(table_schema: Annotated[str, Query(..., description='�
         DependsRBAC,
     ],
 )
-async def import_table(
-    app: Annotated[str, Body(..., description='应用名称，用于代码生成到指定 app')],
-    table_name: Annotated[str, Body(..., description='数据库表名')],
-    table_schema: Annotated[str, Body(..., description='数据库名')] = 'fba',
-) -> ResponseModel:
-    await gen_service.import_business_and_model(app=app, table_schema=table_schema, table_name=table_name)
+async def import_table(obj: ImportParam) -> ResponseModel:
+    await gen_service.import_business_and_model(obj=obj)
     return response_base.success()
 
 

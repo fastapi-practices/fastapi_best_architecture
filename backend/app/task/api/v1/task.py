@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Path
+from fastapi import APIRouter, Depends, Path
 
+from backend.app.task.schema.task import RunParam
 from backend.app.task.service.task_service import task_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -45,10 +46,6 @@ async def get_task_result(tid: Annotated[str, Path(description='任务ID')]) -> 
         DependsRBAC,
     ],
 )
-async def run_task(
-    name: Annotated[str, Path(description='任务名称')],
-    args: Annotated[list | None, Body(description='任务函数位置参数')] = None,
-    kwargs: Annotated[dict | None, Body(description='任务函数关键字参数')] = None,
-) -> ResponseModel:
-    task = task_service.run(name=name, args=args, kwargs=kwargs)
+async def run_task(obj: RunParam) -> ResponseModel:
+    task = task_service.run(name=obj.name, args=obj.args, kwargs=obj.kwargs)
     return response_base.success(data=task)
