@@ -24,18 +24,18 @@ class TaskService:
     @staticmethod
     def get_status(uid: str):
         try:
-            result = AsyncResult(id=uid, app=celery_app)
+            task_result = AsyncResult(id=uid, app=celery_app)
         except NotRegistered:
             raise NotFoundError(msg='任务不存在')
-        return result.status
+        return task_result.status
 
     @staticmethod
     def get_result(uid: str):
         try:
-            result = AsyncResult(id=uid, app=celery_app)
+            task_result = AsyncResult(id=uid, app=celery_app)
         except NotRegistered:
             raise NotFoundError(msg='任务不存在')
-        return result
+        return task_result.result
 
     @staticmethod
     def run(*, name: str, args: list | None = None, kwargs: dict | None = None):

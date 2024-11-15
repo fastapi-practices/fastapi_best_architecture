@@ -19,21 +19,21 @@ async def get_all_tasks() -> ResponseModel:
     return response_base.success(data=tasks)
 
 
-@router.get('/current', summary='获取当前正在执行的任务', dependencies=[DependsJwtAuth])
+@router.get('/running', summary='获取正在执行的任务', dependencies=[DependsJwtAuth])
 async def get_current_task() -> ResponseModel:
     task = task_service.get()
     return response_base.success(data=task)
 
 
-@router.get('/{uid}/status', summary='获取任务状态', dependencies=[DependsJwtAuth])
-async def get_task_status(uid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    status = task_service.get_status(uid)
+@router.get('/{tid}/status', summary='获取任务状态', dependencies=[DependsJwtAuth])
+async def get_task_status(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    status = task_service.get_status(tid)
     return response_base.success(data=status)
 
 
-@router.get('/{uid}', summary='获取任务结果', dependencies=[DependsJwtAuth])
-async def get_task_result(uid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    task = task_service.get_result(uid)
+@router.get('/{tid}', summary='获取任务结果', dependencies=[DependsJwtAuth])
+async def get_task_result(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    task = task_service.get_result(tid)
     return response_base.success(data=task)
 
 
