@@ -9,7 +9,7 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
-from backend.app.admin.service.login_log_service import LoginLogService
+from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
@@ -69,7 +69,7 @@ class AuthService:
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
                 task = BackgroundTask(
-                    LoginLogService.create,
+                    login_log_service.create,
                     **dict(
                         db=db,
                         request=request,
@@ -85,7 +85,7 @@ class AuthService:
                 raise e
             else:
                 background_tasks.add_task(
-                    LoginLogService.create,
+                    login_log_service.create,
                     **dict(
                         db=db,
                         request=request,
