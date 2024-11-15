@@ -9,7 +9,7 @@ from backend.app.admin.crud.crud_user_social import user_social_dao
 from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import RegisterUserParam
 from backend.app.admin.schema.user_social import CreateUserSocialParam
-from backend.app.admin.service.login_log_service import LoginLogService
+from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.exception.errors import AuthorizationError
 from backend.common.security import jwt
@@ -74,7 +74,7 @@ class OAuth2Service:
                 status=LoginLogStatusType.success.value,
                 msg='登录成功（OAuth2）',
             )
-            background_tasks.add_task(LoginLogService.create, **login_log)
+            background_tasks.add_task(login_log_service.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
