@@ -31,7 +31,7 @@ class TaskSettings(BaseSettings):
 
     # Celery
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
-    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery_'
+    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
     CELERY_BACKEND_REDIS_TIMEOUT: int = 5
     CELERY_TASK_PACKAGES: list[str] = [
         'app.task.celery_task',

@@ -7,5 +7,5 @@ from backend.app.task.celery import celery_app
 
 @celery_app.task(name='task_demo_async')
 async def task_demo_async() -> str:
-    await sleep(10)
+    await sleep(20)
     return 'test async'

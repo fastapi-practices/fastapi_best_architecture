@@ -52,3 +52,16 @@ class AccessToken:
 class RefreshToken:
     refresh_token: str
     refresh_token_expire_time: datetime
+
+
+@dataclasses.dataclass
+class TaskResult:
+    result: str
+    traceback: str
+    status: str
+    name: str
+    args: list | None
+    kwargs: dict | None
+    worker: str
+    retries: int | None
+    queue: str | None
