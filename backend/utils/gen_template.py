@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from pydantic.alias_generators import to_pascal, to_snake
 
@@ -77,7 +79,7 @@ class GenTemplate:
         return code_gen_path_mapping[tpl_path]
 
     @staticmethod
-    def get_vars(business: GenBusiness, models: list[GenModel]) -> dict:
+    def get_vars(business: GenBusiness, models: Sequence[GenModel]) -> dict:
         """
         获取模版变量
 

@@ -11,6 +11,7 @@ from backend.app.admin.schema.casbin_rule import (
     DeleteAllPoliciesParam,
     DeletePolicyParam,
     DeleteUserRoleParam,
+    UpdatePoliciesParam,
     UpdatePolicyParam,
 )
 from backend.common.exception import errors
@@ -49,19 +50,23 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def update_policy(*, old: UpdatePolicyParam, new: UpdatePolicyParam) -> bool:
+    async def update_policy(*, obj: UpdatePolicyParam) -> bool:
+        old_obj = obj.old
+        new_obj = obj.new
         enforcer = await rbac.enforcer()
-        _p = enforcer.has_policy(old.sub, old.path, old.method)
+        _p = enforcer.has_policy(old_obj.sub, old_obj.path, old_obj.method)
         if not _p:
             raise errors.NotFoundError(msg='权限不存在')
-        data = await enforcer.update_policy([old.sub, old.path, old.method], [new.sub, new.path, new.method])
+        data = await enforcer.update_policy(
+            [old_obj.sub, old_obj.path, old_obj.method], [new_obj.sub, new_obj.path, new_obj.method]
+        )
         return data
 
     @staticmethod
-    async def update_policies(*, old: list[UpdatePolicyParam], new: list[UpdatePolicyParam]) -> bool:
+    async def update_policies(*, obj: UpdatePoliciesParam) -> bool:
         enforcer = await rbac.enforcer()
         data = await enforcer.update_policies(
-            [list(o.model_dump().values()) for o in old], [list(n.model_dump().values()) for n in new]
+            [list(o.model_dump().values()) for o in obj.old], [list(n.model_dump().values()) for n in obj.new]
         )
         return data
 
