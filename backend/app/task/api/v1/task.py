@@ -14,32 +14,39 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('', summary='获取所有可执行任务模块', dependencies=[DependsJwtAuth])
+@router.get('', summary='获取可执行任务', dependencies=[DependsJwtAuth])
 async def get_all_tasks() -> ResponseModel:
-    tasks = task_service.get_list()
+    tasks = await task_service.get_list()
     return response_base.success(data=tasks)
 
 
-@router.get('/running', summary='获取正在执行的任务', dependencies=[DependsJwtAuth])
-async def get_current_task() -> ResponseModel:
-    task = task_service.get()
-    return response_base.success(data=task)
-
-
-@router.get('/{tid}/status', summary='获取任务状态', dependencies=[DependsJwtAuth])
-async def get_task_status(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    status = task_service.get_status(tid)
+@router.get(
+    '/{tid}',
+    summary='获取任务详情',
+    deprecated=True,
+    description='此接口被视为作废，建议使用 flower 查看任务详情',
+    dependencies=[DependsJwtAuth],
+)
+async def get_task_detail(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    status = task_service.get_detail(tid=tid)
     return response_base.success(data=status)
 
 
-@router.get('/{tid}', summary='获取任务结果', dependencies=[DependsJwtAuth])
-async def get_task_result(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    task = task_service.get_result(tid)
-    return response_base.success(data=task)
+@router.post(
+    '/{tid}',
+    summary='撤销任务',
+    dependencies=[
+        Depends(RequestPermission('sys:task:revoke')),
+        DependsRBAC,
+    ],
+)
+async def revoke_task(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    task_service.revoke(tid=tid)
+    return response_base.success()
 
 
 @router.post(
-    '/{name}',
+    '',
     summary='执行任务',
     dependencies=[
         Depends(RequestPermission('sys:task:run')),
@@ -47,5 +54,5 @@ async def get_task_result(tid: Annotated[str, Path(description='任务ID')]) -> 
     ],
 )
 async def run_task(obj: RunParam) -> ResponseModel:
-    task = task_service.run(name=obj.name, args=obj.args, kwargs=obj.kwargs)
+    task = task_service.run(obj=obj)
     return response_base.success(data=task)

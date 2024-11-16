@@ -23,6 +23,6 @@
 
 你可以通过 `CELERY_BROKER` 控制消息代理选择，它支持 redis 和 rabbitmq
 
-对于本地调试，我们建议使用 redis
+对于本地调试，建议使用 redis
 
-对于线上环境，我们强制使用 rabbitmq
+对于线上环境，强制使用 rabbitmq
