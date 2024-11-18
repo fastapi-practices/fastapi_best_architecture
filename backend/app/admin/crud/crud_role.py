@@ -6,8 +6,8 @@ from sqlalchemy import Select, desc, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Menu, Role, User
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.model import Dept, Menu, Role, User
+from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleDeptParam, UpdateRoleMenuParam, UpdateRoleParam
 
 
 class CRUDRole(CRUDPlus[Role]):
@@ -121,6 +121,21 @@ class CRUDRole(CRUDPlus[Role]):
         menus = await db.execute(stmt)
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
+
+    async def update_depts(self, db, role_id: int, dept_ids: UpdateRoleDeptParam) -> int:
+        """
+        更新角色部门
+
+        :param db:
+        :param role_id:
+        :param dept_ids:
+        :return:
+        """
+        stmt = select(Dept).where(Dept.id.in_(dept_ids.depts))
+        depts = await db.execute(stmt)
+        current_role = await self.get_with_relation(db, role_id)
+        current_role.depts = depts.scalars().all()
+        return len(current_role.depts)
 
     async def delete(self, db, role_id: list[int]) -> int:
         """

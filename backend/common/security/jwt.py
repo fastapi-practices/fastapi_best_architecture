@@ -173,13 +173,13 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
         raise AuthorizationError(msg='用户已被锁定，请联系系统管理员')
     if user.dept_id:
         if not user.dept.status:
-            raise AuthorizationError(msg='用户所属部门已锁定')
+            raise AuthorizationError(msg='用户所属部门已被锁定，请联系系统管理员')
         if user.dept.del_flag:
-            raise AuthorizationError(msg='用户所属部门已删除')
+            raise AuthorizationError(msg='用户所属部门已被删除，请联系系统管理员')
     if user.roles:
         role_status = [role.status for role in user.roles]
         if all(status == 0 for status in role_status):
-            raise AuthorizationError(msg='用户所属角色已锁定')
+            raise AuthorizationError(msg='用户所属角色已被锁定，请联系系统管理员')
     return user
 
 
