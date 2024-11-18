@@ -27,7 +27,7 @@ dependencies = [
     "itsdangerous>=2.2.0",
     "loguru>=0.7.2",
     "msgspec>=0.18.6",
-    "passlib>=1.7.4",
+    "pwdlib>=0.2.1",
     "path==17.0.0",
     "phonenumbers>=8.13.0",
     "psutil>=6.0.0",
@@ -46,7 +46,7 @@ dependencies = [
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool==0.1.0rc7",
     "asgi-correlation-id>=4.3.3",
-    "python-socketio[asyncio]>=5.11.4",
+    "python-socketio>=5.11.4",
 ]
 
 [dependency-groups]

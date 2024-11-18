@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Union
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import VARBINARY, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.sys_user_role import sys_user_role
@@ -22,7 +22,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='用户名')
     nickname: Mapped[str] = mapped_column(String(20), unique=True, comment='昵称')
     password: Mapped[str | None] = mapped_column(String(255), comment='密码')
-    salt: Mapped[str | None] = mapped_column(String(5), comment='加密盐')
+    salt: Mapped[bytes | None] = mapped_column(VARBINARY(255), comment='加密盐')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
     is_staff: Mapped[bool] = mapped_column(default=False, comment='后台管理登陆(0否 1是)')

@@ -6,7 +6,8 @@ from fastapi import Depends, Request
 from fastapi.security import HTTPBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import ExpiredSignatureError, JWTError, jwt
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
+from pwdlib.hashers.bcrypt import BcryptHasher
 from pydantic_core import from_json
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,21 +21,21 @@ from backend.database.db_redis import redis_client
 from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-
 # JWT authorizes dependency injection
 DependsJwtAuth = Depends(HTTPBearer())
 
+password_hash = PasswordHash((BcryptHasher(),))
 
-def get_hash_password(password: str) -> str:
+
+def get_hash_password(password: str, salt: bytes | None) -> str:
     """
     Encrypt passwords using the hash algorithm
 
     :param password:
+    :param salt:
     :return:
     """
-    return pwd_context.hash(password)
+    return password_hash.hash(password, salt=salt)
 
 
 def password_verify(plain_password: str, hashed_password: str) -> bool:
@@ -45,7 +46,7 @@ def password_verify(plain_password: str, hashed_password: str) -> bool:
     :param hashed_password: The hash ciphers to compare
     :return:
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    return password_hash.verify(plain_password, hashed_password)
 
 
 async def create_access_token(sub: str, multi_login: bool) -> AccessToken:

@@ -534,10 +534,10 @@ dependencies = [
     { name = "jinja2" },
     { name = "loguru" },
     { name = "msgspec" },
-    { name = "passlib" },
     { name = "path" },
     { name = "phonenumbers" },
     { name = "psutil" },
+    { name = "pwdlib" },
     { name = "pydantic" },
     { name = "python-jose" },
     { name = "python-socketio" },
@@ -587,13 +587,13 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "msgspec", specifier = ">=0.18.6" },
-    { name = "passlib", specifier = ">=1.7.4" },
     { name = "path", specifier = "==17.0.0" },
     { name = "phonenumbers", specifier = ">=8.13.0" },
     { name = "psutil", specifier = ">=6.0.0" },
+    { name = "pwdlib", specifier = ">=0.2.1" },
     { name = "pydantic", specifier = ">=2.9.1" },
     { name = "python-jose", specifier = ">=3.3.0" },
-    { name = "python-socketio", extras = ["asyncio"], specifier = ">=5.11.4" },
+    { name = "python-socketio", specifier = ">=5.11.4" },
     { name = "redis", extras = ["hiredis"], specifier = ">=5.2.0" },
     { name = "sqlalchemy", specifier = ">=2.0.30" },
     { name = "sqlalchemy-crud-plus", specifier = "==1.6.0" },
@@ -1175,15 +1175,6 @@ wheels = [
 ]
 
 [[package]]
-name = "passlib"
-version = "1.7.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b6/06/9da9ee59a67fae7761aab3ccc84fa4f3f33f125b370f1ccdb915bf967c11/passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04", size = 689844 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/a4/ab6b7589382ca3df236e03faa71deac88cae040af60c071a78d254a62172/passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1", size = 525554 },
-]
-
-[[package]]
 name = "path"
 version = "17.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1374,6 +1365,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/27/c2/d034856ac47e3b3cdfa9720d0e113902e615f4190d5d1bdb8df4b2015fb2/psutil-6.1.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d905186d647b16755a800e7263d43df08b790d709d575105d419f8b6ef65423a", size = 288804 },
     { url = "https://files.pythonhosted.org/packages/ea/55/5389ed243c878725feffc0d6a3bc5ef6764312b6fc7c081faaa2cfa7ef37/psutil-6.1.0-cp37-abi3-win32.whl", hash = "sha256:1ad45a1f5d0b608253b11508f80940985d1d0c8f6111b5cb637533a0e6ddc13e", size = 250386 },
     { url = "https://files.pythonhosted.org/packages/11/91/87fa6f060e649b1e1a7b19a4f5869709fbf750b7c8c262ee776ec32f3028/psutil-6.1.0-cp37-abi3-win_amd64.whl", hash = "sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32fd7a377d996be", size = 254228 },
+]
+
+[[package]]
+name = "pwdlib"
+version = "0.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/a0/9daed437a6226f632a25d98d65d60ba02bdafa920c90dcb6454c611ead6c/pwdlib-0.2.1.tar.gz", hash = "sha256:9a1d8a8fa09a2f7ebf208265e55d7d008103cbdc82b9e4902ffdd1ade91add5e", size = 11699 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/f3/0dae5078a486f0fdf4d4a1121e103bc42694a9da9bea7b0f2c63f29cfbd3/pwdlib-0.2.1-py3-none-any.whl", hash = "sha256:1823dc6f22eae472b540e889ecf57fd424051d6a4023ec0bcf7f0de2d9d7ef8c", size = 8082 },
 ]
 
 [[package]]
