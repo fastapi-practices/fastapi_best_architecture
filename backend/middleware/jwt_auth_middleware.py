@@ -4,18 +4,15 @@ from typing import Any
 
 from fastapi import Request, Response
 from fastapi.security.utils import get_authorization_scheme_param
-from pydantic_core import from_json
 from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
 from starlette.requests import HTTPConnection
 
 from backend.app.admin.schema.user import CurrentUserIns
 from backend.common.exception.errors import TokenError
 from backend.common.log import log
-from backend.common.security import jwt
+from backend.common.security.jwt import jwt_authentication
 from backend.core.conf import settings
-from backend.database.db_mysql import async_db_session
-from backend.database.db_redis import redis_client
-from backend.utils.serializers import MsgSpecJSONResponse, select_as_dict
+from backend.utils.serializers import MsgSpecJSONResponse
 
 
 class _AuthenticationError(AuthenticationError):
@@ -48,21 +45,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
             return
 
         try:
-            sub = await jwt.jwt_authentication(token)
-            cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{sub}')
-            if not cache_user:
-                async with async_db_session() as db:
-                    current_user = await jwt.get_current_user(db, sub)
-                    user = CurrentUserIns(**select_as_dict(current_user))
-                    await redis_client.setex(
-                        f'{settings.JWT_USER_REDIS_PREFIX}:{sub}',
-                        settings.JWT_USER_REDIS_EXPIRE_SECONDS,
-                        user.model_dump_json(),
-                    )
-            else:
-                # TODO: 在恰当的时机，应替换为使用 model_validate_json
-                # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
-                user = CurrentUserIns.model_validate(from_json(cache_user, allow_partial=True))
+            user = await jwt_authentication(token)
         except TokenError as exc:
             raise _AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
         except Exception as e:

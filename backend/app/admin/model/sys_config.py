@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import String
+from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,16 +13,9 @@ class Config(Base):
     __tablename__ = 'sys_config'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    login_title: Mapped[str] = mapped_column(String(20), default='登录 FBA', comment='登录页面标题')
-    login_sub_title: Mapped[str] = mapped_column(
-        String(50), default='fastapi_best_architecture', comment='登录页面子标题'
-    )
-    footer: Mapped[str] = mapped_column(String(50), default='FBA', comment='页脚标题')
-    logo: Mapped[str] = mapped_column(LONGTEXT, default='Arco', comment='Logo')
-    system_title: Mapped[str] = mapped_column(String(20), default='Arco', comment='系统标题')
-    system_comment: Mapped[str] = mapped_column(
-        LONGTEXT,
-        default='基于 FastAPI 构建的前后端分离 RBAC 权限控制系统，采用独特的伪三层架构模型设计，'
-        '内置 fastapi-admin 基本实现，并作为模板库免费开源',
-        comment='系统描述',
-    )
+    name: Mapped[str] = mapped_column(String(20), comment='名称')
+    type: Mapped[str | None] = mapped_column(String(20), server_default=None, comment='类型')
+    key: Mapped[str] = mapped_column(String(50), unique=True, comment='键名')
+    value: Mapped[str] = mapped_column(LONGTEXT, comment='键值')
+    is_frontend: Mapped[str] = mapped_column(Boolean, default=False, comment='是否前端')
+    remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')

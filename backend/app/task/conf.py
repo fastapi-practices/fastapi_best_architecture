@@ -19,7 +19,7 @@ class TaskSettings(BaseSettings):
     ENVIRONMENT: Literal['dev', 'pro']
 
     # Env Celery
-    CELERY_BROKER_REDIS_DATABASE: int  # 仅当使用 redis 作为 broker 时生效, 更适用于测试环境
+    CELERY_BROKER_REDIS_DATABASE: int  # 仅在 dev 模式时生效
     CELERY_BACKEND_REDIS_DATABASE: int
 
     # Env Rabbitmq
@@ -31,9 +31,9 @@ class TaskSettings(BaseSettings):
 
     # Celery
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
-    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery'
-    CELERY_BACKEND_REDIS_TIMEOUT: float = 5.0
-    CELERY_TASKS_PACKAGES: list[str] = [
+    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
+    CELERY_BACKEND_REDIS_TIMEOUT: int = 5
+    CELERY_TASK_PACKAGES: list[str] = [
         'app.task.celery_task',
         'app.task.celery_task.db_log',
     ]
@@ -44,12 +44,12 @@ class TaskSettings(BaseSettings):
             'schedule': 10,
         },
         'exec-every-sunday': {
-            'task': 'auto_delete_db_opera_log',
-            'schedule': crontab(0, 0, day_of_week='6'),  # type: ignore
+            'task': 'delete_db_opera_log',
+            'schedule': crontab('0', '0', day_of_week='6'),
         },
         'exec-every-15-of-month': {
-            'task': 'auto_delete_db_login_log',
-            'schedule': crontab(0, 0, day_of_month='15'),  # type: ignore
+            'task': 'delete_db_login_log',
+            'schedule': crontab('0', '0', day_of_month='15'),
         },
     }
 

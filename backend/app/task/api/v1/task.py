@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Path
+from fastapi import APIRouter, Depends, Path
 
+from backend.app.task.schema.task import RunParam
 from backend.app.task.service.task_service import task_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -13,42 +14,45 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('', summary='获取所有可执行任务模块', dependencies=[DependsJwtAuth])
+@router.get('', summary='获取可执行任务', dependencies=[DependsJwtAuth])
 async def get_all_tasks() -> ResponseModel:
-    tasks = task_service.get_list()
+    tasks = await task_service.get_list()
     return response_base.success(data=tasks)
 
 
-@router.get('/current', summary='获取当前正在执行的任务', dependencies=[DependsJwtAuth])
-async def get_current_task() -> ResponseModel:
-    task = task_service.get()
-    return response_base.success(data=task)
-
-
-@router.get('/{uid}/status', summary='获取任务状态', dependencies=[DependsJwtAuth])
-async def get_task_status(uid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    status = task_service.get_status(uid)
+@router.get(
+    '/{tid}',
+    summary='获取任务详情',
+    deprecated=True,
+    description='此接口被视为作废，建议使用 flower 查看任务详情',
+    dependencies=[DependsJwtAuth],
+)
+async def get_task_detail(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    status = task_service.get_detail(tid=tid)
     return response_base.success(data=status)
 
 
-@router.get('/{uid}', summary='获取任务结果', dependencies=[DependsJwtAuth])
-async def get_task_result(uid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
-    task = task_service.get_result(uid)
-    return response_base.success(data=task)
+@router.post(
+    '/{tid}',
+    summary='撤销任务',
+    dependencies=[
+        Depends(RequestPermission('sys:task:revoke')),
+        DependsRBAC,
+    ],
+)
+async def revoke_task(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+    task_service.revoke(tid=tid)
+    return response_base.success()
 
 
 @router.post(
-    '/{name}',
+    '',
     summary='执行任务',
     dependencies=[
         Depends(RequestPermission('sys:task:run')),
         DependsRBAC,
     ],
 )
-async def run_task(
-    name: Annotated[str, Path(description='任务名称')],
-    args: Annotated[list | None, Body(description='任务函数位置参数')] = None,
-    kwargs: Annotated[dict | None, Body(description='任务函数关键字参数')] = None,
-) -> ResponseModel:
-    task = task_service.run(name=name, args=args, kwargs=kwargs)
+async def run_task(obj: RunParam) -> ResponseModel:
+    task = task_service.run(obj=obj)
     return response_base.success(data=task)

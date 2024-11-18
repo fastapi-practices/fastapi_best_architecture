@@ -9,7 +9,7 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
-from backend.app.admin.service.login_log_service import LoginLogService
+from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
@@ -34,7 +34,7 @@ class AuthService:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
                 raise errors.NotFoundError(msg='用户名或密码有误')
-            elif not password_verify(f'{obj.password}{current_user.salt}', current_user.password):
+            elif not password_verify(f'{obj.password}', current_user.password):
                 raise errors.AuthorizationError(msg='用户名或密码有误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -53,7 +53,7 @@ class AuthService:
                     raise errors.NotFoundError(msg='用户名或密码有误')
                 user_uuid = current_user.uuid
                 username = current_user.username
-                if not password_verify(obj.password + current_user.salt, current_user.password):
+                if not password_verify(obj.password, current_user.password):
                     raise errors.AuthorizationError(msg='用户名或密码有误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -69,7 +69,7 @@ class AuthService:
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
                 task = BackgroundTask(
-                    LoginLogService.create,
+                    login_log_service.create,
                     **dict(
                         db=db,
                         request=request,
@@ -85,7 +85,7 @@ class AuthService:
                 raise e
             else:
                 background_tasks.add_task(
-                    LoginLogService.create,
+                    login_log_service.create,
                     **dict(
                         db=db,
                         request=request,
@@ -168,4 +168,4 @@ class AuthService:
             await redis_client.delete_prefix(key_prefix)
 
 
-auth_service = AuthService()
+auth_service: AuthService = AuthService()

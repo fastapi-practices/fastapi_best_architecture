@@ -15,6 +15,7 @@ from backend.app.generator.crud.crud_gen import gen_dao
 from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.crud.crud_gen_model import gen_model_dao
 from backend.app.generator.model import GenBusiness
+from backend.app.generator.schema.gen import ImportParam
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_model_service import gen_model_service
@@ -32,17 +33,17 @@ class GenService:
             return await gen_dao.get_all_tables(db, table_schema)
 
     @staticmethod
-    async def import_business_and_model(*, app: str, table_schema: str, table_name: str) -> None:
+    async def import_business_and_model(*, obj: ImportParam) -> None:
         async with async_db_session.begin() as db:
-            table_info = await gen_dao.get_table(db, table_name)
+            table_info = await gen_dao.get_table(db, obj.table_name)
             if not table_info:
                 raise errors.NotFoundError(msg='数据库表不存在')
-            business_info = await gen_business_dao.get_by_name(db, table_name)
+            business_info = await gen_business_dao.get_by_name(db, obj.table_name)
             if business_info:
                 raise errors.ForbiddenError(msg='已存在相同数据库表业务')
             table_name = table_info[0]
             business_data = {
-                'app_name': app,
+                'app_name': obj.app,
                 'table_name_en': table_name,
                 'table_name_zh': table_info[1] or ' '.join(table_name.split('_')),
                 'table_simple_name_zh': table_info[1] or table_name.split('_')[-1],
@@ -51,7 +52,7 @@ class GenService:
             new_business = GenBusiness(**CreateGenBusinessParam(**business_data).model_dump())
             db.add(new_business)
             await db.flush()
-            column_info = await gen_dao.get_all_columns(db, table_schema, table_name)
+            column_info = await gen_dao.get_all_columns(db, obj.table_schema, table_name)
             for column in column_info:
                 column_type = column[-1].split('(')[0].upper()
                 pd_type = sql_type_to_pydantic(column_type)
@@ -127,6 +128,17 @@ class GenService:
                 if not init_filepath.exists():
                     async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
+                if 'api' in str(code_folder):
+                    # api __init__.py
+                    api_init_filepath = code_folder.parent.joinpath('__init__.py')
+                    if not api_init_filepath.exists():
+                        async with aiofiles.open(api_init_filepath, 'w', encoding='utf-8') as f:
+                            await f.write(gen_template.init_content)
+                    # app __init__.py
+                    app_init_filepath = api_init_filepath.parent.joinpath('__init__.py')
+                    if not app_init_filepath:
+                        async with aiofiles.open(app_init_filepath, 'w', encoding='utf-8') as f:
+                            await f.write(gen_template.init_content)
                 # 写入代码文件呢
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
@@ -161,9 +173,13 @@ class GenService:
                         f'from backend.app.{business.app_name}.model.{business.table_name_en} '
                         f'import {to_pascal(business.table_name_en)}\n',
                     )
+                if 'api' in new_code_path:
+                    # api __init__.py
+                    api_init_filepath = os.path.join(*new_code_path.split('/')[:-2], '__init__.py')
+                    zf.writestr(api_init_filepath, gen_template.init_content)
             zf.close()
             bio.seek(0)
             return bio
 
 
-gen_service = GenService()
+gen_service: GenService = GenService()

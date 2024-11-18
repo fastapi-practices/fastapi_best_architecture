@@ -12,8 +12,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # 某些包可能存在同步不及时导致安装失败的情况，可更改为官方源：https://pypi.org/simple
-RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-    && pip install -r backend/requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv sync --group server --default-index https://mirrors.aliyun.com/pypi/simple
 
 ENV TZ = Asia/Shanghai
 

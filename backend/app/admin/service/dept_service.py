@@ -71,4 +71,4 @@ class DeptService:
             return count
 
 
-dept_service = DeptService()
+dept_service: DeptService = DeptService()

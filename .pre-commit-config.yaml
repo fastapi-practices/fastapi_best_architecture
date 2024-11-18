@@ -8,7 +8,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.6.4
+    rev: v0.7.2
     hooks:
       - id: ruff
         args:
@@ -20,7 +20,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.20
+    rev: 0.4.29
     hooks:
       - id: uv-lock
         args:

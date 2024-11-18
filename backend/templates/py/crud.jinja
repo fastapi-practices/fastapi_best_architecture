@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import delete
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy_crud_plus import CRUDPlus
-
 from backend.app.{{ app_name }}.model import {{ table_name_class }}
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+from sqlalchemy import Select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 
 class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
@@ -20,6 +19,14 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         :return:
         """
         return await self.select_model(db, pk)
+
+    async def get_list(self) -> Select:
+        """
+        获取 {{ schema_name }} 列表
+
+        :return:
+        """
+        return await self.select_order('created_time', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ table_name_class }}]:
         """
