@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fast_captcha import text_captcha
+import bcrypt
+
 from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -70,8 +71,8 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         if not social:
-            salt = text_captcha(5)
-            obj.password = get_hash_password(f'{obj.password}{salt}')
+            salt = bcrypt.gensalt()
+            obj.password = get_hash_password(f'{obj.password}', salt)
             dict_obj = obj.model_dump()
             dict_obj.update({'is_staff': True, 'salt': salt})
         else:
@@ -88,8 +89,8 @@ class CRUDUser(CRUDPlus[User]):
         :param obj:
         :return:
         """
-        salt = text_captcha(5)
-        obj.password = get_hash_password(f'{obj.password}{salt}')
+        salt = bcrypt.gensalt()
+        obj.password = get_hash_password(f'{obj.password}', salt)
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
