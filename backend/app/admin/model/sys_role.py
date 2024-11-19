@@ -17,7 +17,7 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(20), unique=True, comment='角色名称')
     data_scope: Mapped[int | None] = mapped_column(
         default=0,
-        comment='权限范围（0: 全部数据，1: 自定义数据，2: 所在部门及以下数据，3: 所在部门数据，4: 仅本人数据）',
+        comment='数据权限范围（0: 全部数据，1: 自定义数据，2: 所在部门及以下数据，3: 所在部门数据，4: 仅本人数据）',
     )
     status: Mapped[int] = mapped_column(default=1, comment='角色状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')

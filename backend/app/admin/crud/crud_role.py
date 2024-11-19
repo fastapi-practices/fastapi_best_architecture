@@ -3,11 +3,18 @@
 from typing import Sequence
 
 from sqlalchemy import Select, desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept, Menu, Role, User
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleDeptParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    UpdateRoleDataScopeParam,
+    UpdateRoleDeptParam,
+    UpdateRoleMenuParam,
+    UpdateRoleParam,
+)
 
 
 class CRUDRole(CRUDPlus[Role]):
@@ -121,6 +128,17 @@ class CRUDRole(CRUDPlus[Role]):
         menus = await db.execute(stmt)
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
+
+    async def update_data_scope(self, db: AsyncSession, role_id: int, data_scope: UpdateRoleDataScopeParam):
+        """
+        更新用户数据范围
+
+        :param db:
+        :param role_id:
+        :param data_scope:
+        :return:
+        """
+        return await self.update_model(db, role_id, data_scope)
 
     async def update_depts(self, db, role_id: int, dept_ids: UpdateRoleDeptParam) -> int:
         """

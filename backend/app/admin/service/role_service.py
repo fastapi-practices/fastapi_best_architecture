@@ -9,7 +9,13 @@ from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleDeptParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    UpdateRoleDataScopeParam,
+    UpdateRoleDeptParam,
+    UpdateRoleMenuParam,
+    UpdateRoleParam,
+)
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
@@ -75,6 +81,17 @@ class RoleService:
             count = await role_dao.update_menus(db, pk, menu_ids)
             if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            return count
+
+    @staticmethod
+    async def update_role_data_scope(*, request: Request, pk: int, data_scope: UpdateRoleDataScopeParam) -> int:
+        async with async_db_session.begin() as db:
+            role = await role_dao.get(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            count = await role_dao.update_data_scope(db, pk, data_scope)
+            if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 

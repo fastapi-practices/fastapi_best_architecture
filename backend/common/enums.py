@@ -38,8 +38,11 @@ class MenuType(IntEnum):
 class RoleDataScopeType(IntEnum):
     """数据范围"""
 
-    all = 1
-    custom = 2
+    all = 0
+    custom = 1
+    dept_child = 2
+    dept = 3
+    self = 4
 
 
 class MethodType(StrEnum):

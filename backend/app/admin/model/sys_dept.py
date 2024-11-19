@@ -5,6 +5,7 @@ from typing import Union
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.app.admin.model.m2m import sys_role_dept
 from backend.common.model import Base, id_key
 
 
@@ -34,4 +35,4 @@ class Dept(Base):
     users: Mapped[list['User']] = relationship(init=False, back_populates='dept')  # noqa: F821
 
     # 部门角色多对多
-    roles: Mapped[list['Role']] = relationship(init=False, back_populates='dept')  # noqa: F821
+    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_role_dept, back_populates='depts')  # noqa: F821
