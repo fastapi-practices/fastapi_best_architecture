@@ -54,7 +54,7 @@ def filter_data_permission(request: Request, model: Any) -> Any:
     if not user_roles:
         return or_(getattr(model, 'created_by') == user_id if hasattr(model, 'created_by') else 1 == 0)
 
-    dept_id = user.dept_id
+    user_dept_id = user.dept_id
 
     conditions = []
 
@@ -74,12 +74,12 @@ def filter_data_permission(request: Request, model: Any) -> Any:
 
         # 部门及以下数据权限
         elif role.data_scope == 2:
-            child_dept_ids = select(Dept.id).where(or_(Dept.id == dept_id, Dept.parent_id == dept_id))
+            child_dept_ids = select(Dept.id).where(or_(Dept.id == user_dept_id, Dept.parent_id == user_dept_id))
             conditions.append(getattr(model, 'dept_id').in_(child_dept_ids) if hasattr(model, 'dept_id') else 1 == 0)
 
         # 本部门数据权限
         elif role.data_scope == 3:
-            conditions.append(getattr(model, 'dept_id') == dept_id if hasattr(model, 'dept_id') else 1 == 0)
+            conditions.append(getattr(model, 'dept_id') == user_dept_id if hasattr(model, 'dept_id') else 1 == 0)
 
         # 仅本人数据权限
         elif role.data_scope == 4:
