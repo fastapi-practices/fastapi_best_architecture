@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model.m2m import sys_role_dept, sys_role_menu, sys_user_role
+from backend.app.admin.model.m2m import sys_role_menu, sys_user_role
 from backend.common.model import Base, id_key
 
 
@@ -27,6 +27,3 @@ class Role(Base):
 
     # 角色菜单多对多
     menus: Mapped[list['Menu']] = relationship(init=False, secondary=sys_role_menu, back_populates='roles')  # noqa: F821
-
-    # 角色部门多对多
-    depts: Mapped[list['Dept']] = relationship(init=False, secondary=sys_role_dept, back_populates='roles')  # noqa: F821

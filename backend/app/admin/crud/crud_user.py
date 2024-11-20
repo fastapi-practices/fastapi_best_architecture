@@ -303,7 +303,6 @@ class CRUDUser(CRUDPlus[User]):
         stmt = select(self.model).options(
             selectinload(self.model.dept),
             selectinload(self.model.roles).joinedload(Role.menus),
-            selectinload(self.model.roles).joinedload(Role.depts),
         )
         filters = []
         if user_id:
