@@ -33,11 +33,20 @@ class DataRuleTypeService:
     @staticmethod
     async def create(*, obj: CreateDataRuleTypeParam) -> None:
         async with async_db_session.begin() as db:
+            data_rule_type = await data_rule_type_dao.get_by_name(db, obj.name)
+            if data_rule_type:
+                raise errors.ForbiddenError(msg='数据权限规则类型已存在')
             await data_rule_type_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDataRuleTypeParam) -> int:
         async with async_db_session.begin() as db:
+            data_rule_type = await data_rule_type_dao.get(db, pk)
+            if not data_rule_type:
+                raise errors.NotFoundError(msg='数据权限规则类型不存在')
+            if data_rule_type.name != obj.name:
+                if await data_rule_type_dao.get_by_name(db, obj.name):
+                    raise errors.ForbiddenError(msg='数据权限规则类型已存在')
             count = await data_rule_type_dao.update(db, pk, obj)
             return count
 

@@ -2,16 +2,19 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
+from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.schema import SchemaBase
 
 
 class DataRuleSchemaBase(SchemaBase):
+    type_id: int
     name: str
     model: str
     column: str
-    condition: str
+    operator: RoleDataRuleOperatorType = Field(RoleDataRuleOperatorType.OR)
+    expression: RoleDataRuleExpressionType = Field(RoleDataRuleExpressionType.eq)
 
 
 class CreateDataRuleParam(DataRuleSchemaBase):

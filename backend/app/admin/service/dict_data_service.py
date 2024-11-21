@@ -31,7 +31,7 @@ class DictDataService:
                 raise errors.ForbiddenError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
-                raise errors.ForbiddenError(msg='字典类型不存在')
+                raise errors.NotFoundError(msg='字典类型不存在')
             await dict_data_dao.create(db, obj)
 
     @staticmethod
@@ -45,7 +45,7 @@ class DictDataService:
                     raise errors.ForbiddenError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
-                raise errors.ForbiddenError(msg='字典类型不存在')
+                raise errors.NotFoundError(msg='字典类型不存在')
             count = await dict_data_dao.update(db, pk, obj)
             return count
 

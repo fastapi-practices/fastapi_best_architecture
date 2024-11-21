@@ -13,7 +13,7 @@ from backend.app.admin.schema.data_rule_type import CreateDataRuleTypeParam, Upd
 class CRUDDataRuleType(CRUDPlus[DataRuleType]):
     async def get(self, db: AsyncSession, pk: int) -> DataRuleType | None:
         """
-        获取 DataRuleType
+        获取数据权限规则类型
 
         :param db:
         :param pk:
@@ -23,15 +23,25 @@ class CRUDDataRuleType(CRUDPlus[DataRuleType]):
 
     async def get_list(self) -> Select:
         """
-        获取 DataRuleType 列表
+        获取数据权限规则类型列表
 
         :return:
         """
         return await self.select_order('created_time', 'desc')
 
+    async def get_by_name(self, db: AsyncSession, name: str) -> DataRuleType | None:
+        """
+        通过 name 获取数据权限规则类型
+
+        :param db:
+        :param name:
+        :return:
+        """
+        return await self.select_model_by_column(db, name=name)
+
     async def get_all(self, db: AsyncSession) -> Sequence[DataRuleType]:
         """
-        获取所有 DataRuleType
+        获取所有数据权限规则类型
 
         :param db:
         :return:
@@ -40,7 +50,7 @@ class CRUDDataRuleType(CRUDPlus[DataRuleType]):
 
     async def create(self, db: AsyncSession, obj_in: CreateDataRuleTypeParam) -> None:
         """
-        创建 DataRuleType
+        创建数据权限规则类型
 
         :param db:
         :param obj_in:
@@ -50,7 +60,7 @@ class CRUDDataRuleType(CRUDPlus[DataRuleType]):
 
     async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDataRuleTypeParam) -> int:
         """
-        更新 DataRuleType
+        更新数据权限规则类型
 
         :param db:
         :param pk:
@@ -61,7 +71,7 @@ class CRUDDataRuleType(CRUDPlus[DataRuleType]):
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除 DataRuleType
+        删除数据权限规则类型
 
         :param db:
         :param pk:

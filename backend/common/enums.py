@@ -35,14 +35,24 @@ class MenuType(IntEnum):
     button = 2
 
 
-class RoleDataScopeType(IntEnum):
-    """数据范围"""
+class RoleDataRuleOperatorType(IntEnum):
+    """数据权限规则运算符"""
 
-    all = 0
-    custom = 1
-    dept_child = 2
-    dept = 3
-    self = 4
+    AND = 0
+    OR = 1
+
+
+class RoleDataRuleExpressionType(IntEnum):
+    """数据权限规则表达式"""
+
+    gt = 0
+    ge = 1
+    lt = 2
+    le = 3
+    eq = 4
+    ne = 5
+    in_ = 6
+    not_in = 7
 
 
 class MethodType(StrEnum):
