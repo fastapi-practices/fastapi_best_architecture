@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
+from backend.app.admin.schema.data_rule import GetDataRuleListDetails
 from backend.app.admin.schema.menu import GetMenuListDetails
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
@@ -34,3 +35,4 @@ class GetRoleListDetails(RoleSchemaBase):
     created_time: datetime
     updated_time: datetime | None = None
     menus: list[GetMenuListDetails]
+    rules: list[GetDataRuleListDetails]

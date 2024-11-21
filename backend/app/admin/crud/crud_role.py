@@ -33,7 +33,7 @@ class CRUDRole(CRUDPlus[Role]):
         :param role_id:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.menus)).where(self.model.id == role_id)
+        stmt = select(self.model).options(selectinload(self.model.menus), selectinload(self.model.rules)).where(self.model.id == role_id)
         role = await db.execute(stmt)
         return role.scalars().first()
 
@@ -46,7 +46,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_user_roles(self, db, user_id: int) -> Sequence[Role]:
+    async def get_by_user(self, db, user_id: int) -> Sequence[Role]:
         """
         获取用户所有角色
 

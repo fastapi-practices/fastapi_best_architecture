@@ -32,7 +32,7 @@ async def get_all_roles() -> ResponseModel:
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    roles = await role_service.get_user_roles(pk=pk)
+    roles = await role_service.get_by_user(pk=pk)
     data = select_list_serialize(roles)
     return response_base.success(data=data)
 

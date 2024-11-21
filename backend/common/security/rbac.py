@@ -69,11 +69,11 @@ class RBAC:
         # 检测用户角色
         user_roles = request.user.roles
         if not user_roles or all(status == 0 for status in user_roles):
-            raise AuthorizationError
+            raise AuthorizationError(msg='用户未分配角色，请联系系统管理员')
 
         # 检测用户所属角色菜单
         if not any(len(role.menus) > 0 for role in user_roles):
-            raise AuthorizationError
+            raise AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
 
         # 检测后台管理操作权限
         method = request.method
