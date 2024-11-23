@@ -12,7 +12,7 @@ from sqlalchemy_crud_plus import CRUDPlus
 class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
     async def get(self, db: AsyncSession, pk: int) -> {{ table_name_class }} | None:
         """
-        获取 {{ schema_name }}
+        获取{{ table_name_zh }}
 
         :param db:
         :param pk:
@@ -22,7 +22,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
 
     async def get_list(self) -> Select:
         """
-        获取 {{ schema_name }} 列表
+        获取{{ table_name_zh }}列表
 
         :return:
         """
@@ -30,7 +30,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ table_name_class }}]:
         """
-        获取所有 {{ schema_name }}
+        获取所有{{ table_name_zh }}
 
         :param db:
         :return:
@@ -39,7 +39,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
 
     async def create(self, db: AsyncSession, obj_in: Create{{ schema_name }}Param) -> None:
         """
-        创建 {{ schema_name }}
+        创建{{ table_name_zh }}
 
         :param db:
         :param obj_in:
@@ -49,7 +49,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
 
     async def update(self, db: AsyncSession, pk: int, obj_in: Update{{ schema_name }}Param) -> int:
         """
-        更新 {{ schema_name }}
+        更新{{ table_name_zh }}
 
         :param db:
         :param pk:
@@ -60,7 +60,7 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除 {{ schema_name }}
+        删除{{ table_name_zh }}
 
         :param db:
         :param pk:

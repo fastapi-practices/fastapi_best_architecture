@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from fastapi import Request
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_api import api_dao
@@ -21,8 +22,8 @@ class ApiService:
             return api
 
     @staticmethod
-    async def get_select(*, name: str = None, method: str = None, path: str = None) -> Select:
-        return await api_dao.get_list(name=name, method=method, path=path)
+    async def get_select(*, request: Request, name: str = None, method: str = None, path: str = None) -> Select:
+        return await api_dao.get_list(request=request, name=name, method=method, path=path)
 
     @staticmethod
     async def get_all() -> Sequence[Api]:

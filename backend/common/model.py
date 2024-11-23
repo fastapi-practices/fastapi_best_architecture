@@ -19,8 +19,8 @@ id_key = Annotated[
 class UserMixin(MappedAsDataclass):
     """用户 Mixin 数据类"""
 
-    create_user: Mapped[int] = mapped_column(sort_order=998, comment='创建者')
-    update_user: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
+    created_by: Mapped[int] = mapped_column(sort_order=998, comment='创建者')
+    updated_by: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
 
 
 class DateTimeMixin(MappedAsDataclass):

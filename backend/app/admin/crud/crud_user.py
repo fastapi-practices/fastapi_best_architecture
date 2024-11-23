@@ -184,8 +184,10 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.dept))
-            .options(selectinload(self.model.roles).selectinload(Role.menus))
+            .options(
+                selectinload(self.model.dept),
+                selectinload(self.model.roles).selectinload(Role.menus),
+            )
             .order_by(desc(self.model.join_time))
         )
         where_list = []
@@ -291,17 +293,19 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
         """
-        获取用户和（部门，角色，菜单）
+        获取用户和（部门，角色，菜单，规则）
 
         :param db:
         :param user_id:
         :param username:
         :return:
         """
-        stmt = (
-            select(self.model)
-            .options(selectinload(self.model.dept))
-            .options(selectinload(self.model.roles).joinedload(Role.menus))
+        stmt = select(self.model).options(
+            selectinload(self.model.dept),
+            selectinload(self.model.roles).options(
+                selectinload(Role.menus),
+                selectinload(Role.rules),
+            ),
         )
         filters = []
         if user_id:

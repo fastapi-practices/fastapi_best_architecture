@@ -5,10 +5,16 @@ from typing import Sequence
 from fastapi import Request
 from sqlalchemy import Select
 
+from backend.app.admin.crud.crud_data_rule import data_rule_dao
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    UpdateRoleMenuParam,
+    UpdateRoleParam,
+    UpdateRoleRuleParam,
+)
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
@@ -31,9 +37,9 @@ class RoleService:
             return roles
 
     @staticmethod
-    async def get_user_roles(*, pk: int) -> Sequence[Role]:
+    async def get_by_user(*, pk: int) -> Sequence[Role]:
         async with async_db_session() as db:
-            roles = await role_dao.get_user_roles(db, user_id=pk)
+            roles = await role_dao.get_by_user(db, user_id=pk)
             return roles
 
     @staticmethod
@@ -73,7 +79,21 @@ class RoleService:
                     raise errors.NotFoundError(msg='菜单不存在')
             count = await role_dao.update_menus(db, pk, menu_ids)
             if pk in [role.id for role in request.user.roles]:
-                await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            return count
+
+    @staticmethod
+    async def update_role_rule(*, request: Request, pk: int, rule_ids: UpdateRoleRuleParam) -> int:
+        async with async_db_session.begin() as db:
+            role = await role_dao.get(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            for rule_id in rule_ids.rules:
+                rule = await data_rule_dao.get(db, rule_id)
+                if not rule:
+                    raise errors.NotFoundError(msg='数据权限不存在')
+            count = await role_dao.update_rules(db, pk, rule_ids)
+            if pk in [role.id for role in request.user.roles]:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 

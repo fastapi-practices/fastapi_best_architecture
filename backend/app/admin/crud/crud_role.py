@@ -6,8 +6,13 @@ from sqlalchemy import Select, desc, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Menu, Role, User
-from backend.app.admin.schema.role import CreateRoleParam, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.model import DataRule, Menu, Role, User
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    UpdateRoleMenuParam,
+    UpdateRoleParam,
+    UpdateRoleRuleParam,
+)
 
 
 class CRUDRole(CRUDPlus[Role]):
@@ -29,7 +34,11 @@ class CRUDRole(CRUDPlus[Role]):
         :param role_id:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.menus)).where(self.model.id == role_id)
+        stmt = (
+            select(self.model)
+            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .where(self.model.id == role_id)
+        )
         role = await db.execute(stmt)
         return role.scalars().first()
 
@@ -42,7 +51,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_user_roles(self, db, user_id: int) -> Sequence[Role]:
+    async def get_by_user(self, db, user_id: int) -> Sequence[Role]:
         """
         获取用户所有角色
 
@@ -121,6 +130,22 @@ class CRUDRole(CRUDPlus[Role]):
         menus = await db.execute(stmt)
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
+
+    async def update_rules(self, db, role_id: int, rule_ids: UpdateRoleRuleParam) -> int:
+        """
+        更新角色数据权限
+
+        :param db:
+        :param role_id:
+        :param rule_ids:
+        :return:
+        """
+        current_role = await self.get_with_relation(db, role_id)
+        # 更新数据权限
+        stmt = select(DataRule).where(DataRule.id.in_(rule_ids.rules))
+        rules = await db.execute(stmt)
+        current_role.rules = rules.scalars().all()
+        return len(current_role.rules)
 
     async def delete(self, db, role_id: list[int]) -> int:
         """

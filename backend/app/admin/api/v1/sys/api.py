@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.api import CreateApiParam, GetApiListDetails, UpdateApiParam
 from backend.app.admin.service.api_service import api_service
@@ -37,12 +37,13 @@ async def get_api(pk: Annotated[int, Path(...)]) -> ResponseModel:
     ],
 )
 async def get_pagination_apis(
+    request: Request,
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,
     path: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
-    api_select = await api_service.get_select(name=name, method=method, path=path)
+    api_select = await api_service.get_select(request=request, name=name, method=method, path=path)
     page_data = await paging_data(db, api_select, GetApiListDetails)
     return response_base.success(data=page_data)
 

@@ -6,7 +6,7 @@ from typing import Union
 from sqlalchemy import VARBINARY, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model.sys_user_role import sys_user_role
+from backend.app.admin.model.m2m import sys_user_role
 from backend.common.model import Base, id_key
 from backend.database.db_mysql import uuid4_str
 from backend.utils.timezone import timezone
@@ -32,14 +32,15 @@ class User(Base):
     phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机号')
     join_time: Mapped[datetime] = mapped_column(init=False, default_factory=timezone.now, comment='注册时间')
     last_login_time: Mapped[datetime | None] = mapped_column(init=False, onupdate=timezone.now, comment='上次登录')
+
     # 部门用户一对多
     dept_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, comment='部门关联ID'
     )
     dept: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='users')  # noqa: F821
-    # 用户角色多对多
-    roles: Mapped[list['Role']] = relationship(  # noqa: F821
-        init=False, secondary=sys_user_role, back_populates='users'
-    )
-    # 用户 OAuth2 一对多
+
+    # 用户社交信息一对多
     socials: Mapped[list['UserSocial']] = relationship(init=False, back_populates='user')  # noqa: F821
+
+    # 用户角色多对多
+    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_user_role, back_populates='users')  # noqa: F821

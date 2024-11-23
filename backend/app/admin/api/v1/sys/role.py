@@ -4,7 +4,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.role import CreateRoleParam, GetRoleListDetails, UpdateRoleMenuParam, UpdateRoleParam
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    GetRoleListDetails,
+    UpdateRoleMenuParam,
+    UpdateRoleParam,
+    UpdateRoleRuleParam,
+)
 from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -27,7 +33,7 @@ async def get_all_roles() -> ResponseModel:
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    roles = await role_service.get_user_roles(pk=pk)
+    roles = await role_service.get_by_user(pk=pk)
     data = select_list_serialize(roles)
     return response_base.success(data=data)
 
@@ -104,6 +110,23 @@ async def update_role_menus(
     request: Request, pk: Annotated[int, Path(...)], menu_ids: UpdateRoleMenuParam
 ) -> ResponseModel:
     count = await role_service.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.put(
+    '/{pk}/rule',
+    summary='更新角色数据权限规则',
+    dependencies=[
+        Depends(RequestPermission('sys:role:rule:edit')),
+        DependsRBAC,
+    ],
+)
+async def update_role_rules(
+    request: Request, pk: Annotated[int, Path(...)], rule_ids: UpdateRoleRuleParam
+) -> ResponseModel:
+    count = await role_service.update_role_rule(request=request, pk=pk, rule_ids=rule_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()

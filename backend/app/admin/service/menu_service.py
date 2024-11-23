@@ -9,9 +9,7 @@ from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.common.exception import errors
-from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
-from backend.database.db_redis import redis_client
 from backend.utils.build_tree import get_tree_data
 
 
@@ -83,7 +81,6 @@ class MenuService:
             if obj.parent_id == menu.id:
                 raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await menu_dao.update(db, pk, obj)
-            await redis_client.delete_prefix(settings.PERMISSION_REDIS_PREFIX)
             return count
 
     @staticmethod
