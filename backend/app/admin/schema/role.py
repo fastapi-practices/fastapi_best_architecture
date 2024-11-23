@@ -28,6 +28,10 @@ class UpdateRoleMenuParam(SchemaBase):
     menus: list[int]
 
 
+class UpdateRoleRuleParam(SchemaBase):
+    rules: list[int]
+
+
 class GetRoleListDetails(RoleSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 

@@ -12,20 +12,28 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
+from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
-
-
-@router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
-async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    data_rule = await data_rule_service.get(pk=pk)
-    return response_base.success(data=data_rule)
 
 
 @router.get('/models', summary='获取支持过滤的数据库模型', dependencies=[DependsJwtAuth])
 async def get_data_rule_models() -> ResponseModel:
     models = await data_rule_service.get_models()
     return response_base.success(data=models)
+
+
+@router.get('/model/{model}/columns', summary='获取支持过滤的数据库模型列', dependencies=[DependsJwtAuth])
+async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> ResponseModel:
+    models = await data_rule_service.get_columns(model=model)
+    return response_base.success(data=models)
+
+
+@router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
+async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    data_rule = await data_rule_service.get(pk=pk)
+    data = GetDataRuleListDetails(**select_as_dict(data_rule))
+    return response_base.success(data=data)
 
 
 @router.get(
@@ -36,7 +44,7 @@ async def get_data_rule_models() -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_pagination_data_rule(db: CurrentSession, name: Annotated[str | None, Query()]) -> ResponseModel:
+async def get_pagination_data_rule(db: CurrentSession, name: Annotated[str | None, Query()] = None) -> ResponseModel:
     data_rule_select = await data_rule_service.get_select(name=name)
     page_data = await paging_data(db, data_rule_select, GetDataRuleListDetails)
     return response_base.success(data=page_data)

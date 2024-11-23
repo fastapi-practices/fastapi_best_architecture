@@ -16,6 +16,7 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
+from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -23,7 +24,8 @@ router = APIRouter()
 @router.get('/{pk}', summary='获取数据权限规则类型详情', dependencies=[DependsJwtAuth])
 async def get_data_rule_type(pk: Annotated[int, Path(...)]) -> ResponseModel:
     data_rule_type = await data_rule_type_service.get(pk=pk)
-    return response_base.success(data=data_rule_type)
+    data = GetDataRuleTypeListDetails(**select_as_dict(data_rule_type))
+    return response_base.success(data=data)
 
 
 @router.get(

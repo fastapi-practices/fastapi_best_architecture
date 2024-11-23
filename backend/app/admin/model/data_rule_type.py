@@ -18,4 +18,4 @@ class DataRuleType(Base):
     remark: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='备注')
 
     # 数据权限规则类型一对多
-    data_rules: Mapped[list['DataRule']] = relationship(init=False, back_populates='type')  # noqa: F821
+    rules: Mapped[list['DataRule']] = relationship(init=False, back_populates='type')  # noqa: F821

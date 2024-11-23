@@ -135,7 +135,6 @@ class UserService:
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
             await user_dao.update_role(db, input_user, obj)
-            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
 
     @staticmethod

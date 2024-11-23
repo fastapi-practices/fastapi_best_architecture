@@ -31,7 +31,7 @@ VALUES (1, '测试', 'test', 0, 0, '', NULL, 0, NULL, NULL, 0, 0, 1, NULL, NULL,
        (22, '删除', '', 0, 0, NULL, NULL, 2, NULL, 'sys:role:del', 1, 1, 1, NULL, 19, '2024-01-07 11:59:07', NULL),
        (23, '编辑角色菜单', '', 0, 0, NULL, NULL, 2, NULL, 'sys:role:menu:edit', 1, 1, 1, NULL, 19, '2024-01-07 01:59:39', NULL),
        (24, '编辑角色部门', '', 0, 0, NULL, NULL, 2, NULL, 'sys:role:dept:edit', 1, 1, 1, NULL, 19, '2024-01-07 01:59:39', NULL),
-       (25, '菜单管理', 'SysMenu', 0, 2, NULL, 'sys-menu', 1, '/admin/menu/index.vue', NULL, 1, 1, 1, NULL, 7, '2023-07-27 19:45:29', NULL);
+       (25, '菜单管理', 'SysMenu', 0, 2, NULL, 'sys-menu', 1, '/admin/menu/index.vue', NULL, 1, 1, 1, NULL, 7, '2023-07-27 19:45:29', NULL),
        (26, '新增', '', 0, 0, NULL, NULL, 2, NULL, 'sys:menu:add', 1, 1, 1, NULL, 25, '2024-01-07 12:01:24', NULL),
        (27, '编辑', '', 0, 0, NULL, NULL, 2, NULL, 'sys:menu:edit', 1, 1, 1, NULL, 25, '2024-01-07 12:01:34', NULL),
        (28, '删除', '', 0, 0, NULL, NULL, 2, NULL, 'sys:menu:del', 1, 1, 1, NULL, 25, '2024-01-07 12:01:48', NULL),

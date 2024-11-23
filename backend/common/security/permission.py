@@ -44,7 +44,10 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
     :param request:
     :return:
     """
-    user_data_rules: list[GetDataRuleListDetails] = request.user.roles.rules
+    data_rules = []
+    for role in request.user.roles:
+        data_rules.extend(role.rules)
+    user_data_rules: list[GetDataRuleListDetails] = list(dict.fromkeys(data_rules))
 
     # 超级管理员和无规则用户不做过滤
     if request.user.is_superuser or not user_data_rules:
@@ -52,20 +55,18 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
 
     where_and_list = []
     where_or_list = []
-    allowed_models = frozenset(m.split('.')[-1] for m in settings.ALLOWED_MODELS)
 
     for rule in user_data_rules:
         rule_model = rule.model
-        if rule_model not in allowed_models:
-            raise errors.NotFoundError(msg='数据模型不存在')
-        try:
-            model_ins = dynamic_import(rule_model)
-        except Exception:
-            raise errors.ServerError(msg='数据模型动态调用失败，请联系系统超级管理员')
-        model_columns = model_ins.__table__.columns.keys()
+        if rule_model not in settings.DATA_PERMISSION_MODELS:
+            raise errors.NotFoundError(msg='数据规则模型不存在')
+        model_ins = dynamic_import(settings.DATA_PERMISSION_MODELS[rule_model])
+        model_columns = [
+            key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
+        ]
         column = rule.column
         if column not in model_columns:
-            raise errors.NotFoundError(msg='数据模型列不存在')
+            raise errors.NotFoundError(msg='数据规则模型列不存在')
 
         # 获取模型的列对象
         column_obj = getattr(model_ins, column)

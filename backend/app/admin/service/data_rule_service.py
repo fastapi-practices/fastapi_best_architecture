@@ -9,7 +9,9 @@ from backend.app.admin.crud.crud_data_rule_type import data_rule_type_dao
 from backend.app.admin.model import DataRule
 from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
 from backend.common.exception import errors
+from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
+from backend.utils.import_parse import dynamic_import
 
 
 class DataRuleService:
@@ -22,8 +24,18 @@ class DataRuleService:
             return data_rule
 
     @staticmethod
-    async def get_models():
-        return
+    async def get_models() -> list:
+        return list(settings.DATA_PERMISSION_MODELS.keys())
+
+    @staticmethod
+    async def get_columns(model: str):
+        if model not in settings.DATA_PERMISSION_MODELS:
+            raise errors.NotFoundError(msg='数据模型不存在')
+        model_ins = dynamic_import(settings.DATA_PERMISSION_MODELS[model])
+        model_columns = [
+            key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
+        ]
+        return model_columns
 
     @staticmethod
     async def get_select(*, name: str = None) -> Select:

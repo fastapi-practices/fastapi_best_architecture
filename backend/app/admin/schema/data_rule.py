@@ -32,3 +32,6 @@ class GetDataRuleListDetails(DataRuleSchemaBase):
     id: int
     created_time: datetime
     updated_time: datetime | None = None
+
+    def __hash__(self):
+        return hash(self.name)

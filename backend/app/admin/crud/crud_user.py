@@ -293,7 +293,7 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
         """
-        获取用户和（部门，角色，菜单）
+        获取用户和（部门，角色，菜单，规则）
 
         :param db:
         :param user_id:
@@ -302,7 +302,10 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = select(self.model).options(
             selectinload(self.model.dept),
-            selectinload(self.model.roles).joinedload(Role.menus),
+            selectinload(self.model.roles).options(
+                selectinload(Role.menus),
+                selectinload(Role.rules),
+            ),
         )
         filters = []
         if user_id:

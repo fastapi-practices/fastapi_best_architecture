@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from fastapi import Request
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Api
 from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
+from backend.common.security.permission import filter_data_permission
 
 
 class CRUDApi(CRUDPlus[Api]):
@@ -21,10 +23,11 @@ class CRUDApi(CRUDPlus[Api]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, name: str = None, method: str = None, path: str = None) -> Select:
+    async def get_list(self, request: Request, name: str = None, method: str = None, path: str = None) -> Select:
         """
         获取 API 列表
 
+        :param request:
         :param name:
         :param method:
         :param path:
@@ -37,7 +40,8 @@ class CRUDApi(CRUDPlus[Api]):
             filters.update(method=method)
         if path is not None:
             filters.update(path__like=f'%{path}%')
-        return await self.select_order('created_time', 'desc', **filters)
+        stmt = await self.select_order('created_time', 'desc', **filters)
+        return stmt.where(filter_data_permission(request))
 
     async def get_all(self, db: AsyncSession) -> Sequence[Api]:
         """

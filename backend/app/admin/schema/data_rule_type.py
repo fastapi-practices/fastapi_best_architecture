@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
+from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
 class DataRuleTypeSchemaBase(SchemaBase):
     name: str
-    status: int
+    status: StatusType = Field(default=StatusType.enable)
     remark: str
 
 
