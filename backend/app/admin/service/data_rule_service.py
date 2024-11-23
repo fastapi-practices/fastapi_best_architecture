@@ -22,6 +22,10 @@ class DataRuleService:
             return data_rule
 
     @staticmethod
+    async def get_models():
+        return
+
+    @staticmethod
     async def get_select(*, name: str = None) -> Select:
         return await data_rule_dao.get_list(name=name)
 

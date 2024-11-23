@@ -15,6 +15,7 @@ class DataRuleSchemaBase(SchemaBase):
     column: str
     operator: RoleDataRuleOperatorType = Field(RoleDataRuleOperatorType.OR)
     expression: RoleDataRuleExpressionType = Field(RoleDataRuleExpressionType.eq)
+    value: str
 
 
 class CreateDataRuleParam(DataRuleSchemaBase):

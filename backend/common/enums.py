@@ -45,12 +45,12 @@ class RoleDataRuleOperatorType(IntEnum):
 class RoleDataRuleExpressionType(IntEnum):
     """数据权限规则表达式"""
 
-    gt = 0
-    ge = 1
-    lt = 2
-    le = 3
-    eq = 4
-    ne = 5
+    eq = 0
+    ne = 1
+    gt = 2
+    ge = 3
+    lt = 4
+    le = 5
     in_ = 6
     not_in = 7
 

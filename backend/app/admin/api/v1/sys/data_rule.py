@@ -16,15 +16,21 @@ from backend.database.db_mysql import CurrentSession
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取数据规则详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
 async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
     data_rule = await data_rule_service.get(pk=pk)
     return response_base.success(data=data_rule)
 
 
+@router.get('/models', summary='获取支持过滤的数据库模型', dependencies=[DependsJwtAuth])
+async def get_data_rule_models() -> ResponseModel:
+    models = await data_rule_service.get_models()
+    return response_base.success(data=models)
+
+
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有数据规则',
+    summary='（模糊条件）分页获取所有数据权限规则',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -38,7 +44,7 @@ async def get_pagination_data_rule(db: CurrentSession, name: Annotated[str | Non
 
 @router.post(
     '',
-    summary='创建数据规则',
+    summary='创建数据权限规则',
     dependencies=[
         Depends(RequestPermission('data:rule:add')),
         DependsRBAC,
@@ -51,7 +57,7 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新数据规则',
+    summary='更新数据权限规则',
     dependencies=[
         Depends(RequestPermission('data:rule:edit')),
         DependsRBAC,
@@ -66,7 +72,7 @@ async def update_data_rule(pk: Annotated[int, Path(...)], obj: UpdateDataRulePar
 
 @router.delete(
     '',
-    summary='（批量）删除数据规则',
+    summary='（批量）删除数据权限规则',
     dependencies=[
         Depends(RequestPermission('data:rule:del')),
         DependsRBAC,

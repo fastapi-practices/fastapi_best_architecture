@@ -33,7 +33,11 @@ class CRUDRole(CRUDPlus[Role]):
         :param role_id:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.menus), selectinload(self.model.rules)).where(self.model.id == role_id)
+        stmt = (
+            select(self.model)
+            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .where(self.model.id == role_id)
+        )
         role = await db.execute(stmt)
         return role.scalars().first()
 

@@ -20,7 +20,7 @@ from backend.database.db_mysql import CurrentSession
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取数据规则类型详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='获取数据权限规则类型详情', dependencies=[DependsJwtAuth])
 async def get_data_rule_type(pk: Annotated[int, Path(...)]) -> ResponseModel:
     data_rule_type = await data_rule_type_service.get(pk=pk)
     return response_base.success(data=data_rule_type)
@@ -28,7 +28,7 @@ async def get_data_rule_type(pk: Annotated[int, Path(...)]) -> ResponseModel:
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有数据规则类型',
+    summary='（模糊条件）分页获取所有数据权限规则类型',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -42,7 +42,7 @@ async def get_pagination_data_rule_type(db: CurrentSession) -> ResponseModel:
 
 @router.post(
     '',
-    summary='创建数据规则类型',
+    summary='创建数据权限规则类型',
     dependencies=[
         Depends(RequestPermission('data:rule:type:add')),
         DependsRBAC,
@@ -55,7 +55,7 @@ async def create_data_rule_type(obj: CreateDataRuleTypeParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新数据规则类型',
+    summary='更新数据权限规则类型',
     dependencies=[
         Depends(RequestPermission('data:rule:type:edit')),
         DependsRBAC,
@@ -70,7 +70,7 @@ async def update_data_rule_type(pk: Annotated[int, Path(...)], obj: UpdateDataRu
 
 @router.delete(
     '',
-    summary='（批量）删除数据规则类型',
+    summary='（批量）删除数据权限规则类型',
     dependencies=[
         Depends(RequestPermission('data:rule:type:del')),
         DependsRBAC,

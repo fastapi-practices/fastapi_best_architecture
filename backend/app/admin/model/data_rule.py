@@ -20,6 +20,7 @@ class DataRule(Base):
     expression: Mapped[int] = mapped_column(
         comment='表达式（0：>、1：>=、2：<、3：<=、4：==、5：!=、6：in、7：not_in）'
     )
+    value: Mapped[str] = mapped_column(String(255), comment='规则值')
 
     # 数据权限规则类型一对多
     type_id: Mapped[int] = mapped_column(

@@ -167,6 +167,13 @@ class Settings(BaseSettings):
         'confirm_password',
     ]
 
+    # Data Perms
+    ALLOWED_MODELS: list[
+        str
+    ] = [  # 允许进行数据过滤的 SQLA 模型，它必须以模块字符串的方式定义（它应该只用于前台数据，这里只是为了演示）
+        'backend.app.admin.model.Api'
+    ]
+
 
 @lru_cache
 def get_settings() -> Settings:
