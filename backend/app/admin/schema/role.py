@@ -39,4 +39,4 @@ class GetRoleListDetails(RoleSchemaBase):
     created_time: datetime
     updated_time: datetime | None = None
     menus: list[GetMenuListDetails]
-    rules: list[GetDataRuleListDetails]
+    rules: list[GetDataRuleListDetails | None] = []
