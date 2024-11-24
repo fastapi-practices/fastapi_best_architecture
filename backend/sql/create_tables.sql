@@ -1,12 +1,10 @@
 SET NAMES utf8mb4;
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for sys_api
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_api`;
-
 CREATE TABLE `sys_api` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(50) NOT NULL COMMENT 'api名称',
@@ -18,13 +16,12 @@ CREATE TABLE `sys_api` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `ix_sys_api_id` (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 4 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_casbin_rule
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_casbin_rule`;
-
 CREATE TABLE `sys_casbin_rule` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `ptype` varchar(255) NOT NULL COMMENT '策略类型: p / g',
@@ -36,13 +33,12 @@ CREATE TABLE `sys_casbin_rule` (
   `v5` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_sys_casbin_rule_id` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_config
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_config`;
-
 CREATE TABLE `sys_config` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(20) NOT NULL COMMENT '名称',
@@ -56,13 +52,50 @@ CREATE TABLE `sys_config` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`),
   KEY `ix_sys_config_id` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Table structure for sys_data_rule
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_data_rule`;
+CREATE TABLE `sys_data_rule` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `name` varchar(255) NOT NULL COMMENT '规则名称',
+  `model` varchar(50) NOT NULL COMMENT 'SQLA 模型类',
+  `column` varchar(20) NOT NULL COMMENT '数据库字段',
+  `operator` int NOT NULL COMMENT '运算符（0：and、1：or）',
+  `expression` int NOT NULL COMMENT '表达式（0：>、1：>=、2：<、3：<=、4：==、5：!=、6：in、7：not_in）',
+  `value` varchar(255) NOT NULL COMMENT '规则值',
+  `type_id` int NOT NULL COMMENT '数据权限规则类型关联ID',
+  `created_time` datetime NOT NULL COMMENT '创建时间',
+  `updated_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `type_id` (`type_id`),
+  KEY `ix_sys_data_rule_id` (`id`),
+  CONSTRAINT `sys_data_rule_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `sys_data_rule_type` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Table structure for sys_data_rule_type
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_data_rule_type`;
+CREATE TABLE `sys_data_rule_type` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `name` varchar(255) NOT NULL COMMENT '规则类型名',
+  `status` int NOT NULL COMMENT '状态（0停用 1正常）',
+  `remark` longtext COMMENT '备注',
+  `created_time` datetime NOT NULL COMMENT '创建时间',
+  `updated_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `ix_sys_data_rule_type_id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_dept
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dept`;
-
 CREATE TABLE `sys_dept` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(50) NOT NULL COMMENT '部门名称',
@@ -80,13 +113,12 @@ CREATE TABLE `sys_dept` (
   KEY `ix_sys_dept_parent_id` (`parent_id`),
   KEY `ix_sys_dept_id` (`id`),
   CONSTRAINT `sys_dept_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_dict_data
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_data`;
-
 CREATE TABLE `sys_dict_data` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `label` varchar(32) NOT NULL COMMENT '字典标签',
@@ -102,14 +134,13 @@ CREATE TABLE `sys_dict_data` (
   UNIQUE KEY `value` (`value`),
   KEY `type_id` (`type_id`),
   KEY `ix_sys_dict_data_id` (`id`),
-  CONSTRAINT `sys_dict_data_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `sys_dict_type` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+  CONSTRAINT `sys_dict_data_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `sys_dict_type` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_dict_type
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_type`;
-
 CREATE TABLE `sys_dict_type` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(32) NOT NULL COMMENT '字典类型名称',
@@ -122,13 +153,12 @@ CREATE TABLE `sys_dict_type` (
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `code` (`code`),
   KEY `ix_sys_dict_type_id` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_gen_business
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_gen_business`;
-
 CREATE TABLE `sys_gen_business` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `app_name` varchar(50) NOT NULL COMMENT '应用名称（英文）',
@@ -146,13 +176,12 @@ CREATE TABLE `sys_gen_business` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `table_name_en` (`table_name_en`),
   KEY `ix_sys_gen_business_id` (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_gen_model
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_gen_model`;
-
 CREATE TABLE `sys_gen_model` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(50) NOT NULL COMMENT '列名称',
@@ -169,13 +198,12 @@ CREATE TABLE `sys_gen_model` (
   KEY `gen_business_id` (`gen_business_id`),
   KEY `ix_sys_gen_model_id` (`id`),
   CONSTRAINT `sys_gen_model_ibfk_1` FOREIGN KEY (`gen_business_id`) REFERENCES `sys_gen_business` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_login_log
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_login_log`;
-
 CREATE TABLE `sys_login_log` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_uuid` varchar(50) NOT NULL COMMENT '用户UUID',
@@ -194,13 +222,12 @@ CREATE TABLE `sys_login_log` (
   `created_time` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `ix_sys_login_log_id` (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 9 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_menu
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_menu`;
-
 CREATE TABLE `sys_menu` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `title` varchar(50) NOT NULL COMMENT '菜单标题',
@@ -223,13 +250,12 @@ CREATE TABLE `sys_menu` (
   KEY `ix_sys_menu_parent_id` (`parent_id`),
   KEY `ix_sys_menu_id` (`id`),
   CONSTRAINT `sys_menu_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `sys_menu` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB AUTO_INCREMENT = 43 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_opera_log
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_opera_log`;
-
 CREATE TABLE `sys_opera_log` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `trace_id` varchar(32) NOT NULL COMMENT '请求跟踪 ID',
@@ -254,17 +280,16 @@ CREATE TABLE `sys_opera_log` (
   `created_time` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `ix_sys_opera_log_id` (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 221 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
-
 CREATE TABLE `sys_role` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `name` varchar(20) NOT NULL COMMENT '角色名称',
-  `data_scope` int DEFAULT NULL COMMENT '权限范围（1：全部数据权限 2：自定义数据权限）',
+  `data_scope` int DEFAULT NULL COMMENT '数据权限范围（0: 全部数据，1: 自定义数据，2: 所在部门及以下数据，3: 所在部门数据，4: 仅本人数据）',
   `status` int NOT NULL COMMENT '角色状态（0停用 1正常）',
   `remark` longtext COMMENT '备注',
   `created_time` datetime NOT NULL COMMENT '创建时间',
@@ -272,47 +297,44 @@ CREATE TABLE `sys_role` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `ix_sys_role_id` (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
--- Table structure for sys_role_dept
+-- Table structure for sys_role_data_rule
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_dept`;
-
-CREATE TABLE `sys_role_dept` (
+DROP TABLE IF EXISTS `sys_role_data_rule`;
+CREATE TABLE `sys_role_data_rule` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `role_id` int NOT NULL COMMENT '角色ID',
-  `dept_id` int NOT NULL COMMENT '部门ID',
-  PRIMARY KEY (`id`, `role_id`, `dept_id`),
-  UNIQUE KEY `ix_sys_role_dept_id` (`id`),
+  `data_rule_id` int NOT NULL COMMENT '数据权限规则ID',
+  PRIMARY KEY (`id`,`role_id`,`data_rule_id`),
+  UNIQUE KEY `ix_sys_role_data_rule_id` (`id`),
   KEY `role_id` (`role_id`),
-  KEY `dept_id` (`dept_id`),
-  CONSTRAINT `sys_role_dept_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `sys_role_dept_ibfk_2` FOREIGN KEY (`dept_id`) REFERENCES `sys_dept` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+  KEY `data_rule_id` (`data_rule_id`),
+  CONSTRAINT `sys_role_data_rule_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sys_role_data_rule_ibfk_2` FOREIGN KEY (`data_rule_id`) REFERENCES `sys_data_rule` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_role_menu
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role_menu`;
-
 CREATE TABLE `sys_role_menu` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `role_id` int NOT NULL COMMENT '角色ID',
   `menu_id` int NOT NULL COMMENT '菜单ID',
-  PRIMARY KEY (`id`, `role_id`, `menu_id`),
+  PRIMARY KEY (`id`,`role_id`,`menu_id`),
   UNIQUE KEY `ix_sys_role_menu_id` (`id`),
   KEY `role_id` (`role_id`),
   KEY `menu_id` (`menu_id`),
   CONSTRAINT `sys_role_menu_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE,
   CONSTRAINT `sys_role_menu_ibfk_2` FOREIGN KEY (`menu_id`) REFERENCES `sys_menu` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
-
 CREATE TABLE `sys_user` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `uuid` varchar(50) NOT NULL,
@@ -340,30 +362,28 @@ CREATE TABLE `sys_user` (
   KEY `dept_id` (`dept_id`),
   KEY `ix_sys_user_id` (`id`),
   CONSTRAINT `sys_user_ibfk_1` FOREIGN KEY (`dept_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_user_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_role`;
-
 CREATE TABLE `sys_user_role` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `user_id` int NOT NULL COMMENT '用户ID',
   `role_id` int NOT NULL COMMENT '角色ID',
-  PRIMARY KEY (`id`, `user_id`, `role_id`),
+  PRIMARY KEY (`id`,`user_id`,`role_id`),
   UNIQUE KEY `ix_sys_user_role_id` (`id`),
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
   CONSTRAINT `sys_user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `sys_user_role_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for sys_user_social
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_social`;
-
 CREATE TABLE `sys_user_social` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `source` varchar(20) NOT NULL COMMENT '第三方用户来源',
@@ -379,6 +399,6 @@ CREATE TABLE `sys_user_social` (
   KEY `user_id` (`user_id`),
   KEY `ix_sys_user_social_id` (`id`),
   CONSTRAINT `sys_user_social_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
