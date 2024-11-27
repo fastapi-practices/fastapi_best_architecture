@@ -147,8 +147,8 @@ async def update_role_rules(
         DependsRBAC,
     ],
 )
-async def delete_role(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await role_service.delete(pk=pk)
+async def delete_role(request: Request, pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+    count = await role_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from fastapi import Request
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_data_rule import data_rule_dao
@@ -11,6 +12,7 @@ from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRu
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
+from backend.database.db_redis import redis_client
 from backend.utils.import_parse import dynamic_import
 
 
@@ -74,9 +76,10 @@ class DataRuleService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, request: Request, pk: list[int]) -> int:
         async with async_db_session.begin() as db:
             count = await data_rule_dao.delete(db, pk)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
 

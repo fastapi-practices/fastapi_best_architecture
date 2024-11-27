@@ -9,7 +9,9 @@ from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.common.exception import errors
+from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
+from backend.database.db_redis import redis_client
 from backend.utils.build_tree import get_tree_data
 
 
@@ -84,12 +86,13 @@ class MenuService:
             return count
 
     @staticmethod
-    async def delete(*, pk: int) -> int:
+    async def delete(*, request: Request, pk: int) -> int:
         async with async_db_session.begin() as db:
             children = await menu_dao.get_children(db, pk)
             if children:
                 raise errors.ForbiddenError(msg='菜单下存在子菜单，无法删除')
             count = await menu_dao.delete(db, pk)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
 

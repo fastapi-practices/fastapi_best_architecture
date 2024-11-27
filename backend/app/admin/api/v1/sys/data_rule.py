@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleListDetails, UpdateDataRuleParam
 from backend.app.admin.service.data_rule_service import data_rule_service
@@ -93,8 +93,8 @@ async def update_data_rule(pk: Annotated[int, Path(...)], obj: UpdateDataRulePar
         DependsRBAC,
     ],
 )
-async def delete_data_rule(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await data_rule_service.delete(pk=pk)
+async def delete_data_rule(request: Request, pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+    count = await data_rule_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()
