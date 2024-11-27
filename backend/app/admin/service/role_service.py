@@ -98,9 +98,10 @@ class RoleService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, request: Request, pk: list[int]) -> int:
         async with async_db_session.begin() as db:
             count = await role_dao.delete(db, pk)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
             return count
 
 

@@ -72,7 +72,11 @@ class CRUDRole(CRUDPlus[Role]):
         :param status:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.menus)).order_by(desc(self.model.created_time))
+        stmt = (
+            select(self.model)
+            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .order_by(desc(self.model.created_time))
+        )
         where_list = []
         if name:
             where_list.append(self.model.name.like(f'%{name}%'))

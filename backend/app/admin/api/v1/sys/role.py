@@ -11,6 +11,7 @@ from backend.app.admin.schema.role import (
     UpdateRoleParam,
     UpdateRoleRuleParam,
 )
+from backend.app.admin.service.data_rule_service import data_rule_service
 from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -42,6 +43,12 @@ async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
 async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseModel:
     menu = await menu_service.get_role_menu_tree(pk=pk)
     return response_base.success(data=menu)
+
+
+@router.get('/{pk}/rules', summary='获取角色所有数据规则', dependencies=[DependsJwtAuth])
+async def get_role_all_rules(pk: Annotated[int, Path(...)]) -> ResponseModel:
+    rule = await data_rule_service.get_role_rules(pk=pk)
+    return response_base.success(data=rule)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
@@ -140,8 +147,8 @@ async def update_role_rules(
         DependsRBAC,
     ],
 )
-async def delete_role(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
-    count = await role_service.delete(pk=pk)
+async def delete_role(request: Request, pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+    count = await role_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

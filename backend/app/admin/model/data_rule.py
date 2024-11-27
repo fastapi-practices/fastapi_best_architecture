@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_data_rule
@@ -21,12 +21,6 @@ class DataRule(Base):
         comment='表达式（0：>、1：>=、2：<、3：<=、4：==、5：!=、6：in、7：not_in）'
     )
     value: Mapped[str] = mapped_column(String(255), comment='规则值')
-
-    # 数据权限规则类型一对多
-    type_id: Mapped[int] = mapped_column(
-        ForeignKey('sys_data_rule_type.id', ondelete='CASCADE'), comment='数据权限规则类型关联ID'
-    )
-    type: Mapped['DataRuleType'] = relationship(init=False, back_populates='rules')  # noqa: F821
 
     # 角色规则多对多
     roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_role_data_rule, back_populates='rules')  # noqa: F821

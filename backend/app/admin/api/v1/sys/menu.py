@@ -72,8 +72,8 @@ async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> Re
         DependsRBAC,
     ],
 )
-async def delete_menu(pk: Annotated[int, Path(...)]) -> ResponseModel:
-    count = await menu_service.delete(pk=pk)
+async def delete_menu(request: Request, pk: Annotated[int, Path(...)]) -> ResponseModel:
+    count = await menu_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()
