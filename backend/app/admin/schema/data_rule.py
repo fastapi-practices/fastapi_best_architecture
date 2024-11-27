@@ -9,7 +9,6 @@ from backend.common.schema import SchemaBase
 
 
 class DataRuleSchemaBase(SchemaBase):
-    type_id: int
     name: str
     model: str
     column: str

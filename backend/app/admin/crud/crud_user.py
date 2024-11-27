@@ -186,7 +186,10 @@ class CRUDUser(CRUDPlus[User]):
             select(self.model)
             .options(
                 selectinload(self.model.dept),
-                selectinload(self.model.roles).selectinload(Role.menus),
+                selectinload(self.model.roles).options(
+                    selectinload(Role.menus),
+                    selectinload(Role.rules),
+                ),
             )
             .order_by(desc(self.model.join_time))
         )

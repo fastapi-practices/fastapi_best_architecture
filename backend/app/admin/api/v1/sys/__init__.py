@@ -6,7 +6,6 @@ from backend.app.admin.api.v1.sys.api import router as api_router
 from backend.app.admin.api.v1.sys.casbin import router as casbin_router
 from backend.app.admin.api.v1.sys.config import router as config_router
 from backend.app.admin.api.v1.sys.data_rule import router as data_rule_router
-from backend.app.admin.api.v1.sys.data_rule_type import router as data_rule_type_router
 from backend.app.admin.api.v1.sys.dept import router as dept_router
 from backend.app.admin.api.v1.sys.dict_data import router as dict_data_router
 from backend.app.admin.api.v1.sys.dict_type import router as dict_type_router
@@ -26,4 +25,3 @@ router.include_router(menu_router, prefix='/menus', tags=['系统目录'])
 router.include_router(role_router, prefix='/roles', tags=['系统角色'])
 router.include_router(user_router, prefix='/users', tags=['系统用户'])
 router.include_router(data_rule_router, prefix='/data-rules', tags=['系统数据权限规则'])
-router.include_router(data_rule_type_router, prefix='/data-rule-types', tags=['系统数据权限类型'])

@@ -12,7 +12,7 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db_mysql import CurrentSession
-from backend.utils.serializers import select_as_dict
+from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
@@ -27,6 +27,13 @@ async def get_data_rule_models() -> ResponseModel:
 async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> ResponseModel:
     models = await data_rule_service.get_columns(model=model)
     return response_base.success(data=models)
+
+
+@router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
+async def get_all_data_rule() -> ResponseModel:
+    data_rules = await data_rule_service.get_all()
+    data = select_list_serialize(data_rules)
+    return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
