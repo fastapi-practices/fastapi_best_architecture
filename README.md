@@ -8,6 +8,8 @@
 > [!NOTE]
 > This repository as a template library open to any person or enterprise can be used for free!
 
+<img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+
 English | [简体中文](./README.zh-CN.md)
 
 FastAPI framework based on the front-end and back-end separation of the middle and back-end solutions, follow
@@ -15,6 +17,8 @@ the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, su
 versions
 
 **🔥Continuously updated and maintained🔥**
+
+Logo: 
 
 ## Pseudo three-tier architecture
 

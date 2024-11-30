@@ -8,11 +8,15 @@
 > [!NOTE]
 > 此仓库作为模板库公开，任何人或企业均可免费使用！
 
+<img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+
 简体中文 | [English](./README.md)
 
 基于 FastAPI 框架的前后端分离中后台解决方案，遵循[伪三层架构](#伪三层架构)设计， 支持 **python3.10** 及以上版本
 
 **🔥持续更新维护中🔥**
+
+Logo：
 
 ## 伪三层架构
 
