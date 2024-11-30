@@ -1,10 +1,11 @@
 # FastAPI Best Architecture
 
-<img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
-
-<p align="right" style="margin-top: 10px; font-size: 12px;">
-    About Logo
-</p>
+<div style="float: right; text-align: center; margin-left: 20px;">
+    <img alt="logo" width="288" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+    <p style="margin-top: 5px; color: #666; font-size: 12px;">
+        Logo
+    </p>
+</div>
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
