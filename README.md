@@ -1,5 +1,9 @@
 # FastAPI Best Architecture
 
+<img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+
+About logo:
+
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -8,8 +12,6 @@
 > [!NOTE]
 > This repository as a template library open to any person or enterprise can be used for free!
 
-<img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
-
 English | [简体中文](./README.zh-CN.md)
 
 FastAPI framework based on the front-end and back-end separation of the middle and back-end solutions, follow
@@ -17,8 +19,6 @@ the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, su
 versions
 
 **🔥Continuously updated and maintained🔥**
-
-Logo: 
 
 ## Pseudo three-tier architecture
 
