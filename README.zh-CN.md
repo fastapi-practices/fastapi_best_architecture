@@ -2,7 +2,9 @@
 
 <img alt="logo" align="right" width="300" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
 
-About logo:
+<p align="right" style="margin-top: 10px; font-size: 12px;">
+    About Logo
+</p>
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
