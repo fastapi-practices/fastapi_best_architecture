@@ -1,5 +1,3 @@
-<br>
-
 <div align="center">
 
 <img alt="The logo includes the abstract combination of the three letters FBA, forming a lightning bolt that seems to spread out from the ground" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">

@@ -1,5 +1,3 @@
-<br>
-
 <div align="center">
 
 <img alt="Logo 包含了 FBA 三个字母抽象结合，形成了一个类似从地面扩散投影上来的闪电" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
