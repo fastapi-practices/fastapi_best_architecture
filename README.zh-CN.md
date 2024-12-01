@@ -1,11 +1,19 @@
-# FastAPI 最佳架构
+<div align="center">
 
-<img alt="logo" align="right" width="288" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+<br/>
+
+<img alt="logo" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+
+<p style="font-size: 14px; color: rgb(160, 160, 160);">Logo 包含了 FBA 三个字母抽象结合，形成了一个类似从地面扩散投影上来的闪电</p>
+
+# FastAPI Best Architecture
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
+
+</div>
 
 > [!NOTE]
 > 此仓库作为模板库公开，任何人或企业均可免费使用！
