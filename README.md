@@ -1,20 +1,31 @@
+<div align="center">
+
+<img alt="The logo includes the abstract combination of the three letters FBA, forming a lightning bolt that seems to spread out from the ground" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+
 # FastAPI Best Architecture
-
-[![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
-[![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
-
-> [!NOTE]
-> This repository as a template library open to any person or enterprise can be used for free!
 
 English | [简体中文](./README.zh-CN.md)
 
-FastAPI framework based on the front-end and back-end separation of the middle and back-end solutions, follow
-the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, support for **python3.10** and above
+A backend and frontend separation solution based on the FastAPI framework, following
+the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, supporting **Python 3.10** and above
 versions
 
 **🔥Continuously updated and maintained🔥**
+
+[![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
+[![Static Badge](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+![Static Badge](https://img.shields.io/badge/MySQL-8.0%2B-%2300758f)
+![Static Badge](https://img.shields.io/badge/SQLAlchemy-2.0-%23778877)
+[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white)](https://discord.com/invite/yNN3wTbVAC)
+![Discord](https://img.shields.io/discord/1185035164577972344)
+
+</div>
+
+> [!NOTE]
+> This repository as a template library open to any person or enterprise can be used for free!
 
 ## Pseudo three-tier architecture
 
