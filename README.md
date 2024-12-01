@@ -2,9 +2,7 @@
 
 <br/>
 
-<img alt="logo" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
-
-<p style="font-size: 14px; color: rgb(160, 160, 160);">The logo includes the abstract combination of the three letters FBA, forming a lightning bolt that seems to spread out from the ground</p>
+<img alt="The logo includes the abstract combination of the three letters FBA, forming a lightning bolt that seems to spread out from the ground" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
 
 # FastAPI Best Architecture
 
