@@ -72,7 +72,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         if not social:
             salt = bcrypt.gensalt()
-            obj.password = get_hash_password(f'{obj.password}', salt)
+            obj.password = get_hash_password(obj.password, salt)
             dict_obj = obj.model_dump()
             dict_obj.update({'is_staff': True, 'salt': salt})
         else:
@@ -90,7 +90,7 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         salt = bcrypt.gensalt()
-        obj.password = get_hash_password(f'{obj.password}', salt)
+        obj.password = get_hash_password(obj.password, salt)
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)

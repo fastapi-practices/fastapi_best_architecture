@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from fastapi import Request, Response
 from fastapi.security import HTTPBasicCredentials
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTask, BackgroundTasks
 
 from backend.app.admin.conf import admin_settings
@@ -29,42 +30,40 @@ from backend.utils.timezone import timezone
 
 class AuthService:
     @staticmethod
-    async def swagger_login(*, obj: HTTPBasicCredentials) -> tuple[str, User]:
-        async with async_db_session.begin() as db:
-            current_user = await user_dao.get_by_username(db, obj.username)
-            if not current_user:
-                raise errors.NotFoundError(msg='用户名或密码有误')
-            elif not password_verify(f'{obj.password}', current_user.password):
-                raise errors.AuthorizationError(msg='用户名或密码有误')
-            elif not current_user.status:
-                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-            access_token = await create_access_token(str(current_user.id), current_user.is_multi_login)
-            await user_dao.update_login_time(db, obj.username)
-            return access_token.access_token, current_user
+    async def user_verify(db: AsyncSession, username: str, password: str) -> User:
+        user = await user_dao.get_by_username(db, username)
+        if not user:
+            raise errors.NotFoundError(msg='用户名或密码有误')
+        elif not password_verify(password, user.password):
+            raise errors.AuthorizationError(msg='用户名或密码有误')
+        elif not user.status:
+            raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+        return user
 
-    @staticmethod
+    async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
+        async with async_db_session.begin() as db:
+            user = await self.user_verify(db, obj.username, obj.password)
+            user_id = user.id
+            a_token = await create_access_token(str(user_id), user.is_multi_login)
+            await user_dao.update_login_time(db, obj.username)
+            return a_token.access_token, user
+
     async def login(
-        *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+        self, *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
     ) -> GetLoginToken:
         async with async_db_session.begin() as db:
             try:
-                current_user = await user_dao.get_by_username(db, obj.username)
-                if not current_user:
-                    raise errors.NotFoundError(msg='用户名或密码有误')
-                user_uuid = current_user.uuid
-                username = current_user.username
-                if not password_verify(obj.password, current_user.password):
-                    raise errors.AuthorizationError(msg='用户名或密码有误')
-                elif not current_user.status:
-                    raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+                user = await self.user_verify(db, obj.username, obj.password)
+                user_id = user.id
+                user_uuid = user.uuid
+                username = user.username
                 captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-                current_user_id = current_user.id
-                access_token = await create_access_token(str(current_user_id), current_user.is_multi_login)
-                refresh_token = await create_refresh_token(str(current_user_id), current_user.is_multi_login)
+                a_token = await create_access_token(str(user_id), user.is_multi_login)
+                r_token = await create_refresh_token(str(user_id), user.is_multi_login)
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
@@ -100,16 +99,16 @@ class AuthService:
                 await user_dao.update_login_time(db, obj.username)
                 response.set_cookie(
                     key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                    value=refresh_token.refresh_token,
+                    value=r_token.refresh_token,
                     max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    expires=timezone.f_utc(refresh_token.refresh_token_expire_time),
+                    expires=timezone.f_utc(r_token.refresh_token_expire_time),
                     httponly=True,
                 )
-                await db.refresh(current_user)
+                await db.refresh(user)
                 data = GetLoginToken(
-                    access_token=access_token.access_token,
-                    access_token_expire_time=access_token.access_token_expire_time,
-                    user=current_user,  # type: ignore
+                    access_token=a_token.access_token,
+                    access_token_expire_time=a_token.access_token_expire_time,
+                    user=user,  # type: ignore
                 )
                 return data
 
@@ -125,17 +124,17 @@ class AuthService:
         if request.user.id != user_id:
             raise errors.TokenError(msg='Refresh Token 无效')
         async with async_db_session() as db:
-            current_user = await user_dao.get(db, user_id)
-            if not current_user:
+            user = await user_dao.get(db, user_id)
+            if not user:
                 raise errors.NotFoundError(msg='用户名或密码有误')
-            elif not current_user.status:
+            elif not user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             current_token = get_token(request)
             new_token = await create_new_token(
-                sub=str(current_user.id),
+                sub=str(user.id),
                 token=current_token,
                 refresh_token=refresh_token,
-                multi_login=current_user.is_multi_login,
+                multi_login=user.is_multi_login,
             )
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
