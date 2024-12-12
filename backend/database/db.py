@@ -16,11 +16,17 @@ SQLALCHEMY_DATABASE_URL = None
 
 # 数据库连接
 if settings.DB_TYPE == 'mysql':
-    SQLALCHEMY_DATABASE_URL = (
-        f'mysql+asyncmy://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}:'
-        f'{settings.MYSQL_PORT}/{settings.MYSQL_DATABASE}?charset={settings.MYSQL_CHARSET}'
+    SQLALCHEMY_DATABASE_URL = URL.create(
+        drivername="mysql+asyncmy",
+        username=settings.MYSQL_USER,
+        password=settings.MYSQL_PASSWORD,
+        host=settings.MYSQL_HOST,
+        port=settings.MYSQL_PORT,
+        database=settings.MYSQL_DATABASE,
+        query={
+            "charset": settings.MYSQL_CHARSET
+        }
     )
-
 elif settings.DB_TYPE == 'postgresql':
     SQLALCHEMY_DATABASE_URL = URL.create(
         drivername="postgresql+asyncpg",
