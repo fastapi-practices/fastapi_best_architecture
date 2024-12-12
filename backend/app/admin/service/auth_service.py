@@ -23,7 +23,7 @@ from backend.common.security.jwt import (
     password_verify,
 )
 from backend.core.conf import settings
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
 

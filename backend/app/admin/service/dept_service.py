@@ -9,7 +9,7 @@ from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.common.exception import errors
 from backend.core.conf import settings
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from backend.database.db_redis import redis_client
 from backend.utils.build_tree import get_tree_data
 

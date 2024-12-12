@@ -10,7 +10,7 @@ from backend.common.enums import MethodType, StatusType
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
-from backend.database.db_mysql import async_engine
+from backend.database.db import async_engine
 
 
 class RBAC:

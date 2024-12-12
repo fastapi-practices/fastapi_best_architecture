@@ -34,7 +34,7 @@ dependencies = [
     "pydantic>=2.9.1",
     "python-jose>=3.3.0",
     "redis[hiredis]>=5.2.0",
-    "SQLAlchemy>=2.0.30",
+    "sqlalchemy[asyncio]>=2.0.30",
     "user-agents==2.2.0",
     "XdbSearchIP>=1.0.2",
     "fastapi_oauth20>=0.0.1a2",
@@ -47,6 +47,7 @@ dependencies = [
     "celery-aio-pool==0.1.0rc7",
     "asgi-correlation-id>=4.3.3",
     "python-socketio>=5.11.4",
+    "asyncpg>=0.30.0",
 ]
 
 [dependency-groups]

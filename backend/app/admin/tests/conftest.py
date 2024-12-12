@@ -6,9 +6,9 @@ import pytest
 
 from starlette.testclient import TestClient
 
-from backend.app.admin.tests.utils.db_mysql import override_get_db
+from backend.app.admin.tests.utils.db import override_get_db
 from backend.core.conf import settings
-from backend.database.db_mysql import get_db
+from backend.database.db import get_db
 from backend.main import app
 
 # 重载数据库

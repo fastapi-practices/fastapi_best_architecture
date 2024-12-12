@@ -13,22 +13,22 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 sys.path.append('../')
 
-from backend.core import path_conf
+from backend.core import path_conf  # noqa: F401
 
 if not os.path.exists(path_conf.ALEMBIC_Versions_DIR):
     os.makedirs(path_conf.ALEMBIC_Versions_DIR)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-config = context.config
+ctx_config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+fileConfig(ctx_config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from backend.common.model import MappedBase
+from backend.common.model import MappedBase  # noqa: F401
 
 # if add new app, do like this
 from backend.app.admin.model import *  # noqa: F401
@@ -37,9 +37,9 @@ from backend.app.generator.model import *  # noqa: F401
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-from backend.database.db_mysql import SQLALCHEMY_DATABASE_URL
+from backend.database.db import SQLALCHEMY_DATABASE_URL  # noqa: F401
 
-config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
+ctx_config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False))
 
 
 def run_migrations_offline():
@@ -54,7 +54,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option('sqlalchemy.url')
+    url = ctx_config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -85,10 +85,11 @@ async def run_migrations_online():
     """
     connectable = AsyncEngine(
         engine_from_config(
-            config.get_section(config.config_ini_section),
+            ctx_config.get_section(ctx_config.config_ini_section),
             prefix='sqlalchemy.',
             poolclass=pool.NullPool,
             future=True,
+            echo=True
         )
     )
 

@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import model_validator, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BasePath
@@ -16,13 +16,23 @@ class Settings(BaseSettings):
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
+    # Env Database Type
+    DB_TYPE: str = 'mysql'  # ex: mysql, postgresql, sqlite
 
     # Env MySQL
-    MYSQL_HOST: str
-    MYSQL_PORT: int
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
+    MYSQL_HOST: str | None = None
+    MYSQL_PORT: int | None
+    MYSQL_USER: str | None
+    MYSQL_PASSWORD: str | None
 
+    # Env PostgreSQL
+    POSTGRES_HOST: str | None = ""
+    POSTGRES_PORT: int | None = 5432
+    POSTGRES_USER: str | None = None
+    POSTGRES_PASSWORD: str | None
+
+    # Env SQLITE
+    SQLITE_DATABASE: str | None
     # Env Redis
     REDIS_HOST: str
     REDIS_PORT: int
@@ -53,10 +63,40 @@ class Settings(BaseSettings):
             values['FASTAPI_STATIC_FILES'] = False
         return values
 
+    @field_validator("POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD", mode='before')
+    @classmethod
+    def check_postgresql_conf(cls, v, info: ValidationInfo):
+        if info.data.get("DB_TYPE") == 'postgresql':
+            if v is None:
+                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is postgresql')
+        return v
+
+    @field_validator("MYSQL_HOST", "MYSQL_PORT", "MYSQL_USER", "MYSQL_PASSWORD", mode='before')
+    @classmethod
+    def check_mysql_conf(cls, v, info: ValidationInfo):
+        if info.data.get("DB_TYPE") == 'mysql':
+            if v is None:
+                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is mysql')
+        return v
+
+    @field_validator("SQLITE_DATABASE", mode='before')
+    @classmethod
+    def check_sqlite_conf(cls, v, info: ValidationInfo):
+        if info.data.get("DB_TYPE") == 'sqlite':
+            if v is None:
+                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is sqlite')
+        return v
+
+    DATABASE_ECHO: bool = False
     # MySQL
-    MYSQL_ECHO: bool = False
+
     MYSQL_DATABASE: str = 'fba'
     MYSQL_CHARSET: str = 'utf8mb4'
+
+    # PostgreSQL
+
+    POSTGRES_DATABASE: str = "fba"
+    POSTGRES_CHARSET: str = 'utf8mb4'
 
     # Redis
     REDIS_TIMEOUT: int = 5

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from typing import Annotated
-
+from sqlalchemy import DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
 
 from backend.utils.timezone import timezone
@@ -27,9 +27,11 @@ class DateTimeMixin(MappedAsDataclass):
     """日期时间 Mixin 数据类"""
 
     created_time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         init=False, default_factory=timezone.now, sort_order=999, comment='创建时间'
     )
     updated_time: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
         init=False, onupdate=timezone.now, sort_order=999, comment='更新时间'
     )
 

@@ -6,7 +6,7 @@ from backend.app.{{ app_name }}.crud.crud_{{ table_name_en }} import {{ table_na
 from backend.app.{{ app_name }}.model import {{ table_name_class }}
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from sqlalchemy import Select
 
 

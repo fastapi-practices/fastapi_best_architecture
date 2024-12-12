@@ -3,7 +3,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
-from backend.database.db_mysql import create_engine_and_session
+from backend.database.db import create_engine_and_session
 
 _, test_async_db_session = create_engine_and_session(
     f'mysql+asyncmy://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}:'
