@@ -1,4 +1,3 @@
-
 import sys
 
 from typing import Annotated
@@ -12,44 +11,32 @@ from backend.common.log import log
 from backend.common.model import MappedBase
 from backend.core.conf import settings
 
-SQLALCHEMY_DATABASE_URL = None
-
 # 数据库连接
-if settings.DB_TYPE == 'mysql':
+SQLALCHEMY_DATABASE_URL = None
+if settings.DATABASE_TYPE == 'mysql':
     SQLALCHEMY_DATABASE_URL = URL.create(
-        drivername="mysql+asyncmy",
+        drivername='mysql+asyncmy',
         username=settings.MYSQL_USER,
         password=settings.MYSQL_PASSWORD,
         host=settings.MYSQL_HOST,
         port=settings.MYSQL_PORT,
         database=settings.MYSQL_DATABASE,
-        query={
-            "charset": settings.MYSQL_CHARSET
-        }
+        query={'charset': settings.MYSQL_CHARSET},
     )
-elif settings.DB_TYPE == 'postgresql':
+elif settings.DATABASE_TYPE == 'pgsql':
     SQLALCHEMY_DATABASE_URL = URL.create(
-        drivername="postgresql+asyncpg",
+        drivername='postgresql+asyncpg',
         username=settings.POSTGRES_USER,
         password=settings.POSTGRES_PASSWORD,
         host=settings.POSTGRES_HOST,
         port=settings.POSTGRES_PORT,
         database=settings.POSTGRES_DATABASE,
-        # query={
-        #     "characterEncoding": settings.POSTGRES_CHARSET
-        # }
-    )
-elif settings.DB_TYPE == 'sqlite':
-    SQLALCHEMY_DATABASE_URL = URL.create(
-        drivername='sqlite+aiosqlite',
-        database=settings.SQLITE_DATABASE,
     )
 else:
-    raise ValueError('不支持的数据库类型')
+    raise ValueError(f'不支持的数据库类型: {settings.DATABASE_TYPE}')
 
 
 def create_engine_and_session(url: str | URL):
-
     try:
         # 数据库引擎
         engine = create_async_engine(url, echo=settings.DATABASE_ECHO, future=True, pool_pre_ping=True)
@@ -58,8 +45,8 @@ def create_engine_and_session(url: str | URL):
         log.error('❌ 数据库链接失败 {}', e)
         sys.exit()
     else:
-        db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
-        return engine, db_session
+        session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+        return engine, session
 
 
 async def get_db():
@@ -72,6 +59,7 @@ async def get_db():
         raise se
     finally:
         await session.close()
+
 
 async_engine, async_db_session = create_engine_and_session(SQLALCHEMY_DATABASE_URL)
 

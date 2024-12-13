@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import String, Text
+from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column
@@ -17,7 +17,7 @@ class CasbinRule(MappedBase):
     ptype: Mapped[str] = mapped_column(String(255), comment='策略类型: p / g')
     v0: Mapped[str] = mapped_column(String(255), comment='角色ID / 用户uuid')
     # v1: Mapped[str] = mapped_column(LONGTEXT, comment='api路径 / 角色名称')
-    v1: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, "postgresql"), comment='api路径 / 角色名称')
+    v1: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='api路径 / 角色名称')
     v2: Mapped[str | None] = mapped_column(String(255), comment='请求方法')
     v3: Mapped[str | None] = mapped_column(String(255))
     v4: Mapped[str | None] = mapped_column(String(255))

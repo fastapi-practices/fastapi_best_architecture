@@ -89,7 +89,7 @@ async def run_migrations_online():
             prefix='sqlalchemy.',
             poolclass=pool.NullPool,
             future=True,
-            echo=True
+            echo=True,
         )
     )
 

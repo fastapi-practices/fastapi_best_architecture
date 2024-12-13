@@ -15,6 +15,7 @@ dependencies = [
     "alembic>=1.14.0",
     "asgiref>=3.8.0",
     "asyncmy>=0.2.9",
+    "asyncpg>=0.30.0",
     "bcrypt>=4.2.0",
     "casbin>=1.36.0",
     "casbin_async_sqlalchemy_adapter>=1.6.0",
@@ -47,7 +48,6 @@ dependencies = [
     "celery-aio-pool==0.1.0rc7",
     "asgi-correlation-id>=4.3.3",
     "python-socketio>=5.11.4",
-    "asyncpg>=0.30.0",
 ]
 
 [dependency-groups]

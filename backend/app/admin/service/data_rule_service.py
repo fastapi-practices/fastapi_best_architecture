@@ -12,7 +12,7 @@ from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRu
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 from backend.utils.import_parse import dynamic_import
 
 

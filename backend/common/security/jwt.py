@@ -17,7 +17,7 @@ from backend.common.dataclasses import AccessToken, NewToken, RefreshToken
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 

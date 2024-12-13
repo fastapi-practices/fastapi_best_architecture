@@ -11,7 +11,7 @@ from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
 
 

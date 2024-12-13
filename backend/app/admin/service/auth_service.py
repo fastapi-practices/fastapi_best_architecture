@@ -24,7 +24,7 @@ from backend.common.security.jwt import (
 )
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
 
 

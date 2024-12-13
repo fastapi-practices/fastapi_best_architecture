@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import lru_cache
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import model_validator, field_validator, ValidationInfo
+from pydantic import ValidationInfo, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BasePath
@@ -16,23 +16,22 @@ class Settings(BaseSettings):
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
+
     # Env Database Type
-    DB_TYPE: str = 'mysql'  # ex: mysql, postgresql, sqlite
+    DATABASE_TYPE: Literal['mysql', 'pgsql']
 
     # Env MySQL
     MYSQL_HOST: str | None = None
-    MYSQL_PORT: int | None
-    MYSQL_USER: str | None
-    MYSQL_PASSWORD: str | None
+    MYSQL_PORT: int | None = None
+    MYSQL_USER: str | None = None
+    MYSQL_PASSWORD: str | None = None
 
     # Env PostgreSQL
-    POSTGRES_HOST: str | None = ""
-    POSTGRES_PORT: int | None = 5432
-    POSTGRES_USER: str | None = None
-    POSTGRES_PASSWORD: str | None
+    PGSQL_HOST: str | None = None
+    PGSQL_PORT: int | None = None
+    PGSQL_USER: str | None = None
+    PGSQL_PASSWORD: str | None = None
 
-    # Env SQLITE
-    SQLITE_DATABASE: str | None
     # Env Redis
     REDIS_HOST: str
     REDIS_PORT: int
@@ -55,48 +54,15 @@ class Settings(BaseSettings):
     FASTAPI_OPENAPI_URL: str | None = f'{FASTAPI_API_V1_PATH}/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
-    @model_validator(mode='before')
-    @classmethod
-    def validate_openapi_url(cls, values):
-        if values['ENVIRONMENT'] == 'pro':
-            values['OPENAPI_URL'] = None
-            values['FASTAPI_STATIC_FILES'] = False
-        return values
-
-    @field_validator("POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD", mode='before')
-    @classmethod
-    def check_postgresql_conf(cls, v, info: ValidationInfo):
-        if info.data.get("DB_TYPE") == 'postgresql':
-            if v is None:
-                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is postgresql')
-        return v
-
-    @field_validator("MYSQL_HOST", "MYSQL_PORT", "MYSQL_USER", "MYSQL_PASSWORD", mode='before')
-    @classmethod
-    def check_mysql_conf(cls, v, info: ValidationInfo):
-        if info.data.get("DB_TYPE") == 'mysql':
-            if v is None:
-                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is mysql')
-        return v
-
-    @field_validator("SQLITE_DATABASE", mode='before')
-    @classmethod
-    def check_sqlite_conf(cls, v, info: ValidationInfo):
-        if info.data.get("DB_TYPE") == 'sqlite':
-            if v is None:
-                raise ValueError(f'{info.field_name} cannot be empty when DB_TYPE is sqlite')
-        return v
-
+    # Database
     DATABASE_ECHO: bool = False
-    # MySQL
 
+    # MySQL
     MYSQL_DATABASE: str = 'fba'
     MYSQL_CHARSET: str = 'utf8mb4'
 
     # PostgreSQL
-
-    POSTGRES_DATABASE: str = "fba"
-    POSTGRES_CHARSET: str = 'utf8mb4'
+    PGSQL_DATABASE: str = 'fba'
 
     # Redis
     REDIS_TIMEOUT: int = 5
@@ -219,6 +185,36 @@ class Settings(BaseSettings):
         'created_time',
         'updated_time',
     ]
+
+    @model_validator(mode='before')
+    @classmethod
+    def check_env(cls, values: Any) -> Any:
+        if values['ENVIRONMENT'] == 'pro':
+            values['OPENAPI_URL'] = None
+            values['FASTAPI_STATIC_FILES'] = False
+        return values
+
+    @field_validator('MYSQL_HOST', 'MYSQL_PORT', 'MYSQL_USER', 'MYSQL_PASSWORD', mode='after')
+    @classmethod
+    def check_mysql_conf(cls, v, info: ValidationInfo):
+        if info.data['DATABASE_TYPE'] == 'mysql':
+            if v is None:
+                raise ValueError(
+                    f'{info.field_name} cannot be empty when DATABASE_TYPE is mysql, '
+                    f'please set {info.field_name} in .env file'
+                )
+        return v
+
+    @field_validator('PGSQL_HOST', 'PGSQL_PORT', 'PGSQL_USER', 'PGSQL_PASSWORD', mode='after')
+    @classmethod
+    def check_postgresql_conf(cls, v, info: ValidationInfo):
+        if info.data['DATABASE_TYPE'] == 'pgsql':
+            if v is None:
+                raise ValueError(
+                    f'{info.field_name} cannot be empty when DATABASE_TYPE is pgsql, '
+                    f'please set {info.field_name} in .env file'
+                )
+        return v
 
 
 @lru_cache

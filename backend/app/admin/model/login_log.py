@@ -28,6 +28,6 @@ class LoginLog(DataClassBase):
     os: Mapped[str | None] = mapped_column(String(50), comment='操作系统')
     browser: Mapped[str | None] = mapped_column(String(50), comment='浏览器')
     device: Mapped[str | None] = mapped_column(String(50), comment='设备')
-    msg: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, "postgresql"), comment='提示消息')
+    msg: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='提示消息')
     login_time: Mapped[datetime] = mapped_column(comment='登录时间')
     created_time: Mapped[datetime] = mapped_column(init=False, default_factory=timezone.now, comment='创建时间')

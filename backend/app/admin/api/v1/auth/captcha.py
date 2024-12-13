@@ -7,7 +7,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.app.admin.conf import admin_settings
 from backend.common.response.response_schema import ResponseModel, response_base
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 
 router = APIRouter()
 
