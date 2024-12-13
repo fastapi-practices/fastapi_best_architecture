@@ -9,7 +9,7 @@ from pathlib import Path
 BasePath = Path(__file__).resolve().parent.parent
 
 # alembic 迁移文件存放路径
-ALEMBIC_Versions_DIR = os.path.join(BasePath, 'alembic', 'versions')
+ALEMBIC_VERSION_DIR = os.path.join(BasePath, 'alembic', 'versions')
 
 # 日志文件路径
 LOG_DIR = os.path.join(BasePath, 'log')
