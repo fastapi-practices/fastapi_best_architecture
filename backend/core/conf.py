@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Any, Literal
 
-from pydantic import ValidationInfo, field_validator, model_validator
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BasePath
@@ -20,17 +20,11 @@ class Settings(BaseSettings):
     # Env Database Type
     DATABASE_TYPE: Literal['mysql', 'pgsql']
 
-    # Env MySQL
-    MYSQL_HOST: str | None = None
-    MYSQL_PORT: int | None = None
-    MYSQL_USER: str | None = None
-    MYSQL_PASSWORD: str | None = None
-
-    # Env PostgreSQL
-    PGSQL_HOST: str | None = None
-    PGSQL_PORT: int | None = None
-    PGSQL_USER: str | None = None
-    PGSQL_PASSWORD: str | None = None
+    # Env Database
+    DATABASE_HOST: str
+    DATABASE_PORT: int
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
 
     # Env Redis
     REDIS_HOST: str
@@ -56,13 +50,8 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_ECHO: bool = False
-
-    # MySQL
-    MYSQL_DATABASE: str = 'fba'
-    MYSQL_CHARSET: str = 'utf8mb4'
-
-    # PostgreSQL
-    PGSQL_DATABASE: str = 'fba'
+    DATABASE_SCHEMA: str = 'fba'
+    DATABASE_CHARSET: str = 'utf8mb4'
 
     # Redis
     REDIS_TIMEOUT: int = 5
@@ -193,28 +182,6 @@ class Settings(BaseSettings):
             values['OPENAPI_URL'] = None
             values['FASTAPI_STATIC_FILES'] = False
         return values
-
-    @field_validator('MYSQL_HOST', 'MYSQL_PORT', 'MYSQL_USER', 'MYSQL_PASSWORD', mode='after')
-    @classmethod
-    def check_mysql_conf(cls, v, info: ValidationInfo):
-        if info.data['DATABASE_TYPE'] == 'mysql':
-            if v is None:
-                raise ValueError(
-                    f'{info.field_name} cannot be empty when DATABASE_TYPE is mysql, '
-                    f'please set {info.field_name} in .env file'
-                )
-        return v
-
-    @field_validator('PGSQL_HOST', 'PGSQL_PORT', 'PGSQL_USER', 'PGSQL_PASSWORD', mode='after')
-    @classmethod
-    def check_postgresql_conf(cls, v, info: ValidationInfo):
-        if info.data['DATABASE_TYPE'] == 'pgsql':
-            if v is None:
-                raise ValueError(
-                    f'{info.field_name} cannot be empty when DATABASE_TYPE is pgsql, '
-                    f'please set {info.field_name} in .env file'
-                )
-        return v
 
 
 @lru_cache
