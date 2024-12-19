@@ -15,8 +15,8 @@ from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR
-from backend.database.db_mysql import create_table
-from backend.database.db_redis import redis_client
+from backend.database.db import create_table
+from backend.database.redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware

@@ -9,7 +9,7 @@ from backend.app.admin.crud.crud_api import api_dao
 from backend.app.admin.model import Api
 from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class ApiService:

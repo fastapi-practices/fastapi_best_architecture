@@ -13,7 +13,7 @@ from backend.app.admin.schema.config import (
     UpdateAnyConfigParam,
 )
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class ConfigService:

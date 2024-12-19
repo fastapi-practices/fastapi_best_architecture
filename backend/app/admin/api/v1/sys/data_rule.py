@@ -11,7 +11,7 @@ from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db_mysql import CurrentSession
+from backend.database.db import CurrentSession
 from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
