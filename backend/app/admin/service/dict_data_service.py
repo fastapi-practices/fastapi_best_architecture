@@ -7,7 +7,7 @@ from backend.app.admin.crud.crud_dict_type import dict_type_dao
 from backend.app.admin.model import DictData
 from backend.app.admin.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class DictDataService:

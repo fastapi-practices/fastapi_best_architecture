@@ -20,8 +20,8 @@ from backend.app.admin.schema.user import (
 from backend.common.exception import errors
 from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify
 from backend.core.conf import settings
-from backend.database.db_mysql import async_db_session
-from backend.database.db_redis import redis_client
+from backend.database.db import async_db_session
+from backend.database.redis import redis_client
 
 
 class UserService:

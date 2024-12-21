@@ -15,7 +15,7 @@ sys.path.append('../')
 
 from backend.common.model import MappedBase
 from backend.core import path_conf
-from backend.database.db_mysql import SQLALCHEMY_DATABASE_URL
+from backend.database.db import SQLALCHEMY_DATABASE_URL
 
 # import your new model here
 from backend.app.admin.model import *  # noqa: F401
@@ -38,7 +38,7 @@ if alembic_config.config_file_name is not None:
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-alembic_config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
+alembic_config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False))
 
 
 def run_migrations_offline():

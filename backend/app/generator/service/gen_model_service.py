@@ -7,7 +7,7 @@ from backend.app.generator.model import GenModel
 from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 from backend.common.enums import GenModelMySQLColumnType
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from backend.utils.type_conversion import sql_type_to_pydantic
 
 
