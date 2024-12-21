@@ -42,20 +42,14 @@ def create_engine_and_session(url: str | URL):
         log.error('❌ 数据库链接失败 {}', e)
         sys.exit()
     else:
-        session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
-        return engine, session
+        db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+        return engine, db_session
 
 
 async def get_db():
     """session 生成器"""
-    session = async_db_session()
-    try:
+    async with async_db_session() as session:
         yield session
-    except Exception as se:
-        await session.rollback()
-        raise se
-    finally:
-        await session.close()
 
 
 async def create_table():
