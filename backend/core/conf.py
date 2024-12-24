@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal['dev', 'pro']
 
     # Env Database Type
-    DATABASE_TYPE: Literal['mysql', 'pgsql']
+    DATABASE_TYPE: Literal['mysql', 'postgresql']
 
     # Env Database
     DATABASE_HOST: str

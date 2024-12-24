@@ -1,5 +1,4 @@
 import sys
-
 from typing import Annotated
 from uuid import uuid4
 
@@ -12,14 +11,14 @@ from backend.common.model import MappedBase
 from backend.core.conf import settings
 
 
-def create_database_url(unittest: bool = False):
+def create_database_url(unittest: bool = False) -> URL:
     """
     创建数据库链接
 
     :param unittest: 是否用于单元测试
     :return:
     """
-    url_conf = dict(
+    url =  URL.create(
         drivername='mysql+asyncmy' if settings.DATABASE_TYPE == 'mysql' else 'postgresql+asyncpg',
         username=settings.DATABASE_USER,
         password=settings.DATABASE_PASSWORD,
@@ -28,8 +27,8 @@ def create_database_url(unittest: bool = False):
         database=settings.DATABASE_SCHEMA if not unittest else f'{settings.DATABASE_SCHEMA}_test',
     )
     if settings.DATABASE_TYPE == 'mysql':
-        url_conf.update(query={'charset': settings.DATABASE_CHARSET})
-    return URL.create(**url_conf)
+        url.update_query_dict({'charset': settings.DATABASE_CHARSET})
+    return url
 
 
 def create_engine_and_session(url: str | URL):
