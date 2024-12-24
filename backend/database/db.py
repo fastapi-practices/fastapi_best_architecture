@@ -1,4 +1,5 @@
 import sys
+
 from typing import Annotated
 from uuid import uuid4
 
@@ -18,7 +19,7 @@ def create_database_url(unittest: bool = False) -> URL:
     :param unittest: 是否用于单元测试
     :return:
     """
-    url =  URL.create(
+    url = URL.create(
         drivername='mysql+asyncmy' if settings.DATABASE_TYPE == 'mysql' else 'postgresql+asyncpg',
         username=settings.DATABASE_USER,
         password=settings.DATABASE_PASSWORD,

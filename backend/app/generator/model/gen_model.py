@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from typing import Union
 
-from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import INTEGER, TEXT
+from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import DataClassBase, id_key
@@ -26,9 +26,7 @@ class GenModel(DataClassBase):
     sort: Mapped[int | None] = mapped_column(default=1, comment='列排序')
     length: Mapped[int] = mapped_column(default=0, comment='列长度')
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
-    is_nullable: Mapped[bool] = mapped_column(
-        Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='是否可为空'
-    )
+    is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
 
     # 代码生成业务模型一对多
     gen_business_id: Mapped[int] = mapped_column(
