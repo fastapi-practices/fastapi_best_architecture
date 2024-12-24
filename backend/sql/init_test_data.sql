@@ -28,7 +28,7 @@ VALUES (1, '测试', 'test', 0, 0, '', NULL, 0, NULL, NULL, 0, 0, 1, NULL, NULL,
        (19, '官网', 'site', 0, 998, 'IconComputer', 'https://fastapi-practices.github.io/fastapi_best_architecture_docs/', 1, NULL, NULL, 1, 1, 1, NULL, NULL, '2023-07-27 19:22:24', NULL),
        (20, '赞助', 'sponsor', 0, 999, 'IconFire', 'https://wu-clan.github.io/sponsor/', 1, NULL, NULL, 1, 1, 1, NULL, NULL, '2024-07-27 12:39:57', NULL);
 
-INSERT INTO `fba`.`sys_role` (`id`, `name`, `data_scope`, `status`, `remark`, `created_time`, `updated_time`) VALUES (1, 'test', 2, 1, NULL, '2023-06-26 17:13:45', NULL);
+INSERT INTO `fba`.`sys_role` (`id`, `name`, `status`, `remark`, `created_time`, `updated_time`) VALUES (1, 'test', 1, NULL, '2023-06-26 17:13:45', NULL);
 
 INSERT INTO `fba`.`sys_role_menu` (`id`, `role_id`, `menu_id`) VALUES (1, 1, 1);
 
