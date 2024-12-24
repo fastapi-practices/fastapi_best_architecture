@@ -4,6 +4,7 @@ from typing import Union
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import DataClassBase, id_key
@@ -19,7 +20,9 @@ class GenModel(DataClassBase):
     comment: Mapped[str | None] = mapped_column(String(255), default=None, comment='列描述')
     type: Mapped[str] = mapped_column(String(20), default='str', comment='SQLA 模型列类型')
     pd_type: Mapped[str] = mapped_column(String(20), default='str', comment='列类型对应的 pydantic 类型')
-    default: Mapped[str | None] = mapped_column(LONGTEXT, default=None, comment='列默认值')
+    default: Mapped[str | None] = mapped_column(
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='列默认值'
+    )
     sort: Mapped[int | None] = mapped_column(default=1, comment='列排序')
     length: Mapped[int] = mapped_column(default=0, comment='列长度')
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')

@@ -11,7 +11,7 @@ from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import IP2REGION_XDB
-from backend.database.db_redis import redis_client
+from backend.database.redis import redis_client
 
 
 def get_request_ip(request: Request) -> str:

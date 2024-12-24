@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.crud.crud_login_log import login_log_dao
 from backend.app.admin.schema.login_log import CreateLoginLogParam
 from backend.common.log import log
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class LoginLogService:

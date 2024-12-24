@@ -7,6 +7,7 @@ from pydantic.alias_generators import to_pascal, to_snake
 
 from backend.app.generator.conf import generator_settings
 from backend.app.generator.model import GenBusiness, GenModel
+from backend.core.conf import settings
 from backend.core.path_conf import JINJA2_TEMPLATE_DIR
 
 
@@ -95,8 +96,9 @@ class GenTemplate:
             'table_simple_name_zh': business.table_simple_name_zh,
             'table_comment': business.table_comment,
             'schema_name': to_pascal(business.schema_name),
-            'have_datetime_column': business.default_datetime_column,
-            'permission_sign': str(business.table_name_en.replace('_', ':')),
+            'default_datetime_column': business.default_datetime_column,
+            'permission': str(business.table_name_en.replace('_', ':')),
+            'database_type': settings.DATABASE_TYPE,
             'models': models,
         }
 

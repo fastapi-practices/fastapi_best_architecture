@@ -6,7 +6,7 @@ from backend.app.generator.crud.crud_gen_business import gen_business_dao
 from backend.app.generator.model import GenBusiness
 from backend.app.generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
 from backend.common.exception import errors
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class GenBusinessService:

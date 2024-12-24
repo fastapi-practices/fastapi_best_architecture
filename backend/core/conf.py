@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import lru_cache
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -17,11 +17,14 @@ class Settings(BaseSettings):
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
 
-    # Env MySQL
-    MYSQL_HOST: str
-    MYSQL_PORT: int
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
+    # Env Database Type
+    DATABASE_TYPE: Literal['mysql', 'postgresql']
+
+    # Env Database
+    DATABASE_HOST: str
+    DATABASE_PORT: int
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
 
     # Env Redis
     REDIS_HOST: str
@@ -45,18 +48,10 @@ class Settings(BaseSettings):
     FASTAPI_OPENAPI_URL: str | None = f'{FASTAPI_API_V1_PATH}/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
-    @model_validator(mode='before')
-    @classmethod
-    def validate_openapi_url(cls, values):
-        if values['ENVIRONMENT'] == 'pro':
-            values['OPENAPI_URL'] = None
-            values['FASTAPI_STATIC_FILES'] = False
-        return values
-
-    # MySQL
-    MYSQL_ECHO: bool = False
-    MYSQL_DATABASE: str = 'fba'
-    MYSQL_CHARSET: str = 'utf8mb4'
+    # Database
+    DATABASE_ECHO: bool = False
+    DATABASE_SCHEMA: str = 'fba'
+    DATABASE_CHARSET: str = 'utf8mb4'
 
     # Redis
     REDIS_TIMEOUT: int = 5
@@ -179,6 +174,14 @@ class Settings(BaseSettings):
         'created_time',
         'updated_time',
     ]
+
+    @model_validator(mode='before')
+    @classmethod
+    def check_env(cls, values: Any) -> Any:
+        if values['ENVIRONMENT'] == 'pro':
+            values['OPENAPI_URL'] = None
+            values['FASTAPI_STATIC_FILES'] = False
+        return values
 
 
 @lru_cache

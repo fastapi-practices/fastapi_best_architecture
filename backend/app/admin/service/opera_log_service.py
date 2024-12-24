@@ -4,7 +4,7 @@ from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_opera_log import opera_log_dao
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 
 
 class OperaLogService:
