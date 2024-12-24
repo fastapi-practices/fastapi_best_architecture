@@ -307,7 +307,6 @@ CREATE TABLE `sys_role`
 (
     `id`           int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
     `name`         varchar(20) NOT NULL COMMENT '角色名称',
-    `data_scope`   int      DEFAULT NULL COMMENT '数据权限范围（0: 全部数据，1: 自定义数据，2: 所在部门及以下数据，3: 所在部门数据，4: 仅本人数据）',
     `status`       int         NOT NULL COMMENT '角色状态（0停用 1正常）',
     `remark`       longtext COMMENT '备注',
     `created_time` datetime    NOT NULL COMMENT '创建时间',

@@ -63,12 +63,11 @@ class CRUDRole(CRUDPlus[Role]):
         roles = await db.execute(stmt)
         return roles.scalars().all()
 
-    async def get_list(self, name: str = None, data_scope: int = None, status: int = None) -> Select:
+    async def get_list(self, name: str = None, status: int = None) -> Select:
         """
         获取角色列表
 
         :param name:
-        :param data_scope:
         :param status:
         :return:
         """
@@ -80,8 +79,6 @@ class CRUDRole(CRUDPlus[Role]):
         where_list = []
         if name:
             where_list.append(self.model.name.like(f'%{name}%'))
-        if data_scope:
-            where_list.append(self.model.data_scope == data_scope)
         if status is not None:
             where_list.append(self.model.status == status)
         if where_list:
