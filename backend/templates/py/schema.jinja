@@ -26,7 +26,7 @@ class Get{{ schema_name }}ListDetails({{ schema_name }}SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    {% if have_datetime_column %}
+    {% if default_datetime_column %}
     created_time: datetime
     updated_time: datetime | None = None
     {% endif %}

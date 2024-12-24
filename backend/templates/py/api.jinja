@@ -39,7 +39,7 @@ async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseMode
     '',
     summary='创建{{ table_simple_name_zh }}',
     dependencies=[
-        Depends(RequestPermission('{{ permission_sign }}:add')),
+        Depends(RequestPermission('{{ permission }}:add')),
         DependsRBAC,
     ],
 )
@@ -52,7 +52,7 @@ async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> Respo
     '/{pk}',
     summary='更新{{ table_simple_name_zh }}',
     dependencies=[
-        Depends(RequestPermission('{{ permission_sign }}:edit')),
+        Depends(RequestPermission('{{ permission }}:edit')),
         DependsRBAC,
     ],
 )
@@ -67,7 +67,7 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
     '',
     summary='（批量）删除{{ table_simple_name_zh }}',
     dependencies=[
-        Depends(RequestPermission('{{ permission_sign }}:del')),
+        Depends(RequestPermission('{{ permission }}:del')),
         DependsRBAC,
     ],
 )
