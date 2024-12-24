@@ -1,5 +1,5 @@
 insert into sys_dept (id, name, level, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
-values  (1, 'test', 0, 0, null, null, null, 1, FALSE, null, '2023-06-26 17:13:45', null);
+values  (1, 'test', 0, 0, null, null, null, 1, 0, null, '2023-06-26 17:13:45', null);
 
 insert into sys_api (id, name, method, path, remark, created_time, updated_time)
 values  (1, '创建API', 'POST', '/api/v1/apis', null, '2024-02-02 11:29:47', null),
@@ -35,7 +35,7 @@ insert into sys_role_menu (id, role_id, menu_id)
 values  (1, 1, 1);
 
 insert into sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
-values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', '0x24326224313224387932654E7563583139566A6D5A33745968424C634F', 'admin@example.com', True, True, 1, True, null, null, '2023-06-26 17:13:45', '2024-11-18 13:53:57', 1, '2023-06-26 17:13:45', '2024-11-18 13:53:57');
+values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', '0x24326224313224387932654E7563583139566A6D5A33745968424C634F', 'admin@example.com', 1, 1, 1, 0, null, null, '2023-06-26 17:13:45', '2024-11-18 13:53:57', 1, '2023-06-26 17:13:45', '2024-11-18 13:53:57');
 
 insert into sys_user_role (id, user_id, role_id)
 values  (1, 1, 1);

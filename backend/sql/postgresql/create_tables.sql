@@ -63,7 +63,7 @@ create table sys_config
     key          varchar(50)              not null
         unique,
     value        text                     not null,
-    is_frontend  boolean                  not null,
+    is_frontend  integer                  not null,
     remark       text,
     created_time timestamp with time zone not null,
     updated_time timestamp with time zone
@@ -137,7 +137,7 @@ create table sys_dept
     phone        varchar(11),
     email        varchar(50),
     status       integer                  not null,
-    del_flag     boolean                  not null,
+    del_flag     integer                  not null,
     parent_id    integer
                                           references sys_dept
                                               on delete set null,
@@ -169,11 +169,11 @@ comment on column sys_dept.created_time is '创建时间';
 
 comment on column sys_dept.updated_time is '更新时间';
 
-create index ix_sys_dept_parent_id
-    on sys_dept (parent_id);
-
 create index ix_sys_dept_id
     on sys_dept (id);
+
+create index ix_sys_dept_parent_id
+    on sys_dept (parent_id);
 
 create table sys_dict_type
 (
@@ -210,20 +210,20 @@ create table sys_login_log
 (
     id           serial
         primary key,
-    user_uuid    varchar(50)  not null,
-    username     varchar(20)  not null,
-    status       integer      not null,
-    ip           varchar(50)  not null,
+    user_uuid    varchar(50)              not null,
+    username     varchar(20)              not null,
+    status       integer                  not null,
+    ip           varchar(50)              not null,
     country      varchar(50),
     region       varchar(50),
     city         varchar(50),
-    user_agent   varchar(255) not null,
+    user_agent   varchar(255)             not null,
     os           varchar(50),
     browser      varchar(50),
     device       varchar(50),
-    msg          text         not null,
-    login_time   timestamp    not null,
-    created_time timestamp    not null
+    msg          text                     not null,
+    login_time   timestamp with time zone not null,
+    created_time timestamp with time zone not null
 );
 
 comment on column sys_login_log.id is '主键id';
@@ -562,10 +562,10 @@ create table sys_user
     password        varchar(255),
     salt            bytea,
     email           varchar(50)              not null,
-    is_superuser    boolean                  not null,
-    is_staff        boolean                  not null,
+    is_superuser    integer                  not null,
+    is_staff        integer                  not null,
     status          integer                  not null,
-    is_multi_login  boolean                  not null,
+    is_multi_login  integer                  not null,
     avatar          varchar(255),
     phone           varchar(11),
     join_time       timestamp with time zone not null,
@@ -614,11 +614,11 @@ comment on column sys_user.updated_time is '更新时间';
 create unique index ix_sys_user_username
     on sys_user (username);
 
-create unique index ix_sys_user_email
-    on sys_user (email);
-
 create index ix_sys_user_id
     on sys_user (id);
+
+create unique index ix_sys_user_email
+    on sys_user (email);
 
 create table sys_gen_model
 (
