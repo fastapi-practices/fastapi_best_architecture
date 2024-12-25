@@ -1,5 +1,3 @@
-version: "3.10"
-
 networks:
   fba_network:
     name: fba_network
@@ -42,7 +40,7 @@ services:
         wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
         mkdir -p /var/log/supervisor/
         supervisord -c /fba/deploy/backend/supervisor.conf
-        supervisorctl restart fastapi_server
+        supervisorctl restart
 
   fba_mysql:
     image: mysql:8.0.29
@@ -67,7 +65,7 @@ services:
 #  fba_postgres:
 #    image: postgres:16
 #    ports:
-#      - "${DOCKER_MYSQL_MAP_PORT:-5432}:5432"
+#      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
 #    container_name: fba_postgres
 #    restart: always
 #    environment:
@@ -75,7 +73,7 @@ services:
 #      POSTGRES_PASSWORD: 123456
 #      TZ: Asia/Shanghai
 #    volumes:
-#      - fba_mysql:/var/lib/postgresql/data
+#      - fba_postgres:/var/lib/postgresql/data
 #    networks:
 #      - fba_network
 
@@ -165,6 +163,4 @@ services:
         wait-for-it -s fba_rabbitmq:5672 -t 300
         mkdir -p /var/log/supervisor/
         supervisord -c /fba/deploy/backend/supervisor.conf
-        supervisorctl restart celery_worker
-        supervisorctl restart celery_beat
-        supervisorctl restart celery_flower
+        supervisorctl restart
