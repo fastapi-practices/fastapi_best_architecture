@@ -42,7 +42,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         start_time = timezone.now()
         request_next = await self.execute_request(request, call_next)
         end_time = timezone.now()
-        cost_time = (end_time - start_time).total_seconds() * 1000.0
+        cost_time = round((end_time - start_time).total_seconds() * 1000.0, 3)
 
         # 此信息只能在请求后获取
         _route = request.scope.get('route')
