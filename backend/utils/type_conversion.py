@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from backend.common.enums import GenModelMySQLColumnType
+from backend.common.enums import GenModelMySQLColumnType, GenModelPostgreSQLColumnType
+from backend.core.conf import settings
 
 
 def sql_type_to_sqlalchemy(typing: str) -> str:
@@ -10,8 +11,12 @@ def sql_type_to_sqlalchemy(typing: str) -> str:
     :param typing:
     :return:
     """
-    if typing in GenModelMySQLColumnType.get_member_keys():
-        return typing
+    if settings.DATABASE_TYPE == 'mysql':
+        if typing in GenModelMySQLColumnType.get_member_keys():
+            return typing
+    else:
+        if typing in GenModelPostgreSQLColumnType.get_member_keys():
+            return typing
     return 'String'
 
 
@@ -23,6 +28,11 @@ def sql_type_to_pydantic(typing: str) -> str:
     :return:
     """
     try:
-        return GenModelMySQLColumnType[typing].value
+        if settings.DATABASE_TYPE == 'mysql':
+            return GenModelMySQLColumnType[typing].value
+        else:
+            if typing == 'CHARACTER VARYING':  # postgresql 中 DDL VARCHAR 的别名
+                return 'str'
+            return GenModelPostgreSQLColumnType[typing].value
     except KeyError:
         return 'str'

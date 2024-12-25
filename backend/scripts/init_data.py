@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ruff: noqa: I001
+from backend.database.db import create_table
 import logging
 import sys
 
@@ -8,7 +9,6 @@ from anyio import run
 
 sys.path.append('../')
 
-from backend.database.db_mysql import create_table
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

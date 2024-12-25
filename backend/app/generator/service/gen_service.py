@@ -21,7 +21,7 @@ from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.exception import errors
 from backend.core.path_conf import BasePath
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from backend.utils.gen_template import gen_template
 from backend.utils.type_conversion import sql_type_to_pydantic
 

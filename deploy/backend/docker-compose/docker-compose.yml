@@ -1,5 +1,3 @@
-version: "3.10"
-
 networks:
   fba_network:
     name: fba_network
@@ -42,7 +40,7 @@ services:
         wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
         mkdir -p /var/log/supervisor/
         supervisord -c /fba/deploy/backend/supervisor.conf
-        supervisorctl restart fastapi_server
+        supervisorctl restart
 
   fba_mysql:
     image: mysql:8.0.29
@@ -64,6 +62,21 @@ services:
       --collation-server=utf8mb4_general_ci
       --lower_case_table_names=1
 
+#  fba_postgres:
+#    image: postgres:16
+#    ports:
+#      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
+#    container_name: fba_postgres
+#    restart: always
+#    environment:
+#      POSTGRES_DB: fba
+#      POSTGRES_PASSWORD: 123456
+#      TZ: Asia/Shanghai
+#    volumes:
+#      - fba_postgres:/var/lib/postgresql/data
+#    networks:
+#      - fba_network
+
   fba_redis:
     image: redis:6.2.7
     ports:
@@ -77,8 +90,6 @@ services:
     networks:
       - fba_network
 
-  # The backend is dedicated, which conflicts with fba_ui，If you choose to use fba_ui，
-  # you should stop using fba_nginx container and use fba_ui container
   fba_nginx:
     image: nginx
     ports:
@@ -93,10 +104,6 @@ services:
     networks:
       - fba_network
 
-#  # If the server memory is less than 4GB and CPU less than four cores
-#  # it is recommended to build this container separately: docker-compose build fba_ui
-#  # You can also go to fba_ui project and build it individually，however,
-#  # that make sure to create the docker network before the build: docker network create fba_network
 #  fba_ui:
 #    build:
 #      context: /root/fastapi_best_architecture_ui
@@ -114,9 +121,6 @@ services:
 #      - -g
 #      - daemon off;
 #    volumes:
-#      # nginx https conf
-#      # When deploying through docker, you need to open this configuration item and
-#      # ensure that the docker_ssl path is consistent with that in nginx conf
 #      # - local_ssl_pem_path:/etc/ssl/xxx.pem
 #      # - local_ssl_key_path:/etc/ssl/xxx.key
 #      - fba_static:/www/fba_server/backend/static
@@ -159,6 +163,4 @@ services:
         wait-for-it -s fba_rabbitmq:5672 -t 300
         mkdir -p /var/log/supervisor/
         supervisord -c /fba/deploy/backend/supervisor.conf
-        supervisorctl restart celery_worker
-        supervisorctl restart celery_beat
-        supervisorctl restart celery_flower
+        supervisorctl restart

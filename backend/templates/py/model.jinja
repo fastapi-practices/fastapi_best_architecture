@@ -5,12 +5,16 @@ from uuid import UUID
 
 import sqlalchemy as sa
 
-from backend.common.model import {% if have_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+from backend.common.model import {% if default_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+{% if database_type == 'mysql' -%}
 from sqlalchemy.dialects import mysql
+{% else -%}
+from sqlalchemy.dialects import postgresql
+{% endif -%}
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBase{% endif %}):
+class {{ table_name_class }}({% if default_datetime_column %}Base{% else %}MappedBase{% endif %}):
     """{{ table_name_zh }}"""
 
     __tablename__ = '{{ table_name_en }}'
@@ -23,9 +27,14 @@ class {{ table_name_class }}({% if have_datetime_column %}Base{% else %}MappedBa
     {%- endif %} = mapped_column(
     {%- if model.type in ['NVARCHAR', 'String', 'Unicode', 'VARCHAR'] -%}
         sa.String({{ model.length }})
-    {%- elif model.type in ['BIT', 'ENUM', 'LONGBLOB', 'LONGTEXT', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'SET',
-    'TINYBLOB', 'TINYINT', 'TINYTEXT', 'YEAR'] -%}
+    {%- elif database_type == 'mysql' and model.type in ['BIT', 'ENUM', 'LONGBLOB', 'LONGTEXT', 'MEDIUMBLOB',
+    'MEDIUMINT', 'MEDIUMTEXT', 'SET', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'YEAR'] -%}
         mysql.{{ model.type }}()
+    {%- elif database_type == 'postgresql' and model.type in [
+    'ARRAY', 'BIT', 'BYTEA', 'CIDR', 'CITEXT', 'DATEMULTIRANGE', 'DATERANGE', 'DOMAIN', 'ENUM', 'HSTORE', 'INET',
+    'INT4MULTIRANGE', 'INT4RANGE', 'INT8MULTIRANGE', 'INT8RANGE', 'INTERVAL', 'JSONB', 'JSONPATH', 'MACADDR',
+    'MACADDR8', 'MONEY', 'NUMMULTIRANGE', 'NUMRANGE', 'OID', 'REGCLASS', 'REGCONFIG', 'TSMULTIRANGE', 'TSQUERY',
+    'TSRANGE', 'TSTZMULTIRANGE', 'TSTZRANGE', 'TSVECTOR'] -%}
     {%- else -%}
         sa.{{ model.type }}()
     {%- endif -%}, default=
