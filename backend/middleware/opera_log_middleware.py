@@ -133,14 +133,14 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})
         else:
             if body_data:
-                json_data = await request.json()
-                if not isinstance(json_data, dict):
-                    json_data = {
-                        f'{type(json_data)}_to_dict_data': json_data.decode('utf-8')
-                        if isinstance(json_data, bytes)
-                        else json_data
-                    }
-                args.update(json_data)
+                content_type = request.headers.get('Content-Type', '').split(';')[0].strip().lower()
+                if content_type == 'application/json':
+                    json_data = await request.json()
+                    if isinstance(json_data, bytes):
+                        json_data = json_data.decode('utf-8')
+                    args.update(json_data)
+                else:
+                    args.update({'body': str(body_data)})
         return args
 
     @staticmethod
