@@ -9,6 +9,7 @@ from backend.app.admin.model.dict_data import DictData
 from backend.app.admin.model.dict_type import DictType
 from backend.app.admin.model.login_log import LoginLog
 from backend.app.admin.model.menu import Menu
+from backend.app.admin.model.notice import Notice
 from backend.app.admin.model.opera_log import OperaLog
 from backend.app.admin.model.role import Role
 from backend.app.admin.model.user import User
