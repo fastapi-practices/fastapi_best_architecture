@@ -128,14 +128,6 @@ class Links(BaseModel):
     prev: str|None= Field(None, description="上一页链接")
 
 
-# 定义分页信息模型
-class Pagination(BaseModel):
-    total: int = Field(..., description="总条数")
-    page: int = Field(..., description="当前页")
-    size: int = Field(..., description="每页数量")
-    total_pages: int = Field(..., description="总页数")
-
-
 # 动态创建组合模型的辅助函数
 def create_paged_response_model(item_model: Type[BaseModel]) -> Type[BaseModel]:
     # 创建内部 data 模型
