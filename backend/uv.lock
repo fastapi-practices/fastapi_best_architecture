@@ -617,7 +617,7 @@ requires-dist = [
     { name = "fastapi", extras = ["all"], specifier = "==0.111.0" },
     { name = "fastapi-limiter", specifier = ">=0.1.6" },
     { name = "fastapi-oauth20", specifier = ">=0.0.1a2" },
-    { name = "fastapi-pagination", specifier = "==0.12.13" },
+    { name = "fastapi-pagination", specifier = ">=0.12.34" },
     { name = "flower", specifier = ">=2.0.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
@@ -693,16 +693,15 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.12.13"
+version = "0.12.34"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "fastapi" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/b4/fe7b2ba2eed6787e4a4f8caa5c10fee1ea2a9c2e55c61c5b795bf6591bbb/fastapi_pagination-0.12.13.tar.gz", hash = "sha256:29b09902e6a946957bbb7d78dac14505b23686236312ebae17be9748d143de3e", size = 21680 }
+sdist = { url = "https://files.pythonhosted.org/packages/83/4d/6e695098ce33b3394cf26b335ca4ec6407f9421cfdf9ad6a38775580db21/fastapi_pagination-0.12.34.tar.gz", hash = "sha256:05ee8c0bc572072160f7f30900bfd87869e1880c87bc5797922fec2e49e65f11", size = 26901 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/6e/9e30c1cbf1c4ea1888a22a9cd988e9d897706d367351533e752a1312fd3d/fastapi_pagination-0.12.13-py3-none-any.whl", hash = "sha256:c8f94327c9d705f89b236c18b72548c6cb5ac9ba559d7b325f479e1c8ccb0c0d", size = 36016 },
+    { url = "https://files.pythonhosted.org/packages/72/f3/a0a1e7efd88dba07743665d1f6f88008c9a1e174458581ecaa53b8699a7c/fastapi_pagination-0.12.34-py3-none-any.whl", hash = "sha256:089d1078aae1784395b4dbd923d0c8246641ddcc291c5ec6d92a30edb92ecbdd", size = 43308 },
 ]
 
 [[package]]
