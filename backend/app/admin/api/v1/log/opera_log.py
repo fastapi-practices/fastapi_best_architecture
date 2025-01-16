@@ -4,7 +4,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schema.opera_log import GetOperaLogListDetails
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -31,7 +30,7 @@ async def get_pagination_opera_logs(
     ip: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     log_select = await opera_log_service.get_select(username=username, status=status, ip=ip)
-    page_data = await paging_data(db, log_select, GetOperaLogListDetails)
+    page_data = await paging_data(db, log_select)
     return response_base.success(data=page_data)
 
 

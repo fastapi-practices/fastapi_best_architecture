@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.api import CreateApiParam, GetApiListDetails, UpdateApiParam
+from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
 from backend.app.admin.service.api_service import api_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -44,7 +44,7 @@ async def get_pagination_apis(
     path: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     api_select = await api_service.get_select(request=request, name=name, method=method, path=path)
-    page_data = await paging_data(db, api_select, GetApiListDetails)
+    page_data = await paging_data(db, api_select)
     return response_base.success(data=page_data)
 
 

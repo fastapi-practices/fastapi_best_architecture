@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.dict_type import CreateDictTypeParam, GetDictTypeListDetails, UpdateDictTypeParam
+from backend.app.admin.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 from backend.app.admin.service.dict_type_service import dict_type_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -31,7 +31,7 @@ async def get_pagination_dict_types(
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
     dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
-    page_data = await paging_data(db, dict_type_select, GetDictTypeListDetails)
+    page_data = await paging_data(db, dict_type_select)
     return response_base.success(data=page_data)
 
 

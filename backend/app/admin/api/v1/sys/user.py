@@ -108,7 +108,7 @@ async def get_pagination_users(
     status: Annotated[int | None, Query()] = None,
 ):
     user_select = await user_service.get_select(dept=dept, username=username, phone=phone, status=status)
-    page_data = await paging_data(db, user_select, GetUserInfoListDetails)
+    page_data = await paging_data(db, user_select)
     return response_base.success(data=page_data)
 
 

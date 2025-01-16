@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.notice import CreateNoticeParam, GetNoticeListDetails, UpdateNoticeParam
+from backend.app.admin.schema.notice import CreateNoticeParam, UpdateNoticeParam
 from backend.app.admin.service.notice_service import notice_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -32,7 +32,7 @@ async def get_notice(pk: Annotated[int, Path(...)]) -> ResponseModel:
 )
 async def get_pagination_notice(db: CurrentSession) -> ResponseModel:
     notice_select = await notice_service.get_select()
-    page_data = await paging_data(db, notice_select, GetNoticeListDetails)
+    page_data = await paging_data(db, notice_select)
     return response_base.success(data=page_data)
 
 

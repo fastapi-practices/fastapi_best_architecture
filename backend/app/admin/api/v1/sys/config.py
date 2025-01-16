@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.config import (
     CreateAnyConfigParam,
-    GetAnyConfigListDetails,
     SaveConfigParam,
     UpdateAnyConfigParam,
 )
@@ -98,7 +97,7 @@ async def get_pagination_config(
     type: Annotated[str | None, Query()] = None,
 ) -> ResponseModel:
     config_select = await config_service.get_select(name=name, type=type)
-    page_data = await paging_data(db, config_select, GetAnyConfigListDetails)
+    page_data = await paging_data(db, config_select)
     return response_base.success(data=page_data)
 
 

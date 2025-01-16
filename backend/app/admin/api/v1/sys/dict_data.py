@@ -39,7 +39,7 @@ async def get_pagination_dict_datas(
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
     dict_data_select = await dict_data_service.get_select(label=label, value=value, status=status)
-    page_data = await paging_data(db, dict_data_select, GetDictDataListDetails)
+    page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
 
 
