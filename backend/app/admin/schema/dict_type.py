@@ -23,7 +23,7 @@ class UpdateDictTypeParam(DictTypeSchemaBase):
     pass
 
 
-class GetDictTypeListDetails(DictTypeSchemaBase):
+class GetDictTypeDetail(DictTypeSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

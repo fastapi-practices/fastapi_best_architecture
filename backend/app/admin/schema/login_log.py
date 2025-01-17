@@ -31,7 +31,7 @@ class UpdateLoginLogParam(LoginLogSchemaBase):
     pass
 
 
-class GetLoginLogListDetails(LoginLogSchemaBase):
+class GetLoginLogDetail(LoginLogSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

@@ -32,7 +32,7 @@ class UpdateMenuParam(MenuSchemaBase):
     pass
 
 
-class GetMenuListDetails(MenuSchemaBase):
+class GetMenuDetail(MenuSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

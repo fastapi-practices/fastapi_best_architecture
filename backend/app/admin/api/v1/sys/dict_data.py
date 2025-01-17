@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.dict_data import CreateDictDataParam, GetDictDataListDetails, UpdateDictDataParam
+from backend.app.admin.schema.dict_data import CreateDictDataParam, GetDictDataDetail, UpdateDictDataParam
 from backend.app.admin.service.dict_data_service import dict_data_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -18,9 +18,9 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
-async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDictDataDetail]:
     dict_data = await dict_data_service.get(pk=pk)
-    data = GetDictDataListDetails(**select_as_dict(dict_data))
+    data = GetDictDataDetail(**select_as_dict(dict_data))
     return response_base.success(data=data)
 
 
@@ -37,7 +37,7 @@ async def get_pagination_dict_datas(
     label: Annotated[str | None, Query()] = None,
     value: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
     dict_data_select = await dict_data_service.get_select(label=label, value=value, status=status)
     page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)

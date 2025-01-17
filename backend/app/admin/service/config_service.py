@@ -8,9 +8,9 @@ from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_config import config_dao
 from backend.app.admin.model import Config
 from backend.app.admin.schema.config import (
-    CreateAnyConfigParam,
-    SaveConfigParam,
-    UpdateAnyConfigParam,
+    CreateConfigParam,
+    SaveBuiltInConfigParam,
+    UpdateConfigParam,
 )
 from backend.common.exception import errors
 from backend.database.db import async_db_session
@@ -23,7 +23,7 @@ class ConfigService:
             return await config_dao.get_by_type(db, type)
 
     @staticmethod
-    async def save_built_in_config(objs: list[SaveConfigParam], type: str) -> None:
+    async def save_built_in_config(objs: list[SaveBuiltInConfigParam], type: str) -> None:
         async with async_db_session.begin() as db:
             for obj in objs:
                 config = await config_dao.get_by_key_and_type(db, obj.key, type)
@@ -47,7 +47,7 @@ class ConfigService:
         return await config_dao.get_list(name=name, type=type)
 
     @staticmethod
-    async def create(*, obj: CreateAnyConfigParam) -> None:
+    async def create(*, obj: CreateConfigParam) -> None:
         async with async_db_session.begin() as db:
             if obj.type in admin_settings.CONFIG_BUILT_IN_TYPES:
                 raise errors.ForbiddenError(msg='非法类型参数')
@@ -57,7 +57,7 @@ class ConfigService:
             await config_dao.create(db, obj)
 
     @staticmethod
-    async def update(*, pk: int, obj: UpdateAnyConfigParam) -> int:
+    async def update(*, pk: int, obj: UpdateConfigParam) -> int:
         async with async_db_session.begin() as db:
             config = await config_dao.get(db, pk)
             if not config:

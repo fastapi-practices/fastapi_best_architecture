@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
+from backend.app.admin.schema.api import CreateApiParam, GetApiDetail, UpdateApiParam
 from backend.app.admin.service.api_service import api_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -17,13 +17,13 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有接口', dependencies=[DependsJwtAuth])
-async def get_all_apis() -> ResponseModel:
+async def get_all_apis() -> ResponseSchemaModel[list[GetApiDetail]]:
     data = await api_service.get_all()
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
-async def get_api(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_api(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetApiDetail]:
     api = await api_service.get(pk=pk)
     return response_base.success(data=api)
 
@@ -42,7 +42,7 @@ async def get_pagination_apis(
     name: Annotated[str | None, Query()] = None,
     method: Annotated[str | None, Query()] = None,
     path: Annotated[str | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetApiDetail]]:
     api_select = await api_service.get_select(request=request, name=name, method=method, path=path)
     page_data = await paging_data(db, api_select)
     return response_base.success(data=page_data)

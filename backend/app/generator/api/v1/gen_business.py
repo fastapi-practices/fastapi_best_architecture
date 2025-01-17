@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Path
 
 from backend.app.generator.schema.gen_business import (
     CreateGenBusinessParam,
-    GetGenBusinessListDetails,
+    GetGenBusinessDetail,
     UpdateGenBusinessParam,
 )
 from backend.app.generator.service.gen_business_service import gen_business_service
@@ -30,7 +30,7 @@ async def get_all_businesses() -> ResponseModel:
 @router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
     business = await gen_business_service.get(pk=pk)
-    data = GetGenBusinessListDetails(**select_as_dict(business))
+    data = GetGenBusinessDetail(**select_as_dict(business))
     return response_base.success(data=data)
 
 

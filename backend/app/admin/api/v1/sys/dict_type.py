@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
+from backend.app.admin.schema.dict_type import CreateDictTypeParam, GetDictTypeDetail, UpdateDictTypeParam
 from backend.app.admin.service.dict_type_service import dict_type_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -29,7 +29,7 @@ async def get_pagination_dict_types(
     name: Annotated[str | None, Query()] = None,
     code: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
     dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select)
     return response_base.success(data=page_data)

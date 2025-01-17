@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleListDetails, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleDetail, UpdateDataRuleParam
 from backend.app.admin.service.data_rule_service import data_rule_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -18,28 +18,28 @@ router = APIRouter()
 
 
 @router.get('/models', summary='获取支持过滤的数据库模型', dependencies=[DependsJwtAuth])
-async def get_data_rule_models() -> ResponseModel:
+async def get_data_rule_models() -> ResponseSchemaModel[list[str]]:
     models = await data_rule_service.get_models()
     return response_base.success(data=models)
 
 
 @router.get('/model/{model}/columns', summary='获取支持过滤的数据库模型列', dependencies=[DependsJwtAuth])
-async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> ResponseModel:
+async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> ResponseSchemaModel[list[str]]:
     models = await data_rule_service.get_columns(model=model)
     return response_base.success(data=models)
 
 
 @router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
-async def get_all_data_rule() -> ResponseModel:
+async def get_all_data_rule() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
     data_rules = await data_rule_service.get_all()
     data = select_list_serialize(data_rules)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
-async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDataRuleDetail]:
     data_rule = await data_rule_service.get(pk=pk)
-    data = GetDataRuleListDetails(**select_as_dict(data_rule))
+    data = GetDataRuleDetail(**select_as_dict(data_rule))
     return response_base.success(data=data)
 
 
@@ -51,7 +51,9 @@ async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_pagination_data_rule(db: CurrentSession, name: Annotated[str | None, Query()] = None) -> ResponseModel:
+async def get_pagination_data_rule(
+    db: CurrentSession, name: Annotated[str | None, Query()] = None
+) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
     data_rule_select = await data_rule_service.get_select(name=name)
     page_data = await paging_data(db, data_rule_select)
     return response_base.success(data=page_data)

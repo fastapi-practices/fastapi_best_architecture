@@ -22,7 +22,7 @@ class Update{{ schema_name }}Param({{ schema_name }}SchemaBase):
     pass
 
 
-class Get{{ schema_name }}ListDetails({{ schema_name }}SchemaBase):
+class Get{{ schema_name }}Detail({{ schema_name }}SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

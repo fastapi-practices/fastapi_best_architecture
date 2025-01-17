@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.schema.dict_type import GetDictTypeListDetails
+from backend.app.admin.schema.dict_type import GetDictTypeDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
@@ -26,10 +26,10 @@ class UpdateDictDataParam(DictDataSchemaBase):
     pass
 
 
-class GetDictDataListDetails(DictDataSchemaBase):
+class GetDictDataDetail(DictDataSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    type: GetDictTypeListDetails
+    type: GetDictTypeDetail
     created_time: datetime
     updated_time: datetime | None = None

@@ -31,7 +31,7 @@ class UpdateGenModelParam(GenModelSchemaBase):
     pass
 
 
-class GetGenModelListDetails(GenModelSchemaBase):
+class GetGenModelDetail(GenModelSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

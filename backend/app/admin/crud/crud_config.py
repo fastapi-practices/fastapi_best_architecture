@@ -8,7 +8,7 @@ from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.conf import admin_settings
 from backend.app.admin.model import Config
-from backend.app.admin.schema.config import CreateAnyConfigParam, UpdateAnyConfigParam
+from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
 
 
 class CRUDConfig(CRUDPlus[Config]):
@@ -72,7 +72,7 @@ class CRUDConfig(CRUDPlus[Config]):
             filters.update(type__like=f'%{type}%')
         return await self.select_order('created_time', 'desc', **filters)
 
-    async def create(self, db: AsyncSession, obj_in: CreateAnyConfigParam) -> None:
+    async def create(self, db: AsyncSession, obj_in: CreateConfigParam) -> None:
         """
         创建 Config
 
@@ -82,7 +82,7 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         await self.create_model(db, obj_in)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateAnyConfigParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateConfigParam) -> int:
         """
         更新 Config
 

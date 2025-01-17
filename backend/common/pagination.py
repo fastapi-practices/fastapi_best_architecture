@@ -84,22 +84,20 @@ class PageData(_PageDetails, Generic[SchemaT]):
 
     E.g. ::
 
-        @router.get('/test', response_model=ResponseSchemaModel[PageData[GetApiListDetails]])
+        @router.get('/test', response_model=ResponseSchemaModel[PageData[GetApiDetail]])
         def test():
-            return ResponseSchemaModel[PageData[GetApiListDetails]](data=GetApiListDetails(...))
+            return ResponseSchemaModel[PageData[GetApiDetail]](data=GetApiDetail(...))
 
 
         @router.get('/test')
-        def test() -> ResponseSchemaModel[PageData[GetApiListDetails]]:
-            return ResponseSchemaModel[PageData[GetApiListDetails]](data=GetApiListDetails(...))
+        def test() -> ResponseSchemaModel[PageData[GetApiDetail]]:
+            return ResponseSchemaModel[PageData[GetApiDetail]](data=GetApiDetail(...))
 
 
         @router.get('/test')
-        def test() -> ResponseSchemaModel[PageData[GetApiListDetails]]:
+        def test() -> ResponseSchemaModel[PageData[GetApiDetail]]:
             res = CustomResponseCode.HTTP_200
-            return ResponseSchemaModel[PageData[GetApiListDetails]](
-                code=res.code, msg=res.msg, data=GetApiListDetails(...)
-            )
+            return ResponseSchemaModel[PageData[GetApiDetail]](code=res.code, msg=res.msg, data=GetApiDetail(...))
     """
 
     items: Sequence[SchemaT]

@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.schema.data_rule import GetDataRuleListDetails
-from backend.app.admin.schema.menu import GetMenuListDetails
+from backend.app.admin.schema.data_rule import GetDataRuleDetail
+from backend.app.admin.schema.menu import GetMenuDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
@@ -32,11 +32,11 @@ class UpdateRoleRuleParam(SchemaBase):
     rules: list[int]
 
 
-class GetRoleListDetails(RoleSchemaBase):
+class GetRoleDetail(RoleSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     created_time: datetime
     updated_time: datetime | None = None
-    menus: list[GetMenuListDetails]
-    rules: list[GetDataRuleListDetails | None] = []
+    menus: list[GetMenuDetail]
+    rules: list[GetDataRuleDetail | None] = []

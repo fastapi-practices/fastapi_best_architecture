@@ -26,7 +26,7 @@ class UpdateDeptParam(DeptSchemaBase):
     pass
 
 
-class GetDeptListDetails(DeptSchemaBase):
+class GetDeptDetail(DeptSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

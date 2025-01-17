@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.role import (
     CreateRoleParam,
-    GetRoleListDetails,
+    GetRoleDetail,
     UpdateRoleMenuParam,
     UpdateRoleParam,
     UpdateRoleRuleParam,
@@ -14,8 +14,8 @@ from backend.app.admin.schema.role import (
 from backend.app.admin.service.data_rule_service import data_rule_service
 from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -26,35 +26,35 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有角色', dependencies=[DependsJwtAuth])
-async def get_all_roles() -> ResponseModel:
+async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
     roles = await role_service.get_all()
     data = select_list_serialize(roles)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
-async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[GetRoleDetail]]:
     roles = await role_service.get_by_user(pk=pk)
     data = select_list_serialize(roles)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
-async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_role_menu_tree(pk=pk)
     return response_base.success(data=menu)
 
 
 @router.get('/{pk}/rules', summary='获取角色所有数据规则', dependencies=[DependsJwtAuth])
-async def get_role_all_rules(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_role_all_rules(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[int]]:
     rule = await data_rule_service.get_role_rules(pk=pk)
     return response_base.success(data=rule)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
-async def get_role(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_role(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetRoleDetail]:
     role = await role_service.get(pk=pk)
-    data = GetRoleListDetails(**select_as_dict(role))
+    data = GetRoleDetail(**select_as_dict(role))
     return response_base.success(data=data)
 
 
@@ -70,7 +70,7 @@ async def get_pagination_roles(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetRoleDetail]]:
     role_select = await role_service.get_select(name=name, status=status)
     page_data = await paging_data(db, role_select)
     return response_base.success(data=page_data)

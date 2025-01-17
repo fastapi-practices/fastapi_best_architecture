@@ -25,7 +25,7 @@ class UpdateNoticeParam(NoticeSchemaBase):
     pass
 
 
-class GetNoticeListDetails(NoticeSchemaBase):
+class GetNoticeDetail(NoticeSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
