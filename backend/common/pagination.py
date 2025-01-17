@@ -63,7 +63,7 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
         total_pages = ceil(total / params.size)
         links = create_links(**{
             'first': {'page': 1, 'size': f'{size}'},
-            'last': {'page': f'{ceil(total / params.size)}', 'size': f'{size}'} if total > 0 else 1,
+            'last': {'page': f'{ceil(total / params.size)}', 'size': f'{size if total > 0 else 1}'},
             'next': {'page': f'{page + 1}', 'size': f'{size}'} if (page + 1) <= total_pages else None,
             'prev': {'page': f'{page - 1}', 'size': f'{size}'} if (page - 1) >= 1 else None,
         }).model_dump()
