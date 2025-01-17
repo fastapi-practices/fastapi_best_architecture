@@ -57,7 +57,7 @@ def register_app():
         version=settings.FASTAPI_VERSION,
         description=settings.FASTAPI_DESCRIPTION,
         docs_url=settings.FASTAPI_DOCS_URL,
-        redoc_url=settings.FASTAPI_REDOCS_URL,
+        redoc_url=settings.FASTAPI_REDOC_URL,
         openapi_url=settings.FASTAPI_OPENAPI_URL,
         default_response_class=MsgSpecJSONResponse,
         lifespan=register_init,
