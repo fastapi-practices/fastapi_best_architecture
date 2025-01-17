@@ -15,7 +15,7 @@ SchemaT = TypeVar('SchemaT')
 
 class ResponseModel(BaseModel):
     """
-    通用型统一返回模型，不包含 data 数据结构
+    通用型统一返回模型，不包含 data schema
 
     E.g. ::
 
@@ -69,26 +69,14 @@ class ResponseSchemaModel(ResponseModel, Generic[SchemaT]):
 
 
 class ResponseBase:
-    """
-    统一返回方法
-
-    .. tip::
-
-        此类中的方法将返回 ResponseModel 模型，作为一种编码风格而存在；
-
-    E.g. ::
-
-        @router.get('/test')
-        def test() -> ResponseModel:
-            return response_base.success(data={'test': 'test'})
-    """
+    """统一返回方法"""
 
     @staticmethod
     def __response(
         *, res: CustomResponseCode | CustomResponse = None, data: Any | None = None
     ) -> ResponseModel | ResponseSchemaModel:
         """
-        请求成功返回通用方法
+        请求返回通用方法
 
         :param res: 返回信息
         :param data: 返回数据
@@ -117,13 +105,13 @@ class ResponseBase:
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
         data: Any | None = None,
-    ) -> Response | ResponseSchemaModel:
+    ) -> Response:
         """
-        此方法是为了提高接口响应速度而创建的，如果返回数据无需进行 pydantic 解析和验证，则推荐使用，相反，请不要使用！
+        此方法是为了提高接口响应速度而创建的，在解析较大 json 时有显著性能提升，但将丢失 pydantic 解析和验证
 
         .. warning::
 
-            使用此返回方法时，不要指定接口参数 response_model，也不要在接口函数后添加箭头返回类型
+            使用此返回方法时，不能指定接口参数 response_model 和箭头返回类型
 
         :param res:
         :param data:

@@ -40,7 +40,7 @@ class _Links(BaseModel):
 
 
 class _PageDetails(BaseModel):
-    items: Sequence[SchemaT] = Field(description='当前页数据')
+    items: list = Field([], description='当前页数据')
     total: int = Field(..., description='总条数')
     page: int = Field(..., description='当前页')
     size: int = Field(..., description='每页数量')
@@ -102,7 +102,7 @@ class PageData(_PageDetails, Generic[SchemaT]):
             )
     """
 
-    ...
+    items: Sequence[SchemaT]
 
 
 async def paging_data(db: AsyncSession, select: Select) -> dict:
