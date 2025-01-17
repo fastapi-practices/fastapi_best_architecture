@@ -53,7 +53,7 @@ async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseModel:
 )
 async def get_pagination_data_rule(db: CurrentSession, name: Annotated[str | None, Query()] = None) -> ResponseModel:
     data_rule_select = await data_rule_service.get_select(name=name)
-    page_data = await paging_data(db, data_rule_select, GetDataRuleListDetails)
+    page_data = await paging_data(db, data_rule_select)
     return response_base.success(data=page_data)
 
 

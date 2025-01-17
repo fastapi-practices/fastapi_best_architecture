@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}ListDetails, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.app.{{ app_name }}.service.{{ table_name_en }}_service import {{ table_name_en }}_service
 from backend.common.pagination import DependsPagination, paging_data
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -31,7 +31,7 @@ async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseMode
 )
 async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseModel:
     {{ table_name_en }}_select = await {{ table_name_en }}_service.get_select()
-    page_data = await paging_data(db, {{ table_name_en }}_select, Get{{ schema_name }}ListDetails)
+    page_data = await paging_data(db, {{ table_name_en }}_select)
     return response_base.success(data=page_data)
 
 

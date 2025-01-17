@@ -72,7 +72,7 @@ async def get_pagination_roles(
     status: Annotated[int | None, Query()] = None,
 ) -> ResponseModel:
     role_select = await role_service.get_select(name=name, status=status)
-    page_data = await paging_data(db, role_select, GetRoleListDetails)
+    page_data = await paging_data(db, role_select)
     return response_base.success(data=page_data)
 
 

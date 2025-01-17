@@ -11,7 +11,6 @@ from backend.app.admin.schema.casbin_rule import (
     DeleteAllPoliciesParam,
     DeletePolicyParam,
     DeleteUserRoleParam,
-    GetPolicyListDetails,
     UpdatePoliciesParam,
     UpdatePolicyParam,
 )
@@ -40,7 +39,7 @@ async def get_pagination_casbin(
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
 ) -> ResponseModel:
     casbin_select = await casbin_service.get_casbin_list(ptype=ptype, sub=sub)
-    page_data = await paging_data(db, casbin_select, GetPolicyListDetails)
+    page_data = await paging_data(db, casbin_select)
     return response_base.success(data=page_data)
 
 

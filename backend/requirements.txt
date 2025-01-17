@@ -36,7 +36,7 @@ fastapi==0.111.0
 fastapi-cli==0.0.5
 fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a2
-fastapi-pagination==0.12.13
+fastapi-pagination==0.12.34
 filelock==3.16.1
 flower==2.0.1
 greenlet==3.1.1
