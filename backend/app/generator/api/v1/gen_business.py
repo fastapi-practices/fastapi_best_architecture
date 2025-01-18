@@ -35,7 +35,7 @@ async def get_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
 
 
 @router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
-async def get_business_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_business_all_models(pk: Annotated[int, Path(...)]) -> ResponseModel:
     models = await gen_model_service.get_by_business(business_id=pk)
     data = select_list_serialize(models)
     return response_base.success(data=data)

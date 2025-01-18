@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
@@ -16,6 +16,7 @@ from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.schema import CustomTreeData
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -40,7 +41,7 @@ async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseSchemaMod
 
 
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
-async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[dict[str, Any]]]:
+async def get_role_all_menus(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[CustomTreeData]:
     menu = await menu_service.get_role_menu_tree(pk=pk)
     return response_base.success(data=menu)
 

@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptDetail, UpdateDeptParam
 from backend.app.admin.service.dept_service import dept_service
-from backend.common.pagination import PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.schema import CustomTreeData
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -29,7 +29,7 @@ async def get_all_depts_tree(
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-) -> ResponseSchemaModel[PageData[GetDeptDetail]]:
+) -> ResponseSchemaModel[CustomTreeData]:
     dept = await dept_service.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
     return response_base.success(data=dept)
 
