@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     FASTAPI_VERSION: str = '0.0.1'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
     FASTAPI_DOCS_URL: str | None = '/docs'
-    FASTAPI_REDOCS_URL: str | None = '/redocs'
+    FASTAPI_REDOC_URL: str | None = '/redoc'
     FASTAPI_OPENAPI_URL: str | None = '/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
@@ -148,7 +148,7 @@ class Settings(BaseSettings):
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
         '/favicon.ico',
         FASTAPI_DOCS_URL,
-        FASTAPI_REDOCS_URL,
+        FASTAPI_REDOC_URL,
         FASTAPI_OPENAPI_URL,
         f'{FASTAPI_API_V1_PATH}/auth/login/swagger',
         f'{FASTAPI_API_V1_PATH}/oauth2/github/callback',
