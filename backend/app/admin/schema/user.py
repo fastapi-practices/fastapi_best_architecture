@@ -5,8 +5,8 @@ from datetime import datetime
 from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 from typing_extensions import Self
 
-from backend.app.admin.schema.dept import GetDeptListDetails
-from backend.app.admin.schema.role import GetRoleListDetails
+from backend.app.admin.schema.dept import GetDeptDetail
+from backend.app.admin.schema.role import GetRoleDetail
 from backend.common.enums import StatusType
 from backend.common.schema import CustomPhoneNumber, SchemaBase
 
@@ -67,18 +67,18 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     last_login_time: datetime | None = None
 
 
-class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
+class GetUserInfoDetail(GetUserInfoNoRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptListDetails | None = None
-    roles: list[GetRoleListDetails]
+    dept: GetDeptDetail | None = None
+    roles: list[GetRoleDetail]
 
 
-class GetCurrentUserInfoDetail(GetUserInfoListDetails):
+class GetCurrentUserInfoDetail(GetUserInfoDetail):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptListDetails | str | None = None
-    roles: list[GetRoleListDetails] | list[str] | None = None
+    dept: GetDeptDetail | str | None = None
+    roles: list[GetRoleDetail] | list[str] | None = None
 
     @model_validator(mode='after')
     def handel(self) -> Self:
@@ -92,7 +92,7 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
         return self
 
 
-class CurrentUserIns(GetUserInfoListDetails):
+class CurrentUserIns(GetUserInfoDetail):
     model_config = ConfigDict(from_attributes=True)
 
 

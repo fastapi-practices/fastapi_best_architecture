@@ -4,6 +4,7 @@ from typing import Sequence
 
 from sqlalchemy import Select, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import noload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule
@@ -27,7 +28,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
 
         :return:
         """
-        stmt = select(self.model).order_by(desc(self.model.created_time))
+        stmt = select(self.model).options(noload(self.model.roles)).order_by(desc(self.model.created_time))
         where_list = []
         if name is not None:
             where_list.append(self.model.name.like(f'%{name}%'))

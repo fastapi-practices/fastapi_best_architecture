@@ -49,20 +49,20 @@ class ResponseSchemaModel(ResponseModel, Generic[SchemaT]):
 
     E.g. ::
 
-        @router.get('/test', response_model=ResponseSchemaModel[GetApiListDetails])
+        @router.get('/test', response_model=ResponseSchemaModel[GetApiDetail])
         def test():
-            return ResponseSchemaModel[GetApiListDetails](data=GetApiListDetails(...))
+            return ResponseSchemaModel[GetApiDetail](data=GetApiDetail(...))
 
 
         @router.get('/test')
-        def test() -> ResponseSchemaModel[GetApiListDetails]:
-            return ResponseSchemaModel[GetApiListDetails](data=GetApiListDetails(...))
+        def test() -> ResponseSchemaModel[GetApiDetail]:
+            return ResponseSchemaModel[GetApiDetail](data=GetApiDetail(...))
 
 
         @router.get('/test')
-        def test() -> ResponseSchemaModel[GetApiListDetails]:
+        def test() -> ResponseSchemaModel[GetApiDetail]:
             res = CustomResponseCode.HTTP_200
-            return ResponseSchemaModel[GetApiListDetails](code=res.code, msg=res.msg, data=GetApiListDetails(...))
+            return ResponseSchemaModel[GetApiDetail](code=res.code, msg=res.msg, data=GetApiDetail(...))
     """
 
     data: SchemaT

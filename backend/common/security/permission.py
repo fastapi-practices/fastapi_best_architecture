@@ -12,7 +12,7 @@ from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import
 
 if TYPE_CHECKING:
-    from backend.app.admin.schema.data_rule import GetDataRuleListDetails
+    from backend.app.admin.schema.data_rule import GetDataRuleDetail
 
 
 class RequestPermission:
@@ -47,7 +47,7 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
     data_rules = []
     for role in request.user.roles:
         data_rules.extend(role.rules)
-    user_data_rules: list[GetDataRuleListDetails] = list(dict.fromkeys(data_rules))
+    user_data_rules: list[GetDataRuleDetail] = list(dict.fromkeys(data_rules))
 
     # 超级管理员和无规则用户不做过滤
     if request.user.is_superuser or not user_data_rules:

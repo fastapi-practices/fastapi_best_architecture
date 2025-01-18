@@ -23,7 +23,7 @@ class UpdateApiParam(ApiSchemaBase):
     pass
 
 
-class GetApiListDetails(ApiSchemaBase):
+class GetApiDetail(ApiSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

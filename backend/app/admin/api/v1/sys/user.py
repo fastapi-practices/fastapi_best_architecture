@@ -8,7 +8,7 @@ from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
     GetCurrentUserInfoDetail,
-    GetUserInfoListDetails,
+    GetUserInfoDetail,
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
@@ -16,7 +16,7 @@ from backend.app.admin.schema.user import (
 )
 from backend.app.admin.service.user_service import user_service
 from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -33,10 +33,10 @@ async def register_user(obj: RegisterUserParam) -> ResponseModel:
 
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
-async def add_user(request: Request, obj: AddUserParam) -> ResponseModel:
+async def add_user(request: Request, obj: AddUserParam) -> ResponseSchemaModel[GetUserInfoDetail]:
     await user_service.add(request=request, obj=obj)
     current_user = await user_service.get_userinfo(username=obj.username)
-    data = GetUserInfoListDetails(**select_as_dict(current_user))
+    data = GetUserInfoDetail(**select_as_dict(current_user))
     return response_base.success(data=data)
 
 
@@ -49,15 +49,15 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
 
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
-async def get_current_user(request: Request) -> ResponseModel:
+async def get_current_user(request: Request) -> ResponseSchemaModel[GetUserInfoDetail]:
     data = GetCurrentUserInfoDetail(**request.user.model_dump())
     return response_base.success(data=data)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
-async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
+async def get_user(username: Annotated[str, Path(...)]) -> ResponseSchemaModel[GetUserInfoDetail]:
     current_user = await user_service.get_userinfo(username=username)
-    data = GetUserInfoListDetails(**select_as_dict(current_user))
+    data = GetUserInfoDetail(**select_as_dict(current_user))
     return response_base.success(data=data)
 
 
@@ -106,7 +106,7 @@ async def get_pagination_users(
     username: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-):
+) -> ResponseModel:
     user_select = await user_service.get_select(dept=dept, username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select)
     return response_base.success(data=page_data)

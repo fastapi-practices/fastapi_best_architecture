@@ -30,7 +30,7 @@ def select_columns_serialize(row: R) -> dict:
     return result
 
 
-def select_list_serialize(row: Sequence[R]) -> list:
+def select_list_serialize(row: Sequence[R]) -> list[dict[str, Any]]:
     """
     Serialize SQLAlchemy select list
 
@@ -59,7 +59,7 @@ def select_as_dict(row: R, use_alias: bool = False) -> dict:
             del result['_sa_instance_state']
     else:
         result = {}
-        mapper = class_mapper(row.__class__)
+        mapper = class_mapper(row.__class__)  # type: ignore
         for prop in mapper.iterate_properties:
             if isinstance(prop, (ColumnProperty, SynonymProperty)):
                 key = prop.key

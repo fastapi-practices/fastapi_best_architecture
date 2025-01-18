@@ -35,11 +35,11 @@ class DataRuleService:
             return rule_ids
 
     @staticmethod
-    async def get_models() -> list:
+    async def get_models() -> list[str]:
         return list(settings.DATA_PERMISSION_MODELS.keys())
 
     @staticmethod
-    async def get_columns(model: str):
+    async def get_columns(model: str) -> list[str]:
         if model not in settings.DATA_PERMISSION_MODELS:
             raise errors.NotFoundError(msg='数据模型不存在')
         model_ins = dynamic_import(settings.DATA_PERMISSION_MODELS[model])

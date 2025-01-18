@@ -38,7 +38,7 @@ class UpdateOperaLogParam(OperaLogSchemaBase):
     pass
 
 
-class GetOperaLogListDetails(OperaLogSchemaBase):
+class GetOperaLogDetail(OperaLogSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
