@@ -3,7 +3,7 @@
 from typing import Sequence
 
 from sqlalchemy import Select, desc, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule, Menu, Role, User
@@ -73,7 +73,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .options(noload(self.model.users), noload(self.model.menus), noload(self.model.rules))
             .order_by(desc(self.model.created_time))
         )
         where_list = []

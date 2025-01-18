@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
+from pydantic import BaseModel, ConfigDict, EmailStr, validate_email
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 # 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
@@ -148,14 +147,6 @@ class CustomEmailStr(EmailStr):
     @classmethod
     def _validate(cls, __input_value: str) -> str:
         return None if __input_value == '' else validate_email(__input_value)[1]
-
-
-class CustomTreeData(BaseModel):
-    """由于树形数据无法固定其数据结构，可使用此类型做为文档说明"""
-
-    tree_data: list[dict[str, Any]] = Field(
-        description='此参数并不是实际参数，仅表示此接口返回为树形数据，具体数据结构请以接口返回内容为准'
-    )
 
 
 class SchemaBase(BaseModel):

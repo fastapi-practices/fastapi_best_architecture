@@ -30,6 +30,6 @@ class GetDictDataDetail(DictDataSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    type: GetDictTypeDetail
+    type: GetDictTypeDetail | None = None
     created_time: datetime
     updated_time: datetime | None = None

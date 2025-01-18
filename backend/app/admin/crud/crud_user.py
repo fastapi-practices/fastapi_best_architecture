@@ -4,11 +4,11 @@ import bcrypt
 
 from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import noload, selectinload
 from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Role, User
+from backend.app.admin.model import Dept, Role, User
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
@@ -185,11 +185,9 @@ class CRUDUser(CRUDPlus[User]):
         stmt = (
             select(self.model)
             .options(
-                selectinload(self.model.dept),
-                selectinload(self.model.roles).options(
-                    selectinload(Role.menus),
-                    selectinload(Role.rules),
-                ),
+                selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
+                noload(self.model.socials),
+                selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.rules)),
             )
             .order_by(desc(self.model.join_time))
         )

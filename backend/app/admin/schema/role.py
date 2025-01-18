@@ -38,5 +38,5 @@ class GetRoleDetail(RoleSchemaBase):
     id: int
     created_time: datetime
     updated_time: datetime | None = None
-    menus: list[GetMenuDetail]
+    menus: list[GetMenuDetail | None] = []
     rules: list[GetDataRuleDetail | None] = []

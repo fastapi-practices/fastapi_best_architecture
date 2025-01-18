@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.menu import CreateMenuParam, GetMenuDetail, UpdateMenuParam
 from backend.app.admin.service.menu_service import menu_service
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.schema import CustomTreeData
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -17,7 +16,7 @@ router = APIRouter()
 
 
 @router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
-async def get_user_sidebar_tree(request: Request) -> ResponseSchemaModel[CustomTreeData]:
+async def get_user_sidebar_tree(request: Request) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_user_menu_tree(request=request)
     return response_base.success(data=menu)
 
@@ -32,7 +31,7 @@ async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetMenu
 @router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
 async def get_all_menus(
     title: Annotated[str | None, Query()] = None, status: Annotated[int | None, Query()] = None
-) -> ResponseSchemaModel[CustomTreeData]:
+) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_menu_tree(title=title, status=status)
     return response_base.success(data=menu)
 
