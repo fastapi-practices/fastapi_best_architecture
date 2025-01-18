@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from backend.app.generator.conf import generator_settings
 from backend.app.generator.schema.gen import ImportParam
 from backend.app.generator.service.gen_service import gen_service
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -17,7 +17,9 @@ router = APIRouter()
 
 
 @router.get('/tables', summary='获取数据库表')
-async def get_all_tables(table_schema: Annotated[str, Query(..., description='数据库名')] = 'fba') -> ResponseModel:
+async def get_all_tables(
+    table_schema: Annotated[str, Query(..., description='数据库名')] = 'fba',
+) -> ResponseSchemaModel[list[str]]:
     data = await gen_service.get_tables(table_schema=table_schema)
     return response_base.success(data=data)
 
@@ -36,13 +38,13 @@ async def import_table(obj: ImportParam) -> ResponseModel:
 
 
 @router.get('/preview/{pk}', summary='生成代码预览', dependencies=[DependsJwtAuth])
-async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseModel:
+async def preview_code(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseSchemaModel[dict[str, bytes]]:
     data = await gen_service.preview(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/generate/{pk}/path', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
-async def generate_path(pk: Annotated[int, Path(..., description='业务ID')]):
+async def generate_path(pk: Annotated[int, Path(..., description='业务ID')]) -> ResponseSchemaModel[list[str]]:
     data = await gen_service.get_generate_path(pk=pk)
     return response_base.success(data=data)
 

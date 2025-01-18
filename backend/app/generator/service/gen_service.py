@@ -69,7 +69,7 @@ class GenService:
                 await gen_model_dao.create(db, CreateGenModelParam(**model_data), pd_type=pd_type)
 
     @staticmethod
-    async def render_tpl_code(*, business: GenBusiness) -> dict:
+    async def render_tpl_code(*, business: GenBusiness) -> dict[str, str]:
         gen_models = await gen_model_service.get_by_business(business_id=business.id)
         if not gen_models:
             raise errors.NotFoundError(msg='代码生成模型表为空')
@@ -79,7 +79,7 @@ class GenService:
             tpl_code_map[tpl_path] = await gen_template.get_template(tpl_path).render_async(**gen_vars)
         return tpl_code_map
 
-    async def preview(self, *, pk: int) -> dict:
+    async def preview(self, *, pk: int) -> dict[str, bytes]:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
@@ -91,7 +91,7 @@ class GenService:
             }
 
     @staticmethod
-    async def get_generate_path(*, pk: int) -> list:
+    async def get_generate_path(*, pk: int) -> list[str]:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:

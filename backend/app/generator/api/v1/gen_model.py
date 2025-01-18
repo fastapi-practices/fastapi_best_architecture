@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Path
 
 from backend.app.generator.schema.gen_model import CreateGenModelParam, GetGenModelDetail, UpdateGenModelParam
 from backend.app.generator.service.gen_model_service import gen_model_service
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -16,13 +16,13 @@ router = APIRouter()
 
 
 @router.get('/types', summary='获取代码生成模型列类型', dependencies=[DependsJwtAuth])
-async def get_model_types() -> ResponseModel:
+async def get_model_types() -> ResponseSchemaModel[list[str]]:
     model_types = await gen_model_service.get_types()
     return response_base.success(data=model_types)
 
 
 @router.get('/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
-async def get_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_model(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetGenModelDetail]:
     model = await gen_model_service.get(pk=pk)
     data = GetGenModelDetail(**select_as_dict(model))
     return response_base.success(data=data)
