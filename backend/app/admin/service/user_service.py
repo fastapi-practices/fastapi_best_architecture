@@ -18,7 +18,7 @@ from backend.app.admin.schema.user import (
     UpdateUserRoleParam,
 )
 from backend.common.exception import errors
-from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify
+from backend.common.security.jwt import get_hash_password, get_token, jwt_decode, password_verify, superuser_verify
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -84,8 +84,8 @@ class UserService:
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}',
                 f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}',
             ]
-            for key in key_prefix:
-                await redis_client.delete_prefix(key)
+            for prefix in key_prefix:
+                await redis_client.delete_prefix(prefix)
             return count
 
     @staticmethod
@@ -208,12 +208,15 @@ class UserService:
                 count = await user_dao.set_multi_login(db, pk, False if multi_login else True)
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
                 token = get_token(request)
+                token_payload = jwt_decode(token)
                 latest_multi_login = await user_dao.get_multi_login(db, pk)
                 # 超级用户修改自身时，除当前token外，其他token失效
                 if pk == user_id:
                     if not latest_multi_login:
                         key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
-                        await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token}')
+                        await redis_client.delete_prefix(
+                            key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}'
+                        )
                         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
                         if refresh_token:
                             key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}'
@@ -225,8 +228,8 @@ class UserService:
                         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
                         if refresh_token:
                             key_prefix.append(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}')
-                        for key in key_prefix:
-                            await redis_client.delete_prefix(key)
+                        for prefix in key_prefix:
+                            await redis_client.delete_prefix(prefix)
                 return count
 
     @staticmethod

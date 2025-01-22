@@ -44,9 +44,13 @@ class AuthService:
     async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
         async with async_db_session.begin() as db:
             user = await self.user_verify(db, obj.username, obj.password)
-            user_id = user.id
-            a_token = await create_access_token(str(user_id), user.is_multi_login)
             await user_dao.update_login_time(db, obj.username)
+            a_token = await create_access_token(
+                str(user.id),
+                user.is_multi_login,
+                # extra info
+                login_type='swagger',
+            )
             return a_token.access_token, user
 
     async def login(
@@ -61,9 +65,29 @@ class AuthService:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-                user_id = user.id
-                a_token = await create_access_token(str(user_id), user.is_multi_login)
-                r_token = await create_refresh_token(str(user_id), user.is_multi_login)
+                await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                await user_dao.update_login_time(db, obj.username)
+                await db.refresh(user)
+                a_token = await create_access_token(
+                    str(user.id),
+                    user.is_multi_login,
+                    # extra info
+                    username=user.username,
+                    nickname=user.nickname,
+                    last_login_time=timezone.t_str(user.last_login_time),
+                    ip=request.state.ip,
+                    os=request.state.os,
+                    browser=request.state.browser,
+                    device=request.state.device,
+                )
+                r_token = await create_refresh_token(str(user.id), user.is_multi_login)
+                response.set_cookie(
+                    key=settings.COOKIE_REFRESH_TOKEN_KEY,
+                    value=r_token.refresh_token,
+                    max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                    expires=timezone.f_utc(r_token.refresh_token_expire_time),
+                    httponly=True,
+                )
             except errors.NotFoundError as e:
                 log.error('登陆错误: 用户名不存在')
                 raise errors.NotFoundError(msg=e.msg)
@@ -99,19 +123,10 @@ class AuthService:
                         msg='登录成功',
                     ),
                 )
-                await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
-                await user_dao.update_login_time(db, obj.username)
-                response.set_cookie(
-                    key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                    value=r_token.refresh_token,
-                    max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    expires=timezone.f_utc(r_token.refresh_token_expire_time),
-                    httponly=True,
-                )
-                await db.refresh(user)
                 data = GetLoginToken(
                     access_token=a_token.access_token,
                     access_token_expire_time=a_token.access_token_expire_time,
+                    session_uuid=a_token.session_uuid,
                     user=user,  # type: ignore
                 )
                 return data
@@ -122,23 +137,31 @@ class AuthService:
         if not refresh_token:
             raise errors.TokenError(msg='Refresh Token 丢失，请重新登录')
         try:
-            user_id = jwt_decode(refresh_token)
+            user_id = jwt_decode(refresh_token).user_id
         except Exception:
             raise errors.TokenError(msg='Refresh Token 无效')
         if request.user.id != user_id:
             raise errors.TokenError(msg='Refresh Token 无效')
         async with async_db_session() as db:
+            token = get_token(request)
             user = await user_dao.get(db, user_id)
             if not user:
                 raise errors.NotFoundError(msg='用户名或密码有误')
             elif not user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-            current_token = get_token(request)
             new_token = await create_new_token(
-                sub=str(user.id),
-                token=current_token,
+                user_id=str(user.id),
+                token=token,
                 refresh_token=refresh_token,
                 multi_login=user.is_multi_login,
+                # extra info
+                username=user.username,
+                nickname=user.nickname,
+                last_login_time=timezone.t_str(user.last_login_time),
+                ip=request.state.ip,
+                os=request.state.os,
+                browser=request.state.browser,
+                device_type=request.state.device,
             )
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
@@ -150,25 +173,27 @@ class AuthService:
             data = GetNewToken(
                 access_token=new_token.new_access_token,
                 access_token_expire_time=new_token.new_access_token_expire_time,
+                session_uuid=new_token.session_uuid,
             )
             return data
 
     @staticmethod
     async def logout(*, request: Request, response: Response) -> None:
         token = get_token(request)
+        token_payload = jwt_decode(token)
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
         if request.user.is_multi_login:
-            key = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token}'
-            await redis_client.delete(key)
+            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token_payload.session_uuid}')
             if refresh_token:
-                key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:{refresh_token}'
-                await redis_client.delete(key)
+                await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:{refresh_token}')
         else:
-            key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:'
-            await redis_client.delete_prefix(key_prefix)
-            key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:'
-            await redis_client.delete_prefix(key_prefix)
+            key_prefix = [
+                f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
+            ]
+            for prefix in key_prefix:
+                await redis_client.delete_prefix(prefix)
 
 
 auth_service: AuthService = AuthService()
