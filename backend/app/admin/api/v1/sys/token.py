@@ -4,7 +4,7 @@ import json
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.token import GetTokenDetail, KickOutToken
 from backend.common.enums import StatusType
@@ -28,6 +28,7 @@ async def get_tokens(username: Annotated[str | None, Query()] = None) -> Respons
         token_payload = jwt_decode(token)
         session_uuid = token_payload.session_uuid
         token_detail = GetTokenDetail(
+            id=token_payload.id,
             session_uuid=session_uuid,
             username='未知',
             nickname='未知',
@@ -69,15 +70,15 @@ async def get_tokens(username: Annotated[str | None, Query()] = None) -> Respons
     return response_base.success(data=data)
 
 
-@router.post(
-    '/kick',
+@router.delete(
+    '/{pk}',
     summary='踢下线',
     dependencies=[
         Depends(RequestPermission('sys:token:kick')),
         DependsRBAC,
     ],
 )
-async def kick_out(request: Request, obj: KickOutToken) -> ResponseModel:
+async def kick_out(request: Request, pk: Annotated[int, Path(...)], session_uuid: KickOutToken) -> ResponseModel:
     superuser_verify(request)
-    await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{obj.user_id}:{obj.session_uuid}')
+    await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{pk}:{session_uuid}')
     return response_base.success()

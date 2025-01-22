@@ -137,7 +137,7 @@ class AuthService:
         if not refresh_token:
             raise errors.TokenError(msg='Refresh Token 丢失，请重新登录')
         try:
-            user_id = jwt_decode(refresh_token).user_id
+            user_id = jwt_decode(refresh_token).id
         except Exception:
             raise errors.TokenError(msg='Refresh Token 无效')
         if request.user.id != user_id:
@@ -181,16 +181,17 @@ class AuthService:
     async def logout(*, request: Request, response: Response) -> None:
         token = get_token(request)
         token_payload = jwt_decode(token)
+        user_id = token_payload.id
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
         if request.user.is_multi_login:
-            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:{token_payload.session_uuid}')
+            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
             if refresh_token:
-                await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:{refresh_token}')
+                await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
         else:
             key_prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}:',
+                f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:',
             ]
             for prefix in key_prefix:
                 await redis_client.delete_prefix(prefix)

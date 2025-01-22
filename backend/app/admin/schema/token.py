@@ -28,11 +28,11 @@ class GetLoginToken(AccessTokenBase):
 
 
 class KickOutToken(SchemaBase):
-    user_id: int
     session_uuid: str
 
 
 class GetTokenDetail(SchemaBase):
+    id: int
     session_uuid: str
     username: str
     nickname: str

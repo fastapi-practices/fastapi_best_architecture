@@ -58,6 +58,6 @@ class RefreshToken:
 
 @dataclasses.dataclass
 class TokenPayload:
+    id: int
     session_uuid: str
-    user_id: int
     expire_time: datetime

@@ -173,7 +173,7 @@ def jwt_decode(token: str) -> TokenPayload:
     try:
         payload = jwt.decode(token, settings.TOKEN_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         session_uuid = payload.get('session_uuid') or 'debug'
-        user_id = int(payload.get('sub'))
+        user_id = payload.get('sub')
         expire_time = payload.get('exp')
         if not user_id:
             raise TokenError(msg='Token 无效')
@@ -181,7 +181,7 @@ def jwt_decode(token: str) -> TokenPayload:
         raise TokenError(msg='Token 已过期')
     except (JWTError, Exception):
         raise TokenError(msg='Token 无效')
-    return TokenPayload(session_uuid=session_uuid, user_id=user_id, expire_time=expire_time)
+    return TokenPayload(id=int(user_id), session_uuid=session_uuid, expire_time=expire_time)
 
 
 async def get_current_user(db: AsyncSession, pk: int) -> User:
@@ -232,7 +232,7 @@ async def jwt_authentication(token: str) -> CurrentUserIns:
     :return:
     """
     token_payload = jwt_decode(token)
-    user_id = token_payload.user_id
+    user_id = token_payload.id
     token_verify = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
     if not token_verify:
         raise TokenError(msg='Token 已过期')
