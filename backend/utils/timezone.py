@@ -40,6 +40,17 @@ class TimeZone:
         return datetime.strptime(date_str, format_str).replace(tzinfo=self.tz_info)
 
     @staticmethod
+    def t_str(dt: datetime, format_str: str = settings.DATETIME_FORMAT) -> str:
+        """
+        时间转时间字符串
+
+        :param dt:
+        :param format_str:
+        :return:
+        """
+        return dt.strftime(format_str)
+
+    @staticmethod
     def f_utc(dt: datetime) -> datetime:
         """
         时区时间转 UTC（GMT）时区
