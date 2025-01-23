@@ -27,7 +27,7 @@ class Menu(Base):
     component: Mapped[str | None] = mapped_column(String(255), default=None, comment='组件路径')
     perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='权限标识')
     status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
-    show: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
+    display: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
     cache: Mapped[int] = mapped_column(default=1, comment='是否缓存（0否 1是）')
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'

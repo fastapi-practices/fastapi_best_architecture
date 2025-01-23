@@ -19,7 +19,7 @@ class MenuSchemaBase(SchemaBase):
     component: str | None = None
     perms: str | None = None
     status: StatusType = Field(default=StatusType.enable)
-    show: StatusType = Field(default=StatusType.enable)
+    display: StatusType = Field(default=StatusType.enable)
     cache: StatusType = Field(default=StatusType.enable)
     remark: str | None = None
 

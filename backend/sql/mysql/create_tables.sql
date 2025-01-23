@@ -226,7 +226,7 @@ create table sys_menu
     component    varchar(255) null comment '组件路径',
     perms        varchar(100) null comment '权限标识',
     status       int          not null comment '菜单状态（0停用 1正常）',
-    `show`       int          not null comment '是否显示（0否 1是）',
+    display      int          not null comment '是否显示（0否 1是）',
     cache        int          not null comment '是否缓存（0否 1是）',
     remark       longtext     null comment '备注',
     parent_id    int          null comment '父菜单ID',
