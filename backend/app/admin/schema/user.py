@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import Any
 
 from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 from typing_extensions import Self
@@ -77,19 +78,20 @@ class GetUserInfoDetail(GetUserInfoNoRelationDetail):
 class GetCurrentUserInfoDetail(GetUserInfoDetail):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptDetail | str | None = None
-    roles: list[GetRoleDetail] | list[str] | None = None
+    dept: str | None = None
+    roles: list[str]
 
-    @model_validator(mode='after')
-    def handel(self) -> Self:
+    @model_validator(mode='before')
+    @classmethod
+    def handel(cls, data: Any) -> Self:
         """处理部门和角色"""
-        dept = self.dept
+        dept = data['dept']
         if dept:
-            self.dept = dept.name  # type: ignore
-        roles = self.roles
+            data['dept'] = dept['name']
+        roles = data['roles']
         if roles:
-            self.roles = [role.name for role in roles]  # type: ignore
-        return self
+            data['roles'] = [role['name'] for role in roles]
+        return data
 
 
 class CurrentUserIns(GetUserInfoDetail):
