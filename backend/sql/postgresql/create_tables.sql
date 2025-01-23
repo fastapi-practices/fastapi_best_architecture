@@ -273,7 +273,7 @@ create table sys_menu
     component    varchar(255),
     perms        varchar(100),
     status       integer                  not null,
-    show         integer                  not null,
+    display      integer                  not null,
     cache        integer                  not null,
     remark       text,
     parent_id    integer
@@ -305,7 +305,7 @@ comment on column sys_menu.perms is '权限标识';
 
 comment on column sys_menu.status is '菜单状态（0停用 1正常）';
 
-comment on column sys_menu.show is '是否显示（0否 1是）';
+comment on column sys_menu.display is '是否显示（0否 1是）';
 
 comment on column sys_menu.cache is '是否缓存（0否 1是）';
 
