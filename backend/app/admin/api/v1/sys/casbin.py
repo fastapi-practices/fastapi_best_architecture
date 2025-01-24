@@ -47,7 +47,7 @@ async def get_pagination_casbin(
 @router.get('/policies', summary='获取所有P权限策略', dependencies=[DependsJwtAuth])
 async def get_all_policies(
     role: Annotated[int | None, Query(description='角色ID')] = None,
-) -> ResponseSchemaModel[list[GetPolicyDetail]]:
+) -> ResponseSchemaModel[list[list[str]]]:
     policies = await casbin_service.get_policy_list(role=role)
     return response_base.success(data=policies)
 
@@ -155,7 +155,7 @@ async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
 
 
 @router.get('/groups', summary='获取所有G权限策略', dependencies=[DependsJwtAuth])
-async def get_all_groups() -> ResponseSchemaModel[list]:
+async def get_all_groups() -> ResponseSchemaModel[list[list[str]]]:
     data = await casbin_service.get_group_list()
     return response_base.success(data=data)
 
