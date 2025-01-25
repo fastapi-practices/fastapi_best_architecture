@@ -138,7 +138,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     json_data = await request.json()
                     if isinstance(json_data, bytes):
                         json_data = json_data.decode('utf-8')
-                    args.update(json_data)
+                    if isinstance(json_data, dict):
+                        args.update(json_data)
+                    else:
+                        # 注意：非字典数据默认使用 body 作为键
+                        args.update({'body': json_data})
                 else:
                     args.update({'body': str(body_data)})
         return args
