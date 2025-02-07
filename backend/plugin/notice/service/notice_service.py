@@ -4,11 +4,11 @@ from typing import Sequence
 
 from sqlalchemy import Select
 
-from backend.app.admin.crud.crud_notice import notice_dao
-from backend.app.admin.model import Notice
-from backend.app.admin.schema.notice import CreateNoticeParam, UpdateNoticeParam
 from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.plugin.notice.crud.crud_notice import notice_dao
+from backend.plugin.notice.model import Notice
+from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam
 
 
 class NoticeService:

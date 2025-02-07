@@ -10,7 +10,6 @@ from backend.app.admin.api.v1.sys.dept import router as dept_router
 from backend.app.admin.api.v1.sys.dict_data import router as dict_data_router
 from backend.app.admin.api.v1.sys.dict_type import router as dict_type_router
 from backend.app.admin.api.v1.sys.menu import router as menu_router
-from backend.app.admin.api.v1.sys.notice import router as notice_router
 from backend.app.admin.api.v1.sys.role import router as role_router
 from backend.app.admin.api.v1.sys.token import router as token_router
 from backend.app.admin.api.v1.sys.user import router as user_router
@@ -27,5 +26,4 @@ router.include_router(menu_router, prefix='/menus', tags=['系统目录'])
 router.include_router(role_router, prefix='/roles', tags=['系统角色'])
 router.include_router(user_router, prefix='/users', tags=['系统用户'])
 router.include_router(data_rule_router, prefix='/data-rules', tags=['系统数据权限规则'])
-router.include_router(notice_router, prefix='/notices', tags=['系统通知公告'])
 router.include_router(token_router, prefix='/tokens', tags=['系统令牌'])
