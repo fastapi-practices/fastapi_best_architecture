@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from typing import Any, Generic, TypeVar
 
 from fastapi import Response
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 from backend.common.response.response_code import CustomResponse, CustomResponseCode
-from backend.core.conf import settings
 from backend.utils.serializers import MsgSpecJSONResponse
 
 SchemaT = TypeVar('SchemaT')
@@ -34,9 +32,6 @@ class ResponseModel(BaseModel):
             res = CustomResponseCode.HTTP_200
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """
-
-    # TODO: json_encoders 配置失效: https://github.com/tiangolo/fastapi/discussions/10252
-    model_config = ConfigDict(json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)})
 
     code: int = CustomResponseCode.HTTP_200.code
     msg: str = CustomResponseCode.HTTP_200.msg
