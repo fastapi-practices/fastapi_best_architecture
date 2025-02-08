@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     FASTAPI_TITLE: str = 'FastAPI'
     FASTAPI_VERSION: str = '0.0.1'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
-    FASTAPI_DOCS_URL: str | None = '/docs'
-    FASTAPI_REDOC_URL: str | None = '/redoc'
+    FASTAPI_DOCS_URL: str = '/docs'
+    FASTAPI_REDOC_URL: str = '/redoc'
     FASTAPI_OPENAPI_URL: str | None = '/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
@@ -185,7 +185,7 @@ class Settings(BaseSettings):
     @classmethod
     def check_env(cls, values: Any) -> Any:
         if values['ENVIRONMENT'] == 'pro':
-            values['OPENAPI_URL'] = None
+            values['FASTAPI_OPENAPI_URL'] = None
             values['FASTAPI_STATIC_FILES'] = False
         return values
 
