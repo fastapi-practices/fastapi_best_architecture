@@ -69,7 +69,7 @@ class OAuth2Service:
                 # extra info
                 username=sys_user.username,
                 nickname=sys_user.nickname,
-                last_login_time=timezone.t_str(user.last_login_time),
+                last_login_time=timezone.t_str(sys_user.last_login_time),
                 ip=request.state.ip,
                 os=request.state.os,
                 browser=request.state.browser,
