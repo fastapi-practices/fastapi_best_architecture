@@ -46,12 +46,12 @@ class OAuth2Service:
             if not sys_user:
                 sys_user = await user_dao.get_by_username(db, social_username)
                 if sys_user:
-                    username = f'{social_username}#{text_captcha(5)}'
+                    social_username = f'{social_username}#{text_captcha(5)}'
                 sys_user = await user_dao.get_by_nickname(db, social_nickname)
                 if sys_user:
-                    nickname = f'{social_nickname}#{text_captcha(5)}'
+                    social_username = f'{social_nickname}#{text_captcha(5)}'
                 new_sys_user = RegisterUserParam(
-                    username=username, password=None, nickname=nickname, email=social_email
+                    username=social_username, password=None, nickname=social_username, email=social_email
                 )
                 await user_dao.create(db, new_sys_user, social=True)
                 await db.flush()
