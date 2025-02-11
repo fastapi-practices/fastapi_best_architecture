@@ -1,5 +1,3 @@
-# 插件名称
-name = 'notice'
 # 是否对此插件启用 alembic
 alembic = true
 
