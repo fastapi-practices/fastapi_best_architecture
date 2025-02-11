@@ -15,7 +15,7 @@ from backend.app.admin.schema.user import (
     UpdateUserRoleParam,
 )
 from backend.app.admin.service.user_service import user_service
-from backend.common.pagination import DependsPagination, paging_data, PageData
+from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
