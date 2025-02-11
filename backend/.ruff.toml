@@ -9,7 +9,7 @@ select = [
     "E",
     "F",
     "I",
-    "TCH",
+    "TC",
     # W
     "W505",
     # PT
@@ -43,8 +43,8 @@ lines-between-types = 1
 order-by-type = true
 
 [lint.per-file-ignores]
-"**/api/v1/*.py" = ["TCH"]
-"**/model/*.py" = ["TCH003"]
+"**/api/v1/*.py" = ["TC"]
+"**/model/*.py" = ["TC003"]
 "**/model/__init__.py" = ["F401"]
 "**/tests/*.py" = ["E402"]
 
