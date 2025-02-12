@@ -1,9 +1,4 @@
-# 是否对此插件启用 alembic
-alembic = true
-
-# app 关联信息
-[app]
 # 属于哪个 app，如果为独立 app，则应设置为 'original'
-belong = 'admin'
-# api 版本
+app = 'admin'
+# api 版本，将生成对应版本路由
 api_version = 'v1'
