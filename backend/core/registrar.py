@@ -10,7 +10,7 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from backend.app.router import route
+from backend.app.router import router
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
 from backend.core.conf import settings
@@ -20,6 +20,7 @@ from backend.database.redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
+from backend.plugin.tools import register_plugin_router
 from backend.utils.demo_site import demo_site
 from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.utils.openapi import simplify_operation_ids
@@ -39,7 +40,9 @@ async def register_init(app: FastAPI):
     await redis_client.open()
     # 初始化 limiter
     await FastAPILimiter.init(
-        redis=redis_client, prefix=settings.REQUEST_LIMITER_REDIS_PREFIX, http_callback=http_limit_callback
+        redis=redis_client,
+        prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
+        http_callback=http_limit_callback,
     )
 
     yield
@@ -77,6 +80,7 @@ def register_app():
 
     # 路由
     register_router(app)
+    register_plugin_router(app)
 
     # 分页
     register_page(app)
@@ -156,7 +160,7 @@ def register_router(app: FastAPI):
     dependencies = [Depends(demo_site)] if settings.DEMO_MODE else None
 
     # API
-    app.include_router(route, dependencies=dependencies)
+    app.include_router(router, dependencies=dependencies)
 
     # Extra
     ensure_unique_route_names(app)

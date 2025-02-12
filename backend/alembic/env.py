@@ -16,7 +16,7 @@ sys.path.append('../')
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
-from backend.plugin.plugin import get_plugin_models
+from backend.plugin.tools import get_plugin_models
 
 # import your new model here
 from backend.app.admin.model import *  # noqa: F401
