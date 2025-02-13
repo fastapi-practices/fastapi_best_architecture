@@ -22,3 +22,6 @@ STATIC_DIR = os.path.join(BasePath, 'static')
 
 # jinja2 模版文件路径
 JINJA2_TEMPLATE_DIR = os.path.join(BasePath, 'templates')
+
+# 插件目录
+PLUGIN_DIR = os.path.join(BasePath, 'plugin')

@@ -13,7 +13,7 @@ from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
-from backend.utils.import_parse import dynamic_import
+from backend.utils.import_parse import dynamic_import_data_model
 
 
 class DataRuleService:
@@ -42,7 +42,10 @@ class DataRuleService:
     async def get_columns(model: str) -> list[str]:
         if model not in settings.DATA_PERMISSION_MODELS:
             raise errors.NotFoundError(msg='数据模型不存在')
-        model_ins = dynamic_import(settings.DATA_PERMISSION_MODELS[model])
+        try:
+            model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[model])
+        except (ImportError, AttributeError):
+            raise errors.ServerError(msg=f'数据模型 {model} 动态导入失败，请联系系统超级管理员')
         model_columns = [
             key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]

@@ -6,8 +6,8 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Notice
-from backend.app.admin.schema.notice import CreateNoticeParam, UpdateNoticeParam
+from backend.plugin.notice.model import Notice
+from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam
 
 
 class CRUDNotice(CRUDPlus[Notice]):

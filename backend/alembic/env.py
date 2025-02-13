@@ -16,10 +16,19 @@ sys.path.append('../')
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
+from backend.plugin.tools import get_plugin_models
 
 # import your new model here
 from backend.app.admin.model import *  # noqa: F401
 from backend.app.generator.model import *  # noqa: F401
+
+# import plugin model
+for cls in get_plugin_models():
+    class_name = cls.__name__
+    if class_name in globals():
+        print(f'\nWarning: Class "{class_name}" already exists in global namespace.')
+    else:
+        globals()[class_name] = cls
 
 if not os.path.exists(path_conf.ALEMBIC_VERSION_DIR):
     os.makedirs(path_conf.ALEMBIC_VERSION_DIR)
