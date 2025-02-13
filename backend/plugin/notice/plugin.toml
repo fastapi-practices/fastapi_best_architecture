@@ -1,9 +1,8 @@
 # 属于哪个 app，如果为独立 app，应设置为 ''
 app = 'admin'
 
-# api 配置，仅针对于非独立 app
+# api 路由配置，仅对于非独立 app 可用
 [api]
-# api 注入模块，将生成对应路由
-module = 'v1.sys'
-# 路由 prefix 配置
-prefix = 'notices'
+# prefix 必须带前导 /
+prefix = '/notices'
+tags = '系统通知公告'
