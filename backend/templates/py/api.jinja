@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}ListDetails, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}Detail, Update{{ schema_name }}Param
 from backend.app.{{ app_name }}.service.{{ table_name_en }}_service import {{ table_name_en }}_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取{{ table_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
-async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
     {{ table_name_en }} = await {{ table_name_en }}_service.get(pk=pk)
     return response_base.success(data={{ table_name_en }})
 
@@ -29,9 +29,9 @@ async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseMode
         DependsPagination,
     ],
 )
-async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseModel:
+async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
     {{ table_name_en }}_select = await {{ table_name_en }}_service.get_select()
-    page_data = await paging_data(db, {{ table_name_en }}_select, Get{{ schema_name }}ListDetails)
+    page_data = await paging_data(db, {{ table_name_en }}_select)
     return response_base.success(data=page_data)
 
 

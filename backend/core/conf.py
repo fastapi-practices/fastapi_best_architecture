@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     FASTAPI_TITLE: str = 'FastAPI'
     FASTAPI_VERSION: str = '0.0.1'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
-    FASTAPI_DOCS_URL: str | None = '/docs'
-    FASTAPI_REDOCS_URL: str | None = '/redocs'
+    FASTAPI_DOCS_URL: str = '/docs'
+    FASTAPI_REDOC_URL: str = '/redoc'
     FASTAPI_OPENAPI_URL: str | None = '/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
@@ -56,11 +56,16 @@ class Settings(BaseSettings):
     # Redis
     REDIS_TIMEOUT: int = 5
 
+    # Socketio
+    WS_NO_AUTH_MARKER: str = 'internal'
+
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
     TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # refresh token 过期时间，单位：秒
     TOKEN_REDIS_PREFIX: str = 'fba:token'
+    TOKEN_EXTRA_INFO_REDIS_PREFIX: str = 'fba:token_extra_info'
+    TOKEN_ONLINE_REDIS_PREFIX: str = 'fba:token_online'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{FASTAPI_API_V1_PATH}/auth/login',
@@ -119,6 +124,7 @@ class Settings(BaseSettings):
     CORS_ALLOWED_ORIGINS: list[str] = [
         'http://127.0.0.1:8000',
         'http://localhost:5173',  # 前端地址，末尾不要带 '/'
+        'http://localhost:63342',
     ]
     CORS_EXPOSE_HEADERS: list[str] = [
         TRACE_ID_REQUEST_HEADER_KEY,
@@ -148,7 +154,7 @@ class Settings(BaseSettings):
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
         '/favicon.ico',
         FASTAPI_DOCS_URL,
-        FASTAPI_REDOCS_URL,
+        FASTAPI_REDOC_URL,
         FASTAPI_OPENAPI_URL,
         f'{FASTAPI_API_V1_PATH}/auth/login/swagger',
         f'{FASTAPI_API_V1_PATH}/oauth2/github/callback',
@@ -179,7 +185,7 @@ class Settings(BaseSettings):
     @classmethod
     def check_env(cls, values: Any) -> Any:
         if values['ENVIRONMENT'] == 'pro':
-            values['OPENAPI_URL'] = None
+            values['FASTAPI_OPENAPI_URL'] = None
             values['FASTAPI_STATIC_FILES'] = False
         return values
 

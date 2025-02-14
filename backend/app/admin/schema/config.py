@@ -7,13 +7,13 @@ from pydantic import ConfigDict
 from backend.common.schema import SchemaBase
 
 
-class SaveConfigParam(SchemaBase):
+class SaveBuiltInConfigParam(SchemaBase):
     name: str
     key: str
     value: str
 
 
-class AnyConfigSchemaBase(SchemaBase):
+class ConfigSchemaBase(SchemaBase):
     name: str
     type: str | None
     key: str
@@ -22,15 +22,15 @@ class AnyConfigSchemaBase(SchemaBase):
     remark: str | None
 
 
-class CreateAnyConfigParam(AnyConfigSchemaBase):
+class CreateConfigParam(ConfigSchemaBase):
     pass
 
 
-class UpdateAnyConfigParam(AnyConfigSchemaBase):
+class UpdateConfigParam(ConfigSchemaBase):
     pass
 
 
-class GetAnyConfigListDetails(AnyConfigSchemaBase):
+class GetConfigDetail(ConfigSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

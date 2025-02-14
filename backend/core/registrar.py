@@ -10,7 +10,6 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from backend.app.router import route
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
 from backend.core.conf import settings
@@ -20,6 +19,7 @@ from backend.database.redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
+from backend.plugin.tools import plugin_router_inject
 from backend.utils.demo_site import demo_site
 from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.utils.openapi import simplify_operation_ids
@@ -39,7 +39,9 @@ async def register_init(app: FastAPI):
     await redis_client.open()
     # 初始化 limiter
     await FastAPILimiter.init(
-        redis=redis_client, prefix=settings.REQUEST_LIMITER_REDIS_PREFIX, http_callback=http_limit_callback
+        redis=redis_client,
+        prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
+        http_callback=http_limit_callback,
     )
 
     yield
@@ -57,7 +59,7 @@ def register_app():
         version=settings.FASTAPI_VERSION,
         description=settings.FASTAPI_DESCRIPTION,
         docs_url=settings.FASTAPI_DOCS_URL,
-        redoc_url=settings.FASTAPI_REDOCS_URL,
+        redoc_url=settings.FASTAPI_REDOC_URL,
         openapi_url=settings.FASTAPI_OPENAPI_URL,
         default_response_class=MsgSpecJSONResponse,
         lifespan=register_init,
@@ -156,7 +158,11 @@ def register_router(app: FastAPI):
     dependencies = [Depends(demo_site)] if settings.DEMO_MODE else None
 
     # API
-    app.include_router(route, dependencies=dependencies)
+    plugin_router_inject()
+
+    from backend.app.router import router  # 必须在插件路由注入后导入
+
+    app.include_router(router, dependencies=dependencies)
 
     # Extra
     ensure_unique_route_names(app)

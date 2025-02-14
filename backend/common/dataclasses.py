@@ -40,12 +40,14 @@ class NewToken:
     new_access_token_expire_time: datetime
     new_refresh_token: str
     new_refresh_token_expire_time: datetime
+    session_uuid: str
 
 
 @dataclasses.dataclass
 class AccessToken:
     access_token: str
     access_token_expire_time: datetime
+    session_uuid: str
 
 
 @dataclasses.dataclass
@@ -55,13 +57,7 @@ class RefreshToken:
 
 
 @dataclasses.dataclass
-class TaskResult:
-    result: str
-    traceback: str
-    status: str
-    name: str
-    args: list | None
-    kwargs: dict | None
-    worker: str
-    retries: int | None
-    queue: str | None
+class TokenPayload:
+    id: int
+    session_uuid: str
+    expire_time: datetime

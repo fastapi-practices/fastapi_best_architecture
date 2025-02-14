@@ -25,7 +25,7 @@ class UpdateDataRuleParam(DataRuleSchemaBase):
     pass
 
 
-class GetDataRuleListDetails(DataRuleSchemaBase):
+class GetDataRuleDetail(DataRuleSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

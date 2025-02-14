@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DictData
@@ -29,7 +29,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param status:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.type)).order_by(desc(self.model.sort))
+        stmt = select(self.model).options(noload(self.model.type)).order_by(desc(self.model.sort))
         where_list = []
         if label is not None:
             where_list.append(self.model.label.like(f'%{label}%'))

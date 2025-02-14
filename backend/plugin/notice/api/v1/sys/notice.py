@@ -4,20 +4,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.notice import CreateNoticeParam, GetNoticeListDetails, UpdateNoticeParam
-from backend.app.admin.service.notice_service import notice_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
+from backend.plugin.notice.schema.notice import CreateNoticeParam, GetNoticeDetail, UpdateNoticeParam
+from backend.plugin.notice.service.notice_service import notice_service
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_notice(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetNoticeDetail]:
     notice = await notice_service.get(pk=pk)
     return response_base.success(data=notice)
 
@@ -30,9 +30,9 @@ async def get_notice(pk: Annotated[int, Path(...)]) -> ResponseModel:
         DependsPagination,
     ],
 )
-async def get_pagination_notice(db: CurrentSession) -> ResponseModel:
+async def get_pagination_notice(db: CurrentSession) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
     notice_select = await notice_service.get_select()
-    page_data = await paging_data(db, notice_select, GetNoticeListDetails)
+    page_data = await paging_data(db, notice_select)
     return response_base.success(data=page_data)
 
 

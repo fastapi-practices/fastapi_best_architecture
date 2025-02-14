@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 from backend.app.admin.conf import admin_settings
 from backend.app.admin.service.oauth2_service import oauth2_service
 from backend.common.enums import UserSocialType
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.response.response_schema import ResponseSchemaModel, response_base
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ _linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, admin_settings.OAUTH2_LINUX_
 
 
 @router.get('', summary='获取 Linux Do 授权链接')
-async def linux_do_auth2() -> ResponseModel:
+async def linux_do_auth2() -> ResponseSchemaModel[str]:
     auth_url = await _linux_do_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
     return response_base.success(data=auth_url)
 

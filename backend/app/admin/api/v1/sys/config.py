@@ -5,14 +5,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.config import (
-    CreateAnyConfigParam,
-    GetAnyConfigListDetails,
-    SaveConfigParam,
-    UpdateAnyConfigParam,
+    CreateConfigParam,
+    GetConfigDetail,
+    SaveBuiltInConfigParam,
+    UpdateConfigParam,
 )
 from backend.app.admin.service.config_service import config_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
-async def get_website_config() -> ResponseModel:
+async def get_website_config() -> ResponseSchemaModel[GetConfigDetail]:
     config = await config_service.get_built_in_config('website')
     return response_base.success(data=config)
 
@@ -35,13 +35,13 @@ async def get_website_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_website_config(objs: list[SaveConfigParam]) -> ResponseModel:
+async def save_website_config(objs: list[SaveBuiltInConfigParam]) -> ResponseModel:
     await config_service.save_built_in_config(objs, 'website')
     return response_base.success()
 
 
 @router.get('/protocol', summary='获取用户协议', dependencies=[DependsJwtAuth])
-async def get_protocol_config() -> ResponseModel:
+async def get_protocol_config() -> ResponseSchemaModel[GetConfigDetail]:
     config = await config_service.get_built_in_config('protocol')
     return response_base.success(data=config)
 
@@ -54,13 +54,13 @@ async def get_protocol_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_protocol_config(objs: list[SaveConfigParam]) -> ResponseModel:
+async def save_protocol_config(objs: list[SaveBuiltInConfigParam]) -> ResponseModel:
     await config_service.save_built_in_config(objs, 'protocol')
     return response_base.success()
 
 
 @router.get('/policy', summary='获取用户政策', dependencies=[DependsJwtAuth])
-async def get_policy_config() -> ResponseModel:
+async def get_policy_config() -> ResponseSchemaModel[GetConfigDetail]:
     config = await config_service.get_built_in_config('policy')
     return response_base.success(data=config)
 
@@ -73,13 +73,13 @@ async def get_policy_config() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def save_policy_config(objs: list[SaveConfigParam]) -> ResponseModel:
+async def save_policy_config(objs: list[SaveBuiltInConfigParam]) -> ResponseModel:
     await config_service.save_built_in_config(objs, 'policy')
     return response_base.success()
 
 
 @router.get('/{pk}', summary='获取系统参数配置详情', dependencies=[DependsJwtAuth])
-async def get_config(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def get_config(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetConfigDetail]:
     config = await config_service.get(pk)
     return response_base.success(data=config)
 
@@ -96,9 +96,9 @@ async def get_pagination_config(
     db: CurrentSession,
     name: Annotated[str | None, Query()] = None,
     type: Annotated[str | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetConfigDetail]]:
     config_select = await config_service.get_select(name=name, type=type)
-    page_data = await paging_data(db, config_select, GetAnyConfigListDetails)
+    page_data = await paging_data(db, config_select)
     return response_base.success(data=page_data)
 
 
@@ -110,7 +110,7 @@ async def get_pagination_config(
         DependsRBAC,
     ],
 )
-async def create_config(obj: CreateAnyConfigParam) -> ResponseModel:
+async def create_config(obj: CreateConfigParam) -> ResponseModel:
     await config_service.create(obj=obj)
     return response_base.success()
 
@@ -123,7 +123,7 @@ async def create_config(obj: CreateAnyConfigParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_config(pk: Annotated[int, Path(...)], obj: UpdateAnyConfigParam) -> ResponseModel:
+async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -> ResponseModel:
     count = await config_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()

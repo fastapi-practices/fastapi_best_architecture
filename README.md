@@ -47,18 +47,6 @@ pattern, use templates to transform it to your heart's content!
 | data access    | dao / mapper   | crud                      |
 | model          | model / entity | model                     |
 
-## Online Demo
-
-You can view some of the preview screenshots
-in [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui)
-
-For the demo entrance, please refer
-to [Official documentation](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
-
-> tester: test / 123456
->
-> super: admin / 123456
-
 ## Features
 
 - [x] Design with FastAPI PEP 593 Annotated Parameters
@@ -81,6 +69,7 @@ to [Official documentation](https://fastapi-practices.github.io/fastapi_best_arc
 - [x] Menu management: Configuration of system menus, user menus, button permission labels
 - [x] Role management: assignment of role menu privileges, assignment of role routing privileges
 - [x] Dictionary management: maintenance of commonly used fixed data or parameters within the system
+- [x] Token management：System user online status detection, supports kicking user offline
 - [x] Code generation: back-end code is automatically generated, supporting preview, write and download.
 - [x] Operation log: logging and querying of normal and abnormal system operations.
 - [x] Login authentication: graphical captcha backend authentication login

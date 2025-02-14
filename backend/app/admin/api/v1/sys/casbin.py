@@ -11,13 +11,13 @@ from backend.app.admin.schema.casbin_rule import (
     DeleteAllPoliciesParam,
     DeletePolicyParam,
     DeleteUserRoleParam,
-    GetPolicyListDetails,
+    GetPolicyDetail,
     UpdatePoliciesParam,
     UpdatePolicyParam,
 )
 from backend.app.admin.service.casbin_service import casbin_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -38,14 +38,16 @@ async def get_pagination_casbin(
     db: CurrentSession,
     ptype: Annotated[str | None, Query(description='策略类型, p / g')] = None,
     sub: Annotated[str | None, Query(description='用户 uuid / 角色')] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetPolicyDetail]]:
     casbin_select = await casbin_service.get_casbin_list(ptype=ptype, sub=sub)
-    page_data = await paging_data(db, casbin_select, GetPolicyListDetails)
+    page_data = await paging_data(db, casbin_select)
     return response_base.success(data=page_data)
 
 
 @router.get('/policies', summary='获取所有P权限策略', dependencies=[DependsJwtAuth])
-async def get_all_policies(role: Annotated[int | None, Query(description='角色ID')] = None) -> ResponseModel:
+async def get_all_policies(
+    role: Annotated[int | None, Query(description='角色ID')] = None,
+) -> ResponseSchemaModel[list[list[str]]]:
     policies = await casbin_service.get_policy_list(role=role)
     return response_base.success(data=policies)
 
@@ -58,7 +60,7 @@ async def get_all_policies(role: Annotated[int | None, Query(description='角色
         DependsRBAC,
     ],
 )
-async def create_policy(p: CreatePolicyParam) -> ResponseModel:
+async def create_policy(p: CreatePolicyParam) -> ResponseSchemaModel[bool]:
     """
     p 策略:
 
@@ -80,7 +82,7 @@ async def create_policy(p: CreatePolicyParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
+async def create_policies(ps: list[CreatePolicyParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.create_policies(ps=ps)
     return response_base.success(data=data)
 
@@ -93,7 +95,7 @@ async def create_policies(ps: list[CreatePolicyParam]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_policy(obj: UpdatePolicyParam) -> ResponseModel:
+async def update_policy(obj: UpdatePolicyParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.update_policy(obj=obj)
     return response_base.success(data=data)
 
@@ -106,7 +108,7 @@ async def update_policy(obj: UpdatePolicyParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_policies(obj: UpdatePoliciesParam) -> ResponseModel:
+async def update_policies(obj: UpdatePoliciesParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.update_policies(obj=obj)
     return response_base.success(data=data)
 
@@ -119,7 +121,7 @@ async def update_policies(obj: UpdatePoliciesParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_policy(p: DeletePolicyParam) -> ResponseModel:
+async def delete_policy(p: DeletePolicyParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_policy(p=p)
     return response_base.success(data=data)
 
@@ -132,7 +134,7 @@ async def delete_policy(p: DeletePolicyParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_policies(ps: list[DeletePolicyParam]) -> ResponseModel:
+async def delete_policies(ps: list[DeletePolicyParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_policies(ps=ps)
     return response_base.success(data=data)
 
@@ -153,7 +155,7 @@ async def delete_all_policies(sub: DeleteAllPoliciesParam) -> ResponseModel:
 
 
 @router.get('/groups', summary='获取所有G权限策略', dependencies=[DependsJwtAuth])
-async def get_all_groups() -> ResponseModel:
+async def get_all_groups() -> ResponseSchemaModel[list[list[str]]]:
     data = await casbin_service.get_group_list()
     return response_base.success(data=data)
 
@@ -166,7 +168,7 @@ async def get_all_groups() -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_group(g: CreateUserRoleParam) -> ResponseModel:
+async def create_group(g: CreateUserRoleParam) -> ResponseSchemaModel[bool]:
     """
     g 策略 (**依赖 p 策略**):
 
@@ -188,7 +190,7 @@ async def create_group(g: CreateUserRoleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseModel:
+async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.create_groups(gs=gs)
     return response_base.success(data=data)
 
@@ -201,7 +203,7 @@ async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_group(g: DeleteUserRoleParam) -> ResponseModel:
+async def delete_group(g: DeleteUserRoleParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_group(g=g)
     return response_base.success(data=data)
 
@@ -214,7 +216,7 @@ async def delete_group(g: DeleteUserRoleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseModel:
+async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_groups(gs=gs)
     return response_base.success(data=data)
 

@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr, validate_email
 from pydantic_extra_types.phone_numbers import PhoneNumber
+
+from backend.core.conf import settings
 
 # 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
 # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
@@ -149,4 +153,7 @@ class CustomEmailStr(EmailStr):
 
 
 class SchemaBase(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
+    model_config = ConfigDict(
+        use_enum_values=True,
+        json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)},
+    )

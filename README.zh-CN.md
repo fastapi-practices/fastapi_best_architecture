@@ -43,16 +43,6 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 | 数据访问 | dao / mapper   | crud                      |
 | 模型   | model / entity | model                     |
 
-## 在线预览
-
-你可以在 [fastapi_best_architecture_ui](https://github.com/fastapi-practices/fastapi_best_architecture_ui) 中查看部分预览截图
-
-演示入口请查看 [官方文档](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
-
-> 测试员：tester / 123456
->
-> 管理员：admin / 123456
-
 ## 特征
 
 - [x] 使用 FastAPI PEP 593 Annotated 参数设计
@@ -75,6 +65,7 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 - [x] 菜单管理：配置系统菜单，用户菜单，按钮权限标识
 - [x] 角色管理：角色菜单权限分配，角色路由权限分配
 - [x] 字典管理：维护系统内部常用固定数据或参数
+- [x] 令牌管理：系统用户在线状态检测，支持踢人下线
 - [x] 代码生成：后端代码自动生成，支持预览，写入及下载
 - [x] 操作日志：系统正常和异常操作的日志记录与查询
 - [x] 登录认证：图形验证码后台认证登录

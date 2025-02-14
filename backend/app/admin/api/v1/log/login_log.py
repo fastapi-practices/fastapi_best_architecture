@@ -4,10 +4,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schema.login_log import GetLoginLogListDetails
+from backend.app.admin.schema.login_log import GetLoginLogDetail
 from backend.app.admin.service.login_log_service import login_log_service
-from backend.common.pagination import DependsPagination, paging_data
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
@@ -29,9 +29,9 @@ async def get_pagination_login_logs(
     username: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
     ip: Annotated[str | None, Query()] = None,
-) -> ResponseModel:
+) -> ResponseSchemaModel[PageData[GetLoginLogDetail]]:
     log_select = await login_log_service.get_select(username=username, status=status, ip=ip)
-    page_data = await paging_data(db, log_select, GetLoginLogListDetails)
+    page_data = await paging_data(db, log_select)
     return response_base.success(data=page_data)
 
 
