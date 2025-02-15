@@ -3,7 +3,6 @@
 from fastapi import APIRouter
 
 from backend.app.admin.api.v1.sys.api import router as api_router
-from backend.app.admin.api.v1.sys.casbin import router as casbin_router
 from backend.app.admin.api.v1.sys.config import router as config_router
 from backend.app.admin.api.v1.sys.data_rule import router as data_rule_router
 from backend.app.admin.api.v1.sys.dept import router as dept_router
@@ -17,7 +16,6 @@ from backend.app.admin.api.v1.sys.user import router as user_router
 router = APIRouter(prefix='/sys')
 
 router.include_router(api_router, prefix='/apis', tags=['系统API'])
-router.include_router(casbin_router, prefix='/casbin', tags=['系统Casbin权限'])
 router.include_router(config_router, prefix='/configs', tags=['系统配置'])
 router.include_router(dept_router, prefix='/depts', tags=['系统部门'])
 router.include_router(dict_data_router, prefix='/dict-datas', tags=['系统字典数据'])

@@ -6,8 +6,8 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import CasbinRule
-from backend.app.admin.schema.casbin_rule import DeleteAllPoliciesParam
+from backend.plugin.casbin.model import CasbinRule
+from backend.plugin.casbin.schema.casbin_rule import DeleteAllPoliciesParam
 
 
 class CRUDCasbin(CRUDPlus[CasbinRule]):
