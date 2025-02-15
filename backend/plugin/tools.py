@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
 import inspect
 import os
+import subprocess
+import sys
 import warnings
+
+from asyncio import subprocess as async_subprocess
 
 import rtoml
 
@@ -119,3 +124,42 @@ def plugin_router_inject() -> None:
 
             # 将插件路由注入到目标 router 中
             target_router.include_router(plugin_router)
+
+
+def install_requirements() -> None:
+    """安装插件依赖"""
+    plugins = get_plugins()
+    for plugin in plugins:
+        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        if not os.path.exists(requirements_file):
+            continue
+        else:
+            try:
+                subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'])
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', requirements_file])
+            except subprocess.CalledProcessError as e:
+                raise EnvironmentError(f'插件 {plugin} 依赖安装失败：{e}') from e
+
+
+async def install_requirements_async() -> None:
+    """异步安装插件依赖"""
+    plugins = get_plugins()
+    for plugin in plugins:
+        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        if not os.path.exists(requirements_file):
+            continue
+        else:
+            await async_subprocess.create_subprocess_exec(sys.executable, '-m', 'ensurepip', '--upgrade')
+            res = await async_subprocess.create_subprocess_exec(
+                sys.executable,
+                '-m',
+                'pip',
+                'install',
+                '-r',
+                requirements_file,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            _, stderr = await res.communicate()
+            if res.returncode != 0:
+                raise EnvironmentError(f'插件 {plugin} 依赖包安装失败：{stderr}')
