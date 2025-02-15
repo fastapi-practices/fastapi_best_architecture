@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from fastapi import Depends, Request
 
 from backend.common.enums import MethodType, StatusType
