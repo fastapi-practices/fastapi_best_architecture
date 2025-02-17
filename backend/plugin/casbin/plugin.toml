@@ -1,8 +1,10 @@
-# 属于哪个 app，如果为独立 app，应设置为 ''
-app = 'admin'
+[app]
+include = 'admin'
 
-# 路由配置，仅对于非独立 app 可用
-[api]
-# prefix 必须带前导 ‘/’，例如：’/api‘
+[api.api]
+prefix = '/api'
+tags = '系统API'
+
+[api.casbin]
 prefix = '/casbin'
 tags = '系统Casbin权限'
