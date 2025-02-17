@@ -38,8 +38,6 @@ class RequestCallNext:
 class NewToken:
     new_access_token: str
     new_access_token_expire_time: datetime
-    new_refresh_token: str
-    new_refresh_token_expire_time: datetime
     session_uuid: str
 
 
