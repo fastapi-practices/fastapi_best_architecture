@@ -28,7 +28,7 @@ class RequestPermission:
         self.value = value
 
     async def __call__(self, request: Request):
-        if settings.PERMISSION_MODE == 'role-menu':
+        if settings.RBAC_ROLE_MENU_MODE:
             if not isinstance(self.value, str):
                 raise ServerError
             # 附加权限标识

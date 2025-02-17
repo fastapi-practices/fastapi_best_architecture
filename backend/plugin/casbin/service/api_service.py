@@ -5,11 +5,11 @@ from typing import Sequence
 from fastapi import Request
 from sqlalchemy import Select
 
-from backend.app.admin.crud.crud_api import api_dao
-from backend.app.admin.model import Api
-from backend.app.admin.schema.api import CreateApiParam, UpdateApiParam
 from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.plugin.casbin.crud.crud_api import api_dao
+from backend.plugin.casbin.model import Api
+from backend.plugin.casbin.schema.api import CreateApiParam, UpdateApiParam
 
 
 class ApiService:

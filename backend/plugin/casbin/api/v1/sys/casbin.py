@@ -5,7 +5,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schema.casbin_rule import (
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession
+from backend.plugin.casbin.schema.casbin_rule import (
     CreatePolicyParam,
     CreateUserRoleParam,
     DeleteAllPoliciesParam,
@@ -15,13 +21,7 @@ from backend.app.admin.schema.casbin_rule import (
     UpdatePoliciesParam,
     UpdatePolicyParam,
 )
-from backend.app.admin.service.casbin_service import casbin_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
-from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.plugin.casbin.service.casbin_service import casbin_service
 
 router = APIRouter()
 

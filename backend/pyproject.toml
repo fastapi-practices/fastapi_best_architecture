@@ -19,8 +19,6 @@ dependencies = [
     "asyncmy>=0.2.10",
     "asyncpg>=0.30.0",
     "bcrypt>=4.2.1",
-    "casbin>=1.38.0",
-    "casbin_async_sqlalchemy_adapter>=1.7.0",
     "celery==5.3.6",
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from backend.app.admin.model.api import Api
-from backend.app.admin.model.casbin_rule import CasbinRule
 from backend.app.admin.model.config import Config
 from backend.app.admin.model.data_rule import DataRule
 from backend.app.admin.model.dept import Dept
