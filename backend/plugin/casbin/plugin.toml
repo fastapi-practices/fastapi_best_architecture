@@ -2,7 +2,7 @@
 include = 'admin'
 
 [api.api]
-prefix = '/api'
+prefix = '/apis'
 tags = '系统API'
 
 [api.casbin]
