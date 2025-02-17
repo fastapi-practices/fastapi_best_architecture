@@ -1,0 +1,6 @@
+[app]
+include = 'admin'
+
+[api.oss]
+prefix = '/oss'
+tags = '阿里云oss'
