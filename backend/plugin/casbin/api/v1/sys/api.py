@@ -4,14 +4,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.api import CreateApiParam, GetApiDetail, UpdateApiParam
-from backend.app.admin.service.api_service import api_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
+from backend.plugin.casbin.schema.api import CreateApiParam, GetApiDetail, UpdateApiParam
+from backend.plugin.casbin.service.api_service import api_service
 
 router = APIRouter()
 

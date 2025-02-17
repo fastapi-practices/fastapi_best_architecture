@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
 import inspect
 import os
+import subprocess
+import sys
 import warnings
+
+from asyncio import subprocess as async_subprocess
 
 import rtoml
 
@@ -10,6 +15,10 @@ from fastapi import APIRouter
 
 from backend.core.path_conf import PLUGIN_DIR
 from backend.utils.import_parse import import_module_cached
+
+
+class PluginInjectError(Exception):
+    pass
 
 
 def get_plugins() -> list[str]:
@@ -49,73 +58,128 @@ def plugin_router_inject() -> None:
     for plugin in plugins:
         toml_path = os.path.join(PLUGIN_DIR, plugin, 'plugin.toml')
         if not os.path.exists(toml_path):
-            raise FileNotFoundError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
+            raise PluginInjectError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
 
-        # 解析 plugin.toml
+        # 获取 plugin.toml 配置
         with open(toml_path, 'r', encoding='utf-8') as f:
             data = rtoml.load(f)
-        app_name = data.get('app', '')
-        prefix = data.get('api', {}).get('prefix', '')
-        tags = data.get('api', {}).get('tags', [])
+        api = data.get('api', {})
 
-        # 插件中 API 路由文件的路径
-        plugin_api_path = os.path.join(PLUGIN_DIR, plugin, 'api')
-        if not os.path.exists(plugin_api_path):
-            raise FileNotFoundError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
+        # 非独立 app
+        if api:
+            app_include = data.get('app', {}).get('include', '')
+            if not app_include:
+                raise PluginInjectError(f'非独立 app 插件 {plugin} 配置文件存在错误，请检查')
 
-        # 路由注入
-        if app_name:
-            # 非独立应用：将插件路由注入到对应模块的路由中
+            # 插件中 API 路由文件的路径
+            plugin_api_path = os.path.join(PLUGIN_DIR, plugin, 'api')
+            if not os.path.exists(plugin_api_path):
+                raise PluginInjectError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
+
+            # 将插件路由注入到对应模块的路由中
             for root, _, api_files in os.walk(plugin_api_path):
                 for file in api_files:
                     if file.endswith('.py') and file != '__init__.py':
-                        file_path = os.path.join(root, file)
+                        # 解析插件路由配置
+                        prefix = data.get('api', {}).get(f'{file[:-3]}', {}).get('prefix', '')
+                        tags = data.get('api', {}).get(f'{file[:-3]}', {}).get('tags', [])
 
                         # 获取插件路由模块
+                        file_path = os.path.join(root, file)
                         path_to_module_str = os.path.relpath(file_path, PLUGIN_DIR).replace(os.sep, '.')[:-3]
                         module_path = f'backend.plugin.{path_to_module_str}'
                         try:
                             module = import_module_cached(module_path)
-                        except ImportError as e:
-                            raise ImportError(f'导入模块 {module_path} 失败：{e}') from e
+                        except PluginInjectError as e:
+                            raise PluginInjectError(f'导入非独立 app 插件 {plugin} 模块 {module_path} 失败：{e}') from e
                         plugin_router = getattr(module, 'router', None)
                         if not plugin_router:
                             warnings.warn(
-                                f'目标模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
+                                f'非独立 app 插件 {plugin} 模块 {module_path} 中没有有效的 router，'
+                                '请检查插件文件是否完整',
                                 FutureWarning,
                             )
                             continue
 
                         # 获取源程序路由模块
                         relative_path = os.path.relpath(root, plugin_api_path)
-                        target_module_path = f'backend.app.{app_name}.api.{relative_path.replace(os.sep, ".")}'
+                        target_module_path = f'backend.app.{app_include}.api.{relative_path.replace(os.sep, ".")}'
                         try:
                             target_module = import_module_cached(target_module_path)
-                        except ImportError as e:
-                            raise ImportError(f'导入目标模块 {target_module_path} 失败：{e}') from e
+                        except PluginInjectError as e:
+                            raise PluginInjectError(f'导入源程序模块 {target_module_path} 失败：{e}') from e
                         target_router = getattr(target_module, 'router', None)
                         if not target_router or not isinstance(target_router, APIRouter):
-                            raise AttributeError(f'目标模块 {module_path} 中没有有效的 router，请检查插件文件是否完整')
+                            raise PluginInjectError(
+                                f'非独立 app 插件 {plugin} 模块 {module_path} 中没有有效的 router，'
+                                '请检查插件文件是否完整'
+                            )
 
                         # 将插件路由注入到目标 router 中
                         target_router.include_router(
                             router=plugin_router,
                             prefix=prefix,
-                            tags=tags if tags == [] else [tags],
+                            tags=[tags] if tags else [],
                         )
+        # 独立 app
         else:
-            # 独立应用：将插件中的路由直接注入到总路由中
+            # 将插件中的路由直接注入到总路由中
             module_path = f'backend.plugin.{plugin}.api.router'
             try:
                 module = import_module_cached(module_path)
-            except ImportError as e:
-                raise ImportError(f'导入目标模块 {module_path} 失败：{e}') from e
-            plugin_router = getattr(module, 'router', None)
-            if not plugin_router or not isinstance(plugin_router, APIRouter):
-                raise AttributeError(f'目标模块 {module_path} 中没有有效的 router，请检查插件文件是否完整')
-            target_module_path = 'backend.app.router'
-            target_module = import_module_cached(target_module_path)
-            target_router = getattr(target_module, 'router')
+            except PluginInjectError as e:
+                raise PluginInjectError(f'导入独立 app 插件 {plugin} 模块 {module_path} 失败：{e}') from e
+            routers = data.get('app', {}).get('router', [])
+            if not routers or not isinstance(routers, list):
+                raise PluginInjectError(f'独立 app 插件 {plugin} 配置文件存在错误，请检查')
+            for router in routers:
+                plugin_router = getattr(module, router, None)
+                if not plugin_router or not isinstance(plugin_router, APIRouter):
+                    raise PluginInjectError(
+                        f'独立 app 插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
+                    )
+                target_module_path = 'backend.app.router'
+                target_module = import_module_cached(target_module_path)
+                target_router = getattr(target_module, 'router')
 
-            # 将插件路由注入到目标 router 中
-            target_router.include_router(plugin_router)
+                # 将插件路由注入到目标 router 中
+                target_router.include_router(plugin_router)
+
+
+def install_requirements() -> None:
+    """安装插件依赖"""
+    plugins = get_plugins()
+    for plugin in plugins:
+        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        if not os.path.exists(requirements_file):
+            continue
+        else:
+            try:
+                subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'])
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', requirements_file])
+            except subprocess.CalledProcessError as e:
+                raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e}') from e
+
+
+async def install_requirements_async() -> None:
+    """异步安装插件依赖"""
+    plugins = get_plugins()
+    for plugin in plugins:
+        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        if not os.path.exists(requirements_file):
+            continue
+        else:
+            await async_subprocess.create_subprocess_exec(sys.executable, '-m', 'ensurepip', '--upgrade')
+            res = await async_subprocess.create_subprocess_exec(
+                sys.executable,
+                '-m',
+                'pip',
+                'install',
+                '-r',
+                requirements_file,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            _, stderr = await res.communicate()
+            if res.returncode != 0:
+                raise PluginInjectError(f'插件 {plugin} 依赖包安装失败：{stderr}')

@@ -1,8 +1,6 @@
-# 属于哪个 app，如果为独立 app，应设置为 ''
-app = 'admin'
+[app]
+include = 'admin'
 
-# api 路由配置，仅对于非独立 app 可用
-[api]
-# prefix 必须带前导 /
+[api.notice]
 prefix = '/notices'
 tags = '系统通知公告'

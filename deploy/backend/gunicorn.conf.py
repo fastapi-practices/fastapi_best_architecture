@@ -8,9 +8,6 @@ chdir = '/fba/backend/'
 # 并行工作进程数
 workers = 1
 
-# 指定每个工作者的线程数
-threads = 4
-
 # 监听队列
 backlog = 512
 

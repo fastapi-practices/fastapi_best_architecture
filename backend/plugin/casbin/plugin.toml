@@ -1,0 +1,10 @@
+[app]
+include = 'admin'
+
+[api.api]
+prefix = '/apis'
+tags = '系统API'
+
+[api.casbin]
+prefix = '/casbin'
+tags = '系统Casbin权限'

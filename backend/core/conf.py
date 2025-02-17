@@ -75,18 +75,8 @@ class Settings(BaseSettings):
     JWT_USER_REDIS_PREFIX: str = 'fba:user'
     JWT_USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
 
-    # Permission (RBAC)
-    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
-    PERMISSION_REDIS_PREFIX: str = 'fba:permission'
-
     # RBAC
-    # Casbin
-    RBAC_CASBIN_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
-        ('POST', f'{FASTAPI_API_V1_PATH}/auth/token/new'),
-    }
-
-    # Role-Menu
+    RBAC_ROLE_MENU_MODE: bool = False
     RBAC_ROLE_MENU_EXCLUDE: list[str] = [
         'sys:monitor:redis',
         'sys:monitor:server',
