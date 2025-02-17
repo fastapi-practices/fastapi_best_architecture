@@ -116,12 +116,11 @@ async def create_refresh_token(user_id: str, multi_login: bool) -> RefreshToken:
     return RefreshToken(refresh_token=refresh_token, refresh_token_expire_time=expire)
 
 
-async def create_new_token(user_id: str, token: str, refresh_token: str, multi_login: bool, **kwargs) -> NewToken:
+async def create_new_token(user_id: str, refresh_token: str, multi_login: bool, **kwargs) -> NewToken:
     """
     Generate new token
 
     :param user_id:
-    :param token
     :param refresh_token:
     :param multi_login:
     :param kwargs: Access token extra information
@@ -129,23 +128,11 @@ async def create_new_token(user_id: str, token: str, refresh_token: str, multi_l
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
-        raise TokenError(msg='Refresh Token 已过期')
-
-    token_payload = jwt_decode(token)
+        raise TokenError(msg='Refresh Token 已过期，请重新登录')
     new_access_token = await create_access_token(user_id, multi_login, **kwargs)
-    new_refresh_token = await create_refresh_token(user_id, multi_login)
-    keys = [
-        f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}',
-        f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}',
-    ]
-    for key in keys:
-        await redis_client.delete(key)
-
     return NewToken(
         new_access_token=new_access_token.access_token,
         new_access_token_expire_time=new_access_token.access_token_expire_time,
-        new_refresh_token=new_refresh_token.refresh_token,
-        new_refresh_token_expire_time=new_refresh_token.refresh_token_expire_time,
         session_uuid=new_access_token.session_uuid,
     )
 
@@ -233,8 +220,8 @@ async def jwt_authentication(token: str) -> CurrentUserIns:
     """
     token_payload = jwt_decode(token)
     user_id = token_payload.id
-    token_verify = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
-    if not token_verify:
+    redis_token = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
+    if not redis_token or token != redis_token:
         raise TokenError(msg='Token 已过期')
     cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
     if not cache_user:

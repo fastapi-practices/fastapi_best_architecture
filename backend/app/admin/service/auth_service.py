@@ -132,18 +132,15 @@ class AuthService:
                 return data
 
     @staticmethod
-    async def new_token(*, request: Request, response: Response) -> GetNewToken:
+    async def new_token(*, request: Request) -> GetNewToken:
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
-            raise errors.TokenError(msg='Refresh Token 丢失，请重新登录')
+            raise errors.TokenError(msg='Refresh Token 已过期，请重新登录')
         try:
             user_id = jwt_decode(refresh_token).id
         except Exception:
             raise errors.TokenError(msg='Refresh Token 无效')
-        if request.user.id != user_id:
-            raise errors.TokenError(msg='Refresh Token 无效')
         async with async_db_session() as db:
-            token = get_token(request)
             user = await user_dao.get(db, user_id)
             if not user:
                 raise errors.NotFoundError(msg='用户名或密码有误')
@@ -151,7 +148,6 @@ class AuthService:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             new_token = await create_new_token(
                 user_id=str(user.id),
-                token=token,
                 refresh_token=refresh_token,
                 multi_login=user.is_multi_login,
                 # extra info
@@ -162,13 +158,6 @@ class AuthService:
                 os=request.state.os,
                 browser=request.state.browser,
                 device_type=request.state.device,
-            )
-            response.set_cookie(
-                key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                value=new_token.new_refresh_token,
-                max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                expires=timezone.f_utc(new_token.new_refresh_token_expire_time),
-                httponly=True,
             )
             data = GetNewToken(
                 access_token=new_token.new_access_token,

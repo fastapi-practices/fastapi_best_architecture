@@ -35,9 +35,9 @@ async def user_login(
     return response_base.success(data=data)
 
 
-@router.post('/token/new', summary='创建新 token', dependencies=[DependsJwtAuth])
+@router.post('/token/new', summary='创建新 token')
 async def create_new_token(request: Request, response: Response) -> ResponseSchemaModel[GetNewToken]:
-    data = await auth_service.new_token(request=request, response=response)
+    data = await auth_service.new_token(request=request)
     return response_base.success(data=data)
 
 
