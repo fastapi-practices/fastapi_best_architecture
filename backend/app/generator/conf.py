@@ -2,15 +2,11 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-from backend.core.path_conf import BasePath
+from pydantic_settings import BaseSettings
 
 
 class GeneratorSettings(BaseSettings):
     """Admin Settings"""
-
-    model_config = SettingsConfigDict(env_file=f'{BasePath}/.env', env_file_encoding='utf-8', extra='ignore')
 
     # 模版目录
     TEMPLATE_BACKEND_DIR_NAME: str = 'py'

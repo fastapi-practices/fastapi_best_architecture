@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+
 from contextlib import asynccontextmanager
 
 import socketio
@@ -9,11 +11,12 @@ from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.staticfiles import StaticFiles
 
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_customize_logfile, setup_logging
 from backend.core.conf import settings
-from backend.core.path_conf import STATIC_DIR
+from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_table
 from backend.database.redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -101,14 +104,17 @@ def register_logger() -> None:
 
 def register_static_file(app: FastAPI):
     """
-    静态文件交互开发模式, 生产将自动关闭，生产必须使用 nginx 静态资源服务
+    静态资源服务，生产应使用 nginx 代理静态资源服务
 
     :param app:
     :return:
     """
+    # 上传静态资源
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+    app.mount('/static/upload', StaticFiles(directory=UPLOAD_DIR), name='upload')
+    # 固有静态资源
     if settings.FASTAPI_STATIC_FILES:
-        from fastapi.staticfiles import StaticFiles
-
         app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 
 

@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     FASTAPI_OPENAPI_URL: str | None = '/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
+    # Upload
+    UPLOAD_READ_SIZE: int = 1024  # 上传文件时分片读取大小
+    UPLOAD_IMAGE_EXT_INCLUDE: list[str] = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+    UPLOAD_IMAGE_SIZE_MAX: int = 1024 * 1024 * 5
+    UPLOAD_VIDEO_EXT_INCLUDE: list[str] = ['mp4', 'mov', 'avi', 'flv']
+    UPLOAD_VIDEO_SIZE_MAX: int = 1024 * 1024 * 20
+
     # Database
     DATABASE_ECHO: bool = False
     DATABASE_SCHEMA: str = 'fba'
@@ -114,7 +121,6 @@ class Settings(BaseSettings):
     CORS_ALLOWED_ORIGINS: list[str] = [
         'http://127.0.0.1:8000',
         'http://localhost:5173',  # 前端地址，末尾不要带 '/'
-        'http://localhost:63342',
     ]
     CORS_EXPOSE_HEADERS: list[str] = [
         TRACE_ID_REQUEST_HEADER_KEY,

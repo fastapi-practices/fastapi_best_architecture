@@ -59,3 +59,8 @@ class TokenPayload:
     id: int
     session_uuid: str
     expire_time: datetime
+
+
+@dataclasses.dataclass
+class UploadUrl:
+    url: str
