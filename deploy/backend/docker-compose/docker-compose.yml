@@ -81,6 +81,7 @@ services:
     volumes:
       - ../nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - fba_static:/www/fba_server/backend/static
+      - fba_static_upload:/www/fba_server/backend/static/upload
     networks:
       - fba_network
 

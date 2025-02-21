@@ -169,8 +169,18 @@ async def install_requirements_async() -> None:
         if not os.path.exists(requirements_file):
             continue
         else:
-            await async_subprocess.create_subprocess_exec(sys.executable, '-m', 'ensurepip', '--upgrade')
-            res = await async_subprocess.create_subprocess_exec(
+            ensurepip_process = await async_subprocess.create_subprocess_exec(
+                sys.executable,
+                '-m',
+                'ensurepip',
+                '--upgrade',
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            _, ensurepip_stderr = await ensurepip_process.communicate()
+            if ensurepip_process.returncode != 0:
+                raise PluginInjectError(f'ensurepip 安装失败：{ensurepip_stderr}')
+            pip_process = await async_subprocess.create_subprocess_exec(
                 sys.executable,
                 '-m',
                 'pip',
@@ -180,6 +190,6 @@ async def install_requirements_async() -> None:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            _, stderr = await res.communicate()
-            if res.returncode != 0:
-                raise PluginInjectError(f'插件 {plugin} 依赖包安装失败：{stderr}')
+            _, pip_stderr = await pip_process.communicate()
+            if pip_process.returncode != 0:
+                raise PluginInjectError(f'插件 {plugin} 依赖包安装失败：{pip_stderr}')

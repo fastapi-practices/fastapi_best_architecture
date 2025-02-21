@@ -103,6 +103,13 @@ class UserSocialType(StrEnum):
     linuxdo = 'LinuxDo'
 
 
+class FileType(StrEnum):
+    """文件类型"""
+
+    image = 'image'
+    video = 'video'
+
+
 class GenModelMySQLColumnType(StrEnum):
     """代码生成模型列类型（MySQL）"""
 
