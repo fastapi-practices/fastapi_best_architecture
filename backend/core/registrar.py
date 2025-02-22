@@ -14,7 +14,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
 from backend.common.exception.exception_handler import register_exception
-from backend.common.log import set_customize_logfile, setup_logging
+from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_table
@@ -99,7 +99,7 @@ def register_logger() -> None:
     :return:
     """
     setup_logging()
-    set_customize_logfile()
+    set_custom_logfile()
 
 
 def register_static_file(app: FastAPI):

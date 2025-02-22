@@ -3,8 +3,7 @@
 import inspect
 import logging
 import os
-
-from sys import stderr, stdout
+import sys
 
 from asgi_correlation_id import correlation_id
 from loguru import logger
@@ -55,37 +54,11 @@ def setup_logging():
         # Debug log handlers
         # logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
 
-    # Remove every other logger's handlers
-    logger.remove()
-
-    # Define the correlation_id filter function
-    # https://github.com/snok/asgi-correlation-id?tab=readme-ov-file#configure-logging
-    # https://github.com/snok/asgi-correlation-id/issues/7
-    def correlation_id_filter(record) -> bool:
-        cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
-        record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
-        return True
-
-    # Configure loguru logger before starts logging
-    logger.configure(
-        handlers=[
-            {
-                'sink': stdout,
-                'level': settings.LOG_STDOUT_LEVEL,
-                'filter': lambda record: correlation_id_filter(record) and record['level'].no <= 25,
-                'format': settings.LOG_STD_FORMAT,
-            },
-            {
-                'sink': stderr,
-                'level': settings.LOG_STDERR_LEVEL,
-                'filter': lambda record: correlation_id_filter(record) and record['level'].no >= 30,
-                'format': settings.LOG_STD_FORMAT,
-            },
-        ]
-    )
+    # configure loguru
+    logger.configure(handlers=[{"sink": sys.stdout, "serialize": False}])
 
 
-def set_customize_logfile():
+def set_custom_logfile():
     log_path = path_conf.LOG_DIR
     if not os.path.exists(log_path):
         os.mkdir(log_path)
@@ -94,10 +67,18 @@ def set_customize_logfile():
     log_stdout_file = os.path.join(log_path, settings.LOG_STDOUT_FILENAME)
     log_stderr_file = os.path.join(log_path, settings.LOG_STDERR_FILENAME)
 
+    # Define the correlation_id filter function
+    # https://github.com/snok/asgi-correlation-id?tab=readme-ov-file#configure-logging
+    # https://github.com/snok/asgi-correlation-id/issues/7
+    def correlation_id_filter(record):
+        cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
+        record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
+        return record
+
     # loguru logger: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
     log_config = {
-        'rotation': '10 MB',
-        'retention': '15 days',
+        'rotation': '5 MB',
+        'retention': '7 days',
         'compression': 'tar.gz',
         'enqueue': True,
         'format': settings.LOG_FILE_FORMAT,
@@ -107,18 +88,20 @@ def set_customize_logfile():
     logger.add(
         str(log_stdout_file),
         level=settings.LOG_STDOUT_LEVEL,
-        **log_config,
+        filter=lambda record: correlation_id_filter(record) and record['level'].no <= 25,
         backtrace=False,
         diagnose=False,
+        **log_config,
     )
 
     # stderr file
     logger.add(
         str(log_stderr_file),
         level=settings.LOG_STDERR_LEVEL,
-        **log_config,
+        filter=lambda record: correlation_id_filter(record) and record['level'].no >= 30,
         backtrace=True,
         diagnose=True,
+        **log_config,
     )
 
 
