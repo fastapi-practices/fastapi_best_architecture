@@ -94,7 +94,6 @@ class Settings(BaseSettings):
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = TOKEN_REFRESH_EXPIRE_SECONDS
 
     # Log
-    LOG_ROOT_LEVEL: str = 'DEBUG'
     LOG_STD_FORMAT: str = (
         '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
         '<cyan> {correlation_id} </> | <lvl>{message}</>'
