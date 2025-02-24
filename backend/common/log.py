@@ -3,8 +3,7 @@
 import inspect
 import logging
 import os
-
-from sys import stderr, stdout
+import sys
 
 from asgi_correlation_id import correlation_id
 from loguru import logger
@@ -37,12 +36,12 @@ class InterceptHandler(logging.Handler):
 
 def setup_logging():
     """
-    From https://pawamoy.github.io/posts/unify-logging-for-a-gunicorn-uvicorn-app/
+    From https://github.com/benoitc/gunicorn/issues/1572#issuecomment-638391953
     https://github.com/pawamoy/pawamoy.github.io/issues/17
     """
-    # Intercept everything at the root logger
+    # Set the logging handler and level
     logging.root.handlers = [InterceptHandler()]
-    logging.root.setLevel(settings.LOG_ROOT_LEVEL)
+    logging.root.setLevel('NOTSET')
 
     # Remove all log handlers and propagate to root logger
     for name in logging.root.manager.loggerDict.keys():
@@ -55,70 +54,65 @@ def setup_logging():
         # Debug log handlers
         # logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
 
-    # Remove every other logger's handlers
-    logger.remove()
-
-    # Define the correlation_id filter function
-    # https://github.com/snok/asgi-correlation-id?tab=readme-ov-file#configure-logging
+    # Define the correlation_id default filter function
     # https://github.com/snok/asgi-correlation-id/issues/7
-    def correlation_id_filter(record) -> bool:
+    def correlation_id_filter(record):
         cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
         record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
-        return True
+        return record
 
-    # Configure loguru logger before starts logging
+    # Remove default loguru logger
+    logger.remove()
+
+    # Set the loguru default handlers
     logger.configure(
         handlers=[
             {
-                'sink': stdout,
-                'level': settings.LOG_STDOUT_LEVEL,
-                'filter': lambda record: correlation_id_filter(record) and record['level'].no <= 25,
+                'sink': sys.stdout,
+                'filter': lambda record: correlation_id_filter(record),
                 'format': settings.LOG_STD_FORMAT,
-            },
-            {
-                'sink': stderr,
-                'level': settings.LOG_STDERR_LEVEL,
-                'filter': lambda record: correlation_id_filter(record) and record['level'].no >= 30,
-                'format': settings.LOG_STD_FORMAT,
-            },
+            }
         ]
     )
 
 
-def set_customize_logfile():
+def set_custom_logfile():
     log_path = path_conf.LOG_DIR
     if not os.path.exists(log_path):
         os.mkdir(log_path)
 
     # log files
-    log_stdout_file = os.path.join(log_path, settings.LOG_STDOUT_FILENAME)
-    log_stderr_file = os.path.join(log_path, settings.LOG_STDERR_FILENAME)
+    log_access_file = os.path.join(log_path, settings.LOG_ACCESS_FILENAME)
+    log_error_file = os.path.join(log_path, settings.LOG_ERROR_FILENAME)
 
-    # loguru logger: https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
+    # set loguru logger default config
+    # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
     log_config = {
-        'rotation': '10 MB',
-        'retention': '15 days',
-        'compression': 'tar.gz',
-        'enqueue': True,
         'format': settings.LOG_FILE_FORMAT,
+        'enqueue': True,
+        'rotation': '5 MB',
+        'retention': '7 days',
+        'compression': 'tar.gz',
     }
 
     # stdout file
     logger.add(
-        str(log_stdout_file),
-        level=settings.LOG_STDOUT_LEVEL,
-        **log_config,
+        str(log_access_file),
+        level=settings.LOG_ACCESS_LEVEL,
+        filter=lambda record: record['level'].no <= 25,
         backtrace=False,
         diagnose=False,
+        **log_config,
     )
 
     # stderr file
     logger.add(
-        str(log_stderr_file),
-        level=settings.LOG_STDERR_LEVEL,
-        **log_config,
+        str(log_error_file),
+        level=settings.LOG_ERROR_LEVEL,
+        filter=lambda record: record['level'].no >= 30,
         backtrace=True,
         diagnose=True,
+        **log_config,
     )
 
 

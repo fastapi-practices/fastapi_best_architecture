@@ -19,11 +19,9 @@ RUN apt-get update \
 
 ENV TZ="Asia/Shanghai"
 
-RUN mkdir -p /var/log/fastapi_server  \
-    && mkdir -p /var/log/supervisor \
-    && mkdir -p /etc/supervisor/conf.d
+RUN mkdir -p /var/log/fastapi_server
 
-COPY deploy/backend/supervisor.conf /etc/supervisor/supervisord.conf
+COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
 
 COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
 
