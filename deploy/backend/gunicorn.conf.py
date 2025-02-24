@@ -26,11 +26,11 @@ worker_class = 'uvicorn.workers.UvicornWorker'
 worker_connections = 2000
 
 # 设置进程文件目录
-pidfile = '/fba/gunicorn.pid'
+pidfile = '/var/run/gunicorn.pid'
 
-# 设置访问日志和错误信息日志路径
-accesslog = '/var/log/fastapi_server/gunicorn_access.log'
-errorlog = '/var/log/fastapi_server/gunicorn_error.log'
+# 设置访问日志和错误信息日志
+accesslog = '-'
+errorlog = '-'
 
 # 设置这个值为true 才会把打印信息记录到错误日志里
 capture_output = True
