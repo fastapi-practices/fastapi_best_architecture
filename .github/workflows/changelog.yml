@@ -11,6 +11,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: janheinrichmerker/action-github-changelog-generator@v2.3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: TriPSs/conventional-changelog-action@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.github_token }}
+          git-message: '📝 Update release notes'
+          git-user-name: 'github-actions[bot]'
+          git-user-email: 'github-actions[bot]@users.noreply.github.com'
