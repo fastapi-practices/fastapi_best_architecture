@@ -82,8 +82,8 @@ def set_custom_logfile():
         os.mkdir(log_path)
 
     # log files
-    log_stdout_file = os.path.join(log_path, settings.LOG_STDOUT_FILENAME)
-    log_stderr_file = os.path.join(log_path, settings.LOG_STDERR_FILENAME)
+    log_access_file = os.path.join(log_path, settings.LOG_ACCESS_FILENAME)
+    log_error_file = os.path.join(log_path, settings.LOG_ERROR_FILENAME)
 
     # set loguru logger default config
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
@@ -97,8 +97,9 @@ def set_custom_logfile():
 
     # stdout file
     logger.add(
-        str(log_stdout_file),
-        level=settings.LOG_STDOUT_LEVEL,
+        str(log_access_file),
+        level=settings.LOG_ACCESS_LEVEL,
+        filter=lambda record: record['level'].no <= 25,
         backtrace=False,
         diagnose=False,
         **log_config,
@@ -106,8 +107,9 @@ def set_custom_logfile():
 
     # stderr file
     logger.add(
-        str(log_stderr_file),
-        level=settings.LOG_STDERR_LEVEL,
+        str(log_error_file),
+        level=settings.LOG_ERROR_LEVEL,
+        filter=lambda record: record['level'].no >= 30,
         backtrace=True,
         diagnose=True,
         **log_config,
