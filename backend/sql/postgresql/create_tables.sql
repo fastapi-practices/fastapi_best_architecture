@@ -131,7 +131,6 @@ create table sys_dept
     id           serial
         primary key,
     name         varchar(50)              not null,
-    level        integer                  not null,
     sort         integer                  not null,
     leader       varchar(20),
     phone        varchar(11),
@@ -148,8 +147,6 @@ create table sys_dept
 comment on column sys_dept.id is '主键id';
 
 comment on column sys_dept.name is '部门名称';
-
-comment on column sys_dept.level is '部门层级';
 
 comment on column sys_dept.sort is '排序';
 
@@ -265,7 +262,6 @@ create table sys_menu
         primary key,
     title        varchar(50)              not null,
     name         varchar(50)              not null,
-    level        integer                  not null,
     sort         integer                  not null,
     icon         varchar(100),
     path         varchar(200),
@@ -288,8 +284,6 @@ comment on column sys_menu.id is '主键id';
 comment on column sys_menu.title is '菜单标题';
 
 comment on column sys_menu.name is '菜单名称';
-
-comment on column sys_menu.level is '菜单层级';
 
 comment on column sys_menu.sort is '排序';
 

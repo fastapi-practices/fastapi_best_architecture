@@ -74,7 +74,6 @@ create table sys_dept
     id           int auto_increment comment '主键id'
         primary key,
     name         varchar(50) not null comment '部门名称',
-    level        int         not null comment '部门层级',
     sort         int         not null comment '排序',
     leader       varchar(20) null comment '负责人',
     phone        varchar(11) null comment '手机',
@@ -218,7 +217,6 @@ create table sys_menu
         primary key,
     title        varchar(50)  not null comment '菜单标题',
     name         varchar(50)  not null comment '菜单名称',
-    level        int          not null comment '菜单层级',
     sort         int          not null comment '排序',
     icon         varchar(100) null comment '菜单图标',
     path         varchar(200) null comment '路由地址',
