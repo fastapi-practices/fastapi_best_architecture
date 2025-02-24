@@ -7,7 +7,7 @@
 English | [简体中文](./README.zh-CN.md)
 
 A backend and frontend separation solution based on the FastAPI framework, following
-the [pseudo three-tier architecture](#pseudo-three-tier-architecture) design, supporting **Python 3.10** and above
+the [pseudo 3-tier architecture](#pseudo-3-tier-architecture) design, supporting **Python 3.10** and above
 versions
 
 **🔥Continuously updated and maintained🔥**
@@ -29,12 +29,12 @@ versions
 > [!NOTE]
 > This repository as a template library open to any person or enterprise can be used for free!
 
-## Pseudo three-tier architecture
+## Pseudo 3-tier architecture
 
-The mvc architecture is a common design pattern in python web, but the three-tier architecture is even more fascinating
+The mvc architecture is a common design pattern in python web, but the 3-tier architecture is even more fascinating
 
-In python web development, there is no common standard for the concept of three-tier architecture, so we'll call it a
-pseudo three-tier architecture here
+In python web development, there is no common standard for the concept of 3-tier architecture, so we'll call it a
+pseudo 3-tier architecture here
 
 But please note that we don't have a traditional multi-app structure (django, springBoot...) If you don't like this
 pattern, use templates to transform it to your heart's content!
@@ -64,19 +64,22 @@ pattern, use templates to transform it to your heart's content!
 
 ## Built-in features
 
-- [x] User management: management of system user roles, assignment of permissions
-- [x] Departmental management: Configuration of the system organization (company, department, group, ...)
-- [x] Menu management: Configuration of system menus, user menus, button permission labels
-- [x] Role management: assignment of role menu privileges, assignment of role routing privileges
-- [x] Dictionary management: maintenance of commonly used fixed data or parameters within the system
-- [x] Token management：System user online status detection, supports kicking user offline
-- [x] Code generation: back-end code is automatically generated, supporting preview, write and download.
-- [x] Operation log: logging and querying of normal and abnormal system operations.
-- [x] Login authentication: graphical captcha backend authentication login
-- [x] Logging: logging and querying of normal and abnormal user logins
-- [x] Service monitoring: server hardware device information and status
-- [x] Timed tasks: automated tasks, asynchronous tasks, support for function calls
-- [x] Interface Documentation: Automatically generate online interactive API interface documentation.
+- [x] User management: System User Role Management, Permission Allocation
+- [x] Department management: Configure system organization (company, department, team...)
+- [x] Menu management: Configure system menu, user menu, button permission tags
+- [x] Role management: role menu permission allocation, role route permission allocation
+- [x] Dictionary management: Maintain commonly used fixed data or parameters within the system
+- [x] Token management: System user online status detection, supports kicking users offline
+- [x] Login authentication: backend-based graphical captcha background authentication login
+- [x] Multipoint login: One-click modification of multipoint login through user information
+- [x] OAuth 2.0: Built-in self-developed OAuth 2.0 login integration
+- [x] Code generation: automatic backend code generation, supports preview, writing, and download
+- [x] Scheduled task: Automated task, asynchronous task, supports function calls
+- [x] Plugin system: Say goodbye to high coupling integration through hot-pluggable plugin mode
+- [x] Operation log: Record and query of system normal and abnormal operations
+- [x] Login log: Record and query of normal and abnormal user login
+- [x] Service monitoring: Server hardware device information and status
+- [x] API documentation: Automatically generate online interactive API documentation
 
 ## Development and deployment
 
