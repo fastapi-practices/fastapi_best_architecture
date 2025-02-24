@@ -17,6 +17,6 @@ jobs:
       - uses: TriPSs/conventional-changelog-action@v5
         with:
           github-token: ${{ secrets.github_token }}
-          git-message: '📝 Update release notes'
+          git-message: 'Update the latest version of changelog'
           git-user-name: 'github-actions[bot]'
           git-user-email: 'github-actions[bot]@users.noreply.github.com'
