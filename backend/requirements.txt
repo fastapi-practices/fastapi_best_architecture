@@ -81,7 +81,7 @@ pytest-sugar==1.0.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-engineio==4.11.2
-python-jose==3.3.0
+python-jose==3.4.0
 python-multipart==0.0.20
 python-socketio==5.12.1
 pytz==2025.1
