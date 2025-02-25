@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from fastapi import Depends
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from backend.common.log import log
 from backend.common.model import MappedBase
@@ -32,11 +32,23 @@ def create_database_url(unittest: bool = False) -> URL:
     return url
 
 
-def create_engine_and_session(url: str | URL):
+def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_sessionmaker[AsyncSession]]:
     """创建数据库引擎和 Session"""
     try:
         # 数据库引擎
-        engine = create_async_engine(url, echo=settings.DATABASE_ECHO, future=True, pool_pre_ping=True)
+        engine = create_async_engine(
+            url,
+            echo=settings.DATABASE_ECHO,
+            echo_pool=settings.DATABASE_POOL_ECHO,
+            future=True,
+            # 中等并发
+            pool_size=10,  # 低：- 高：+
+            max_overflow=20,  # 低：- 高：+
+            pool_timeout=30,  # 低：+ 高：-
+            pool_recycle=3600,  # 低：+ 高：-
+            pool_pre_ping=True,  # 低：False 高：True
+            pool_use_lifo=False,  # 低：False 高：True
+        )
         # log.success('数据库连接成功')
     except Exception as e:
         log.error('❌ 数据库链接失败 {}', e)
@@ -52,7 +64,7 @@ async def get_db():
         yield session
 
 
-async def create_table():
+async def create_table() -> None:
     """创建数据库表"""
     async with async_engine.begin() as coon:
         await coon.run_sync(MappedBase.metadata.create_all)
@@ -64,6 +76,6 @@ def uuid4_str() -> str:
 
 
 SQLALCHEMY_DATABASE_URL = create_database_url()
-async_engine, async_db_session = create_engine_and_session(SQLALCHEMY_DATABASE_URL)
+async_engine, async_db_session = create_async_engine_and_session(SQLALCHEMY_DATABASE_URL)
 # Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]
