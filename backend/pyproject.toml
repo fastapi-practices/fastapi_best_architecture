@@ -64,10 +64,6 @@ server = [
     "aio_pika==9.4.3",
     "wait-for-it>=2.2.2",
 ]
-casbin = [
-    "casbin>=1.38.0",
-    "casbin_async_sqlalchemy_adapter>=1.7.0",
-]
 
 [tool.uv]
 package = false
