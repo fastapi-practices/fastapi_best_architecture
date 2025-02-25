@@ -57,6 +57,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_ECHO: bool = False
+    DATABASE_POOL_ECHO: bool = False
     DATABASE_SCHEMA: str = 'fba'
     DATABASE_CHARSET: str = 'utf8mb4'
 

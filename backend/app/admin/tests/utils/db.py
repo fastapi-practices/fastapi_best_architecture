@@ -1,21 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.database.db import create_database_url, create_engine_and_session
+from backend.database.db import create_async_engine_and_session, create_database_url
 
 TEST_SQLALCHEMY_DATABASE_URL = create_database_url(unittest=True)
 
-_, async_test_db_session = create_engine_and_session(TEST_SQLALCHEMY_DATABASE_URL)
+_, async_test_db_session = create_async_engine_and_session(TEST_SQLALCHEMY_DATABASE_URL)
 
 
-async def override_get_db() -> AsyncSession:
+async def override_get_db():
     """session 生成器"""
-    session = async_test_db_session()
-    try:
+    async with async_test_db_session() as session:
         yield session
-    except Exception as se:
-        await session.rollback()
-        raise se
-    finally:
-        await session.close()
