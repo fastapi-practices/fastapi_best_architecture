@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.10, <3.13"
 
 [[package]]
@@ -241,31 +240,6 @@ source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7c/58/1546c970afcd2a2428b1bfafecf2371d8951cc34b46701bea73f4280989e/billiard-4.2.1.tar.gz", hash = "sha256:12b641b0c539073fc8d3f5b8b7be998956665c4233c7c1fcd66a7e677c4fb36f" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/30/da/43b15f28fe5f9e027b41c539abc5469052e9d48fd75f8ff094ba2a0ae767/billiard-4.2.1-py3-none-any.whl", hash = "sha256:40b59a4ac8806ba2c2369ea98d876bc6108b051c227baffd928c644d15d8f3cb" },
-]
-
-[[package]]
-name = "casbin"
-version = "1.38.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "simpleeval" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/60/73/9ed7ce839505b3c82dba0dcb327a45fb0a2497d45c78c54aced75ff12475/casbin-1.38.0.tar.gz", hash = "sha256:64a758b367d829aa69d30ef28f58e6b26511ff238a939ad3f7d053535f7d4627" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/54/ad/8f4720120c0e3f4d22e24b57f452868a4e07f6c1bb32be5cc548be5e45cb/casbin-1.38.0-py3-none-any.whl", hash = "sha256:229245632a98ec17c53cbaf8432826c3180876b5577fe85b2fa3d708c5d293da" },
-]
-
-[[package]]
-name = "casbin-async-sqlalchemy-adapter"
-version = "1.7.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "casbin" },
-    { name = "sqlalchemy" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/32/28/52d18166e54b8f36228212d2ee00ee86b41d492cab18973e324e3523ff36/casbin_async_sqlalchemy_adapter-1.7.0.tar.gz", hash = "sha256:c946bdbb6c1f9a458fc75e86ac5565fd5f0c07704b78d4b57c257b97a06b5c68" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/5a/f3/1fa59284c75e6497d1184459e4743f1ceb39125becca0ca0d67c4f385356/casbin_async_sqlalchemy_adapter-1.7.0-py3-none-any.whl", hash = "sha256:d0a1ede29303a11eaa79e258579536b45267373cbd8f03e047ae1a399b92344b" },
 ]
 
 [[package]]
@@ -602,10 +576,6 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
-casbin = [
-    { name = "casbin" },
-    { name = "casbin-async-sqlalchemy-adapter" },
-]
 dev = [
     { name = "pytest" },
     { name = "pytest-sugar" },
@@ -659,10 +629,6 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-casbin = [
-    { name = "casbin", specifier = ">=1.38.0" },
-    { name = "casbin-async-sqlalchemy-adapter", specifier = ">=1.7.0" },
-]
 dev = [
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-sugar", specifier = ">=1.0.0" },
@@ -1848,15 +1814,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/b0/d4/bfa032f961103eba93de583b161f0e6a5b63cebb8f2c7d0c6e6efe1e3d2e/simple_websocket-1.1.0.tar.gz", hash = "sha256:7939234e7aa067c534abdab3a9ed933ec9ce4691b0713c78acb195560aa52ae4" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/52/59/0782e51887ac6b07ffd1570e0364cf901ebc36345fea669969d2084baebb/simple_websocket-1.1.0-py3-none-any.whl", hash = "sha256:4af6069630a38ed6c561010f0e11a5bc0d4ca569b36306eb257cd9a192497c8c" },
-]
-
-[[package]]
-name = "simpleeval"
-version = "1.0.3"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ff/6f/15be211749430f52f2c8f0c69158a6fc961c03aac93fa28d44d1a6f5ebc7/simpleeval-1.0.3.tar.gz", hash = "sha256:67bbf246040ac3b57c29cf048657b9cf31d4e7b9d6659684daa08ca8f1e45829" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a0/e9/e58082fbb8cecbb6fb4133033c40cc50c248b1a331582be3a0f39138d65b/simpleeval-1.0.3-py3-none-any.whl", hash = "sha256:e3bdbb8c82c26297c9a153902d0fd1858a6c3774bf53ff4f134788c3f2035c38" },
 ]
 
 [[package]]
