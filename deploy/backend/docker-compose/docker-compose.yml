@@ -161,5 +161,7 @@ volumes:
     name: fba_redis
   fba_static:
     name: fba_static
+  fba_static_upload:
+    name: fba_static_upload
   fba_rabbitmq:
     name: fba_rabbitmq
