@@ -34,6 +34,7 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debi
     && mkdir -p /var/log/celery
 
 COPY . .
+RUN chmod +x backend/*.sh
 COPY --from=builder /usr/local /usr/local
 COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
 ARG SERVICE_TYPE=fastapi_server
@@ -42,4 +43,4 @@ COPY deploy/backend/${SERVICE_TYPE}.conf /etc/supervisor/conf.d/
 EXPOSE 8001
 EXPOSE 8555
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["backend/${SERVICE_TYPE}-start.sh"]
