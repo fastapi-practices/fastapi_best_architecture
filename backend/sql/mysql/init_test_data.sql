@@ -6,7 +6,7 @@ values  (1, '创建API', 'POST', '/api/v1/apis', null, '2024-02-02 11:29:47', nu
         (2, '删除API', 'DELETE', '/api/v1/apis', null, '2024-02-02 11:31:32', null),
         (3, '编辑API', 'PUT', '/api/v1/apis/{pk}', null, '2024-02-02 11:32:22', null);
 
-insert into sys_menu (id, title, name, level, sort, icon, path, menu_type, component, perms, status, display, cache, remark, parent_id, created_time, updated_time)
+insert into sys_menu (id, title, name, sort, icon, path, menu_type, component, perms, status, display, cache, remark, parent_id, created_time, updated_time)
 values  (1, '测试', 'test', 0, '', null, 0, null, null, 0, 0, 1, null, null, '2023-07-27 19:14:10', null),
         (2, '仪表盘', 'dashboard', 0, 'IconDashboard', 'dashboard', 0, null, null, 1, 1, 1, null, null, '2023-07-27 19:15:45', null),
         (3, '工作台', 'Workplace', 0, null, 'workplace', 1, '/dashboard/workplace/index.vue', null, 1, 1, 1, null, 2, '2023-07-27 19:17:59', null),
