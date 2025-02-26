@@ -61,7 +61,7 @@ lint = [
 ]
 server = [
     "gunicorn==21.2.0",
-    "aio_pika==9.4.3",
+    "aio-pika==9.4.3",
     "wait-for-it>=2.2.2",
 ]
 
