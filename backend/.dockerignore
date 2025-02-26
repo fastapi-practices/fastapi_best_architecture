@@ -1,5 +1,5 @@
-__pycache__/
-venv/
-.venv/
-.python-version
-.git/
+**/__pycache__/
+**/venv/
+**/.venv/
+**/.python-version
+**/.git/
