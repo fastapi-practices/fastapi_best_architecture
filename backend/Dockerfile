@@ -1,10 +1,11 @@
-ARG SERVICE_TYPE=fastapi_server
+# Select the image to build based on SERVER_TYPE, defaulting to fastapi_server, or docker-compose build args
+ARG SERVER_TYPE=fastapi_server
 
-# ===== Build Stage =====
+# === Python environment from uv ===
 FROM python:3.10-slim AS builder
-COPY --from=ghcr.io/astral-sh/uv:0.6.2 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install dependencies for building Python packages
+# Used for build Python packages
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
     && apt-get install -y --no-install-recommends gcc python3-dev \
@@ -14,52 +15,63 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debi
 ENV UV_COMPILE_BYTECODE=1 \
     UV_NO_CACHE=1 \
     UV_LINK_MODE=copy \
-    UV_PROJECT_ENVIRONMENT=/usr/local
+    UV_PROJECT_ENVIRONMENT=/usr/local \
+    UV_INDEX=https://mirrors.aliyun.com/pypi/simple
 
-# COPY backend/plugin/casbin/requirements.txt plugin_casbin_requirements.txt
-
-# Install dependencies using uv (with cache optimization)
+# Install dependencies with cache
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=backend/uv.lock,target=uv.lock \
     --mount=type=bind,source=backend/pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-default-groups --group server
-    # uv sync --frozen --no-install-project --no-default-groups --group server \
-    # && uv pip install --system -r plugin_casbin_requirements.txt
+    uv sync --frozen --no-default-groups --group server
 
+# === Runtime base server image ===
+FROM python:3.10-slim AS base_server
 
-# ===== Runtime Base Image =====
-FROM python:3.10-slim AS runtime
 SHELL ["/bin/bash", "-c"]
-ENV TZ="Asia/Shanghai"
 
-# Install runtime dependencies
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
-    && apt-get install -y --no-install-recommends supervisor procps iproute2 \
+    && apt-get install -y --no-install-recommends supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy application and Python packages
 COPY . /fba
+
 COPY --from=builder /usr/local /usr/local
 
-# ===== FastAPI Server Image =====
-FROM runtime AS fastapi_server
-WORKDIR /fba/backend
-RUN mkdir -p /var/log/fastapi_server
+# Install plugin dependencies
+WORKDIR /fba
+ENV PYTHONPATH=/fba
+RUN python3 backend/scripts/init_plugin.py
+
+# === FastPAI server iamge ===
+FROM base_server AS fastapi_server
+
+WORKDIR /fba
+
 COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
 COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
+
+RUN mkdir -p /var/log/fastapi_server
+
 EXPOSE 8001
-ENV PYTHONPATH=/fba
+
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port","8000"]
 
-# ===== Celery Worker Image =====
-FROM runtime AS celery
-WORKDIR /fba/backend
-RUN mkdir -p /var/log/celery && chmod +x /fba/backend/*.sh
+# === Celery server iamge ===
+FROM base_server AS celery
+
+WORKDIR /fba/backend/
+
 COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
 COPY deploy/backend/celery.conf /etc/supervisor/conf.d/
+
+RUN mkdir -p /var/log/celery
+
+RUN chmod +x celery-start.sh
+
 EXPOSE 8555
+
 CMD ["./celery-start.sh"]
 
-# Select the image type based on SERVICE_TYPE build arg
-FROM ${SERVICE_TYPE}
+# Build image
+FROM ${SERVER_TYPE}
