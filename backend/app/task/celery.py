@@ -57,8 +57,6 @@ def init_celery() -> celery.Celery:
         result_backend_transport_options=result_backend_transport_options,
         task_cls='app.task.celery_task.base:TaskBase',
         task_track_started=True,
-        # TODO: Update this work if celery version >= 6.0.0
-        worker_pool=celery_aio_pool.pool.AsyncIOPool,
     )
 
     # Load task modules
