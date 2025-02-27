@@ -41,7 +41,7 @@ def setup_logging():
     """
     # Set the logging handler and level
     logging.root.handlers = [InterceptHandler()]
-    logging.root.setLevel('NOTSET')
+    logging.root.setLevel(settings.LOG_STD_LEVEL)
 
     # Remove all log handlers and propagate to root logger
     for name in logging.root.manager.loggerDict.keys():
@@ -69,6 +69,7 @@ def setup_logging():
         handlers=[
             {
                 'sink': sys.stdout,
+                'level': settings.LOG_STD_LEVEL,
                 'filter': lambda record: correlation_id_filter(record),
                 'format': settings.LOG_STD_FORMAT,
             }
@@ -98,7 +99,7 @@ def set_custom_logfile():
     # stdout file
     logger.add(
         str(log_access_file),
-        level=settings.LOG_ACCESS_LEVEL,
+        level=settings.LOG_ACCESS_FILE_LEVEL,
         filter=lambda record: record['level'].no <= 25,
         backtrace=False,
         diagnose=False,
@@ -108,7 +109,7 @@ def set_custom_logfile():
     # stderr file
     logger.add(
         str(log_error_file),
-        level=settings.LOG_ERROR_LEVEL,
+        level=settings.LOG_ERROR_FILE_LEVEL,
         filter=lambda record: record['level'].no >= 30,
         backtrace=True,
         diagnose=True,
