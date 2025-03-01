@@ -178,6 +178,10 @@ class Settings(BaseSettings):
         'updated_time',
     ]
 
+    # Plugin
+    PLUGIN_PIP_CHINA: bool = True
+    PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
+
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:

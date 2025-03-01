@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from backend.app.admin.schema.token import GetTokenDetail, KickOutToken
 from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth, jwt_decode, superuser_verify
+from backend.common.security.jwt import jwt_decode, superuser_verify
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
@@ -18,7 +18,7 @@ from backend.database.redis import redis_client
 router = APIRouter()
 
 
-@router.get('', summary='获取令牌列表', dependencies=[DependsJwtAuth])
+@router.get('', summary='获取令牌列表')
 async def get_tokens(username: Annotated[str | None, Query()] = None) -> ResponseSchemaModel[list[GetTokenDetail]]:
     token_keys = await redis_client.keys(f'{settings.TOKEN_REDIS_PREFIX}:*')
     token_online = await redis_client.smembers(settings.TOKEN_ONLINE_REDIS_PREFIX)
