@@ -6,18 +6,28 @@ import zipfile
 
 from typing import Annotated
 
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.params import Query
 
 from backend.common.exception import errors
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 from backend.core.path_conf import PLUGIN_DIR
 from backend.plugin.tools import install_requirements_async
 
 router = APIRouter()
 
 
-@router.post('/install', summary='安装插件', description='需使用插件 zip 压缩包进行安装')
+@router.post(
+    '/install',
+    summary='安装插件',
+    description='需使用插件 zip 压缩包进行安装',
+    dependencies=[
+        Depends(RequestPermission('sys:plugin:install')),
+        DependsRBAC,
+    ],
+)
 async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
     contents = await file.read()
     file_bytes = io.BytesIO(contents)

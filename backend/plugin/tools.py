@@ -169,7 +169,7 @@ async def install_requirements_async(wait: bool = True) -> None:
     """
     异步安装插件依赖
 
-    :param wait: 是否等待结果并校验，开启将 IO 阻塞
+    :param wait: 是否等待结果并校验，开启将造成 IO 阻塞
     :return:
     """
     plugins = get_plugins()
