@@ -8,6 +8,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.params import Query
+from starlette.responses import StreamingResponse
 
 from backend.common.exception import errors
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -68,5 +69,29 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
     return response_base.success()
 
 
-@router.post('/zip', summary='打包插件')
-async def build_plugin_zip(plugin: Annotated[str, Query()]): ...
+@router.post(
+    '/zip',
+    summary='打包插件',
+    dependencies=[
+        Depends(RequestPermission('sys:plugin:zip')),
+        DependsRBAC,
+    ],
+)
+async def build_plugin_zip(plugin: Annotated[str, Query()]):
+    plugin_dir = os.path.join(PLUGIN_DIR, plugin)
+    if not os.path.exists(plugin_dir):
+        raise errors.ForbiddenError(msg='插件不存在')
+    bio = io.BytesIO()
+    with zipfile.ZipFile(bio, 'w') as zf:
+        for root, dirs, files in os.walk(plugin_dir):
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, start=plugin_dir)
+                zf.write(file_path, arcname)
+    bio.seek(0)
+    return StreamingResponse(
+        bio,
+        media_type='application/x-zip-compressed',
+        headers={'Content-Disposition': f'attachment; filename={plugin}.zip'},
+    )
