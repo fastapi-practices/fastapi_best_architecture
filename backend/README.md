@@ -9,13 +9,15 @@
 2. Run the following Docker command to build container:
 
    ```shell
-   docker build -f backend/backend.dockerfile -t fba_backend_independent .
+   docker build -f backend/Dockerfile -t fba_backend_independent .
    ```
 
 3. Start container
 
+   Native boot needs to change `127.0.0.1` in `.env` to `host.docker.internal`
+
    ```shell
-   docker run -d fba_backend_independent -p 8000:8000 --name fba_app
+   docker run -d -p 8000:8000 --name fba_server fba_backend_independent
    ```
 
 ## Contributing
@@ -26,7 +28,7 @@
     - Any python version between Python >= 3.10
     - Git
     - [uv](https://docs.astral.sh/uv/getting-started/installation/)
-    - Fork this repository to your GitHub account  
+    - Fork this repository to your GitHub account
 
 2. Installation and setup
 
