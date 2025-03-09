@@ -25,12 +25,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
           uv sync --only-group lint
 
       - name: Run lint
         run: |
-          cd backend
           source .venv/bin/activate
-          chmod 755 scripts/lint.sh
-          ./scripts/lint.sh
+          chmod 755 backend/scripts/lint.sh
+          ./backend/scripts/lint.sh
