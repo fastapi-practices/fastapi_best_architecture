@@ -23,15 +23,8 @@ repos:
     rev: 0.5.29
     hooks:
       - id: uv-lock
-        args:
-          - '--directory'
-          - 'backend'
-        files: backend/uv\.lock$
       - id: uv-export
         args:
-          - '--directory'
-          - 'backend'
           - '-o'
           - 'requirements.txt'
           - '--no-hashes'
-        files: backend/uv\.lock$
