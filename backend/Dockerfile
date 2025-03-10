@@ -43,7 +43,7 @@ WORKDIR /fba
 ENV PYTHONPATH=/fba
 RUN python3 backend/scripts/init_plugin.py
 
-# === FastPAI server iamge ===
+# === FastAPI server image ===
 FROM base_server AS fastapi_server
 
 WORKDIR /fba
@@ -57,7 +57,7 @@ EXPOSE 8001
 
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port","8000"]
 
-# === Celery server iamge ===
+# === Celery server image ===
 FROM base_server AS celery
 
 WORKDIR /fba/backend/
