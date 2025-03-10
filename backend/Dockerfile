@@ -20,8 +20,8 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 # Install dependencies with cache
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=backend/uv.lock,target=uv.lock \
-    --mount=type=bind,source=backend/pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-default-groups --group server
 
 # === Runtime base server image ===
