@@ -70,3 +70,7 @@ server = [
 package = false
 python-downloads = "manual"
 default-groups = ["dev", "lint"]
+
+[[tool.uv.index]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple"
