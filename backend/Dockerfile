@@ -15,8 +15,7 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debi
 ENV UV_COMPILE_BYTECODE=1 \
     UV_NO_CACHE=1 \
     UV_LINK_MODE=copy \
-    UV_PROJECT_ENVIRONMENT=/usr/local \
-    UV_INDEX=https://mirrors.aliyun.com/pypi/simple
+    UV_PROJECT_ENVIRONMENT=/usr/local
 
 # Install dependencies with cache
 RUN --mount=type=cache,target=/root/.cache/uv \
