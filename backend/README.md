@@ -2,14 +2,11 @@
 
 ## Docker
 
-> [!IMPORTANT]
-> Due to Docker context limitations, you can't build an image in this directory
-
 1. Make sure you're at the root of the project
 2. Run the following Docker command to build container:
 
    ```shell
-   docker build -f backend/Dockerfile -t fba_backend_independent .
+   docker build -f Dockerfile -t fba_backend_independent .
    ```
 
 3. Start container
@@ -39,9 +36,7 @@
    
    cd fastapi_best_architecture/backend
    
-   uv venv
-   
-   uv pip install -r requirements.txt
+   uv sync --frozen
    ```
 
 3. Checkout a new branch and make your changes

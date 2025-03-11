@@ -1,8 +1,8 @@
 services:
   fba_server:
     build:
-      context: ../../../
-      dockerfile: backend/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     image: fba_server:latest
     container_name: fba_server
     restart: always
@@ -11,7 +11,7 @@ services:
       - fba_redis
       - fba_celery
     volumes:
-      - .env.server:/fba/backend/.env
+      - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
       - fba_static:/fba/backend/app/static
     networks:
       - fba_network
@@ -80,7 +80,7 @@ services:
     depends_on:
       - fba_server
     volumes:
-      - ../nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/backend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - fba_static:/www/fba_server/backend/static
       - fba_static_upload:/www/fba_server/backend/static/upload
     networks:
@@ -127,8 +127,8 @@ services:
 
   fba_celery:
     build:
-      context: ../../../
-      dockerfile: backend/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       args:
         - SERVER_TYPE=celery
     image: fba_celery:latest
