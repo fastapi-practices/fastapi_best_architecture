@@ -1,3 +1,21 @@
+<a id="v1.0.3"></a>
+# [v1.0.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.0.3) - 2025-03-11
+
+## What's Changed
+* Update the changelog for v1.0.2 by [@wu-clan](https://github.com/wu-clan) in [#536](https://github.com/fastapi-practices/fastapi_best_architecture/pull/536)
+* Update docker scripts in backend README by [@wu-clan](https://github.com/wu-clan) in [#537](https://github.com/fastapi-practices/fastapi_best_architecture/pull/537)
+* Refactor toml and dependencies file dir by [@wu-clan](https://github.com/wu-clan) in [#538](https://github.com/fastapi-practices/fastapi_best_architecture/pull/538)
+* Fix typos in Dockerfile comments by [@huyuwei1996](https://github.com/huyuwei1996) in [#539](https://github.com/fastapi-practices/fastapi_best_architecture/pull/539)
+* Fix Dockerfile mounts for dependency installation by [@huyuwei1996](https://github.com/huyuwei1996) in [#540](https://github.com/fastapi-practices/fastapi_best_architecture/pull/540)
+* Add Aliyun mirror to PyPI index in pyproject.toml by [@huyuwei1996](https://github.com/huyuwei1996) in [#541](https://github.com/fastapi-practices/fastapi_best_architecture/pull/541)
+* Update docker scripts and nginx conf by [@wu-clan](https://github.com/wu-clan) in [#542](https://github.com/fastapi-practices/fastapi_best_architecture/pull/542)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.2...v1.0.3
+
+[Changes][v1.0.3]
+
+
 <a id="v1.0.2"></a>
 # [v1.0.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.0.2) - 2025-03-01
 
@@ -357,6 +375,7 @@
 [Changes][v1.0.0]
 
 
+[v1.0.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/fastapi-practices/fastapi_best_architecture/tree/v1.0.0
