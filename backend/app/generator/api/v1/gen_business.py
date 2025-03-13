@@ -16,29 +16,25 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
 
 @router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
-    businesses = await gen_business_service.get_all()
-    data = select_list_serialize(businesses)
+    data = await gen_business_service.get_all()
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetGenBusinessDetail]:
-    business = await gen_business_service.get(pk=pk)
-    data = GetGenBusinessDetail(**select_as_dict(business))
+    data = await gen_business_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
 async def get_business_all_models(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[GetGenModelDetail]]:
-    models = await gen_model_service.get_by_business(business_id=pk)
-    data = select_list_serialize(models)
+    data = await gen_model_service.get_by_business(business_id=pk)
     return response_base.success(data=data)
 
 

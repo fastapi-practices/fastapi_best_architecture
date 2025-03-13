@@ -20,22 +20,19 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
-from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
 
 @router.get('/all', summary='获取所有角色', dependencies=[DependsJwtAuth])
 async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
-    roles = await role_service.get_all()
-    data = select_list_serialize(roles)
+    data = await role_service.get_all()
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[GetRoleDetail]]:
-    roles = await role_service.get_by_user(pk=pk)
-    data = select_list_serialize(roles)
+    data = await role_service.get_by_user(pk=pk)
     return response_base.success(data=data)
 
 
@@ -53,8 +50,7 @@ async def get_role_all_rules(pk: Annotated[int, Path(...)]) -> ResponseSchemaMod
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetRoleDetail]:
-    role = await role_service.get(pk=pk)
-    data = GetRoleDetail(**select_as_dict(role))
+    data = await role_service.get(pk=pk)
     return response_base.success(data=data)
 
 

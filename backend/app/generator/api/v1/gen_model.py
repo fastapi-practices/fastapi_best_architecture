@@ -10,7 +10,6 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -23,8 +22,7 @@ async def get_model_types() -> ResponseSchemaModel[list[str]]:
 
 @router.get('/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
 async def get_model(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetGenModelDetail]:
-    model = await gen_model_service.get(pk=pk)
-    data = GetGenModelDetail(**select_as_dict(model))
+    data = await gen_model_service.get(pk=pk)
     return response_base.success(data=data)
 
 

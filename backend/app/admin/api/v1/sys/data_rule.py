@@ -12,7 +12,6 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
-from backend.utils.serializers import select_as_dict, select_list_serialize
 
 router = APIRouter()
 
@@ -31,15 +30,13 @@ async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> Response
 
 @router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
 async def get_all_data_rule() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
-    data_rules = await data_rule_service.get_all()
-    data = select_list_serialize(data_rules)
+    data = await data_rule_service.get_all()
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
 async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDataRuleDetail]:
-    data_rule = await data_rule_service.get(pk=pk)
-    data = GetDataRuleDetail(**select_as_dict(data_rule))
+    data = await data_rule_service.get(pk=pk)
     return response_base.success(data=data)
 
 
