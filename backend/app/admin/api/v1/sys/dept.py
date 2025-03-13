@@ -10,15 +10,13 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
 async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDeptDetail]:
-    dept = await dept_service.get(pk=pk)
-    data = GetDeptDetail(**select_as_dict(dept))
+    data = await dept_service.get(pk=pk)
     return response_base.success(data=data)
 
 

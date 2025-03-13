@@ -21,7 +21,6 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
-from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -35,8 +34,7 @@ async def register_user(obj: RegisterUserParam) -> ResponseModel:
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
 async def add_user(request: Request, obj: AddUserParam) -> ResponseSchemaModel[GetUserInfoDetail]:
     await user_service.add(request=request, obj=obj)
-    current_user = await user_service.get_userinfo(username=obj.username)
-    data = GetUserInfoDetail(**select_as_dict(current_user))
+    data = await user_service.get_userinfo(username=obj.username)
     return response_base.success(data=data)
 
 
@@ -56,8 +54,7 @@ async def get_current_user(request: Request) -> ResponseSchemaModel[GetCurrentUs
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
 async def get_user(username: Annotated[str, Path(...)]) -> ResponseSchemaModel[GetUserInfoDetail]:
-    current_user = await user_service.get_userinfo(username=username)
-    data = GetUserInfoDetail(**select_as_dict(current_user))
+    data = await user_service.get_userinfo(username=username)
     return response_base.success(data=data)
 
 

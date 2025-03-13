@@ -5,7 +5,6 @@ from datetime import datetime
 from pydantic import ConfigDict, Field, model_validator
 from typing_extensions import Self
 
-from backend.app.generator.schema.gen_model import GetGenModelDetail
 from backend.common.schema import SchemaBase
 
 
@@ -42,4 +41,3 @@ class GetGenBusinessDetail(GenBusinessSchemaBase):
     id: int
     created_time: datetime
     updated_time: datetime | None = None
-    gen_model: list[GetGenModelDetail] | None = None

@@ -10,7 +10,6 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.serializers import select_as_dict
 
 router = APIRouter()
 
@@ -23,8 +22,7 @@ async def get_user_sidebar_tree(request: Request) -> ResponseSchemaModel[list[di
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
 async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetMenuDetail]:
-    menu = await menu_service.get(pk=pk)
-    data = GetMenuDetail(**select_as_dict(menu))
+    data = await menu_service.get(pk=pk)
     return response_base.success(data=data)
 
 
