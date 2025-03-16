@@ -5,16 +5,8 @@ import importlib
 from functools import lru_cache
 from typing import Any
 
-
-def module_parse(module_path: str) -> tuple:
-    """
-    Parse a python module string into a python module and class/function.
-
-    :param module_path:
-    :return:
-    """
-    module_path, class_or_func = module_path.rsplit('.', 1)
-    return module_path, class_or_func
+from backend.common.exception import errors
+from backend.common.log import log
 
 
 @lru_cache(maxsize=512)
@@ -35,7 +27,12 @@ def dynamic_import_data_model(module_path: str) -> Any:
     :param module_path:
     :return:
     """
-    module_path, class_or_func = module_parse(module_path)
-    module = import_module_cached(module_path)
-    ins = getattr(module, class_or_func)
+    module_path, class_or_func = module_path.rsplit('.', 1)
+
+    try:
+        module = import_module_cached(module_path)
+        ins = getattr(module, class_or_func)
+    except (ImportError, AttributeError) as e:
+        log.error(e)
+        raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
     return ins

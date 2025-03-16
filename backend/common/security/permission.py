@@ -60,10 +60,7 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
         rule_model = rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
             raise errors.NotFoundError(msg='数据规则模型不存在')
-        try:
-            model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
-        except (ImportError, AttributeError):
-            raise errors.ServerError(msg=f'数据模型 {rule_model} 动态导入失败，请联系系统超级管理员')
+        model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
         model_columns = [
             key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]

@@ -169,7 +169,7 @@ class Settings(BaseSettings):
     DATA_PERMISSION_MODELS: dict[
         str, str
     ] = {  # 允许进行数据过滤的 SQLA 模型，它必须以模块字符串的方式定义（它应该只用于前台数据，这里只是为了演示）
-        'Api': 'backend.app.admin.model.Api',
+        'Api': 'backend.plugin.casbin.model.Api',
     }
     DATA_PERMISSION_COLUMN_EXCLUDE: list[str] = [  # 排除允许进行数据过滤的 SQLA 模型列
         'id',
