@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
 import inspect
 import os
 import subprocess
 import sys
 import warnings
 
-from asyncio import subprocess as async_subprocess
-
 import rtoml
 
 from fastapi import APIRouter
+from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
@@ -156,49 +154,19 @@ def install_requirements() -> None:
             continue
         else:
             try:
-                subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'])
-                pip_requirements = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
+                ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']
+                pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
                 if settings.PLUGIN_PIP_CHINA:
-                    pip_requirements.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-                subprocess.check_call(pip_requirements)
+                    pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
+                subprocess.check_call(ensurepip_install)
+                subprocess.check_call(pip_install)
             except subprocess.CalledProcessError as e:
-                raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e}') from e
+                raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e.stderr}') from e
 
 
-async def install_requirements_async(wait: bool = True) -> None:
+async def install_requirements_async() -> None:
     """
-    异步安装插件依赖
-
-    :param wait: 是否等待结果并校验，开启将造成 IO 阻塞
-    :return:
+    异步安装插件依赖（由于 Windows 平台限制，无法实现完美的全异步方案），详情：
+    https://stackoverflow.com/questions/44633458/why-am-i-getting-notimplementederror-with-async-and-await-on-windows
     """
-    plugins = get_plugins()
-    for plugin in plugins:
-        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
-        if not os.path.exists(requirements_file):
-            continue
-        else:
-            ensurepip_process = await async_subprocess.create_subprocess_exec(
-                sys.executable,
-                '-m',
-                'ensurepip',
-                '--upgrade',
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            if wait:
-                _, ensurepip_stderr = await ensurepip_process.communicate()
-                if ensurepip_process.returncode != 0:
-                    raise PluginInjectError(f'ensurepip 安装失败：{ensurepip_stderr}')
-            pip_requirements = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
-            if settings.PLUGIN_PIP_CHINA:
-                pip_requirements.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-            pip_process = await async_subprocess.create_subprocess_exec(
-                *pip_requirements,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            if wait:
-                _, pip_stderr = await pip_process.communicate()
-                if pip_process.returncode != 0:
-                    raise PluginInjectError(f'插件 {plugin} 依赖包安装失败：{pip_stderr}')
+    await run_in_threadpool(install_requirements)
