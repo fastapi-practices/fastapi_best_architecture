@@ -4,8 +4,8 @@ import httpx
 
 from asgiref.sync import sync_to_async
 from fastapi import Request
+from ip2loc import XdbSearcher
 from user_agents import parse
-from XdbSearchIP.xdbSearcher import XdbSearcher
 
 from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
@@ -80,7 +80,7 @@ async def parse_ip_info(request: Request) -> IpInfo:
     ip = get_request_ip(request)
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
-        country, region, city = location.split(' ')
+        country, region, city = location.split('|')
         return IpInfo(ip=ip, country=country, region=region, city=city)
     if settings.IP_LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
@@ -94,7 +94,7 @@ async def parse_ip_info(request: Request) -> IpInfo:
         city = location_info.get('city')
         await redis_client.set(
             f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}',
-            f'{country} {region} {city}',
+            f'{country}|{region}|{city}',
             ex=settings.IP_LOCATION_EXPIRE_SECONDS,
         )
     return IpInfo(ip=ip, country=country, region=region, city=city)

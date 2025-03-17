@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, EmailStr, validate_email
-from pydantic_extra_types.phone_numbers import PhoneNumber
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
 from backend.core.conf import settings
 
@@ -142,8 +142,7 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
 }
 
 
-class CustomPhoneNumber(PhoneNumber):
-    default_region_code = 'CN'
+CustomPhoneNumber = Annotated[str, Field(pattern=r'^1[3-9]\d{9}$')]
 
 
 class CustomEmailStr(EmailStr):
