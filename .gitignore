@@ -1,2 +1,7 @@
 .idea/
 .vscode/
+venv/
+.venv/
+.python-version
+.ruff_cache/
+.pytest_cache/
