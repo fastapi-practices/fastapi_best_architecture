@@ -30,7 +30,7 @@ ecdsa==0.19.0
 email-validator==2.2.0
 exceptiongroup==1.2.2 ; python_full_version < '3.11'
 fast-captcha==0.3.2
-fastapi==0.111.0
+fastapi==0.115.11
 fastapi-cli==0.0.5
 fastapi-limiter==0.1.6
 fastapi-oauth20==0.0.1a2
@@ -48,6 +48,7 @@ humanize==4.12.1
 identify==2.6.9
 idna==3.10
 iniconfig==2.0.0
+ip2loc==1.0.0
 itsdangerous==2.2.0
 jinja2==3.1.6
 kombu==5.4.2
@@ -58,10 +59,8 @@ markupsafe==3.0.2
 mdurl==0.1.2
 msgspec==0.19.0
 nodeenv==1.9.1
-orjson==3.10.15
 packaging==24.2
 path==17.0.0
-phonenumbers==9.0.0
 pillow==11.1.0
 platformdirs==4.3.6
 pluggy==1.5.0
@@ -74,7 +73,6 @@ pyasn1==0.4.8
 pycparser==2.22 ; platform_python_implementation != 'PyPy'
 pydantic==2.10.6
 pydantic-core==2.27.2
-pydantic-extra-types==2.10.2
 pydantic-settings==2.8.1
 pygments==2.19.1
 pytest==8.3.5
@@ -99,7 +97,7 @@ six==1.17.0
 sniffio==1.3.1
 sqlalchemy==2.0.38
 sqlalchemy-crud-plus==1.6.0
-starlette==0.37.2
+starlette==0.46.1
 termcolor==2.5.0
 tomli==2.2.1 ; python_full_version < '3.11'
 tornado==6.4.2
@@ -108,7 +106,6 @@ typing-extensions==4.12.2
 tzdata==2025.1
 ua-parser==1.0.1
 ua-parser-builtins==0.18.0.post1
-ujson==5.10.0
 user-agents==2.2.0
 uvicorn==0.34.0
 uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
@@ -119,6 +116,5 @@ wcwidth==0.2.13
 websockets==15.0.1
 win32-setctime==1.2.0 ; sys_platform == 'win32'
 wsproto==1.2.0
-xdbsearchip==1.0.2
 zope-event==5.0
 zope-interface==7.2
