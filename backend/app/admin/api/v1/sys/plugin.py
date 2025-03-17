@@ -64,7 +64,7 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
                 members.append(member)
         zf.extractall(PLUGIN_DIR, members)
         if os.path.exists(os.path.join(full_plugin_path, 'requirements.txt')):
-            await install_requirements_async(False)
+            await install_requirements_async()
 
     return response_base.success()
 
