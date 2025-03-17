@@ -1,6 +1,8 @@
-**/__pycache__
-**/venv
-**/.venv
-**/.python-version
-**/.git
-**/.github
+.git/
+.github/
+.idea/
+.vscode/
+venv/
+.venv/
+.ruff_cache/
+.pytest_cache/
