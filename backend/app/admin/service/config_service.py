@@ -28,7 +28,7 @@ class ConfigService:
             for obj in objs:
                 config = await config_dao.get_by_key_and_type(db, obj.key, type)
                 if config is None:
-                    if await config_dao.get_by_key(db, obj.key, built_in=True):
+                    if await config_dao.get_by_key(db, obj.key):
                         raise errors.ForbiddenError(msg=f'参数配置 {obj.key} 已存在')
                     await config_dao.create_model(db, obj, flush=True, type=type)
                 else:
@@ -62,6 +62,10 @@ class ConfigService:
             config = await config_dao.get(db, pk)
             if not config:
                 raise errors.NotFoundError(msg='参数配置不存在')
+            if config.key != obj.key:
+                config = await config_dao.get_by_key(db, obj.key)
+                if config:
+                    raise errors.ForbiddenError(msg=f'参数配置 {obj.key} 已存在')
             count = await config_dao.update(db, pk, obj)
             return count
 

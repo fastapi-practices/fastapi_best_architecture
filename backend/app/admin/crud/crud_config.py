@@ -43,7 +43,7 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.select_model_by_column(db, key=key, type=type)
 
-    async def get_by_key(self, db: AsyncSession, key: str, built_in: bool = False) -> Config | None:
+    async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
         通过 key 获取系统配置参数
 
@@ -52,10 +52,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param built_in:
         :return:
         """
-        filters = {'key': key}
-        if not built_in:
-            filters.update({'type__not_in': admin_settings.CONFIG_BUILT_IN_TYPES})
-        return await self.select_model_by_column(db, **filters)
+        return await self.select_model_by_column(db, key=key)
 
     async def get_list(self, name: str = None, type: str = None) -> Select:
         """
