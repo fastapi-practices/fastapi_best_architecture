@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
-async def get_website_config() -> ResponseSchemaModel[GetConfigDetail]:
+async def get_website_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
     config = await config_service.get_built_in_config('website')
     return response_base.success(data=config)
 
@@ -41,7 +41,7 @@ async def save_website_config(objs: list[SaveBuiltInConfigParam]) -> ResponseMod
 
 
 @router.get('/protocol', summary='获取用户协议', dependencies=[DependsJwtAuth])
-async def get_protocol_config() -> ResponseSchemaModel[GetConfigDetail]:
+async def get_protocol_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
     config = await config_service.get_built_in_config('protocol')
     return response_base.success(data=config)
 
@@ -60,7 +60,7 @@ async def save_protocol_config(objs: list[SaveBuiltInConfigParam]) -> ResponseMo
 
 
 @router.get('/policy', summary='获取用户政策', dependencies=[DependsJwtAuth])
-async def get_policy_config() -> ResponseSchemaModel[GetConfigDetail]:
+async def get_policy_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
     config = await config_service.get_built_in_config('policy')
     return response_base.success(data=config)
 

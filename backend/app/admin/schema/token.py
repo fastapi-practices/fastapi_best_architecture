@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from backend.app.admin.schema.user import GetUserInfoNoRelationDetail
+from backend.app.admin.schema.user import GetUserInfoDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
@@ -10,7 +10,7 @@ from backend.common.schema import SchemaBase
 class GetSwaggerToken(SchemaBase):
     access_token: str
     token_type: str = 'Bearer'
-    user: GetUserInfoNoRelationDetail
+    user: GetUserInfoDetail
 
 
 class AccessTokenBase(SchemaBase):
@@ -24,7 +24,7 @@ class GetNewToken(AccessTokenBase):
 
 
 class GetLoginToken(AccessTokenBase):
-    user: GetUserInfoNoRelationDetail
+    user: GetUserInfoDetail
 
 
 class KickOutToken(SchemaBase):
