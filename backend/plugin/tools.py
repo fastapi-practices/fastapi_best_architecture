@@ -64,6 +64,7 @@ def _load_plugin_config(plugin: str) -> dict[str, Any]:
     加载插件配置
     
     :param plugin: 插件名称
+    :return:
     """
     toml_path = os.path.join(PLUGIN_DIR, plugin, 'plugin.toml')
     if not os.path.exists(toml_path):
@@ -79,6 +80,7 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
     
     :param plugin: 插件名称
     :param data: 插件配置数据
+    :return:
     """
     app_include = data.get('app', {}).get('include', '')
     if not app_include:
@@ -138,6 +140,7 @@ def _inject_app_router(plugin: str, data: dict[str, Any]) -> None:
     
     :param plugin: 插件名称
     :param data: 插件配置数据
+    :return:
     """
     module_path = f'backend.plugin.{plugin}.api.router'
     try:
@@ -180,6 +183,7 @@ def _install_plugin_requirements(plugin: str, requirements_file: str) -> None:
     
     :param plugin: 插件名称
     :param requirements_file: 依赖文件路径
+    :return:
     """
     try:
         ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']

@@ -176,10 +176,10 @@ class CRUDUser(CRUDPlus[User]):
         """
         获取用户列表
 
-        :param dept:
-        :param username:
-        :param phone:
-        :param status:
+        :param dept: 部门 ID（可选）
+        :param username: 用户名（可选）
+        :param phone: 电话号码（可选）
+        :param status: 用户状态（可选）
         :return:
         """
         stmt = (
@@ -191,17 +191,22 @@ class CRUDUser(CRUDPlus[User]):
             )
             .order_by(desc(self.model.join_time))
         )
-        where_list = []
+        
+        # 构建过滤条件
+        filters = []
         if dept:
-            where_list.append(self.model.dept_id == dept)
+            filters.append(self.model.dept_id == dept)
         if username:
-            where_list.append(self.model.username.like(f'%{username}%'))
+            filters.append(self.model.username.like(f'%{username}%'))
         if phone:
-            where_list.append(self.model.phone.like(f'%{phone}%'))
+            filters.append(self.model.phone.like(f'%{phone}%'))
         if status is not None:
-            where_list.append(self.model.status == status)
-        if where_list:
-            stmt = stmt.where(and_(*where_list))
+            filters.append(self.model.status == status)
+        
+        # 应用过滤条件
+        if filters:
+            stmt = stmt.where(and_(*filters))
+        
         return stmt
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:
