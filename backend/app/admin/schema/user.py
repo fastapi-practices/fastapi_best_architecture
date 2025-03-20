@@ -7,7 +7,7 @@ from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptDetail
-from backend.app.admin.schema.role import GetRoleDetail
+from backend.app.admin.schema.role import GetRoleWithRelationDetail
 from backend.common.enums import StatusType
 from backend.common.schema import CustomPhoneNumber, SchemaBase
 
@@ -33,6 +33,12 @@ class AddUserParam(AuthSchemaBase):
     email: EmailStr = Field(examples=['user@example.com'])
 
 
+class ResetPasswordParam(SchemaBase):
+    old_password: str
+    new_password: str
+    confirm_password: str
+
+
 class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = None
     username: str
@@ -53,7 +59,7 @@ class AvatarParam(SchemaBase):
     url: HttpUrl = Field(description='头像 http 地址')
 
 
-class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
+class GetUserInfoDetail(UserInfoSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     dept_id: int | None = None
@@ -68,14 +74,14 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     last_login_time: datetime | None = None
 
 
-class GetUserInfoDetail(GetUserInfoNoRelationDetail):
+class GetUserInfoWithRelationDetail(GetUserInfoDetail):
     model_config = ConfigDict(from_attributes=True)
 
     dept: GetDeptDetail | None = None
-    roles: list[GetRoleDetail]
+    roles: list[GetRoleWithRelationDetail]
 
 
-class GetCurrentUserInfoDetail(GetUserInfoDetail):
+class GetCurrentUserInfoWithRelationDetail(GetUserInfoWithRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 
     dept: str | None = None
@@ -92,13 +98,3 @@ class GetCurrentUserInfoDetail(GetUserInfoDetail):
         if roles:
             data['roles'] = [role['name'] for role in roles]
         return data
-
-
-class CurrentUserIns(GetUserInfoDetail):
-    model_config = ConfigDict(from_attributes=True)
-
-
-class ResetPasswordParam(SchemaBase):
-    old_password: str
-    new_password: str
-    confirm_password: str

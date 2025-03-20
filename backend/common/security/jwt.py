@@ -15,7 +15,7 @@ from pydantic_core import from_json
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
-from backend.app.admin.schema.user import CurrentUserIns
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken, TokenPayload
 from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.core.conf import settings
@@ -211,7 +211,7 @@ def superuser_verify(request: Request) -> bool:
     return superuser
 
 
-async def jwt_authentication(token: str) -> CurrentUserIns:
+async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
     """
     JWT authentication
 
@@ -227,7 +227,7 @@ async def jwt_authentication(token: str) -> CurrentUserIns:
     if not cache_user:
         async with async_db_session() as db:
             current_user = await get_current_user(db, user_id)
-            user = CurrentUserIns(**select_as_dict(current_user))
+            user = GetUserInfoWithRelationDetail(**select_as_dict(current_user))
             await redis_client.setex(
                 f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
                 settings.JWT_USER_REDIS_EXPIRE_SECONDS,
@@ -236,5 +236,5 @@ async def jwt_authentication(token: str) -> CurrentUserIns:
     else:
         # TODO: 在恰当的时机，应替换为使用 model_validate_json
         # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
-        user = CurrentUserIns.model_validate(from_json(cache_user, allow_partial=True))
+        user = GetUserInfoWithRelationDetail.model_validate(from_json(cache_user, allow_partial=True))
     return user

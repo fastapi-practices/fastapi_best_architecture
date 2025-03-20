@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from backend.app.admin.schema.role import (
     CreateRoleParam,
     GetRoleDetail,
+    GetRoleWithRelationDetail,
     UpdateRoleMenuParam,
     UpdateRoleParam,
     UpdateRoleRuleParam,
@@ -49,7 +50,7 @@ async def get_role_all_rules(pk: Annotated[int, Path(...)]) -> ResponseSchemaMod
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
-async def get_role(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetRoleDetail]:
+async def get_role(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetRoleWithRelationDetail]:
     data = await role_service.get(pk=pk)
     return response_base.success(data=data)
 

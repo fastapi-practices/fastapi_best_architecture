@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
-    GetCurrentUserInfoDetail,
-    GetUserInfoDetail,
+    GetCurrentUserInfoWithRelationDetail,
+    GetUserInfoWithRelationDetail,
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
@@ -32,7 +32,7 @@ async def register_user(obj: RegisterUserParam) -> ResponseModel:
 
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])
-async def add_user(request: Request, obj: AddUserParam) -> ResponseSchemaModel[GetUserInfoDetail]:
+async def add_user(request: Request, obj: AddUserParam) -> ResponseSchemaModel[GetUserInfoWithRelationDetail]:
     await user_service.add(request=request, obj=obj)
     data = await user_service.get_userinfo(username=obj.username)
     return response_base.success(data=data)
@@ -47,13 +47,13 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
 
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
-async def get_current_user(request: Request) -> ResponseSchemaModel[GetCurrentUserInfoDetail]:
-    data = GetCurrentUserInfoDetail(**request.user.model_dump())
+async def get_current_user(request: Request) -> ResponseSchemaModel[GetCurrentUserInfoWithRelationDetail]:
+    data = request.user.model_dump()
     return response_base.success(data=data)
 
 
 @router.get('/{username}', summary='查看用户信息', dependencies=[DependsJwtAuth])
-async def get_user(username: Annotated[str, Path(...)]) -> ResponseSchemaModel[GetUserInfoDetail]:
+async def get_user(username: Annotated[str, Path(...)]) -> ResponseSchemaModel[GetUserInfoWithRelationDetail]:
     data = await user_service.get_userinfo(username=username)
     return response_base.success(data=data)
 
@@ -103,7 +103,7 @@ async def get_pagination_users(
     username: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,
     status: Annotated[int | None, Query()] = None,
-) -> ResponseSchemaModel[PageData[GetUserInfoDetail]]:
+) -> ResponseSchemaModel[PageData[GetUserInfoWithRelationDetail]]:
     user_select = await user_service.get_select(dept=dept, username=username, phone=phone, status=status)
     page_data = await paging_data(db, user_select)
     return response_base.success(data=page_data)
