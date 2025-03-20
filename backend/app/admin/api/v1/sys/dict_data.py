@@ -4,7 +4,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.dict_data import CreateDictDataParam, GetDictDataDetail, UpdateDictDataParam
+from backend.app.admin.schema.dict_data import (
+    CreateDictDataParam,
+    GetDictDataDetail,
+    GetDictDataWithRelation,
+    UpdateDictDataParam,
+)
 from backend.app.admin.service.dict_data_service import dict_data_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -17,7 +22,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
-async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDictDataDetail]:
+async def get_dict_data(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDictDataWithRelation]:
     data = await dict_data_service.get(pk=pk)
     return response_base.success(data=data)
 
