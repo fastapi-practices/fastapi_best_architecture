@@ -20,7 +20,7 @@ from backend.app.generator.schema.gen_business import CreateGenBusinessParam
 from backend.app.generator.schema.gen_model import CreateGenModelParam
 from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.exception import errors
-from backend.core.path_conf import BasePath
+from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
 from backend.utils.gen_template import gen_template
 from backend.utils.type_conversion import sql_type_to_pydantic
@@ -114,7 +114,7 @@ class GenService:
             tpl_code_map = await self.render_tpl_code(business=business)
             gen_path = business.gen_path
             if not gen_path:
-                gen_path = os.path.join(BasePath, 'app')
+                gen_path = os.path.join(BASE_PATH, 'app')
             for tpl_path, code in tpl_code_map.items():
                 code_filepath = os.path.join(
                     gen_path,

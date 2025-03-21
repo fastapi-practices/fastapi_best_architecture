@@ -191,7 +191,7 @@ class CRUDUser(CRUDPlus[User]):
             )
             .order_by(desc(self.model.join_time))
         )
-        
+
         # 构建过滤条件
         filters = []
         if dept:
@@ -202,11 +202,11 @@ class CRUDUser(CRUDPlus[User]):
             filters.append(self.model.phone.like(f'%{phone}%'))
         if status is not None:
             filters.append(self.model.status == status)
-        
+
         # 应用过滤条件
         if filters:
             stmt = stmt.where(and_(*filters))
-        
+
         return stmt
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:

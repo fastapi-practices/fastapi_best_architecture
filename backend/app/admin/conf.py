@@ -4,13 +4,13 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from backend.core.path_conf import BasePath
+from backend.core.path_conf import BASE_PATH
 
 
 class AdminSettings(BaseSettings):
     """Admin Settings"""
 
-    model_config = SettingsConfigDict(env_file=f'{BasePath}/.env', env_file_encoding='utf-8', extra='ignore')
+    model_config = SettingsConfigDict(env_file=f'{BASE_PATH}/.env', env_file_encoding='utf-8', extra='ignore')
 
     # OAuth2：https://github.com/fastapi-practices/fastapi_oauth20
     # GitHub

@@ -18,7 +18,17 @@ from backend.utils.serializers import MsgSpecJSONResponse
 class _AuthenticationError(AuthenticationError):
     """重写内部认证错误类"""
 
-    def __init__(self, *, code: int = None, msg: str = None, headers: dict[str, Any] | None = None):
+    def __init__(
+        self, *, code: int | None = None, msg: str | None = None, headers: dict[str, Any] | None = None
+    ) -> None:
+        """
+        初始化认证错误
+
+        :param code: 错误码
+        :param msg: 错误信息
+        :param headers: 响应头
+        :return:
+        """
         self.code = code
         self.msg = msg
         self.headers = headers
@@ -29,10 +39,22 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
     @staticmethod
     def auth_exception_handler(conn: HTTPConnection, exc: _AuthenticationError) -> Response:
-        """覆盖内部认证错误处理"""
+        """
+        覆盖内部认证错误处理
+
+        :param conn: HTTP 连接对象
+        :param exc: 认证错误对象
+        :return:
+        """
         return MsgSpecJSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
     async def authenticate(self, request: Request) -> tuple[AuthCredentials, GetUserInfoWithRelationDetail] | None:
+        """
+        认证请求
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
         token = request.headers.get('Authorization')
         if not token:
             return

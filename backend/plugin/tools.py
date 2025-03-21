@@ -20,56 +20,55 @@ from backend.utils.import_parse import import_module_cached
 
 class PluginInjectError(Exception):
     """插件注入错误"""
-    pass
 
 
 def get_plugins() -> list[str]:
     """获取插件列表"""
     plugin_packages = []
-    
+
     # 遍历插件目录
     for item in os.listdir(PLUGIN_DIR):
         item_path = os.path.join(PLUGIN_DIR, item)
-        
+
         # 检查是否为目录且包含 __init__.py 文件
         if os.path.isdir(item_path) and '__init__.py' in os.listdir(item_path):
             plugin_packages.append(item)
-    
+
     return plugin_packages
 
 
 def get_plugin_models() -> list[type]:
     """获取插件所有模型类"""
     classes = []
-    
+
     # 获取所有插件
     plugins = get_plugins()
-    
+
     # 遍历插件列表
     for plugin in plugins:
         # 导入插件的模型模块
         module_path = f'backend.plugin.{plugin}.model'
         module = import_module_cached(module_path)
-        
+
         # 获取模块中的所有类
         for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj):
                 classes.append(obj)
-                
+
     return classes
 
 
 def _load_plugin_config(plugin: str) -> dict[str, Any]:
     """
     加载插件配置
-    
+
     :param plugin: 插件名称
     :return:
     """
     toml_path = os.path.join(PLUGIN_DIR, plugin, 'plugin.toml')
     if not os.path.exists(toml_path):
         raise PluginInjectError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
-    
+
     with open(toml_path, 'r', encoding='utf-8') as f:
         return rtoml.load(f)
 
@@ -77,7 +76,7 @@ def _load_plugin_config(plugin: str) -> dict[str, Any]:
 def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
     """
     扩展级插件路由注入
-    
+
     :param plugin: 插件名称
     :param data: 插件配置数据
     :return:
@@ -102,14 +101,13 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
             file_path = os.path.join(root, file)
             path_to_module_str = os.path.relpath(file_path, PLUGIN_DIR).replace(os.sep, '.')[:-3]
             module_path = f'backend.plugin.{path_to_module_str}'
-            
+
             try:
                 module = import_module_cached(module_path)
                 plugin_router = getattr(module, 'router', None)
                 if not plugin_router:
                     warnings.warn(
-                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，'
-                        '请检查插件文件是否完整',
+                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                         FutureWarning,
                     )
                     continue
@@ -118,11 +116,10 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                 target_module_path = f'backend.app.{app_include}.api.{relative_path.replace(os.sep, ".")}'
                 target_module = import_module_cached(target_module_path)
                 target_router = getattr(target_module, 'router', None)
-                
+
                 if not target_router or not isinstance(target_router, APIRouter):
                     raise PluginInjectError(
-                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，'
-                        '请检查插件文件是否完整'
+                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
                     )
 
                 target_router.include_router(
@@ -137,7 +134,7 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
 def _inject_app_router(plugin: str, data: dict[str, Any]) -> None:
     """
     应用级插件路由注入
-    
+
     :param plugin: 插件名称
     :param data: 插件配置数据
     :return:
@@ -180,7 +177,7 @@ def plugin_router_inject() -> None:
 def _install_plugin_requirements(plugin: str, requirements_file: str) -> None:
     """
     安装单个插件的依赖
-    
+
     :param plugin: 插件名称
     :param requirements_file: 依赖文件路径
     :return:
@@ -207,7 +204,7 @@ def install_requirements() -> None:
 async def install_requirements_async() -> None:
     """
     异步安装插件依赖
-    
+
     由于 Windows 平台限制，无法实现完美的全异步方案，详情：
     https://stackoverflow.com/questions/44633458/why-am-i-getting-notimplementederror-with-async-and-await-on-windows
     """

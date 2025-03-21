@@ -7,7 +7,12 @@ from backend.utils.serializers import RowData, select_list_serialize
 
 
 def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
-    """获取所有树形结构节点"""
+    """
+    获取所有树形结构节点
+
+    :param row: 原始数据行序列
+    :return:
+    """
     tree_nodes = select_list_serialize(row)
     tree_nodes.sort(key=lambda x: x['sort'])
     return tree_nodes
@@ -17,10 +22,10 @@ def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     通过遍历算法构造树形结构
 
-    :param nodes:
+    :param nodes: 树节点列表
     :return:
     """
-    tree = []
+    tree: list[dict[str, Any]] = []
     node_dict = {node['id']: node for node in nodes}
 
     for node in nodes:
@@ -45,16 +50,16 @@ def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = No
     """
     通过递归算法构造树形结构（性能影响较大）
 
-    :param nodes:
-    :param parent_id:
+    :param nodes: 树节点列表
+    :param parent_id: 父节点 ID，默认为 None 表示根节点
     :return:
     """
-    tree = []
+    tree: list[dict[str, Any]] = []
     for node in nodes:
         if node['parent_id'] == parent_id:
-            child_node = recursive_to_tree(nodes, parent_id=node['id'])
-            if child_node:
-                node['children'] = child_node
+            child_nodes = recursive_to_tree(nodes, parent_id=node['id'])
+            if child_nodes:
+                node['children'] = child_nodes
             tree.append(node)
     return tree
 
@@ -65,9 +70,9 @@ def get_tree_data(
     """
     获取树形结构数据
 
-    :param row:
-    :param build_type:
-    :param parent_id:
+    :param row: 原始数据行序列
+    :param build_type: 构建树形结构的算法类型，默认为遍历算法
+    :param parent_id: 父节点 ID，仅在递归算法中使用
     :return:
     """
     nodes = get_tree_nodes(row)

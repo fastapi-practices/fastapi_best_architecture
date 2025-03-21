@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import sys
 
-from typing import Annotated
+from typing import Annotated, AsyncGenerator
 from uuid import uuid4
 
 from fastapi import Depends
@@ -33,7 +35,12 @@ def create_database_url(unittest: bool = False) -> URL:
 
 
 def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_sessionmaker[AsyncSession]]:
-    """创建数据库引擎和 Session"""
+    """
+    创建数据库引擎和 Session
+
+    :param url: 数据库连接 URL
+    :return:
+    """
     try:
         # 数据库引擎
         engine = create_async_engine(
@@ -58,8 +65,8 @@ def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_
         return engine, db_session
 
 
-async def get_db():
-    """session 生成器"""
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """获取数据库会话"""
     async with async_db_session() as session:
         yield session
 

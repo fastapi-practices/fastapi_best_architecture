@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from asyncio import create_task
+from typing import Any
 
 from asgiref.sync import sync_to_async
 from fastapi import Response
@@ -22,7 +23,14 @@ from backend.utils.trace_id import get_request_trace_id
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(self, request: Request, call_next: Any) -> Response:
+        """
+        处理请求并记录操作日志
+
+        :param request: FastAPI 请求对象
+        :param call_next: 下一个中间件或路由处理函数
+        :return:
+        """
         # 排除记录白名单
         path = request.url.path
         if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
@@ -79,8 +87,14 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         return request_next.response
 
-    async def execute_request(self, request: Request, call_next) -> RequestCallNext:
-        """执行请求"""
+    async def execute_request(self, request: Request, call_next: Any) -> RequestCallNext:
+        """
+        执行请求并处理异常
+
+        :param request: FastAPI 请求对象
+        :param call_next: 下一个中间件或路由处理函数
+        :return:
+        """
         code = 200
         msg = 'Success'
         status = StatusType.enable
@@ -101,7 +115,14 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
-        """请求异常处理器"""
+        """
+        请求异常处理器
+
+        :param request: FastAPI 请求对象
+        :param code: 错误码
+        :param msg: 错误信息
+        :return:
+        """
         exception_states = [
             '__request_http_exception__',
             '__request_validation_exception__',
@@ -121,8 +142,13 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         return code, msg
 
     @staticmethod
-    async def get_request_args(request: Request) -> dict:
-        """获取请求参数"""
+    async def get_request_args(request: Request) -> dict[str, Any]:
+        """
+        获取请求参数
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
         args = dict(request.query_params)
         args.update(request.path_params)
         # Tip: .body() 必须在 .form() 之前获取
@@ -149,11 +175,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     @sync_to_async
-    def desensitization(args: dict) -> dict | None:
+    def desensitization(args: dict[str, Any]) -> dict[str, Any] | None:
         """
         脱敏处理
 
-        :param args:
+        :param args: 需要脱敏的参数字典
         :return:
         """
         if not args:

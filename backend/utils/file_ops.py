@@ -14,11 +14,11 @@ from backend.core.path_conf import UPLOAD_DIR
 from backend.utils.timezone import timezone
 
 
-def build_filename(file: UploadFile):
+def build_filename(file: UploadFile) -> str:
     """
     构建文件名
 
-    :param file:
+    :param file: FastAPI 上传文件对象
     :return:
     """
     timestamp = int(timezone.now().timestamp())
@@ -32,14 +32,15 @@ def file_verify(file: UploadFile, file_type: FileType) -> None:
     """
     文件验证
 
-    :param file:
-    :param file_type:
+    :param file: FastAPI 上传文件对象
+    :param file_type: 文件类型枚举
     :return:
     """
     filename = file.filename
     file_ext = filename.split('.')[-1].lower()
     if not file_ext:
         raise errors.ForbiddenError(msg='未知的文件类型')
+
     if file_type == FileType.image:
         if file_ext not in settings.UPLOAD_IMAGE_EXT_INCLUDE:
             raise errors.ForbiddenError(msg='此图片格式暂不支持')
@@ -52,11 +53,11 @@ def file_verify(file: UploadFile, file_type: FileType) -> None:
             raise errors.ForbiddenError(msg='视频超出最大限制，请重新选择')
 
 
-async def upload_file(file: UploadFile):
+async def upload_file(file: UploadFile) -> str:
     """
     上传文件
 
-    :param file:
+    :param file: FastAPI 上传文件对象
     :return:
     """
     filename = build_filename(file)
