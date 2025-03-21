@@ -14,43 +14,38 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
-def select_columns_serialize(row: R) -> dict:
+def select_columns_serialize(row: R) -> dict[str, Any]:
     """
-    Serialize SQLAlchemy select table columns, does not contain relational columns
+    序列化 SQLAlchemy 查询表的列，不包含关联列
 
-    :param row:
+    :param row: SQLAlchemy 查询结果行
     :return:
     """
     result = {}
     for column in row.__table__.columns.keys():
-        v = getattr(row, column)
-        if isinstance(v, Decimal):
-            v = decimal_encoder(v)
-        result[column] = v
+        value = getattr(row, column)
+        if isinstance(value, Decimal):
+            value = decimal_encoder(value)
+        result[column] = value
     return result
 
 
 def select_list_serialize(row: Sequence[R]) -> list[dict[str, Any]]:
     """
-    Serialize SQLAlchemy select list
+    序列化 SQLAlchemy 查询列表
 
-    :param row:
+    :param row: SQLAlchemy 查询结果列表
     :return:
     """
-    result = [select_columns_serialize(_) for _ in row]
-    return result
+    return [select_columns_serialize(item) for item in row]
 
 
-def select_as_dict(row: R, use_alias: bool = False) -> dict:
+def select_as_dict(row: R, use_alias: bool = False) -> dict[str, Any]:
     """
-    Converting SQLAlchemy select to dict, which can contain relational data,
-    depends on the properties of the select object itself
+    将 SQLAlchemy 查询结果转换为字典，可以包含关联数据
 
-    If set use_alias is True, the column name will be returned as alias,
-    If alias doesn't exist in columns, we don't recommend setting it to True
-
-    :param row:
-    :param use_alias:
+    :param row: SQLAlchemy 查询结果行
+    :param use_alias: 是否使用别名作为列名
     :return:
     """
     if not use_alias:
@@ -70,7 +65,7 @@ def select_as_dict(row: R, use_alias: bool = False) -> dict:
 
 class MsgSpecJSONResponse(JSONResponse):
     """
-    JSON response using the high-performance msgspec library to serialize data to JSON.
+    使用高性能的 msgspec 库将数据序列化为 JSON 的响应类
     """
 
     def render(self, content: Any) -> bytes:

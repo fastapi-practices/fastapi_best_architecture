@@ -11,6 +11,13 @@ class AccessMiddleware(BaseHTTPMiddleware):
     """请求日志中间件"""
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        """
+        处理请求并记录访问日志
+
+        :param request: FastAPI 请求对象
+        :param call_next: 下一个中间件或路由处理函数
+        :return:
+        """
         start_time = timezone.now()
         response = await call_next(request)
         end_time = timezone.now()

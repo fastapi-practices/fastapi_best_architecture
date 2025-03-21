@@ -1,5 +1,7 @@
 .idea/
 .vscode/
+.cursor/
+.DS_Store
 venv/
 .venv/
 .python-version

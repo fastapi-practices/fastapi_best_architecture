@@ -10,12 +10,14 @@ from backend.app.generator.schema.gen_business import CreateGenBusinessParam, Up
 
 
 class CRUDGenBusiness(CRUDPlus[GenBusiness]):
+    """代码生成业务 CRUD 类"""
+
     async def get(self, db: AsyncSession, pk: int) -> GenBusiness | None:
         """
         获取代码生成业务表
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 主键 ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -24,8 +26,8 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         通过 name 获取代码生成业务表
 
-        :param db:
-        :param name:
+        :param db: 数据库会话
+        :param name: 表名
         :return:
         """
         return await self.select_model_by_column(db, table_name_en=name)
@@ -34,6 +36,7 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         获取所有代码生成业务表
 
+        :param db: 数据库会话
         :return:
         """
         return await self.select_models(db)
@@ -42,8 +45,8 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         创建代码生成业务表
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj_in: 创建参数
         :return:
         """
         await self.create_model(db, obj_in)
@@ -52,9 +55,8 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         更新代码生成业务表
 
-        :param db:
-        :param pk:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj_in: 更新参数
         :return:
         """
         return await self.update_model(db, pk, obj_in)
@@ -63,8 +65,8 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         删除代码生成业务表
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 主键 ID
         :return:
         """
         return await self.delete_model(db, pk)

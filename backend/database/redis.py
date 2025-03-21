@@ -10,7 +10,10 @@ from backend.core.conf import settings
 
 
 class RedisCli(Redis):
-    def __init__(self):
+    """Redis 客户端"""
+
+    def __init__(self) -> None:
+        """初始化 Redis 客户端"""
         super(RedisCli, self).__init__(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
@@ -20,12 +23,8 @@ class RedisCli(Redis):
             decode_responses=True,  # 转码 utf-8
         )
 
-    async def open(self):
-        """
-        触发初始化连接
-
-        :return:
-        """
+    async def open(self) -> None:
+        """触发初始化连接"""
         try:
             await self.ping()
         except TimeoutError:
@@ -38,12 +37,12 @@ class RedisCli(Redis):
             log.error('❌ 数据库 redis 连接异常 {}', e)
             sys.exit()
 
-    async def delete_prefix(self, prefix: str, exclude: str | list = None):
+    async def delete_prefix(self, prefix: str, exclude: str | list[str] | None = None) -> None:
         """
-        删除指定前缀的所有key
+        删除指定前缀的所有 key
 
-        :param prefix:
-        :param exclude:
+        :param prefix: 前缀
+        :param exclude: 排除的 key
         :return:
         """
         keys = []

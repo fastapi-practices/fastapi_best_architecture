@@ -13,14 +13,21 @@ from backend.common.exception.errors import NotFoundError
 class TaskService:
     @staticmethod
     async def get_list() -> list[str]:
+        """获取所有已注册的 Celery 任务列表"""
         registered_tasks = await run_in_threadpool(celery_app.control.inspect().registered)
         if not registered_tasks:
-            raise errors.ForbiddenError(msg='celery 服务未启动')
+            raise errors.ForbiddenError(msg='Celery 服务未启动')
         tasks = list(registered_tasks.values())[0]
         return tasks
 
     @staticmethod
     def get_detail(*, tid: str) -> TaskResult:
+        """
+        获取指定任务的详细信息
+
+        :param tid: 任务 UUID
+        :return:
+        """
         try:
             result = AsyncResult(id=tid, app=celery_app)
         except NotRegistered:
@@ -38,7 +45,13 @@ class TaskService:
         )
 
     @staticmethod
-    def revoke(*, tid: str):
+    def revoke(*, tid: str) -> None:
+        """
+        撤销指定的任务
+
+        :param tid: 任务 UUID
+        :return:
+        """
         try:
             result = AsyncResult(id=tid, app=celery_app)
         except NotRegistered:
@@ -47,6 +60,12 @@ class TaskService:
 
     @staticmethod
     def run(*, obj: RunParam) -> str:
+        """
+        运行指定的任务
+
+        :param obj: 任务运行参数
+        :return:
+        """
         task: AsyncResult = celery_app.send_task(name=obj.name, args=obj.args, kwargs=obj.kwargs)
         return task.task_id
 

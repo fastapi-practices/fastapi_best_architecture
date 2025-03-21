@@ -9,8 +9,17 @@ from backend.core.conf import settings
 
 
 class CRUDGen:
+    """代码生成 CRUD 类"""
+
     @staticmethod
-    async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[str]:
+    async def get_all_tables(db: AsyncSession, table_schema: str) -> list[str]:
+        """
+        获取所有表名
+
+        :param db: 数据库会话
+        :param table_schema: 数据库 schema 名称
+        :return:
+        """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
             SELECT table_name AS table_name FROM information_schema.tables 
@@ -30,6 +39,13 @@ class CRUDGen:
 
     @staticmethod
     async def get_table(db: AsyncSession, table_name: str) -> Row[tuple]:
+        """
+        获取表信息
+
+        :param db: 数据库会话
+        :param table_name: 表名
+        :return:
+        """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
             SELECT table_name AS table_name, table_comment AS table_comment FROM information_schema.tables 
@@ -51,6 +67,14 @@ class CRUDGen:
 
     @staticmethod
     async def get_all_columns(db: AsyncSession, table_schema: str, table_name: str) -> Sequence[Row[tuple]]:
+        """
+        获取所有列信息
+
+        :param db: 数据库会话
+        :param table_schema: 数据库 schema 名称
+        :param table_name: 表名
+        :return:
+        """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
             SELECT column_name AS column_name, 

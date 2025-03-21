@@ -27,7 +27,7 @@ async def get_all_tasks() -> ResponseSchemaModel[list[str]]:
     description='此接口被视为作废，建议使用 flower 查看任务详情',
     dependencies=[DependsJwtAuth],
 )
-async def get_task_detail(tid: Annotated[str, Path(description='任务ID')]) -> ResponseSchemaModel[TaskResult]:
+async def get_task_detail(tid: Annotated[str, Path(description='任务 UUID')]) -> ResponseSchemaModel[TaskResult]:
     status = task_service.get_detail(tid=tid)
     return response_base.success(data=status)
 
@@ -40,7 +40,7 @@ async def get_task_detail(tid: Annotated[str, Path(description='任务ID')]) -> 
         DependsRBAC,
     ],
 )
-async def revoke_task(tid: Annotated[str, Path(description='任务ID')]) -> ResponseModel:
+async def revoke_task(tid: Annotated[str, Path(description='任务 UUID')]) -> ResponseModel:
     task_service.revoke(tid=tid)
     return response_base.success()
 

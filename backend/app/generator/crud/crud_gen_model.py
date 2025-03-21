@@ -10,10 +10,14 @@ from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGe
 
 
 class CRUDGenModel(CRUDPlus[GenModel]):
+    """代码生成模型 CRUD 类"""
+
     async def get(self, db: AsyncSession, pk: int) -> GenModel | None:
         """
         获取代码生成模型列
 
+        :param db: 数据库会话
+        :param pk: 主键 ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -22,8 +26,8 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         获取所有代码生成模型列
 
-        :param db:
-        :param business_id:
+        :param db: 数据库会话
+        :param business_id: 业务 ID
         :return:
         """
         return await self.select_models_order(db, sort_columns='sort', gen_business_id=business_id)
@@ -32,21 +36,21 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         创建代码生成模型表
 
-        :param db:
-        :param obj_in:
-        :param pd_type:
+        :param db: 数据库会话
+        :param obj_in: 创建参数
+        :param pd_type: Pydantic 类型
         :return:
         """
         await self.create_model(db, obj_in, pd_type=pd_type)
 
     async def update(self, db: AsyncSession, pk: int, obj_in: UpdateGenModelParam, pd_type: str | None = None) -> int:
         """
-        更细代码生成模型表
+        更新代码生成模型表
 
-        :param db:
-        :param pk:
-        :param obj_in:
-        :param pd_type:
+        :param db: 数据库会话
+        :param pk: 主键 ID
+        :param obj_in: 更新参数
+        :param pd_type: Pydantic 类型
         :return:
         """
         return await self.update_model(db, pk, obj_in, pd_type=pd_type)
@@ -55,8 +59,8 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         删除代码生成模型表
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 主键 ID
         :return:
         """
         return await self.delete_model(db, pk)
