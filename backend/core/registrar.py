@@ -157,7 +157,7 @@ def register_router(app: FastAPI) -> None:
 
     # API
     plugin_router_inject()
-    
+
     # 必须在插件路由注入后导入
     from backend.app.router import router
 

@@ -13,7 +13,10 @@ class Settings(BaseSettings):
     """全局配置"""
 
     model_config = SettingsConfigDict(
-        env_file=f'{BASE_PATH}/.env', env_file_encoding='utf-8', extra='ignore', case_sensitive=True
+        env_file=f'{BASE_PATH}/.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+        case_sensitive=True,
     )
 
     # 环境配置（从环境变量读取）
