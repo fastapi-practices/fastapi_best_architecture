@@ -9,7 +9,7 @@ from backend.common.schema import SchemaBase
 
 
 class GenBusinessSchemaBase(SchemaBase):
-    """代码生成业务基类"""
+    """代码生成业务基础模型"""
 
     app_name: str = Field(description='应用名称（英文）')
     table_name_en: str = Field(description='表名称（英文）')
@@ -31,11 +31,11 @@ class GenBusinessSchemaBase(SchemaBase):
 
 
 class CreateGenBusinessParam(GenBusinessSchemaBase):
-    """创建代码生成业务"""
+    """创建代码生成业务参数"""
 
 
 class UpdateGenBusinessParam(GenBusinessSchemaBase):
-    """更新代码生成业务"""
+    """更新代码生成业务参数"""
 
 
 class GetGenBusinessDetail(GenBusinessSchemaBase):

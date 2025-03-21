@@ -7,7 +7,7 @@ from backend.utils.type_conversion import sql_type_to_sqlalchemy
 
 
 class GenModelSchemaBase(SchemaBase):
-    """代码生成模型基类"""
+    """代码生成模型基础模型"""
 
     name: str = Field(description='列名称')
     comment: str | None = Field(default=None, description='列描述')
@@ -27,11 +27,11 @@ class GenModelSchemaBase(SchemaBase):
 
 
 class CreateGenModelParam(GenModelSchemaBase):
-    """创建代码生成模型"""
+    """创建代码生成模型参数"""
 
 
 class UpdateGenModelParam(GenModelSchemaBase):
-    """更新代码生成模型"""
+    """更新代码生成模型参数"""
 
 
 class GetGenModelDetail(GenModelSchemaBase):
