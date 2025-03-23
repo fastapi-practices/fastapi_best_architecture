@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Any
+
 from fast_captcha import text_captcha
 from fastapi import BackgroundTasks, Request, Response
 
@@ -20,15 +22,27 @@ from backend.utils.timezone import timezone
 
 
 class OAuth2Service:
+    """OAuth2 认证服务类"""
+
     @staticmethod
     async def create_with_login(
         *,
         request: Request,
         response: Response,
         background_tasks: BackgroundTasks,
-        user: dict,
+        user: dict[str, Any],
         social: UserSocialType,
     ) -> GetLoginToken | None:
+        """
+        创建 OAuth2 用户并登录
+
+        :param request: FastAPI 请求对象
+        :param response: FastAPI 响应对象
+        :param background_tasks: FastAPI 后台任务
+        :param user: OAuth2 用户信息
+        :param social: 社交平台类型
+        :return:
+        """
         async with async_db_session.begin() as db:
             # 获取 OAuth2 平台用户信息
             social_id = user.get('id')

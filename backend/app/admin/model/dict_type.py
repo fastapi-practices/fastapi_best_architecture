@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model.dict_data import DictData
 
 
 class DictType(Base):
@@ -22,4 +29,4 @@ class DictType(Base):
     )
 
     # 字典类型一对多
-    datas: Mapped[list['DictData']] = relationship(init=False, back_populates='type')  # noqa: F821
+    datas: Mapped[list[DictData]] = relationship(init=False, back_populates='type')

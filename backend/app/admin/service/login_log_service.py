@@ -13,8 +13,18 @@ from backend.database.db import async_db_session
 
 
 class LoginLogService:
+    """登录日志服务类"""
+
     @staticmethod
-    async def get_select(*, username: str, status: int, ip: str) -> Select:
+    async def get_select(*, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
+        """
+        获取登录日志列表查询条件
+
+        :param username: 用户名
+        :param status: 状态
+        :param ip: IP 地址
+        :return:
+        """
         return await login_log_dao.get_list(username=username, status=status, ip=ip)
 
     @staticmethod
@@ -28,6 +38,18 @@ class LoginLogService:
         status: int,
         msg: str,
     ) -> None:
+        """
+        创建登录日志
+
+        :param db: 数据库会话
+        :param request: FastAPI 请求对象
+        :param user_uuid: 用户 UUID
+        :param username: 用户名
+        :param login_time: 登录时间
+        :param status: 状态
+        :param msg: 消息
+        :return:
+        """
         try:
             obj_in = CreateLoginLogParam(
                 user_uuid=user_uuid,
@@ -50,12 +72,19 @@ class LoginLogService:
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
+        """
+        删除登录日志
+
+        :param pk: 日志 ID 列表
+        :return:
+        """
         async with async_db_session.begin() as db:
             count = await login_log_dao.delete(db, pk)
             return count
 
     @staticmethod
     async def delete_all() -> int:
+        """清空所有登录日志"""
         async with async_db_session.begin() as db:
             count = await login_log_dao.delete_all(db)
             return count

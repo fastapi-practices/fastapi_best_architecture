@@ -21,7 +21,7 @@ async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDept
 
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
-async def get_all_depts_tree(
+async def get_all_depts(
     name: Annotated[str | None, Query()] = None,
     leader: Annotated[str | None, Query()] = None,
     phone: Annotated[str | None, Query()] = None,

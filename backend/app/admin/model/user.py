@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Union
+from typing import TYPE_CHECKING
 
 from sqlalchemy import VARBINARY, Boolean, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import BYTEA, INTEGER
@@ -11,6 +13,11 @@ from backend.app.admin.model.m2m import sys_user_role
 from backend.common.model import Base, id_key
 from backend.database.db import uuid4_str
 from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from backend.app.admin.model.dept import Dept
+    from backend.app.admin.model.role import Role
+    from backend.app.admin.model.user_social import UserSocial
 
 
 class User(Base):
@@ -48,10 +55,10 @@ class User(Base):
     dept_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, comment='部门关联ID'
     )
-    dept: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='users')  # noqa: F821
+    dept: Mapped[Dept | None] = relationship(init=False, back_populates='users')
 
     # 用户社交信息一对多
-    socials: Mapped[list['UserSocial']] = relationship(init=False, back_populates='user')  # noqa: F821
+    socials: Mapped[list[UserSocial]] = relationship(init=False, back_populates='user')
 
     # 用户角色多对多
-    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_user_role, back_populates='users')  # noqa: F821
+    roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_user_role, back_populates='users')

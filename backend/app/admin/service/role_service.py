@@ -22,8 +22,16 @@ from backend.database.redis import redis_client
 
 
 class RoleService:
+    """角色服务类"""
+
     @staticmethod
     async def get(*, pk: int) -> Role:
+        """
+        获取角色详情
+
+        :param pk: 角色 ID
+        :return:
+        """
         async with async_db_session() as db:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
@@ -32,22 +40,42 @@ class RoleService:
 
     @staticmethod
     async def get_all() -> Sequence[Role]:
+        """获取所有角色"""
         async with async_db_session() as db:
             roles = await role_dao.get_all(db)
             return roles
 
     @staticmethod
     async def get_by_user(*, pk: int) -> Sequence[Role]:
+        """
+        获取用户的角色列表
+
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session() as db:
             roles = await role_dao.get_by_user(db, user_id=pk)
             return roles
 
     @staticmethod
-    async def get_select(*, name: str = None, status: int = None) -> Select:
+    async def get_select(*, name: str | None = None, status: int | None = None) -> Select:
+        """
+        获取角色列表查询条件
+
+        :param name: 角色名称
+        :param status: 状态
+        :return:
+        """
         return await role_dao.get_list(name=name, status=status)
 
     @staticmethod
     async def create(*, obj: CreateRoleParam) -> None:
+        """
+        创建角色
+
+        :param obj: 角色创建参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             role = await role_dao.get_by_name(db, obj.name)
             if role:
@@ -56,6 +84,13 @@ class RoleService:
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateRoleParam) -> int:
+        """
+        更新角色
+
+        :param pk: 角色 ID
+        :param obj: 角色更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
@@ -69,6 +104,14 @@ class RoleService:
 
     @staticmethod
     async def update_role_menu(*, request: Request, pk: int, menu_ids: UpdateRoleMenuParam) -> int:
+        """
+        更新角色菜单
+
+        :param request: FastAPI 请求对象
+        :param pk: 角色 ID
+        :param menu_ids: 菜单 ID 列表
+        :return:
+        """
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
@@ -84,6 +127,14 @@ class RoleService:
 
     @staticmethod
     async def update_role_rule(*, request: Request, pk: int, rule_ids: UpdateRoleRuleParam) -> int:
+        """
+        更新角色数据权限
+
+        :param request: FastAPI 请求对象
+        :param pk: 角色 ID
+        :param rule_ids: 权限规则 ID 列表
+        :return:
+        """
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
@@ -99,6 +150,13 @@ class RoleService:
 
     @staticmethod
     async def delete(*, request: Request, pk: list[int]) -> int:
+        """
+        删除角色
+
+        :param request: FastAPI 请求对象
+        :param pk: 角色 ID 列表
+        :return:
+        """
         async with async_db_session.begin() as db:
             count = await role_dao.delete(db, pk)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')

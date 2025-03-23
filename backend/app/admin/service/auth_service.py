@@ -30,8 +30,18 @@ from backend.utils.timezone import timezone
 
 
 class AuthService:
+    """认证服务类"""
+
     @staticmethod
     async def user_verify(db: AsyncSession, username: str, password: str) -> User:
+        """
+        验证用户名和密码
+
+        :param db: 数据库会话
+        :param username: 用户名
+        :param password: 密码
+        :return:
+        """
         user = await user_dao.get_by_username(db, username)
         if not user:
             raise errors.NotFoundError(msg='用户名或密码有误')
@@ -42,6 +52,12 @@ class AuthService:
         return user
 
     async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
+        """
+        Swagger 文档登录
+
+        :param obj: 登录凭证
+        :return:
+        """
         async with async_db_session.begin() as db:
             user = await self.user_verify(db, obj.username, obj.password)
             await user_dao.update_login_time(db, obj.username)
@@ -56,6 +72,15 @@ class AuthService:
     async def login(
         self, *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
     ) -> GetLoginToken:
+        """
+        用户登录
+
+        :param request: 请求对象
+        :param response: 响应对象
+        :param obj: 登录参数
+        :param background_tasks: 后台任务
+        :return:
+        """
         async with async_db_session.begin() as db:
             user = None
             try:
@@ -133,6 +158,12 @@ class AuthService:
 
     @staticmethod
     async def new_token(*, request: Request) -> GetNewToken:
+        """
+        获取新的访问令牌
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
             raise errors.TokenError(msg='Refresh Token 已过期，请重新登录')
@@ -168,6 +199,13 @@ class AuthService:
 
     @staticmethod
     async def logout(*, request: Request, response: Response) -> None:
+        """
+        用户登出
+
+        :param request: FastAPI 请求对象
+        :param response: FastAPI 响应对象
+        :return:
+        """
         token = get_token(request)
         token_payload = jwt_decode(token)
         user_id = token_payload.id

@@ -25,8 +25,16 @@ from backend.database.redis import redis_client
 
 
 class UserService:
+    """用户服务类"""
+
     @staticmethod
     async def register(*, obj: RegisterUserParam) -> None:
+        """
+        注册新用户
+
+        :param obj: 用户注册参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             if not obj.password:
                 raise errors.ForbiddenError(msg='密码为空')
@@ -44,6 +52,13 @@ class UserService:
 
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
+        """
+        添加新用户
+
+        :param request: FastAPI 请求对象
+        :param obj: 用户添加参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             username = await user_dao.get_by_username(db, obj.username)
@@ -69,6 +84,13 @@ class UserService:
 
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
+        """
+        重置用户密码
+
+        :param request: FastAPI 请求对象
+        :param obj: 密码重置参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             user = await user_dao.get(db, request.user.id)
             if not password_verify(obj.old_password, user.password):
@@ -90,6 +112,12 @@ class UserService:
 
     @staticmethod
     async def get_userinfo(*, username: str) -> User:
+        """
+        获取用户信息
+
+        :param username: 用户名
+        :return:
+        """
         async with async_db_session() as db:
             user = await user_dao.get_with_relation(db, username=username)
             if not user:
@@ -98,6 +126,14 @@ class UserService:
 
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
+        """
+        更新用户信息
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param obj: 用户更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -123,6 +159,14 @@ class UserService:
 
     @staticmethod
     async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
+        """
+        更新用户角色
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param obj: 角色更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -139,6 +183,14 @@ class UserService:
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
+        """
+        更新用户头像
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param avatar: 头像参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
                 if request.user.username != username:
@@ -152,10 +204,26 @@ class UserService:
 
     @staticmethod
     async def get_select(*, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
+        """
+        获取用户列表查询条件
+
+        :param dept: 部门 ID
+        :param username: 用户名
+        :param phone: 手机号
+        :param status: 状态
+        :return:
+        """
         return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:
+        """
+        更新用户权限
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if not await user_dao.get(db, pk):
@@ -170,6 +238,13 @@ class UserService:
 
     @staticmethod
     async def update_staff(*, request: Request, pk: int) -> int:
+        """
+        更新用户职员状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if not await user_dao.get(db, pk):
@@ -184,6 +259,13 @@ class UserService:
 
     @staticmethod
     async def update_status(*, request: Request, pk: int) -> int:
+        """
+        更新用户状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if not await user_dao.get(db, pk):
@@ -198,6 +280,13 @@ class UserService:
 
     @staticmethod
     async def update_multi_login(*, request: Request, pk: int) -> int:
+        """
+        更新用户多端登录状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if not await user_dao.get(db, pk):
@@ -234,6 +323,12 @@ class UserService:
 
     @staticmethod
     async def delete(*, username: str) -> int:
+        """
+        删除用户
+
+        :param username: 用户名
+        :return:
+        """
         async with async_db_session.begin() as db:
             input_user = await user_dao.get_by_username(db, username)
             if not input_user:

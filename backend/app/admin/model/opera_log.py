@@ -3,7 +3,8 @@
 from datetime import datetime
 
 from sqlalchemy import DateTime, String
-from sqlalchemy.dialects.mysql import JSON, LONGTEXT, TEXT
+from sqlalchemy.dialects.mysql import JSON, LONGTEXT
+from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import DataClassBase, id_key

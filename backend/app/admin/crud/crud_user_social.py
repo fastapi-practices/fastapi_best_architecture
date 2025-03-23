@@ -8,14 +8,16 @@ from backend.app.admin.schema.user_social import CreateUserSocialParam
 from backend.common.enums import UserSocialType
 
 
-class CRUDOUserSocial(CRUDPlus[UserSocial]):
+class CRUDUserSocial(CRUDPlus[UserSocial]):
+    """用户社交账号数据库操作类"""
+
     async def get(self, db: AsyncSession, pk: int, source: UserSocialType) -> UserSocial | None:
         """
-        获取用户社交账号绑定
+        获取用户社交账号绑定详情
 
-        :param db:
-        :param pk:
-        :param source:
+        :param db: 数据库会话
+        :param pk: 用户 ID
+        :param source: 社交账号类型
         :return:
         """
         return await self.select_model_by_column(db, user_id=pk, source=source)
@@ -24,8 +26,8 @@ class CRUDOUserSocial(CRUDPlus[UserSocial]):
         """
         创建用户社交账号绑定
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj_in: 用户社交账号绑定创建参数
         :return:
         """
         await self.create_model(db, obj_in)
@@ -34,11 +36,11 @@ class CRUDOUserSocial(CRUDPlus[UserSocial]):
         """
         删除用户社交账号绑定
 
-        :param db:
-        :param social_id:
+        :param db: 数据库会话
+        :param social_id: 社交账号绑定 ID
         :return:
         """
         return await self.delete_model(db, social_id)
 
 
-user_social_dao: CRUDOUserSocial = CRUDOUserSocial(UserSocial)
+user_social_dao: CRUDUserSocial = CRUDUserSocial(UserSocial)
