@@ -56,12 +56,16 @@ def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_
             pool_pre_ping=True,  # 低：False 高：True
             pool_use_lifo=False,  # 低：False 高：True
         )
-        # log.success('数据库连接成功')
     except Exception as e:
         log.error('❌ 数据库链接失败 {}', e)
         sys.exit()
     else:
-        db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+        db_session = async_sessionmaker(
+            bind=engine,
+            class_=AsyncSession,
+            autoflush=False,  # 禁用自动刷新
+            expire_on_commit=False,  # 禁用提交时过期
+        )
         return engine, db_session
 
 

@@ -193,8 +193,7 @@ class CRUDUser(CRUDPlus[User]):
             )
             .order_by(desc(self.model.join_time))
         )
-
-        # 构建过滤条件
+        
         filters = []
         if dept:
             filters.append(self.model.dept_id == dept)
@@ -204,8 +203,7 @@ class CRUDUser(CRUDPlus[User]):
             filters.append(self.model.phone.like(f'%{phone}%'))
         if status is not None:
             filters.append(self.model.status == status)
-
-        # 应用过滤条件
+            
         if filters:
             stmt = stmt.where(and_(*filters))
 
@@ -257,44 +255,44 @@ class CRUDUser(CRUDPlus[User]):
 
     async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
         """
-        设置用户的超级管理员状态
+        设置用户超级管理员状态
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param is_super: 是否为超级管理员
+        :param is_super: 是否超级管理员
         :return:
         """
         return await self.update_model(db, user_id, {'is_superuser': is_super})
 
     async def set_staff(self, db: AsyncSession, user_id: int, is_staff: bool) -> int:
         """
-        设置用户的后台登录权限
+        设置用户后台登录状态
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param is_staff: 是否允许登录后台
+        :param is_staff: 是否可登录后台
         :return:
         """
         return await self.update_model(db, user_id, {'is_staff': is_staff})
 
-    async def set_status(self, db: AsyncSession, user_id: int, status: bool) -> int:
+    async def set_status(self, db: AsyncSession, user_id: int, status: int) -> int:
         """
-        设置用户的启用状态
+        设置用户状态
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param status: 是否启用用户
+        :param status: 状态
         :return:
         """
         return await self.update_model(db, user_id, {'status': status})
 
     async def set_multi_login(self, db: AsyncSession, user_id: int, multi_login: bool) -> int:
         """
-        设置用户的多点登录权限
+        设置用户多端登录状态
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param multi_login: 是否允许多点登录
+        :param multi_login: 是否允许多端登录
         :return:
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
@@ -303,7 +301,7 @@ class CRUDUser(CRUDPlus[User]):
         self, db: AsyncSession, *, user_id: int | None = None, username: str | None = None
     ) -> User | None:
         """
-        获取用户及关联数据
+        获取用户关联信息
 
         :param db: 数据库会话
         :param user_id: 用户 ID
@@ -317,12 +315,18 @@ class CRUDUser(CRUDPlus[User]):
                 selectinload(Role.rules),
             ),
         )
+        
         filters = []
         if user_id:
             filters.append(self.model.id == user_id)
         if username:
             filters.append(self.model.username == username)
-        user = await db.execute(stmt.where(*filters))
+            
+        if filters:
+            stmt = stmt.where(and_(*filters))
+    
+        user = await db.execute(stmt)
+            
         return user.scalars().first()
 
 

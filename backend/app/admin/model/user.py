@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import VARBINARY, Boolean, DateTime, ForeignKey, String
+from sqlalchemy import VARBINARY, Boolean, DateTime, ForeignKey, String, Index
 from sqlalchemy.dialects.postgresql import BYTEA, INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -38,7 +38,7 @@ class User(Base):
     is_staff: Mapped[bool] = mapped_column(
         Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='后台管理登陆(0否 1是)'
     )
-    status: Mapped[int] = mapped_column(default=1, comment='用户账号状态(0停用 1正常)')
+    status: Mapped[int] = mapped_column(default=1, index=True, comment='用户账号状态(0停用 1正常)')
     is_multi_login: Mapped[bool] = mapped_column(
         Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='是否重复登陆(0否 1是)'
     )
