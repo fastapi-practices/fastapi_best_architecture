@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class DictData(Base):
-    """字典数据"""
+    """字典数据表"""
 
     __tablename__ = 'sys_dict_data'
 

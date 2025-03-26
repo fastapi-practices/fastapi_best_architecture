@@ -12,11 +12,7 @@ from backend.plugin.casbin.model import CasbinRule
 
 
 async def casbin_enforcer() -> casbin.AsyncEnforcer:
-    """
-    获取 casbin 执行器
-
-    :return:
-    """
+    """获取 casbin 执行器"""
     # 模型定义：https://casbin.org/zh/docs/category/model
     _CASBIN_RBAC_MODEL_CONF_TEXT = """
     [request_definition]
@@ -45,7 +41,7 @@ async def casbin_verify(request: Request) -> None:
     """
     Casbin 权限校验
 
-    :param request:
+    :param request: FastAPI 请求对象
     :return:
     """
     method = request.method

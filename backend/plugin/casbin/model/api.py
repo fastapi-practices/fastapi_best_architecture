@@ -9,12 +9,12 @@ from backend.common.model import Base, id_key
 
 
 class Api(Base):
-    """系统api"""
+    """API 表"""
 
     __tablename__ = 'sys_api'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(50), unique=True, comment='api名称')
+    name: Mapped[str] = mapped_column(String(50), unique=True, comment='API 名称')
     method: Mapped[str] = mapped_column(String(16), comment='请求方法')
-    path: Mapped[str] = mapped_column(String(500), comment='api路径')
+    path: Mapped[str] = mapped_column(String(500), comment='API 路径')
     remark: Mapped[str | None] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='备注')

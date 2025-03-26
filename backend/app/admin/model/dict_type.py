@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class DictType(Base):
-    """字典类型"""
+    """字典类型表"""
 
     __tablename__ = 'sys_dict_type'
 
