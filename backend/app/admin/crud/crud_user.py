@@ -244,7 +244,7 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_multi_login(self, db: AsyncSession, user_id: int) -> bool:
         """
-        获取用户是否允许多点登录
+        获取用户是否允许多端登录
 
         :param db: 数据库会话
         :param user_id: 用户 ID

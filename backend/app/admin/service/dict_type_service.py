@@ -16,8 +16,8 @@ class DictTypeService:
         """
         获取字典类型列表查询条件
 
-        :param name: 字典名称
-        :param code: 字典编码
+        :param name: 字典类型名称
+        :param code: 字典类型编码
         :param status: 状态
         :return:
         """

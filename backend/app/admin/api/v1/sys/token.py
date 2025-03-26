@@ -19,7 +19,9 @@ router = APIRouter()
 
 
 @router.get('', summary='获取令牌列表', dependencies=[DependsJwtAuth])
-async def get_tokens(username: Annotated[str | None, Query()] = None) -> ResponseSchemaModel[list[GetTokenDetail]]:
+async def get_tokens(
+    username: Annotated[str | None, Query(description='用户名')] = None,
+) -> ResponseSchemaModel[list[GetTokenDetail]]:
     token_keys = await redis_client.keys(f'{settings.TOKEN_REDIS_PREFIX}:*')
     online_clients = await redis_client.smembers(settings.TOKEN_ONLINE_REDIS_PREFIX)
     data: list[GetTokenDetail] = []

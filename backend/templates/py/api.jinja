@@ -23,7 +23,7 @@ async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseSche
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有{{ table_simple_name_zh }}',
+    summary='分页获取所有{{ table_simple_name_zh }}',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -65,7 +65,7 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
 
 @router.delete(
     '',
-    summary='（批量）删除{{ table_simple_name_zh }}',
+    summary='删除{{ table_simple_name_zh }}',
     dependencies=[
         Depends(RequestPermission('{{ permission }}:del')),
         DependsRBAC,

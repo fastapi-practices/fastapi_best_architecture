@@ -25,8 +25,8 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         获取字典类型列表
 
-        :param name: 字典名称
-        :param code: 字典编码
+        :param name: 字典类型名称
+        :param code: 字典类型编码
         :param status: 字典状态
         :return:
         """

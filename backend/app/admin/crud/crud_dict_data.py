@@ -26,8 +26,8 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         获取字典数据列表
 
-        :param label: 字典标签
-        :param value: 字典键值
+        :param label: 字典数据标签
+        :param value: 字典数据键值
         :param status: 字典状态
         :return:
         """

@@ -28,7 +28,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有权限策略',
+    summary='分页获取所有权限策略',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
