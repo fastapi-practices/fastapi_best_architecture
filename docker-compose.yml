@@ -67,7 +67,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      - fba_redis:/usr/local/etc/redis
+      - fba_redis:/data
     networks:
       - fba_network
 
