@@ -58,7 +58,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 def register_app() -> FastAPI:
-    """注册并配置 FastAPI 应用"""
+    """注册 FastAPI 应用"""
     app = FastAPI(
         title=settings.FASTAPI_TITLE,
         version=settings.FASTAPI_VERSION,
@@ -69,6 +69,7 @@ def register_app() -> FastAPI:
         default_response_class=MsgSpecJSONResponse,
         lifespan=register_init,
     )
+
     register_socket_app(app)
     register_logger()
     register_static_file(app)

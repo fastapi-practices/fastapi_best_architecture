@@ -301,9 +301,7 @@ class UserService:
             if pk == user_id:
                 if not latest_multi_login:
                     key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
-                    await redis_client.delete_prefix(
-                        key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}'
-                    )
+                    await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}')
                     refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
                     if refresh_token:
                         key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}'

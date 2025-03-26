@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from backend.app.admin.schema.token import GetTokenDetail, KickOutToken
 from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth, jwt_decode, superuser_verify
+from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
@@ -78,7 +78,9 @@ async def get_tokens(username: Annotated[str | None, Query()] = None) -> Respons
         DependsRBAC,
     ],
 )
-async def kick_out(request: Request, pk: Annotated[int, Path(...)], session_uuid: KickOutToken) -> ResponseModel:
+async def kick_out(
+    request: Request, pk: Annotated[int, Path(..., description='用户 ID')], session_uuid: KickOutToken
+) -> ResponseModel:
     superuser_verify(request)
-    await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{pk}:{session_uuid}')
+    await revoke_token(pk)
     return response_base.success()

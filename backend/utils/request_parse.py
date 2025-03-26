@@ -93,12 +93,11 @@ async def parse_ip_info(request: Request) -> IpInfo:
         country, region, city = location.split('|')
         return IpInfo(ip=ip, country=country, region=region, city=city)
 
+    location_info = None
     if settings.IP_LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
     elif settings.IP_LOCATION_PARSE == 'offline':
         location_info = await get_location_offline(ip)
-    else:
-        location_info = None
 
     if location_info:
         country = location_info.get('country')

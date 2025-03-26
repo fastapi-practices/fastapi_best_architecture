@@ -12,10 +12,8 @@ from backend.core.path_conf import JINJA2_TEMPLATE_DIR
 
 
 class GenTemplate:
-    def __init__(self):
-        """
-        初始化模板生成器
-        """
+    def __init__(self) -> None:
+        """初始化模板生成器"""
         self.env = Environment(
             loader=FileSystemLoader(JINJA2_TEMPLATE_DIR),
             autoescape=select_autoescape(enabled_extensions=['jinja']),

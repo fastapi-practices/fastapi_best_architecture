@@ -57,14 +57,14 @@ class JwtAuthMiddleware(AuthenticationBackend):
         """
         token = request.headers.get('Authorization')
         if not token:
-            return
+            return None
 
         if request.url.path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
-            return
+            return None
 
         scheme, token = get_authorization_scheme_param(token)
         if scheme.lower() != 'bearer':
-            return
+            return None
 
         try:
             user = await jwt_authentication(token)

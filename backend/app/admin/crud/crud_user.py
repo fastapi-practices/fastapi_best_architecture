@@ -193,7 +193,7 @@ class CRUDUser(CRUDPlus[User]):
             )
             .order_by(desc(self.model.join_time))
         )
-        
+
         filters = []
         if dept:
             filters.append(self.model.dept_id == dept)
@@ -203,7 +203,7 @@ class CRUDUser(CRUDPlus[User]):
             filters.append(self.model.phone.like(f'%{phone}%'))
         if status is not None:
             filters.append(self.model.status == status)
-            
+
         if filters:
             stmt = stmt.where(and_(*filters))
 
@@ -315,18 +315,18 @@ class CRUDUser(CRUDPlus[User]):
                 selectinload(Role.rules),
             ),
         )
-        
+
         filters = []
         if user_id:
             filters.append(self.model.id == user_id)
         if username:
             filters.append(self.model.username == username)
-            
+
         if filters:
             stmt = stmt.where(and_(*filters))
-    
+
         user = await db.execute(stmt)
-            
+
         return user.scalars().first()
 
 

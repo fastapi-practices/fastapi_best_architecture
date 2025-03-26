@@ -17,33 +17,48 @@ if TYPE_CHECKING:
 
 class RequestPermission:
     """
-    请求权限，仅用于角色菜单RBAC
+    请求权限验证器，用于角色菜单 RBAC 权限控制
 
-    Tip:
+    注意：
         使用此请求权限时，需要将 `Depends(RequestPermission('xxx'))` 在 `DependsRBAC` 之前设置，
-        因为 fastapi 当前版本的接口依赖注入按正序执行，意味着 RBAC 标识会在验证前被设置
+        因为 FastAPI 当前版本的接口依赖注入按正序执行，意味着 RBAC 标识会在验证前被设置
     """
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
+        """
+        初始化请求权限验证器
+
+        :param value: 权限标识
+        :return:
+        """
         self.value = value
 
-    async def __call__(self, request: Request):
+    async def __call__(self, request: Request) -> None:
+        """
+        验证请求权限
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
         if settings.RBAC_ROLE_MENU_MODE:
             if not isinstance(self.value, str):
                 raise ServerError
-            # 附加权限标识
+            # 附加权限标识到请求状态
             request.state.permission = self.value
 
 
 def filter_data_permission(request: Request) -> ColumnElement[bool]:
     """
-    过滤数据权限
+    过滤数据权限，控制用户可见数据范围
 
-    使用场景：用户登录前台后，控制其能看到哪些数据
+    使用场景：
+        - 用户登录前台后，控制其能看到哪些数据
+        - 根据用户角色和规则过滤数据访问权限
 
-    :param request:
+    :param request: FastAPI 请求对象
     :return:
     """
+    # 获取用户角色和规则
     data_rules = []
     for role in request.user.roles:
         data_rules.extend(role.rules)
@@ -57,10 +72,13 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
     where_or_list = []
 
     for rule in user_data_rules:
+        # 验证规则模型
         rule_model = rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
             raise errors.NotFoundError(msg='数据规则模型不存在')
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
+
+        # 验证规则列
         model_columns = [
             key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
@@ -68,11 +86,9 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
         if column not in model_columns:
             raise errors.NotFoundError(msg='数据规则模型列不存在')
 
-        # 获取模型的列对象
+        # 构建过滤条件
         column_obj = getattr(model_ins, column)
         rule_expression = rule.expression
-
-        # 根据表达式类型构建条件
         condition = None
         if rule_expression == RoleDataRuleExpressionType.eq:
             condition = column_obj == rule.value
@@ -93,14 +109,14 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:
             values = rule.value.split(',') if isinstance(rule.value, str) else rule.value
             condition = ~column_obj.in_(values)
 
+        # 根据运算符添加到对应列表
         if condition is not None:
-            rule_operator = rule.operator
-            if rule_operator == RoleDataRuleOperatorType.AND:
+            if rule.operator == RoleDataRuleOperatorType.AND:
                 where_and_list.append(condition)
-            elif rule_operator == RoleDataRuleOperatorType.OR:
+            elif rule.operator == RoleDataRuleOperatorType.OR:
                 where_or_list.append(condition)
 
-    # 组合条件
+    # 组合所有条件
     where_list = []
     if where_and_list:
         where_list.append(and_(*where_and_list))

@@ -14,9 +14,9 @@ from backend.core.conf import settings
 
 class InterceptHandler(logging.Handler):
     """
-    默认处理器，来自 loguru 文档示例
+    日志拦截处理器，用于将标准库的日志重定向到 loguru
 
-    参见 https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+    参考：https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
     """
 
     def emit(self, record: logging.LogRecord):
@@ -35,10 +35,10 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def setup_logging():
+def setup_logging() -> None:
     """
     设置日志处理器
-    
+
     参考：
     - https://github.com/benoitc/gunicorn/issues/1572#issuecomment-638391953
     - https://github.com/pawamoy/pawamoy.github.io/issues/17
@@ -47,7 +47,7 @@ def setup_logging():
     logging.root.handlers = [InterceptHandler()]
     logging.root.setLevel(settings.LOG_STD_LEVEL)
 
-    # 移除所有日志处理器并传播到根日志记录器
+    # 配置日志传播规则
     for name in logging.root.manager.loggerDict.keys():
         logging.getLogger(name).handlers = []
         if 'uvicorn.access' in name or 'watchfiles.main' in name:
@@ -65,10 +65,8 @@ def setup_logging():
         record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
         return record
 
-    # 移除默认 loguru 日志记录器
-    logger.remove()
-
-    # 设置 loguru 默认处理器
+    # 配置 loguru 处理器
+    logger.remove()  # 移除默认处理器
     logger.configure(
         handlers=[
             {
@@ -81,7 +79,7 @@ def setup_logging():
     )
 
 
-def set_custom_logfile():
+def set_custom_logfile() -> None:
     """设置自定义日志文件"""
     log_path = path_conf.LOG_DIR
     if not os.path.exists(log_path):
@@ -91,7 +89,7 @@ def set_custom_logfile():
     log_access_file = os.path.join(log_path, settings.LOG_ACCESS_FILENAME)
     log_error_file = os.path.join(log_path, settings.LOG_ERROR_FILENAME)
 
-    # 设置 loguru 日志记录器默认配置
+    # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
     log_config = {
         'format': settings.LOG_FILE_FORMAT,
@@ -122,4 +120,5 @@ def set_custom_logfile():
     )
 
 
+# 创建 logger 实例
 log = logger

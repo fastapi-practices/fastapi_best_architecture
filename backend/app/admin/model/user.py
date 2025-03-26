@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import VARBINARY, Boolean, DateTime, ForeignKey, String, Index
+from sqlalchemy import VARBINARY, Boolean, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import BYTEA, INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
