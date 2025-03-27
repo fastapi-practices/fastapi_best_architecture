@@ -67,7 +67,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      - fba_redis:/usr/local/etc/redis
+      - fba_redis:/data
     networks:
       - fba_network
 
@@ -138,6 +138,8 @@ services:
     restart: always
     depends_on:
       - fba_rabbitmq
+    volumes:
+      - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
     networks:
       - fba_network
     command:
