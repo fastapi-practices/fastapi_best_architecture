@@ -70,6 +70,7 @@ def register_app() -> FastAPI:
         lifespan=register_init,
     )
 
+    # 注册组件
     register_socket_app(app)
     register_logger()
     register_static_file(app)
@@ -82,14 +83,14 @@ def register_app() -> FastAPI:
 
 
 def register_logger() -> None:
-    """配置系统日志"""
+    """注册日志"""
     setup_logging()
     set_custom_logfile()
 
 
 def register_static_file(app: FastAPI) -> None:
     """
-    注册静态资源服务，生产环境应使用 nginx 代理静态资源服务
+    注册静态资源服务
 
     :param app: FastAPI 应用实例
     :return:
@@ -106,15 +107,15 @@ def register_static_file(app: FastAPI) -> None:
 
 def register_middleware(app: FastAPI) -> None:
     """
-    注册中间件，执行顺序从下往上
+    注册中间件（执行顺序从下往上）
 
     :param app: FastAPI 应用实例
     :return:
     """
-    # Opera log (required)
+    # Opera log (必须)
     app.add_middleware(OperaLogMiddleware)
 
-    # JWT auth (required)
+    # JWT auth (必须)
     app.add_middleware(
         AuthenticationMiddleware,
         backend=JwtAuthMiddleware(),
@@ -130,10 +131,10 @@ def register_middleware(app: FastAPI) -> None:
     # State
     app.add_middleware(StateMiddleware)
 
-    # Trace ID (required)
+    # Trace ID (必须)
     app.add_middleware(CorrelationIdMiddleware, validator=False)
 
-    # CORS: Always at the end
+    # CORS（必须放在最下面）
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
 
@@ -156,10 +157,10 @@ def register_router(app: FastAPI) -> None:
     """
     dependencies = [Depends(demo_site)] if settings.DEMO_MODE else None
 
-    # API
+    # 插件路由
     plugin_router_inject()
 
-    # 必须在插件路由注入后导入
+    # 系统路由（必须在插件路由注入后导入）
     from backend.app.router import router
 
     app.include_router(router, dependencies=dependencies)

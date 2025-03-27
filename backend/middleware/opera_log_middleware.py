@@ -78,7 +78,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             cost_time=cost_time,
             opera_time=start_time,
         )
-        create_task(opera_log_service.create(obj_in=opera_log_in))  # noqa: ignore
+        create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
 
         # 错误抛出
         if request_next.err:

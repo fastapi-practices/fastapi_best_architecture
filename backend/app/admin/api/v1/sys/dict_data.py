@@ -23,7 +23,7 @@ router = APIRouter()
 
 @router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(
-    pk: Annotated[int, Path(..., description='字典数据 ID')],
+    pk: Annotated[int, Path(description='字典数据 ID')],
 ) -> ResponseSchemaModel[GetDictDataWithRelation]:
     data = await dict_data_service.get(pk=pk)
     return response_base.success(data=data)
@@ -70,7 +70,7 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     ],
 )
 async def update_dict_data(
-    pk: Annotated[int, Path(..., description='字典数据 ID')], obj: UpdateDictDataParam
+    pk: Annotated[int, Path(description='字典数据 ID')], obj: UpdateDictDataParam
 ) -> ResponseModel:
     count = await dict_data_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -86,7 +86,7 @@ async def update_dict_data(
         DependsRBAC,
     ],
 )
-async def delete_dict_data(pk: Annotated[list[int], Query(..., description='字典数据 ID 列表')]) -> ResponseModel:
+async def delete_dict_data(pk: Annotated[list[int], Query(description='字典数据 ID 列表')]) -> ResponseModel:
     count = await dict_data_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

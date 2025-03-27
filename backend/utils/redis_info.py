@@ -7,11 +7,8 @@ from backend.utils.server_info import server_info
 class RedisInfo:
     @staticmethod
     async def get_info() -> dict[str, str]:
-        """
-        获取 Redis 服务器信息
+        """获取 Redis 服务器信息"""
 
-        :return:
-        """
         # 获取原始信息
         info = await redis_client.info()
 
@@ -36,11 +33,8 @@ class RedisInfo:
 
     @staticmethod
     async def get_stats() -> list[dict[str, str]]:
-        """
-        获取 Redis 命令统计信息
+        """获取 Redis 命令统计信息"""
 
-        :return:
-        """
         # 获取命令统计信息
         command_stats = await redis_client.info('commandstats')
 

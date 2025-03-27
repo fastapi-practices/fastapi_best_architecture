@@ -32,15 +32,18 @@ class CRUDDictData(CRUDPlus[DictData]):
         :return:
         """
         stmt = select(self.model).options(noload(self.model.type)).order_by(desc(self.model.sort))
-        where_list = []
+
+        filters = []
         if label is not None:
-            where_list.append(self.model.label.like(f'%{label}%'))
+            filters.append(self.model.label.like(f'%{label}%'))
         if value is not None:
-            where_list.append(self.model.value.like(f'%{value}%'))
+            filters.append(self.model.value.like(f'%{value}%'))
         if status is not None:
-            where_list.append(self.model.status == status)
-        if where_list:
-            stmt = stmt.where(and_(*where_list))
+            filters.append(self.model.status == status)
+
+        if filters:
+            stmt = stmt.where(and_(*filters))
+
         return stmt
 
     async def get_by_label(self, db: AsyncSession, label: str) -> DictData | None:
@@ -53,26 +56,26 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_model_by_column(db, label=label)
 
-    async def create(self, db: AsyncSession, obj_in: CreateDictDataParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDictDataParam) -> None:
         """
         创建字典数据
 
         :param db: 数据库会话
-        :param obj_in: 字典数据创建参数
+        :param obj: 字典数据创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictDataParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateDictDataParam) -> int:
         """
         更新字典数据
 
         :param db: 数据库会话
         :param pk: 字典数据 ID
-        :param obj_in: 字典数据更新参数
+        :param obj: 字典数据更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

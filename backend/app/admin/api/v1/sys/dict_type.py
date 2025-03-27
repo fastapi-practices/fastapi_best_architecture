@@ -57,7 +57,7 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
     ],
 )
 async def update_dict_type(
-    pk: Annotated[int, Path(..., description='字典类型 ID')], obj: UpdateDictTypeParam
+    pk: Annotated[int, Path(description='字典类型 ID')], obj: UpdateDictTypeParam
 ) -> ResponseModel:
     count = await dict_type_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -73,7 +73,7 @@ async def update_dict_type(
         DependsRBAC,
     ],
 )
-async def delete_dict_type(pk: Annotated[list[int], Query(..., description='字典类型 ID 列表')]) -> ResponseModel:
+async def delete_dict_type(pk: Annotated[list[int], Query(description='字典类型 ID 列表')]) -> ResponseModel:
     count = await dict_type_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

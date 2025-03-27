@@ -13,9 +13,7 @@ from backend.app.admin.model.m2m import sys_role_data_rule, sys_role_menu, sys_u
 from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
-    from backend.app.admin.model.data_rule import DataRule
-    from backend.app.admin.model.menu import Menu
-    from backend.app.admin.model.user import User
+    from backend.app.admin.model import DataRule, Menu, User
 
 
 class Role(Base):

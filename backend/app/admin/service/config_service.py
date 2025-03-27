@@ -17,14 +17,14 @@ from backend.database.db import async_db_session
 
 
 class ConfigService:
-    """配置服务类"""
+    """参数配置服务类"""
 
     @staticmethod
     async def get_built_in_config(type: str) -> Sequence[Config]:
         """
-        获取内置配置
+        获取内置参数配置
 
-        :param type: 配置类型
+        :param type: 参数配置类型
         :return:
         """
         async with async_db_session() as db:
@@ -33,10 +33,10 @@ class ConfigService:
     @staticmethod
     async def save_built_in_config(objs: list[SaveBuiltInConfigParam], type: str) -> None:
         """
-        保存内置配置
+        保存内置参数配置
 
-        :param objs: 配置参数列表
-        :param type: 配置类型
+        :param objs: 参数配置参数列表
+        :param type: 参数配置类型
         :return:
         """
         async with async_db_session.begin() as db:
@@ -52,9 +52,9 @@ class ConfigService:
     @staticmethod
     async def get(pk: int) -> Config:
         """
-        获取配置详情
+        获取参数配置详情
 
-        :param pk: 配置 ID
+        :param pk: 参数配置 ID
         :return:
         """
         async with async_db_session() as db:
@@ -66,10 +66,10 @@ class ConfigService:
     @staticmethod
     async def get_select(*, name: str | None = None, type: str | None = None) -> Select:
         """
-        获取配置列表查询条件
+        获取参数配置列表查询条件
 
-        :param name: 配置名称
-        :param config_type: 配置类型
+        :param name: 参数配置名称
+        :param type: 参数配置类型
         :return:
         """
         return await config_dao.get_list(name=name, type=type)
@@ -77,9 +77,9 @@ class ConfigService:
     @staticmethod
     async def create(*, obj: CreateConfigParam) -> None:
         """
-        创建配置
+        创建参数配置
 
-        :param obj: 配置创建参数
+        :param obj: 参数配置创建参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -93,10 +93,10 @@ class ConfigService:
     @staticmethod
     async def update(*, pk: int, obj: UpdateConfigParam) -> int:
         """
-        更新配置
+        更新参数配置
 
-        :param pk: 配置 ID
-        :param obj: 配置更新参数
+        :param pk: 参数配置 ID
+        :param obj: 参数配置更新参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -113,9 +113,9 @@ class ConfigService:
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         """
-        删除配置
+        删除参数配置
 
-        :param pk: 配置 ID 列表
+        :param pk: 参数配置 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:

@@ -14,8 +14,8 @@ class DataRuleSchemaBase(SchemaBase):
     name: str = Field(description='规则名称')
     model: str = Field(description='模型名称')
     column: str = Field(description='字段名称')
-    operator: RoleDataRuleOperatorType = Field(default=RoleDataRuleOperatorType.OR, description='操作符（AND/OR）')
-    expression: RoleDataRuleExpressionType = Field(default=RoleDataRuleExpressionType.eq, description='表达式类型')
+    operator: RoleDataRuleOperatorType = Field(RoleDataRuleOperatorType.OR, description='操作符（AND/OR）')
+    expression: RoleDataRuleExpressionType = Field(RoleDataRuleExpressionType.eq, description='表达式类型')
     value: str = Field(description='规则值')
 
 
@@ -34,7 +34,7 @@ class GetDataRuleDetail(DataRuleSchemaBase):
 
     id: int = Field(description='规则 ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')
 
     def __hash__(self) -> int:
         """计算哈希值"""

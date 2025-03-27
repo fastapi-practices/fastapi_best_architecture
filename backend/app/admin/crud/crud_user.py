@@ -96,10 +96,12 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
+
         role_list = []
         for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
+
         db.add(new_user)
 
     async def update_userinfo(self, db: AsyncSession, input_user: int, obj: UpdateUserParam) -> int:
@@ -125,6 +127,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         for i in list(input_user.roles):
             input_user.roles.remove(i)
+
         role_list = []
         for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
@@ -310,10 +313,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = select(self.model).options(
             selectinload(self.model.dept),
-            selectinload(self.model.roles).options(
-                selectinload(Role.menus),
-                selectinload(Role.rules),
-            ),
+            selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.rules)),
         )
 
         filters = []
@@ -326,7 +326,6 @@ class CRUDUser(CRUDPlus[User]):
             stmt = stmt.where(and_(*filters))
 
         user = await db.execute(stmt)
-
         return user.scalars().first()
 
 

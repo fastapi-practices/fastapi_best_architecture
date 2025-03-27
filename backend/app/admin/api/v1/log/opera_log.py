@@ -43,7 +43,7 @@ async def get_pagination_opera_logs(
         DependsRBAC,
     ],
 )
-async def delete_opera_log(pk: Annotated[list[int], Query(..., description='操作日志 ID 列表')]) -> ResponseModel:
+async def delete_opera_log(pk: Annotated[list[int], Query(description='操作日志 ID 列表')]) -> ResponseModel:
     count = await opera_log_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

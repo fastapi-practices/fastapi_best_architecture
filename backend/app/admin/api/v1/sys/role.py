@@ -33,7 +33,7 @@ async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
 
 @router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
 async def get_user_all_roles(
-    pk: Annotated[int, Path(..., description='用户 ID')],
+    pk: Annotated[int, Path(description='用户 ID')],
 ) -> ResponseSchemaModel[list[GetRoleDetail]]:
     data = await role_service.get_by_user(pk=pk)
     return response_base.success(data=data)
@@ -41,21 +41,21 @@ async def get_user_all_roles(
 
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
 async def get_role_all_menus(
-    pk: Annotated[int, Path(..., description='角色 ID')],
+    pk: Annotated[int, Path(description='角色 ID')],
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_role_menu_tree(pk=pk)
     return response_base.success(data=menu)
 
 
 @router.get('/{pk}/rules', summary='获取角色所有数据规则', dependencies=[DependsJwtAuth])
-async def get_role_all_rules(pk: Annotated[int, Path(..., description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
+async def get_role_all_rules(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
     rule = await data_rule_service.get_role_rules(pk=pk)
     return response_base.success(data=rule)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(
-    pk: Annotated[int, Path(..., description='角色 ID')],
+    pk: Annotated[int, Path(description='角色 ID')],
 ) -> ResponseSchemaModel[GetRoleWithRelationDetail]:
     data = await role_service.get(pk=pk)
     return response_base.success(data=data)
@@ -100,7 +100,7 @@ async def create_role(obj: CreateRoleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_role(pk: Annotated[int, Path(..., description='角色 ID')], obj: UpdateRoleParam) -> ResponseModel:
+async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: UpdateRoleParam) -> ResponseModel:
     count = await role_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -116,7 +116,7 @@ async def update_role(pk: Annotated[int, Path(..., description='角色 ID')], ob
     ],
 )
 async def update_role_menus(
-    request: Request, pk: Annotated[int, Path(..., description='角色 ID')], menu_ids: UpdateRoleMenuParam
+    request: Request, pk: Annotated[int, Path(description='角色 ID')], menu_ids: UpdateRoleMenuParam
 ) -> ResponseModel:
     count = await role_service.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
     if count > 0:
@@ -133,7 +133,7 @@ async def update_role_menus(
     ],
 )
 async def update_role_rules(
-    request: Request, pk: Annotated[int, Path(..., description='角色 ID')], rule_ids: UpdateRoleRuleParam
+    request: Request, pk: Annotated[int, Path(description='角色 ID')], rule_ids: UpdateRoleRuleParam
 ) -> ResponseModel:
     count = await role_service.update_role_rule(request=request, pk=pk, rule_ids=rule_ids)
     if count > 0:
@@ -149,9 +149,7 @@ async def update_role_rules(
         DependsRBAC,
     ],
 )
-async def delete_role(
-    request: Request, pk: Annotated[list[int], Query(..., description='角色 ID 列表')]
-) -> ResponseModel:
+async def delete_role(request: Request, pk: Annotated[list[int], Query(description='角色 ID 列表')]) -> ResponseModel:
     count = await role_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

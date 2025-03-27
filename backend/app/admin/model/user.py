@@ -15,9 +15,7 @@ from backend.database.db import uuid4_str
 from backend.utils.timezone import timezone
 
 if TYPE_CHECKING:
-    from backend.app.admin.model.dept import Dept
-    from backend.app.admin.model.role import Role
-    from backend.app.admin.model.user_social import UserSocial
+    from backend.app.admin.model import Dept, Role, UserSocial
 
 
 class User(Base):

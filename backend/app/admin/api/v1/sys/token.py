@@ -81,7 +81,7 @@ async def get_tokens(
     ],
 )
 async def kick_out(
-    request: Request, pk: Annotated[int, Path(..., description='用户 ID')], obj: KickOutToken
+    request: Request, pk: Annotated[int, Path(description='用户 ID')], obj: KickOutToken
 ) -> ResponseModel:
     superuser_verify(request)
     await revoke_token(str(pk), obj.session_uuid)

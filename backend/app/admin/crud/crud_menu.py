@@ -67,26 +67,26 @@ class CRUDMenu(CRUDPlus[Menu]):
         menu = await db.execute(stmt)
         return menu.scalars().all()
 
-    async def create(self, db: AsyncSession, obj_in: CreateMenuParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateMenuParam) -> None:
         """
         创建菜单
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, menu_id: int, obj_in: UpdateMenuParam) -> int:
+    async def update(self, db: AsyncSession, menu_id: int, obj: UpdateMenuParam) -> int:
         """
         更新菜单
 
         :param db: 数据库会话
         :param menu_id: 菜单 ID
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, menu_id, obj_in)
+        return await self.update_model(db, menu_id, obj)
 
     async def delete(self, db: AsyncSession, menu_id: int) -> int:
         """
@@ -98,7 +98,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         """
         return await self.delete_model(db, menu_id)
 
-    async def get_children(self, db: AsyncSession, menu_id: int) -> list[Menu]:
+    async def get_children(self, db: AsyncSession, menu_id: int) -> list[Menu | None]:
         """
         获取子菜单列表
 

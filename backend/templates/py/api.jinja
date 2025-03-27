@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取{{ table_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
-async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
+async def get_{{ table_name_en }}(pk: Annotated[int, Path()]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
     {{ table_name_en }} = await {{ table_name_en }}_service.get(pk=pk)
     return response_base.success(data={{ table_name_en }})
 
@@ -56,7 +56,7 @@ async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> Respo
         DependsRBAC,
     ],
 )
-async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{{ schema_name }}Param) -> ResponseModel:
+async def update_{{ table_name_en }}(pk: Annotated[int, Path()], obj: Update{{ schema_name }}Param) -> ResponseModel:
     count = await {{ table_name_en }}_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -71,7 +71,7 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
         DependsRBAC,
     ],
 )
-async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query()]) -> ResponseModel:
     count = await {{ table_name_en }}_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

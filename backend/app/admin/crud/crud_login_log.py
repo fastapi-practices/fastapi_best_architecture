@@ -29,15 +29,15 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
             filters.update(ip__like=f'%{ip}%')
         return await self.select_order('created_time', 'desc', **filters)
 
-    async def create(self, db: AsyncSession, obj_in: CreateLoginLogParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateLoginLogParam) -> None:
         """
         创建登录日志
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in, commit=True)
+        await self.create_model(db, obj, commit=True)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

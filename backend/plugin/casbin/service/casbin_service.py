@@ -8,11 +8,11 @@ from backend.common.exception import errors
 from backend.database.db import async_db_session
 from backend.plugin.casbin.crud.crud_casbin import casbin_dao
 from backend.plugin.casbin.schema.casbin_rule import (
+    CreateGroupParam,
     CreatePolicyParam,
-    CreateUserRoleParam,
     DeleteAllPoliciesParam,
+    DeleteGroupParam,
     DeletePolicyParam,
-    DeleteUserRoleParam,
     UpdatePoliciesParam,
     UpdatePolicyParam,
 )
@@ -28,7 +28,7 @@ class CasbinService:
         获取 Casbin 规则列表
 
         :param ptype: 策略类型
-        :param sub: 用户 UIUID / 角色 ID
+        :param sub: 用户 UUID / 角色 ID
         :return:
         """
         return await casbin_dao.get_list(ptype, sub)
@@ -91,7 +91,8 @@ class CasbinService:
         if not _p:
             raise errors.NotFoundError(msg='权限不存在')
         data = await enforcer.update_policy(
-            [old_obj.sub, old_obj.path, old_obj.method], [new_obj.sub, new_obj.path, new_obj.method]
+            [old_obj.sub, old_obj.path, old_obj.method],
+            [new_obj.sub, new_obj.path, new_obj.method],
         )
         return data
 
@@ -105,7 +106,8 @@ class CasbinService:
         """
         enforcer = await casbin_enforcer()
         data = await enforcer.update_policies(
-            [list(o.model_dump().values()) for o in obj.old], [list(n.model_dump().values()) for n in obj.new]
+            [list(o.model_dump().values()) for o in obj.old],
+            [list(n.model_dump().values()) for n in obj.new],
         )
         return data
 
@@ -158,7 +160,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_group(*, g: CreateUserRoleParam) -> bool:
+    async def create_group(*, g: CreateGroupParam) -> bool:
         """
         创建 G 策略
 
@@ -172,7 +174,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def create_groups(*, gs: list[CreateUserRoleParam]) -> bool:
+    async def create_groups(*, gs: list[CreateGroupParam]) -> bool:
         """
         批量创建 G 策略
 
@@ -186,7 +188,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_group(*, g: DeleteUserRoleParam) -> bool:
+    async def delete_group(*, g: DeleteGroupParam) -> bool:
         """
         删除 G 策略
 
@@ -201,7 +203,7 @@ class CasbinService:
         return data
 
     @staticmethod
-    async def delete_groups(*, gs: list[DeleteUserRoleParam]) -> bool:
+    async def delete_groups(*, gs: list[DeleteGroupParam]) -> bool:
         """
         批量删除 G 策略
 

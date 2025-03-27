@@ -49,26 +49,26 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.select_model_by_column(db, code=code)
 
-    async def create(self, db: AsyncSession, obj_in: CreateDictTypeParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDictTypeParam) -> None:
         """
         创建字典类型
 
         :param db: 数据库会话
-        :param obj_in: 字典类型创建参数
+        :param obj: 字典类型创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDictTypeParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateDictTypeParam) -> int:
         """
         更新字典类型
 
         :param db: 数据库会话
         :param pk: 字典类型 ID
-        :param obj_in: 字典类型更新参数
+        :param obj: 字典类型更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

@@ -64,26 +64,26 @@ class CRUDApi(CRUDPlus[Api]):
         """
         return await self.select_model_by_column(db, name=name)
 
-    async def create(self, db: AsyncSession, obj_in: CreateApiParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateApiParam) -> None:
         """
         创建 API
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApiParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateApiParam) -> int:
         """
         更新 API
 
         :param db: 数据库会话
         :param pk: 主键
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

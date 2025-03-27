@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, desc, select
+from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
@@ -79,13 +79,16 @@ class CRUDRole(CRUDPlus[Role]):
             .options(noload(self.model.users), noload(self.model.menus), noload(self.model.rules))
             .order_by(desc(self.model.created_time))
         )
-        where_list = []
-        if name:
-            where_list.append(self.model.name.like(f'%{name}%'))
+
+        filters = []
+        if name is not None:
+            filters.append(self.model.name.like(f'%{name}%'))
         if status is not None:
-            where_list.append(self.model.status == status)
-        if where_list:
-            stmt = stmt.where(*where_list)
+            filters.append(self.model.status == status)
+
+        if filters:
+            stmt = stmt.where(and_(*filters))
+
         return stmt
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:
@@ -98,26 +101,26 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_model_by_column(db, name=name)
 
-    async def create(self, db: AsyncSession, obj_in: CreateRoleParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateRoleParam) -> None:
         """
         创建角色
 
         :param db: 数据库会话
-        :param obj_in: 角色创建参数
+        :param obj: 角色创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, role_id: int, obj_in: UpdateRoleParam) -> int:
+    async def update(self, db: AsyncSession, role_id: int, obj: UpdateRoleParam) -> int:
         """
         更新角色
 
         :param db: 数据库会话
         :param role_id: 角色 ID
-        :param obj_in: 角色更新参数
+        :param obj: 角色更新参数
         :return:
         """
-        return await self.update_model(db, role_id, obj_in)
+        return await self.update_model(db, role_id, obj)
 
     async def update_menus(self, db: AsyncSession, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:
         """

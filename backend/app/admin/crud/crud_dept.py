@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Dept, User
+from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 
 
@@ -63,26 +63,26 @@ class CRUDDept(CRUDPlus[Dept]):
             filters.update(status=status)
         return await self.select_models_order(db, sort_columns='sort', **filters)
 
-    async def create(self, db: AsyncSession, obj_in: CreateDeptParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
         """
         创建部门
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, dept_id: int, obj_in: UpdateDeptParam) -> int:
+    async def update(self, db: AsyncSession, dept_id: int, obj: UpdateDeptParam) -> int:
         """
         更新部门
 
         :param db: 数据库会话
         :param dept_id: 部门 ID
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, dept_id, obj_in)
+        return await self.update_model(db, dept_id, obj)
 
     async def delete(self, db: AsyncSession, dept_id: int) -> int:
         """
@@ -94,7 +94,7 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         return await self.delete_model_by_column(db, id=dept_id, logical_deletion=True, deleted_flag_column='del_flag')
 
-    async def get_with_relation(self, db: AsyncSession, dept_id: int) -> list[User]:
+    async def get_with_relation(self, db: AsyncSession, dept_id: int) -> Dept | None:
         """
         获取部门及关联数据
 
@@ -104,10 +104,9 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         stmt = select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
         result = await db.execute(stmt)
-        user_relation = result.scalars().first()
-        return user_relation.users
+        return result.scalars().first()
 
-    async def get_children(self, db: AsyncSession, dept_id: int) -> list[Dept]:
+    async def get_children(self, db: AsyncSession, dept_id: int) -> list[Dept | None]:
         """
         获取子部门列表
 

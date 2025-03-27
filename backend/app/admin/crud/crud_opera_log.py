@@ -29,15 +29,15 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
             filters.update(ip=f'%{ip}%')
         return await self.select_order('created_time', 'desc', **filters)
 
-    async def create(self, db: AsyncSession, obj_in: CreateOperaLogParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateOperaLogParam) -> None:
         """
         创建操作日志
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

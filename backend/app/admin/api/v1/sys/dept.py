@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
-async def get_dept(pk: Annotated[int, Path(..., description='部门 ID')]) -> ResponseSchemaModel[GetDeptDetail]:
+async def get_dept(pk: Annotated[int, Path(description='部门 ID')]) -> ResponseSchemaModel[GetDeptDetail]:
     data = await dept_service.get(pk=pk)
     return response_base.success(data=data)
 
@@ -52,7 +52,7 @@ async def create_dept(obj: CreateDeptParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dept(pk: Annotated[int, Path(..., description='部门 ID')], obj: UpdateDeptParam) -> ResponseModel:
+async def update_dept(pk: Annotated[int, Path(description='部门 ID')], obj: UpdateDeptParam) -> ResponseModel:
     count = await dept_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -67,7 +67,7 @@ async def update_dept(pk: Annotated[int, Path(..., description='部门 ID')], ob
         DependsRBAC,
     ],
 )
-async def delete_dept(request: Request, pk: Annotated[int, Path(..., description='部门 ID')]) -> ResponseModel:
+async def delete_dept(request: Request, pk: Annotated[int, Path(description='部门 ID')]) -> ResponseModel:
     count = await dept_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

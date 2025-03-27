@@ -23,15 +23,15 @@ class OperaLogService:
         return await opera_log_dao.get_list(username=username, status=status, ip=ip)
 
     @staticmethod
-    async def create(*, obj_in: CreateOperaLogParam) -> None:
+    async def create(*, obj: CreateOperaLogParam) -> None:
         """
         创建操作日志
 
-        :param obj_in: 操作日志创建参数
+        :param obj: 操作日志创建参数
         :return:
         """
         async with async_db_session.begin() as db:
-            await opera_log_dao.create(db, obj_in)
+            await opera_log_dao.create(db, obj)
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:

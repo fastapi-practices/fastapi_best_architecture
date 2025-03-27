@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, desc, select
+from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload
 from sqlalchemy_crud_plus import CRUDPlus
@@ -32,11 +32,14 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         :return:
         """
         stmt = select(self.model).options(noload(self.model.roles)).order_by(desc(self.model.created_time))
-        where_list = []
+
+        filters = []
         if name is not None:
-            where_list.append(self.model.name.like(f'%{name}%'))
-        if where_list:
-            stmt = stmt.where(*where_list)
+            filters.append(self.model.name.like(f'%{name}%'))
+
+        if filters:
+            stmt = stmt.where(and_(*filters))
+
         return stmt
 
     async def get_by_name(self, db: AsyncSession, name: str) -> DataRule | None:
@@ -58,26 +61,26 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: CreateDataRuleParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDataRuleParam) -> None:
         """
         创建规则
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDataRuleParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateDataRuleParam) -> int:
         """
         更新规则
 
         :param db: 数据库会话
         :param pk: 规则 ID
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

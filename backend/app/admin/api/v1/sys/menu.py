@@ -21,7 +21,7 @@ async def get_user_sidebar(request: Request) -> ResponseSchemaModel[list[dict[st
 
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
-async def get_menu(pk: Annotated[int, Path(..., description='菜单 ID')]) -> ResponseSchemaModel[GetMenuDetail]:
+async def get_menu(pk: Annotated[int, Path(description='菜单 ID')]) -> ResponseSchemaModel[GetMenuDetail]:
     data = await menu_service.get(pk=pk)
     return response_base.success(data=data)
 
@@ -56,7 +56,7 @@ async def create_menu(obj: CreateMenuParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_menu(pk: Annotated[int, Path(..., description='菜单 ID')], obj: UpdateMenuParam) -> ResponseModel:
+async def update_menu(pk: Annotated[int, Path(description='菜单 ID')], obj: UpdateMenuParam) -> ResponseModel:
     count = await menu_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -71,7 +71,7 @@ async def update_menu(pk: Annotated[int, Path(..., description='菜单 ID')], ob
         DependsRBAC,
     ],
 )
-async def delete_menu(request: Request, pk: Annotated[int, Path(..., description='菜单 ID 列表')]) -> ResponseModel:
+async def delete_menu(request: Request, pk: Annotated[int, Path(description='菜单 ID 列表')]) -> ResponseModel:
     count = await menu_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

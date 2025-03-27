@@ -13,7 +13,7 @@ class GetSwaggerToken(SchemaBase):
     """Swagger 认证令牌"""
 
     access_token: str = Field(description='访问令牌')
-    token_type: str = Field(default='Bearer', description='令牌类型')
+    token_type: str = Field('Bearer', description='令牌类型')
     user: GetUserInfoDetail = Field(description='用户信息')
 
 

@@ -3,7 +3,7 @@
 from typing import Any, Generic, TypeVar
 
 from fastapi import Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.common.response.response_code import CustomResponse, CustomResponseCode
 from backend.utils.serializers import MsgSpecJSONResponse
@@ -33,9 +33,9 @@ class ResponseModel(BaseModel):
             return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
     """
 
-    code: int = CustomResponseCode.HTTP_200.code
-    msg: str = CustomResponseCode.HTTP_200.msg
-    data: Any | None = None
+    code: int = Field(CustomResponseCode.HTTP_200.code, description='返回状态码')
+    msg: str = Field(CustomResponseCode.HTTP_200.msg, description='返回信息')
+    data: Any | None = Field(None, description='返回数据')
 
 
 class ResponseSchemaModel(ResponseModel, Generic[SchemaT]):

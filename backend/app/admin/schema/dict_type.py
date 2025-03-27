@@ -13,20 +13,16 @@ class DictTypeSchemaBase(SchemaBase):
 
     name: str = Field(description='字典名称')
     code: str = Field(description='字典编码')
-    status: StatusType = Field(default=StatusType.enable, description='状态')
-    remark: str | None = Field(default=None, description='备注')
+    status: StatusType = Field(StatusType.enable, description='状态')
+    remark: str | None = Field(None, description='备注')
 
 
 class CreateDictTypeParam(DictTypeSchemaBase):
     """创建字典类型参数"""
 
-    pass
-
 
 class UpdateDictTypeParam(DictTypeSchemaBase):
     """更新字典类型参数"""
-
-    pass
 
 
 class GetDictTypeDetail(DictTypeSchemaBase):
@@ -36,4 +32,4 @@ class GetDictTypeDetail(DictTypeSchemaBase):
 
     id: int = Field(description='字典类型 ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

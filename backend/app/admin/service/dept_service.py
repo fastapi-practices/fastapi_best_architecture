@@ -102,7 +102,8 @@ class DeptService:
         :return:
         """
         async with async_db_session.begin() as db:
-            dept_user = await dept_dao.get_with_relation(db, pk)
+            dept = await dept_dao.get_with_relation(db, pk)
+            dept_user = dept.users
             if dept_user:
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
             children = await dept_dao.get_children(db, pk)

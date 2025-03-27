@@ -44,7 +44,7 @@ class GenModelService:
         :return:
         """
         async with async_db_session() as db:
-            return await gen_model_dao.get_all_by_business_id(db, business_id)
+            return await gen_model_dao.get_all_by_business(db, business_id)
 
     @staticmethod
     async def create(*, obj: CreateGenModelParam) -> None:
@@ -55,7 +55,7 @@ class GenModelService:
         :return:
         """
         async with async_db_session.begin() as db:
-            gen_models = await gen_model_dao.get_all_by_business_id(db, obj.gen_business_id)
+            gen_models = await gen_model_dao.get_all_by_business(db, obj.gen_business_id)
             if obj.name in [gen_model.name for gen_model in gen_models]:
                 raise errors.ForbiddenError(msg='禁止添加相同列到同一模型表')
 
@@ -74,7 +74,7 @@ class GenModelService:
         async with async_db_session.begin() as db:
             model = await gen_model_dao.get(db, pk)
             if obj.name != model.name:
-                gen_models = await gen_model_dao.get_all_by_business_id(db, obj.gen_business_id)
+                gen_models = await gen_model_dao.get_all_by_business(db, obj.gen_business_id)
                 if obj.name in [gen_model.name for gen_model in gen_models]:
                     raise errors.ForbiddenError(msg='模型列名已存在')
 

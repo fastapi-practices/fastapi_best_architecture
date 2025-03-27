@@ -41,25 +41,26 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: CreateGenBusinessParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateGenBusinessParam) -> None:
         """
         创建代码生成业务表
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateGenBusinessParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenBusinessParam) -> int:
         """
         更新代码生成业务表
 
         :param db: 数据库会话
-        :param obj_in: 更新参数
+        :param pk: 主键 ID
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """

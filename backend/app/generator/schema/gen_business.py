@@ -15,12 +15,12 @@ class GenBusinessSchemaBase(SchemaBase):
     table_name_en: str = Field(description='表名称（英文）')
     table_name_zh: str = Field(description='表名称（中文）')
     table_simple_name_zh: str = Field(description='表名称（中文简称）')
-    table_comment: str | None = Field(default=None, description='表描述')
-    schema_name: str | None = Field(default=None, description='Schema 名称 (默认为英文表名称)')
-    default_datetime_column: bool = Field(default=True, description='是否存在默认时间列')
-    api_version: str = Field(default='v1', description='代码生成 api 版本，默认为 v1')
-    gen_path: str | None = Field(default=None, description='代码生成路径（默认为 app 根路径）')
-    remark: str | None = Field(default=None, description='备注')
+    table_comment: str | None = Field(None, description='表描述')
+    schema_name: str | None = Field(None, description='Schema 名称 (默认为英文表名称)')
+    default_datetime_column: bool = Field(True, description='是否存在默认时间列')
+    api_version: str = Field('v1', description='代码生成 api 版本')
+    gen_path: str | None = Field(None, description='代码生成路径（默认为 app 根路径）')
+    remark: str | None = Field(None, description='备注')
 
     @model_validator(mode='after')
     def check_schema_name(self) -> Self:
@@ -45,4 +45,4 @@ class GetGenBusinessDetail(GenBusinessSchemaBase):
 
     id: int = Field(description='主键 ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

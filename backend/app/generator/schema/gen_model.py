@@ -10,14 +10,14 @@ class GenModelSchemaBase(SchemaBase):
     """代码生成模型基础模型"""
 
     name: str = Field(description='列名称')
-    comment: str | None = Field(default=None, description='列描述')
+    comment: str | None = Field(None, description='列描述')
     type: str = Field(description='SQLA 模型列类型')
-    default: str | None = Field(default=None, description='列默认值')
+    default: str | None = Field(None, description='列默认值')
     sort: int = Field(description='列排序')
     length: int = Field(description='列长度')
-    is_pk: bool = Field(default=False, description='是否主键')
-    is_nullable: bool = Field(default=False, description='是否可为空')
-    gen_business_id: int | None = Field(ge=1, description='代码生成业务ID')
+    is_pk: bool = Field(False, description='是否主键')
+    is_nullable: bool = Field(False, description='是否可为空')
+    gen_business_id: int = Field(description='代码生成业务ID')
 
     @field_validator('type')
     @classmethod

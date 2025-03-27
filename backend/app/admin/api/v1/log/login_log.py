@@ -43,7 +43,7 @@ async def get_pagination_login_logs(
         DependsRBAC,
     ],
 )
-async def delete_login_log(pk: Annotated[list[int], Query(..., description='登录日志 ID 列表')]) -> ResponseModel:
+async def delete_login_log(pk: Annotated[list[int], Query(description='登录日志 ID 列表')]) -> ResponseModel:
     count = await login_log_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

@@ -8,9 +8,9 @@ from backend.core.conf import settings
 
 
 class CasbinSettings(BaseSettings):
-    """Casbin 配置类"""
+    """Casbin 配置"""
 
-    # RBAC 配置
+    # RBAC
     RBAC_CASBIN_EXCLUDE: set[tuple[str, str]] = {
         ('POST', f'{settings.FASTAPI_API_V1_PATH}/auth/logout'),
         ('POST', f'{settings.FASTAPI_API_V1_PATH}/auth/token/new'),

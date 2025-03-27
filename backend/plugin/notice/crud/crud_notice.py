@@ -36,26 +36,26 @@ class CRUDNotice(CRUDPlus[Notice]):
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: CreateNoticeParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateNoticeParam) -> None:
         """
         创建通知公告
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateNoticeParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateNoticeParam) -> int:
         """
         更新通知公告
 
         :param db: 数据库会话
         :param pk: 主键
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

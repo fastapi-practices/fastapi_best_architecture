@@ -12,11 +12,11 @@ from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
 from backend.plugin.casbin.schema.casbin_rule import (
+    CreateGroupParam,
     CreatePolicyParam,
-    CreateUserRoleParam,
     DeleteAllPoliciesParam,
+    DeleteGroupParam,
     DeletePolicyParam,
-    DeleteUserRoleParam,
     GetPolicyDetail,
     UpdatePoliciesParam,
     UpdatePolicyParam,
@@ -61,15 +61,6 @@ async def get_all_policies(
     ],
 )
 async def create_policy(p: CreatePolicyParam) -> ResponseSchemaModel[bool]:
-    """
-    p 策略:
-
-    - 推荐添加基于角色的访问权限, 需配合添加 g 策略才能真正拥有访问权限，适合配置全局接口访问策略<br>
-    **格式**: 角色 role + 访问路径 path + 访问方法 method
-
-    - 如果添加基于用户的访问权限, 不需配合添加 g 策略就能真正拥有权限，适合配置指定用户接口访问策略<br>
-    **格式**: 用户 uuid + 访问路径 path + 访问方法 method
-    """
     data = await casbin_service.create_policy(p=p)
     return response_base.success(data=data)
 
@@ -168,68 +159,59 @@ async def get_all_groups() -> ResponseSchemaModel[list[list[str]]]:
         DependsRBAC,
     ],
 )
-async def create_group(g: CreateUserRoleParam) -> ResponseSchemaModel[bool]:
-    """
-    g 策略 (**依赖 p 策略**):
-
-    - 如果在 p 策略中添加了基于角色的访问权限, 则还需要在 g 策略中添加基于用户组的访问权限, 才能真正拥有访问权限<br>
-    **格式**: 用户 uuid + 角色 role
-
-    - 如果在 p 策略中添加了基于用户的访问权限, 则不添加相应的 g 策略能直接拥有访问权限<br>
-    但是拥有的不是用户角色的所有权限, 而只是单一的对应的 p 策略所添加的访问权限
-    """
+async def create_group(g: CreateGroupParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.create_group(g=g)
     return response_base.success(data=data)
 
 
 @router.post(
     '/groups',
-    summary='添加多组G权限策略',
+    summary='添加多组 G 权限策略',
     dependencies=[
         Depends(RequestPermission('casbin:g:group:add')),
         DependsRBAC,
     ],
 )
-async def create_groups(gs: list[CreateUserRoleParam]) -> ResponseSchemaModel[bool]:
+async def create_groups(gs: list[CreateGroupParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.create_groups(gs=gs)
     return response_base.success(data=data)
 
 
 @router.delete(
     '/group',
-    summary='删除G权限策略',
+    summary='删除 G 权限策略',
     dependencies=[
         Depends(RequestPermission('casbin:g:del')),
         DependsRBAC,
     ],
 )
-async def delete_group(g: DeleteUserRoleParam) -> ResponseSchemaModel[bool]:
+async def delete_group(g: DeleteGroupParam) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_group(g=g)
     return response_base.success(data=data)
 
 
 @router.delete(
     '/groups',
-    summary='删除多组G权限策略',
+    summary='删除多组 G 权限策略',
     dependencies=[
         Depends(RequestPermission('casbin:g:group:del')),
         DependsRBAC,
     ],
 )
-async def delete_groups(gs: list[DeleteUserRoleParam]) -> ResponseSchemaModel[bool]:
+async def delete_groups(gs: list[DeleteGroupParam]) -> ResponseSchemaModel[bool]:
     data = await casbin_service.delete_groups(gs=gs)
     return response_base.success(data=data)
 
 
 @router.delete(
     '/groups/all',
-    summary='删除所有G权限策略',
+    summary='删除所有 G 权限策略',
     dependencies=[
         Depends(RequestPermission('casbin:g:empty')),
         DependsRBAC,
     ],
 )
-async def delete_all_groups(uuid: Annotated[UUID, Query(...)]) -> ResponseModel:
+async def delete_all_groups(uuid: Annotated[UUID, Query()]) -> ResponseModel:
     count = await casbin_service.delete_all_groups(uuid=uuid)
     if count > 0:
         return response_base.success()

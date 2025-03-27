@@ -23,7 +23,7 @@ async def get_all_apis() -> ResponseSchemaModel[list[GetApiDetail]]:
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
-async def get_api(pk: Annotated[int, Path(..., description='API ID')]) -> ResponseSchemaModel[GetApiDetail]:
+async def get_api(pk: Annotated[int, Path(description='API ID')]) -> ResponseSchemaModel[GetApiDetail]:
     api = await api_service.get(pk=pk)
     return response_base.success(data=api)
 
@@ -69,7 +69,7 @@ async def create_api(obj: CreateApiParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_api(pk: Annotated[int, Path(..., description='API ID')], obj: UpdateApiParam) -> ResponseModel:
+async def update_api(pk: Annotated[int, Path(description='API ID')], obj: UpdateApiParam) -> ResponseModel:
     count = await api_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -84,7 +84,7 @@ async def update_api(pk: Annotated[int, Path(..., description='API ID')], obj: U
         DependsRBAC,
     ],
 )
-async def delete_api(pk: Annotated[list[int], Query(..., description='API ID 列表')]) -> ResponseModel:
+async def delete_api(pk: Annotated[list[int], Query(description='API ID 列表')]) -> ResponseModel:
     count = await api_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

@@ -31,10 +31,11 @@ class CRUDCasbin(CRUDPlus[CasbinRule]):
         :param sub: 删除参数
         :return:
         """
-        where_list = [sub.role]
+        filters = [sub.role]
         if sub.uuid:
-            where_list.append(sub.uuid)
-        return await self.delete_model_by_column(db, allow_multiple=True, v0__mor={'eq': where_list})
+            filters.append(sub.uuid)
+
+        return await self.delete_model_by_column(db, allow_multiple=True, v0__mor={'eq': filters})
 
     async def delete_groups_by_uuid(self, db: AsyncSession, uuid: UUID) -> int:
         """

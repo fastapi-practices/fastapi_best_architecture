@@ -12,9 +12,9 @@ class ApiSchemaBase(SchemaBase):
     """API 基础模型"""
 
     name: str = Field(description='API 名称')
-    method: MethodType = Field(default=MethodType.GET, description='请求方法')
+    method: MethodType = Field(MethodType.GET, description='请求方法')
     path: str = Field(description='API 路径')
-    remark: str | None = Field(default=None, description='备注')
+    remark: str | None = Field(None, description='备注')
 
 
 class CreateApiParam(ApiSchemaBase):
@@ -32,4 +32,4 @@ class GetApiDetail(ApiSchemaBase):
 
     id: int = Field(description='API ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

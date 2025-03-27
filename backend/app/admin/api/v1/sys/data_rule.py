@@ -38,7 +38,7 @@ async def get_all_data_rules() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
 
 @router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
 async def get_data_rule(
-    pk: Annotated[int, Path(..., description='数据规则 ID')],
+    pk: Annotated[int, Path(description='数据规则 ID')],
 ) -> ResponseSchemaModel[GetDataRuleDetail]:
     data = await data_rule_service.get(pk=pk)
     return response_base.success(data=data)
@@ -82,7 +82,7 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
     ],
 )
 async def update_data_rule(
-    pk: Annotated[int, Path(..., description='数据规则 ID')], obj: UpdateDataRuleParam
+    pk: Annotated[int, Path(description='数据规则 ID')], obj: UpdateDataRuleParam
 ) -> ResponseModel:
     count = await data_rule_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -99,7 +99,7 @@ async def update_data_rule(
     ],
 )
 async def delete_data_rule(
-    request: Request, pk: Annotated[list[int], Query(..., description='数据规则 ID 列表')]
+    request: Request, pk: Annotated[list[int], Query(description='数据规则 ID 列表')]
 ) -> ResponseModel:
     count = await data_rule_service.delete(request=request, pk=pk)
     if count > 0:

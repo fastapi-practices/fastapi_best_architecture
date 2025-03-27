@@ -22,7 +22,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         return await self.select_model(db, pk)
 
-    async def get_all_by_business_id(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
+    async def get_all_by_business(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
         """
         获取所有代码生成模型列
 
@@ -32,28 +32,28 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         return await self.select_models_order(db, sort_columns='sort', gen_business_id=business_id)
 
-    async def create(self, db: AsyncSession, obj_in: CreateGenModelParam, pd_type: str | None = None) -> None:
+    async def create(self, db: AsyncSession, obj: CreateGenModelParam, pd_type: str | None = None) -> None:
         """
         创建代码生成模型表
 
         :param db: 数据库会话
-        :param obj_in: 创建参数
+        :param obj: 创建参数
         :param pd_type: Pydantic 类型
         :return:
         """
-        await self.create_model(db, obj_in, pd_type=pd_type)
+        await self.create_model(db, obj, pd_type=pd_type)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateGenModelParam, pd_type: str | None = None) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenModelParam, pd_type: str | None = None) -> int:
         """
         更新代码生成模型表
 
         :param db: 数据库会话
         :param pk: 主键 ID
-        :param obj_in: 更新参数
+        :param obj: 更新参数
         :param pd_type: Pydantic 类型
         :return:
         """
-        return await self.update_model(db, pk, obj_in, pd_type=pd_type)
+        return await self.update_model(db, pk, obj, pd_type=pd_type)
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """

@@ -14,8 +14,8 @@ class RoleSchemaBase(SchemaBase):
     """角色基础模型"""
 
     name: str = Field(description='角色名称')
-    status: StatusType = Field(default=StatusType.enable, description='状态')
-    remark: str | None = Field(default=None, description='备注')
+    status: StatusType = Field(StatusType.enable, description='状态')
+    remark: str | None = Field(None, description='备注')
 
 
 class CreateRoleParam(RoleSchemaBase):
@@ -45,11 +45,11 @@ class GetRoleDetail(RoleSchemaBase):
 
     id: int = Field(description='角色 ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')
 
 
 class GetRoleWithRelationDetail(GetRoleDetail):
     """角色关联详情"""
 
-    menus: list[GetMenuDetail | None] = Field(default=[], description='菜单详情列表')
-    rules: list[GetDataRuleDetail | None] = Field(default=[], description='数据规则详情列表')
+    menus: list[GetMenuDetail | None] = Field([], description='菜单详情列表')
+    rules: list[GetDataRuleDetail | None] = Field([], description='数据规则详情列表')

@@ -51,7 +51,7 @@ class LoginLogService:
         :return:
         """
         try:
-            obj_in = CreateLoginLogParam(
+            obj = CreateLoginLogParam(
                 user_uuid=user_uuid,
                 username=username,
                 status=status,
@@ -66,7 +66,7 @@ class LoginLogService:
                 msg=msg,
                 login_time=login_time,
             )
-            await login_log_dao.create(db, obj_in)
+            await login_log_dao.create(db, obj)
         except Exception as e:
             log.error(f'登录日志创建失败: {e}')
 

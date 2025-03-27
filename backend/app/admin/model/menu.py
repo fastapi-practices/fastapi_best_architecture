@@ -13,7 +13,7 @@ from backend.app.admin.model.m2m import sys_role_menu
 from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
-    from backend.app.admin.model.role import Role
+    from backend.app.admin.model import Role
 
 
 class Menu(Base):

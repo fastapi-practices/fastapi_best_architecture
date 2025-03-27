@@ -5,7 +5,6 @@ from typing import Any
 from fastapi import HTTPException
 from starlette.background import BackgroundTask
 
-from backend.common.log import log
 from backend.common.response.response_code import CustomErrorCode, StandardResponseCode
 
 
@@ -19,7 +18,6 @@ class BaseExceptionMixin(Exception):
         self.data = data
         # The original background task: https://www.starlette.io/background/
         self.background = background
-        log.error('业务异常: {}', msg)
 
 
 class HTTPError(HTTPException):
@@ -27,7 +25,6 @@ class HTTPError(HTTPException):
 
     def __init__(self, *, code: int, msg: Any = None, headers: dict[str, Any] | None = None):
         super().__init__(status_code=code, detail=msg, headers=headers)
-        log.error('HTTP 异常: {}', msg)
 
 
 class CustomError(BaseExceptionMixin):

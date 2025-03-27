@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
-    from backend.app.generator.model.gen_model import GenModel
+    from backend.app.generator.model import GenModel
 
 
 class GenBusiness(Base):

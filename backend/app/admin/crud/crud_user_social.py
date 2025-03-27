@@ -22,15 +22,15 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         """
         return await self.select_model_by_column(db, user_id=pk, source=source)
 
-    async def create(self, db: AsyncSession, obj_in: CreateUserSocialParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateUserSocialParam) -> None:
         """
         创建用户社交账号绑定
 
         :param db: 数据库会话
-        :param obj_in: 用户社交账号绑定创建参数
+        :param obj: 用户社交账号绑定创建参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
     async def delete(self, db: AsyncSession, social_id: int) -> int:
         """

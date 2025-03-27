@@ -78,7 +78,7 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def build_plugin(plugin: Annotated[str, Query(..., description='插件名称')]) -> StreamingResponse:
+async def build_plugin(plugin: Annotated[str, Query(description='插件名称')]) -> StreamingResponse:
     plugin_dir = os.path.join(PLUGIN_DIR, plugin)
     if not os.path.exists(plugin_dir):
         raise errors.ForbiddenError(msg='插件不存在')

@@ -37,26 +37,26 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: Create{{ schema_name }}Param) -> None:
+    async def create(self, db: AsyncSession, obj: Create{{ schema_name }}Param) -> None:
         """
         创建{{ table_name_zh }}
 
         :param db:
-        :param obj_in:
+        :param obj:
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: Update{{ schema_name }}Param) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: Update{{ schema_name }}Param) -> int:
         """
         更新{{ table_name_zh }}
 
         :param db:
         :param pk:
-        :param obj_in:
+        :param obj:
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """

@@ -15,7 +15,7 @@ class NoticeSchemaBase(SchemaBase):
     type: int = Field(description='类型（0：通知、1：公告）')
     author: str = Field(description='作者')
     source: str = Field(description='信息来源')
-    status: StatusType = Field(default=StatusType.enable, description='状态（0：隐藏、1：显示）')
+    status: StatusType = Field(StatusType.enable, description='状态（0：隐藏、1：显示）')
     content: str = Field(description='内容')
 
 
@@ -34,4 +34,4 @@ class GetNoticeDetail(NoticeSchemaBase):
 
     id: int = Field(description='通知公告 ID')
     created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(default=None, description='更新时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

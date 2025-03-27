@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(..., description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
+async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
     notice = await notice_service.get(pk=pk)
     return response_base.success(data=notice)
 
@@ -57,9 +57,7 @@ async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_notice(
-    pk: Annotated[int, Path(..., description='通知公告 ID')], obj: UpdateNoticeParam
-) -> ResponseModel:
+async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam) -> ResponseModel:
     count = await notice_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -74,7 +72,7 @@ async def update_notice(
         DependsRBAC,
     ],
 )
-async def delete_notice(pk: Annotated[list[int], Query(..., description='通知公告 ID 列表')]) -> ResponseModel:
+async def delete_notice(pk: Annotated[list[int], Query(description='通知公告 ID 列表')]) -> ResponseModel:
     count = await notice_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Generic, Sequence, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Sequence, TypeVar
 
 from fastapi import Depends
 from fastapi_pagination import pagination_ctx
@@ -23,8 +23,8 @@ SchemaT = TypeVar('SchemaT')
 class _CustomPageParams(BaseModel, AbstractParams):
     """自定义分页参数"""
 
-    page: int = Field(default=1, ge=1, description='页码')
-    size: int = Field(default=20, gt=0, le=100, description='每页数量')
+    page: int = Field(1, ge=1, description='页码')
+    size: int = Field(20, gt=0, le=100, description='每页数量')
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
@@ -36,9 +36,9 @@ class _CustomPageParams(BaseModel, AbstractParams):
 class _Links(BaseModel):
     """分页链接"""
 
-    first: str = Field(..., description='首页链接')
-    last: str = Field(..., description='尾页链接')
-    self: str = Field(..., description='当前页链接')
+    first: str = Field(description='首页链接')
+    last: str = Field(description='尾页链接')
+    self: str = Field(description='当前页链接')
     next: str | None = Field(None, description='下一页链接')
     prev: str | None = Field(None, description='上一页链接')
 
@@ -47,11 +47,11 @@ class _PageDetails(BaseModel):
     """分页详情"""
 
     items: list = Field([], description='当前页数据列表')
-    total: int = Field(..., description='数据总条数')
-    page: int = Field(..., description='当前页码')
-    size: int = Field(..., description='每页数量')
-    total_pages: int = Field(..., description='总页数')
-    links: _Links = Field(..., description='分页链接')
+    total: int = Field(description='数据总条数')
+    page: int = Field(description='当前页码')
+    size: int = Field(description='每页数量')
+    total_pages: int = Field(description='总页数')
+    links: _Links = Field(description='分页链接')
 
 
 class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
@@ -111,7 +111,7 @@ class PageData(_PageDetails, Generic[SchemaT]):
     items: Sequence[SchemaT]
 
 
-async def paging_data(db: AsyncSession, select: Select) -> dict:
+async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
     """
     基于 SQLAlchemy 创建分页数据
 

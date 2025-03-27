@@ -64,7 +64,7 @@ def init_celery() -> celery.Celery:
         task_track_started=True,
     )
 
-    # 自动发现任务模块
+    # 自动发现任务
     app.autodiscover_tasks(task_settings.CELERY_TASK_PACKAGES)
 
     return app

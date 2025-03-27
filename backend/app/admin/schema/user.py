@@ -28,7 +28,7 @@ class AuthLoginParam(AuthSchemaBase):
 class RegisterUserParam(AuthSchemaBase):
     """用户注册参数"""
 
-    nickname: str | None = Field(default=None, description='昵称')
+    nickname: str | None = Field(None, description='昵称')
     email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
 
 
@@ -37,7 +37,7 @@ class AddUserParam(AuthSchemaBase):
 
     dept_id: int = Field(description='部门 ID')
     roles: list[int] = Field(description='角色 ID 列表')
-    nickname: str | None = Field(default=None, description='昵称')
+    nickname: str | None = Field(None, description='昵称')
     email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
 
 
@@ -52,11 +52,11 @@ class ResetPasswordParam(SchemaBase):
 class UserInfoSchemaBase(SchemaBase):
     """用户信息基础模型"""
 
-    dept_id: int | None = Field(default=None, description='部门 ID')
+    dept_id: int | None = Field(None, description='部门 ID')
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
     email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
-    phone: CustomPhoneNumber | None = Field(default=None, description='手机号')
+    phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
@@ -80,16 +80,16 @@ class GetUserInfoDetail(UserInfoSchemaBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept_id: int | None = Field(default=None, description='部门 ID')
+    dept_id: int | None = Field(None, description='部门 ID')
     id: int = Field(description='用户 ID')
     uuid: str = Field(description='用户 UUID')
-    avatar: str | None = Field(default=None, description='头像')
-    status: StatusType = Field(default=StatusType.enable, description='状态')
+    avatar: str | None = Field(None, description='头像')
+    status: StatusType = Field(StatusType.enable, description='状态')
     is_superuser: bool = Field(description='是否超级管理员')
     is_staff: bool = Field(description='是否管理员')
     is_multi_login: bool = Field(description='是否允许多端登录')
     join_time: datetime = Field(description='加入时间')
-    last_login_time: datetime | None = Field(default=None, description='最后登录时间')
+    last_login_time: datetime | None = Field(None, description='最后登录时间')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):
@@ -97,7 +97,7 @@ class GetUserInfoWithRelationDetail(GetUserInfoDetail):
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptDetail | None = Field(default=None, description='部门信息')
+    dept: GetDeptDetail | None = Field(None, description='部门信息')
     roles: list[GetRoleWithRelationDetail] = Field(description='角色列表')
 
 
@@ -106,7 +106,7 @@ class GetCurrentUserInfoWithRelationDetail(GetUserInfoWithRelationDetail):
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept: str | None = Field(default=None, description='部门名称')
+    dept: str | None = Field(None, description='部门名称')
     roles: list[str] = Field(description='角色名称列表')
 
     @model_validator(mode='before')

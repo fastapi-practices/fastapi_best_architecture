@@ -19,11 +19,7 @@ class TimeZone:
         self.tz_info = zoneinfo.ZoneInfo(tz)
 
     def now(self) -> datetime:
-        """
-        获取当前时区时间
-
-        :return:
-        """
+        """获取当前时区时间"""
         return datetime.now(self.tz_info)
 
     def f_datetime(self, dt: datetime) -> datetime:
