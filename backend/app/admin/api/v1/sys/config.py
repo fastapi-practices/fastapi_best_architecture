@@ -21,7 +21,7 @@ from backend.database.db import CurrentSession
 router = APIRouter()
 
 
-@router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
+@router.get('/website', summary='获取网站配置', dependencies=[DependsJwtAuth])
 async def get_website_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
     config = await config_service.get_built_in_config('website')
     return response_base.success(data=config)
@@ -29,7 +29,7 @@ async def get_website_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
 
 @router.post(
     '/website',
-    summary='保存网站配置信息',
+    summary='保存网站配置',
     dependencies=[
         Depends(RequestPermission('sys:config:website:add')),
         DependsRBAC,
