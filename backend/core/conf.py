@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     TOKEN_ONLINE_REDIS_PREFIX: str = 'fba:token_online'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = [  # JWT / RBAC 路由白名单
-        '/api/v1/auth/login',
+        f'{FASTAPI_API_V1_PATH}/auth/login',
     ]
 
     # JWT
@@ -131,9 +131,9 @@ class Settings(BaseSettings):
     # 演示模式配置
     DEMO_MODE: bool = False
     DEMO_MODE_EXCLUDE: set[tuple[str, str]] = {
-        ('POST', '/api/v1/auth/login'),
-        ('POST', '/api/v1/auth/logout'),
-        ('GET', '/api/v1/auth/captcha'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/login'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
+        ('GET', f'{FASTAPI_API_V1_PATH}/auth/captcha'),
     }
 
     # IP 定位配置
@@ -167,9 +167,9 @@ class Settings(BaseSettings):
         '/docs',
         '/redoc',
         '/openapi',
-        '/api/v1/auth/login/swagger',
-        '/api/v1/oauth2/github/callback',
-        '/api/v1/oauth2/linux-do/callback',
+        f'{FASTAPI_API_V1_PATH}/auth/login/swagger',
+        f'{FASTAPI_API_V1_PATH}/oauth2/github/callback',
+        f'{FASTAPI_API_V1_PATH}/oauth2/linux-do/callback',
     ]
     OPERA_LOG_ENCRYPT_TYPE: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
     OPERA_LOG_ENCRYPT_KEY_INCLUDE: list[str] = [  # 将加密接口入参参数对应的值
