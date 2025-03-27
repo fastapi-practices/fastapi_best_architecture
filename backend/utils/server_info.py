@@ -69,20 +69,16 @@ class ServerInfo:
         """获取 CPU 信息"""
         cpu_info = {'usage': round(psutil.cpu_percent(percpu=False), 2)}  # %
 
-        # 检查是否是 Apple M系列芯片
-        if platform.system() == 'Darwin' and 'arm' in platform.machine().lower():
+        try:
+            # CPU 频率信息，最大、最小和当前频率
+            cpu_freq = psutil.cpu_freq()
+            cpu_info.update({
+                'max_freq': round(cpu_freq.max, 2),  # MHz
+                'min_freq': round(cpu_freq.min, 2),  # MHz
+                'current_freq': round(cpu_freq.current, 2),  # MHz
+            })
+        except Exception:
             cpu_info.update({'max_freq': 0, 'min_freq': 0, 'current_freq': 0})
-        else:
-            try:
-                # CPU 频率信息，最大、最小和当前频率
-                cpu_freq = psutil.cpu_freq()
-                cpu_info.update({
-                    'max_freq': round(cpu_freq.max, 2),  # MHz
-                    'min_freq': round(cpu_freq.min, 2),  # MHz
-                    'current_freq': round(cpu_freq.current, 2),  # MHz
-                })
-            except (FileNotFoundError, AttributeError):
-                cpu_info.update({'max_freq': 0, 'min_freq': 0, 'current_freq': 0})
 
         # CPU 逻辑核心数，物理核心数
         cpu_info.update({
