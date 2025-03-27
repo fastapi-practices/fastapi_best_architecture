@@ -60,10 +60,10 @@ class CRUDMenu(CRUDPlus[Menu]):
         :return:
         """
         stmt = select(self.model).order_by(asc(self.model.sort))
-        where_list = [self.model.menu_type.in_([0, 1])]
+        filters = [self.model.menu_type.in_([0, 1])]
         if not superuser:
-            where_list.append(self.model.id.in_(menu_ids))
-        stmt = stmt.where(and_(*where_list))
+            filters.append(self.model.id.in_(menu_ids))
+        stmt = stmt.where(and_(*filters))
         menu = await db.execute(stmt)
         return menu.scalars().all()
 
