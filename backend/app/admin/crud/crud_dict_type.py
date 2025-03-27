@@ -54,7 +54,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         创建字典类型
 
         :param db: 数据库会话
-        :param obj: 字典类型创建参数
+        :param obj: 创建字典类型参数
         :return:
         """
         await self.create_model(db, obj)
@@ -65,7 +65,7 @@ class CRUDDictType(CRUDPlus[DictType]):
 
         :param db: 数据库会话
         :param pk: 字典类型 ID
-        :param obj: 字典类型更新参数
+        :param obj: 更新字典类型参数
         :return:
         """
         return await self.update_model(db, pk, obj)

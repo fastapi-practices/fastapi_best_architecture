@@ -34,7 +34,7 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         创建操作日志
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建操作日志参数
         :return:
         """
         await self.create_model(db, obj)
@@ -44,7 +44,7 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         删除操作日志
 
         :param db: 数据库会话
-        :param pk: 日志 ID 列表
+        :param pk: 操作日志 ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

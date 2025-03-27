@@ -66,7 +66,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         创建规则
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建规则参数
         :return:
         """
         await self.create_model(db, obj)
@@ -77,7 +77,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
 
         :param db: 数据库会话
         :param pk: 规则 ID
-        :param obj: 更新参数
+        :param obj: 更新规则参数
         :return:
         """
         return await self.update_model(db, pk, obj)

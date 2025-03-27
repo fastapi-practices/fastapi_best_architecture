@@ -18,7 +18,7 @@ class CRUDNotice(CRUDPlus[Notice]):
         获取通知公告
 
         :param db: 数据库会话
-        :param pk: 主键
+        :param pk: 通知公告 ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -41,7 +41,7 @@ class CRUDNotice(CRUDPlus[Notice]):
         创建通知公告
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建通知公告参数
         :return:
         """
         await self.create_model(db, obj)
@@ -51,8 +51,8 @@ class CRUDNotice(CRUDPlus[Notice]):
         更新通知公告
 
         :param db: 数据库会话
-        :param pk: 主键
-        :param obj: 更新参数
+        :param pk: 通知公告 ID
+        :param obj: 更新通知公告参数
         :return:
         """
         return await self.update_model(db, pk, obj)
@@ -62,7 +62,7 @@ class CRUDNotice(CRUDPlus[Notice]):
         删除通知公告
 
         :param db: 数据库会话
-        :param pk: 主键列表
+        :param pk: 通知公告 ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

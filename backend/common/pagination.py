@@ -5,7 +5,7 @@ from __future__ import annotations
 from math import ceil
 from typing import TYPE_CHECKING, Any, Generic, Sequence, TypeVar
 
-from fastapi import Depends
+from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -23,8 +23,8 @@ SchemaT = TypeVar('SchemaT')
 class _CustomPageParams(BaseModel, AbstractParams):
     """自定义分页参数"""
 
-    page: int = Field(1, ge=1, description='页码')
-    size: int = Field(20, gt=0, le=100, description='每页数量')
+    page: int = Query(1, ge=1, description='页码')
+    size: int = Query(20, gt=0, le=100, description='每页数量')
 
     def to_raw_params(self) -> RawParams:
         return RawParams(

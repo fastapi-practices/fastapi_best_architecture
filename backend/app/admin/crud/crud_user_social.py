@@ -27,7 +27,7 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         创建用户社交账号绑定
 
         :param db: 数据库会话
-        :param obj: 用户社交账号绑定创建参数
+        :param obj: 创建用户社交账号绑定参数
         :return:
         """
         await self.create_model(db, obj)

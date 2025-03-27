@@ -15,12 +15,12 @@ class AdminSettings(BaseSettings):
     # .env OAuth2
     OAUTH2_GITHUB_CLIENT_ID: str
     OAUTH2_GITHUB_CLIENT_SECRET: str
-    OAUTH2_LINUXDO_CLIENT_ID: str
-    OAUTH2_LINUXDO_CLIENT_SECRET: str
+    OAUTH2_LINUX_DO_CLIENT_ID: str
+    OAUTH2_LINUX_DO_CLIENT_SECRET: str
 
     # OAuth2
     OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/github/callback'
-    OAUTH2_LINUXDO_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/linux-do/callback'
+    OAUTH2_LINUX_DO_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/linux-do/callback'
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
     # 验证码

@@ -75,7 +75,7 @@ class CRUDConfig(CRUDPlus[Config]):
         创建参数配置
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建参数配置参数
         :return:
         """
         await self.create_model(db, obj)
@@ -86,7 +86,7 @@ class CRUDConfig(CRUDPlus[Config]):
 
         :param db: 数据库会话
         :param pk: 参数配置 ID
-        :param obj: 更新参数
+        :param obj: 更新参数配置参数
         :return:
         """
         return await self.update_model(db, pk, obj)

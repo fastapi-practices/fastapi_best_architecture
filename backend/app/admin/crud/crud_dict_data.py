@@ -61,7 +61,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         创建字典数据
 
         :param db: 数据库会话
-        :param obj: 字典数据创建参数
+        :param obj: 创建字典数据参数
         :return:
         """
         await self.create_model(db, obj)
@@ -72,7 +72,7 @@ class CRUDDictData(CRUDPlus[DictData]):
 
         :param db: 数据库会话
         :param pk: 字典数据 ID
-        :param obj: 字典数据更新参数
+        :param obj: 更新字典数据参数
         :return:
         """
         return await self.update_model(db, pk, obj)

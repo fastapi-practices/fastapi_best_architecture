@@ -51,7 +51,7 @@ class OAuth2Service:
                 social_username = user.get('login')
             social_nickname = user.get('name')
             social_email = user.get('email')
-            if social == UserSocialType.linuxdo:  # 不提供明文邮箱的平台
+            if social == UserSocialType.linux_do:  # 不提供明文邮箱的平台
                 social_email = f'{social_username}@linux.do'
             if not social_email:
                 raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')

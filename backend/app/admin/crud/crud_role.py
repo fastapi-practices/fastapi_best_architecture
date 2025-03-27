@@ -106,7 +106,7 @@ class CRUDRole(CRUDPlus[Role]):
         创建角色
 
         :param db: 数据库会话
-        :param obj: 角色创建参数
+        :param obj: 创建角色参数
         :return:
         """
         await self.create_model(db, obj)
@@ -117,7 +117,7 @@ class CRUDRole(CRUDPlus[Role]):
 
         :param db: 数据库会话
         :param role_id: 角色 ID
-        :param obj: 角色更新参数
+        :param obj: 更新角色参数
         :return:
         """
         return await self.update_model(db, role_id, obj)

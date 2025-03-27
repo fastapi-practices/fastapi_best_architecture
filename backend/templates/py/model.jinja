@@ -5,13 +5,14 @@ from uuid import UUID
 
 import sqlalchemy as sa
 
-from backend.common.model import {% if default_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
 {% if database_type == 'mysql' -%}
 from sqlalchemy.dialects import mysql
 {% else -%}
 from sqlalchemy.dialects import postgresql
 {% endif -%}
 from sqlalchemy.orm import Mapped, mapped_column
+
+from backend.common.model import {% if default_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
 
 
 class {{ table_name_class }}({% if default_datetime_column %}Base{% else %}MappedBase{% endif %}):

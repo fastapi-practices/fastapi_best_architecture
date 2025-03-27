@@ -15,6 +15,9 @@ class TaskSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=f'{BASE_PATH}/.env', env_file_encoding='utf-8', extra='ignore')
 
+    # .env 环境
+    ENVIRONMENT: Literal['dev', 'pro']
+
     # .env Redis 配置
     CELERY_BROKER_REDIS_DATABASE: int
     CELERY_BACKEND_REDIS_DATABASE: int
@@ -54,7 +57,7 @@ class TaskSettings(BaseSettings):
 
     @model_validator(mode='before')
     @classmethod
-    def validate_celery_broker(cls, values: dict[str, Any]) -> dict[str, Any]:
+    def validate_celery_broker(cls, values: Any) -> Any:
         """生产环境强制使用 RabbitMQ 作为消息代理"""
         if values['ENVIRONMENT'] == 'pro':
             values['CELERY_BROKER'] = 'rabbitmq'

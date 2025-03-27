@@ -20,7 +20,7 @@ class CRUDApi(CRUDPlus[Api]):
         获取 API
 
         :param db: 数据库会话
-        :param pk: 主键
+        :param pk: API ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -69,7 +69,7 @@ class CRUDApi(CRUDPlus[Api]):
         创建 API
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建 API 参数
         :return:
         """
         await self.create_model(db, obj)
@@ -79,8 +79,8 @@ class CRUDApi(CRUDPlus[Api]):
         更新 API
 
         :param db: 数据库会话
-        :param pk: 主键
-        :param obj: 更新参数
+        :param pk: API ID
+        :param obj: 更新 API 参数
         :return:
         """
         return await self.update_model(db, pk, obj)
@@ -90,7 +90,7 @@ class CRUDApi(CRUDPlus[Api]):
         删除 API
 
         :param db: 数据库会话
-        :param pk: 主键列表
+        :param pk: API ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

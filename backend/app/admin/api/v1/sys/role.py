@@ -143,7 +143,7 @@ async def update_role_rules(
 
 @router.delete(
     '',
-    summary='删除角色',
+    summary='批量删除角色',
     dependencies=[
         Depends(RequestPermission('sys:role:del')),
         DependsRBAC,

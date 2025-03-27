@@ -34,7 +34,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         创建登录日志
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建登录日志参数
         :return:
         """
         await self.create_model(db, obj, commit=True)
@@ -44,7 +44,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         删除登录日志
 
         :param db: 数据库会话
-        :param pk: 日志 ID 列表
+        :param pk: 登录日志 ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

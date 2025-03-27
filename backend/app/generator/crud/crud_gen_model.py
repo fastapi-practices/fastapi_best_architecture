@@ -17,7 +17,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         获取代码生成模型列
 
         :param db: 数据库会话
-        :param pk: 主键 ID
+        :param pk: 代码生成模型 ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -34,10 +34,10 @@ class CRUDGenModel(CRUDPlus[GenModel]):
 
     async def create(self, db: AsyncSession, obj: CreateGenModelParam, pd_type: str | None = None) -> None:
         """
-        创建代码生成模型表
+        创建代码生成模型
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建代码生成模型参数
         :param pd_type: Pydantic 类型
         :return:
         """
@@ -45,11 +45,11 @@ class CRUDGenModel(CRUDPlus[GenModel]):
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateGenModelParam, pd_type: str | None = None) -> int:
         """
-        更新代码生成模型表
+        更新代码生成模型
 
         :param db: 数据库会话
-        :param pk: 主键 ID
-        :param obj: 更新参数
+        :param pk: 代码生成模型 ID
+        :param obj: 更新代码生成模型参数
         :param pd_type: Pydantic 类型
         :return:
         """
@@ -57,10 +57,10 @@ class CRUDGenModel(CRUDPlus[GenModel]):
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """
-        删除代码生成模型表
+        删除代码生成模型
 
         :param db: 数据库会话
-        :param pk: 主键 ID
+        :param pk: 代码生成模型 ID
         :return:
         """
         return await self.delete_model(db, pk)

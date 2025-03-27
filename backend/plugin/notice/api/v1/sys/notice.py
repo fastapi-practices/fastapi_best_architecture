@@ -66,7 +66,7 @@ async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')],
 
 @router.delete(
     '',
-    summary='删除通知公告',
+    summary='批量删除通知公告',
     dependencies=[
         Depends(RequestPermission('sys:notice:del')),
         DependsRBAC,

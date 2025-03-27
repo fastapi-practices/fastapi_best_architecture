@@ -20,7 +20,7 @@ class ApiService:
         """
         获取 API
 
-        :param pk: 主键
+        :param pk: API ID
         :return:
         """
         async with async_db_session() as db:
@@ -54,7 +54,7 @@ class ApiService:
         """
         创建 API
 
-        :param obj: 创建参数
+        :param obj: 创建 API 参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -68,8 +68,8 @@ class ApiService:
         """
         更新 API
 
-        :param pk: 主键
-        :param obj: 更新参数
+        :param pk: API ID
+        :param obj: 更新 API 参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -84,7 +84,7 @@ class ApiService:
         """
         删除 API
 
-        :param pk: 主键列表
+        :param pk: API ID 列表
         :return:
         """
         async with async_db_session.begin() as db:

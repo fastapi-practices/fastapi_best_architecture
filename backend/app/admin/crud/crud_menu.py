@@ -72,7 +72,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         创建菜单
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建菜单参数
         :return:
         """
         await self.create_model(db, obj)
@@ -83,7 +83,7 @@ class CRUDMenu(CRUDPlus[Menu]):
 
         :param db: 数据库会话
         :param menu_id: 菜单 ID
-        :param obj: 更新参数
+        :param obj: 更新菜单参数
         :return:
         """
         return await self.update_model(db, menu_id, obj)

@@ -51,7 +51,7 @@ class GenModelService:
         """
         创建模型
 
-        :param obj: 创建参数
+        :param obj: 创建模型参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -68,7 +68,7 @@ class GenModelService:
         更新模型
 
         :param pk: 模型 ID
-        :param obj: 更新参数
+        :param obj: 更新模型参数
         :return:
         """
         async with async_db_session.begin() as db:

@@ -44,7 +44,6 @@ def get_plugin_models() -> list[type]:
     # 获取所有插件
     plugins = get_plugins()
 
-    # 遍历插件列表
     for plugin in plugins:
         # 导入插件的模型模块
         module_path = f'backend.plugin.{plugin}.model'
@@ -58,7 +57,7 @@ def get_plugin_models() -> list[type]:
     return classes
 
 
-def _load_plugin_config(plugin: str) -> dict[str, Any]:
+def load_plugin_config(plugin: str) -> dict[str, Any]:
     """
     加载插件配置
 
@@ -73,7 +72,7 @@ def _load_plugin_config(plugin: str) -> dict[str, Any]:
         return rtoml.load(f)
 
 
-def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
+def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
     """
     扩展级插件路由注入
 
@@ -94,10 +93,12 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
             if not (file.endswith('.py') and file != '__init__.py'):
                 continue
 
+            # 解析插件路由配置
             file_config = data.get('api', {}).get(f'{file[:-3]}', {})
             prefix = file_config.get('prefix', '')
             tags = file_config.get('tags', [])
 
+            # 获取插件路由模块
             file_path = os.path.join(root, file)
             path_to_module_str = os.path.relpath(file_path, PLUGIN_DIR).replace(os.sep, '.')[:-3]
             module_path = f'backend.plugin.{path_to_module_str}'
@@ -112,6 +113,7 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                     )
                     continue
 
+                # 获取目标 app 路由
                 relative_path = os.path.relpath(root, plugin_api_path)
                 target_module_path = f'backend.app.{app_include}.api.{relative_path.replace(os.sep, ".")}'
                 target_module = import_module_cached(target_module_path)
@@ -122,16 +124,17 @@ def _inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                         f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
                     )
 
+                # 将插件路由注入到目标路由中
                 target_router.include_router(
                     router=plugin_router,
                     prefix=prefix,
                     tags=[tags] if tags else [],
                 )
             except Exception as e:
-                raise PluginInjectError(f'注入扩展级插件 {plugin} 路由失败：{str(e)}') from e
+                raise PluginInjectError(f'扩展级插件 {plugin} 路由注入失败：{str(e)}') from e
 
 
-def _inject_app_router(plugin: str, data: dict[str, Any]) -> None:
+def inject_app_router(plugin: str, data: dict[str, Any]) -> None:
     """
     应用级插件路由注入
 
@@ -146,6 +149,7 @@ def _inject_app_router(plugin: str, data: dict[str, Any]) -> None:
         if not routers or not isinstance(routers, list):
             raise PluginInjectError(f'应用级插件 {plugin} 配置文件存在错误，请检查')
 
+        # 获取目标路由
         target_module = import_module_cached('backend.app.router')
         target_router = getattr(target_module, 'router')
 
@@ -155,23 +159,22 @@ def _inject_app_router(plugin: str, data: dict[str, Any]) -> None:
                 raise PluginInjectError(
                     f'应用级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
                 )
+
+            # 将插件路由注入到目标路由中
             target_router.include_router(plugin_router)
     except Exception as e:
-        raise PluginInjectError(f'注入应用级插件 {plugin} 路由失败：{str(e)}') from e
+        raise PluginInjectError(f'应用级插件 {plugin} 路由注入失败：{str(e)}') from e
 
 
 def plugin_router_inject() -> None:
     """插件路由注入"""
     for plugin in get_plugins():
-        try:
-            data = _load_plugin_config(plugin)
-            # 基于插件 plugin.toml 配置文件，判断插件类型
-            if data.get('api'):
-                _inject_extra_router(plugin, data)
-            else:
-                _inject_app_router(plugin, data)
-        except Exception as e:
-            raise PluginInjectError(f'插件 {plugin} 路由注入失败：{str(e)}') from e
+        data = load_plugin_config(plugin)
+        # 基于插件 plugin.toml 配置文件，判断插件类型
+        if data.get('api'):
+            inject_extra_router(plugin, data)
+        else:
+            inject_app_router(plugin, data)
 
 
 def _install_plugin_requirements(plugin: str, requirements_file: str) -> None:

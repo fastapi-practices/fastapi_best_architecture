@@ -68,7 +68,7 @@ class CRUDUser(CRUDPlus[User]):
         创建用户
 
         :param db: 数据库会话
-        :param obj: 注册参数
+        :param obj: 注册用户参数
         :param social: 是否社交用户
         :return:
         """
@@ -88,7 +88,7 @@ class CRUDUser(CRUDPlus[User]):
         添加用户
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 添加用户参数
         :return:
         """
         salt = bcrypt.gensalt()
@@ -110,7 +110,7 @@ class CRUDUser(CRUDPlus[User]):
 
         :param db: 数据库会话
         :param input_user: 用户 ID
-        :param obj: 更新参数
+        :param obj: 更新用户参数
         :return:
         """
         return await self.update_model(db, input_user, obj)
@@ -122,7 +122,7 @@ class CRUDUser(CRUDPlus[User]):
 
         :param db: 数据库会话
         :param input_user: 用户对象
-        :param obj: 角色参数
+        :param obj: 更新角色参数
         :return:
         """
         for i in list(input_user.roles):

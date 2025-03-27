@@ -68,7 +68,7 @@ class CRUDDept(CRUDPlus[Dept]):
         创建部门
 
         :param db: 数据库会话
-        :param obj: 创建参数
+        :param obj: 创建部门参数
         :return:
         """
         await self.create_model(db, obj)
@@ -79,7 +79,7 @@ class CRUDDept(CRUDPlus[Dept]):
 
         :param db: 数据库会话
         :param dept_id: 部门 ID
-        :param obj: 更新参数
+        :param obj: 更新部门参数
         :return:
         """
         return await self.update_model(db, dept_id, obj)

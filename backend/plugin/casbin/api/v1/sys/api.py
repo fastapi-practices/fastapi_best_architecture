@@ -78,7 +78,7 @@ async def update_api(pk: Annotated[int, Path(description='API ID')], obj: Update
 
 @router.delete(
     '',
-    summary='删除接口',
+    summary='批量删除接口',
     dependencies=[
         Depends(RequestPermission('sys:api:del')),
         DependsRBAC,

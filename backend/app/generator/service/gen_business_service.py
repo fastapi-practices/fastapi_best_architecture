@@ -37,7 +37,7 @@ class GenBusinessService:
         """
         创建业务
 
-        :param obj: 创建参数
+        :param obj: 创建业务参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -52,7 +52,7 @@ class GenBusinessService:
         更新业务
 
         :param pk: 业务 ID
-        :param obj: 更新参数
+        :param obj: 更新业务参数
         :return:
         """
         async with async_db_session.begin() as db:

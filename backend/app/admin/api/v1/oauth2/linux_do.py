@@ -12,16 +12,16 @@ from backend.common.response.response_schema import ResponseSchemaModel, respons
 
 router = APIRouter()
 
-_linuxdo_client = LinuxDoOAuth20(
-    admin_settings.OAUTH2_LINUXDO_CLIENT_ID,
-    admin_settings.OAUTH2_LINUXDO_CLIENT_SECRET,
+_linux_do_client = LinuxDoOAuth20(
+    admin_settings.OAUTH2_LINUX_DO_CLIENT_ID,
+    admin_settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
 )
-_linuxdo_oauth2 = FastAPIOAuth20(_linuxdo_client, admin_settings.OAUTH2_LINUXDO_REDIRECT_URI)
+_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
 
 
 @router.get('', summary='获取 LinuxDo 授权链接')
-async def linuxdo_auth2() -> ResponseSchemaModel[str]:
-    auth_url = await _linuxdo_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_LINUXDO_REDIRECT_URI)
+async def linux_do_auth2() -> ResponseSchemaModel[str]:
+    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
     return response_base.success(data=auth_url)
 
 
@@ -31,20 +31,20 @@ async def linuxdo_auth2() -> ResponseSchemaModel[str]:
     description='LinuxDo 授权后，自动重定向到当前地址并获取用户信息，通过用户信息自动创建系统用户',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
-async def linuxdo_login(
+async def linux_do_login(
     request: Request,
     response: Response,
     background_tasks: BackgroundTasks,
-    oauth2: FastAPIOAuth20 = Depends(_linuxdo_oauth2),
+    oauth2: FastAPIOAuth20 = Depends(_linux_do_oauth2),
 ):
     token, _state = oauth2
     access_token = token['access_token']
-    user = await _linuxdo_client.get_userinfo(access_token)
+    user = await _linux_do_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
         request=request,
         response=response,
         background_tasks=background_tasks,
         user=user,
-        social=UserSocialType.linuxdo,
+        social=UserSocialType.linux_do,
     )
     return RedirectResponse(url=f'{admin_settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')

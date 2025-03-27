@@ -28,7 +28,7 @@ class CRUDCasbin(CRUDPlus[CasbinRule]):
         删除角色所有 P 策略
 
         :param db: 数据库会话
-        :param sub: 删除参数
+        :param sub: 删除所有 P 策略参数
         :return:
         """
         filters = [sub.role]
@@ -42,7 +42,7 @@ class CRUDCasbin(CRUDPlus[CasbinRule]):
         删除用户所有 G 策略
 
         :param db: 数据库会话
-        :param uuid: 用户uuid
+        :param uuid: 用户 UUID
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, v0=str(uuid))

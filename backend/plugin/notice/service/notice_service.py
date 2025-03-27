@@ -19,7 +19,7 @@ class NoticeService:
         """
         获取通知公告
 
-        :param pk: 主键
+        :param pk: 通知公告 ID
         :return:
         """
         async with async_db_session() as db:
@@ -45,7 +45,7 @@ class NoticeService:
         """
         创建通知公告
 
-        :param obj: 创建参数
+        :param obj: 创建通知公告参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -56,8 +56,8 @@ class NoticeService:
         """
         更新通知公告
 
-        :param pk: 主键
-        :param obj: 更新参数
+        :param pk: 通知公告 ID
+        :param obj: 更新通知公告参数
         :return:
         """
         async with async_db_session.begin() as db:
@@ -72,7 +72,7 @@ class NoticeService:
         """
         删除通知公告
 
-        :param pk: 主键列表
+        :param pk: 通知公告 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:

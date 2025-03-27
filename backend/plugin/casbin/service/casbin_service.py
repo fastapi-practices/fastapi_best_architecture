@@ -81,7 +81,7 @@ class CasbinService:
         """
         更新 P 策略
 
-        :param obj: 更新参数
+        :param obj: 更新 P 策略参数
         :return:
         """
         old_obj = obj.old
@@ -101,7 +101,7 @@ class CasbinService:
         """
         批量更新 P 策略
 
-        :param obj: 更新参数
+        :param obj: 更新 P 策略参数
         :return:
         """
         enforcer = await casbin_enforcer()
@@ -164,7 +164,7 @@ class CasbinService:
         """
         创建 G 策略
 
-        :param g: 创建参数
+        :param g: 创建 G 策略参数
         :return:
         """
         enforcer = await casbin_enforcer()
