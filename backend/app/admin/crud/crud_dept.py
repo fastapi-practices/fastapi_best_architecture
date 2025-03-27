@@ -100,7 +100,7 @@ class CRUDDept(CRUDPlus[Dept]):
         user_relation = result.scalars().first()
         return user_relation.users
 
-    async def get_children(self, db: AsyncSession, dept_id: int) -> list[Dept]:
+    async def get_children(self, db: AsyncSession, dept_id: int) -> Sequence[Dept]:
         """
         获取子部门
 
@@ -108,10 +108,9 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id:
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.children)).where(self.model.id == dept_id)
+        stmt = select(self.model).where(self.model.parent_id == dept_id, self.model.del_flag == 0)
         result = await db.execute(stmt)
-        dept = result.scalars().first()
-        return dept.children
+        return result.scalars().all()
 
 
 dept_dao: CRUDDept = CRUDDept(Dept)
