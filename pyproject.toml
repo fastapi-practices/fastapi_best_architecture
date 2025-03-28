@@ -40,14 +40,14 @@ dependencies = [
     "path==17.0.0",
     "psutil>=6.0.0",
     "pwdlib>=0.2.1",
-    "pydantic>=2.10.6",
+    "pydantic>=2.11.0",
     "pydantic-settings>=2.0.0",
     "python-jose>=3.3.0",
     "python-socketio>=5.12.0",
     "redis[hiredis]>=5.2.0",
     "rtoml>=0.12.0",
     "sqlalchemy-crud-plus==1.6.0",
-    "sqlalchemy[asyncio]>=2.0.30",
+    "sqlalchemy[asyncio]>=2.0.40",
     "user-agents==2.2.0",
 ]
 
@@ -57,12 +57,11 @@ dev = [
     "pytest-sugar>=1.0.0",
 ]
 lint = [
-    "ruff>=0.9.0",
     "pre-commit>=4.0.0",
 ]
 server = [
-    "gunicorn==21.2.0",
-    "aio-pika==9.4.3",
+    "gunicorn>=21.2.0",
+    "aio-pika>=9.4.3",
     "wait-for-it>=2.2.2",
 ]
 
