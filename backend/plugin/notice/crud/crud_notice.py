@@ -11,60 +11,58 @@ from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeP
 
 
 class CRUDNotice(CRUDPlus[Notice]):
+    """通知公告数据库操作类"""
+
     async def get(self, db: AsyncSession, pk: int) -> Notice | None:
         """
-        获取系统通知公告
+        获取通知公告
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 通知公告 ID
         :return:
         """
         return await self.select_model(db, pk)
 
     async def get_list(self) -> Select:
-        """
-        获取系统通知公告列表
-
-        :return:
-        """
+        """获取通知公告列表"""
         return await self.select_order('created_time', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[Notice]:
         """
-        获取所有系统通知公告
+        获取所有通知公告
 
-        :param db:
+        :param db: 数据库会话
         :return:
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: CreateNoticeParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateNoticeParam) -> None:
         """
-        创建系统通知公告
+        创建通知公告
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj: 创建通知公告参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateNoticeParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateNoticeParam) -> int:
         """
-        更新系统通知公告
+        更新通知公告
 
-        :param db:
-        :param pk:
-        :param obj_in:
+        :param db: 数据库会话
+        :param pk: 通知公告 ID
+        :param obj: 更新通知公告参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除系统通知公告
+        删除通知公告
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 通知公告 ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

@@ -14,21 +14,22 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('/sidebar', summary='获取用户菜单展示树', dependencies=[DependsJwtAuth])
-async def get_user_sidebar_tree(request: Request) -> ResponseSchemaModel[list[dict[str, Any]]]:
+@router.get('/sidebar', summary='获取用户侧边栏', dependencies=[DependsJwtAuth])
+async def get_user_sidebar(request: Request) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_user_menu_tree(request=request)
     return response_base.success(data=menu)
 
 
 @router.get('/{pk}', summary='获取菜单详情', dependencies=[DependsJwtAuth])
-async def get_menu(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetMenuDetail]:
+async def get_menu(pk: Annotated[int, Path(description='菜单 ID')]) -> ResponseSchemaModel[GetMenuDetail]:
     data = await menu_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
 async def get_all_menus(
-    title: Annotated[str | None, Query()] = None, status: Annotated[int | None, Query()] = None
+    title: Annotated[str | None, Query(description='菜单标题')] = None,
+    status: Annotated[int | None, Query(description='状体')] = None,
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
     menu = await menu_service.get_menu_tree(title=title, status=status)
     return response_base.success(data=menu)
@@ -55,7 +56,7 @@ async def create_menu(obj: CreateMenuParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> ResponseModel:
+async def update_menu(pk: Annotated[int, Path(description='菜单 ID')], obj: UpdateMenuParam) -> ResponseModel:
     count = await menu_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -70,7 +71,7 @@ async def update_menu(pk: Annotated[int, Path(...)], obj: UpdateMenuParam) -> Re
         DependsRBAC,
     ],
 )
-async def delete_menu(request: Request, pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def delete_menu(request: Request, pk: Annotated[int, Path(description='菜单 ID 列表')]) -> ResponseModel:
     count = await menu_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

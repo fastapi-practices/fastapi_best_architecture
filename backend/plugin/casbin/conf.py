@@ -8,7 +8,7 @@ from backend.core.conf import settings
 
 
 class CasbinSettings(BaseSettings):
-    """Casbin Settings"""
+    """Casbin 配置"""
 
     # RBAC
     RBAC_CASBIN_EXCLUDE: set[tuple[str, str]] = {
@@ -19,7 +19,7 @@ class CasbinSettings(BaseSettings):
 
 @lru_cache
 def get_casbin_settings() -> CasbinSettings:
-    """获取 xxx 配置"""
+    """获取 Casbin 配置"""
     return CasbinSettings()
 
 

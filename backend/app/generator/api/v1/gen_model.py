@@ -21,7 +21,7 @@ async def get_model_types() -> ResponseSchemaModel[list[str]]:
 
 
 @router.get('/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
-async def get_model(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetGenModelDetail]:
+async def get_model(pk: Annotated[int, Path(description='模型 ID')]) -> ResponseSchemaModel[GetGenModelDetail]:
     data = await gen_model_service.get(pk=pk)
     return response_base.success(data=data)
 
@@ -47,7 +47,7 @@ async def create_model(obj: CreateGenModelParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_model(pk: Annotated[int, Path(...)], obj: UpdateGenModelParam) -> ResponseModel:
+async def update_model(pk: Annotated[int, Path(description='模型 ID')], obj: UpdateGenModelParam) -> ResponseModel:
     count = await gen_model_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -62,7 +62,7 @@ async def update_model(pk: Annotated[int, Path(...)], obj: UpdateGenModelParam) 
         DependsRBAC,
     ],
 )
-async def delete_model(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def delete_model(pk: Annotated[int, Path(description='模型 ID')]) -> ResponseModel:
     count = await gen_model_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

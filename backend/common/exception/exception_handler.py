@@ -3,7 +3,6 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
-from pydantic.errors import PydanticUserError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
@@ -12,7 +11,6 @@ from backend.common.exception.errors import BaseExceptionMixin
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
 from backend.common.schema import (
-    CUSTOM_USAGE_ERROR_MESSAGES,
     CUSTOM_VALIDATION_ERROR_MESSAGES,
 )
 from backend.core.conf import settings
@@ -20,36 +18,34 @@ from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.trace_id import get_request_trace_id
 
 
-def _get_exception_code(status_code: int):
+def _get_exception_code(status_code: int) -> int:
     """
-    获取返回状态码, OpenAPI, Uvicorn... 可用状态码基于 RFC 定义, 详细代码见下方链接
+    获取返回状态码（可用状态码基于 RFC 定义）
 
-    `python 状态码标准支持 <https://github.com/python/cpython/blob/6e3cc72afeaee2532b4327776501eb8234ac787b/Lib/http
-    /__init__.py#L7>`__
+    `python 状态码标准支持 <https://github.com/python/cpython/blob/6e3cc72afeaee2532b4327776501eb8234ac787b/Lib/http/__init__.py#L7>`__
 
     `IANA 状态码注册表 <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`__
 
-    :param status_code:
+    :param status_code: HTTP 状态码
     :return:
     """
     try:
         STATUS_PHRASES[status_code]
+        return status_code
     except Exception:
-        code = StandardResponseCode.HTTP_400
-    else:
-        code = status_code
-    return code
+        return StandardResponseCode.HTTP_400
 
 
-async def _validation_exception_handler(request: Request, e: RequestValidationError | ValidationError):
+async def _validation_exception_handler(request: Request, exc: RequestValidationError | ValidationError):
     """
     数据验证异常处理
 
-    :param e:
+    :param request: 请求对象
+    :param exc: 验证异常
     :return:
     """
     errors = []
-    for error in e.errors():
+    for error in exc.errors():
         custom_message = CUSTOM_VALIDATION_ERROR_MESSAGES.get(error['type'])
         if custom_message:
             ctx = error.get('ctx')
@@ -87,10 +83,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
         """
-        全局HTTP异常处理
+        全局 HTTP 异常处理
 
-        :param request:
-        :param exc:
+        :param request: FastAPI 请求对象
+        :param exc: HTTP 异常
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -113,10 +109,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(RequestValidationError)
     async def fastapi_validation_exception_handler(request: Request, exc: RequestValidationError):
         """
-        fastapi 数据验证异常处理
+        FastAPI 数据验证异常处理
 
-        :param request:
-        :param exc:
+        :param request: FastAPI 请求对象
+        :param exc: 验证异常
         :return:
         """
         return await _validation_exception_handler(request, exc)
@@ -124,42 +120,21 @@ def register_exception(app: FastAPI):
     @app.exception_handler(ValidationError)
     async def pydantic_validation_exception_handler(request: Request, exc: ValidationError):
         """
-        pydantic 数据验证异常处理
+        Pydantic 数据验证异常处理
 
-        :param request:
-        :param exc:
+        :param request: 请求对象
+        :param exc: 验证异常
         :return:
         """
         return await _validation_exception_handler(request, exc)
-
-    @app.exception_handler(PydanticUserError)
-    async def pydantic_user_error_handler(request: Request, exc: PydanticUserError):
-        """
-        Pydantic 用户异常处理
-
-        :param request:
-        :param exc:
-        :return:
-        """
-        content = {
-            'code': StandardResponseCode.HTTP_500,
-            'msg': CUSTOM_USAGE_ERROR_MESSAGES.get(exc.code),
-            'data': None,
-        }
-        request.state.__request_pydantic_user_error__ = content
-        content.update(trace_id=get_request_trace_id(request))
-        return MsgSpecJSONResponse(
-            status_code=StandardResponseCode.HTTP_500,
-            content=content,
-        )
 
     @app.exception_handler(AssertionError)
     async def assertion_error_handler(request: Request, exc: AssertionError):
         """
         断言错误处理
 
-        :param request:
-        :param exc:
+        :param request: FastAPI 请求对象
+        :param exc: 断言错误
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -183,8 +158,8 @@ def register_exception(app: FastAPI):
         """
         全局自定义异常处理
 
-        :param request:
-        :param exc:
+        :param request: FastAPI 请求对象
+        :param exc: 自定义异常
         :return:
         """
         content = {
@@ -205,8 +180,8 @@ def register_exception(app: FastAPI):
         """
         全局未知异常处理
 
-        :param request:
-        :param exc:
+        :param request: FastAPI 请求对象
+        :param exc: 未知异常
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -233,10 +208,11 @@ def register_exception(app: FastAPI):
             跨域自定义 500 异常处理
 
             `Related issue <https://github.com/encode/starlette/issues/1175>`_
+
             `Solution <https://github.com/fastapi/fastapi/discussions/7847#discussioncomment-5144709>`_
 
-            :param request:
-            :param exc:
+            :param request: FastAPI 请求对象
+            :param exc: 自定义异常
             :return:
             """
             if isinstance(exc, BaseExceptionMixin):

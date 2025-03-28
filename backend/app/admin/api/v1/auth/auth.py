@@ -36,7 +36,7 @@ async def user_login(
 
 
 @router.post('/token/new', summary='创建新 token')
-async def create_new_token(request: Request, response: Response) -> ResponseSchemaModel[GetNewToken]:
+async def create_new_token(request: Request) -> ResponseSchemaModel[GetNewToken]:
     data = await auth_service.new_token(request=request)
     return response_base.success(data=data)
 

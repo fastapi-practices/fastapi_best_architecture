@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.generator.model import GenModel
 
 
 class GenBusiness(Base):
@@ -28,4 +33,4 @@ class GenBusiness(Base):
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )
     # 代码生成业务模型一对多
-    gen_model: Mapped[list['GenModel']] = relationship(init=False, back_populates='gen_business')  # noqa: F821
+    gen_model: Mapped[list['GenModel']] = relationship(init=False, back_populates='gen_business')

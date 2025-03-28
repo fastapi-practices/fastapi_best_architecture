@@ -23,14 +23,14 @@ async def get_all_apis() -> ResponseSchemaModel[list[GetApiDetail]]:
 
 
 @router.get('/{pk}', summary='获取接口详情', dependencies=[DependsJwtAuth])
-async def get_api(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetApiDetail]:
+async def get_api(pk: Annotated[int, Path(description='API ID')]) -> ResponseSchemaModel[GetApiDetail]:
     api = await api_service.get(pk=pk)
     return response_base.success(data=api)
 
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有接口',
+    summary='分页获取所有接口',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -39,9 +39,9 @@ async def get_api(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetApiDe
 async def get_pagination_apis(
     request: Request,
     db: CurrentSession,
-    name: Annotated[str | None, Query()] = None,
-    method: Annotated[str | None, Query()] = None,
-    path: Annotated[str | None, Query()] = None,
+    name: Annotated[str | None, Query(description='API 名称')] = None,
+    method: Annotated[str | None, Query(description='请求方法')] = None,
+    path: Annotated[str | None, Query(description='API 路径')] = None,
 ) -> ResponseSchemaModel[PageData[GetApiDetail]]:
     api_select = await api_service.get_select(request=request, name=name, method=method, path=path)
     page_data = await paging_data(db, api_select)
@@ -69,7 +69,7 @@ async def create_api(obj: CreateApiParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_api(pk: Annotated[int, Path(...)], obj: UpdateApiParam) -> ResponseModel:
+async def update_api(pk: Annotated[int, Path(description='API ID')], obj: UpdateApiParam) -> ResponseModel:
     count = await api_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -78,13 +78,13 @@ async def update_api(pk: Annotated[int, Path(...)], obj: UpdateApiParam) -> Resp
 
 @router.delete(
     '',
-    summary='（批量）删除接口',
+    summary='批量删除接口',
     dependencies=[
         Depends(RequestPermission('sys:api:del')),
         DependsRBAC,
     ],
 )
-async def delete_api(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_api(pk: Annotated[list[int], Query(description='API ID 列表')]) -> ResponseModel:
     count = await api_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

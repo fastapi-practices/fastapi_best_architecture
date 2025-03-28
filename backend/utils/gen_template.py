@@ -12,7 +12,8 @@ from backend.core.path_conf import JINJA2_TEMPLATE_DIR
 
 
 class GenTemplate:
-    def __init__(self):
+    def __init__(self) -> None:
+        """初始化模板生成器"""
         self.env = Environment(
             loader=FileSystemLoader(JINJA2_TEMPLATE_DIR),
             autoescape=select_autoescape(enabled_extensions=['jinja']),
@@ -25,18 +26,17 @@ class GenTemplate:
 
     def get_template(self, jinja_file: str) -> Template:
         """
-        获取模版文件
+        获取模板文件
 
-        :param jinja_file:
+        :param jinja_file: Jinja2 模板文件
         :return:
         """
-
         return self.env.get_template(jinja_file)
 
     @staticmethod
     def get_template_paths() -> list[str]:
         """
-        获取模版文件路径
+        获取模板文件路径列表
 
         :return:
         """
@@ -53,26 +53,25 @@ class GenTemplate:
         """
         获取代码生成路径列表
 
-        :param business:
+        :param business: 代码生成业务对象
         :return:
         """
         app_name = business.app_name
         module_name = business.table_name_en
-        target_files = [
+        return [
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/api/{business.api_version}/{module_name}.py',
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/crud/crud_{module_name}.py',
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/model/{module_name}.py',
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/schema/{module_name}.py',
             f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/service/{module_name}_service.py',
         ]
-        return target_files
 
     def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
         """
         获取代码生成路径
 
-        :param tpl_path:
-        :param business:
+        :param tpl_path: 模板文件路径
+        :param business: 代码生成业务对象
         :return:
         """
         target_files = self.get_code_gen_paths(business)
@@ -80,12 +79,12 @@ class GenTemplate:
         return code_gen_path_mapping[tpl_path]
 
     @staticmethod
-    def get_vars(business: GenBusiness, models: Sequence[GenModel]) -> dict:
+    def get_vars(business: GenBusiness, models: Sequence[GenModel]) -> dict[str, str | Sequence[GenModel]]:
         """
-        获取模版变量
+        获取模板变量
 
-        :param business:
-        :param models:
+        :param business: 代码生成业务对象
+        :param models: 代码生成模型对象列表
         :return:
         """
         return {

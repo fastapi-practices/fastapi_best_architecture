@@ -6,9 +6,9 @@ from backend.core.conf import settings
 
 def sql_type_to_sqlalchemy(typing: str) -> str:
     """
-    Converts a sql type to a SQLAlchemy type.
+    将 SQL 类型转换为 SQLAlchemy 类型
 
-    :param typing:
+    :param typing: SQL 类型字符串
     :return:
     """
     if settings.DATABASE_TYPE == 'mysql':
@@ -22,17 +22,16 @@ def sql_type_to_sqlalchemy(typing: str) -> str:
 
 def sql_type_to_pydantic(typing: str) -> str:
     """
-    Converts a sql type to a pydantic type.
+    将 SQL 类型转换为 Pydantic 类型
 
-    :param typing:
+    :param typing: SQL 类型字符串
     :return:
     """
     try:
         if settings.DATABASE_TYPE == 'mysql':
             return GenModelMySQLColumnType[typing].value
-        else:
-            if typing == 'CHARACTER VARYING':  # postgresql 中 DDL VARCHAR 的别名
-                return 'str'
-            return GenModelPostgreSQLColumnType[typing].value
+        if typing == 'CHARACTER VARYING':  # postgresql 中 DDL VARCHAR 的别名
+            return 'str'
+        return GenModelPostgreSQLColumnType[typing].value
     except KeyError:
         return 'str'

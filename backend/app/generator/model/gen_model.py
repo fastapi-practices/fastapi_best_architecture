@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -8,6 +8,9 @@ from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import DataClassBase, id_key
+
+if TYPE_CHECKING:
+    from backend.app.generator.model import GenBusiness
 
 
 class GenModel(DataClassBase):
@@ -32,4 +35,4 @@ class GenModel(DataClassBase):
     gen_business_id: Mapped[int] = mapped_column(
         ForeignKey('sys_gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
     )
-    gen_business: Mapped[Union['GenBusiness', None]] = relationship(init=False, back_populates='gen_model')  # noqa: F821
+    gen_business: Mapped[Union['GenBusiness', None]] = relationship(init=False, back_populates='gen_model')

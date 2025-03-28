@@ -25,8 +25,16 @@ from backend.database.redis import redis_client
 
 
 class UserService:
+    """用户服务类"""
+
     @staticmethod
     async def register(*, obj: RegisterUserParam) -> None:
+        """
+        注册新用户
+
+        :param obj: 用户注册参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             if not obj.password:
                 raise errors.ForbiddenError(msg='密码为空')
@@ -44,6 +52,13 @@ class UserService:
 
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
+        """
+        添加新用户
+
+        :param request: FastAPI 请求对象
+        :param obj: 用户添加参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
             username = await user_dao.get_by_username(db, obj.username)
@@ -69,13 +84,20 @@ class UserService:
 
     @staticmethod
     async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
+        """
+        重置用户密码
+
+        :param request: FastAPI 请求对象
+        :param obj: 密码重置参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             user = await user_dao.get(db, request.user.id)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
             if not password_verify(obj.old_password, user.password):
                 raise errors.ForbiddenError(msg='原密码错误')
-            np1 = obj.new_password
-            np2 = obj.confirm_password
-            if np1 != np2:
+            if obj.new_password != obj.confirm_password:
                 raise errors.ForbiddenError(msg='密码输入不一致')
             new_pwd = get_hash_password(obj.new_password, user.salt)
             count = await user_dao.reset_password(db, request.user.id, new_pwd)
@@ -90,6 +112,12 @@ class UserService:
 
     @staticmethod
     async def get_userinfo(*, username: str) -> User:
+        """
+        获取用户信息
+
+        :param username: 用户名
+        :return:
+        """
         async with async_db_session() as db:
             user = await user_dao.get_with_relation(db, username=username)
             if not user:
@@ -98,10 +126,17 @@ class UserService:
 
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
+        """
+        更新用户信息
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param obj: 用户更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.ForbiddenError(msg='你只能修改自己的信息')
+            if not request.user.is_superuser and request.user.username != username:
+                raise errors.ForbiddenError(msg='你只能修改自己的信息')
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -123,10 +158,17 @@ class UserService:
 
     @staticmethod
     async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
+        """
+        更新用户角色
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param obj: 角色更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.AuthorizationError
+            if not request.user.is_superuser and request.user.username != username:
+                raise errors.AuthorizationError
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -139,10 +181,17 @@ class UserService:
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
+        """
+        更新用户头像
+
+        :param request: FastAPI 请求对象
+        :param username: 用户名
+        :param avatar: 头像参数
+        :return:
+        """
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.AuthorizationError
+            if not request.user.is_superuser and request.user.username != username:
+                raise errors.AuthorizationError
             input_user = await user_dao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -152,96 +201,138 @@ class UserService:
 
     @staticmethod
     async def get_select(*, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
+        """
+        获取用户列表查询条件
+
+        :param dept: 部门 ID
+        :param username: 用户名
+        :param phone: 手机号
+        :param status: 状态
+        :return:
+        """
         return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:
+        """
+        更新用户权限
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
-            if not await user_dao.get(db, pk):
+            user = await user_dao.get(db, pk)
+            if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            else:
-                if pk == request.user.id:
-                    raise errors.ForbiddenError(msg='非法操作')
-                super_status = await user_dao.get_super(db, pk)
-                count = await user_dao.set_super(db, pk, False if super_status else True)
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
-                return count
+            if pk == request.user.id:
+                raise errors.ForbiddenError(msg='非法操作')
+            super_status = await user_dao.get_super(db, pk)
+            count = await user_dao.set_super(db, pk, not super_status)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
+            return count
 
     @staticmethod
     async def update_staff(*, request: Request, pk: int) -> int:
+        """
+        更新用户职员状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
-            if not await user_dao.get(db, pk):
+            user = await user_dao.get(db, pk)
+            if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            else:
-                if pk == request.user.id:
-                    raise errors.ForbiddenError(msg='非法操作')
-                staff_status = await user_dao.get_staff(db, pk)
-                count = await user_dao.set_staff(db, pk, False if staff_status else True)
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
-                return count
+            if pk == request.user.id:
+                raise errors.ForbiddenError(msg='非法操作')
+            staff_status = await user_dao.get_staff(db, pk)
+            count = await user_dao.set_staff(db, pk, not staff_status)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
+            return count
 
     @staticmethod
     async def update_status(*, request: Request, pk: int) -> int:
+        """
+        更新用户状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
-            if not await user_dao.get(db, pk):
+            user = await user_dao.get(db, pk)
+            if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            else:
-                if pk == request.user.id:
-                    raise errors.ForbiddenError(msg='非法操作')
-                status = await user_dao.get_status(db, pk)
-                count = await user_dao.set_status(db, pk, False if status else True)
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
-                return count
+            if pk == request.user.id:
+                raise errors.ForbiddenError(msg='非法操作')
+            status = await user_dao.get_status(db, pk)
+            count = await user_dao.set_status(db, pk, 0 if status == 1 else 1)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{pk}')
+            return count
 
     @staticmethod
     async def update_multi_login(*, request: Request, pk: int) -> int:
+        """
+        更新用户多端登录状态
+
+        :param request: FastAPI 请求对象
+        :param pk: 用户 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             superuser_verify(request)
-            if not await user_dao.get(db, pk):
+            user = await user_dao.get(db, pk)
+            if not user:
                 raise errors.NotFoundError(msg='用户不存在')
+            user_id = request.user.id
+            multi_login = await user_dao.get_multi_login(db, pk) if pk != user_id else request.user.is_multi_login
+            count = await user_dao.set_multi_login(db, pk, not multi_login)
+            # 删除当前用户缓存
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            token = get_token(request)
+            token_payload = jwt_decode(token)
+            latest_multi_login = await user_dao.get_multi_login(db, pk)
+            # 超级用户修改自身时，除当前 token 外，其他 token 失效
+            if pk == user_id:
+                if not latest_multi_login:
+                    key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
+                    await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}')
+                    refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
+                    if refresh_token:
+                        key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}'
+                        await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{refresh_token}')
+            # 超级用户修改他人时，其他 token 将全部失效
             else:
-                user_id = request.user.id
-                multi_login = await user_dao.get_multi_login(db, pk) if pk != user_id else request.user.is_multi_login
-                count = await user_dao.set_multi_login(db, pk, False if multi_login else True)
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
-                token = get_token(request)
-                token_payload = jwt_decode(token)
-                latest_multi_login = await user_dao.get_multi_login(db, pk)
-                # 超级用户修改自身时，除当前token外，其他token失效
-                if pk == user_id:
-                    if not latest_multi_login:
-                        key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{pk}'
-                        await redis_client.delete_prefix(
-                            key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}'
-                        )
-                        refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
-                        if refresh_token:
-                            key_prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}'
-                            await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{refresh_token}')
-                # 超级用户修改他人时，其他token将全部失效
-                else:
-                    if not latest_multi_login:
-                        key_prefix = [f'{settings.TOKEN_REDIS_PREFIX}:{pk}']
-                        refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
-                        if refresh_token:
-                            key_prefix.append(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}')
-                        for prefix in key_prefix:
-                            await redis_client.delete_prefix(prefix)
-                return count
+                if not latest_multi_login:
+                    key_prefix = [f'{settings.TOKEN_REDIS_PREFIX}:{pk}']
+                    refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
+                    if refresh_token:
+                        key_prefix.append(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{pk}')
+                    for prefix in key_prefix:
+                        await redis_client.delete_prefix(prefix)
+            return count
 
     @staticmethod
     async def delete(*, username: str) -> int:
+        """
+        删除用户
+
+        :param username: 用户名
+        :return:
+        """
         async with async_db_session.begin() as db:
-            input_user = await user_dao.get_by_username(db, username)
-            if not input_user:
+            user = await user_dao.get_by_username(db, username)
+            if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            count = await user_dao.delete(db, input_user.id)
+            count = await user_dao.delete(db, user.id)
             key_prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{input_user.id}',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{input_user.id}',
+                f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
             ]
             for key in key_prefix:
                 await redis_client.delete_prefix(key)

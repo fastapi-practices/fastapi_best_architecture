@@ -16,8 +16,16 @@ from backend.utils.build_tree import get_tree_data
 
 
 class MenuService:
+    """菜单服务类"""
+
     @staticmethod
     async def get(*, pk: int) -> Menu:
+        """
+        获取菜单详情
+
+        :param pk: 菜单 ID
+        :return:
+        """
         async with async_db_session() as db:
             menu = await menu_dao.get(db, menu_id=pk)
             if not menu:
@@ -26,6 +34,13 @@ class MenuService:
 
     @staticmethod
     async def get_menu_tree(*, title: str | None = None, status: int | None = None) -> list[dict[str, Any]]:
+        """
+        获取菜单树形结构
+
+        :param title: 菜单标题
+        :param status: 状态
+        :return:
+        """
         async with async_db_session() as db:
             menu_select = await menu_dao.get_all(db, title=title, status=status)
             menu_tree = get_tree_data(menu_select)
@@ -33,6 +48,12 @@ class MenuService:
 
     @staticmethod
     async def get_role_menu_tree(*, pk: int) -> list[dict[str, Any]]:
+        """
+        获取角色的菜单树形结构
+
+        :param pk: 角色 ID
+        :return:
+        """
         async with async_db_session() as db:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
@@ -44,6 +65,12 @@ class MenuService:
 
     @staticmethod
     async def get_user_menu_tree(*, request: Request) -> list[dict[str, Any]]:
+        """
+        获取用户的菜单树形结构
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
         async with async_db_session() as db:
             roles = request.user.roles
             menu_ids = []
@@ -57,6 +84,12 @@ class MenuService:
 
     @staticmethod
     async def create(*, obj: CreateMenuParam) -> None:
+        """
+        创建菜单
+
+        :param obj: 菜单创建参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             title = await menu_dao.get_by_title(db, obj.title)
             if title:
@@ -69,6 +102,13 @@ class MenuService:
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateMenuParam) -> int:
+        """
+        更新菜单
+
+        :param pk: 菜单 ID
+        :param obj: 菜单更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             menu = await menu_dao.get(db, pk)
             if not menu:
@@ -87,6 +127,13 @@ class MenuService:
 
     @staticmethod
     async def delete(*, request: Request, pk: int) -> int:
+        """
+        删除菜单
+
+        :param request: FastAPI 请求对象
+        :param pk: 菜单 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
             children = await menu_dao.get_children(db, pk)
             if children:

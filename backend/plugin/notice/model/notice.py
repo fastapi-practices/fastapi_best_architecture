@@ -8,7 +8,7 @@ from backend.common.model import Base, id_key
 
 
 class Notice(Base):
-    """系统通知公告"""
+    """系统通知公告表"""
 
     __tablename__ = 'sys_notice'
 

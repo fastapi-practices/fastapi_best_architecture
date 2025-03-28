@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有字典类型',
+    summary='分页获取所有字典类型',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -26,9 +26,9 @@ router = APIRouter()
 )
 async def get_pagination_dict_types(
     db: CurrentSession,
-    name: Annotated[str | None, Query()] = None,
-    code: Annotated[str | None, Query()] = None,
-    status: Annotated[int | None, Query()] = None,
+    name: Annotated[str | None, Query(description='字典类型名称')] = None,
+    code: Annotated[str | None, Query(description='字典类型编码')] = None,
+    status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
     dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
     page_data = await paging_data(db, dict_type_select)
@@ -56,7 +56,9 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypeParam) -> ResponseModel:
+async def update_dict_type(
+    pk: Annotated[int, Path(description='字典类型 ID')], obj: UpdateDictTypeParam
+) -> ResponseModel:
     count = await dict_type_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -65,13 +67,13 @@ async def update_dict_type(pk: Annotated[int, Path(...)], obj: UpdateDictTypePar
 
 @router.delete(
     '',
-    summary='（批量）删除字典类型',
+    summary='批量删除字典类型',
     dependencies=[
         Depends(RequestPermission('sys:dict:type:del')),
         DependsRBAC,
     ],
 )
-async def delete_dict_type(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_dict_type(pk: Annotated[list[int], Query(description='字典类型 ID 列表')]) -> ResponseModel:
     count = await dict_type_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

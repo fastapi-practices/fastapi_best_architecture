@@ -7,7 +7,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
 from backend.core.conf import settings
 
-# 自定义验证错误信息不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
+# 自定义验证错误信息
+# 不包含验证预期内容（也就是输入内容），受支持的预期内容字段参考以下链接
 # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
 # 替换预期内容字段方式，参考以下链接
 # https://github.com/pydantic/pydantic/blob/caa78016433ec9b16a973f92f187a7b6bfde6cb5/docs/errors/errors.md?plain=1#L232
@@ -108,50 +109,20 @@ CUSTOM_VALIDATION_ERROR_MESSAGES = {
     'value_error': '值输入错误',
 }
 
-CUSTOM_USAGE_ERROR_MESSAGES = {
-    'class-not-fully-defined': '类属性类型未完全定义',
-    'custom-json-schema': '__modify_schema__ 方法在V2中已被弃用',
-    'decorator-missing-field': '定义了无效字段验证器',
-    'discriminator-no-field': '鉴别器字段未全部定义',
-    'discriminator-alias-type': '鉴别器字段使用非字符串类型定义',
-    'discriminator-needs-literal': '鉴别器字段需要使用字面值定义',
-    'discriminator-alias': '鉴别器字段别名定义不一致',
-    'discriminator-validator': '鉴别器字段禁止定义字段验证器',
-    'model-field-overridden': '无类型定义字段禁止重写',
-    'model-field-missing-annotation': '缺少字段类型定义',
-    'config-both': '重复定义配置项',
-    'removed-kwargs': '调用已移除的关键字配置参数',
-    'invalid-for-json-schema': '存在无效的 JSON 类型',
-    'base-model-instantiated': '禁止实例化基础模型',
-    'undefined-annotation': '缺少类型定义',
-    'schema-for-unknown-type': '未知类型定义',
-    'create-model-field-definitions': '字段定义错误',
-    'create-model-config-base': '配置项定义错误',
-    'validator-no-fields': '字段验证器未指定字段',
-    'validator-invalid-fields': '字段验证器字段定义错误',
-    'validator-instance-method': '字段验证器必须为类方法',
-    'model-serializer-instance-method': '序列化器必须为实例方法',
-    'validator-v1-signature': 'V1字段验证器错误已被弃用',
-    'validator-signature': '字段验证器签名错误',
-    'field-serializer-signature': '字段序列化器签名无法识别',
-    'model-serializer-signature': '模型序列化器签名无法识别',
-    'multiple-field-serializers': '字段序列化器重复定义',
-    'invalid_annotated_type': '无效的类型定义',
-    'type-adapter-config-unused': '类型适配器配置项定义错误',
-    'root-model-extra': '根模型禁止定义额外字段',
-}
-
-
 CustomPhoneNumber = Annotated[str, Field(pattern=r'^1[3-9]\d{9}$')]
 
 
 class CustomEmailStr(EmailStr):
+    """自定义邮箱类型"""
+
     @classmethod
     def _validate(cls, __input_value: str) -> str:
         return None if __input_value == '' else validate_email(__input_value)[1]
 
 
 class SchemaBase(BaseModel):
+    """基础模型配置"""
+
     model_config = ConfigDict(
         use_enum_values=True,
         json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)},

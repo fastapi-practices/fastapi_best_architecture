@@ -3,6 +3,7 @@
 from typing import Sequence
 
 from sqlalchemy import and_, asc, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -11,33 +12,35 @@ from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 
 
 class CRUDMenu(CRUDPlus[Menu]):
-    async def get(self, db, menu_id: int) -> Menu | None:
-        """
-        获取菜单
+    """菜单数据库操作类"""
 
-        :param db:
-        :param menu_id:
+    async def get(self, db: AsyncSession, menu_id: int) -> Menu | None:
+        """
+        获取菜单详情
+
+        :param db: 数据库会话
+        :param menu_id: 菜单 ID
         :return:
         """
         return await self.select_model(db, menu_id)
 
-    async def get_by_title(self, db, title: str) -> Menu | None:
+    async def get_by_title(self, db: AsyncSession, title: str) -> Menu | None:
         """
-        通过 title 获取菜单
+        通过标题获取菜单
 
-        :param db:
-        :param title:
+        :param db: 数据库会话
+        :param title: 菜单标题
         :return:
         """
         return await self.select_model_by_column(db, title=title, menu_type__ne=2)
 
-    async def get_all(self, db, title: str | None = None, status: int | None = None) -> Sequence[Menu]:
+    async def get_all(self, db: AsyncSession, title: str | None = None, status: int | None = None) -> Sequence[Menu]:
         """
-        获取所有菜单
+        获取菜单列表
 
-        :param db:
-        :param title:
-        :param status:
+        :param db: 数据库会话
+        :param title: 菜单标题
+        :param status: 菜单状态
         :return:
         """
         filters = {}
@@ -47,60 +50,60 @@ class CRUDMenu(CRUDPlus[Menu]):
             filters.update(status=status)
         return await self.select_models_order(db, 'sort', **filters)
 
-    async def get_role_menus(self, db, superuser: bool, menu_ids: list[int]) -> Sequence[Menu]:
+    async def get_role_menus(self, db: AsyncSession, superuser: bool, menu_ids: list[int]) -> Sequence[Menu]:
         """
-        获取角色菜单
+        获取角色菜单列表
 
-        :param db:
-        :param superuser:
-        :param menu_ids:
+        :param db: 数据库会话
+        :param superuser: 是否超级管理员
+        :param menu_ids: 菜单 ID 列表
         :return:
         """
         stmt = select(self.model).order_by(asc(self.model.sort))
-        where_list = [self.model.menu_type.in_([0, 1])]
+        filters = [self.model.menu_type.in_([0, 1])]
         if not superuser:
-            where_list.append(self.model.id.in_(menu_ids))
-        stmt = stmt.where(and_(*where_list))
+            filters.append(self.model.id.in_(menu_ids))
+        stmt = stmt.where(and_(*filters))
         menu = await db.execute(stmt)
         return menu.scalars().all()
 
-    async def create(self, db, obj_in: CreateMenuParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateMenuParam) -> None:
         """
         创建菜单
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj: 创建菜单参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db, menu_id: int, obj_in: UpdateMenuParam) -> int:
+    async def update(self, db: AsyncSession, menu_id: int, obj: UpdateMenuParam) -> int:
         """
         更新菜单
 
-        :param db:
-        :param menu_id:
-        :param obj_in:
+        :param db: 数据库会话
+        :param menu_id: 菜单 ID
+        :param obj: 更新菜单参数
         :return:
         """
-        return await self.update_model(db, menu_id, obj_in)
+        return await self.update_model(db, menu_id, obj)
 
-    async def delete(self, db, menu_id: int) -> int:
+    async def delete(self, db: AsyncSession, menu_id: int) -> int:
         """
         删除菜单
 
-        :param db:
-        :param menu_id:
+        :param db: 数据库会话
+        :param menu_id: 菜单 ID
         :return:
         """
         return await self.delete_model(db, menu_id)
 
-    async def get_children(self, db, menu_id: int) -> list[Menu]:
+    async def get_children(self, db: AsyncSession, menu_id: int) -> list[Menu | None]:
         """
-        获取子菜单
+        获取子菜单列表
 
-        :param db:
-        :param menu_id:
+        :param db: 数据库会话
+        :param menu_id: 菜单 ID
         :return:
         """
         stmt = select(self.model).options(selectinload(self.model.children)).where(self.model.id == menu_id)

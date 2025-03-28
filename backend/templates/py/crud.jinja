@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from backend.app.{{ app_name }}.model import {{ table_name_class }}
-from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
+
+from backend.app.{{ app_name }}.model import {{ table_name_class }}
+from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 
 
 class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
@@ -14,59 +15,55 @@ class CRUD{{ table_name_class }}(CRUDPlus[{{ schema_name }}]):
         """
         获取{{ table_name_zh }}
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: {{ table_simple_name_zh }} ID
         :return:
         """
         return await self.select_model(db, pk)
 
     async def get_list(self) -> Select:
-        """
-        获取{{ table_name_zh }}列表
-
-        :return:
-        """
+        """获取{{ table_name_zh }}列表"""
         return await self.select_order('created_time', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ table_name_class }}]:
         """
         获取所有{{ table_name_zh }}
 
-        :param db:
+        :param db: 数据库会话
         :return:
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: Create{{ schema_name }}Param) -> None:
+    async def create(self, db: AsyncSession, obj: Create{{ schema_name }}Param) -> None:
         """
         创建{{ table_name_zh }}
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj: 创建{{ table_simple_name_zh }} 参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: Update{{ schema_name }}Param) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: Update{{ schema_name }}Param) -> int:
         """
         更新{{ table_name_zh }}
 
-        :param db:
-        :param pk:
-        :param obj_in:
+        :param db: 数据库会话
+        :param pk: {{ table_simple_name_zh }} ID
+        :param obj: 更新 {{ table_simple_name_zh }} 参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
         删除{{ table_name_zh }}
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: {{ table_simple_name_zh }} ID
         :return:
         """
-        return  await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
 
 {{ table_name_en }}_dao: CRUD{{ table_name_class }} = CRUD{{ table_name_class }}({{ table_name_class }})

@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_data_rule
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import Role
 
 
 class DataRule(Base):
@@ -23,4 +30,4 @@ class DataRule(Base):
     value: Mapped[str] = mapped_column(String(255), comment='规则值')
 
     # 角色规则多对多
-    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_role_data_rule, back_populates='rules')  # noqa: F821
+    roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_data_rule, back_populates='rules')

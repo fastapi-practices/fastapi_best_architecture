@@ -13,8 +13,8 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
     """
     RBAC 权限校验（鉴权顺序很重要，谨慎修改）
 
-    :param request:
-    :param _token:
+    :param request: FastAPI 请求对象
+    :param _token: JWT 令牌
     :return:
     """
     path = request.url.path

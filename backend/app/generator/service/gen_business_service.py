@@ -10,8 +10,16 @@ from backend.database.db import async_db_session
 
 
 class GenBusinessService:
+    """代码生成业务服务类"""
+
     @staticmethod
     async def get(*, pk: int) -> GenBusiness:
+        """
+        获取指定 ID 的业务
+
+        :param pk: 业务 ID
+        :return:
+        """
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
@@ -20,12 +28,18 @@ class GenBusinessService:
 
     @staticmethod
     async def get_all() -> Sequence[GenBusiness]:
+        """获取所有业务"""
         async with async_db_session() as db:
-            businesses = await gen_business_dao.get_all(db)
-            return businesses
+            return await gen_business_dao.get_all(db)
 
     @staticmethod
     async def create(*, obj: CreateGenBusinessParam) -> None:
+        """
+        创建业务
+
+        :param obj: 创建业务参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             business = await gen_business_dao.get_by_name(db, obj.table_name_en)
             if business:
@@ -34,15 +48,26 @@ class GenBusinessService:
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateGenBusinessParam) -> int:
+        """
+        更新业务
+
+        :param pk: 业务 ID
+        :param obj: 更新业务参数
+        :return:
+        """
         async with async_db_session.begin() as db:
-            count = await gen_business_dao.update(db, pk, obj)
-            return count
+            return await gen_business_dao.update(db, pk, obj)
 
     @staticmethod
     async def delete(*, pk: int) -> int:
+        """
+        删除业务
+
+        :param pk: 业务 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
-            count = await gen_business_dao.delete(db, pk)
-            return count
+            return await gen_business_dao.delete(db, pk)
 
 
 gen_business_service: GenBusinessService = GenBusinessService()

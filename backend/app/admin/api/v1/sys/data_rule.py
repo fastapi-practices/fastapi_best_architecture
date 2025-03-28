@@ -23,33 +23,37 @@ async def get_data_rule_models() -> ResponseSchemaModel[list[str]]:
 
 
 @router.get('/model/{model}/columns', summary='获取支持过滤的数据库模型列', dependencies=[DependsJwtAuth])
-async def get_data_rule_model_columns(model: Annotated[str, Path()]) -> ResponseSchemaModel[list[str]]:
+async def get_data_rule_model_columns(
+    model: Annotated[str, Path(description='模型名称')],
+) -> ResponseSchemaModel[list[str]]:
     models = await data_rule_service.get_columns(model=model)
     return response_base.success(data=models)
 
 
 @router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
-async def get_all_data_rule() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
+async def get_all_data_rules() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
     data = await data_rule_service.get_all()
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据权限规则详情', dependencies=[DependsJwtAuth])
-async def get_data_rule(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDataRuleDetail]:
+async def get_data_rule(
+    pk: Annotated[int, Path(description='数据规则 ID')],
+) -> ResponseSchemaModel[GetDataRuleDetail]:
     data = await data_rule_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有数据权限规则',
+    summary='分页获取所有数据权限规则',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_data_rule(
-    db: CurrentSession, name: Annotated[str | None, Query()] = None
+async def get_pagination_data_rules(
+    db: CurrentSession, name: Annotated[str | None, Query(description='规则名称')] = None
 ) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
     data_rule_select = await data_rule_service.get_select(name=name)
     page_data = await paging_data(db, data_rule_select)
@@ -77,7 +81,9 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_data_rule(pk: Annotated[int, Path(...)], obj: UpdateDataRuleParam) -> ResponseModel:
+async def update_data_rule(
+    pk: Annotated[int, Path(description='数据规则 ID')], obj: UpdateDataRuleParam
+) -> ResponseModel:
     count = await data_rule_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -86,13 +92,15 @@ async def update_data_rule(pk: Annotated[int, Path(...)], obj: UpdateDataRulePar
 
 @router.delete(
     '',
-    summary='（批量）删除数据权限规则',
+    summary='批量删除数据权限规则',
     dependencies=[
         Depends(RequestPermission('data:rule:del')),
         DependsRBAC,
     ],
 )
-async def delete_data_rule(request: Request, pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_data_rule(
+    request: Request, pk: Annotated[list[int], Query(description='数据规则 ID 列表')]
+) -> ResponseModel:
     count = await data_rule_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

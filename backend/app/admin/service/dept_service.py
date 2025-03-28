@@ -15,8 +15,16 @@ from backend.utils.build_tree import get_tree_data
 
 
 class DeptService:
+    """部门服务类"""
+
     @staticmethod
     async def get(*, pk: int) -> Dept:
+        """
+        获取部门详情
+
+        :param pk: 部门 ID
+        :return:
+        """
         async with async_db_session() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
@@ -27,6 +35,15 @@ class DeptService:
     async def get_dept_tree(
         *, name: str | None = None, leader: str | None = None, phone: str | None = None, status: int | None = None
     ) -> list[dict[str, Any]]:
+        """
+        获取部门树形结构
+
+        :param name: 部门名称
+        :param leader: 部门负责人
+        :param phone: 联系电话
+        :param status: 状态
+        :return:
+        """
         async with async_db_session() as db:
             dept_select = await dept_dao.get_all(db=db, name=name, leader=leader, phone=phone, status=status)
             tree_data = get_tree_data(dept_select)
@@ -34,6 +51,12 @@ class DeptService:
 
     @staticmethod
     async def create(*, obj: CreateDeptParam) -> None:
+        """
+        创建部门
+
+        :param obj: 部门创建参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_by_name(db, obj.name)
             if dept:
@@ -46,6 +69,13 @@ class DeptService:
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDeptParam) -> int:
+        """
+        更新部门
+
+        :param pk: 部门 ID
+        :param obj: 部门更新参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
@@ -64,8 +94,16 @@ class DeptService:
 
     @staticmethod
     async def delete(*, request: Request, pk: int) -> int:
+        """
+        删除部门
+
+        :param request: FastAPI 请求对象
+        :param pk: 部门 ID
+        :return:
+        """
         async with async_db_session.begin() as db:
-            dept_user = await dept_dao.get_with_relation(db, pk)
+            dept = await dept_dao.get_with_relation(db, pk)
+            dept_user = dept.users
             if dept_user:
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
             children = await dept_dao.get_children(db, pk)

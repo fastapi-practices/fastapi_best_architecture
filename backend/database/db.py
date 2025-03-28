@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import sys
 
-from typing import Annotated
+from typing import Annotated, AsyncGenerator
 from uuid import uuid4
 
 from fastapi import Depends
@@ -33,7 +35,12 @@ def create_database_url(unittest: bool = False) -> URL:
 
 
 def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_sessionmaker[AsyncSession]]:
-    """创建数据库引擎和 Session"""
+    """
+    创建数据库引擎和 Session
+
+    :param url: 数据库连接 URL
+    :return:
+    """
     try:
         # 数据库引擎
         engine = create_async_engine(
@@ -49,17 +56,21 @@ def create_async_engine_and_session(url: str | URL) -> tuple[AsyncEngine, async_
             pool_pre_ping=True,  # 低：False 高：True
             pool_use_lifo=False,  # 低：False 高：True
         )
-        # log.success('数据库连接成功')
     except Exception as e:
         log.error('❌ 数据库链接失败 {}', e)
         sys.exit()
     else:
-        db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+        db_session = async_sessionmaker(
+            bind=engine,
+            class_=AsyncSession,
+            autoflush=False,  # 禁用自动刷新
+            expire_on_commit=False,  # 禁用提交时过期
+        )
         return engine, db_session
 
 
-async def get_db():
-    """session 生成器"""
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """获取数据库会话"""
     async with async_db_session() as session:
         yield session
 

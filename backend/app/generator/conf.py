@@ -6,9 +6,9 @@ from pydantic_settings import BaseSettings
 
 
 class GeneratorSettings(BaseSettings):
-    """Admin Settings"""
+    """代码生成配置"""
 
-    # 模版目录
+    # 模版
     TEMPLATE_BACKEND_DIR_NAME: str = 'py'
 
     # 代码下载
@@ -17,7 +17,7 @@ class GeneratorSettings(BaseSettings):
 
 @lru_cache
 def get_generator_settings() -> GeneratorSettings:
-    """获取 generator 配置"""
+    """获取代码生成配置"""
     return GeneratorSettings()
 
 

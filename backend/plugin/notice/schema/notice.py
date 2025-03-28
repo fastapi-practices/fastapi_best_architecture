@@ -9,25 +9,29 @@ from backend.common.schema import SchemaBase
 
 
 class NoticeSchemaBase(SchemaBase):
-    title: str
-    type: int
-    author: str
-    source: str
-    status: StatusType = Field(default=StatusType.enable)
-    content: str
+    """通知公告基础模型"""
+
+    title: str = Field(description='标题')
+    type: int = Field(description='类型（0：通知、1：公告）')
+    author: str = Field(description='作者')
+    source: str = Field(description='信息来源')
+    status: StatusType = Field(StatusType.enable, description='状态（0：隐藏、1：显示）')
+    content: str = Field(description='内容')
 
 
 class CreateNoticeParam(NoticeSchemaBase):
-    pass
+    """创建通知公告参数"""
 
 
 class UpdateNoticeParam(NoticeSchemaBase):
-    pass
+    """更新通知公告参数"""
 
 
 class GetNoticeDetail(NoticeSchemaBase):
+    """通知公告详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    created_time: datetime
-    updated_time: datetime | None = None
+    id: int = Field(description='通知公告 ID')
+    created_time: datetime = Field(description='创建时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

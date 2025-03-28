@@ -15,17 +15,17 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取部门详情', dependencies=[DependsJwtAuth])
-async def get_dept(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetDeptDetail]:
+async def get_dept(pk: Annotated[int, Path(description='部门 ID')]) -> ResponseSchemaModel[GetDeptDetail]:
     data = await dept_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
-async def get_all_depts_tree(
-    name: Annotated[str | None, Query()] = None,
-    leader: Annotated[str | None, Query()] = None,
-    phone: Annotated[str | None, Query()] = None,
-    status: Annotated[int | None, Query()] = None,
+async def get_all_depts(
+    name: Annotated[str | None, Query(description='部门名称')] = None,
+    leader: Annotated[str | None, Query(description='部门负责人')] = None,
+    phone: Annotated[str | None, Query(description='联系电话')] = None,
+    status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
     dept = await dept_service.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
     return response_base.success(data=dept)
@@ -52,7 +52,7 @@ async def create_dept(obj: CreateDeptParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> ResponseModel:
+async def update_dept(pk: Annotated[int, Path(description='部门 ID')], obj: UpdateDeptParam) -> ResponseModel:
     count = await dept_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -67,7 +67,7 @@ async def update_dept(pk: Annotated[int, Path(...)], obj: UpdateDeptParam) -> Re
         DependsRBAC,
     ],
 )
-async def delete_dept(request: Request, pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def delete_dept(request: Request, pk: Annotated[int, Path(description='部门 ID')]) -> ResponseModel:
     count = await dept_service.delete(request=request, pk=pk)
     if count > 0:
         return response_base.success()

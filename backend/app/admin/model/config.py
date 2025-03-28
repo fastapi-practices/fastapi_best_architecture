@@ -9,7 +9,7 @@ from backend.common.model import Base, id_key
 
 
 class Config(Base):
-    """系统配置表"""
+    """参数配置表"""
 
     __tablename__ = 'sys_config'
 

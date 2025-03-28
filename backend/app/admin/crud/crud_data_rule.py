@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, desc, select
+from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload
 from sqlalchemy_crud_plus import CRUDPlus
@@ -12,76 +12,82 @@ from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRu
 
 
 class CRUDDataRule(CRUDPlus[DataRule]):
+    """数据权限规则数据库操作类"""
+
     async def get(self, db: AsyncSession, pk: int) -> DataRule | None:
         """
-        获取数据权限规则
+        获取规则详情
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 规则 ID
         :return:
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, name: str = None) -> Select:
+    async def get_list(self, name: str | None = None) -> Select:
         """
-        获取数据权限规则列表
+        获取规则列表
 
+        :param name: 规则名称
         :return:
         """
         stmt = select(self.model).options(noload(self.model.roles)).order_by(desc(self.model.created_time))
-        where_list = []
+
+        filters = []
         if name is not None:
-            where_list.append(self.model.name.like(f'%{name}%'))
-        if where_list:
-            stmt = stmt.where(*where_list)
+            filters.append(self.model.name.like(f'%{name}%'))
+
+        if filters:
+            stmt = stmt.where(and_(*filters))
+
         return stmt
 
-    async def get_by_name(self, db: AsyncSession, name: str):
+    async def get_by_name(self, db: AsyncSession, name: str) -> DataRule | None:
         """
-        通过 name 获取数据权限规则
+        通过名称获取规则
 
-        :param db:
-        :param name:
+        :param db: 数据库会话
+        :param name: 规则名称
         :return:
         """
         return await self.select_model_by_column(db, name=name)
 
     async def get_all(self, db: AsyncSession) -> Sequence[DataRule]:
         """
-        获取所有数据权限规则
+        获取所有规则
 
-        :param db:
+        :param db: 数据库会话
         :return:
         """
         return await self.select_models(db)
 
-    async def create(self, db: AsyncSession, obj_in: CreateDataRuleParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDataRuleParam) -> None:
         """
-        创建数据权限规则
+        创建规则
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj: 创建规则参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateDataRuleParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateDataRuleParam) -> int:
         """
-        更新数据权限规则
+        更新规则
 
-        :param db:
-        :param pk:
-        :param obj_in:
+        :param db: 数据库会话
+        :param pk: 规则 ID
+        :param obj: 更新规则参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除数据权限规则
+        删除规则
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: 规则 ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

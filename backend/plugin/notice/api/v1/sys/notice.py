@@ -17,20 +17,20 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetNoticeDetail]:
+async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
     notice = await notice_service.get(pk=pk)
     return response_base.success(data=notice)
 
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有通知公告',
+    summary='分页获取所有通知公告',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_notice(db: CurrentSession) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
+async def get_pagination_notices(db: CurrentSession) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
     notice_select = await notice_service.get_select()
     page_data = await paging_data(db, notice_select)
     return response_base.success(data=page_data)
@@ -57,7 +57,7 @@ async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_notice(pk: Annotated[int, Path(...)], obj: UpdateNoticeParam) -> ResponseModel:
+async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam) -> ResponseModel:
     count = await notice_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -66,13 +66,13 @@ async def update_notice(pk: Annotated[int, Path(...)], obj: UpdateNoticeParam) -
 
 @router.delete(
     '',
-    summary='（批量）删除通知公告',
+    summary='批量删除通知公告',
     dependencies=[
         Depends(RequestPermission('sys:notice:del')),
         DependsRBAC,
     ],
 )
-async def delete_notice(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_notice(pk: Annotated[list[int], Query(description='通知公告 ID 列表')]) -> ResponseModel:
     count = await notice_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

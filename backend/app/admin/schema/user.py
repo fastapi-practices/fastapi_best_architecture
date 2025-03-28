@@ -13,84 +13,106 @@ from backend.common.schema import CustomPhoneNumber, SchemaBase
 
 
 class AuthSchemaBase(SchemaBase):
-    username: str
-    password: str | None
+    """用户认证基础模型"""
+
+    username: str = Field(description='用户名')
+    password: str | None = Field(description='密码')
 
 
 class AuthLoginParam(AuthSchemaBase):
-    captcha: str
+    """用户登录参数"""
+
+    captcha: str = Field(description='验证码')
 
 
 class RegisterUserParam(AuthSchemaBase):
-    nickname: str | None = None
-    email: EmailStr = Field(examples=['user@example.com'])
+    """用户注册参数"""
+
+    nickname: str | None = Field(None, description='昵称')
+    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
 
 
 class AddUserParam(AuthSchemaBase):
-    dept_id: int
-    roles: list[int]
-    nickname: str | None = None
-    email: EmailStr = Field(examples=['user@example.com'])
+    """添加用户参数"""
+
+    dept_id: int = Field(description='部门 ID')
+    roles: list[int] = Field(description='角色 ID 列表')
+    nickname: str | None = Field(None, description='昵称')
+    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
 
 
 class ResetPasswordParam(SchemaBase):
-    old_password: str
-    new_password: str
-    confirm_password: str
+    """重置密码参数"""
+
+    old_password: str = Field(description='旧密码')
+    new_password: str = Field(description='新密码')
+    confirm_password: str = Field(description='确认密码')
 
 
 class UserInfoSchemaBase(SchemaBase):
-    dept_id: int | None = None
-    username: str
-    nickname: str
-    email: EmailStr = Field(examples=['user@example.com'])
-    phone: CustomPhoneNumber | None = None
+    """用户信息基础模型"""
+
+    dept_id: int | None = Field(None, description='部门 ID')
+    username: str = Field(description='用户名')
+    nickname: str = Field(description='昵称')
+    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
+    phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
-    pass
+    """更新用户参数"""
 
 
 class UpdateUserRoleParam(SchemaBase):
-    roles: list[int]
+    """更新用户角色参数"""
+
+    roles: list[int] = Field(description='角色 ID 列表')
 
 
 class AvatarParam(SchemaBase):
+    """更新头像参数"""
+
     url: HttpUrl = Field(description='头像 http 地址')
 
 
 class GetUserInfoDetail(UserInfoSchemaBase):
+    """用户信息详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    dept_id: int | None = None
-    id: int
-    uuid: str
-    avatar: str | None = None
-    status: StatusType = Field(default=StatusType.enable)
-    is_superuser: bool
-    is_staff: bool
-    is_multi_login: bool
-    join_time: datetime = None
-    last_login_time: datetime | None = None
+    dept_id: int | None = Field(None, description='部门 ID')
+    id: int = Field(description='用户 ID')
+    uuid: str = Field(description='用户 UUID')
+    avatar: str | None = Field(None, description='头像')
+    status: StatusType = Field(StatusType.enable, description='状态')
+    is_superuser: bool = Field(description='是否超级管理员')
+    is_staff: bool = Field(description='是否管理员')
+    is_multi_login: bool = Field(description='是否允许多端登录')
+    join_time: datetime = Field(description='加入时间')
+    last_login_time: datetime | None = Field(None, description='最后登录时间')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):
+    """用户信息关联详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptDetail | None = None
-    roles: list[GetRoleWithRelationDetail]
+    dept: GetDeptDetail | None = Field(None, description='部门信息')
+    roles: list[GetRoleWithRelationDetail] = Field(description='角色列表')
 
 
 class GetCurrentUserInfoWithRelationDetail(GetUserInfoWithRelationDetail):
+    """当前用户信息关联详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    dept: str | None = None
-    roles: list[str]
+    dept: str | None = Field(None, description='部门名称')
+    roles: list[str] = Field(description='角色名称列表')
 
     @model_validator(mode='before')
     @classmethod
     def handel(cls, data: Any) -> Self:
-        """处理部门和角色"""
+        """处理部门和角色数据"""
         dept = data['dept']
         if dept:
             data['dept'] = dept['name']

@@ -14,18 +14,19 @@ from backend.core.conf import settings
 
 class InterceptHandler(logging.Handler):
     """
-    Default handler from examples in loguru documentation.
-    See https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+    日志拦截处理器，用于将标准库的日志重定向到 loguru
+
+    参考：https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
     """
 
     def emit(self, record: logging.LogRecord):
-        # Get corresponding Loguru level if it exists
+        # 获取对应的 Loguru 级别（如果存在）
         try:
             level = logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
 
-        # Find caller from where originated the logged message.
+        # 查找记录日志消息的调用者
         frame, depth = inspect.currentframe(), 0
         while frame and (depth == 0 or frame.f_code.co_filename == logging.__file__):
             frame = frame.f_back
@@ -34,16 +35,19 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def setup_logging():
+def setup_logging() -> None:
     """
-    From https://github.com/benoitc/gunicorn/issues/1572#issuecomment-638391953
-    https://github.com/pawamoy/pawamoy.github.io/issues/17
+    设置日志处理器
+
+    参考：
+    - https://github.com/benoitc/gunicorn/issues/1572#issuecomment-638391953
+    - https://github.com/pawamoy/pawamoy.github.io/issues/17
     """
-    # Set the logging handler and level
+    # 设置根日志处理器和级别
     logging.root.handlers = [InterceptHandler()]
     logging.root.setLevel(settings.LOG_STD_LEVEL)
 
-    # Remove all log handlers and propagate to root logger
+    # 配置日志传播规则
     for name in logging.root.manager.loggerDict.keys():
         logging.getLogger(name).handlers = []
         if 'uvicorn.access' in name or 'watchfiles.main' in name:
@@ -54,17 +58,15 @@ def setup_logging():
         # Debug log handlers
         # logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
 
-    # Define the correlation_id default filter function
+    # 定义 correlation_id 默认过滤函数
     # https://github.com/snok/asgi-correlation-id/issues/7
     def correlation_id_filter(record):
         cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
         record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
         return record
 
-    # Remove default loguru logger
-    logger.remove()
-
-    # Set the loguru default handlers
+    # 配置 loguru 处理器
+    logger.remove()  # 移除默认处理器
     logger.configure(
         handlers=[
             {
@@ -77,16 +79,17 @@ def setup_logging():
     )
 
 
-def set_custom_logfile():
+def set_custom_logfile() -> None:
+    """设置自定义日志文件"""
     log_path = path_conf.LOG_DIR
     if not os.path.exists(log_path):
         os.mkdir(log_path)
 
-    # log files
+    # 日志文件
     log_access_file = os.path.join(log_path, settings.LOG_ACCESS_FILENAME)
     log_error_file = os.path.join(log_path, settings.LOG_ERROR_FILENAME)
 
-    # set loguru logger default config
+    # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
     log_config = {
         'format': settings.LOG_FILE_FORMAT,
@@ -96,7 +99,7 @@ def set_custom_logfile():
         'compression': 'tar.gz',
     }
 
-    # stdout file
+    # 标准输出文件
     logger.add(
         str(log_access_file),
         level=settings.LOG_ACCESS_FILE_LEVEL,
@@ -106,7 +109,7 @@ def set_custom_logfile():
         **log_config,
     )
 
-    # stderr file
+    # 标准错误文件
     logger.add(
         str(log_error_file),
         level=settings.LOG_ERROR_FILE_LEVEL,
@@ -117,4 +120,5 @@ def set_custom_logfile():
     )
 
 
+# 创建 logger 实例
 log = logger

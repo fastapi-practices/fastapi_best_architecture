@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, Path, Query
+
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}Detail, Update{{ schema_name }}Param
 from backend.app.{{ app_name }}.service.{{ table_name_en }}_service import {{ table_name_en }}_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
@@ -10,26 +12,25 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
-from fastapi import APIRouter, Depends, Path, Query
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取{{ table_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
-async def get_{{ table_name_en }}(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
+async def get_{{ table_name_en }}(pk: Annotated[int, Path(description='{{ table_simple_name_zh }} ID')]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
     {{ table_name_en }} = await {{ table_name_en }}_service.get(pk=pk)
     return response_base.success(data={{ table_name_en }})
 
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有{{ table_simple_name_zh }}',
+    summary='分页获取所有{{ table_simple_name_zh }}',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_{{ table_name_en }}(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
+async def get_pagination_{{ table_name_en }}s(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
     {{ table_name_en }}_select = await {{ table_name_en }}_service.get_select()
     page_data = await paging_data(db, {{ table_name_en }}_select)
     return response_base.success(data=page_data)
@@ -56,7 +57,7 @@ async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> Respo
         DependsRBAC,
     ],
 )
-async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{{ schema_name }}Param) -> ResponseModel:
+async def update_{{ table_name_en }}(pk: Annotated[int, Path(description='{{ table_simple_name_zh }} ID')], obj: Update{{ schema_name }}Param) -> ResponseModel:
     count = await {{ table_name_en }}_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -65,13 +66,13 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(...)], obj: Update{
 
 @router.delete(
     '',
-    summary='（批量）删除{{ table_simple_name_zh }}',
+    summary='批量删除{{ table_simple_name_zh }}',
     dependencies=[
         Depends(RequestPermission('{{ permission }}:del')),
         DependsRBAC,
     ],
 )
-async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(description='{{ table_simple_name_zh }} ID 列表')]) -> ResponseModel:
     count = await {{ table_name_en }}_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

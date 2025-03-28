@@ -9,23 +9,27 @@ from backend.common.schema import SchemaBase
 
 
 class DictTypeSchemaBase(SchemaBase):
-    name: str
-    code: str
-    status: StatusType = Field(default=StatusType.enable)
-    remark: str | None = None
+    """字典类型基础模型"""
+
+    name: str = Field(description='字典名称')
+    code: str = Field(description='字典编码')
+    status: StatusType = Field(StatusType.enable, description='状态')
+    remark: str | None = Field(None, description='备注')
 
 
 class CreateDictTypeParam(DictTypeSchemaBase):
-    pass
+    """创建字典类型参数"""
 
 
 class UpdateDictTypeParam(DictTypeSchemaBase):
-    pass
+    """更新字典类型参数"""
 
 
 class GetDictTypeDetail(DictTypeSchemaBase):
+    """字典类型详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    created_time: datetime
-    updated_time: datetime | None = None
+    id: int = Field(description='字典类型 ID')
+    created_time: datetime = Field(description='创建时间')
+    updated_time: datetime | None = Field(None, description='更新时间')

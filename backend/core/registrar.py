@@ -3,6 +3,7 @@
 import os
 
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 import socketio
 
@@ -30,10 +31,11 @@ from backend.utils.serializers import MsgSpecJSONResponse
 
 
 @asynccontextmanager
-async def register_init(app: FastAPI):
+async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     启动初始化
 
+    :param app: FastAPI 应用实例
     :return:
     """
     # 创建数据库表
@@ -55,8 +57,8 @@ async def register_init(app: FastAPI):
     await FastAPILimiter.close()
 
 
-def register_app():
-    # FastAPI
+def register_app() -> FastAPI:
+    """注册 FastAPI 应用"""
     app = FastAPI(
         title=settings.FASTAPI_TITLE,
         version=settings.FASTAPI_VERSION,
@@ -68,79 +70,71 @@ def register_app():
         lifespan=register_init,
     )
 
-    # socketio
+    # 注册组件
     register_socket_app(app)
-
-    # 日志
     register_logger()
-
-    # 静态文件
     register_static_file(app)
-
-    # 中间件
     register_middleware(app)
-
-    # 路由
     register_router(app)
-
-    # 分页
     register_page(app)
-
-    # 全局异常处理
     register_exception(app)
 
     return app
 
 
 def register_logger() -> None:
-    """
-    系统日志
-
-    :return:
-    """
+    """注册日志"""
     setup_logging()
     set_custom_logfile()
 
 
-def register_static_file(app: FastAPI):
+def register_static_file(app: FastAPI) -> None:
     """
-    静态资源服务，生产应使用 nginx 代理静态资源服务
+    注册静态资源服务
 
-    :param app:
+    :param app: FastAPI 应用实例
     :return:
     """
     # 上传静态资源
     if not os.path.exists(UPLOAD_DIR):
         os.makedirs(UPLOAD_DIR)
     app.mount('/static/upload', StaticFiles(directory=UPLOAD_DIR), name='upload')
+
     # 固有静态资源
     if settings.FASTAPI_STATIC_FILES:
         app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
 
 
-def register_middleware(app: FastAPI):
+def register_middleware(app: FastAPI) -> None:
     """
-    中间件，执行顺序从下往上
+    注册中间件（执行顺序从下往上）
 
-    :param app:
+    :param app: FastAPI 应用实例
     :return:
     """
-    # Opera log (required)
+    # Opera log (必须)
     app.add_middleware(OperaLogMiddleware)
-    # JWT auth (required)
+
+    # JWT auth (必须)
     app.add_middleware(
-        AuthenticationMiddleware, backend=JwtAuthMiddleware(), on_error=JwtAuthMiddleware.auth_exception_handler
+        AuthenticationMiddleware,
+        backend=JwtAuthMiddleware(),
+        on_error=JwtAuthMiddleware.auth_exception_handler,
     )
+
     # Access log
     if settings.MIDDLEWARE_ACCESS:
         from backend.middleware.access_middleware import AccessMiddleware
 
         app.add_middleware(AccessMiddleware)
+
     # State
     app.add_middleware(StateMiddleware)
-    # Trace ID (required)
+
+    # Trace ID (必须)
     app.add_middleware(CorrelationIdMiddleware, validator=False)
-    # CORS: Always at the end
+
+    # CORS（必须放在最下面）
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
 
@@ -154,19 +148,20 @@ def register_middleware(app: FastAPI):
         )
 
 
-def register_router(app: FastAPI):
+def register_router(app: FastAPI) -> None:
     """
-    路由
+    注册路由
 
-    :param app: FastAPI
+    :param app: FastAPI 应用实例
     :return:
     """
     dependencies = [Depends(demo_site)] if settings.DEMO_MODE else None
 
-    # API
+    # 插件路由
     plugin_router_inject()
 
-    from backend.app.router import router  # 必须在插件路由注入后导入
+    # 系统路由（必须在插件路由注入后导入）
+    from backend.app.router import router
 
     app.include_router(router, dependencies=dependencies)
 
@@ -175,21 +170,21 @@ def register_router(app: FastAPI):
     simplify_operation_ids(app)
 
 
-def register_page(app: FastAPI):
+def register_page(app: FastAPI) -> None:
     """
-    分页查询
+    注册分页查询功能
 
-    :param app:
+    :param app: FastAPI 应用实例
     :return:
     """
     add_pagination(app)
 
 
-def register_socket_app(app: FastAPI):
+def register_socket_app(app: FastAPI) -> None:
     """
-    socket 应用
+    注册 Socket.IO 应用
 
-    :param app:
+    :param app: FastAPI 应用实例
     :return:
     """
     from backend.common.socketio.server import sio

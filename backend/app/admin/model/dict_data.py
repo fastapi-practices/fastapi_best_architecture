@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
@@ -7,9 +11,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
 
+if TYPE_CHECKING:
+    from backend.app.admin.model import DictType
+
 
 class DictData(Base):
-    """字典数据"""
+    """字典数据表"""
 
     __tablename__ = 'sys_dict_data'
 
@@ -26,4 +33,4 @@ class DictData(Base):
     type_id: Mapped[int] = mapped_column(
         ForeignKey('sys_dict_type.id', ondelete='CASCADE'), default=0, comment='字典类型关联ID'
     )
-    type: Mapped['DictType'] = relationship(init=False, back_populates='datas')  # noqa: F821
+    type: Mapped[DictType] = relationship(init=False, back_populates='datas')

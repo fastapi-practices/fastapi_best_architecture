@@ -2,44 +2,56 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from pydantic import Field
+
 from backend.app.admin.schema.user import GetUserInfoDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
 class GetSwaggerToken(SchemaBase):
-    access_token: str
-    token_type: str = 'Bearer'
-    user: GetUserInfoDetail
+    """Swagger 认证令牌"""
+
+    access_token: str = Field(description='访问令牌')
+    token_type: str = Field('Bearer', description='令牌类型')
+    user: GetUserInfoDetail = Field(description='用户信息')
 
 
 class AccessTokenBase(SchemaBase):
-    access_token: str
-    access_token_expire_time: datetime
-    session_uuid: str
+    """访问令牌基础模型"""
+
+    access_token: str = Field(description='访问令牌')
+    access_token_expire_time: datetime = Field(description='令牌过期时间')
+    session_uuid: str = Field(description='会话 UUID')
 
 
 class GetNewToken(AccessTokenBase):
-    pass
+    """获取新令牌"""
 
 
 class GetLoginToken(AccessTokenBase):
-    user: GetUserInfoDetail
+    """获取登录令牌"""
+
+    user: GetUserInfoDetail = Field(description='用户信息')
 
 
 class KickOutToken(SchemaBase):
-    session_uuid: str
+    """踢出令牌"""
+
+    session_uuid: str = Field(description='会话 UUID')
 
 
 class GetTokenDetail(SchemaBase):
-    id: int
-    session_uuid: str
-    username: str
-    nickname: str
-    ip: str
-    os: str
-    browser: str
-    device: str
-    status: StatusType
-    last_login_time: str
-    expire_time: datetime
+    """令牌详情"""
+
+    id: int = Field(description='用户 ID')
+    session_uuid: str = Field(description='会话 UUID')
+    username: str = Field(description='用户名')
+    nickname: str = Field(description='昵称')
+    ip: str = Field(description='IP 地址')
+    os: str = Field(description='操作系统')
+    browser: str = Field(description='浏览器')
+    device: str = Field(description='设备')
+    status: StatusType = Field(description='状态')
+    last_login_time: str = Field(description='最后登录时间')
+    expire_time: datetime = Field(description='过期时间')

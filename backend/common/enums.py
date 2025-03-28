@@ -2,27 +2,38 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from enum import IntEnum as SourceIntEnum
-from typing import Type
+from typing import Any, Type, TypeVar
+
+T = TypeVar('T', bound=Enum)
 
 
 class _EnumBase:
+    """枚举基类，提供通用方法"""
+
     @classmethod
-    def get_member_keys(cls: Type[Enum]) -> list[str]:
+    def get_member_keys(cls: Type[T]) -> list[str]:
+        """获取枚举成员名称列表"""
         return [name for name in cls.__members__.keys()]
 
     @classmethod
-    def get_member_values(cls: Type[Enum]) -> list:
+    def get_member_values(cls: Type[T]) -> list:
+        """获取枚举成员值列表"""
         return [item.value for item in cls.__members__.values()]
+
+    @classmethod
+    def get_member_dict(cls: Type[T]) -> dict[str, Any]:
+        """获取枚举成员字典"""
+        return {name: item.value for name, item in cls.__members__.items()}
 
 
 class IntEnum(_EnumBase, SourceIntEnum):
-    """整型枚举"""
+    """整型枚举基类"""
 
     pass
 
 
 class StrEnum(_EnumBase, str, Enum):
-    """字符串枚举"""
+    """字符串枚举基类"""
 
     pass
 
@@ -56,7 +67,7 @@ class RoleDataRuleExpressionType(IntEnum):
 
 
 class MethodType(StrEnum):
-    """请求方法"""
+    """HTTP 请求方法"""
 
     GET = 'GET'
     POST = 'POST'
@@ -67,7 +78,7 @@ class MethodType(StrEnum):
 
 
 class LoginLogStatusType(IntEnum):
-    """登陆日志状态"""
+    """登录日志状态"""
 
     fail = 0
     success = 1
@@ -100,7 +111,7 @@ class UserSocialType(StrEnum):
     """用户社交类型"""
 
     github = 'GitHub'
-    linuxdo = 'LinuxDo'
+    linux_do = 'LinuxDo'
 
 
 class FileType(StrEnum):
@@ -176,7 +187,7 @@ class GenModelMySQLColumnType(StrEnum):
 
 
 class GenModelPostgreSQLColumnType(StrEnum):
-    """代码生成模型列类型（PostgreSQL），仅作为数据保留，并未实施"""
+    """代码生成模型列类型（PostgreSQL）"""
 
     # Python 类型映射
     BIGINT = 'int'

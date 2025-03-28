@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Boolean, ForeignKey, String
 from sqlalchemy.dialects.postgresql import INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import User
 
 
 class Dept(Base):
@@ -29,8 +34,8 @@ class Dept(Base):
     parent_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
     )
-    parent: Mapped[Union['Dept', None]] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[list['Dept'] | None] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Optional['Dept']] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[Optional[list['Dept']]] = relationship(init=False, back_populates='parent')
 
     # 部门用户一对多
-    users: Mapped[list['User']] = relationship(init=False, back_populates='dept')  # noqa: F821
+    users: Mapped[list[User]] = relationship(init=False, back_populates='dept')

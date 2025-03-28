@@ -52,16 +52,17 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
         full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
         if os.path.exists(full_plugin_path):
             raise errors.ForbiddenError(msg='此插件已安装')
-        os.makedirs(full_plugin_path)
+        else:
+            os.makedirs(full_plugin_path, exist_ok=True)
 
-        # 解压安装
+        # 解压（安装）
         members = []
         for member in zf.infolist():
             if member.filename.startswith(plugin_dir_in_zip):
-                member.filename = member.filename.replace(plugin_dir_in_zip, '')
-                if not member.filename:
-                    continue
-                members.append(member)
+                new_filename = member.filename.replace(plugin_dir_in_zip, '')
+                if new_filename:
+                    member.filename = new_filename
+                    members.append(member)
         zf.extractall(PLUGIN_DIR, members)
         if os.path.exists(os.path.join(full_plugin_path, 'requirements.txt')):
             await install_requirements_async()
@@ -77,10 +78,11 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def build_plugin_zip(plugin: Annotated[str, Query()]):
+async def build_plugin(plugin: Annotated[str, Query(description='插件名称')]) -> StreamingResponse:
     plugin_dir = os.path.join(PLUGIN_DIR, plugin)
     if not os.path.exists(plugin_dir):
         raise errors.ForbiddenError(msg='插件不存在')
+
     bio = io.BytesIO()
     with zipfile.ZipFile(bio, 'w') as zf:
         for root, dirs, files in os.walk(plugin_dir):
@@ -89,6 +91,7 @@ async def build_plugin_zip(plugin: Annotated[str, Query()]):
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, start=plugin_dir)
                 zf.write(file_path, arcname)
+
     bio.seek(0)
     return StreamingResponse(
         bio,

@@ -27,13 +27,17 @@ async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]
 
 
 @router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
-async def get_business(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetGenBusinessDetail]:
+async def get_business(
+    pk: Annotated[int, Path(description='业务 ID')],
+) -> ResponseSchemaModel[GetGenBusinessDetail]:
     data = await gen_business_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
-async def get_business_all_models(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[list[GetGenModelDetail]]:
+async def get_business_all_models(
+    pk: Annotated[int, Path(description='业务 ID')],
+) -> ResponseSchemaModel[list[GetGenModelDetail]]:
     data = await gen_model_service.get_by_business(business_id=pk)
     return response_base.success(data=data)
 
@@ -60,7 +64,9 @@ async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_business(pk: Annotated[int, Path(...)], obj: UpdateGenBusinessParam) -> ResponseModel:
+async def update_business(
+    pk: Annotated[int, Path(description='业务 ID')], obj: UpdateGenBusinessParam
+) -> ResponseModel:
     count = await gen_business_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -75,7 +81,7 @@ async def update_business(pk: Annotated[int, Path(...)], obj: UpdateGenBusinessP
         DependsRBAC,
     ],
 )
-async def delete_business(pk: Annotated[int, Path(...)]) -> ResponseModel:
+async def delete_business(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseModel:
     count = await gen_business_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

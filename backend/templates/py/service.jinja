@@ -2,17 +2,24 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from sqlalchemy import Select
+
 from backend.app.{{ app_name }}.crud.crud_{{ table_name_en }} import {{ table_name_en }}_dao
 from backend.app.{{ app_name }}.model import {{ table_name_class }}
 from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
 from backend.database.db import async_db_session
-from sqlalchemy import Select
 
 
 class {{ table_name_class }}Service:
     @staticmethod
     async def get(*, pk: int) -> {{ table_name_class }}:
+        """
+        获取{{ table_simple_name_zh }}
+
+        :param pk: {{ table_simple_name_zh }} ID
+        :return:
+        """
         async with async_db_session() as db:
             {{ table_name_en }} = await {{ table_name_en }}_dao.get(db, pk)
             if not {{ table_name_en }}:
@@ -21,27 +28,48 @@ class {{ table_name_class }}Service:
 
     @staticmethod
     async def get_select() -> Select:
+        """获取{{ table_simple_name_zh }}查询对象"""
         return await {{ table_name_en }}_dao.get_list()
 
     @staticmethod
     async def get_all() -> Sequence[{{ table_name_class }}]:
+        """获取所有{{ table_simple_name_zh }}"""
         async with async_db_session() as db:
             {{ table_name_en }}s = await {{ table_name_en }}_dao.get_all(db)
             return {{ table_name_en }}s
 
     @staticmethod
     async def create(*, obj: Create{{ schema_name }}Param) -> None:
+        """
+        创建{{ table_simple_name_zh }}
+
+        :param obj: 创建{{ table_simple_name_zh }}参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             await {{ table_name_en }}_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: Update{{ schema_name }}Param) -> int:
+        """
+        更新{{ table_simple_name_zh }}
+
+        :param pk: {{ table_simple_name_zh }} ID
+        :param obj: 更新{{ table_simple_name_zh }}参数
+        :return:
+        """
         async with async_db_session.begin() as db:
             count = await {{ table_name_en }}_dao.update(db, pk, obj)
             return count
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
+        """
+        删除{{ table_simple_name_zh }}
+
+        :param pk: {{ table_simple_name_zh }} ID 列表
+        :return:
+        """
         async with async_db_session.begin() as db:
             count = await {{ table_name_en }}_dao.delete(db, pk)
             return count

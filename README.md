@@ -6,9 +6,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A backend and frontend separation solution based on the FastAPI framework, following
-the [pseudo 3-tier architecture](#pseudo-3-tier-architecture) design, supporting **Python 3.10** and above
-versions
+Enterprise-level backend architecture solution
 
 **🔥Continuously updated and maintained🔥**
 
@@ -49,37 +47,39 @@ pattern, use templates to transform it to your heart's content!
 
 ## Features
 
-- [x] Design with FastAPI PEP 593 Annotated Parameters
-- [x] Global asynchronous design with async/await + asgiref
-- [x] Follows Restful API specification
-- [x] Global SQLAlchemy 2.0 syntax
-- [x] Pydantic v1 and v2 (different branches)
-- [x] Casbin RBAC access control model
-- [x] Role menu RBAC access control model
-- [x] Celery asynchronous tasks
-- [x] JWT middleware whitelist authentication
-- [x] Global customizable time zone time
-- [x] Docker / Docker-compose deployment
-- [x] Pytest Unit Testing
+- [x] Global FastAPI PEP 593 Annotated parameter style
+- [x] Comprehensive async/await + asgiref asynchronous design
+- [x] Adheres to RESTful API specifications
+- [x] Uses SQLAlchemy 2.0 with new syntax
+- [x] Uses Pydantic v2 version
+- [x] Implements role-menu RBAC access control
+- [x] Integrates Casbin RBAC access control
+- [x] Supports Celery asynchronous tasks
+- [x] Custom-developed JWT authentication middleware
+- [x] Supports global custom time zones
+- [x] Supports Docker / Docker-compose deployment
+- [x] Integrates Pytest unit testing
 
-## Built-in features
+## Built-in Functions
 
-- [x] User management: System User Role Management, Permission Allocation
-- [x] Department management: Configure system organization (company, department, team...)
-- [x] Menu management: Configure system menu, user menu, button permission tags
-- [x] Role management: role menu permission allocation, role route permission allocation
-- [x] Dictionary management: Maintain commonly used fixed data or parameters within the system
-- [x] Token management: System user online status detection, supports kicking users offline
-- [x] Login authentication: backend-based graphical captcha background authentication login
-- [x] Multipoint login: One-click modification of multipoint login through user information
-- [x] OAuth 2.0: Built-in self-developed OAuth 2.0 login integration
-- [x] Code generation: automatic backend code generation, supports preview, writing, and download
-- [x] Scheduled task: Automated task, asynchronous task, supports function calls
-- [x] Plugin system: Say goodbye to high coupling integration through hot-pluggable plugin mode
-- [x] Operation log: Record and query of system normal and abnormal operations
-- [x] Login log: Record and query of normal and abnormal user login
-- [x] Service monitoring: Server hardware device information and status
-- [x] API documentation: Automatically generate online interactive API documentation
+- [x] User Management: Assign roles and permissions
+- [x] Department Management: Configure organizational structure (company, department, team, etc.)
+- [x] Menu Management: Set up menus and button-level permissions
+- [x] Role Management: Configure roles, assign menus and permissions
+- [x] Dictionary Management: Maintain common parameters and configurations
+- [x] Parameter Management: Dynamically configure commonly used system parameters
+- [x] Notification Announcements: Publish and maintain system notification and announcement information
+- [x] Token Management: Detect online status, support forced logout
+- [x] Multi-device Login: Support one-click switching between multi-device login modes
+- [x] OAuth 2.0: Built-in custom-developed OAuth 2.0 authorization login
+- [x] Plugin System: Hot-swappable plugin design to reduce coupling
+- [x] Scheduled Tasks: Support scheduled, asynchronous tasks, and function calls
+- [x] Code Generation: Automatically generate code with preview, write, and download support
+- [x] Operation Logs: Record and query normal and abnormal operations
+- [x] Login Logs: Record and query normal and abnormal logins
+- [x] Cache Monitoring: Query system cache information and command statistics
+- [x] Service Monitoring: View server hardware information and status
+- [x] API Documentation: Automatically generate online interactive API documentation
 
 ## Development and deployment
 
@@ -103,7 +103,7 @@ the [official documentation](https://fastapi-practices.github.io/fastapi_best_ar
 
 ## Interactivity
 
-[TG / Discord](https://wu-clan.github.io/homepage/)
+[Discord](https://wu-clan.github.io/homepage/)
 
 ## Sponsor us
 

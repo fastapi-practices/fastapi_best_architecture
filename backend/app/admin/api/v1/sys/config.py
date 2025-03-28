@@ -21,7 +21,7 @@ from backend.database.db import CurrentSession
 router = APIRouter()
 
 
-@router.get('/website', summary='获取网站配置信息', dependencies=[DependsJwtAuth])
+@router.get('/website', summary='获取网站参数配置', dependencies=[DependsJwtAuth])
 async def get_website_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
     config = await config_service.get_built_in_config('website')
     return response_base.success(data=config)
@@ -29,7 +29,7 @@ async def get_website_config() -> ResponseSchemaModel[list[GetConfigDetail]]:
 
 @router.post(
     '/website',
-    summary='保存网站配置信息',
+    summary='保存网站参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:website:add')),
         DependsRBAC,
@@ -78,23 +78,23 @@ async def save_policy_config(objs: list[SaveBuiltInConfigParam]) -> ResponseMode
     return response_base.success()
 
 
-@router.get('/{pk}', summary='获取系统参数配置详情', dependencies=[DependsJwtAuth])
-async def get_config(pk: Annotated[int, Path(...)]) -> ResponseSchemaModel[GetConfigDetail]:
+@router.get('/{pk}', summary='获取参数配置详情', dependencies=[DependsJwtAuth])
+async def get_config(pk: Annotated[int, Path(description='参数配置 ID')]) -> ResponseSchemaModel[GetConfigDetail]:
     config = await config_service.get(pk)
     return response_base.success(data=config)
 
 
 @router.get(
     '',
-    summary='（模糊条件）分页获取所有系统参数配置',
+    summary='分页获取所有参数配置',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_config(
+async def get_pagination_configs(
     db: CurrentSession,
-    name: Annotated[str | None, Query()] = None,
+    name: Annotated[str | None, Query(description='参数配置名称')] = None,
     type: Annotated[str | None, Query()] = None,
 ) -> ResponseSchemaModel[PageData[GetConfigDetail]]:
     config_select = await config_service.get_select(name=name, type=type)
@@ -104,7 +104,7 @@ async def get_pagination_config(
 
 @router.post(
     '',
-    summary='创建系统参数配置',
+    summary='创建参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:add')),
         DependsRBAC,
@@ -117,13 +117,13 @@ async def create_config(obj: CreateConfigParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新系统参数配置',
+    summary='更新参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:edit')),
         DependsRBAC,
     ],
 )
-async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -> ResponseModel:
+async def update_config(pk: Annotated[int, Path(description='参数配置 ID')], obj: UpdateConfigParam) -> ResponseModel:
     count = await config_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -132,13 +132,13 @@ async def update_config(pk: Annotated[int, Path(...)], obj: UpdateConfigParam) -
 
 @router.delete(
     '',
-    summary='（批量）删除系统参数配置',
+    summary='批量删除参数配置',
     dependencies=[
         Depends(RequestPermission('sys:config:del')),
         DependsRBAC,
     ],
 )
-async def delete_config(pk: Annotated[list[int], Query(...)]) -> ResponseModel:
+async def delete_config(pk: Annotated[list[int], Query(description='参数配置 ID 列表')]) -> ResponseModel:
     count = await config_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

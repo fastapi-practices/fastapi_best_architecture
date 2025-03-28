@@ -13,12 +13,14 @@ from backend.plugin.casbin.schema.api import CreateApiParam, UpdateApiParam
 
 
 class CRUDApi(CRUDPlus[Api]):
+    """API 数据库操作类"""
+
     async def get(self, db: AsyncSession, pk: int) -> Api | None:
         """
         获取 API
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: API ID
         :return:
         """
         return await self.select_model(db, pk)
@@ -27,10 +29,10 @@ class CRUDApi(CRUDPlus[Api]):
         """
         获取 API 列表
 
-        :param request:
-        :param name:
-        :param method:
-        :param path:
+        :param request: FastAPI 请求对象
+        :param name: API 名称
+        :param method: 请求方法
+        :param path: API 路径
         :return:
         """
         filters = {}
@@ -47,48 +49,48 @@ class CRUDApi(CRUDPlus[Api]):
         """
         获取所有 API
 
-        :param db:
+        :param db: 数据库会话
         :return:
         """
         return await self.select_models(db)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Api | None:
         """
-        通过 name 获取 API
+        通过名称获取 API
 
-        :param db:
-        :param name:
+        :param db: 数据库会话
+        :param name: API 名称
         :return:
         """
         return await self.select_model_by_column(db, name=name)
 
-    async def create(self, db: AsyncSession, obj_in: CreateApiParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateApiParam) -> None:
         """
         创建 API
 
-        :param db:
-        :param obj_in:
+        :param db: 数据库会话
+        :param obj: 创建 API 参数
         :return:
         """
-        await self.create_model(db, obj_in)
+        await self.create_model(db, obj)
 
-    async def update(self, db: AsyncSession, pk: int, obj_in: UpdateApiParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateApiParam) -> int:
         """
         更新 API
 
-        :param db:
-        :param pk:
-        :param obj_in:
+        :param db: 数据库会话
+        :param pk: API ID
+        :param obj: 更新 API 参数
         :return:
         """
-        return await self.update_model(db, pk, obj_in)
+        return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
         删除 API
 
-        :param db:
-        :param pk:
+        :param db: 数据库会话
+        :param pk: API ID 列表
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

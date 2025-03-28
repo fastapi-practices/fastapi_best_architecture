@@ -15,28 +15,32 @@ from backend.database.redis import redis_client
 
 
 def get_request_ip(request: Request) -> str:
-    """获取请求的 ip 地址"""
+    """
+    获取请求的 IP 地址
+
+    :param request: FastAPI 请求对象
+    :return:
+    """
     real = request.headers.get('X-Real-IP')
     if real:
-        ip = real
-    else:
-        forwarded = request.headers.get('X-Forwarded-For')
-        if forwarded:
-            ip = forwarded.split(',')[0]
-        else:
-            ip = request.client.host
+        return real
+
+    forwarded = request.headers.get('X-Forwarded-For')
+    if forwarded:
+        return forwarded.split(',')[0]
+
     # 忽略 pytest
-    if ip == 'testclient':
-        ip = '127.0.0.1'
-    return ip
+    if request.client.host == 'testclient':
+        return '127.0.0.1'
+    return request.client.host
 
 
 async def get_location_online(ip: str, user_agent: str) -> dict | None:
     """
-    在线获取 ip 地址属地，无法保证可用性，准确率较高
+    在线获取 IP 地址属地，无法保证可用性，准确率较高
 
-    :param ip:
-    :param user_agent:
+    :param ip: IP 地址
+    :param user_agent: 用户代理字符串
     :return:
     """
     async with httpx.AsyncClient(timeout=3) as client:
@@ -47,16 +51,16 @@ async def get_location_online(ip: str, user_agent: str) -> dict | None:
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
-            log.error(f'在线获取 ip 地址属地失败，错误信息：{e}')
+            log.error(f'在线获取 IP 地址属地失败，错误信息：{e}')
             return None
 
 
 @sync_to_async
 def get_location_offline(ip: str) -> dict | None:
     """
-    离线获取 ip 地址属地，无法保证准确率，100%可用
+    离线获取 IP 地址属地，无法保证准确率，100% 可用
 
-    :param ip:
+    :param ip: IP 地址
     :return:
     """
     try:
@@ -71,23 +75,30 @@ def get_location_offline(ip: str) -> dict | None:
             'city': data[3] if data[3] != '0' else None,
         }
     except Exception as e:
-        log.error(f'离线获取 ip 地址属地失败，错误信息：{e}')
+        log.error(f'离线获取 IP 地址属地失败，错误信息：{e}')
         return None
 
 
 async def parse_ip_info(request: Request) -> IpInfo:
+    """
+    解析请求的 IP 信息
+
+    :param request: FastAPI 请求对象
+    :return:
+    """
     country, region, city = None, None, None
     ip = get_request_ip(request)
     location = await redis_client.get(f'{settings.IP_LOCATION_REDIS_PREFIX}:{ip}')
     if location:
         country, region, city = location.split('|')
         return IpInfo(ip=ip, country=country, region=region, city=city)
+
+    location_info = None
     if settings.IP_LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
     elif settings.IP_LOCATION_PARSE == 'offline':
         location_info = await get_location_offline(ip)
-    else:
-        location_info = None
+
     if location_info:
         country = location_info.get('country')
         region = location_info.get('regionName')
@@ -101,6 +112,12 @@ async def parse_ip_info(request: Request) -> IpInfo:
 
 
 def parse_user_agent_info(request: Request) -> UserAgentInfo:
+    """
+    解析请求的用户代理信息
+
+    :param request: FastAPI 请求对象
+    :return:
+    """
     user_agent = request.headers.get('User-Agent')
     _user_agent = parse(user_agent)
     os = _user_agent.get_os()

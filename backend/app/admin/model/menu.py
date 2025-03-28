@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -9,6 +11,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_menu
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import Role
 
 
 class Menu(Base):
@@ -36,8 +41,8 @@ class Menu(Base):
     parent_id: Mapped[int | None] = mapped_column(
         ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
     )
-    parent: Mapped[Union['Menu', None]] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[list['Menu'] | None] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Optional['Menu']] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[Optional[list['Menu']]] = relationship(init=False, back_populates='parent')
 
     # 菜单角色多对多
-    roles: Mapped[list['Role']] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')  # noqa: F821
+    roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')

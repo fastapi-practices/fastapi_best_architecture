@@ -2,37 +2,43 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
 from backend.common.schema import SchemaBase
 
 
 class SaveBuiltInConfigParam(SchemaBase):
-    name: str
-    key: str
-    value: str
+    """保存内置参数配置参数"""
+
+    name: str = Field(description='参数配置名称')
+    key: str = Field(description='参数配置键名')
+    value: str = Field(description='参数配置值')
 
 
 class ConfigSchemaBase(SchemaBase):
-    name: str
-    type: str | None
-    key: str
-    value: str
-    is_frontend: bool
-    remark: str | None
+    """参数配置基础模型"""
+
+    name: str = Field(description='参数配置名称')
+    type: str | None = Field(None, description='参数配置类型')
+    key: str = Field(description='参数配置键名')
+    value: str = Field(description='参数配置值')
+    is_frontend: bool = Field(description='是否前端参数配置')
+    remark: str | None = Field(None, description='备注')
 
 
 class CreateConfigParam(ConfigSchemaBase):
-    pass
+    """创建参数配置参数"""
 
 
 class UpdateConfigParam(ConfigSchemaBase):
-    pass
+    """更新参数配置参数"""
 
 
 class GetConfigDetail(ConfigSchemaBase):
+    """参数配置详情"""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    created_time: datetime
-    updated_time: datetime | None = None
+    id: int = Field(description='参数配置 ID')
+    created_time: datetime = Field(description='创建时间')
+    updated_time: datetime | None = Field(None, description='更新时间')
