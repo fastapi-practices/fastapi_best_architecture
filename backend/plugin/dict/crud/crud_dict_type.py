@@ -4,8 +4,8 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import DictType
-from backend.app.admin.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
+from backend.plugin.dict.model import DictType
+from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
 
 class CRUDDictType(CRUDPlus[DictType]):

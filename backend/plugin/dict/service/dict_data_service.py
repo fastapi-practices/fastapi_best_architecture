@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select
 
-from backend.app.admin.crud.crud_dict_data import dict_data_dao
-from backend.app.admin.crud.crud_dict_type import dict_type_dao
-from backend.app.admin.model import DictData
-from backend.app.admin.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
+from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
+from backend.plugin.dict.model import DictData
+from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 
 
 class DictDataService:

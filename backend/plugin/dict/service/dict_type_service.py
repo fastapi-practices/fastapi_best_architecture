@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Select
 
-from backend.app.admin.crud.crud_dict_type import dict_type_dao
-from backend.app.admin.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
+from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
 
 class DictTypeService:

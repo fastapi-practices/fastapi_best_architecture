@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
-    from backend.app.admin.model import DictData
+    from backend.plugin.dict.model import DictData
 
 
 class DictType(Base):

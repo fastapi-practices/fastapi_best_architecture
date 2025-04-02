@@ -4,14 +4,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.dict_type import CreateDictTypeParam, GetDictTypeDetail, UpdateDictTypeParam
-from backend.app.admin.service.dict_type_service import dict_type_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
+from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, GetDictTypeDetail, UpdateDictTypeParam
+from backend.plugin.dict.service.dict_type_service import dict_type_service
 
 router = APIRouter()
 
