@@ -24,15 +24,18 @@ class Menu(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     title: Mapped[str] = mapped_column(String(50), comment='菜单标题')
     name: Mapped[str] = mapped_column(String(50), comment='菜单名称')
+    path: Mapped[str] = mapped_column(String(200), comment='路由地址')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
     icon: Mapped[str | None] = mapped_column(String(100), default=None, comment='菜单图标')
-    path: Mapped[str | None] = mapped_column(String(200), default=None, comment='路由地址')
-    menu_type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
+    type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
     component: Mapped[str | None] = mapped_column(String(255), default=None, comment='组件路径')
     perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='权限标识')
     status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
     display: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
     cache: Mapped[int] = mapped_column(default=1, comment='是否缓存（0否 1是）')
+    link: Mapped[str | None] = mapped_column(
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='外链地址'
+    )
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )

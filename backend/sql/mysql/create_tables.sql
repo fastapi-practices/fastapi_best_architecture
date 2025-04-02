@@ -1,39 +1,41 @@
 create table sys_api
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
-    name         varchar(50)  not null comment 'api名称',
+    name         varchar(50)  not null comment 'API 名称',
     method       varchar(16)  not null comment '请求方法',
-    path         varchar(500) not null comment 'api路径',
+    path         varchar(500) not null comment 'API 路径',
     remark       longtext     null comment '备注',
     created_time datetime     not null comment '创建时间',
     updated_time datetime     null comment '更新时间',
     constraint name
         unique (name)
-);
+)
+    comment 'API 表';
 
 create index ix_sys_api_id
     on sys_api (id);
 
 create table sys_casbin_rule
 (
-    id    int auto_increment comment '主键id'
+    id    int auto_increment comment '主键 ID'
         primary key,
     ptype varchar(255) not null comment '策略类型: p / g',
-    v0    varchar(255) not null comment '角色ID / 用户uuid',
-    v1    longtext     not null comment 'api路径 / 角色名称',
+    v0    varchar(255) not null comment '用户 UUID / 角色 ID',
+    v1    longtext     not null comment 'API 路径 / 角色名称',
     v2    varchar(255) null comment '请求方法',
-    v3    varchar(255) null,
-    v4    varchar(255) null,
-    v5    varchar(255) null
-);
+    v3    varchar(255) null comment '预留字段',
+    v4    varchar(255) null comment '预留字段',
+    v5    varchar(255) null comment '预留字段'
+)
+    comment 'Casbin 规则表';
 
 create index ix_sys_casbin_rule_id
     on sys_casbin_rule (id);
 
 create table sys_config
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     name         varchar(20) not null comment '名称',
     type         varchar(20) null comment '类型',
@@ -45,14 +47,15 @@ create table sys_config
     updated_time datetime    null comment '更新时间',
     constraint `key`
         unique (`key`)
-);
+)
+    comment '参数配置表';
 
 create index ix_sys_config_id
     on sys_config (id);
 
 create table sys_data_rule
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     name         varchar(255) not null comment '规则名称',
     model        varchar(50)  not null comment 'SQLA 模型类',
@@ -64,14 +67,15 @@ create table sys_data_rule
     updated_time datetime     null comment '更新时间',
     constraint name
         unique (name)
-);
+)
+    comment '数据权限规则表';
 
 create index ix_sys_data_rule_id
     on sys_data_rule (id);
 
 create table sys_dept
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     name         varchar(50) not null comment '部门名称',
     sort         int         not null comment '排序',
@@ -86,7 +90,8 @@ create table sys_dept
     constraint sys_dept_ibfk_1
         foreign key (parent_id) references sys_dept (id)
             on delete set null
-);
+)
+    comment '部门表';
 
 create index ix_sys_dept_id
     on sys_dept (id);
@@ -96,7 +101,7 @@ create index ix_sys_dept_parent_id
 
 create table sys_dict_type
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     name         varchar(32) not null comment '字典类型名称',
     code         varchar(32) not null comment '字典类型编码',
@@ -108,11 +113,12 @@ create table sys_dict_type
         unique (code),
     constraint name
         unique (name)
-);
+)
+    comment '字典类型表';
 
 create table sys_dict_data
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     label        varchar(32) not null comment '字典标签',
     value        varchar(32) not null comment '字典值',
@@ -129,7 +135,8 @@ create table sys_dict_data
     constraint sys_dict_data_ibfk_1
         foreign key (type_id) references sys_dict_type (id)
             on delete cascade
-);
+)
+    comment '字典数据表';
 
 create index ix_sys_dict_data_id
     on sys_dict_data (id);
@@ -142,7 +149,7 @@ create index ix_sys_dict_type_id
 
 create table sys_gen_business
 (
-    id                      int auto_increment comment '主键id'
+    id                      int auto_increment comment '主键 ID'
         primary key,
     app_name                varchar(50)  not null comment '应用名称（英文）',
     table_name_en           varchar(255) not null comment '表名称（英文）',
@@ -158,14 +165,15 @@ create table sys_gen_business
     updated_time            datetime     null comment '更新时间',
     constraint table_name_en
         unique (table_name_en)
-);
+)
+    comment '代码生成业务表';
 
 create index ix_sys_gen_business_id
     on sys_gen_business (id);
 
 create table sys_gen_model
 (
-    id              int auto_increment comment '主键id'
+    id              int auto_increment comment '主键 ID'
         primary key,
     name            varchar(50)  not null comment '列名称',
     comment         varchar(255) null comment '列描述',
@@ -180,7 +188,8 @@ create table sys_gen_model
     constraint sys_gen_model_ibfk_1
         foreign key (gen_business_id) references sys_gen_business (id)
             on delete cascade
-);
+)
+    comment '代码生成模型表';
 
 create index gen_business_id
     on sys_gen_model (gen_business_id);
@@ -190,7 +199,7 @@ create index ix_sys_gen_model_id
 
 create table sys_login_log
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     user_uuid    varchar(50)  not null comment '用户UUID',
     username     varchar(20)  not null comment '用户名',
@@ -206,26 +215,28 @@ create table sys_login_log
     msg          longtext     not null comment '提示消息',
     login_time   datetime     not null comment '登录时间',
     created_time datetime     not null comment '创建时间'
-);
+)
+    comment '登录日志表';
 
 create index ix_sys_login_log_id
     on sys_login_log (id);
 
 create table sys_menu
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     title        varchar(50)  not null comment '菜单标题',
     name         varchar(50)  not null comment '菜单名称',
+    path         varchar(200) not null comment '路由地址',
     sort         int          not null comment '排序',
     icon         varchar(100) null comment '菜单图标',
-    path         varchar(200) null comment '路由地址',
-    menu_type    int          not null comment '菜单类型（0目录 1菜单 2按钮）',
+    type         int          not null comment '菜单类型（0目录 1菜单 2按钮）',
     component    varchar(255) null comment '组件路径',
     perms        varchar(100) null comment '权限标识',
     status       int          not null comment '菜单状态（0停用 1正常）',
     display      int          not null comment '是否显示（0否 1是）',
     cache        int          not null comment '是否缓存（0否 1是）',
+    link         longtext     null comment '外链地址',
     remark       longtext     null comment '备注',
     parent_id    int          null comment '父菜单ID',
     created_time datetime     not null comment '创建时间',
@@ -233,7 +244,8 @@ create table sys_menu
     constraint sys_menu_ibfk_1
         foreign key (parent_id) references sys_menu (id)
             on delete set null
-);
+)
+    comment '菜单表';
 
 create index ix_sys_menu_id
     on sys_menu (id);
@@ -241,9 +253,27 @@ create index ix_sys_menu_id
 create index ix_sys_menu_parent_id
     on sys_menu (parent_id);
 
+create table sys_notice
+(
+    id           int auto_increment comment '主键 ID'
+        primary key,
+    title        varchar(50) not null comment '标题',
+    type         int         not null comment '类型（0：通知、1：公告）',
+    author       varchar(16) not null comment '作者',
+    source       varchar(50) not null comment '信息来源',
+    status       int         not null comment '状态（0：隐藏、1：显示）',
+    content      longtext    not null comment '内容',
+    created_time datetime    not null comment '创建时间',
+    updated_time datetime    null comment '更新时间'
+)
+    comment '系统通知公告表';
+
+create index ix_sys_notice_id
+    on sys_notice (id);
+
 create table sys_opera_log
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     trace_id     varchar(32)  not null comment '请求跟踪 ID',
     username     varchar(20)  null comment '用户名',
@@ -265,14 +295,15 @@ create table sys_opera_log
     cost_time    float        not null comment '请求耗时（ms）',
     opera_time   datetime     not null comment '操作时间',
     created_time datetime     not null comment '创建时间'
-);
+)
+    comment '操作日志表';
 
 create index ix_sys_opera_log_id
     on sys_opera_log (id);
 
 create table sys_role
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     name         varchar(20) not null comment '角色名称',
     status       int         not null comment '角色状态（0停用 1正常）',
@@ -281,7 +312,8 @@ create table sys_role
     updated_time datetime    null comment '更新时间',
     constraint name
         unique (name)
-);
+)
+    comment '角色表';
 
 create index ix_sys_role_id
     on sys_role (id);
@@ -332,7 +364,7 @@ create index role_id
 
 create table sys_user
 (
-    id              int auto_increment comment '主键id'
+    id              int auto_increment comment '主键 ID'
         primary key,
     uuid            varchar(50)    not null,
     username        varchar(20)    not null comment '用户名',
@@ -362,13 +394,17 @@ create table sys_user
     constraint sys_user_ibfk_1
         foreign key (dept_id) references sys_dept (id)
             on delete set null
-);
+)
+    comment '用户表';
 
 create index dept_id
     on sys_user (dept_id);
 
 create index ix_sys_user_id
     on sys_user (id);
+
+create index ix_sys_user_status
+    on sys_user (status);
 
 create table sys_user_role
 (
@@ -394,7 +430,7 @@ create index user_id
 
 create table sys_user_social
 (
-    id           int auto_increment comment '主键id'
+    id           int auto_increment comment '主键 ID'
         primary key,
     source       varchar(20)  not null comment '第三方用户来源',
     open_id      varchar(20)  null comment '第三方用户的 open id',
@@ -408,7 +444,8 @@ create table sys_user_social
     constraint sys_user_social_ibfk_1
         foreign key (user_id) references sys_user (id)
             on delete set null
-);
+)
+    comment '用户社交表（OAuth2）';
 
 create index ix_sys_user_social_id
     on sys_user_social (id);

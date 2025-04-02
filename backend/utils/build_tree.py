@@ -84,3 +84,30 @@ def get_tree_data(
         case _:
             raise ValueError(f'无效的算法类型：{build_type}')
     return tree
+
+
+def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
+    """
+    获取 vben5 菜单树形结构数据
+
+    :param row: 原始数据行序列
+    :return:
+    """
+    # 需要移除的原始字段
+    remove_keys = {'status', 'display', 'title', 'link', 'cache'}
+
+    vben5_nodes = [
+        {
+            **{k: v for k, v in node.items() if k not in remove_keys},
+            'disabled': node['status'],
+            'show': node['display'],
+            'meta': {
+                'title': node['title'],
+                'link': node['link'],
+                'keepAlive': node['cache'],
+            },
+        }
+        for node in get_tree_nodes(row)
+    ]
+
+    return traversal_to_tree(vben5_nodes)

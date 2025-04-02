@@ -12,7 +12,7 @@ from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
-from backend.utils.build_tree import get_tree_data
+from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
 
 
 class MenuService:
@@ -79,7 +79,7 @@ class MenuService:
                 for role in roles:
                     menu_ids.extend([menu.id for menu in role.menus])
                 menu_select = await menu_dao.get_role_menus(db, request.user.is_superuser, menu_ids)
-                menu_tree = get_tree_data(menu_select)
+                menu_tree = get_vben5_tree_data(menu_select)
             return menu_tree
 
     @staticmethod
