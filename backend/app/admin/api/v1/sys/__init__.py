@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
-from backend.app.admin.api.v1.sys.config import router as config_router
 from backend.app.admin.api.v1.sys.data_rule import router as data_rule_router
 from backend.app.admin.api.v1.sys.dept import router as dept_router
 from backend.app.admin.api.v1.sys.dict_data import router as dict_data_router
@@ -16,7 +15,6 @@ from backend.app.admin.api.v1.sys.user import router as user_router
 
 router = APIRouter(prefix='/sys')
 
-router.include_router(config_router, prefix='/configs', tags=['系统参数配置'])
 router.include_router(dept_router, prefix='/depts', tags=['系统部门'])
 router.include_router(dict_data_router, prefix='/dict-datas', tags=['系统字典数据'])
 router.include_router(dict_type_router, prefix='/dict-types', tags=['系统字典类型'])

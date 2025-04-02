@@ -6,9 +6,9 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.conf import admin_settings
-from backend.app.admin.model import Config
-from backend.app.admin.schema.config import CreateConfigParam, UpdateConfigParam
+from backend.plugin.config.conf import config_settings
+from backend.plugin.config.model import Config
+from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigParam
 
 
 class CRUDConfig(CRUDPlus[Config]):
@@ -22,7 +22,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pk: 参数配置 ID
         :return:
         """
-        return await self.select_model_by_column(db, id=pk, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES)
+        return await self.select_model_by_column(db, id=pk, type__not_in=config_settings.CONFIG_BUILT_IN_TYPES)
 
     async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config]:
         """
@@ -63,7 +63,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param type: 参数配置类型
         :return:
         """
-        filters = {'type__not_in': admin_settings.CONFIG_BUILT_IN_TYPES}
+        filters = {'type__not_in': config_settings.CONFIG_BUILT_IN_TYPES}
         if name is not None:
             filters.update(name__like=f'%{name}%')
         if type is not None:
@@ -100,7 +100,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :return:
         """
         return await self.delete_model_by_column(
-            db, allow_multiple=True, id__in=pk, type__not_in=admin_settings.CONFIG_BUILT_IN_TYPES
+            db, allow_multiple=True, id__in=pk, type__not_in=config_settings.CONFIG_BUILT_IN_TYPES
         )
 
 
