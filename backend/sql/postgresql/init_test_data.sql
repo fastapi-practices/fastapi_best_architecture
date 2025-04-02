@@ -7,7 +7,7 @@ values  (1, '创建API', 'POST', '/api/v1/apis', null, '2024-02-02 11:29:47', nu
         (3, '编辑API', 'PUT', '/api/v1/apis/{pk}', null, '2024-02-02 11:32:22', null);
 
 insert into fba.sys_menu (id, title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
-values  (1, '测试', 'test', '', 0, '', 0, null, null, 0, 0, 1, null, null, null, '2023-07-27 19:14:10', null),
+values  (1, '测试', 'Test', 'test', 0, null, 0, null, null, 0, 0, 1, null, null, null, '2023-07-27 19:14:10', null),
         (2, '仪表盘', 'Dashboard', 'dashboard', 0, 'material-symbols:dashboard', 0, null, null, 1, 1, 1, null, null, null, '2023-07-27 19:15:45', null),
         (3, '工作台', 'Workspace', 'workspace', 0, null, 1, '/dashboard/workspace/index.vue', null, 1, 1, 1, null, null, 2, '2023-07-27 19:17:59', null),
         (4, '数据分析', 'Analytics', 'analytics', 0, null, 1, '/dashboard/analytics/index.vue', null, 1, 1, 1, null, null, 2, '2023-07-27 19:17:59', null),
