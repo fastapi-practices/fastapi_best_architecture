@@ -27,13 +27,10 @@ class AdminSettings(BaseSettings):
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
 
-    # 参数配置
-    CONFIG_BUILT_IN_TYPES: list[str] = ['website', 'protocol', 'policy']
-
 
 @lru_cache
 def get_admin_settings() -> AdminSettings:
-    """获取 admin 参数配置"""
+    """获取 admin 配置"""
     return AdminSettings()
 
 

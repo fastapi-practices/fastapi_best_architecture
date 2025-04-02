@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from backend.app.admin.model.config import Config
 from backend.app.admin.model.data_rule import DataRule
 from backend.app.admin.model.dept import Dept
 from backend.app.admin.model.dict_data import DictData
