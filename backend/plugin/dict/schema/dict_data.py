@@ -4,9 +4,9 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.schema.dict_type import GetDictTypeDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
+from backend.plugin.dict.schema.dict_type import GetDictTypeDetail
 
 
 class DictDataSchemaBase(SchemaBase):

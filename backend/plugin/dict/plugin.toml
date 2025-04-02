@@ -1,0 +1,10 @@
+[app]
+include = 'admin'
+
+[api.dict_data]
+prefix = '/dict-datas'
+tags = '系统字典数据'
+
+[api.dict_type]
+prefix = '/dict-types'
+tags = '系统字典类型'
