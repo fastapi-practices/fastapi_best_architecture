@@ -24,7 +24,7 @@ class _CustomPageParams(BaseModel, AbstractParams):
     """自定义分页参数"""
 
     page: int = Query(1, ge=1, description='页码')
-    size: int = Query(20, gt=0, le=100, description='每页数量')
+    size: int = Query(20, gt=0, le=200, description='每页数量')
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
