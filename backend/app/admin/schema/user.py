@@ -16,7 +16,7 @@ class AuthSchemaBase(SchemaBase):
     """用户认证基础模型"""
 
     username: str = Field(description='用户名')
-    password: str | None = Field(description='密码')
+    password: str = Field(description='密码')
 
 
 class AuthLoginParam(AuthSchemaBase):
