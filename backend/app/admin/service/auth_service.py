@@ -45,10 +45,16 @@ class AuthService:
         user = await user_dao.get_by_username(db, username)
         if not user:
             raise errors.NotFoundError(msg='用户名或密码有误')
-        elif user.password is None or not password_verify(password, user.password):
+
+        if user.password is None:
             raise errors.AuthorizationError(msg='用户名或密码有误')
-        elif not user.status:
+        else:
+            if not password_verify(password, user.password):
+                raise errors.AuthorizationError(msg='用户名或密码有误')
+
+        if not user.status:
             raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+
         return user
 
     async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
