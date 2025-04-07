@@ -61,7 +61,8 @@ async def get_tokens(
         extra_info = await redis_client.get(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{session_uuid}')
         if extra_info:
             extra_info = json.loads(extra_info)
-            if extra_info.get('login_type') != 'swagger':
+            # 排除 swagger 登录生成的 token
+            if extra_info.get('swagger') is None:
                 if username is not None:
                     if username == extra_info.get('username'):
                         append_token_detail()
