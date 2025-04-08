@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
+
 from typing import Any
 
 from celery import Task
@@ -34,7 +36,7 @@ class TaskBase(Task):
         """
         await task_notification(msg=f'任务 {task_id} 执行成功')
 
-    async def on_failure(self, exc: Exception, task_id: str, args, kwargs, einfo) -> None:
+    def on_failure(self, exc: Exception, task_id: str, args, kwargs, einfo) -> None:
         """
         任务失败后执行钩子
 
@@ -43,4 +45,5 @@ class TaskBase(Task):
         :param einfo: 异常信息
         :return:
         """
-        await task_notification(msg=f'任务 {task_id} 执行失败')
+        loop = asyncio.get_event_loop()
+        loop.create_task(task_notification(msg=f'任务 {task_id} 执行失败'))
