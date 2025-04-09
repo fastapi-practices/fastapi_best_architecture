@@ -13,12 +13,12 @@ from backend.common.response.response_schema import ResponseSchemaModel, respons
 router = APIRouter()
 
 _github_client = GitHubOAuth20(admin_settings.OAUTH2_GITHUB_CLIENT_ID, admin_settings.OAUTH2_GITHUB_CLIENT_SECRET)
-_github_oauth2 = FastAPIOAuth20(_github_client, admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
+_github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_login')
 
 
 @router.get('', summary='获取 Github 授权链接')
-async def github_auth2() -> ResponseSchemaModel[str]:
-    auth_url = await _github_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_GITHUB_REDIRECT_URI)
+async def github_oauth2(request: Request) -> ResponseSchemaModel[str]:
+    auth_url = await _github_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
     return response_base.success(data=auth_url)
 
 

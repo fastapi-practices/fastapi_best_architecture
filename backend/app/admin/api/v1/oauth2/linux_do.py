@@ -16,12 +16,12 @@ _linux_do_client = LinuxDoOAuth20(
     admin_settings.OAUTH2_LINUX_DO_CLIENT_ID,
     admin_settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
 )
-_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
+_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, redirect_route_name='linux_do_login')
 
 
 @router.get('', summary='获取 LinuxDo 授权链接')
-async def linux_do_auth2() -> ResponseSchemaModel[str]:
-    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=admin_settings.OAUTH2_LINUX_DO_REDIRECT_URI)
+async def linux_do_oauth2(request: Request) -> ResponseSchemaModel[str]:
+    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
     return response_base.success(data=auth_url)
 
 
