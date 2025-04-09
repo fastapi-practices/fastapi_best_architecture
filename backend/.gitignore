@@ -1,6 +1,6 @@
 __pycache__/
 .env
-log/
 alembic/versions/
 static/media/
+*.log
 celerybeat-schedule.*
