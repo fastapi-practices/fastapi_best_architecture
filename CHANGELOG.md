@@ -1,3 +1,27 @@
+<a id="v1.0.5"></a>
+# [v1.0.5](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.0.5) - 2025-04-09
+
+## What's Changed
+* Update the changelog for v1.0.4 by [@wu-clan](https://github.com/wu-clan) in [#558](https://github.com/fastapi-practices/fastapi_best_architecture/pull/558)
+* Bump dependencies and pre-commits by [@wu-clan](https://github.com/wu-clan) in [#559](https://github.com/fastapi-practices/fastapi_best_architecture/pull/559)
+* Add python 3.13 to GitHub ci by [@wu-clan](https://github.com/wu-clan) in [#560](https://github.com/fastapi-practices/fastapi_best_architecture/pull/560)
+* Update the system config to plugin by [@wu-clan](https://github.com/wu-clan) in [#561](https://github.com/fastapi-practices/fastapi_best_architecture/pull/561)
+* Update dict data and type to plugin by [@wu-clan](https://github.com/wu-clan) in [#562](https://github.com/fastapi-practices/fastapi_best_architecture/pull/562)
+* Update menu and add vben5 compatibility by [@wu-clan](https://github.com/wu-clan) in [#563](https://github.com/fastapi-practices/fastapi_best_architecture/pull/563)
+* Update the vben5 tree data structure by [@wu-clan](https://github.com/wu-clan) in [#564](https://github.com/fastapi-practices/fastapi_best_architecture/pull/564)
+* Update custom validation error messages by [@wu-clan](https://github.com/wu-clan) in [#566](https://github.com/fastapi-practices/fastapi_best_architecture/pull/566)
+* Update the number of pagination le by [@wu-clan](https://github.com/wu-clan) in [#565](https://github.com/fastapi-practices/fastapi_best_architecture/pull/565)
+* Fix the login password verification by [@wu-clan](https://github.com/wu-clan) in [#568](https://github.com/fastapi-practices/fastapi_best_architecture/pull/568)
+* Fix the failure hook of celery task by [@wu-clan](https://github.com/wu-clan) in [#569](https://github.com/fastapi-practices/fastapi_best_architecture/pull/569)
+* Bump fastapi oauth2 from 0.0.1a2 to 0.0.1 by [@wu-clan](https://github.com/wu-clan) in [#570](https://github.com/fastapi-practices/fastapi_best_architecture/pull/570)
+* Fix the log rule in gitignore by [@wu-clan](https://github.com/wu-clan) in [#571](https://github.com/fastapi-practices/fastapi_best_architecture/pull/571)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
+
+[Changes][v1.0.5]
+
+
 <a id="v1.0.4"></a>
 # [v1.0.4](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.0.4) - 2025-03-28
 
@@ -403,6 +427,7 @@
 [Changes][v1.0.0]
 
 
+[v1.0.5]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
 [v1.0.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.3...v1.0.4
 [v1.0.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.1...v1.0.2
