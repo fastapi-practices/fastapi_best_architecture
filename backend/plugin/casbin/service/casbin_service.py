@@ -34,7 +34,7 @@ class CasbinService:
         return await casbin_dao.get_list(ptype, sub)
 
     @staticmethod
-    async def get_policy_list(*, role: int | None = None) -> list:
+    async def get_policy_list(*, role: int | None) -> list:
         """
         获取 P 策略列表
 

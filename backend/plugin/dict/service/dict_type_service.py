@@ -12,7 +12,7 @@ class DictTypeService:
     """字典类型服务类"""
 
     @staticmethod
-    async def get_select(*, name: str | None = None, code: str | None = None, status: int | None = None) -> Select:
+    async def get_select(*, name: str | None, code: str | None, status: int | None) -> Select:
         """
         获取字典类型列表查询条件
 

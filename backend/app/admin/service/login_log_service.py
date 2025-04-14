@@ -16,7 +16,7 @@ class LoginLogService:
     """登录日志服务类"""
 
     @staticmethod
-    async def get_select(*, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
+    async def get_select(*, username: str | None, status: int | None, ip: str | None) -> Select:
         """
         获取登录日志列表查询条件
 

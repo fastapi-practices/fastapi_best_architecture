@@ -55,7 +55,7 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.select_model_by_column(db, key=key)
 
-    async def get_list(self, name: str | None = None, type: str | None = None) -> Select:
+    async def get_list(self, name: str | None, type: str | None) -> Select:
         """
         获取参数配置列表
 

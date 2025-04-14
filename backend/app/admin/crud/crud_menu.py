@@ -34,7 +34,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         """
         return await self.select_model_by_column(db, title=title, menu_type__ne=2)
 
-    async def get_all(self, db: AsyncSession, title: str | None = None, status: int | None = None) -> Sequence[Menu]:
+    async def get_all(self, db: AsyncSession, title: str | None, status: int | None) -> Sequence[Menu]:
         """
         获取菜单列表
 

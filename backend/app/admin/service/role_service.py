@@ -58,7 +58,7 @@ class RoleService:
             return roles
 
     @staticmethod
-    async def get_select(*, name: str | None = None, status: int | None = None) -> Select:
+    async def get_select(*, name: str | None, status: int | None) -> Select:
         """
         获取角色列表查询条件
 

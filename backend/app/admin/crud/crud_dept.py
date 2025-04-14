@@ -37,10 +37,10 @@ class CRUDDept(CRUDPlus[Dept]):
     async def get_all(
         self,
         db: AsyncSession,
-        name: str | None = None,
-        leader: str | None = None,
-        phone: str | None = None,
-        status: int | None = None,
+        name: str | None,
+        leader: str | None,
+        phone: str | None,
+        status: int | None
     ) -> Sequence[Dept]:
         """
         获取所有部门

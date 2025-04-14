@@ -33,7 +33,7 @@ class MenuService:
             return menu
 
     @staticmethod
-    async def get_menu_tree(*, title: str | None = None, status: int | None = None) -> list[dict[str, Any]]:
+    async def get_menu_tree(*, title: str | None, status: int | None) -> list[dict[str, Any]]:
         """
         获取菜单树形结构
 
