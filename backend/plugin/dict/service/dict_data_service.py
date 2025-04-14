@@ -28,7 +28,7 @@ class DictDataService:
             return dict_data
 
     @staticmethod
-    async def get_select(*, label: str | None = None, value: str | None = None, status: int | None = None) -> Select:
+    async def get_select(*, label: str | None, value: str | None, status: int | None) -> Select:
         """
         获取字典数据列表查询条件
 

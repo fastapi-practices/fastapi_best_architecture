@@ -70,7 +70,7 @@ class DataRuleService:
         return model_columns
 
     @staticmethod
-    async def get_select(*, name: str | None = None) -> Select:
+    async def get_select(*, name: str | None) -> Select:
         """
         获取数据规则列表查询条件
 

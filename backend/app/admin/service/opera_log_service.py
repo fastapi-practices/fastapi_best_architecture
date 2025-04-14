@@ -11,7 +11,7 @@ class OperaLogService:
     """操作日志服务类"""
 
     @staticmethod
-    async def get_select(*, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
+    async def get_select(*, username: str | None, status: int | None, ip: str | None) -> Select:
         """
         获取操作日志列表查询条件
 

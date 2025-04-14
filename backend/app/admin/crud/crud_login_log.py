@@ -11,7 +11,7 @@ from backend.app.admin.schema.login_log import CreateLoginLogParam
 class CRUDLoginLog(CRUDPlus[LoginLog]):
     """登录日志数据库操作类"""
 
-    async def get_list(self, username: str | None = None, status: int | None = None, ip: str | None = None) -> Select:
+    async def get_list(self, username: str | None, status: int | None, ip: str | None) -> Select:
         """
         获取登录日志列表
 

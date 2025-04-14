@@ -21,7 +21,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, *, name: str | None = None, code: str | None = None, status: int | None = None) -> Select:
+    async def get_list(self, *, name: str | None, code: str | None, status: int | None) -> Select:
         """
         获取字典类型列表
 

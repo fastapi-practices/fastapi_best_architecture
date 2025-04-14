@@ -68,7 +68,9 @@ class ResponseBase:
 
     @staticmethod
     def __response(
-        *, res: CustomResponseCode | CustomResponse = None, data: Any | None = None
+        *,
+        res: CustomResponseCode | CustomResponse,
+        data: Any | None,
     ) -> ResponseModel | ResponseSchemaModel:
         """
         请求返回通用方法

@@ -35,12 +35,7 @@ class CRUDDept(CRUDPlus[Dept]):
         return await self.select_model_by_column(db, name=name, del_flag=0)
 
     async def get_all(
-        self,
-        db: AsyncSession,
-        name: str | None = None,
-        leader: str | None = None,
-        phone: str | None = None,
-        status: int | None = None,
+        self, db: AsyncSession, name: str | None, leader: str | None, phone: str | None, status: int | None
     ) -> Sequence[Dept]:
         """
         获取所有部门

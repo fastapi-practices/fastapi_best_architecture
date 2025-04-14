@@ -24,7 +24,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, name: str | None = None) -> Select:
+    async def get_list(self, name: str | None) -> Select:
         """
         获取规则列表
 

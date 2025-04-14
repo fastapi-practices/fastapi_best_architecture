@@ -684,13 +684,13 @@ wheels = [
 [[package]]
 name = "fastapi-oauth20"
 version = "0.0.1"
-source = { registry = "https://pypi.org/simple" }
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8e/66/25d4ece161689184f47130bc7ea5bf9c73113c2e628cf586546aa574d8d1/fastapi_oauth20-0.0.1.tar.gz", hash = "sha256:22bf6564f3af42a94cb597f8e20af1366e89e19af49291d15784a4c14059d4c9", size = 6681 }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/8e/66/25d4ece161689184f47130bc7ea5bf9c73113c2e628cf586546aa574d8d1/fastapi_oauth20-0.0.1.tar.gz", hash = "sha256:22bf6564f3af42a94cb597f8e20af1366e89e19af49291d15784a4c14059d4c9" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/87/7e0423109ba2c0f8a0794eedff5bb1f79792e5d8d0941ba0b26f962e3e5c/fastapi_oauth20-0.0.1-py3-none-any.whl", hash = "sha256:921fe0e874cb4186998f74b1d951c360400aceb5ca3889a85c806d865a991f88", size = 11242 },
+    { url = "https://mirrors.aliyun.com/pypi/packages/cf/87/7e0423109ba2c0f8a0794eedff5bb1f79792e5d8d0941ba0b26f962e3e5c/fastapi_oauth20-0.0.1-py3-none-any.whl", hash = "sha256:921fe0e874cb4186998f74b1d951c360400aceb5ca3889a85c806d865a991f88" },
 ]
 
 [[package]]

@@ -32,7 +32,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         return await self.select_models_order(db, sort_columns='sort', gen_business_id=business_id)
 
-    async def create(self, db: AsyncSession, obj: CreateGenModelParam, pd_type: str | None = None) -> None:
+    async def create(self, db: AsyncSession, obj: CreateGenModelParam, pd_type: str | None) -> None:
         """
         创建代码生成模型
 
@@ -43,7 +43,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         await self.create_model(db, obj, pd_type=pd_type)
 
-    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenModelParam, pd_type: str | None = None) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenModelParam, pd_type: str | None) -> int:
         """
         更新代码生成模型
 

@@ -200,7 +200,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def get_select(*, dept: int, username: str = None, phone: str = None, status: int = None) -> Select:
+    async def get_select(*, dept: int, username: str, phone: str, status: int) -> Select:
         """
         获取用户列表查询条件
 

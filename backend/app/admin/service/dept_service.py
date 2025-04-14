@@ -33,7 +33,7 @@ class DeptService:
 
     @staticmethod
     async def get_dept_tree(
-        *, name: str | None = None, leader: str | None = None, phone: str | None = None, status: int | None = None
+        *, name: str | None, leader: str | None, phone: str | None, status: int | None
     ) -> list[dict[str, Any]]:
         """
         获取部门树形结构

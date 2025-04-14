@@ -175,9 +175,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, pk, {'password': new_pwd})
 
-    async def get_list(
-        self, dept: int | None = None, username: str | None = None, phone: str | None = None, status: int | None = None
-    ) -> Select:
+    async def get_list(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
         """
         获取用户列表
 

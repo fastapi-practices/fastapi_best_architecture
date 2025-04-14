@@ -66,7 +66,7 @@ class CRUDRole(CRUDPlus[Role]):
         roles = await db.execute(stmt)
         return roles.scalars().all()
 
-    async def get_list(self, name: str | None = None, status: int | None = None) -> Select:
+    async def get_list(self, name: str | None, status: int | None) -> Select:
         """
         获取角色列表
 

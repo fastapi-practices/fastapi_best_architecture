@@ -64,7 +64,7 @@ class ConfigService:
             return config
 
     @staticmethod
-    async def get_select(*, name: str | None = None, type: str | None = None) -> Select:
+    async def get_select(*, name: str | None, type: str | None) -> Select:
         """
         获取参数配置列表查询条件
 
