@@ -18,7 +18,7 @@ STATIC_DIR = BASE_PATH / 'static'
 UPLOAD_DIR = STATIC_DIR / 'upload'
 
 # jinja2 模版文件路径
-JINJA2_TEMPLATE_DIR = BASE_PATH / 'templates'
+JINJA2_TEMPLATE_DIR = BASE_PATH / 'templates' / 'generator'
 
 # 插件目录
 PLUGIN_DIR = BASE_PATH / 'plugin'

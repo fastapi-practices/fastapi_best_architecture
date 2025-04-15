@@ -21,8 +21,8 @@ from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.exception import errors
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
-from backend.utils.gen_template import gen_template
-from backend.utils.type_conversion import sql_type_to_pydantic
+from backend.utils.generator.gen_template import gen_template
+from backend.utils.generator.type_conversion import sql_type_to_pydantic
 
 
 class GenService:
@@ -99,7 +99,7 @@ class GenService:
         gen_vars = gen_template.get_vars(business, gen_models)
         return {
             tpl_path: await gen_template.get_template(tpl_path).render_async(**gen_vars)
-            for tpl_path in gen_template.get_template_paths()
+            for tpl_path in gen_template.get_template_files()
         }
 
     async def preview(self, *, pk: int) -> dict[str, bytes]:
@@ -115,10 +115,13 @@ class GenService:
                 raise errors.NotFoundError(msg='业务不存在')
 
             tpl_code_map = await self.render_tpl_code(business=business)
-            return {
-                tpl.replace('.jinja', '.py') if tpl.startswith('py') else ...: code.encode('utf-8')
-                for tpl, code in tpl_code_map.items()
-            }
+
+            codes = {}
+            for tpl, code in tpl_code_map.items():
+                if tpl.startswith('python'):
+                    codes[tpl.replace('.jinja', '.py').split('/')[-1]] = code.encode('utf-8')
+
+            return codes
 
     @staticmethod
     async def get_generate_path(*, pk: int) -> list[str]:
@@ -133,9 +136,10 @@ class GenService:
             if not business:
                 raise errors.NotFoundError(msg='业务不存在')
 
-            gen_path = business.gen_path or 'fba-backend-app-path'
+            gen_path = business.gen_path or 'fba-backend-app-dir'
             target_files = gen_template.get_code_gen_paths(business)
-            return [os.path.join(gen_path, *target_file.split('/')[1:]) for target_file in target_files]
+
+            return [os.path.join(gen_path, *target_file.split('/')) for target_file in target_files]
 
     async def generate(self, *, pk: int) -> None:
         """
@@ -155,32 +159,29 @@ class GenService:
             for tpl_path, code in tpl_code_map.items():
                 code_filepath = os.path.join(
                     gen_path,
-                    *gen_template.get_code_gen_path(tpl_path, business).split('/')[1:],
+                    *gen_template.get_code_gen_path(tpl_path, business).split('/'),
                 )
-                code_folder = Path(str(code_filepath)).parent
-                code_folder.mkdir(parents=True, exist_ok=True)
 
                 # 写入 init 文件
+                str_code_filepath = str(code_filepath)
+                code_folder = Path(str_code_filepath).parent
+                code_folder.mkdir(parents=True, exist_ok=True)
+
                 init_filepath = code_folder.joinpath('__init__.py')
-                if not init_filepath.exists():
-                    async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
+                async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
+                    await f.write(gen_template.init_content)
+
+                # api __init__.py
+                if 'api' in str_code_filepath:
+                    api_init_filepath = code_folder.parent.joinpath('__init__.py')
+                    async with aiofiles.open(api_init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
 
-                if 'api' in str(code_folder):
-                    # api __init__.py
-                    api_init_filepath = code_folder.parent.joinpath('__init__.py')
-                    if not api_init_filepath.exists():
-                        async with aiofiles.open(api_init_filepath, 'w', encoding='utf-8') as f:
-                            await f.write(gen_template.init_content)
-                    # app __init__.py
-                    app_init_filepath = api_init_filepath.parent.joinpath('__init__.py')
-                    if not app_init_filepath.exists():
-                        async with aiofiles.open(app_init_filepath, 'w', encoding='utf-8') as f:
-                            await f.write(gen_template.init_content)
-
-                # 写入代码文件
-                async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
-                    await f.write(code)
+                # app __init__.py
+                if 'service' in str_code_filepath:
+                    app_init_filepath = code_folder.parent.joinpath('__init__.py')
+                    async with aiofiles.open(app_init_filepath, 'w', encoding='utf-8') as f:
+                        await f.write(gen_template.init_content)
 
                 # model init 文件补充
                 if code_folder.name == 'model':
@@ -189,6 +190,10 @@ class GenService:
                             f'from backend.app.{business.app_name}.model.{business.table_name_en} '
                             f'import {to_pascal(business.table_name_en)}\n',
                         )
+
+                # 写入代码文件
+                async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
+                    await f.write(code)
 
     async def download(self, *, pk: int) -> io.BytesIO:
         """
@@ -206,13 +211,12 @@ class GenService:
             with zipfile.ZipFile(bio, 'w') as zf:
                 tpl_code_map = await self.render_tpl_code(business=business)
                 for tpl_path, code in tpl_code_map.items():
-                    # 写入代码文件
-                    new_code_path = gen_template.get_code_gen_path(tpl_path, business)
-                    zf.writestr(new_code_path, code)
+                    code_filepath = gen_template.get_code_gen_path(tpl_path, business)
 
                     # 写入 init 文件
-                    init_filepath = os.path.join(*new_code_path.split('/')[:-1], '__init__.py')
-                    if 'model' not in new_code_path.split('/'):
+                    code_dir = os.path.dirname(code_filepath)
+                    init_filepath = os.path.join(code_dir, '__init__.py')
+                    if 'model' not in code_filepath.split('/'):
                         zf.writestr(init_filepath, gen_template.init_content)
                     else:
                         zf.writestr(
@@ -222,10 +226,18 @@ class GenService:
                             f'import {to_pascal(business.table_name_en)}\n',
                         )
 
-                    if 'api' in new_code_path:
-                        # api __init__.py
-                        api_init_filepath = os.path.join(*new_code_path.split('/')[:-2], '__init__.py')
+                    # api __init__.py
+                    if 'api' in code_dir:
+                        api_init_filepath = os.path.join(os.path.dirname(code_dir), '__init__.py')
                         zf.writestr(api_init_filepath, gen_template.init_content)
+
+                    # app __init__.py
+                    if 'service' in code_dir:
+                        app_init_filepath = os.path.join(os.path.dirname(code_dir), '__init__.py')
+                        zf.writestr(app_init_filepath, gen_template.init_content)
+
+                    # 写入代码文件
+                    zf.writestr(code_filepath, code)
 
             bio.seek(0)
             return bio
