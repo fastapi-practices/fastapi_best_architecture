@@ -5,7 +5,6 @@ from typing import Sequence
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from pydantic.alias_generators import to_pascal, to_snake
 
-from backend.app.generator.conf import generator_settings
 from backend.app.generator.model import GenBusiness, GenModel
 from backend.core.conf import settings
 from backend.core.path_conf import JINJA2_TEMPLATE_DIR
@@ -34,19 +33,19 @@ class GenTemplate:
         return self.env.get_template(jinja_file)
 
     @staticmethod
-    def get_template_paths() -> list[str]:
+    def get_template_files() -> list[str]:
         """
-        获取模板文件路径列表
+        获取模板文件列表
 
         :return:
         """
-        return [
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/api.jinja',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/crud.jinja',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/model.jinja',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/schema.jinja',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/service.jinja',
-        ]
+        files = []
+
+        # python
+        python_template_path = JINJA2_TEMPLATE_DIR / 'python'
+        files.extend([f'python/{file.name}' for file in python_template_path.iterdir() if file.is_file()])
+
+        return files
 
     @staticmethod
     def get_code_gen_paths(business: GenBusiness) -> list[str]:
@@ -59,11 +58,11 @@ class GenTemplate:
         app_name = business.app_name
         module_name = business.table_name_en
         return [
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/api/{business.api_version}/{module_name}.py',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/crud/crud_{module_name}.py',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/model/{module_name}.py',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/schema/{module_name}.py',
-            f'{generator_settings.TEMPLATE_BACKEND_DIR_NAME}/{app_name}/service/{module_name}_service.py',
+            f'{app_name}/api/{business.api_version}/{module_name}.py',
+            f'{app_name}/crud/crud_{module_name}.py',
+            f'{app_name}/model/{module_name}.py',
+            f'{app_name}/schema/{module_name}.py',
+            f'{app_name}/service/{module_name}_service.py',
         ]
 
     def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
@@ -75,7 +74,7 @@ class GenTemplate:
         :return:
         """
         target_files = self.get_code_gen_paths(business)
-        code_gen_path_mapping = dict(zip(self.get_template_paths(), target_files))
+        code_gen_path_mapping = dict(zip(self.get_template_files(), target_files))
         return code_gen_path_mapping[tpl_path]
 
     @staticmethod
