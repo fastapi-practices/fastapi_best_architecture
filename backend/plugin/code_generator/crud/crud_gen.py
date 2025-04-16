@@ -12,7 +12,7 @@ class CRUDGen:
     """代码生成 CRUD 类"""
 
     @staticmethod
-    async def get_all_tables(db: AsyncSession, table_schema: str) -> list[str]:
+    async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[str]:
         """
         获取所有表名
 
