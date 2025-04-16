@@ -10,19 +10,19 @@ import aiofiles
 
 from pydantic.alias_generators import to_pascal
 
-from backend.app.generator.crud.crud_gen import gen_dao
-from backend.app.generator.crud.crud_gen_business import gen_business_dao
-from backend.app.generator.crud.crud_gen_model import gen_model_dao
-from backend.app.generator.model import GenBusiness
-from backend.app.generator.schema.gen import ImportParam
-from backend.app.generator.schema.gen_business import CreateGenBusinessParam
-from backend.app.generator.schema.gen_model import CreateGenModelParam
-from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.exception import errors
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
-from backend.utils.generator.gen_template import gen_template
-from backend.utils.generator.type_conversion import sql_type_to_pydantic
+from backend.plugin.code_generator.crud.crud_gen import gen_dao
+from backend.plugin.code_generator.crud.crud_gen_business import gen_business_dao
+from backend.plugin.code_generator.crud.crud_gen_model import gen_model_dao
+from backend.plugin.code_generator.model import GenBusiness
+from backend.plugin.code_generator.schema.gen import ImportParam
+from backend.plugin.code_generator.schema.gen_business import CreateGenBusinessParam
+from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam
+from backend.plugin.code_generator.service.gen_model_service import gen_model_service
+from backend.plugin.code_generator.utils.gen_template import gen_template
+from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
 
 class GenService:

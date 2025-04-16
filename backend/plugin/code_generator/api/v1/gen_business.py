@@ -4,18 +4,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path
 
-from backend.app.generator.schema.gen_business import (
-    CreateGenBusinessParam,
-    GetGenBusinessDetail,
-    UpdateGenBusinessParam,
-)
-from backend.app.generator.schema.gen_model import GetGenModelDetail
-from backend.app.generator.service.gen_business_service import gen_business_service
-from backend.app.generator.service.gen_model_service import gen_model_service
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.plugin.code_generator.schema.gen_business import (
+    CreateGenBusinessParam,
+    GetGenBusinessDetail,
+    UpdateGenBusinessParam,
+)
+from backend.plugin.code_generator.schema.gen_model import GetGenModelDetail
+from backend.plugin.code_generator.service.gen_business_service import gen_business_service
+from backend.plugin.code_generator.service.gen_model_service import gen_model_service
 
 router = APIRouter()
 

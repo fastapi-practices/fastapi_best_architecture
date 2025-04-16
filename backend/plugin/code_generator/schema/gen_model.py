@@ -3,7 +3,7 @@
 from pydantic import ConfigDict, Field, field_validator
 
 from backend.common.schema import SchemaBase
-from backend.utils.generator.type_conversion import sql_type_to_sqlalchemy
+from backend.plugin.code_generator.utils.type_conversion import sql_type_to_sqlalchemy
 
 
 class GenModelSchemaBase(SchemaBase):

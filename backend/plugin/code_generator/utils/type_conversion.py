@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from backend.common.enums import GenModelMySQLColumnType, GenModelPostgreSQLColumnType
 from backend.core.conf import settings
+from backend.plugin.code_generator.enums import GenModelMySQLColumnType, GenModelPostgreSQLColumnType
 
 
 def sql_type_to_sqlalchemy(typing: str) -> str:
