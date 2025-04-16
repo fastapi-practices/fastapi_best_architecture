@@ -142,7 +142,7 @@ class CRUDUser(CRUDPlus[User]):
         :param avatar: 头像地址
         :return:
         """
-        return await self.update_model(db, input_user, {'avatar': avatar.url})
+        return await self.update_model(db, input_user, {'avatar': str(avatar.url)})
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
