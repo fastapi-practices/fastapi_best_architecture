@@ -22,7 +22,7 @@ class DictData(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     label: Mapped[str] = mapped_column(String(32), unique=True, comment='字典标签')
-    value: Mapped[str] = mapped_column(String(32), unique=True, comment='字典值')
+    value: Mapped[str] = mapped_column(String(32), comment='字典值')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
     status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(
