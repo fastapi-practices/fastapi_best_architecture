@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from pydantic.alias_generators import to_pascal, to_snake
 
 from backend.core.conf import settings
-from backend.plugin.code_generator.model import GenBusiness, GenModel
+from backend.plugin.code_generator.model import GenBusiness, GenColumn
 from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
 
 
@@ -56,13 +56,13 @@ class GenTemplate:
         :return:
         """
         app_name = business.app_name
-        module_name = business.table_name_en
+        filename = business.filename
         return [
-            f'{app_name}/api/{business.api_version}/{module_name}.py',
-            f'{app_name}/crud/crud_{module_name}.py',
-            f'{app_name}/model/{module_name}.py',
-            f'{app_name}/schema/{module_name}.py',
-            f'{app_name}/service/{module_name}_service.py',
+            f'{app_name}/api/{business.api_version}/{filename}.py',
+            f'{app_name}/crud/crud_{filename}.py',
+            f'{app_name}/model/{filename}.py',
+            f'{app_name}/schema/{filename}.py',
+            f'{app_name}/service/{filename}_service.py',
         ]
 
     def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
@@ -78,7 +78,7 @@ class GenTemplate:
         return code_gen_path_mapping[tpl_path]
 
     @staticmethod
-    def get_vars(business: GenBusiness, models: Sequence[GenModel]) -> dict[str, str | Sequence[GenModel]]:
+    def get_vars(business: GenBusiness, models: Sequence[GenColumn]) -> dict[str, str | Sequence[GenColumn]]:
         """
         获取模板变量
 

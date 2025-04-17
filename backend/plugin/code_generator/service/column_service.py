@@ -4,10 +4,10 @@ from typing import Sequence
 
 from backend.common.exception import errors
 from backend.database.db import async_db_session
-from backend.plugin.code_generator.crud.crud_gen_model import gen_model_dao
+from backend.plugin.code_generator.crud.crud_column import gen_model_dao
 from backend.plugin.code_generator.enums import GenModelMySQLColumnType
-from backend.plugin.code_generator.model import GenModel
-from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
+from backend.plugin.code_generator.model import GenColumn
+from backend.plugin.code_generator.schema.column import CreateGenModelParam, UpdateGenModelParam
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
 
@@ -15,7 +15,7 @@ class GenModelService:
     """代码生成模型服务类"""
 
     @staticmethod
-    async def get(*, pk: int) -> GenModel:
+    async def get(*, pk: int) -> GenColumn:
         """
         获取指定 ID 的模型
 
@@ -36,7 +36,7 @@ class GenModelService:
         return types
 
     @staticmethod
-    async def get_by_business(*, business_id: int) -> Sequence[GenModel]:
+    async def get_by_business(*, business_id: int) -> Sequence[GenColumn]:
         """
         获取指定业务的所有模型
 

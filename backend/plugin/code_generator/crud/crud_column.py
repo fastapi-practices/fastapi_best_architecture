@@ -5,14 +5,14 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.plugin.code_generator.model import GenModel
-from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
+from backend.plugin.code_generator.model import GenColumn
+from backend.plugin.code_generator.schema.column import CreateGenModelParam, UpdateGenModelParam
 
 
-class CRUDGenModel(CRUDPlus[GenModel]):
+class CRUDGenModel(CRUDPlus[GenColumn]):
     """代码生成模型 CRUD 类"""
 
-    async def get(self, db: AsyncSession, pk: int) -> GenModel | None:
+    async def get(self, db: AsyncSession, pk: int) -> GenColumn | None:
         """
         获取代码生成模型列
 
@@ -22,7 +22,7 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         """
         return await self.select_model(db, pk)
 
-    async def get_all_by_business(self, db: AsyncSession, business_id: int) -> Sequence[GenModel]:
+    async def get_all_by_business(self, db: AsyncSession, business_id: int) -> Sequence[GenColumn]:
         """
         获取所有代码生成模型列
 
@@ -66,4 +66,4 @@ class CRUDGenModel(CRUDPlus[GenModel]):
         return await self.delete_model(db, pk)
 
 
-gen_model_dao: CRUDGenModel = CRUDGenModel(GenModel)
+gen_model_dao: CRUDGenModel = CRUDGenModel(GenColumn)
