@@ -5,9 +5,9 @@ from typing import Sequence
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from pydantic.alias_generators import to_pascal, to_snake
 
-from backend.app.generator.model import GenBusiness, GenModel
 from backend.core.conf import settings
-from backend.core.path_conf import JINJA2_TEMPLATE_DIR
+from backend.plugin.code_generator.model import GenBusiness, GenModel
+from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
 
 
 class GenTemplate:

@@ -5,8 +5,8 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.generator.model import GenModel
-from backend.app.generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
+from backend.plugin.code_generator.model import GenModel
+from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam, UpdateGenModelParam
 
 
 class CRUDGenModel(CRUDPlus[GenModel]):
