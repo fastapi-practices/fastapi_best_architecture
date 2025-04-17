@@ -8,14 +8,14 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.schema.gen_business import (
+from backend.plugin.code_generator.schema.business import (
     CreateGenBusinessParam,
     GetGenBusinessDetail,
     UpdateGenBusinessParam,
 )
-from backend.plugin.code_generator.schema.gen_model import GetGenModelDetail
-from backend.plugin.code_generator.service.gen_business_service import gen_business_service
-from backend.plugin.code_generator.service.gen_model_service import gen_model_service
+from backend.plugin.code_generator.schema.column import GetGenModelDetail
+from backend.plugin.code_generator.service.business_service import gen_business_service
+from backend.plugin.code_generator.service.column_service import gen_model_service
 
 router = APIRouter()
 

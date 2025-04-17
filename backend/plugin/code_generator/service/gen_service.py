@@ -5,6 +5,7 @@ import os.path
 import zipfile
 
 from pathlib import Path
+from typing import Sequence
 
 import aiofiles
 
@@ -13,14 +14,14 @@ from pydantic.alias_generators import to_pascal
 from backend.common.exception import errors
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
+from backend.plugin.code_generator.crud.crud_business import gen_business_dao
+from backend.plugin.code_generator.crud.crud_column import gen_model_dao
 from backend.plugin.code_generator.crud.crud_gen import gen_dao
-from backend.plugin.code_generator.crud.crud_gen_business import gen_business_dao
-from backend.plugin.code_generator.crud.crud_gen_model import gen_model_dao
 from backend.plugin.code_generator.model import GenBusiness
+from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
+from backend.plugin.code_generator.schema.column import CreateGenModelParam
 from backend.plugin.code_generator.schema.gen import ImportParam
-from backend.plugin.code_generator.schema.gen_business import CreateGenBusinessParam
-from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam
-from backend.plugin.code_generator.service.gen_model_service import gen_model_service
+from backend.plugin.code_generator.service.column_service import gen_model_service
 from backend.plugin.code_generator.utils.gen_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
@@ -29,7 +30,7 @@ class GenService:
     """代码生成服务类"""
 
     @staticmethod
-    async def get_tables(*, table_schema: str) -> list[str]:
+    async def get_tables(*, table_schema: str) -> Sequence[str]:
         """
         获取指定 schema 下的所有表名
 
@@ -57,14 +58,17 @@ class GenService:
                 raise errors.ForbiddenError(msg='已存在相同数据库表业务')
 
             table_name = table_info[0]
-            business_data = {
-                'app_name': obj.app,
-                'table_name_en': table_name,
-                'table_name_zh': table_info[1] or ' '.join(table_name.split('_')),
-                'table_simple_name_zh': table_info[1] or table_name.split('_')[-1],
-                'table_comment': table_info[1],
-            }
-            new_business = GenBusiness(**CreateGenBusinessParam(**business_data).model_dump())
+            new_business = GenBusiness(
+                **CreateGenBusinessParam(
+                    app_name=obj.app,
+                    table_name_en=table_name,
+                    table_name_zh=table_info[1] or ' '.join(table_name.split('_')),
+                    table_simple_name_zh=table_info[1] or table_name.split('_')[-1],
+                    table_comment=table_info[1],
+                    schema_name=table_name,
+                    filename=table_name,
+                ).model_dump()
+            )
             db.add(new_business)
             await db.flush()
 
@@ -72,17 +76,20 @@ class GenService:
             for column in column_info:
                 column_type = column[-1].split('(')[0].upper()
                 pd_type = sql_type_to_pydantic(column_type)
-                model_data = {
-                    'name': column[0],
-                    'comment': column[-2],
-                    'type': column_type,
-                    'sort': column[-3],
-                    'length': column[-1].split('(')[1][:-1] if pd_type == 'str' and '(' in column[-1] else 0,
-                    'is_pk': column[1],
-                    'is_nullable': column[2],
-                    'gen_business_id': new_business.id,
-                }
-                await gen_model_dao.create(db, CreateGenModelParam(**model_data), pd_type=pd_type)
+                await gen_model_dao.create(
+                    db,
+                    CreateGenModelParam(
+                        name=column[0],
+                        comment=column[-2],
+                        type=column_type,
+                        sort=column[-3],
+                        length=column[-1].split('(')[1][:-1] if pd_type == 'str' and '(' in column[-1] else 0,
+                        is_pk=column[1],
+                        is_nullable=column[2],
+                        gen_business_id=new_business.id,
+                    ),
+                    pd_type=pd_type,
+                )
 
     @staticmethod
     async def render_tpl_code(*, business: GenBusiness) -> dict[str, str]:

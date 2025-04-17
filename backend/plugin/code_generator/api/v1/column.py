@@ -8,8 +8,8 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.schema.gen_model import CreateGenModelParam, GetGenModelDetail, UpdateGenModelParam
-from backend.plugin.code_generator.service.gen_model_service import gen_model_service
+from backend.plugin.code_generator.schema.column import CreateGenModelParam, GetGenModelDetail, UpdateGenModelParam
+from backend.plugin.code_generator.service.column_service import gen_model_service
 
 router = APIRouter()
 

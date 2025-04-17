@@ -4,9 +4,9 @@ from typing import Sequence
 
 from backend.common.exception import errors
 from backend.database.db import async_db_session
-from backend.plugin.code_generator.crud.crud_gen_business import gen_business_dao
+from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.model import GenBusiness
-from backend.plugin.code_generator.schema.gen_business import CreateGenBusinessParam, UpdateGenBusinessParam
+from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
 
 
 class GenBusinessService:

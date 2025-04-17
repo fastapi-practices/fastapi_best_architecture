@@ -1,3 +1,54 @@
+create table gen_business
+(
+    id                      int auto_increment comment '主键 ID'
+        primary key,
+    app_name                varchar(50)  not null comment '应用名称（英文）',
+    table_name_en           varchar(255) not null comment '表名称（英文）',
+    table_name_zh           varchar(255) not null comment '表名称（中文）',
+    table_simple_name_zh    varchar(255) not null comment '表名称（中文简称）',
+    table_comment           varchar(255) null comment '表描述',
+    schema_name             varchar(255) null comment 'Schema 名称 (默认为英文表名称)',
+    filename                varchar(20)  null comment '基础文件名（默认为英文表名称）',
+    default_datetime_column tinyint(1)   not null comment '是否存在默认时间列',
+    api_version             varchar(20)  not null comment '代码生成 api 版本，默认为 v1',
+    gen_path                varchar(255) null comment '代码生成路径（默认为 app 根路径）',
+    remark                  longtext     null comment '备注',
+    created_time            datetime     not null comment '创建时间',
+    updated_time            datetime     null comment '更新时间',
+    constraint table_name_en
+        unique (table_name_en)
+)
+    comment '代码生成业务表';
+
+create index ix_gen_business_id
+    on gen_business (id);
+
+create table gen_column
+(
+    id              int auto_increment comment '主键 ID'
+        primary key,
+    name            varchar(50)  not null comment '列名称',
+    comment         varchar(255) null comment '列描述',
+    type            varchar(20)  not null comment 'SQLA 模型列类型',
+    pd_type         varchar(20)  not null comment '列类型对应的 pydantic 类型',
+    `default`       longtext     null comment '列默认值',
+    sort            int          null comment '列排序',
+    length          int          not null comment '列长度',
+    is_pk           tinyint(1)   not null comment '是否主键',
+    is_nullable     tinyint(1)   not null comment '是否可为空',
+    gen_business_id int          not null comment '代码生成业务ID',
+    constraint gen_column_ibfk_1
+        foreign key (gen_business_id) references gen_business (id)
+            on delete cascade
+)
+    comment '代码生成模型列表';
+
+create index gen_business_id
+    on gen_column (gen_business_id);
+
+create index ix_gen_column_id
+    on gen_column (id);
+
 create table sys_api
 (
     id           int auto_increment comment '主键 ID'
@@ -110,9 +161,7 @@ create table sys_dict_type
     created_time datetime    not null comment '创建时间',
     updated_time datetime    null comment '更新时间',
     constraint code
-        unique (code),
-    constraint name
-        unique (name)
+        unique (code)
 )
     comment '字典类型表';
 
@@ -130,8 +179,6 @@ create table sys_dict_data
     updated_time datetime    null comment '更新时间',
     constraint label
         unique (label),
-    constraint value
-        unique (value),
     constraint sys_dict_data_ibfk_1
         foreign key (type_id) references sys_dict_type (id)
             on delete cascade
@@ -146,56 +193,6 @@ create index type_id
 
 create index ix_sys_dict_type_id
     on sys_dict_type (id);
-
-create table sys_gen_business
-(
-    id                      int auto_increment comment '主键 ID'
-        primary key,
-    app_name                varchar(50)  not null comment '应用名称（英文）',
-    table_name_en           varchar(255) not null comment '表名称（英文）',
-    table_name_zh           varchar(255) not null comment '表名称（中文）',
-    table_simple_name_zh    varchar(255) not null comment '表名称（中文简称）',
-    table_comment           varchar(255) null comment '表描述',
-    schema_name             varchar(255) null comment 'Schema 名称 (默认为英文表名称)',
-    default_datetime_column tinyint(1)   not null comment '是否存在默认时间列',
-    api_version             varchar(20)  not null comment '代码生成 api 版本，默认为 v1',
-    gen_path                varchar(255) null comment '代码生成路径（默认为 app 根路径）',
-    remark                  longtext     null comment '备注',
-    created_time            datetime     not null comment '创建时间',
-    updated_time            datetime     null comment '更新时间',
-    constraint table_name_en
-        unique (table_name_en)
-)
-    comment '代码生成业务表';
-
-create index ix_sys_gen_business_id
-    on sys_gen_business (id);
-
-create table sys_gen_model
-(
-    id              int auto_increment comment '主键 ID'
-        primary key,
-    name            varchar(50)  not null comment '列名称',
-    comment         varchar(255) null comment '列描述',
-    type            varchar(20)  not null comment 'SQLA 模型列类型',
-    pd_type         varchar(20)  not null comment '列类型对应的 pydantic 类型',
-    `default`       longtext     null comment '列默认值',
-    sort            int          null comment '列排序',
-    length          int          not null comment '列长度',
-    is_pk           tinyint(1)   not null comment '是否主键',
-    is_nullable     tinyint(1)   not null comment '是否可为空',
-    gen_business_id int          not null comment '代码生成业务ID',
-    constraint sys_gen_model_ibfk_1
-        foreign key (gen_business_id) references sys_gen_business (id)
-            on delete cascade
-)
-    comment '代码生成模型表';
-
-create index gen_business_id
-    on sys_gen_model (gen_business_id);
-
-create index ix_sys_gen_model_id
-    on sys_gen_model (id);
 
 create table sys_login_log
 (

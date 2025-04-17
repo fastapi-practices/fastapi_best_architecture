@@ -397,6 +397,62 @@ alter table sys_casbin_rule
 create index ix_sys_casbin_rule_id
     on sys_casbin_rule (id);
 
+create table gen_business
+(
+    id                      serial
+        primary key,
+    app_name                varchar(50)              not null,
+    table_name_en           varchar(255)             not null
+        unique,
+    table_name_zh           varchar(255)             not null,
+    table_simple_name_zh    varchar(255)             not null,
+    table_comment           varchar(255),
+    schema_name             varchar(255),
+    filename                varchar(20),
+    default_datetime_column boolean                  not null,
+    api_version             varchar(20)              not null,
+    gen_path                varchar(255),
+    remark                  text,
+    created_time            timestamp with time zone not null,
+    updated_time            timestamp with time zone
+);
+
+comment on table gen_business is '代码生成业务表';
+
+comment on column gen_business.id is '主键 ID';
+
+comment on column gen_business.app_name is '应用名称（英文）';
+
+comment on column gen_business.table_name_en is '表名称（英文）';
+
+comment on column gen_business.table_name_zh is '表名称（中文）';
+
+comment on column gen_business.table_simple_name_zh is '表名称（中文简称）';
+
+comment on column gen_business.table_comment is '表描述';
+
+comment on column gen_business.schema_name is 'Schema 名称 (默认为英文表名称)';
+
+comment on column gen_business.filename is '基础文件名（默认为英文表名称）';
+
+comment on column gen_business.default_datetime_column is '是否存在默认时间列';
+
+comment on column gen_business.api_version is '代码生成 api 版本，默认为 v1';
+
+comment on column gen_business.gen_path is '代码生成路径（默认为 app 根路径）';
+
+comment on column gen_business.remark is '备注';
+
+comment on column gen_business.created_time is '创建时间';
+
+comment on column gen_business.updated_time is '更新时间';
+
+alter table gen_business
+    owner to postgres;
+
+create index ix_gen_business_id
+    on gen_business (id);
+
 create table sys_config
 (
     id           serial
@@ -438,6 +494,41 @@ alter table sys_config
 create index ix_sys_config_id
     on sys_config (id);
 
+create table sys_dict_type
+(
+    id           serial
+        primary key,
+    name         varchar(32)              not null,
+    code         varchar(32)              not null
+        unique,
+    status       integer                  not null,
+    remark       text,
+    created_time timestamp with time zone not null,
+    updated_time timestamp with time zone
+);
+
+comment on table sys_dict_type is '字典类型表';
+
+comment on column sys_dict_type.id is '主键 ID';
+
+comment on column sys_dict_type.name is '字典类型名称';
+
+comment on column sys_dict_type.code is '字典类型编码';
+
+comment on column sys_dict_type.status is '状态（0停用 1正常）';
+
+comment on column sys_dict_type.remark is '备注';
+
+comment on column sys_dict_type.created_time is '创建时间';
+
+comment on column sys_dict_type.updated_time is '更新时间';
+
+alter table sys_dict_type
+    owner to postgres;
+
+create index ix_sys_dict_type_id
+    on sys_dict_type (id);
+
 create table sys_notice
 (
     id           serial
@@ -477,95 +568,6 @@ alter table sys_notice
 
 create index ix_sys_notice_id
     on sys_notice (id);
-
-create table sys_dict_type
-(
-    id           serial
-        primary key,
-    name         varchar(32)              not null
-        unique,
-    code         varchar(32)              not null
-        unique,
-    status       integer                  not null,
-    remark       text,
-    created_time timestamp with time zone not null,
-    updated_time timestamp with time zone
-);
-
-comment on table sys_dict_type is '字典类型表';
-
-comment on column sys_dict_type.id is '主键 ID';
-
-comment on column sys_dict_type.name is '字典类型名称';
-
-comment on column sys_dict_type.code is '字典类型编码';
-
-comment on column sys_dict_type.status is '状态（0停用 1正常）';
-
-comment on column sys_dict_type.remark is '备注';
-
-comment on column sys_dict_type.created_time is '创建时间';
-
-comment on column sys_dict_type.updated_time is '更新时间';
-
-alter table sys_dict_type
-    owner to postgres;
-
-create index ix_sys_dict_type_id
-    on sys_dict_type (id);
-
-create table sys_gen_business
-(
-    id                      serial
-        primary key,
-    app_name                varchar(50)              not null,
-    table_name_en           varchar(255)             not null
-        unique,
-    table_name_zh           varchar(255)             not null,
-    table_simple_name_zh    varchar(255)             not null,
-    table_comment           varchar(255),
-    schema_name             varchar(255),
-    default_datetime_column boolean                  not null,
-    api_version             varchar(20)              not null,
-    gen_path                varchar(255),
-    remark                  text,
-    created_time            timestamp with time zone not null,
-    updated_time            timestamp with time zone
-);
-
-comment on table sys_gen_business is '代码生成业务表';
-
-comment on column sys_gen_business.id is '主键 ID';
-
-comment on column sys_gen_business.app_name is '应用名称（英文）';
-
-comment on column sys_gen_business.table_name_en is '表名称（英文）';
-
-comment on column sys_gen_business.table_name_zh is '表名称（中文）';
-
-comment on column sys_gen_business.table_simple_name_zh is '表名称（中文简称）';
-
-comment on column sys_gen_business.table_comment is '表描述';
-
-comment on column sys_gen_business.schema_name is 'Schema 名称 (默认为英文表名称)';
-
-comment on column sys_gen_business.default_datetime_column is '是否存在默认时间列';
-
-comment on column sys_gen_business.api_version is '代码生成 api 版本，默认为 v1';
-
-comment on column sys_gen_business.gen_path is '代码生成路径（默认为 app 根路径）';
-
-comment on column sys_gen_business.remark is '备注';
-
-comment on column sys_gen_business.created_time is '创建时间';
-
-comment on column sys_gen_business.updated_time is '更新时间';
-
-alter table sys_gen_business
-    owner to postgres;
-
-create index ix_sys_gen_business_id
-    on sys_gen_business (id);
 
 create table sys_role_menu
 (
@@ -681,17 +683,65 @@ comment on column sys_user.updated_time is '更新时间';
 alter table sys_user
     owner to postgres;
 
+create index ix_sys_user_id
+    on sys_user (id);
+
+create unique index ix_sys_user_email
+    on sys_user (email);
+
 create unique index ix_sys_user_username
     on sys_user (username);
 
 create index ix_sys_user_status
     on sys_user (status);
 
-create index ix_sys_user_id
-    on sys_user (id);
+create table gen_column
+(
+    id              serial
+        primary key,
+    name            varchar(50) not null,
+    comment         varchar(255),
+    type            varchar(20) not null,
+    pd_type         varchar(20) not null,
+    "default"       text,
+    sort            integer,
+    length          integer     not null,
+    is_pk           boolean     not null,
+    is_nullable     boolean     not null,
+    gen_business_id integer     not null
+        references gen_business
+            on delete cascade
+);
 
-create unique index ix_sys_user_email
-    on sys_user (email);
+comment on table gen_column is '代码生成模型列表';
+
+comment on column gen_column.id is '主键 ID';
+
+comment on column gen_column.name is '列名称';
+
+comment on column gen_column.comment is '列描述';
+
+comment on column gen_column.type is 'SQLA 模型列类型';
+
+comment on column gen_column.pd_type is '列类型对应的 pydantic 类型';
+
+comment on column gen_column."default" is '列默认值';
+
+comment on column gen_column.sort is '列排序';
+
+comment on column gen_column.length is '列长度';
+
+comment on column gen_column.is_pk is '是否主键';
+
+comment on column gen_column.is_nullable is '是否可为空';
+
+comment on column gen_column.gen_business_id is '代码生成业务ID';
+
+alter table gen_column
+    owner to postgres;
+
+create index ix_gen_column_id
+    on gen_column (id);
 
 create table sys_dict_data
 (
@@ -699,8 +749,7 @@ create table sys_dict_data
         primary key,
     label        varchar(32)              not null
         unique,
-    value        varchar(32)              not null
-        unique,
+    value        varchar(32)              not null,
     sort         integer                  not null,
     status       integer                  not null,
     remark       text,
@@ -736,54 +785,6 @@ alter table sys_dict_data
 
 create index ix_sys_dict_data_id
     on sys_dict_data (id);
-
-create table sys_gen_model
-(
-    id              serial
-        primary key,
-    name            varchar(50) not null,
-    comment         varchar(255),
-    type            varchar(20) not null,
-    pd_type         varchar(20) not null,
-    "default"       text,
-    sort            integer,
-    length          integer     not null,
-    is_pk           boolean     not null,
-    is_nullable     boolean     not null,
-    gen_business_id integer     not null
-        references sys_gen_business
-            on delete cascade
-);
-
-comment on table sys_gen_model is '代码生成模型表';
-
-comment on column sys_gen_model.id is '主键 ID';
-
-comment on column sys_gen_model.name is '列名称';
-
-comment on column sys_gen_model.comment is '列描述';
-
-comment on column sys_gen_model.type is 'SQLA 模型列类型';
-
-comment on column sys_gen_model.pd_type is '列类型对应的 pydantic 类型';
-
-comment on column sys_gen_model."default" is '列默认值';
-
-comment on column sys_gen_model.sort is '列排序';
-
-comment on column sys_gen_model.length is '列长度';
-
-comment on column sys_gen_model.is_pk is '是否主键';
-
-comment on column sys_gen_model.is_nullable is '是否可为空';
-
-comment on column sys_gen_model.gen_business_id is '代码生成业务ID';
-
-alter table sys_gen_model
-    owner to postgres;
-
-create index ix_sys_gen_model_id
-    on sys_gen_model (id);
 
 create table sys_user_role
 (
