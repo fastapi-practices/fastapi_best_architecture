@@ -1,3 +1,22 @@
+<a id="v1.1.0"></a>
+# [v1.1.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.0) - 2025-04-17
+
+## What's Changed
+* Update the changelog for v1.0.5 by [@wu-clan](https://github.com/wu-clan) in [#572](https://github.com/fastapi-practices/fastapi_best_architecture/pull/572)
+* Update the default value for some functions by [@wu-clan](https://github.com/wu-clan) in [#573](https://github.com/fastapi-practices/fastapi_best_architecture/pull/573)
+* Optimize the file structure of code generator by [@wu-clan](https://github.com/wu-clan) in [#574](https://github.com/fastapi-practices/fastapi_best_architecture/pull/574)
+* Update casbin RBAC verify to dynamic import by [@wu-clan](https://github.com/wu-clan) in [#576](https://github.com/fastapi-practices/fastapi_best_architecture/pull/576)
+* Update unique columns in dict models by [@wu-clan](https://github.com/wu-clan) in [#577](https://github.com/fastapi-practices/fastapi_best_architecture/pull/577)
+* Update the code generator to plugin by [@wu-clan](https://github.com/wu-clan) in [#578](https://github.com/fastapi-practices/fastapi_best_architecture/pull/578)
+* Fix avatar url type of update avatar by [@huyuwei1996](https://github.com/huyuwei1996) in [#575](https://github.com/fastapi-practices/fastapi_best_architecture/pull/575)
+* Update code generator file and table naming by [@wu-clan](https://github.com/wu-clan) in [#579](https://github.com/fastapi-practices/fastapi_best_architecture/pull/579)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
+
+[Changes][v1.1.0]
+
+
 <a id="v1.0.5"></a>
 # [v1.0.5](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.0.5) - 2025-04-09
 
@@ -427,6 +446,7 @@
 [Changes][v1.0.0]
 
 
+[v1.1.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
 [v1.0.5]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
 [v1.0.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.3...v1.0.4
 [v1.0.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.2...v1.0.3
