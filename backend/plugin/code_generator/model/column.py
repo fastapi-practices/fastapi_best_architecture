@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class GenColumn(DataClassBase):
-    """代码生成模型表"""
+    """代码生成模型列表"""
 
     __tablename__ = 'gen_column'
 

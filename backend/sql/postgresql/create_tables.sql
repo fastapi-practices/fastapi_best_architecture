@@ -713,7 +713,7 @@ create table gen_column
             on delete cascade
 );
 
-comment on table gen_column is '代码生成模型表';
+comment on table gen_column is '代码生成模型列表';
 
 comment on column gen_column.id is '主键 ID';
 

@@ -41,7 +41,7 @@ create table gen_column
         foreign key (gen_business_id) references gen_business (id)
             on delete cascade
 )
-    comment '代码生成模型表';
+    comment '代码生成模型列表';
 
 create index gen_business_id
     on gen_column (gen_business_id);
