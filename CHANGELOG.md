@@ -1,3 +1,17 @@
+<a id="v1.1.1"></a>
+# [v1.1.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.1) - 2025-04-18
+
+## What's Changed
+* Update changelog for v1.1.0 by [@wu-clan](https://github.com/wu-clan) in [#580](https://github.com/fastapi-practices/fastapi_best_architecture/pull/580)
+* Fix the plugin system route injection by [@wu-clan](https://github.com/wu-clan) in [#581](https://github.com/fastapi-practices/fastapi_best_architecture/pull/581)
+* Fix list query in the dict plugin by [@wu-clan](https://github.com/wu-clan) in [#582](https://github.com/fastapi-practices/fastapi_best_architecture/pull/582)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
+
+[Changes][v1.1.1]
+
+
 <a id="v1.1.0"></a>
 # [v1.1.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.0) - 2025-04-17
 
@@ -446,6 +460,7 @@
 [Changes][v1.0.0]
 
 
+[v1.1.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
 [v1.1.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
 [v1.0.5]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
 [v1.0.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.3...v1.0.4
