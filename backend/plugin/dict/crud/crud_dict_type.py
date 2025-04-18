@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select
+from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import noload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.dict.model import DictType
@@ -30,14 +31,20 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param status: 字典状态
         :return:
         """
-        filters = {}
+        stmt = select(self.model).options(noload(self.model.datas)).order_by(desc(self.model.created_time))
+
+        filters = []
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters.append(self.model.name.like(f'%{name}%'))
         if code is not None:
-            filters.update(code__like=f'%{code}%')
+            filters.append(self.model.code.like(f'%{code}%'))
         if status is not None:
-            filters.update(status=status)
-        return await self.select_order('created_time', 'desc', **filters)
+            filters.append(self.model.status == status)
+
+        if filters:
+            stmt = stmt.where(and_(*filters))
+
+        return stmt
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """
