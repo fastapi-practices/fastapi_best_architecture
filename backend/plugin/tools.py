@@ -134,12 +134,13 @@ def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                 raise PluginInjectError(f'扩展级插件 {plugin} 路由注入失败：{str(e)}') from e
 
 
-def inject_app_router(plugin: str, data: dict[str, Any]) -> None:
+def inject_app_router(plugin: str, data: dict[str, Any], target_router: APIRouter) -> None:
     """
     应用级插件路由注入
 
     :param plugin: 插件名称
     :param data: 插件配置数据
+    :param target_router: FastAPI 路由器
     :return:
     """
     module_path = f'backend.plugin.{plugin}.api.router'
@@ -148,10 +149,6 @@ def inject_app_router(plugin: str, data: dict[str, Any]) -> None:
         routers = data.get('app', {}).get('router', [])
         if not routers or not isinstance(routers, list):
             raise PluginInjectError(f'应用级插件 {plugin} 配置文件存在错误，请检查')
-
-        # 获取目标路由
-        target_module = import_module_cached('backend.app.router')
-        target_router = getattr(target_module, 'router')
 
         for router in routers:
             plugin_router = getattr(module, router, None)
@@ -166,15 +163,26 @@ def inject_app_router(plugin: str, data: dict[str, Any]) -> None:
         raise PluginInjectError(f'应用级插件 {plugin} 路由注入失败：{str(e)}') from e
 
 
-def plugin_router_inject() -> None:
-    """插件路由注入"""
+def build_final_router() -> APIRouter:
+    """构建最终路由"""
+
+    extra_plugins = []
+    app_plugins = []
+
     for plugin in get_plugins():
         data = load_plugin_config(plugin)
-        # 基于插件 plugin.toml 配置文件，判断插件类型
-        if data.get('api'):
-            inject_extra_router(plugin, data)
-        else:
-            inject_app_router(plugin, data)
+        (extra_plugins if data.get('api') else app_plugins).append((plugin, data))
+
+    for plugin, data in extra_plugins:
+        inject_extra_router(plugin, data)
+
+    # 主路由，必须在插件路由注入后导入
+    from backend.app.router import router as main_router
+
+    for plugin, data in app_plugins:
+        inject_app_router(plugin, data, main_router)
+
+    return main_router
 
 
 def _install_plugin_requirements(plugin: str, requirements_file: str) -> None:

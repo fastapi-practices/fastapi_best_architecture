@@ -23,7 +23,7 @@ from backend.database.redis import redis_client
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
-from backend.plugin.tools import plugin_router_inject
+from backend.plugin.tools import build_final_router
 from backend.utils.demo_site import demo_site
 from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.utils.openapi import simplify_operation_ids
@@ -157,12 +157,8 @@ def register_router(app: FastAPI) -> None:
     """
     dependencies = [Depends(demo_site)] if settings.DEMO_MODE else None
 
-    # 插件路由
-    plugin_router_inject()
-
-    # 系统路由（必须在插件路由注入后导入）
-    from backend.app.router import router
-
+    # API
+    router = build_final_router()
     app.include_router(router, dependencies=dependencies)
 
     # Extra
