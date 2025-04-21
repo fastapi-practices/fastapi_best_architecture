@@ -32,7 +32,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         :param title: 菜单标题
         :return:
         """
-        return await self.select_model_by_column(db, title=title, menu_type__ne=2)
+        return await self.select_model_by_column(db, title=title, type__ne=2)
 
     async def get_all(self, db: AsyncSession, title: str | None, status: int | None) -> Sequence[Menu]:
         """
