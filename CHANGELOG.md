@@ -1,3 +1,20 @@
+<a id="v1.1.2"></a>
+# [v1.1.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.2) - 2025-04-23
+
+## What's Changed
+* Update the changelog for v1.1.1 by [@wu-clan](https://github.com/wu-clan) in [#583](https://github.com/fastapi-practices/fastapi_best_architecture/pull/583)
+* Fix the condition to query menu by title by [@wu-clan](https://github.com/wu-clan) in [#584](https://github.com/fastapi-practices/fastapi_best_architecture/pull/584)
+* Fix cache cleanup when updating role menu by [@wu-clan](https://github.com/wu-clan) in [#585](https://github.com/fastapi-practices/fastapi_best_architecture/pull/585)
+* Optimize the userinfo cache cleaning logic by [@wu-clan](https://github.com/wu-clan) in [#586](https://github.com/fastapi-practices/fastapi_best_architecture/pull/586)
+* Bump fastapi pagination from 0.12.34 to 0.13.0 by [@wu-clan](https://github.com/wu-clan) in [#587](https://github.com/fastapi-practices/fastapi_best_architecture/pull/587)
+* Update the routing style of the task app by [@wu-clan](https://github.com/wu-clan) in [#588](https://github.com/fastapi-practices/fastapi_best_architecture/pull/588)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.1...v1.1.2
+
+[Changes][v1.1.2]
+
+
 <a id="v1.1.1"></a>
 # [v1.1.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.1) - 2025-04-18
 
@@ -460,6 +477,7 @@
 [Changes][v1.0.0]
 
 
+[v1.1.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.1...v1.1.2
 [v1.1.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
 [v1.1.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
 [v1.0.5]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
