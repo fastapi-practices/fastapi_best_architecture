@@ -34,5 +34,5 @@ class Role(Base):
     # 角色菜单多对多
     menus: Mapped[list[Menu]] = relationship(init=False, secondary=sys_role_menu, back_populates='roles')
 
-    # 角色数据权限规则多对多
+    # 角色数据规则多对多
     rules: Mapped[list[DataRule]] = relationship(init=False, secondary=sys_role_data_rule, back_populates='roles')

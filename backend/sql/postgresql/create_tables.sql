@@ -13,7 +13,7 @@ create table sys_data_rule
     updated_time timestamp with time zone
 );
 
-comment on table sys_data_rule is '数据权限规则表';
+comment on table sys_data_rule is '数据规则表';
 
 comment on column sys_data_rule.id is '主键 ID';
 
@@ -609,7 +609,7 @@ comment on column sys_role_data_rule.id is '主键ID';
 
 comment on column sys_role_data_rule.role_id is '角色ID';
 
-comment on column sys_role_data_rule.data_rule_id is '数据权限规则ID';
+comment on column sys_role_data_rule.data_rule_id is '数据规则ID';
 
 alter table sys_role_data_rule
     owner to postgres;

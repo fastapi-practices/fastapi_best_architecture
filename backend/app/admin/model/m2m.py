@@ -30,6 +30,6 @@ sys_role_data_rule = Table(
         Integer,
         ForeignKey('sys_data_rule.id', ondelete='CASCADE'),
         primary_key=True,
-        comment='数据权限规则ID',
+        comment='数据规则ID',
     ),
 )

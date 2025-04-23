@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from fastapi import Request
-
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
@@ -93,24 +91,23 @@ class DeptService:
             return count
 
     @staticmethod
-    async def delete(*, request: Request, pk: int) -> int:
+    async def delete(*, pk: int) -> int:
         """
         删除部门
 
-        :param request: FastAPI 请求对象
         :param pk: 部门 ID
         :return:
         """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_with_relation(db, pk)
-            dept_user = dept.users
-            if dept_user:
+            if dept.users:
                 raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
             children = await dept_dao.get_children(db, pk)
             if children:
                 raise errors.ForbiddenError(msg='部门下存在子部门，无法删除')
             count = await dept_dao.delete(db, pk)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            for user in dept.users:
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
 

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class DataRule(Base):
-    """数据权限规则表"""
+    """数据规则表"""
 
     __tablename__ = 'sys_data_rule'
 

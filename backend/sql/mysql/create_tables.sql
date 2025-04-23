@@ -119,7 +119,7 @@ create table sys_data_rule
     constraint name
         unique (name)
 )
-    comment '数据权限规则表';
+    comment '数据规则表';
 
 create index ix_sys_data_rule_id
     on sys_data_rule (id);
@@ -319,7 +319,7 @@ create table sys_role_data_rule
 (
     id           int auto_increment comment '主键ID',
     role_id      int not null comment '角色ID',
-    data_rule_id int not null comment '数据权限规则ID',
+    data_rule_id int not null comment '数据规则ID',
     primary key (id, role_id, data_rule_id),
     constraint ix_sys_role_data_rule_id
         unique (id),

@@ -12,7 +12,7 @@ from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRu
 
 
 class CRUDDataRule(CRUDPlus[DataRule]):
-    """数据权限规则数据库操作类"""
+    """数据规则数据库操作类"""
 
     async def get(self, db: AsyncSession, pk: int) -> DataRule | None:
         """

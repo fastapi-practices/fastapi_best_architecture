@@ -47,14 +47,14 @@ class MenuType(IntEnum):
 
 
 class RoleDataRuleOperatorType(IntEnum):
-    """数据权限规则运算符"""
+    """数据规则运算符"""
 
     AND = 0
     OR = 1
 
 
 class RoleDataRuleExpressionType(IntEnum):
-    """数据权限规则表达式"""
+    """数据规则表达式"""
 
     eq = 0  # ==
     ne = 1  # !=
