@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptDetail, UpdateDeptParam
 from backend.app.admin.service.dept_service import dept_service
@@ -67,8 +67,8 @@ async def update_dept(pk: Annotated[int, Path(description='部门 ID')], obj: Up
         DependsRBAC,
     ],
 )
-async def delete_dept(request: Request, pk: Annotated[int, Path(description='部门 ID')]) -> ResponseModel:
-    count = await dept_service.delete(request=request, pk=pk)
+async def delete_dept(pk: Annotated[int, Path(description='部门 ID')]) -> ResponseModel:
+    count = await dept_service.delete(pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

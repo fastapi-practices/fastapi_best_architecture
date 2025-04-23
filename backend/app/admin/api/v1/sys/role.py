@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.role import (
     CreateRoleParam,
@@ -116,9 +116,9 @@ async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: Up
     ],
 )
 async def update_role_menus(
-    request: Request, pk: Annotated[int, Path(description='角色 ID')], menu_ids: UpdateRoleMenuParam
+    pk: Annotated[int, Path(description='角色 ID')], menu_ids: UpdateRoleMenuParam
 ) -> ResponseModel:
-    count = await role_service.update_role_menu(request=request, pk=pk, menu_ids=menu_ids)
+    count = await role_service.update_role_menu(pk=pk, menu_ids=menu_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -126,16 +126,16 @@ async def update_role_menus(
 
 @router.put(
     '/{pk}/rule',
-    summary='更新角色数据权限规则',
+    summary='更新角色数据规则',
     dependencies=[
         Depends(RequestPermission('sys:role:rule:edit')),
         DependsRBAC,
     ],
 )
 async def update_role_rules(
-    request: Request, pk: Annotated[int, Path(description='角色 ID')], rule_ids: UpdateRoleRuleParam
+    pk: Annotated[int, Path(description='角色 ID')], rule_ids: UpdateRoleRuleParam
 ) -> ResponseModel:
-    count = await role_service.update_role_rule(request=request, pk=pk, rule_ids=rule_ids)
+    count = await role_service.update_role_rule(pk=pk, rule_ids=rule_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -149,8 +149,8 @@ async def update_role_rules(
         DependsRBAC,
     ],
 )
-async def delete_role(request: Request, pk: Annotated[list[int], Query(description='角色 ID 列表')]) -> ResponseModel:
-    count = await role_service.delete(request=request, pk=pk)
+async def delete_role(pk: Annotated[list[int], Query(description='角色 ID 列表')]) -> ResponseModel:
+    count = await role_service.delete(pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

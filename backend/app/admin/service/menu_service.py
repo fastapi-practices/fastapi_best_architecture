@@ -123,14 +123,16 @@ class MenuService:
             if obj.parent_id == menu.id:
                 raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await menu_dao.update(db, pk, obj)
+            for role in await menu.awaitable_attrs.roles:
+                for user in await role.awaitable_attrs.users:
+                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
     @staticmethod
-    async def delete(*, request: Request, pk: int) -> int:
+    async def delete(*, pk: int) -> int:
         """
         删除菜单
 
-        :param request: FastAPI 请求对象
         :param pk: 菜单 ID
         :return:
         """
@@ -138,8 +140,12 @@ class MenuService:
             children = await menu_dao.get_children(db, pk)
             if children:
                 raise errors.ForbiddenError(msg='菜单下存在子菜单，无法删除')
+            menu = await menu_dao.get(db, pk)
             count = await menu_dao.delete(db, pk)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+            if menu:
+                for role in await menu.awaitable_attrs.roles:
+                    for user in await role.awaitable_attrs.users:
+                        await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
 
