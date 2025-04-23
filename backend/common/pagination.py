@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Generic, Sequence, TypeVar
 from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
-from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import apaginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel, Field
 
@@ -63,8 +63,8 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
     def create(
         cls,
         items: list,
-        total: int,
         params: _CustomPageParams,
+        total: int = 0,
     ) -> _CustomPage[T]:
         page = params.page
         size = params.size
@@ -119,7 +119,7 @@ async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
     :param select: SQL 查询语句
     :return:
     """
-    paginated_data: _CustomPage = await paginate(db, select)
+    paginated_data: _CustomPage = await apaginate(db, select)
     page_data = paginated_data.model_dump()
     return page_data
 

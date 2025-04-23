@@ -28,7 +28,7 @@ dependencies = [
     "fastapi-cli==0.0.5",
     "fastapi-limiter>=0.1.6",
     "fastapi-oauth20>=0.0.1",
-    "fastapi-pagination>=0.12.34",
+    "fastapi-pagination>=0.13.0",
     "fastapi[standard]==0.115.11",
     "flower>=2.0.0",
     "gevent>=24.11.1",

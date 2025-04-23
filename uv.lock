@@ -616,7 +616,7 @@ requires-dist = [
     { name = "fastapi-cli", specifier = "==0.0.5" },
     { name = "fastapi-limiter", specifier = ">=0.1.6" },
     { name = "fastapi-oauth20", specifier = ">=0.0.1" },
-    { name = "fastapi-pagination", specifier = ">=0.12.34" },
+    { name = "fastapi-pagination", specifier = ">=0.13.0" },
     { name = "flower", specifier = ">=2.0.0" },
     { name = "gevent", specifier = ">=24.11.1" },
     { name = "ip2loc", specifier = ">=1.0.0" },
@@ -695,15 +695,16 @@ wheels = [
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.12.34"
+version = "0.13.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
+    { name = "fastapi" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/83/4d/6e695098ce33b3394cf26b335ca4ec6407f9421cfdf9ad6a38775580db21/fastapi_pagination-0.12.34.tar.gz", hash = "sha256:05ee8c0bc572072160f7f30900bfd87869e1880c87bc5797922fec2e49e65f11" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/eb/6e/42aca34d094e004a92155f2f6e2129faa3ea00aef313f630f7d589c2a13f/fastapi_pagination-0.13.0.tar.gz", hash = "sha256:665f434ca7e8a570fb6cb5d84a557441b21a984eb2126c37bae31b1dae14875a" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/72/f3/a0a1e7efd88dba07743665d1f6f88008c9a1e174458581ecaa53b8699a7c/fastapi_pagination-0.12.34-py3-none-any.whl", hash = "sha256:089d1078aae1784395b4dbd923d0c8246641ddcc291c5ec6d92a30edb92ecbdd" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/58/58/730c6fcda9fa65661879aa9113067dbfe3c7547d2567c6f91c18c7d6a297/fastapi_pagination-0.13.0-py3-none-any.whl", hash = "sha256:064af558ca1f58a04e93d0479a1a0cf12c658ff21a97bd1dddb2d76f6cf4654f" },
 ]
 
 [[package]]
