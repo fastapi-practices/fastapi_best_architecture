@@ -20,16 +20,3 @@ sys_role_menu = Table(
     Column('menu_id', Integer, ForeignKey('sys_menu.id', ondelete='CASCADE'), primary_key=True, comment='菜单ID'),
 )
 
-sys_role_data_rule = Table(
-    'sys_role_data_rule',
-    MappedBase.metadata,
-    Column('id', INT, primary_key=True, unique=True, index=True, autoincrement=True, comment='主键ID'),
-    Column('role_id', Integer, ForeignKey('sys_role.id', ondelete='CASCADE'), primary_key=True, comment='角色ID'),
-    Column(
-        'data_rule_id',
-        Integer,
-        ForeignKey('sys_data_rule.id', ondelete='CASCADE'),
-        primary_key=True,
-        comment='数据规则ID',
-    ),
-)

@@ -39,7 +39,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .options(selectinload(self.model.menus))
             .where(self.model.id == role_id)
         )
         role = await db.execute(stmt)
@@ -136,21 +136,6 @@ class CRUDRole(CRUDPlus[Role]):
         menus = await db.execute(stmt)
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
-
-    async def update_rules(self, db: AsyncSession, role_id: int, rule_ids: UpdateRoleRuleParam) -> int:
-        """
-        更新角色数据规则
-
-        :param db: 数据库会话
-        :param role_id: 角色 ID
-        :param rule_ids: 权限规则 ID 列表
-        :return:
-        """
-        current_role = await self.get_with_relation(db, role_id)
-        stmt = select(DataRule).where(DataRule.id.in_(rule_ids.rules))
-        rules = await db.execute(stmt)
-        current_role.rules = rules.scalars().all()
-        return len(current_role.rules)
 
     async def delete(self, db: AsyncSession, role_id: list[int]) -> int:
         """

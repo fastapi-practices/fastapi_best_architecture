@@ -47,12 +47,6 @@ async def get_role_all_menus(
     return response_base.success(data=menu)
 
 
-@router.get('/{pk}/rules', summary='获取角色所有数据规则', dependencies=[DependsJwtAuth])
-async def get_role_all_rules(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
-    rule = await data_rule_service.get_role_rules(pk=pk)
-    return response_base.success(data=rule)
-
-
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
 async def get_role(
     pk: Annotated[int, Path(description='角色 ID')],
@@ -123,22 +117,6 @@ async def update_role_menus(
         return response_base.success()
     return response_base.fail()
 
-
-@router.put(
-    '/{pk}/rule',
-    summary='更新角色数据规则',
-    dependencies=[
-        Depends(RequestPermission('sys:role:rule:edit')),
-        DependsRBAC,
-    ],
-)
-async def update_role_rules(
-    pk: Annotated[int, Path(description='角色 ID')], rule_ids: UpdateRoleRuleParam
-) -> ResponseModel:
-    count = await role_service.update_role_rule(pk=pk, rule_ids=rule_ids)
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
 
 
 @router.delete(

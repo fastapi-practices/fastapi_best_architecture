@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from datetime import datetime
+
+from pydantic import Field, ConfigDict
+
+from backend.common.enums import StatusType
+from backend.common.schema import SchemaBase
+
+
+class DataScopeBase(SchemaBase):
+    """数据范围基础模型"""
+
+    name: str = Field(description='名称')
+    status: StatusType = Field(StatusType.enable, description='状态')
+
+
+class CreateDataScopeParam(DataScopeBase):
+    """创建数据范围参数"""
+
+
+class UpdateDataScopeParam(DataScopeBase):
+    """更新数据范围参数"""
+
+
+class GetDataScopeDetail(DataScopeBase):
+    """数据范围详情"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int = Field(description='数据范围 ID')
+    created_time: datetime = Field(description='创建时间')
+    updated_time: datetime | None = Field(None, description='更新时间')
+
