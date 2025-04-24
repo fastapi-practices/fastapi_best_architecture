@@ -4,8 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Get{{ schema_name }}Detail, Update{{ schema_name }}Param
-from backend.app.{{ app_name }}.service.{{ table_name_en }}_service import {{ table_name_en }}_service
+from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Get{{ schema_name }}Detail, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.service.{{ table_name }}_service import {{ table_name }}_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
@@ -16,49 +16,49 @@ from backend.database.db import CurrentSession
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取{{ table_simple_name_zh }}详情', dependencies=[DependsJwtAuth])
-async def get_{{ table_name_en }}(pk: Annotated[int, Path(description='{{ table_simple_name_zh }} ID')]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
-    {{ table_name_en }} = await {{ table_name_en }}_service.get(pk=pk)
-    return response_base.success(data={{ table_name_en }})
+@router.get('/{pk}', summary='获取{{ doc_comment }}详情', dependencies=[DependsJwtAuth])
+async def get_{{ table_name }}(pk: Annotated[int, Path(description='{{ doc_comment }} ID')]) -> ResponseSchemaModel[Get{{ schema_name }}Detail]:
+    {{ table_name }} = await {{ table_name }}_service.get(pk=pk)
+    return response_base.success(data={{ table_name }})
 
 
 @router.get(
     '',
-    summary='分页获取所有{{ table_simple_name_zh }}',
+    summary='分页获取所有{{ doc_comment }}',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_{{ table_name_en }}s(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
-    {{ table_name_en }}_select = await {{ table_name_en }}_service.get_select()
-    page_data = await paging_data(db, {{ table_name_en }}_select)
+async def get_pagination_{{ table_name }}s(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
+    {{ table_name }}_select = await {{ table_name }}_service.get_select()
+    page_data = await paging_data(db, {{ table_name }}_select)
     return response_base.success(data=page_data)
 
 
 @router.post(
     '',
-    summary='创建{{ table_simple_name_zh }}',
+    summary='创建{{ doc_comment }}',
     dependencies=[
         Depends(RequestPermission('{{ permission }}:add')),
         DependsRBAC,
     ],
 )
-async def create_{{ table_name_en }}(obj: Create{{ schema_name }}Param) -> ResponseModel:
-    await {{ table_name_en }}_service.create(obj=obj)
+async def create_{{ table_name }}(obj: Create{{ schema_name }}Param) -> ResponseModel:
+    await {{ table_name }}_service.create(obj=obj)
     return response_base.success()
 
 
 @router.put(
     '/{pk}',
-    summary='更新{{ table_simple_name_zh }}',
+    summary='更新{{ doc_comment }}',
     dependencies=[
         Depends(RequestPermission('{{ permission }}:edit')),
         DependsRBAC,
     ],
 )
-async def update_{{ table_name_en }}(pk: Annotated[int, Path(description='{{ table_simple_name_zh }} ID')], obj: Update{{ schema_name }}Param) -> ResponseModel:
-    count = await {{ table_name_en }}_service.update(pk=pk, obj=obj)
+async def update_{{ table_name }}(pk: Annotated[int, Path(description='{{ doc_comment }} ID')], obj: Update{{ schema_name }}Param) -> ResponseModel:
+    count = await {{ table_name }}_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -66,14 +66,14 @@ async def update_{{ table_name_en }}(pk: Annotated[int, Path(description='{{ tab
 
 @router.delete(
     '',
-    summary='批量删除{{ table_simple_name_zh }}',
+    summary='批量删除{{ doc_comment }}',
     dependencies=[
         Depends(RequestPermission('{{ permission }}:del')),
         DependsRBAC,
     ],
 )
-async def delete_{{ table_name_en }}(pk: Annotated[list[int], Query(description='{{ table_simple_name_zh }} ID 列表')]) -> ResponseModel:
-    count = await {{ table_name_en }}_service.delete(pk=pk)
+async def delete_{{ table_name }}(pk: Annotated[list[int], Query(description='{{ doc_comment }} ID 列表')]) -> ResponseModel:
+    count = await {{ table_name }}_service.delete(pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

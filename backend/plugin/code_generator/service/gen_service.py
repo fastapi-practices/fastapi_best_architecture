@@ -61,10 +61,10 @@ class GenService:
             new_business = GenBusiness(
                 **CreateGenBusinessParam(
                     app_name=obj.app,
-                    table_name_en=table_name,
-                    table_name_zh=table_info[1] or ' '.join(table_name.split('_')),
-                    table_simple_name_zh=table_info[1] or table_name.split('_')[-1],
+                    table_name=table_name,
+                    doc_comment=table_info[1] or table_name.split('_')[-1],
                     table_comment=table_info[1],
+                    class_name=table_name,
                     schema_name=table_name,
                     filename=table_name,
                 ).model_dump()
@@ -194,8 +194,8 @@ class GenService:
                 if code_folder.name == 'model':
                     async with aiofiles.open(init_filepath, 'a', encoding='utf-8') as f:
                         await f.write(
-                            f'from backend.app.{business.app_name}.model.{business.table_name_en} '
-                            f'import {to_pascal(business.table_name_en)}\n',
+                            f'from backend.app.{business.app_name}.model.{business.table_name} '
+                            f'import {to_pascal(business.table_name)}\n',
                         )
 
                 # 写入代码文件
@@ -229,8 +229,8 @@ class GenService:
                         zf.writestr(
                             init_filepath,
                             f'{gen_template.init_content}'
-                            f'from backend.app.{business.app_name}.model.{business.table_name_en} '
-                            f'import {to_pascal(business.table_name_en)}\n',
+                            f'from backend.app.{business.app_name}.model.{business.table_name} '
+                            f'import {to_pascal(business.table_name)}\n',
                         )
 
                     # api __init__.py

@@ -88,14 +88,14 @@ class GenTemplate:
         """
         return {
             'app_name': business.app_name,
-            'table_name_en': to_snake(business.table_name_en),
-            'table_name_class': to_pascal(business.table_name_en),
-            'table_name_zh': business.table_name_zh,
-            'table_simple_name_zh': business.table_simple_name_zh,
+            'table_name': to_snake(business.table_name),
+            'doc_comment': business.doc_comment,
             'table_comment': business.table_comment,
+            'class_name': to_pascal(business.class_name),
+            'instance_name': to_snake(business.class_name),
             'schema_name': to_pascal(business.schema_name),
             'default_datetime_column': business.default_datetime_column,
-            'permission': str(business.table_name_en.replace('_', ':')),
+            'permission': str(business.table_name.replace('_', ':')),
             'database_type': settings.DATABASE_TYPE,
             'models': models,
         }
