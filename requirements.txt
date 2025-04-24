@@ -39,7 +39,7 @@ filelock==3.18.0
 flower==2.0.1
 gevent==24.11.1
 greenlet==3.1.1
-h11==0.14.0
+h11==0.16.0
 hiredis==3.1.0
 httpcore==1.0.7
 httptools==0.6.4
