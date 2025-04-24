@@ -15,10 +15,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from backend.common.model import {% if default_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
 
 
-class {{ table_name_class }}({% if default_datetime_column %}Base{% else %}MappedBase{% endif %}):
-    """{{ table_name_zh }}"""
+class {{ class_name }}({% if default_datetime_column %}Base{% else %}MappedBase{% endif %}):
+    """{{ table_comment }}"""
 
-    __tablename__ = '{{ table_name_en }}'
+    __tablename__ = '{{ table_name }}'
 
     id: Mapped[id_key] = mapped_column(init=False)
     {% for model in models %}

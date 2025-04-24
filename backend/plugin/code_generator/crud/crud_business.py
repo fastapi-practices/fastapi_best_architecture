@@ -30,7 +30,7 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         :param name: 表名
         :return:
         """
-        return await self.select_model_by_column(db, table_name_en=name)
+        return await self.select_model_by_column(db, table_name=name)
 
     async def get_all(self, db: AsyncSession) -> Sequence[GenBusiness]:
         """
