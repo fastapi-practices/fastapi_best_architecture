@@ -39,7 +39,7 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
         创建{{ doc_comment }}
 
         :param db: 数据库会话
-        :param obj: 创建{{ doc_comment }} 参数
+        :param obj: 创建{{ doc_comment }}参数
         :return:
         """
         await self.create_model(db, obj)
@@ -50,7 +50,7 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
 
         :param db: 数据库会话
         :param pk: {{ doc_comment }} ID
-        :param obj: 更新 {{ doc_comment }} 参数
+        :param obj: 更新 {{ doc_comment }}参数
         :return:
         """
         return await self.update_model(db, pk, obj)
