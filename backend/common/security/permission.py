@@ -12,7 +12,7 @@ from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import_data_model
 
 if TYPE_CHECKING:
-    from backend.plugin.data_permission.schema.data_rule import GetDataRuleDetail
+    from backend.app.admin.schema.data_rule import GetDataRuleDetail
 
 
 class RequestPermission:

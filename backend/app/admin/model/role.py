@@ -9,13 +9,11 @@ from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model.m2m import sys_role_menu, sys_user_role
+from backend.app.admin.model.m2m import sys_role_data_scope, sys_role_menu, sys_user_role
 from backend.common.model import Base, id_key
-from backend.plugin.data_permission.model.m2m import sys_role_data_scope
 
 if TYPE_CHECKING:
-    from backend.app.admin.model import Menu, User
-    from backend.plugin.data_permission.model import DataScope
+    from backend.app.admin.model import DataScope, Menu, User
 
 
 class Role(Base):

@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import TYPE_CHECKING
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.app.admin.model import DataRule, Role
+from backend.app.admin.model.m2m import sys_role_data_scope
 from backend.common.model import Base, id_key
-from backend.plugin.data_permission.model.m2m import sys_role_data_scope
-
-if TYPE_CHECKING:
-    from backend.app.admin.model import Role
-    from backend.plugin.data_permission.model import DataRule
 
 
 class DataScope(Base):
@@ -19,7 +15,7 @@ class DataScope(Base):
     __tablename__ = 'sys_data_scope'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(50), comment='名称')
+    name: Mapped[str] = mapped_column(String(50), unique=True, comment='名称')
     status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
 
     # 数据范围规则一对多

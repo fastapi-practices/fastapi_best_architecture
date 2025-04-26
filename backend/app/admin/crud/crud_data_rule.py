@@ -8,7 +8,7 @@ from sqlalchemy.orm import noload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule
-from backend.plugin.data_permission.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
 
 
 class CRUDDataRule(CRUDPlus[DataRule]):

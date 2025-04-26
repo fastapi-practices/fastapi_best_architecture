@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Sequence
+from typing import Any, Sequence
 
 from sqlalchemy import Select
 
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
@@ -11,11 +12,13 @@ from backend.app.admin.schema.role import (
     CreateRoleParam,
     UpdateRoleMenuParam,
     UpdateRoleParam,
+    UpdateRoleScopeParam,
 )
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.utils.build_tree import get_tree_data
 
 
 class RoleService:
@@ -43,7 +46,7 @@ class RoleService:
             return roles
 
     @staticmethod
-    async def get_by_user(*, pk: int) -> Sequence[Role]:
+    async def get_users(*, pk: int) -> Sequence[Role]:
         """
         获取用户的角色列表
 
@@ -51,7 +54,7 @@ class RoleService:
         :return:
         """
         async with async_db_session() as db:
-            roles = await role_dao.get_by_user(db, user_id=pk)
+            roles = await role_dao.get_users(db, user_id=pk)
             return roles
 
     @staticmethod
@@ -64,6 +67,38 @@ class RoleService:
         :return:
         """
         return await role_dao.get_list(name=name, status=status)
+
+    @staticmethod
+    async def get_menu_tree(*, pk: int) -> list[dict[str, Any]]:
+        """
+        获取角色的菜单树形结构
+
+        :param pk: 角色 ID
+        :return:
+        """
+        async with async_db_session() as db:
+            role = await role_dao.get_with_relation(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            menu_ids = [menu.id for menu in role.menus]
+            menu_select = await menu_dao.get_role_menus(db, False, menu_ids)
+            menu_tree = get_tree_data(menu_select)
+            return menu_tree
+
+    @staticmethod
+    async def get_scopes(*, pk: int) -> list[int]:
+        """
+        获取角色数据范围列表
+
+        :param pk:
+        :return:
+        """
+        async with async_db_session() as db:
+            role = await role_dao.get_with_relation(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            scope_ids = [scope.id for scope in role.scopes]
+            return scope_ids
 
     @staticmethod
     async def create(*, obj: CreateRoleParam) -> None:
@@ -123,6 +158,27 @@ class RoleService:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
+    @staticmethod
+    async def update_role_scope(*, pk: int, scope_ids: UpdateRoleScopeParam) -> int:
+        """
+        更新角色数据范围
+
+        :param pk: 角色 ID
+        :param scope_ids: 权限规则 ID 列表
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            role = await role_dao.get(db, pk)
+            if not role:
+                raise errors.NotFoundError(msg='角色不存在')
+            for scope_id in scope_ids.scopes:
+                scope = await data_scope_dao.get(db, scope_id)
+                if not scope:
+                    raise errors.NotFoundError(msg='数据范围不存在')
+            count = await role_dao.update_scopes(db, pk, scope_ids)
+            for user in await role.awaitable_attrs.users:
+                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+            return count
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:

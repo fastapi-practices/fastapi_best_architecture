@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Any, Self
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field
 
+from backend.app.admin.schema.data_scope import GetDataScopeDetail
 from backend.app.admin.schema.menu import GetMenuDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
-from backend.plugin.data_permission.schema.data_scope import GetDataScopeDetail
 
 
 class RoleSchemaBase(SchemaBase):
@@ -31,6 +30,12 @@ class UpdateRoleMenuParam(SchemaBase):
     """更新角色菜单参数"""
 
     menus: list[int] = Field(description='菜单 ID 列表')
+
+
+class UpdateRoleScopeParam(SchemaBase):
+    """更新角色数据范围参数"""
+
+    scopes: list[int] = Field(description='数据范围 ID 列表')
 
 
 class GetRoleDetail(RoleSchemaBase):

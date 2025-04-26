@@ -4,14 +4,12 @@ from typing import Sequence
 
 from sqlalchemy import Select
 
-from backend.plugin.data_permission.crud.crud_data_rule import data_rule_dao
-from backend.app.admin.crud.crud_role import role_dao
+from backend.app.admin.crud.crud_data_rule import data_rule_dao
 from backend.app.admin.model import DataRule
-from backend.plugin.data_permission.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.database.redis import redis_client
 from backend.utils.import_parse import dynamic_import_data_model
 
 
@@ -98,9 +96,6 @@ class DataRuleService:
             if not data_rule:
                 raise errors.NotFoundError(msg='数据规则不存在')
             count = await data_rule_dao.update(db, pk, obj)
-            for role in await data_rule.awaitable_attrs.roles:
-                for user in await role.awaitable_attrs.users:
-                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
     @staticmethod
@@ -113,12 +108,6 @@ class DataRuleService:
         """
         async with async_db_session.begin() as db:
             count = await data_rule_dao.delete(db, pk)
-            for _pk in pk:
-                data_rule = await data_rule_dao.get(db, _pk)
-                if data_rule:
-                    for role in await data_rule.awaitable_attrs.roles:
-                        for user in await role.awaitable_attrs.users:
-                            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
 

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
+from backend.app.admin.model import DataRule
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
@@ -23,6 +24,12 @@ class UpdateDataScopeParam(DataScopeBase):
     """更新数据范围参数"""
 
 
+class UpdateDataScopeRuleParam(SchemaBase):
+    """更新数据范围规则参数"""
+
+    rules: list[int] = Field(description='数据规则 ID 列表')
+
+
 class GetDataScopeDetail(DataScopeBase):
     """数据范围详情"""
 
@@ -32,3 +39,8 @@ class GetDataScopeDetail(DataScopeBase):
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')
 
+
+class GetDataScopeWithRelationDetail(GetDataScopeDetail):
+    """数据范围关联详情"""
+
+    rules: list[DataRule] = Field([], description='数据规则列表')

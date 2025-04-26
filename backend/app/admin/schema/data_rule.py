@@ -17,6 +17,7 @@ class DataRuleSchemaBase(SchemaBase):
     operator: RoleDataRuleOperatorType = Field(RoleDataRuleOperatorType.OR, description='操作符（AND/OR）')
     expression: RoleDataRuleExpressionType = Field(RoleDataRuleExpressionType.eq, description='表达式类型')
     value: str = Field(description='规则值')
+    remark: str = Field(description='备注')
 
 
 class CreateDataRuleParam(DataRuleSchemaBase):
