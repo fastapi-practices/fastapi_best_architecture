@@ -36,7 +36,3 @@ class GetDataRuleDetail(DataRuleSchemaBase):
     id: int = Field(description='规则 ID')
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')
-
-    def __hash__(self) -> int:
-        """计算哈希值"""
-        return hash(self.name)

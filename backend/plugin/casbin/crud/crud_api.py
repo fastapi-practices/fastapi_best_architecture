@@ -7,7 +7,6 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.common.security.permission import filter_data_permission
 from backend.plugin.casbin.model import Api
 from backend.plugin.casbin.schema.api import CreateApiParam, UpdateApiParam
 
@@ -43,7 +42,7 @@ class CRUDApi(CRUDPlus[Api]):
         if path is not None:
             filters.update(path__like=f'%{path}%')
         stmt = await self.select_order('created_time', 'desc', **filters)
-        return stmt.where(filter_data_permission(request))
+        return stmt
 
     async def get_all(self, db: AsyncSession) -> Sequence[Api]:
         """
