@@ -36,7 +36,7 @@ class DataRuleService:
         return list(settings.DATA_PERMISSION_MODELS.keys())
 
     @staticmethod
-    async def get_columns(model: str) -> list[str]:
+    async def get_columns(model: str) -> list[dict[str, str]]:
         """
         获取数据规则可用模型的字段列表
 
@@ -46,8 +46,11 @@ class DataRuleService:
         if model not in settings.DATA_PERMISSION_MODELS:
             raise errors.NotFoundError(msg='数据规则可用模型不存在')
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[model])
+
         model_columns = [
-            key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
+            {column.key: column.comment}
+            for column in model_ins.__table__.columns
+            if column.key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
         return model_columns
 
@@ -95,6 +98,9 @@ class DataRuleService:
             data_rule = await data_rule_dao.get(db, pk)
             if not data_rule:
                 raise errors.NotFoundError(msg='数据规则不存在')
+            if data_rule.name != obj.name:
+                if await data_rule_dao.get_by_name(db, obj.name):
+                    raise errors.ForbiddenError(msg='数据规则已存在')
             count = await data_rule_dao.update(db, pk, obj)
             return count
 

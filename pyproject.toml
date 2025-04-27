@@ -46,7 +46,7 @@ dependencies = [
     "python-socketio>=5.12.0",
     "redis[hiredis]>=5.2.0",
     "rtoml>=0.12.0",
-    "sqlalchemy-crud-plus==1.6.0",
+    "sqlalchemy-crud-plus>=1.8.0",
     "sqlalchemy[asyncio]>=2.0.40",
     "user-agents==2.2.0",
 ]

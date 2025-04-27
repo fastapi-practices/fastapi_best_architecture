@@ -16,8 +16,6 @@ from backend.utils.import_parse import dynamic_import_data_model
 if TYPE_CHECKING:
     from backend.app.admin.model import DataRule
 
-    pass
-
 
 class RequestPermission:
     """
@@ -65,11 +63,13 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
     # 获取用户角色和数据范围
     data_scopes = []
     for role in request.user.roles:
-        data_scopes.extend(role.scopes)
+        for scope in role.scopes:
+            if scope.status:
+                data_scopes.append(scope)
 
     # 超级管理员和无规则用户不做过滤
-    if request.user.is_superuser or not data_scopes:
-        return or_(1 == 1)
+    # if request.user.is_superuser or not data_scopes:
+    #     return or_(1 == 1)
 
     # 获取数据范围规则
     data_rule_list: list[DataRule] = []
@@ -80,7 +80,7 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
     where_and_list = []
     where_or_list = []
 
-    for data_rule in list(dict.fromkeys(data_rule_list)):
+    for data_rule in data_rule_list:
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
@@ -99,31 +99,33 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
         column_obj = getattr(model_ins, column)
         rule_expression = data_rule.expression
         condition = None
-        if rule_expression == RoleDataRuleExpressionType.eq:
-            condition = column_obj == data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.ne:
-            condition = column_obj != data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.gt:
-            condition = column_obj > data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.ge:
-            condition = column_obj >= data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.lt:
-            condition = column_obj < data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.le:
-            condition = column_obj <= data_rule.value
-        elif rule_expression == RoleDataRuleExpressionType.in_:
-            values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
-            condition = column_obj.in_(values)
-        elif data_rule.expression == RoleDataRuleExpressionType.not_in:
-            values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
-            condition = ~column_obj.in_(values)
+        match rule_expression:
+            case RoleDataRuleExpressionType.eq:
+                condition = column_obj == data_rule.value
+            case RoleDataRuleExpressionType.ne:
+                condition = column_obj != data_rule.value
+            case RoleDataRuleExpressionType.gt:
+                condition = column_obj > data_rule.value
+            case RoleDataRuleExpressionType.ge:
+                condition = column_obj >= data_rule.value
+            case RoleDataRuleExpressionType.lt:
+                condition = column_obj < data_rule.value
+            case RoleDataRuleExpressionType.le:
+                condition = column_obj <= data_rule.value
+            case RoleDataRuleExpressionType.in_:
+                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                condition = column_obj.in_(values)
+            case RoleDataRuleExpressionType.not_in:
+                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                condition = column_obj.not_in(values)
 
         # 根据运算符添加到对应列表
         if condition is not None:
-            if data_rule.operator == RoleDataRuleOperatorType.AND:
-                where_and_list.append(condition)
-            elif data_rule.operator == RoleDataRuleOperatorType.OR:
-                where_or_list.append(condition)
+            match data_rule.operator:
+                case RoleDataRuleOperatorType.AND:
+                    where_and_list.append(condition)
+                case RoleDataRuleOperatorType.OR:
+                    where_or_list.append(condition)
 
     # 组合所有条件
     where_list = []

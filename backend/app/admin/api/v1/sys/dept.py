@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptDetail, UpdateDeptParam
 from backend.app.admin.service.dept_service import dept_service
@@ -22,12 +22,13 @@ async def get_dept(pk: Annotated[int, Path(description='部门 ID')]) -> Respons
 
 @router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
 async def get_all_depts(
+    request: Request,
     name: Annotated[str | None, Query(description='部门名称')] = None,
     leader: Annotated[str | None, Query(description='部门负责人')] = None,
     phone: Annotated[str | None, Query(description='联系电话')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
-    dept = await dept_service.get_dept_tree(name=name, leader=leader, phone=phone, status=status)
+    dept = await dept_service.get_dept_tree(request=request, name=name, leader=leader, phone=phone, status=status)
     return response_base.success(data=dept)
 
 

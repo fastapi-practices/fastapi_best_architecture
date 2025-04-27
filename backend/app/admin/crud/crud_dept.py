@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from fastapi import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -9,6 +10,7 @@ from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
+from backend.common.security.permission import filter_data_permission
 
 
 class CRUDDept(CRUDPlus[Dept]):
@@ -35,11 +37,18 @@ class CRUDDept(CRUDPlus[Dept]):
         return await self.select_model_by_column(db, name=name, del_flag=0)
 
     async def get_all(
-        self, db: AsyncSession, name: str | None, leader: str | None, phone: str | None, status: int | None
+        self,
+        request: Request,
+        db: AsyncSession,
+        name: str | None,
+        leader: str | None,
+        phone: str | None,
+        status: int | None,
     ) -> Sequence[Dept]:
         """
         获取所有部门
 
+        :param request: FastAPI 请求对象
         :param db: 数据库会话
         :param name: 部门名称
         :param leader: 负责人
@@ -56,7 +65,7 @@ class CRUDDept(CRUDPlus[Dept]):
             filters.update(phone__startswith=phone)
         if status is not None:
             filters.update(status=status)
-        return await self.select_models_order(db, sort_columns='sort', **filters)
+        return await self.select_models_order(db, 'sort', None, await filter_data_permission(db, request), **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
         """
