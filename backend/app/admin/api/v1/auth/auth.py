@@ -34,6 +34,12 @@ async def user_login(
     data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)
 
+@router.post('/login', summary='LDAP登录', description='使用LDAP账号和密码登录系统，无需验证码')
+async def ldap_login(
+    request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+) -> ResponseSchemaModel[GetLoginToken]:
+    data = await auth_service.ldap_login(request=request, response=response, obj=obj, background_tasks=background_tasks)
+    return response_base.success(data=data)
 
 @router.post('/token/new', summary='创建新 token')
 async def create_new_token(request: Request) -> ResponseSchemaModel[GetNewToken]:
