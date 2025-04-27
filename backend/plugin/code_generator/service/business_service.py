@@ -41,7 +41,7 @@ class GenBusinessService:
         :return:
         """
         async with async_db_session.begin() as db:
-            business = await gen_business_dao.get_by_name(db, obj.table_name_en)
+            business = await gen_business_dao.get_by_name(db, obj.table_name)
             if business:
                 raise errors.ForbiddenError(msg='代码生成业务已存在')
             await gen_business_dao.create(db, obj)

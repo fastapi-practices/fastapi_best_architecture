@@ -4,75 +4,75 @@ from typing import Sequence
 
 from sqlalchemy import Select
 
-from backend.app.{{ app_name }}.crud.crud_{{ table_name_en }} import {{ table_name_en }}_dao
-from backend.app.{{ app_name }}.model import {{ table_name_class }}
-from backend.app.{{ app_name }}.schema.{{ table_name_en }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.crud.crud_{{ table_name }} import {{ table_name }}_dao
+from backend.app.{{ app_name }}.model import {{ class_name }}
+from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
 from backend.database.db import async_db_session
 
 
-class {{ table_name_class }}Service:
+class {{ class_name }}Service:
     @staticmethod
-    async def get(*, pk: int) -> {{ table_name_class }}:
+    async def get(*, pk: int) -> {{ class_name }}:
         """
-        获取{{ table_simple_name_zh }}
+        获取{{ doc_comment }}
 
-        :param pk: {{ table_simple_name_zh }} ID
+        :param pk: {{ doc_comment }} ID
         :return:
         """
         async with async_db_session() as db:
-            {{ table_name_en }} = await {{ table_name_en }}_dao.get(db, pk)
-            if not {{ table_name_en }}:
-                raise errors.NotFoundError(msg='{{ table_simple_name_zh }}不存在')
-            return {{ table_name_en }}
+            {{ table_name }} = await {{ table_name }}_dao.get(db, pk)
+            if not {{ table_name }}:
+                raise errors.NotFoundError(msg='{{ doc_comment }}不存在')
+            return {{ table_name }}
 
     @staticmethod
     async def get_select() -> Select:
-        """获取{{ table_simple_name_zh }}查询对象"""
-        return await {{ table_name_en }}_dao.get_list()
+        """获取{{ doc_comment }}查询对象"""
+        return await {{ table_name }}_dao.get_list()
 
     @staticmethod
-    async def get_all() -> Sequence[{{ table_name_class }}]:
-        """获取所有{{ table_simple_name_zh }}"""
+    async def get_all() -> Sequence[{{ class_name }}]:
+        """获取所有{{ doc_comment }}"""
         async with async_db_session() as db:
-            {{ table_name_en }}s = await {{ table_name_en }}_dao.get_all(db)
-            return {{ table_name_en }}s
+            {{ table_name }}s = await {{ table_name }}_dao.get_all(db)
+            return {{ table_name }}s
 
     @staticmethod
     async def create(*, obj: Create{{ schema_name }}Param) -> None:
         """
-        创建{{ table_simple_name_zh }}
+        创建{{ doc_comment }}
 
-        :param obj: 创建{{ table_simple_name_zh }}参数
+        :param obj: 创建{{ doc_comment }}参数
         :return:
         """
         async with async_db_session.begin() as db:
-            await {{ table_name_en }}_dao.create(db, obj)
+            await {{ table_name }}_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: Update{{ schema_name }}Param) -> int:
         """
-        更新{{ table_simple_name_zh }}
+        更新{{ doc_comment }}
 
-        :param pk: {{ table_simple_name_zh }} ID
-        :param obj: 更新{{ table_simple_name_zh }}参数
+        :param pk: {{ doc_comment }} ID
+        :param obj: 更新{{ doc_comment }}参数
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await {{ table_name_en }}_dao.update(db, pk, obj)
+            count = await {{ table_name }}_dao.update(db, pk, obj)
             return count
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         """
-        删除{{ table_simple_name_zh }}
+        删除{{ doc_comment }}
 
-        :param pk: {{ table_simple_name_zh }} ID 列表
+        :param pk: {{ doc_comment }} ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await {{ table_name_en }}_dao.delete(db, pk)
+            count = await {{ table_name }}_dao.delete(db, pk)
             return count
 
 
-{{ table_name_en }}_service: {{ table_name_class }}Service = {{ table_name_class }}Service()
+{{ instance_name }}_service: {{ class_name }}Service = {{ class_name }}Service()
