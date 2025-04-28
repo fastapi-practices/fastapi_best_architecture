@@ -311,7 +311,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = select(self.model).options(
             selectinload(self.model.dept),
-            selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.rules)),
+            selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.scopes)),
         )
 
         filters = []

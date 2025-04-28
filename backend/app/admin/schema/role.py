@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.schema.data_rule import GetDataRuleDetail
+from backend.app.admin.schema.data_scope import GetDataScopeDetail
 from backend.app.admin.schema.menu import GetMenuDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
@@ -32,10 +32,10 @@ class UpdateRoleMenuParam(SchemaBase):
     menus: list[int] = Field(description='菜单 ID 列表')
 
 
-class UpdateRoleRuleParam(SchemaBase):
-    """更新角色规则参数"""
+class UpdateRoleScopeParam(SchemaBase):
+    """更新角色数据范围参数"""
 
-    rules: list[int] = Field(description='数据规则 ID 列表')
+    scopes: list[int] = Field(description='数据范围 ID 列表')
 
 
 class GetRoleDetail(RoleSchemaBase):
@@ -52,4 +52,4 @@ class GetRoleWithRelationDetail(GetRoleDetail):
     """角色关联详情"""
 
     menus: list[GetMenuDetail | None] = Field([], description='菜单详情列表')
-    rules: list[GetDataRuleDetail | None] = Field([], description='数据规则详情列表')
+    scopes: list[GetDataScopeDetail | None] = Field([], description='数据范围列表')

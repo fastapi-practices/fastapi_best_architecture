@@ -4,7 +4,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleDetail, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import (
+    CreateDataRuleParam,
+    GetDataRuleColumnDetail,
+    GetDataRuleDetail,
+    UpdateDataRuleParam,
+)
 from backend.app.admin.service.data_rule_service import data_rule_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -25,7 +30,7 @@ async def get_data_rule_models() -> ResponseSchemaModel[list[str]]:
 @router.get('/model/{model}/columns', summary='获取数据规则可用模型列', dependencies=[DependsJwtAuth])
 async def get_data_rule_model_columns(
     model: Annotated[str, Path(description='模型名称')],
-) -> ResponseSchemaModel[list[str]]:
+) -> ResponseSchemaModel[list[GetDataRuleColumnDetail]]:
     models = await data_rule_service.get_columns(model=model)
     return response_base.success(data=models)
 

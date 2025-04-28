@@ -10,10 +10,8 @@ from backend.app.admin.schema.role import (
     GetRoleWithRelationDetail,
     UpdateRoleMenuParam,
     UpdateRoleParam,
-    UpdateRoleRuleParam,
+    UpdateRoleScopeParam,
 )
-from backend.app.admin.service.data_rule_service import data_rule_service
-from backend.app.admin.service.menu_service import menu_service
 from backend.app.admin.service.role_service import role_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -35,7 +33,7 @@ async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
 async def get_user_all_roles(
     pk: Annotated[int, Path(description='用户 ID')],
 ) -> ResponseSchemaModel[list[GetRoleDetail]]:
-    data = await role_service.get_by_user(pk=pk)
+    data = await role_service.get_users(pk=pk)
     return response_base.success(data=data)
 
 
@@ -43,13 +41,13 @@ async def get_user_all_roles(
 async def get_role_all_menus(
     pk: Annotated[int, Path(description='角色 ID')],
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
-    menu = await menu_service.get_role_menu_tree(pk=pk)
+    menu = await role_service.get_menu_tree(pk=pk)
     return response_base.success(data=menu)
 
 
-@router.get('/{pk}/rules', summary='获取角色所有数据规则', dependencies=[DependsJwtAuth])
-async def get_role_all_rules(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
-    rule = await data_rule_service.get_role_rules(pk=pk)
+@router.get('/{pk}/scopes', summary='获取角色所有数据范围', dependencies=[DependsJwtAuth])
+async def get_role_all_scopes(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
+    rule = await role_service.get_scopes(pk=pk)
     return response_base.success(data=rule)
 
 
@@ -125,17 +123,17 @@ async def update_role_menus(
 
 
 @router.put(
-    '/{pk}/rule',
-    summary='更新角色数据规则',
+    '/{pk}/scope',
+    summary='更新角色数据范围',
     dependencies=[
-        Depends(RequestPermission('sys:role:rule:edit')),
+        Depends(RequestPermission('sys:role:scope:edit')),
         DependsRBAC,
     ],
 )
-async def update_role_rules(
-    pk: Annotated[int, Path(description='角色 ID')], rule_ids: UpdateRoleRuleParam
+async def update_role_scopes(
+    pk: Annotated[int, Path(description='角色 ID')], scope_ids: UpdateRoleScopeParam
 ) -> ResponseModel:
-    count = await role_service.update_role_rule(pk=pk, rule_ids=rule_ids)
+    count = await role_service.update_role_scope(pk=pk, scope_ids=scope_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()

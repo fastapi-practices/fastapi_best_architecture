@@ -7,12 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import DataRule, Menu, Role, User
+from backend.app.admin.model import DataScope, Menu, Role, User
 from backend.app.admin.schema.role import (
     CreateRoleParam,
     UpdateRoleMenuParam,
     UpdateRoleParam,
-    UpdateRoleRuleParam,
+    UpdateRoleScopeParam,
 )
 
 
@@ -39,7 +39,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.menus), selectinload(self.model.rules))
+            .options(selectinload(self.model.menus), selectinload(self.model.scopes))
             .where(self.model.id == role_id)
         )
         role = await db.execute(stmt)
@@ -54,7 +54,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_by_user(self, db: AsyncSession, user_id: int) -> Sequence[Role]:
+    async def get_users(self, db: AsyncSession, user_id: int) -> Sequence[Role]:
         """
         获取用户角色列表
 
@@ -76,7 +76,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         stmt = (
             select(self.model)
-            .options(noload(self.model.users), noload(self.model.menus), noload(self.model.rules))
+            .options(noload(self.model.users), noload(self.model.menus), noload(self.model.scopes))
             .order_by(desc(self.model.created_time))
         )
 
@@ -137,20 +137,20 @@ class CRUDRole(CRUDPlus[Role]):
         current_role.menus = menus.scalars().all()
         return len(current_role.menus)
 
-    async def update_rules(self, db: AsyncSession, role_id: int, rule_ids: UpdateRoleRuleParam) -> int:
+    async def update_scopes(self, db: AsyncSession, role_id: int, scope_ids: UpdateRoleScopeParam) -> int:
         """
-        更新角色数据规则
+        更新角色数据范围
 
         :param db: 数据库会话
         :param role_id: 角色 ID
-        :param rule_ids: 权限规则 ID 列表
+        :param scope_ids: 权限范围 ID 列表
         :return:
         """
         current_role = await self.get_with_relation(db, role_id)
-        stmt = select(DataRule).where(DataRule.id.in_(rule_ids.rules))
-        rules = await db.execute(stmt)
-        current_role.rules = rules.scalars().all()
-        return len(current_role.rules)
+        stmt = select(DataScope).where(DataScope.id.in_(scope_ids.scopes))
+        scopes = await db.execute(stmt)
+        current_role.scopes = scopes.scalars().all()
+        return len(current_role.scopes)
 
     async def delete(self, db: AsyncSession, role_id: list[int]) -> int:
         """

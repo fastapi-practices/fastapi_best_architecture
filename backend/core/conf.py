@@ -89,11 +89,12 @@ class Settings(BaseSettings):
 
     # 数据权限配置
     DATA_PERMISSION_MODELS: dict[str, str] = {  # 允许进行数据过滤的 SQLA 模型，它必须以模块字符串的方式定义
-        'Api': 'backend.plugin.casbin.model.Api',
+        '部门': 'backend.app.admin.model.Dept',
     }
     DATA_PERMISSION_COLUMN_EXCLUDE: list[str] = [  # 排除允许进行数据过滤的 SQLA 模型列
         'id',
         'sort',
+        'del_flag',
         'created_time',
         'updated_time',
     ]

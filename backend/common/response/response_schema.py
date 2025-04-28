@@ -40,7 +40,7 @@ class ResponseModel(BaseModel):
 
 class ResponseSchemaModel(ResponseModel, Generic[SchemaT]):
     """
-    包含返回数据 schema 的通用型统一返回模型，仅适用于非分页接口
+    包含返回数据 schema 的通用型统一返回模型
 
     示例::
 

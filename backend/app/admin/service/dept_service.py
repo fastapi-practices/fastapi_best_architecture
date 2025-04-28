@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
+from fastapi import Request
+
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
@@ -31,11 +33,12 @@ class DeptService:
 
     @staticmethod
     async def get_dept_tree(
-        *, name: str | None, leader: str | None, phone: str | None, status: int | None
+        *, request: Request, name: str | None, leader: str | None, phone: str | None, status: int | None
     ) -> list[dict[str, Any]]:
         """
         获取部门树形结构
 
+        :param request: FastAPI 请求对象
         :param name: 部门名称
         :param leader: 部门负责人
         :param phone: 联系电话
@@ -43,7 +46,7 @@ class DeptService:
         :return:
         """
         async with async_db_session() as db:
-            dept_select = await dept_dao.get_all(db=db, name=name, leader=leader, phone=phone, status=status)
+            dept_select = await dept_dao.get_all(request, db, name, leader, phone, status)
             tree_data = get_tree_data(dept_select)
             return tree_data
 
