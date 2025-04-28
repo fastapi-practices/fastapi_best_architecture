@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.app.admin.model import DataRule
+from backend.app.admin.schema.data_rule import GetDataRuleDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
@@ -43,4 +43,4 @@ class GetDataScopeDetail(DataScopeBase):
 class GetDataScopeWithRelationDetail(GetDataScopeDetail):
     """数据范围关联详情"""
 
-    rules: list[DataRule] = Field([], description='数据规则列表')
+    rules: list[GetDataRuleDetail] = Field([], description='数据规则列表')
