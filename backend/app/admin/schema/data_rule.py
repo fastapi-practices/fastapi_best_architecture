@@ -35,3 +35,10 @@ class GetDataRuleDetail(DataRuleSchemaBase):
     id: int = Field(description='规则 ID')
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')
+
+
+class GetDataRuleColumnDetail(SchemaBase):
+    """数据规则可用模型字段详情"""
+
+    key: str = Field(description='字段名')
+    comment: str = Field(description='字段评论')

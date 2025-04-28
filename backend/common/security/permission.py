@@ -68,8 +68,8 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
                 data_scopes.append(scope)
 
     # 超级管理员和无规则用户不做过滤
-    # if request.user.is_superuser or not data_scopes:
-    #     return or_(1 == 1)
+    if request.user.is_superuser or not data_scopes:
+        return or_(1 == 1)
 
     # 获取数据范围规则
     data_rule_list: list[DataRule] = []
@@ -77,10 +77,18 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
         data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope.id)
         data_rule_list.extend(data_scope_with_relation.rules)
 
+    # 去重
+    seen_data_rule_ids = set()
+    new_data_rule_list = []
+    for rule in data_rule_list:
+        if rule.id not in seen_data_rule_ids:
+            seen_data_rule_ids.add(rule.id)
+            new_data_rule_list.append(rule)
+
     where_and_list = []
     where_or_list = []
 
-    for data_rule in data_rule_list:
+    for data_rule in new_data_rule_list:
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:

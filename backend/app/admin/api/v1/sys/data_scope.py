@@ -91,6 +91,7 @@ async def update_data_scope(
     summary='更新数据范围规则',
     dependencies=[
         Depends(RequestPermission('data:scope:rule:edit')),
+        DependsRBAC,
     ],
 )
 async def update_data_scope_rules(

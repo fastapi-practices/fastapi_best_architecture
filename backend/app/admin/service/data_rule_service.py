@@ -6,7 +6,7 @@ from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_data_rule import data_rule_dao
 from backend.app.admin.model import DataRule
-from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleColumnDetail, UpdateDataRuleParam
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -36,7 +36,7 @@ class DataRuleService:
         return list(settings.DATA_PERMISSION_MODELS.keys())
 
     @staticmethod
-    async def get_columns(model: str) -> list[dict[str, str]]:
+    async def get_columns(model: str) -> list[GetDataRuleColumnDetail]:
         """
         获取数据规则可用模型的字段列表
 
@@ -48,7 +48,7 @@ class DataRuleService:
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[model])
 
         model_columns = [
-            {column.key: column.comment}
+            GetDataRuleColumnDetail(key=column.key, comment=column.comment)
             for column in model_ins.__table__.columns
             if column.key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
