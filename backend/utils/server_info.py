@@ -7,7 +7,6 @@ import sys
 
 from datetime import datetime, timedelta
 from datetime import timezone as tz
-from typing import Dict, List
 
 import psutil
 
@@ -103,7 +102,7 @@ class ServerInfo:
         }
 
     @staticmethod
-    def get_sys_info() -> Dict[str, str]:
+    def get_sys_info() -> dict[str, str]:
         """获取服务器信息"""
         hostname = socket.gethostname()
         ip = '127.0.0.1'
@@ -124,7 +123,7 @@ class ServerInfo:
         }
 
     @staticmethod
-    def get_disk_info() -> List[Dict[str, str]]:
+    def get_disk_info() -> list[dict[str, str]]:
         """获取磁盘信息"""
         disk_info = []
         for partition in psutil.disk_partitions(all=False):
