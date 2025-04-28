@@ -3,20 +3,20 @@ create table gen_business
     id                      int auto_increment comment '主键 ID'
         primary key,
     app_name                varchar(50)  not null comment '应用名称（英文）',
-    table_name_en           varchar(255) not null comment '表名称（英文）',
-    table_name_zh           varchar(255) not null comment '表名称（中文）',
-    table_simple_name_zh    varchar(255) not null comment '表名称（中文简称）',
+    table_name              varchar(255) not null comment '表名称（英文）',
+    doc_comment             varchar(255) not null comment '文档注释（用于函数/参数文档）',
     table_comment           varchar(255) null comment '表描述',
-    schema_name             varchar(255) null comment 'Schema 名称 (默认为英文表名称)',
-    filename                varchar(20)  null comment '基础文件名（默认为英文表名称）',
+    class_name              varchar(50)  null comment '基础类名（默认为英文表名称）',
+    schema_name             varchar(50)  null comment 'Schema 名称 (默认为英文表名称)',
+    filename                varchar(50)  null comment '基础文件名（默认为英文表名称）',
     default_datetime_column tinyint(1)   not null comment '是否存在默认时间列',
     api_version             varchar(20)  not null comment '代码生成 api 版本，默认为 v1',
     gen_path                varchar(255) null comment '代码生成路径（默认为 app 根路径）',
     remark                  longtext     null comment '备注',
     created_time            datetime     not null comment '创建时间',
     updated_time            datetime     null comment '更新时间',
-    constraint table_name_en
-        unique (table_name_en)
+    constraint table_name
+        unique (table_name)
 )
     comment '代码生成业务表';
 
@@ -49,41 +49,6 @@ create index gen_business_id
 create index ix_gen_column_id
     on gen_column (id);
 
-create table sys_api
-(
-    id           int auto_increment comment '主键 ID'
-        primary key,
-    name         varchar(50)  not null comment 'API 名称',
-    method       varchar(16)  not null comment '请求方法',
-    path         varchar(500) not null comment 'API 路径',
-    remark       longtext     null comment '备注',
-    created_time datetime     not null comment '创建时间',
-    updated_time datetime     null comment '更新时间',
-    constraint name
-        unique (name)
-)
-    comment 'API 表';
-
-create index ix_sys_api_id
-    on sys_api (id);
-
-create table sys_casbin_rule
-(
-    id    int auto_increment comment '主键 ID'
-        primary key,
-    ptype varchar(255) not null comment '策略类型: p / g',
-    v0    varchar(255) not null comment '用户 UUID / 角色 ID',
-    v1    longtext     not null comment 'API 路径 / 角色名称',
-    v2    varchar(255) null comment '请求方法',
-    v3    varchar(255) null comment '预留字段',
-    v4    varchar(255) null comment '预留字段',
-    v5    varchar(255) null comment '预留字段'
-)
-    comment 'Casbin 规则表';
-
-create index ix_sys_casbin_rule_id
-    on sys_casbin_rule (id);
-
 create table sys_config
 (
     id           int auto_increment comment '主键 ID'
@@ -104,25 +69,48 @@ create table sys_config
 create index ix_sys_config_id
     on sys_config (id);
 
+create table sys_data_scope
+(
+    id           int auto_increment comment '主键 ID'
+        primary key,
+    name         varchar(50) not null comment '名称',
+    status       int         not null comment '状态（0停用 1正常）',
+    created_time datetime    not null comment '创建时间',
+    updated_time datetime    null comment '更新时间',
+    constraint name
+        unique (name)
+)
+    comment '数据范围表';
+
 create table sys_data_rule
 (
     id           int auto_increment comment '主键 ID'
         primary key,
-    name         varchar(255) not null comment '规则名称',
-    model        varchar(50)  not null comment 'SQLA 模型类',
-    `column`     varchar(20)  not null comment '数据库字段',
+    name         varchar(500) not null comment '名称',
+    model        varchar(50)  not null comment 'SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名',
+    `column`     varchar(20)  not null comment '模型字段名',
     operator     int          not null comment '运算符（0：and、1：or）',
     expression   int          not null comment '表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）',
     value        varchar(255) not null comment '规则值',
+    scope_id     int          null comment '数据范围关联 ID',
     created_time datetime     not null comment '创建时间',
     updated_time datetime     null comment '更新时间',
     constraint name
-        unique (name)
+        unique (name),
+    constraint sys_data_rule_ibfk_1
+        foreign key (scope_id) references sys_data_scope (id)
+            on delete set null
 )
     comment '数据规则表';
 
 create index ix_sys_data_rule_id
     on sys_data_rule (id);
+
+create index scope_id
+    on sys_data_rule (scope_id);
+
+create index ix_sys_data_scope_id
+    on sys_data_scope (id);
 
 create table sys_dept
 (
@@ -315,27 +303,27 @@ create table sys_role
 create index ix_sys_role_id
     on sys_role (id);
 
-create table sys_role_data_rule
+create table sys_role_data_scope
 (
-    id           int auto_increment comment '主键ID',
-    role_id      int not null comment '角色ID',
-    data_rule_id int not null comment '数据规则ID',
-    primary key (id, role_id, data_rule_id),
-    constraint ix_sys_role_data_rule_id
+    id            int auto_increment comment '主键 ID',
+    role_id       int not null comment '角色 ID',
+    data_scope_id int not null comment '数据范围 ID',
+    primary key (id, role_id, data_scope_id),
+    constraint ix_sys_role_data_scope_id
         unique (id),
-    constraint sys_role_data_rule_ibfk_1
+    constraint sys_role_data_scope_ibfk_1
         foreign key (role_id) references sys_role (id)
             on delete cascade,
-    constraint sys_role_data_rule_ibfk_2
-        foreign key (data_rule_id) references sys_data_rule (id)
+    constraint sys_role_data_scope_ibfk_2
+        foreign key (data_scope_id) references sys_data_scope (id)
             on delete cascade
 );
 
-create index data_rule_id
-    on sys_role_data_rule (data_rule_id);
+create index data_scope_id
+    on sys_role_data_scope (data_scope_id);
 
 create index role_id
-    on sys_role_data_rule (role_id);
+    on sys_role_data_scope (role_id);
 
 create table sys_role_menu
 (

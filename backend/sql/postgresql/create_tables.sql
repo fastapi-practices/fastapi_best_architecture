@@ -1,43 +1,28 @@
-create table sys_data_rule
+create table sys_data_scope
 (
     id           serial
         primary key,
-    name         varchar(255)             not null
+    name         varchar(50)              not null
         unique,
-    model        varchar(50)              not null,
-    "column"     varchar(20)              not null,
-    operator     integer                  not null,
-    expression   integer                  not null,
-    value        varchar(255)             not null,
+    status       integer                  not null,
     created_time timestamp with time zone not null,
     updated_time timestamp with time zone
 );
 
-comment on table sys_data_rule is '数据规则表';
+comment on table sys_data_scope is '数据范围表';
 
-comment on column sys_data_rule.id is '主键 ID';
+comment on column sys_data_scope.id is '主键 ID';
 
-comment on column sys_data_rule.name is '规则名称';
+comment on column sys_data_scope.name is '名称';
 
-comment on column sys_data_rule.model is 'SQLA 模型类';
+comment on column sys_data_scope.status is '状态（0停用 1正常）';
 
-comment on column sys_data_rule."column" is '数据库字段';
+comment on column sys_data_scope.created_time is '创建时间';
 
-comment on column sys_data_rule.operator is '运算符（0：and、1：or）';
+comment on column sys_data_scope.updated_time is '更新时间';
 
-comment on column sys_data_rule.expression is '表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）';
-
-comment on column sys_data_rule.value is '规则值';
-
-comment on column sys_data_rule.created_time is '创建时间';
-
-comment on column sys_data_rule.updated_time is '更新时间';
-
-alter table sys_data_rule
-    owner to postgres;
-
-create index ix_sys_data_rule_id
-    on sys_data_rule (id);
+create index ix_sys_data_scope_id
+    on sys_data_scope (id);
 
 create table sys_dept
 (
@@ -81,14 +66,11 @@ comment on column sys_dept.created_time is '创建时间';
 
 comment on column sys_dept.updated_time is '更新时间';
 
-alter table sys_dept
-    owner to postgres;
+create index ix_sys_dept_id
+    on sys_dept (id);
 
 create index ix_sys_dept_parent_id
     on sys_dept (parent_id);
-
-create index ix_sys_dept_id
-    on sys_dept (id);
 
 create table sys_login_log
 (
@@ -141,9 +123,6 @@ comment on column sys_login_log.msg is '提示消息';
 comment on column sys_login_log.login_time is '登录时间';
 
 comment on column sys_login_log.created_time is '创建时间';
-
-alter table sys_login_log
-    owner to postgres;
 
 create index ix_sys_login_log_id
     on sys_login_log (id);
@@ -207,9 +186,6 @@ comment on column sys_menu.parent_id is '父菜单ID';
 comment on column sys_menu.created_time is '创建时间';
 
 comment on column sys_menu.updated_time is '更新时间';
-
-alter table sys_menu
-    owner to postgres;
 
 create index ix_sys_menu_id
     on sys_menu (id);
@@ -287,9 +263,6 @@ comment on column sys_opera_log.opera_time is '操作时间';
 
 comment on column sys_opera_log.created_time is '创建时间';
 
-alter table sys_opera_log
-    owner to postgres;
-
 create index ix_sys_opera_log_id
     on sys_opera_log (id);
 
@@ -319,139 +292,8 @@ comment on column sys_role.created_time is '创建时间';
 
 comment on column sys_role.updated_time is '更新时间';
 
-alter table sys_role
-    owner to postgres;
-
 create index ix_sys_role_id
     on sys_role (id);
-
-create table sys_api
-(
-    id           serial
-        primary key,
-    name         varchar(50)              not null
-        unique,
-    method       varchar(16)              not null,
-    path         varchar(500)             not null,
-    remark       text,
-    created_time timestamp with time zone not null,
-    updated_time timestamp with time zone
-);
-
-comment on table sys_api is 'API 表';
-
-comment on column sys_api.id is '主键 ID';
-
-comment on column sys_api.name is 'API 名称';
-
-comment on column sys_api.method is '请求方法';
-
-comment on column sys_api.path is 'API 路径';
-
-comment on column sys_api.remark is '备注';
-
-comment on column sys_api.created_time is '创建时间';
-
-comment on column sys_api.updated_time is '更新时间';
-
-alter table sys_api
-    owner to postgres;
-
-create index ix_sys_api_id
-    on sys_api (id);
-
-create table sys_casbin_rule
-(
-    id    serial
-        primary key,
-    ptype varchar(255) not null,
-    v0    varchar(255) not null,
-    v1    text         not null,
-    v2    varchar(255),
-    v3    varchar(255),
-    v4    varchar(255),
-    v5    varchar(255)
-);
-
-comment on table sys_casbin_rule is 'Casbin 规则表';
-
-comment on column sys_casbin_rule.id is '主键 ID';
-
-comment on column sys_casbin_rule.ptype is '策略类型: p / g';
-
-comment on column sys_casbin_rule.v0 is '用户 UUID / 角色 ID';
-
-comment on column sys_casbin_rule.v1 is 'API 路径 / 角色名称';
-
-comment on column sys_casbin_rule.v2 is '请求方法';
-
-comment on column sys_casbin_rule.v3 is '预留字段';
-
-comment on column sys_casbin_rule.v4 is '预留字段';
-
-comment on column sys_casbin_rule.v5 is '预留字段';
-
-alter table sys_casbin_rule
-    owner to postgres;
-
-create index ix_sys_casbin_rule_id
-    on sys_casbin_rule (id);
-
-create table gen_business
-(
-    id                      serial
-        primary key,
-    app_name                varchar(50)              not null,
-    table_name_en           varchar(255)             not null
-        unique,
-    table_name_zh           varchar(255)             not null,
-    table_simple_name_zh    varchar(255)             not null,
-    table_comment           varchar(255),
-    schema_name             varchar(255),
-    filename                varchar(20),
-    default_datetime_column boolean                  not null,
-    api_version             varchar(20)              not null,
-    gen_path                varchar(255),
-    remark                  text,
-    created_time            timestamp with time zone not null,
-    updated_time            timestamp with time zone
-);
-
-comment on table gen_business is '代码生成业务表';
-
-comment on column gen_business.id is '主键 ID';
-
-comment on column gen_business.app_name is '应用名称（英文）';
-
-comment on column gen_business.table_name_en is '表名称（英文）';
-
-comment on column gen_business.table_name_zh is '表名称（中文）';
-
-comment on column gen_business.table_simple_name_zh is '表名称（中文简称）';
-
-comment on column gen_business.table_comment is '表描述';
-
-comment on column gen_business.schema_name is 'Schema 名称 (默认为英文表名称)';
-
-comment on column gen_business.filename is '基础文件名（默认为英文表名称）';
-
-comment on column gen_business.default_datetime_column is '是否存在默认时间列';
-
-comment on column gen_business.api_version is '代码生成 api 版本，默认为 v1';
-
-comment on column gen_business.gen_path is '代码生成路径（默认为 app 根路径）';
-
-comment on column gen_business.remark is '备注';
-
-comment on column gen_business.created_time is '创建时间';
-
-comment on column gen_business.updated_time is '更新时间';
-
-alter table gen_business
-    owner to postgres;
-
-create index ix_gen_business_id
-    on gen_business (id);
 
 create table sys_config
 (
@@ -488,9 +330,6 @@ comment on column sys_config.created_time is '创建时间';
 
 comment on column sys_config.updated_time is '更新时间';
 
-alter table sys_config
-    owner to postgres;
-
 create index ix_sys_config_id
     on sys_config (id);
 
@@ -522,9 +361,6 @@ comment on column sys_dict_type.remark is '备注';
 comment on column sys_dict_type.created_time is '创建时间';
 
 comment on column sys_dict_type.updated_time is '更新时间';
-
-alter table sys_dict_type
-    owner to postgres;
 
 create index ix_sys_dict_type_id
     on sys_dict_type (id);
@@ -563,11 +399,104 @@ comment on column sys_notice.created_time is '创建时间';
 
 comment on column sys_notice.updated_time is '更新时间';
 
-alter table sys_notice
-    owner to postgres;
-
 create index ix_sys_notice_id
     on sys_notice (id);
+
+create table gen_business
+(
+    id                      serial
+        primary key,
+    app_name                varchar(50)              not null,
+    table_name              varchar(255)             not null
+        unique,
+    doc_comment             varchar(255)             not null,
+    table_comment           varchar(255),
+    class_name              varchar(50),
+    schema_name             varchar(50),
+    filename                varchar(50),
+    default_datetime_column boolean                  not null,
+    api_version             varchar(20)              not null,
+    gen_path                varchar(255),
+    remark                  text,
+    created_time            timestamp with time zone not null,
+    updated_time            timestamp with time zone
+);
+
+comment on table gen_business is '代码生成业务表';
+
+comment on column gen_business.id is '主键 ID';
+
+comment on column gen_business.app_name is '应用名称（英文）';
+
+comment on column gen_business.table_name is '表名称（英文）';
+
+comment on column gen_business.doc_comment is '文档注释（用于函数/参数文档）';
+
+comment on column gen_business.table_comment is '表描述';
+
+comment on column gen_business.class_name is '基础类名（默认为英文表名称）';
+
+comment on column gen_business.schema_name is 'Schema 名称 (默认为英文表名称)';
+
+comment on column gen_business.filename is '基础文件名（默认为英文表名称）';
+
+comment on column gen_business.default_datetime_column is '是否存在默认时间列';
+
+comment on column gen_business.api_version is '代码生成 api 版本，默认为 v1';
+
+comment on column gen_business.gen_path is '代码生成路径（默认为 app 根路径）';
+
+comment on column gen_business.remark is '备注';
+
+comment on column gen_business.created_time is '创建时间';
+
+comment on column gen_business.updated_time is '更新时间';
+
+create index ix_gen_business_id
+    on gen_business (id);
+
+create table sys_data_rule
+(
+    id           serial
+        primary key,
+    name         varchar(500)             not null
+        unique,
+    model        varchar(50)              not null,
+    "column"     varchar(20)              not null,
+    operator     integer                  not null,
+    expression   integer                  not null,
+    value        varchar(255)             not null,
+    scope_id     integer
+                                          references sys_data_scope
+                                              on delete set null,
+    created_time timestamp with time zone not null,
+    updated_time timestamp with time zone
+);
+
+comment on table sys_data_rule is '数据规则表';
+
+comment on column sys_data_rule.id is '主键 ID';
+
+comment on column sys_data_rule.name is '名称';
+
+comment on column sys_data_rule.model is 'SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名';
+
+comment on column sys_data_rule."column" is '模型字段名';
+
+comment on column sys_data_rule.operator is '运算符（0：and、1：or）';
+
+comment on column sys_data_rule.expression is '表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）';
+
+comment on column sys_data_rule.value is '规则值';
+
+comment on column sys_data_rule.scope_id is '数据范围关联 ID';
+
+comment on column sys_data_rule.created_time is '创建时间';
+
+comment on column sys_data_rule.updated_time is '更新时间';
+
+create index ix_sys_data_rule_id
+    on sys_data_rule (id);
 
 create table sys_role_menu
 (
@@ -587,35 +516,29 @@ comment on column sys_role_menu.role_id is '角色ID';
 
 comment on column sys_role_menu.menu_id is '菜单ID';
 
-alter table sys_role_menu
-    owner to postgres;
-
 create unique index ix_sys_role_menu_id
     on sys_role_menu (id);
 
-create table sys_role_data_rule
+create table sys_role_data_scope
 (
-    id           serial,
-    role_id      integer not null
+    id            serial,
+    role_id       integer not null
         references sys_role
             on delete cascade,
-    data_rule_id integer not null
-        references sys_data_rule
+    data_scope_id integer not null
+        references sys_data_scope
             on delete cascade,
-    primary key (id, role_id, data_rule_id)
+    primary key (id, role_id, data_scope_id)
 );
 
-comment on column sys_role_data_rule.id is '主键ID';
+comment on column sys_role_data_scope.id is '主键 ID';
 
-comment on column sys_role_data_rule.role_id is '角色ID';
+comment on column sys_role_data_scope.role_id is '角色 ID';
 
-comment on column sys_role_data_rule.data_rule_id is '数据规则ID';
+comment on column sys_role_data_scope.data_scope_id is '数据范围 ID';
 
-alter table sys_role_data_rule
-    owner to postgres;
-
-create unique index ix_sys_role_data_rule_id
-    on sys_role_data_rule (id);
+create unique index ix_sys_role_data_scope_id
+    on sys_role_data_scope (id);
 
 create table sys_user
 (
@@ -680,20 +603,57 @@ comment on column sys_user.created_time is '创建时间';
 
 comment on column sys_user.updated_time is '更新时间';
 
-alter table sys_user
-    owner to postgres;
+create unique index ix_sys_user_email
+    on sys_user (email);
 
 create index ix_sys_user_id
     on sys_user (id);
-
-create unique index ix_sys_user_email
-    on sys_user (email);
 
 create unique index ix_sys_user_username
     on sys_user (username);
 
 create index ix_sys_user_status
     on sys_user (status);
+
+create table sys_dict_data
+(
+    id           serial
+        primary key,
+    label        varchar(32)              not null
+        unique,
+    value        varchar(32)              not null,
+    sort         integer                  not null,
+    status       integer                  not null,
+    remark       text,
+    type_id      integer                  not null
+        references sys_dict_type
+            on delete cascade,
+    created_time timestamp with time zone not null,
+    updated_time timestamp with time zone
+);
+
+comment on table sys_dict_data is '字典数据表';
+
+comment on column sys_dict_data.id is '主键 ID';
+
+comment on column sys_dict_data.label is '字典标签';
+
+comment on column sys_dict_data.value is '字典值';
+
+comment on column sys_dict_data.sort is '排序';
+
+comment on column sys_dict_data.status is '状态（0停用 1正常）';
+
+comment on column sys_dict_data.remark is '备注';
+
+comment on column sys_dict_data.type_id is '字典类型关联ID';
+
+comment on column sys_dict_data.created_time is '创建时间';
+
+comment on column sys_dict_data.updated_time is '更新时间';
+
+create index ix_sys_dict_data_id
+    on sys_dict_data (id);
 
 create table gen_column
 (
@@ -737,54 +697,8 @@ comment on column gen_column.is_nullable is '是否可为空';
 
 comment on column gen_column.gen_business_id is '代码生成业务ID';
 
-alter table gen_column
-    owner to postgres;
-
 create index ix_gen_column_id
     on gen_column (id);
-
-create table sys_dict_data
-(
-    id           serial
-        primary key,
-    label        varchar(32)              not null
-        unique,
-    value        varchar(32)              not null,
-    sort         integer                  not null,
-    status       integer                  not null,
-    remark       text,
-    type_id      integer                  not null
-        references sys_dict_type
-            on delete cascade,
-    created_time timestamp with time zone not null,
-    updated_time timestamp with time zone
-);
-
-comment on table sys_dict_data is '字典数据表';
-
-comment on column sys_dict_data.id is '主键 ID';
-
-comment on column sys_dict_data.label is '字典标签';
-
-comment on column sys_dict_data.value is '字典值';
-
-comment on column sys_dict_data.sort is '排序';
-
-comment on column sys_dict_data.status is '状态（0停用 1正常）';
-
-comment on column sys_dict_data.remark is '备注';
-
-comment on column sys_dict_data.type_id is '字典类型关联ID';
-
-comment on column sys_dict_data.created_time is '创建时间';
-
-comment on column sys_dict_data.updated_time is '更新时间';
-
-alter table sys_dict_data
-    owner to postgres;
-
-create index ix_sys_dict_data_id
-    on sys_dict_data (id);
 
 create table sys_user_role
 (
@@ -803,9 +717,6 @@ comment on column sys_user_role.id is '主键ID';
 comment on column sys_user_role.user_id is '用户ID';
 
 comment on column sys_user_role.role_id is '角色ID';
-
-alter table sys_user_role
-    owner to postgres;
 
 create unique index ix_sys_user_role_id
     on sys_user_role (id);
@@ -848,9 +759,6 @@ comment on column sys_user_social.user_id is '用户关联ID';
 comment on column sys_user_social.created_time is '创建时间';
 
 comment on column sys_user_social.updated_time is '更新时间';
-
-alter table sys_user_social
-    owner to postgres;
 
 create index ix_sys_user_social_id
     on sys_user_social (id);
