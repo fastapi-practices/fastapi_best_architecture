@@ -1,3 +1,20 @@
+<a id="v1.2.0"></a>
+# [v1.2.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.2.0) - 2025-05-01
+
+## What's Changed
+* Update changelog for v1.1.2 by [@wu-clan](https://github.com/wu-clan) in [#589](https://github.com/fastapi-practices/fastapi_best_architecture/pull/589)
+* Update code generator table columns by [@wu-clan](https://github.com/wu-clan) in [#590](https://github.com/fastapi-practices/fastapi_best_architecture/pull/590)
+* Update the default RBAC solution by [@wu-clan](https://github.com/wu-clan) in [#593](https://github.com/fastapi-practices/fastapi_best_architecture/pull/593)
+* Optimize the server information retrieval by [@wu-clan](https://github.com/wu-clan) in [#595](https://github.com/fastapi-practices/fastapi_best_architecture/pull/595)
+* Refactor the data rule to scope rule by [@wu-clan](https://github.com/wu-clan) in [#596](https://github.com/fastapi-practices/fastapi_best_architecture/pull/596)
+* Update the SQL script for creat tables by [@wu-clan](https://github.com/wu-clan) in [#597](https://github.com/fastapi-practices/fastapi_best_architecture/pull/597)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.2...v1.2.0
+
+[Changes][v1.2.0]
+
+
 <a id="v1.1.2"></a>
 # [v1.1.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.1.2) - 2025-04-23
 
@@ -477,6 +494,7 @@
 [Changes][v1.0.0]
 
 
+[v1.2.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.2...v1.2.0
 [v1.1.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.1...v1.1.2
 [v1.1.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
 [v1.1.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
