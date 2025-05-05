@@ -18,6 +18,13 @@ class AdminSettings(BaseSettings):
     OAUTH2_LINUX_DO_CLIENT_ID: str
     OAUTH2_LINUX_DO_CLIENT_SECRET: str
 
+    # LDAP
+    LDAP_SERVER: str 
+    LDAP_PORT: int 
+    LDAP_BASE_DN: str 
+    LDAP_BASE_DC: str 
+
+
     # OAuth2
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
