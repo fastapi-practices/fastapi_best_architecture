@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import socketio
 
-from backend.app.task.conf import task_settings
 from backend.common.log import log
 from backend.common.security.jwt import jwt_authentication
 from backend.core.conf import settings
@@ -13,13 +12,13 @@ sio = socketio.AsyncServer(
     # 集成 Celery 实现消息订阅
     client_manager=socketio.AsyncRedisManager(
         f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-        f'{settings.REDIS_PORT}/{task_settings.CELERY_BROKER_REDIS_DATABASE}'
+        f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
     )
-    if task_settings.CELERY_BROKER == 'redis'
+    if settings.CELERY_BROKER == 'redis'
     else socketio.AsyncAioPikaManager(
         (
-            f'amqp://{task_settings.RABBITMQ_USERNAME}:{task_settings.RABBITMQ_PASSWORD}@'
-            f'{task_settings.RABBITMQ_HOST}:{task_settings.RABBITMQ_PORT}'
+            f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{settings.CELERY_RABBITMQ_PASSWORD}@'
+            f'{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}'
         )
     ),
     async_mode='asgi',

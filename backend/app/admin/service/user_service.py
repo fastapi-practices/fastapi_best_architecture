@@ -191,7 +191,7 @@ class UserService:
         """
         async with async_db_session.begin() as db:
             if request.user.username != username:
-                raise errors.AuthorizationError
+                raise errors.AuthorizationError(msg='你只能修改自己的信息')
             user = await user_dao.get_by_username(db, username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')

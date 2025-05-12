@@ -3,6 +3,7 @@
 from functools import lru_cache
 from typing import Any, Literal
 
+from celery.schedules import crontab
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -184,13 +185,77 @@ class Settings(BaseSettings):
     PLUGIN_PIP_CHINA: bool = True
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
 
+    # App Admin
+    # .env OAuth2
+    OAUTH2_GITHUB_CLIENT_ID: str
+    OAUTH2_GITHUB_CLIENT_SECRET: str
+    OAUTH2_LINUX_DO_CLIENT_ID: str
+    OAUTH2_LINUX_DO_CLIENT_SECRET: str
+
+    # OAuth2
+    OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
+
+    # 验证码
+    CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
+    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
+
+    # App Task
+    # .env Redis 配置
+    CELERY_BROKER_REDIS_DATABASE: int
+    CELERY_BACKEND_REDIS_DATABASE: int
+
+    # .env RabbitMQ 配置
+    # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
+    CELERY_RABBITMQ_HOST: str
+    CELERY_RABBITMQ_PORT: int
+    CELERY_RABBITMQ_USERNAME: str
+    CELERY_RABBITMQ_PASSWORD: str
+
+    # 基础配置
+    CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
+    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
+    CELERY_BACKEND_REDIS_TIMEOUT: int = 5
+    CELERY_TASK_PACKAGES: list[str] = [
+        'app.task.celery_task',
+        'app.task.celery_task.db_log',
+    ]
+    CELERY_TASK_MAX_RETRIES: int = 5
+
+    # 定时任务配置
+    CELERY_SCHEDULE: dict[str, dict[str, Any]] = {
+        'exec-every-10-seconds': {
+            'task': 'task_demo_async',
+            'schedule': 10,
+        },
+        'exec-every-sunday': {
+            'task': 'delete_db_opera_log',
+            'schedule': crontab('0', '0', day_of_week='6'),
+        },
+        'exec-every-15-of-month': {
+            'task': 'delete_db_login_log',
+            'schedule': crontab('0', '0', day_of_month='15'),
+        },
+    }
+
+    # Plugin Code Generator
+    # 代码下载
+    CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'
+
+    # Plugin Config
+    # 参数配置
+    CONFIG_BUILT_IN_TYPES: list[str] = ['website', 'protocol', 'policy']
+
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:
-        """生产环境下禁用 OpenAPI 文档和静态文件服务"""
+        """检查环境变量"""
         if values.get('ENVIRONMENT') == 'pro':
+            # FastAPI
             values['FASTAPI_OPENAPI_URL'] = None
             values['FASTAPI_STATIC_FILES'] = False
+            # Task
+            values['CELERY_BROKER'] = 'rabbitmq'
+
         return values
 
 

@@ -5,14 +5,14 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
 from starlette.responses import RedirectResponse
 
-from backend.app.admin.conf import admin_settings
 from backend.app.admin.service.oauth2_service import oauth2_service
 from backend.common.enums import UserSocialType
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
+from backend.core.conf import settings
 
 router = APIRouter()
 
-_github_client = GitHubOAuth20(admin_settings.OAUTH2_GITHUB_CLIENT_ID, admin_settings.OAUTH2_GITHUB_CLIENT_SECRET)
+_github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_GITHUB_CLIENT_SECRET)
 _github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_login')
 
 
@@ -44,4 +44,4 @@ async def github_login(
         user=user,
         social=UserSocialType.github,
     )
-    return RedirectResponse(url=f'{admin_settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')
+    return RedirectResponse(url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')

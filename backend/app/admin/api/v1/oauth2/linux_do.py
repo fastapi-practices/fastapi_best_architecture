@@ -5,16 +5,16 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, LinuxDoOAuth20
 from starlette.responses import RedirectResponse
 
-from backend.app.admin.conf import admin_settings
 from backend.app.admin.service.oauth2_service import oauth2_service
 from backend.common.enums import UserSocialType
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
+from backend.core.conf import settings
 
 router = APIRouter()
 
 _linux_do_client = LinuxDoOAuth20(
-    admin_settings.OAUTH2_LINUX_DO_CLIENT_ID,
-    admin_settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
+    settings.OAUTH2_LINUX_DO_CLIENT_ID,
+    settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
 )
 _linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, redirect_route_name='linux_do_login')
 
@@ -47,4 +47,4 @@ async def linux_do_login(
         user=user,
         social=UserSocialType.linux_do,
     )
-    return RedirectResponse(url=f'{admin_settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')
+    return RedirectResponse(url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')
