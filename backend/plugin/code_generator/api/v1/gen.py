@@ -9,7 +9,7 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.conf import generator_settings
+from backend.core.conf import settings
 from backend.plugin.code_generator.schema.gen import ImportParam
 from backend.plugin.code_generator.service.gen_service import gen_service
 
@@ -69,5 +69,5 @@ async def download_code(pk: Annotated[int, Path(description='业务 ID')]):
     return StreamingResponse(
         bio,
         media_type='application/x-zip-compressed',
-        headers={'Content-Disposition': f'attachment; filename={generator_settings.DOWNLOAD_ZIP_FILENAME}.zip'},
+        headers={'Content-Disposition': f'attachment; filename={settings.CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME}.zip'},
     )

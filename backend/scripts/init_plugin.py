@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# ruff: noqa: I001
 from anyio import run
 
 from backend.plugin.tools import install_requirements_async

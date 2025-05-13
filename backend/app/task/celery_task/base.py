@@ -7,15 +7,15 @@ from typing import Any
 from celery import Task
 from sqlalchemy.exc import SQLAlchemyError
 
-from backend.app.task.conf import task_settings
 from backend.common.socketio.actions import task_notification
+from backend.core.conf import settings
 
 
 class TaskBase(Task):
     """Celery 任务基类"""
 
     autoretry_for = (SQLAlchemyError,)
-    max_retries = task_settings.CELERY_TASK_MAX_RETRIES
+    max_retries = settings.CELERY_TASK_MAX_RETRIES
 
     async def before_start(self, task_id: str, args, kwargs) -> None:
         """
