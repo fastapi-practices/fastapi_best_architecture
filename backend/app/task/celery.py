@@ -5,7 +5,6 @@ from typing import Any
 import celery
 import celery_aio_pool
 
-from backend.app.task.conf import task_settings
 from backend.core.conf import settings
 
 __all__ = ['celery_app']
@@ -16,11 +15,11 @@ def get_broker_url() -> str:
     if task_settings.CELERY_BROKER == 'redis':
         return (
             f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-            f'{settings.REDIS_PORT}/{task_settings.CELERY_BROKER_REDIS_DATABASE}'
+            f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
         )
     return (
-        f'amqp://{task_settings.RABBITMQ_USERNAME}:{task_settings.RABBITMQ_PASSWORD}@'
-        f'{task_settings.RABBITMQ_HOST}:{task_settings.RABBITMQ_PORT}'
+        f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{settings.CELERY_RABBITMQ_PASSWORD}@'
+        f'{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}'
     )
 
 
@@ -28,16 +27,16 @@ def get_result_backend() -> str:
     """GET RESULT BACKEND URL"""
     return (
         f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-        f'{settings.REDIS_PORT}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
+        f'{settings.REDIS_PORT}/{settings.CELERY_BACKEND_REDIS_DATABASE}'
     )
 
 
 def get_result_backend_transport_options() -> dict[str, Any]:
     """Access result backend transfer options"""
     return {
-        'global_keyprefix': task_settings.CELERY_BACKEND_REDIS_PREFIX,
+        'global_keyprefix': settings.CELERY_BACKEND_REDIS_PREFIX,
         'retry_policy': {
-            'timeout': task_settings.CELERY_BACKEND_REDIS_TIMEOUT,
+            'timeout': settings.CELERY_BACKEND_REDIS_TIMEOUT,
         },
     }
 
@@ -55,7 +54,7 @@ def init_celery() -> celery.Celery:
         'fba_celery',
         enable_utc=False,
         timezone=settings.DATETIME_TIMEZONE,
-        beat_schedule=task_settings.CELERY_SCHEDULE,
+        beat_schedule=settings.CELERY_SCHEDULE,
         broker_url=get_broker_url(),
         broker_connection_retry_on_startup=True,
         result_backend=get_result_backend(),
