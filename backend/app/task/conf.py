@@ -11,25 +11,25 @@ from backend.core.path_conf import BASE_PATH
 
 
 class TaskSettings(BaseSettings):
-    """Celery 任务配置"""
+    """Celery Task Configuration"""
 
     model_config = SettingsConfigDict(env_file=f'{BASE_PATH}/.env', env_file_encoding='utf-8', extra='ignore')
 
-    # .env 环境
+    # .env environment
     ENVIRONMENT: Literal['dev', 'pro']
 
-    # .env Redis 配置
+    # .env Redis Configuration
     CELERY_BROKER_REDIS_DATABASE: int
     CELERY_BACKEND_REDIS_DATABASE: int
 
-    # .env RabbitMQ 配置
+    # .env RabbitMQ Configuration
     # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
     RABBITMQ_HOST: str
     RABBITMQ_PORT: int
     RABBITMQ_USERNAME: str
     RABBITMQ_PASSWORD: str
 
-    # Celery 基础配置
+    # Celery Basic Configuration
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
     CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
     CELERY_BACKEND_REDIS_TIMEOUT: int = 5
@@ -39,7 +39,7 @@ class TaskSettings(BaseSettings):
     ]
     CELERY_TASK_MAX_RETRIES: int = 5
 
-    # Celery 定时任务配置
+    # Celery Time job configuration
     CELERY_SCHEDULE: dict[str, dict[str, Any]] = {
         'exec-every-10-seconds': {
             'task': 'task_demo_async',
@@ -58,7 +58,7 @@ class TaskSettings(BaseSettings):
     @model_validator(mode='before')
     @classmethod
     def validate_celery_broker(cls, values: Any) -> Any:
-        """生产环境强制使用 RabbitMQ 作为消息代理"""
+        """Production environment enforces the use of RabbitMQ as a news agency"""
         if values['ENVIRONMENT'] == 'pro':
             values['CELERY_BROKER'] = 'rabbitmq'
         return values
@@ -66,7 +66,7 @@ class TaskSettings(BaseSettings):
 
 @lru_cache
 def get_task_settings() -> TaskSettings:
-    """获取 Celery 任务配置"""
+    """Fetch Celery Job Configuration"""
     return TaskSettings()
 
 

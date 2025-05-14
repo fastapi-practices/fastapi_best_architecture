@@ -16,9 +16,9 @@ from backend.common.log import log
 
 def ensure_unique_route_names(app: FastAPI) -> None:
     """
-    检查路由名称是否唯一
+    Check if the route name is unique
 
-    :param app: FastAPI 应用实例
+    :param app: FastAPI application instance
     :return:
     """
     temp_routes = set()
@@ -31,19 +31,19 @@ def ensure_unique_route_names(app: FastAPI) -> None:
 
 async def http_limit_callback(request: Request, response: Response, expire: int) -> None:
     """
-    请求限制时的默认回调函数
+    Default callback function when requesting limit
 
-    :param request: FastAPI 请求对象
-    :param response: FastAPI 响应对象
-    :param expire: 剩余毫秒数
+    :param request: FastAPI
+    :param responding objects
+    :param expire: ms left
     :return:
     """
     expires = ceil(expire / 1000)
-    raise errors.HTTPError(code=429, msg='请求过于频繁，请稍后重试', headers={'Retry-After': str(expires)})
+    raise errors.HTTPError(code=429, msg='Please try again later', headers={'Retry-After': str(expires)})
 
 
 def timer(func) -> Callable:
-    """函数耗时计时装饰器"""
+    """Function Time-timer Decorator"""
 
     @functools.wraps(func)
     async def async_wrapper(*args, **kwargs) -> Any:
@@ -62,7 +62,7 @@ def timer(func) -> Callable:
         return result
 
     def _log_time(func, elapsed: float):
-        # 智能选择单位（秒、毫秒、微秒、纳秒）
+        # Smart selection units (seconds, milliseconds, microseconds, nanoseconds)）
         if elapsed >= 1:
             unit, factor = 's', 1
         else:

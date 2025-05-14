@@ -9,15 +9,15 @@ from backend.core.conf import settings
 
 
 class CRUDGen:
-    """代码生成 CRUD 类"""
+    """CODE GENERATION CRUD CLASS"""
 
     @staticmethod
     async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[str]:
         """
-        获取所有表名
+        Get All Table Names
 
-        :param db: 数据库会话
-        :param table_schema: 数据库 schema 名称
+        :param db: database session
+        :param table_schema: database schema name
         :return:
         """
         if settings.DATABASE_TYPE == 'mysql':
@@ -31,7 +31,7 @@ class CRUDGen:
             SELECT table_name AS table_name FROM information_schema.tables 
             WHERE table_name NOT LIKE 'sys_gen_%' 
             AND table_catalog = :table_schema
-            AND table_schema = 'public'; -- schema 通常是 'public'
+            AND table_schema = 'public'; --schema usually 'public'
             """
         stmt = text(sql).bindparams(table_schema=table_schema)
         result = await db.execute(stmt)
@@ -40,10 +40,10 @@ class CRUDGen:
     @staticmethod
     async def get_table(db: AsyncSession, table_name: str) -> Row[tuple]:
         """
-        获取表信息
+        Get Form Information
 
-        :param db: 数据库会话
-        :param table_name: 表名
+        :param db: database session
+        :param table_name: table name
         :return:
         """
         if settings.DATABASE_TYPE == 'mysql':
@@ -59,7 +59,7 @@ class CRUDGen:
             FROM pg_tables t
             WHERE t.tablename NOT LIKE 'sys_gen_%'
             AND t.tablename = :table_name
-            AND t.schemaname = 'public'; -- schema 通常是 'public'
+            AND t.schemaname = 'public'; --schema usually 'public'
             """
         stmt = text(sql).bindparams(table_name=table_name)
         result = await db.execute(stmt)
@@ -68,11 +68,11 @@ class CRUDGen:
     @staticmethod
     async def get_all_columns(db: AsyncSession, table_schema: str, table_name: str) -> Sequence[Row[tuple]]:
         """
-        获取所有列信息
+        Can not open message
 
-        :param db: 数据库会话
-        :param table_schema: 数据库 schema 名称
-        :param table_name: 表名
+        :param db: database session
+        :param table_schema: database schema name
+        :param table_name: table name
         :return:
         """
         if settings.DATABASE_TYPE == 'mysql':
@@ -113,7 +113,7 @@ class CRUDGen:
             FROM pg_attribute a
             JOIN pg_class t ON a.attrelid = t.oid
             JOIN pg_namespace n ON n.oid = t.relnamespace
-            WHERE n.nspname = 'public'  -- 根据你的实际情况修改 schema 名称，通常是 'public'
+            WHERE n.nspname = 'public' -- change the name of schema according to your actual situation, usually 'public'
             AND t.relname = :table_name
             AND a.attnum > 0
             AND NOT a.attisdropped

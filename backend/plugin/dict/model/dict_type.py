@@ -16,17 +16,17 @@ if TYPE_CHECKING:
 
 
 class DictType(Base):
-    """字典类型表"""
+    """Dictionary Type Table"""
 
     __tablename__ = 'sys_dict_type'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(32), comment='字典类型名称')
-    code: Mapped[str] = mapped_column(String(32), unique=True, comment='字典类型编码')
-    status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
+    name: Mapped[str] = mapped_column(String(32), comment='Dictionary Type Name')
+    code: Mapped[str] = mapped_column(String(32), unique=True, comment='Dictionary type encoding')
+    status: Mapped[int] = mapped_column(default=1, comment='Status (0 disabled 1)')
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='Remarks'
     )
 
-    # 字典类型一对多
+    # Dictionary type one pair more
     datas: Mapped[list[DictData]] = relationship(init=False, back_populates='type')

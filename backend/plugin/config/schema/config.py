@@ -8,37 +8,37 @@ from backend.common.schema import SchemaBase
 
 
 class SaveBuiltInConfigParam(SchemaBase):
-    """保存内置参数配置参数"""
+    """Save built-in parameters configuration parameters"""
 
-    name: str = Field(description='参数配置名称')
-    key: str = Field(description='参数配置键名')
-    value: str = Field(description='参数配置值')
+    name: str = Field(description='Parameter Configuration Name')
+    key: str = Field(description='Parameter Configuration Keyname')
+    value: str = Field(description='Parameter Configuration Values')
 
 
 class ConfigSchemaBase(SchemaBase):
-    """参数配置基础模型"""
+    """Parameter Configuration Base Model"""
 
-    name: str = Field(description='参数配置名称')
-    type: str | None = Field(None, description='参数配置类型')
-    key: str = Field(description='参数配置键名')
-    value: str = Field(description='参数配置值')
-    is_frontend: bool = Field(description='是否前端参数配置')
-    remark: str | None = Field(None, description='备注')
+    name: str = Field(description='Parameter Configuration Name')
+    type: str | None = Field(None, description='Parameter Configuration Type')
+    key: str = Field(description='Parameter Configuration Keyname')
+    value: str = Field(description='Parameter Configuration Values')
+    is_frontend: bool = Field(description='Whether to configure front-end parameters')
+    remark: str | None = Field(None, description='Remarks')
 
 
 class CreateConfigParam(ConfigSchemaBase):
-    """创建参数配置参数"""
+    """Create Parameter Configuration Parameters"""
 
 
 class UpdateConfigParam(ConfigSchemaBase):
-    """更新参数配置参数"""
+    """Update parameter configuration parameters"""
 
 
 class GetConfigDetail(ConfigSchemaBase):
-    """参数配置详情"""
+    """Parameter Configuration Details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(description='参数配置 ID')
-    created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(None, description='更新时间')
+    id: int = Field(description='PARAMETER CONFIGURATION ID')
+    created_time: datetime = Field(description='Created')
+    updated_time: datetime | None = Field(None, description='Update Time')

@@ -22,7 +22,7 @@ from backend.utils.timezone import timezone
 
 
 class OAuth2Service:
-    """OAuth2 认证服务类"""
+    """OAuth2 Accreditation Service Category"""
 
     @staticmethod
     async def create_with_login(
@@ -34,28 +34,28 @@ class OAuth2Service:
         social: UserSocialType,
     ) -> GetLoginToken | None:
         """
-        创建 OAuth2 用户并登录
+        Create and login for Outlook2 users
 
-        :param request: FastAPI 请求对象
-        :param response: FastAPI 响应对象
-        :param background_tasks: FastAPI 后台任务
-        :param user: OAuth2 用户信息
-        :param social: 社交平台类型
+        :param request: FastAPI
+        :param responding objects
+        :param background_tasks: FastAPI background job
+        :param user: Outlook2 user information
+        :param social: social platform type
         :return:
         """
         async with async_db_session.begin() as db:
-            # 获取 OAuth2 平台用户信息
+            # Get OAuth2 platform user information
             social_id = user.get('id')
             social_username = user.get('username')
             if social == UserSocialType.github:
                 social_username = user.get('login')
             social_nickname = user.get('name')
             social_email = user.get('email')
-            if social == UserSocialType.linux_do:  # 不提供明文邮箱的平台
+            if social == UserSocialType.linux_do:  # Platform for not providing e-mails
                 social_email = f'{social_username}@linux.do'
             if not social_email:
-                raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
-            # 创建系统用户
+                raise AuthorizationError(msg=f'could not close temporary folder: %s')
+            # Create System Users
             sys_user = await user_dao.check_email(db, social_email)
             if not sys_user:
                 sys_user = await user_dao.get_by_username(db, social_username)
@@ -70,13 +70,13 @@ class OAuth2Service:
                 await user_dao.create(db, new_sys_user, social=True)
                 await db.flush()
                 sys_user = await user_dao.check_email(db, social_email)
-            # 绑定社交用户
+            # Binding social users
             sys_user_id = sys_user.id
             user_social = await user_social_dao.get(db, sys_user_id, social.value)
             if not user_social:
                 new_user_social = CreateUserSocialParam(source=social.value, uid=str(social_id), user_id=sys_user_id)
                 await user_social_dao.create(db, new_user_social)
-            # 创建 token
+            # Create token
             access_token = await jwt.create_access_token(
                 str(sys_user_id),
                 sys_user.is_multi_login,
@@ -99,7 +99,7 @@ class OAuth2Service:
                 username=sys_user.username,
                 login_time=timezone.now(),
                 status=LoginLogStatusType.success.value,
-                msg='登录成功（OAuth2）',
+                msg='Login Success (OAuth2)',
             )
             background_tasks.add_task(login_log_service.create, **login_log)
             await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')

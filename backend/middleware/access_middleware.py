@@ -8,14 +8,14 @@ from backend.utils.timezone import timezone
 
 
 class AccessMiddleware(BaseHTTPMiddleware):
-    """请求日志中间件"""
+    """Requested Log Intermediate"""
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """
-        处理请求并记录访问日志
+        Processing requests and recording access logs
 
-        :param request: FastAPI 请求对象
-        :param call_next: 下一个中间件或路由处理函数
+        :param request: FastAPI
+        :param call_text: next intermediate or route processing function
         :return:
         """
         start_time = timezone.now()

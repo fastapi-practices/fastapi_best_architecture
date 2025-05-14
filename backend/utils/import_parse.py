@@ -14,9 +14,9 @@ T = TypeVar('T')
 @lru_cache(maxsize=512)
 def import_module_cached(module_path: str) -> Any:
     """
-    缓存导入模块
+    Cache Import Module
 
-    :param module_path: 模块路径
+    :param modeule_path: modular path
     :return:
     """
     return importlib.import_module(module_path)
@@ -24,9 +24,9 @@ def import_module_cached(module_path: str) -> Any:
 
 def dynamic_import_data_model(module_path: str) -> Type[T]:
     """
-    动态导入数据模型
+    Dynamic Import Data Model
 
-    :param module_path: 模块路径，格式为 'module_path.class_name'
+    :param modeule_path: module path, formatted as 'module_path.class_name '
     :return:
     """
     try:
@@ -34,5 +34,5 @@ def dynamic_import_data_model(module_path: str) -> Type[T]:
         module = import_module_cached(module_path)
         return getattr(module, class_name)
     except (ImportError, AttributeError) as e:
-        log.error(f'动态导入数据模型失败：{e}')
-        raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
+        log.error(f'dynamic import data model failed: {e}')
+        raise errors.ServerError(msg='Data model column dynamical resolution failed. Please contact the system supermanager')

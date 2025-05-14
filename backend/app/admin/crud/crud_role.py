@@ -17,24 +17,24 @@ from backend.app.admin.schema.role import (
 
 
 class CRUDRole(CRUDPlus[Role]):
-    """角色数据库操作类"""
+    """Role Database Operator Category"""
 
     async def get(self, db: AsyncSession, role_id: int) -> Role | None:
         """
-        获取角色详情
+        Get Role Details
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID
+        :param db: database session
+        :param role id
         :return:
         """
         return await self.select_model(db, role_id)
 
     async def get_with_relation(self, db: AsyncSession, role_id: int) -> Role | None:
         """
-        获取角色及关联数据
+        Access to role and association data
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID
+        :param db: database session
+        :param role id
         :return:
         """
         stmt = (
@@ -47,19 +47,19 @@ class CRUDRole(CRUDPlus[Role]):
 
     async def get_all(self, db: AsyncSession) -> Sequence[Role]:
         """
-        获取所有角色
+        Get All Roles
 
-        :param db: 数据库会话
+        :param db: database session
         :return:
         """
         return await self.select_models(db)
 
     async def get_users(self, db: AsyncSession, user_id: int) -> Sequence[Role]:
         """
-        获取用户角色列表
+        Get User Roles List
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         stmt = select(self.model).join(self.model.users).where(User.id == user_id)
@@ -68,10 +68,10 @@ class CRUDRole(CRUDPlus[Role]):
 
     async def get_list(self, name: str | None, status: int | None) -> Select:
         """
-        获取角色列表
+        Get Role List
 
-        :param name: 角色名称
-        :param status: 角色状态
+        :param name: role name
+        :param role status:
         :return:
         """
         stmt = (
@@ -93,42 +93,42 @@ class CRUDRole(CRUDPlus[Role]):
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:
         """
-        通过名称获取角色
+        Get roles by name
 
-        :param db: 数据库会话
-        :param name: 角色名称
+        :param db: database session
+        :param name: role name
         :return:
         """
         return await self.select_model_by_column(db, name=name)
 
     async def create(self, db: AsyncSession, obj: CreateRoleParam) -> None:
         """
-        创建角色
+        Create Role
 
-        :param db: 数据库会话
-        :param obj: 创建角色参数
+        :param db: database session
+        :param obj: create role parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def update(self, db: AsyncSession, role_id: int, obj: UpdateRoleParam) -> int:
         """
-        更新角色
+        Update Role
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID
-        :param obj: 更新角色参数
+        :param db: database session
+        :param role id
+        :param obj: update role parameters
         :return:
         """
         return await self.update_model(db, role_id, obj)
 
     async def update_menus(self, db: AsyncSession, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:
         """
-        更新角色菜单
+        Update Role Menu
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID
-        :param menu_ids: 菜单 ID 列表
+        :param db: database session
+        :param role id
+        :param menu_ids: menu ID list
         :return:
         """
         current_role = await self.get_with_relation(db, role_id)
@@ -139,11 +139,11 @@ class CRUDRole(CRUDPlus[Role]):
 
     async def update_scopes(self, db: AsyncSession, role_id: int, scope_ids: UpdateRoleScopeParam) -> int:
         """
-        更新角色数据范围
+        Update role data range
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID
-        :param scope_ids: 权限范围 ID 列表
+        :param db: database session
+        :param role id
+        :param scope_ids: Permission range ID list
         :return:
         """
         current_role = await self.get_with_relation(db, role_id)
@@ -154,10 +154,10 @@ class CRUDRole(CRUDPlus[Role]):
 
     async def delete(self, db: AsyncSession, role_id: list[int]) -> int:
         """
-        删除角色
+        Remove Role
 
-        :param db: 数据库会话
-        :param role_id: 角色 ID 列表
+        :param db: database session
+        :param rOLE_id: Role ID list
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=role_id)

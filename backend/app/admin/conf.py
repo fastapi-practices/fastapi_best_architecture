@@ -8,7 +8,7 @@ from backend.core.path_conf import BASE_PATH
 
 
 class AdminSettings(BaseSettings):
-    """Admin 配置"""
+    """Admin Configuration"""
 
     model_config = SettingsConfigDict(env_file=f'{BASE_PATH}/.env', env_file_encoding='utf-8', extra='ignore')
 
@@ -21,14 +21,14 @@ class AdminSettings(BaseSettings):
     # OAuth2
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
-    # 验证码
+    # Authentication Code
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
-    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
+    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 min
 
 
 @lru_cache
 def get_admin_settings() -> AdminSettings:
-    """获取 admin 配置"""
+    """get admin configuration"""
     return AdminSettings()
 
 

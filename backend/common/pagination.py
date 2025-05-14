@@ -21,10 +21,10 @@ SchemaT = TypeVar('SchemaT')
 
 
 class _CustomPageParams(BaseModel, AbstractParams):
-    """自定义分页参数"""
+    """Customize page break parameters"""
 
-    page: int = Query(1, ge=1, description='页码')
-    size: int = Query(20, gt=0, le=200, description='每页数量')
+    page: int = Query(1, ge=1, description='Page Number')
+    size: int = Query(20, gt=0, le=200, description='Number per page')
 
     def to_raw_params(self) -> RawParams:
         return RawParams(
@@ -34,28 +34,28 @@ class _CustomPageParams(BaseModel, AbstractParams):
 
 
 class _Links(BaseModel):
-    """分页链接"""
+    """Page Break Link"""
 
-    first: str = Field(description='首页链接')
-    last: str = Field(description='尾页链接')
-    self: str = Field(description='当前页链接')
-    next: str | None = Field(None, description='下一页链接')
-    prev: str | None = Field(None, description='上一页链接')
+    first: str = Field(description='First Page Link')
+    last: str = Field(description='End Page Link')
+    self: str = Field(description='Current Page Link')
+    next: str | None = Field(None, description='Next Page Link')
+    prev: str | None = Field(None, description='Previous Page Link')
 
 
 class _PageDetails(BaseModel):
-    """分页详情"""
+    """Page Break Details"""
 
-    items: list = Field([], description='当前页数据列表')
-    total: int = Field(description='数据总条数')
-    page: int = Field(description='当前页码')
-    size: int = Field(description='每页数量')
-    total_pages: int = Field(description='总页数')
-    links: _Links = Field(description='分页链接')
+    items: list = Field([], description='Current Page Data List')
+    total: int = Field(description='Total number of data entries')
+    page: int = Field(description='Current Page Number')
+    size: int = Field(description='Number per page')
+    total_pages: int = Field(description='Total pages')
+    links: _Links = Field(description='Page Break Link')
 
 
 class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
-    """自定义分页类"""
+    """Customise Page Break Classes"""
 
     __params_type__ = _CustomPageParams
 
@@ -88,7 +88,7 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
 
 class PageData(_PageDetails, Generic[SchemaT]):
     """
-    包含返回数据 schema 的统一返回模型，仅适用于分页接口
+    a unified return model with returned data, only for page breaks
 
     E.g. ::
 
@@ -113,10 +113,10 @@ class PageData(_PageDetails, Generic[SchemaT]):
 
 async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
     """
-    基于 SQLAlchemy 创建分页数据
+    Create page break data based on SQLAlchemy
 
-    :param db: 数据库会话
-    :param select: SQL 查询语句
+    :param db: database session
+    :param self: SQL query statement
     :return:
     """
     paginated_data: _CustomPage = await apaginate(db, select)
@@ -124,5 +124,5 @@ async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
     return page_data
 
 
-# 分页依赖注入
+# Page break depends on injection
 DependsPagination = Depends(pagination_ctx(_CustomPage))

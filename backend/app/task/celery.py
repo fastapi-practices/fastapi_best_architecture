@@ -12,7 +12,7 @@ __all__ = ['celery_app']
 
 
 def get_broker_url() -> str:
-    """获取消息代理 URL"""
+    """GET MESSAGE PROXY URL"""
     if task_settings.CELERY_BROKER == 'redis':
         return (
             f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
@@ -25,7 +25,7 @@ def get_broker_url() -> str:
 
 
 def get_result_backend() -> str:
-    """获取结果后端 URL"""
+    """GET RESULT BACKEND URL"""
     return (
         f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
         f'{settings.REDIS_PORT}/{task_settings.CELERY_BACKEND_REDIS_DATABASE}'
@@ -33,7 +33,7 @@ def get_result_backend() -> str:
 
 
 def get_result_backend_transport_options() -> dict[str, Any]:
-    """获取结果后端传输选项"""
+    """Access result backend transfer options"""
     return {
         'global_keyprefix': task_settings.CELERY_BACKEND_REDIS_PREFIX,
         'retry_policy': {
@@ -43,7 +43,7 @@ def get_result_backend_transport_options() -> dict[str, Any]:
 
 
 def init_celery() -> celery.Celery:
-    """初始化 Celery 应用"""
+    """Initialize Celery Application"""
 
     # TODO: Update this work if celery version >= 6.0.0
     # https://github.com/fastapi-practices/fastapi_best_architecture/issues/321
@@ -64,11 +64,11 @@ def init_celery() -> celery.Celery:
         task_track_started=True,
     )
 
-    # 自动发现任务
+    # _Other Organiser
     app.autodiscover_tasks(task_settings.CELERY_TASK_PACKAGES)
 
     return app
 
 
-# 创建 Celery 实例
+# Create Celery Example
 celery_app: celery.Celery = init_celery()

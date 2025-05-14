@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    summary='server 监控',
+    summary='server monitoring',
     dependencies=[
         Depends(RequestPermission('sys:monitor:server')),
         DependsJwtAuth,
@@ -21,7 +21,7 @@ router = APIRouter()
 )
 async def get_server_info() -> ResponseModel:
     data = {
-        # 扔到线程池，避免阻塞
+        # Throw it to the thread pool to avoid jamming
         'cpu': await run_in_threadpool(server_info.get_cpu_info),
         'mem': await run_in_threadpool(server_info.get_mem_info),
         'sys': await run_in_threadpool(server_info.get_sys_info),

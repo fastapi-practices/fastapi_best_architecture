@@ -10,25 +10,25 @@ from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDict
 
 
 class CRUDDictData(CRUDPlus[DictData]):
-    """字典数据数据库操作类"""
+    """Dictionary Data Database Operating Category"""
 
     async def get(self, db: AsyncSession, pk: int) -> DictData | None:
         """
-        获取字典数据详情
+        Get Dictionary Data Details
 
-        :param db: 数据库会话
-        :param pk: 字典数据 ID
+        :param db: database session
+        :param pk: Dictionary data ID
         :return:
         """
         return await self.select_model(db, pk)
 
     async def get_list(self, label: str | None, value: str | None, status: int | None) -> Select:
         """
-        获取字典数据列表
+        Fetch Dictionary Data List
 
-        :param label: 字典数据标签
-        :param value: 字典数据键值
-        :param status: 字典状态
+        :param label: dictionary data tag
+        :param value: dictionary data keys
+        :param status: dictionary status
         :return:
         """
         stmt = select(self.model).options(noload(self.model.type)).order_by(desc(self.model.sort))
@@ -48,51 +48,51 @@ class CRUDDictData(CRUDPlus[DictData]):
 
     async def get_by_label(self, db: AsyncSession, label: str) -> DictData | None:
         """
-        通过标签获取字典数据
+        Get Dictionary Data Through Tabs
 
-        :param db: 数据库会话
-        :param label: 字典标签
+        :param db: database session
+        :param label: dictionary label
         :return:
         """
         return await self.select_model_by_column(db, label=label)
 
     async def create(self, db: AsyncSession, obj: CreateDictDataParam) -> None:
         """
-        创建字典数据
+        Create Dictionary Data
 
-        :param db: 数据库会话
-        :param obj: 创建字典数据参数
+        :param db: database session
+        :param obj: create dictionary data parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateDictDataParam) -> int:
         """
-        更新字典数据
+        Update Dictionary Data
 
-        :param db: 数据库会话
-        :param pk: 字典数据 ID
-        :param obj: 更新字典数据参数
+        :param db: database session
+        :param pk: Dictionary data ID
+        :param obj: update dictionary data parameters
         :return:
         """
         return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除字典数据
+        Delete Dictionary Data
 
-        :param db: 数据库会话
-        :param pk: 字典数据 ID 列表
+        :param db: database session
+        :param pk: dictionary data ID list
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
     async def get_with_relation(self, db: AsyncSession, pk: int) -> DictData | None:
         """
-        获取字典数据及关联数据
+        Get dictionary data and associated data
 
-        :param db: 数据库会话
-        :param pk: 字典数据 ID
+        :param db: database session
+        :param pk: Dictionary data ID
         :return:
         """
         stmt = select(self.model).options(selectinload(self.model.type)).where(self.model.id == pk)

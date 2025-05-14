@@ -9,7 +9,7 @@ from backend.common.response.response_code import CustomErrorCode, StandardRespo
 
 
 class BaseExceptionMixin(Exception):
-    """基础异常混入类"""
+    """Basic abnormally mixed category"""
 
     code: int
 
@@ -21,14 +21,14 @@ class BaseExceptionMixin(Exception):
 
 
 class HTTPError(HTTPException):
-    """HTTP 异常"""
+    """HTTP ANOMALY"""
 
     def __init__(self, *, code: int, msg: Any = None, headers: dict[str, Any] | None = None):
         super().__init__(status_code=code, detail=msg, headers=headers)
 
 
 class CustomError(BaseExceptionMixin):
-    """自定义异常"""
+    """Custom anomaly"""
 
     def __init__(self, *, error: CustomErrorCode, data: Any = None, background: BackgroundTask | None = None):
         self.code = error.code
@@ -36,7 +36,7 @@ class CustomError(BaseExceptionMixin):
 
 
 class RequestError(BaseExceptionMixin):
-    """请求异常"""
+    """Request abnormal"""
 
     code = StandardResponseCode.HTTP_400
 
@@ -45,7 +45,7 @@ class RequestError(BaseExceptionMixin):
 
 
 class ForbiddenError(BaseExceptionMixin):
-    """禁止访问异常"""
+    """Ban Access Abnormal"""
 
     code = StandardResponseCode.HTTP_403
 
@@ -54,7 +54,7 @@ class ForbiddenError(BaseExceptionMixin):
 
 
 class NotFoundError(BaseExceptionMixin):
-    """资源不存在异常"""
+    """There's no anomaly in the resources"""
 
     code = StandardResponseCode.HTTP_404
 
@@ -63,7 +63,7 @@ class NotFoundError(BaseExceptionMixin):
 
 
 class ServerError(BaseExceptionMixin):
-    """服务器异常"""
+    """Server anomaly"""
 
     code = StandardResponseCode.HTTP_500
 
@@ -74,7 +74,7 @@ class ServerError(BaseExceptionMixin):
 
 
 class GatewayError(BaseExceptionMixin):
-    """网关异常"""
+    """Gateway anomaly"""
 
     code = StandardResponseCode.HTTP_502
 
@@ -83,7 +83,7 @@ class GatewayError(BaseExceptionMixin):
 
 
 class AuthorizationError(BaseExceptionMixin):
-    """授权异常"""
+    """Authorization irregular"""
 
     code = StandardResponseCode.HTTP_401
 
@@ -92,7 +92,7 @@ class AuthorizationError(BaseExceptionMixin):
 
 
 class TokenError(HTTPError):
-    """Token 异常"""
+    """Token is abnormal"""
 
     code = StandardResponseCode.HTTP_401
 

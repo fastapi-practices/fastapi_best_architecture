@@ -16,21 +16,21 @@ if TYPE_CHECKING:
 
 
 class DictData(Base):
-    """字典数据表"""
+    """Dictionary Data Sheet"""
 
     __tablename__ = 'sys_dict_data'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    label: Mapped[str] = mapped_column(String(32), unique=True, comment='字典标签')
-    value: Mapped[str] = mapped_column(String(32), comment='字典值')
-    sort: Mapped[int] = mapped_column(default=0, comment='排序')
-    status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
+    label: Mapped[str] = mapped_column(String(32), unique=True, comment='Dictionary Label')
+    value: Mapped[str] = mapped_column(String(32), comment='Dictionary values')
+    sort: Mapped[int] = mapped_column(default=0, comment='Sort')
+    status: Mapped[int] = mapped_column(default=1, comment='Status (0 disabled 1)')
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='Remarks'
     )
 
-    # 字典类型一对多
+    # Dictionary type one pair more
     type_id: Mapped[int] = mapped_column(
-        ForeignKey('sys_dict_type.id', ondelete='CASCADE'), default=0, comment='字典类型关联ID'
+        ForeignKey('sys_dict_type.id', ondelete='CASCADE'), default=0, comment='DICTIONARY TYPE ASSOCIATION ID'
     )
     type: Mapped[DictType] = relationship(init=False, back_populates='datas')

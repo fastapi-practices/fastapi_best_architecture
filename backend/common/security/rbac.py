@@ -13,54 +13,54 @@ from backend.utils.import_parse import import_module_cached
 
 async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
     """
-    RBAC 权限校验（鉴权顺序很重要，谨慎修改）
+    RBAC PERMISSION VALIDATION (THE ORDER OF ASSURANCE IS IMPORTANT, CAREFULLY MODIFIED)）
 
-    :param request: FastAPI 请求对象
-    :param _token: JWT 令牌
+    :param request: FastAPI
+    :param _token: JWT token
     :return:
     """
     path = request.url.path
 
-    # API 鉴权白名单
+    # API SEPARATIVE LIST
     if path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
         return
 
-    # JWT 授权状态强制校验
+    # JWT AUTHENTICATION
     if not request.auth.scopes:
         raise TokenError
 
-    # 超级管理员免校验
+    # Superadmin waiver
     if request.user.is_superuser:
         return
 
-    # 检测用户角色
+    # Testing user roles
     user_roles = request.user.roles
     if not user_roles or all(status == 0 for status in user_roles):
-        raise AuthorizationError(msg='用户未分配角色，请联系系统管理员')
+        raise AuthorizationError(msg='User not assigned roles, contact System Administrator')
 
-    # 检测用户所属角色菜单
+    # Test user-owned roles menu
     if not any(len(role.menus) > 0 for role in user_roles):
-        raise AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
+        raise AuthorizationError(msg='Could not close temporary folder: %s')
 
-    # 检测后台管理操作权限
+    # Test backstage management privileges
     method = request.method
     if method != MethodType.GET or method != MethodType.OPTIONS:
         if not request.user.is_staff:
-            raise AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
+            raise AuthorizationError(msg='The user has been disabled for back-office management. Please contact the system administrator')
 
-    # RBAC 鉴权
+    # RBAC RIGHTS
     if settings.RBAC_ROLE_MENU_MODE:
         path_auth_perm = getattr(request.state, 'permission', None)
 
-        # 没有菜单操作权限标识不校验
+        # Do not verify without menu operation permissions
         if not path_auth_perm:
             return
 
-        # 菜单鉴权白名单
+        # Menu Separator List
         if path_auth_perm in settings.RBAC_ROLE_MENU_EXCLUDE:
             return
 
-        # 已分配菜单权限校验
+        # Could not close temporary folder: %s
         allow_perms = []
         for role in user_roles:
             for menu in role.menus:
@@ -73,11 +73,11 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
             casbin_rbac = import_module_cached('backend.plugin.casbin.utils.rbac')
             casbin_verify = getattr(casbin_rbac, 'casbin_verify')
         except (ImportError, AttributeError) as e:
-            log.error(f'正在通过 casbin 执行 RBAC 权限校验，但此插件不存在: {e}')
-            raise errors.ServerError(msg='权限校验失败，请联系系统管理员')
+            log.error(f'Validation of RBAC permissions by casbin, but this plugin does not exist: {e}')
+            raise errors.ServerError(msg='Permission verification failed. Contact System Administrator')
 
         await casbin_verify(request)
 
 
-# RBAC 授权依赖注入
+# RBAC MANDATE DEPENDENCE ON INJECTION
 DependsRBAC = Depends(rbac_verify)

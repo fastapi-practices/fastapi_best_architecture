@@ -9,35 +9,35 @@ from backend.common.enums import UserSocialType
 
 
 class CRUDUserSocial(CRUDPlus[UserSocial]):
-    """用户社交账号数据库操作类"""
+    """User Social Account Database Operating Category"""
 
     async def get(self, db: AsyncSession, pk: int, source: UserSocialType) -> UserSocial | None:
         """
-        获取用户社交账号绑定详情
+        Fetch user social account binding details
 
-        :param db: 数据库会话
-        :param pk: 用户 ID
-        :param source: 社交账号类型
+        :param db: database session
+        :param pk: User ID
+        :param source: social account type
         :return:
         """
         return await self.select_model_by_column(db, user_id=pk, source=source)
 
     async def create(self, db: AsyncSession, obj: CreateUserSocialParam) -> None:
         """
-        创建用户社交账号绑定
+        Create user social account binding
 
-        :param db: 数据库会话
-        :param obj: 创建用户社交账号绑定参数
+        :param db: database session
+        :param obj: create user social account binding parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def delete(self, db: AsyncSession, social_id: int) -> int:
         """
-        删除用户社交账号绑定
+        Remove user social account binding
 
-        :param db: 数据库会话
-        :param social_id: 社交账号绑定 ID
+        :param db: database session
+        :param social_id: social account binding ID
         :return:
         """
         return await self.delete_model(db, social_id)

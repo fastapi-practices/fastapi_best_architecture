@@ -19,65 +19,66 @@ if TYPE_CHECKING:
 
 class RequestPermission:
     """
-    请求权限验证器，用于角色菜单 RBAC 权限控制
+    REQUEST PERMISSION CERTIFIER FOR ROLE MENU RBAC PERMISSION CONTROL
 
-    注意：
-        使用此请求权限时，需要将 `Depends(RequestPermission('xxx'))` 在 `DependsRBAC` 之前设置，
-        因为 FastAPI 当前版本的接口依赖注入按正序执行，意味着 RBAC 标识会在验证前被设置
+    Attention：
+        Use this request permission to set `Depends' (RequestPermission('xx')) 'before `DependsRBAC '，
+        Because the current version of the FastAPI interface relies on injection in order, which means that the RBAC identifier will be set before authentication
     """
 
     def __init__(self, value: str) -> None:
         """
-        初始化请求权限验证器
+        Initialization Request Permission Validator
 
-        :param value: 权限标识
+        :param value: permission mark
         :return:
         """
         self.value = value
 
     async def __call__(self, request: Request) -> None:
         """
-        验证请求权限
+        Permission to verify a request
 
-        :param request: FastAPI 请求对象
+        :param request: FastAPI
         :return:
         """
         if settings.RBAC_ROLE_MENU_MODE:
             if not isinstance(self.value, str):
                 raise ServerError
-            # 附加权限标识到请求状态
+            # Additional Permissions Mark to Request Status
             request.state.permission = self.value
 
 
 async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:
     """
-    过滤数据权限，控制用户可见数据范围
+    Filter Data Permissions to Control User Visible Data Ranges
 
-    使用场景：
-        - 控制用户能看到哪些数据
+    Use scene：
+        - Control what data the user can see
 
-    :param db: 数据库会话
-    :param request: FastAPI 请求对象
+    :param db: database session
+    :param request: FastAPI
     :return:
     """
-    # 获取用户角色和数据范围
+    # Access to user roles and data ranges
     data_scopes = []
     for role in request.user.roles:
         for scope in role.scopes:
             if scope.status:
                 data_scopes.append(scope)
 
-    # 超级管理员和无规则用户不做过滤
+    # Super Administrators and Ungrateful Users do not filter
     if request.user.is_superuser or not data_scopes:
+        print('super admin or no data scope')
         return or_(1 == 1)
 
-    # 获取数据范围规则
+    # Rules on access to data coverage
     data_rule_list: list[DataRule] = []
     for data_scope in data_scopes:
         data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope.id)
         data_rule_list.extend(data_scope_with_relation.rules)
 
-    # 去重
+    # Heavy
     seen_data_rule_ids = set()
     new_data_rule_list = []
     for rule in data_rule_list:
@@ -89,21 +90,23 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
     where_or_list = []
 
     for data_rule in new_data_rule_list:
-        # 验证规则模型
+        # Model of certification rules
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
-            raise errors.NotFoundError(msg='数据规则模型不存在')
-        model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
+            raise errors.NotFoundError(msg='Data rule model does not exist')
+        model_ins = dynamic_import_data_model(
+            settings.DATA_PERMISSION_MODELS[rule_model])
 
-        # 验证规则列
+        # Authentication Rules Bar
         model_columns = [
             key for key in model_ins.__table__.columns.keys() if key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
         column = data_rule.column
         if column not in model_columns:
-            raise errors.NotFoundError(msg='数据规则模型列不存在')
+            raise errors.NotFoundError(
+                msg='Data rule model column does not exist')
 
-        # 构建过滤条件
+        # Build Filter Conditions
         column_obj = getattr(model_ins, column)
         rule_expression = data_rule.expression
         condition = None
@@ -121,13 +124,15 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
             case RoleDataRuleExpressionType.le:
                 condition = column_obj <= data_rule.value
             case RoleDataRuleExpressionType.in_:
-                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                values = data_rule.value.split(',') if isinstance(
+                    data_rule.value, str) else data_rule.value
                 condition = column_obj.in_(values)
             case RoleDataRuleExpressionType.not_in:
-                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                values = data_rule.value.split(',') if isinstance(
+                    data_rule.value, str) else data_rule.value
                 condition = column_obj.not_in(values)
 
-        # 根据运算符添加到对应列表
+        # Add to the corresponding list by operator
         if condition is not None:
             match data_rule.operator:
                 case RoleDataRuleOperatorType.AND:
@@ -135,7 +140,7 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
                 case RoleDataRuleOperatorType.OR:
                     where_or_list.append(condition)
 
-    # 组合所有条件
+    # Group All Conditions
     where_list = []
     if where_and_list:
         where_list.append(and_(*where_and_list))

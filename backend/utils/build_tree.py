@@ -8,9 +8,9 @@ from backend.utils.serializers import RowData, select_list_serialize
 
 def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
     """
-    获取所有树形结构节点
+    Fetch all tree structure nodes
 
-    :param row: 原始数据行序列
+    :param row: original data line sequence
     :return:
     """
     tree_nodes = select_list_serialize(row)
@@ -20,9 +20,9 @@ def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
 
 def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
-    通过遍历算法构造树形结构
+    Construct tree structure through cross-calculations
 
-    :param nodes: 树节点列表
+    :param nodes: list of tree nodes
     :return:
     """
     tree: list[dict[str, Any]] = []
@@ -48,10 +48,10 @@ def traversal_to_tree(nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = None) -> list[dict[str, Any]]:
     """
-    通过递归算法构造树形结构（性能影响较大）
+    Construct tree structure through a recursive algorithm (higher impact)
 
-    :param nodes: 树节点列表
-    :param parent_id: 父节点 ID，默认为 None 表示根节点
+    :param nodes: list of tree nodes
+    :param parent_id: Parent ID, default None for root
     :return:
     """
     tree: list[dict[str, Any]] = []
@@ -68,11 +68,11 @@ def get_tree_data(
     row: Sequence[RowData], build_type: BuildTreeType = BuildTreeType.traversal, *, parent_id: int | None = None
 ) -> list[dict[str, Any]]:
     """
-    获取树形结构数据
+    Fetch tree structure data
 
-    :param row: 原始数据行序列
-    :param build_type: 构建树形结构的算法类型，默认为遍历算法
-    :param parent_id: 父节点 ID，仅在递归算法中使用
+    :param row: original data line sequence
+    :param build_type: algorithm type for building tree structures, default to traversal
+    :param parent_id: Parent Node ID, used only in recursive algorithms
     :return:
     """
     nodes = get_tree_nodes(row)
@@ -82,18 +82,18 @@ def get_tree_data(
         case BuildTreeType.recursive:
             tree = recursive_to_tree(nodes, parent_id=parent_id)
         case _:
-            raise ValueError(f'无效的算法类型：{build_type}')
+            raise ValueError(f'invalid algorithm type: {build_type}')
     return tree
 
 
 def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
     """
-    获取 vben5 菜单树形结构数据
+    fetch vben5 tree structure data
 
-    :param row: 原始数据行序列
+    :param row: original data line sequence
     :return:
     """
-    # 需要移除的原始字段
+    # Original field to remove
     remove_keys = {'title', 'icon', 'link', 'cache', 'display', 'status'}
 
     vben5_nodes = [

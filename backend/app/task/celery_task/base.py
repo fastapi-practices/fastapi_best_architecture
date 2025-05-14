@@ -12,38 +12,38 @@ from backend.common.socketio.actions import task_notification
 
 
 class TaskBase(Task):
-    """Celery 任务基类"""
+    """Celery Job Base Category"""
 
     autoretry_for = (SQLAlchemyError,)
     max_retries = task_settings.CELERY_TASK_MAX_RETRIES
 
     async def before_start(self, task_id: str, args, kwargs) -> None:
         """
-        任务开始前执行钩子
+        A hook before the mission starts
 
-        :param task_id: 任务 ID
+        :param task_id: task ID
         :return:
         """
-        await task_notification(msg=f'任务 {task_id} 开始执行')
+        await task_notification(msg=f'mission {task_id} start')
 
     async def on_success(self, retval: Any, task_id: str, args, kwargs) -> None:
         """
-        任务成功后执行钩子
+        After mission success, execute hooks
 
-        :param retval: 任务返回值
-        :param task_id: 任务 ID
+        :param retval: task return value
+        :param task_id: task ID
         :return:
         """
-        await task_notification(msg=f'任务 {task_id} 执行成功')
+        await task_notification(msg=f'task {task_id} successfully executed')
 
     def on_failure(self, exc: Exception, task_id: str, args, kwargs, einfo) -> None:
         """
-        任务失败后执行钩子
+        Execute hooks after mission failure
 
-        :param exc: 异常对象
-        :param task_id: 任务 ID
-        :param einfo: 异常信息
+        :param exc: abnormal object
+        :param task_id: task ID
+        :param einfo: abnormal information
         :return:
         """
         loop = asyncio.get_event_loop()
-        loop.create_task(task_notification(msg=f'任务 {task_id} 执行失败'))
+        loop.create_task(task_notification(msg=f'task {task_id} failed'))

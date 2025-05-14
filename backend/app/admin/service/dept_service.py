@@ -15,20 +15,20 @@ from backend.utils.build_tree import get_tree_data
 
 
 class DeptService:
-    """部门服务类"""
+    """Sector service category"""
 
     @staticmethod
     async def get(*, pk: int) -> Dept:
         """
-        获取部门详情
+        Access to sector details
 
-        :param pk: 部门 ID
+        :param pk: Department ID
         :return:
         """
         async with async_db_session() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
+                raise errors.NotFoundError(msg='Department does not exist')
             return dept
 
     @staticmethod
@@ -36,13 +36,13 @@ class DeptService:
         *, request: Request, name: str | None, leader: str | None, phone: str | None, status: int | None
     ) -> list[dict[str, Any]]:
         """
-        获取部门树形结构
+        Get a sector tree structure
 
-        :param request: FastAPI 请求对象
-        :param name: 部门名称
-        :param leader: 部门负责人
-        :param phone: 联系电话
-        :param status: 状态
+        :param request: FastAPI
+        :param name: department name
+        :param head of department
+        :param phone:
+        :param status: status
         :return:
         """
         async with async_db_session() as db:
@@ -53,61 +53,61 @@ class DeptService:
     @staticmethod
     async def create(*, obj: CreateDeptParam) -> None:
         """
-        创建部门
+        Create Sector
 
-        :param obj: 部门创建参数
+        :param obj: sector creation parameters
         :return:
         """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_by_name(db, obj.name)
             if dept:
-                raise errors.ForbiddenError(msg='部门名称已存在')
+                raise errors.ForbiddenError(msg='Department name already exists')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:
-                    raise errors.NotFoundError(msg='父级部门不存在')
+                    raise errors.NotFoundError(msg='There is no parent department')
             await dept_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDeptParam) -> int:
         """
-        更新部门
+        Update Department
 
-        :param pk: 部门 ID
-        :param obj: 部门更新参数
+        :param pk: Department ID
+        :param obj: sector update parameters
         :return:
         """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
+                raise errors.NotFoundError(msg='Department does not exist')
             if dept.name != obj.name:
                 if await dept_dao.get_by_name(db, obj.name):
-                    raise errors.ForbiddenError(msg='部门名称已存在')
+                    raise errors.ForbiddenError(msg='Department name already exists')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:
-                    raise errors.NotFoundError(msg='父级部门不存在')
+                    raise errors.NotFoundError(msg='There is no parent department')
             if obj.parent_id == dept.id:
-                raise errors.ForbiddenError(msg='禁止关联自身为父级')
+                raise errors.ForbiddenError(msg='Prohibit association with parent')
             count = await dept_dao.update(db, pk, obj)
             return count
 
     @staticmethod
     async def delete(*, pk: int) -> int:
         """
-        删除部门
+        Delete Sector
 
-        :param pk: 部门 ID
+        :param pk: Department ID
         :return:
         """
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_with_relation(db, pk)
             if dept.users:
-                raise errors.ForbiddenError(msg='部门下存在用户，无法删除')
+                raise errors.ForbiddenError(msg='Users exist under department, cannot be deleted')
             children = await dept_dao.get_children(db, pk)
             if children:
-                raise errors.ForbiddenError(msg='部门下存在子部门，无法删除')
+                raise errors.ForbiddenError(msg='Subsector exists under Sector, cannot be deleted')
             count = await dept_dao.delete(db, pk)
             for user in dept.users:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

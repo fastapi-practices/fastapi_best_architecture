@@ -12,30 +12,30 @@ from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeP
 
 
 class NoticeService:
-    """通知公告服务类"""
+    """Notification service category"""
 
     @staticmethod
     async def get(*, pk: int) -> Notice:
         """
-        获取通知公告
+        Access to notice announcements
 
-        :param pk: 通知公告 ID
+        :param pk: Notification bulletin ID
         :return:
         """
         async with async_db_session() as db:
             notice = await notice_dao.get(db, pk)
             if not notice:
-                raise errors.NotFoundError(msg='通知公告不存在')
+                raise errors.NotFoundError(msg='Notifier announcement does not exist')
             return notice
 
     @staticmethod
     async def get_select() -> Select:
-        """获取通知公告查询对象"""
+        """Get Notification Bulletin Queryer"""
         return await notice_dao.get_list()
 
     @staticmethod
     async def get_all() -> Sequence[Notice]:
-        """获取所有通知公告"""
+        """Get all notices posted"""
         async with async_db_session() as db:
             notices = await notice_dao.get_all(db)
             return notices
@@ -43,9 +43,9 @@ class NoticeService:
     @staticmethod
     async def create(*, obj: CreateNoticeParam) -> None:
         """
-        创建通知公告
+        Create Notification Bulletin
 
-        :param obj: 创建通知公告参数
+        :param obj: create notification bulletin parameters
         :return:
         """
         async with async_db_session.begin() as db:
@@ -54,25 +54,25 @@ class NoticeService:
     @staticmethod
     async def update(*, pk: int, obj: UpdateNoticeParam) -> int:
         """
-        更新通知公告
+        Update notification bulletins
 
-        :param pk: 通知公告 ID
-        :param obj: 更新通知公告参数
+        :param pk: Notification bulletin ID
+        :param obj: update announcement parameters
         :return:
         """
         async with async_db_session.begin() as db:
             notice = await notice_dao.get(db, pk)
             if not notice:
-                raise errors.NotFoundError(msg='通知公告不存在')
+                raise errors.NotFoundError(msg='Notifier announcement does not exist')
             count = await notice_dao.update(db, pk, obj)
             return count
 
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         """
-        删除通知公告
+        Delete Notification Bulletin
 
-        :param pk: 通知公告 ID 列表
+        :param pk: Notification Bulletin ID list
         :return:
         """
         async with async_db_session.begin() as db:

@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    summary='redis 监控',
+    summary='the redis monitor',
     dependencies=[
         Depends(RequestPermission('sys:monitor:redis')),
         DependsJwtAuth,

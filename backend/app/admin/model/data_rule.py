@@ -14,22 +14,22 @@ if TYPE_CHECKING:
 
 
 class DataRule(Base):
-    """数据规则表"""
+    """Data rule sheet"""
 
     __tablename__ = 'sys_data_rule'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(500), unique=True, comment='名称')
-    model: Mapped[str] = mapped_column(String(50), comment='SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名')
-    column: Mapped[str] = mapped_column(String(20), comment='模型字段名')
-    operator: Mapped[int] = mapped_column(comment='运算符（0：and、1：or）')
+    name: Mapped[str] = mapped_column(String(500), unique=True, comment='Name')
+    model: Mapped[str] = mapped_column(String(50), comment='SQLA MODEL NAME, CORRESPONDING TO DATA_PERMISSION_MODES')
+    column: Mapped[str] = mapped_column(String(20), comment='Model field name')
+    operator: Mapped[int] = mapped_column(comment='operators (0:and, 1:or)')
     expression: Mapped[int] = mapped_column(
-        comment='表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）'
+        comment='expressions (0: =, 1:! =, 2:>, 3:>, 4:<, 5:: < , 6:in, 7:not_in)'
     )
-    value: Mapped[str] = mapped_column(String(255), comment='规则值')
+    value: Mapped[str] = mapped_column(String(255), comment='Rule value')
 
-    # 数据范围规则一对多
+    # Data range rules are multiple
     scope_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_data_scope.id', ondelete='SET NULL'), default=None, comment='数据范围关联 ID'
+        ForeignKey('sys_data_scope.id', ondelete='SET NULL'), default=None, comment='DATA RANGE CORRELATION ID'
     )
     scope: Mapped[DataScope] = relationship(init=False, back_populates='rules')

@@ -16,7 +16,7 @@ from backend.common.security.jwt import DependsJwtAuth
 router = APIRouter()
 
 
-@router.post('/login/swagger', summary='swagger 调试专用', description='用于快捷获取 token 进行 swagger 认证')
+@router.post('/login/swagger', summary='swagger debug special', description='swagger authentication for quick access token')
 async def swagger_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetSwaggerToken:
     token, user = await auth_service.swagger_login(obj=obj)
     return GetSwaggerToken(access_token=token, user=user)  # type: ignore
@@ -24,8 +24,8 @@ async def swagger_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
 
 @router.post(
     '/login',
-    summary='用户登录',
-    description='json 格式登录, 仅支持在第三方api工具调试, 例如: postman',
+    summary='User Login',
+    description='login in json format only supports debugging api tools in third parties, e. g. postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def user_login(
@@ -35,13 +35,13 @@ async def user_login(
     return response_base.success(data=data)
 
 
-@router.post('/token/new', summary='创建新 token')
+@router.post('/token/new', summary='create new token')
 async def create_new_token(request: Request) -> ResponseSchemaModel[GetNewToken]:
     data = await auth_service.new_token(request=request)
     return response_base.success(data=data)
 
 
-@router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
+@router.post('/logout', summary='User Logout', dependencies=[DependsJwtAuth])
 async def user_logout(request: Request, response: Response) -> ResponseModel:
     await auth_service.logout(request=request, response=response)
     return response_base.success()

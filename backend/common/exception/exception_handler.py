@@ -20,13 +20,13 @@ from backend.utils.trace_id import get_request_trace_id
 
 def _get_exception_code(status_code: int) -> int:
     """
-    获取返回状态码（可用状态码基于 RFC 定义）
+    GET BACK STATE CODE (AVAILABLE STATUS CODE BASED ON RFC DEFINITION)）
 
-    `python 状态码标准支持 <https://github.com/python/cpython/blob/6e3cc72afeaee2532b4327776501eb8234ac787b/Lib/http/__init__.py#L7>`__
+    `python status code standard support <https://github.com/python/cpython/blob/6e3cc72afeaee2532b4327776501eb8234ac787b/Lib/http/__init__.py#L7>`__
 
-    `IANA 状态码注册表 <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`__
+    `IANA STATUS NUMBER REGISTRATION FORM <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`__
 
-    :param status_code: HTTP 状态码
+    :param status_code: HTTP status code
     :return:
     """
     try:
@@ -38,10 +38,10 @@ def _get_exception_code(status_code: int) -> int:
 
 async def _validation_exception_handler(request: Request, exc: RequestValidationError | ValidationError):
     """
-    数据验证异常处理
+    Data validation anomaly processing
 
-    :param request: 请求对象
-    :param exc: 验证异常
+    :param request:
+    :param exc: authentication anomaly
     :return:
     """
     errors = []
@@ -61,20 +61,20 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
-        message = 'json解析失败'
+        message = 'json parsing failed'
     else:
         error_input = error.get('input')
         field = str(error.get('loc')[-1])
         error_msg = error.get('msg')
-        message = f'{field} {error_msg}，输入：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
-    msg = f'请求参数非法: {message}'
+        message = f'{field} {error_msg}, enter: {error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
+    msg = f'request parameter is invalid: {message}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
     content = {
         'code': StandardResponseCode.HTTP_422,
         'msg': msg,
         'data': data,
     }
-    request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
+    request.state.__request_validation_exception__ = content  # Use to get unusual information in the middle
     content.update(trace_id=get_request_trace_id(request))
     return MsgSpecJSONResponse(status_code=422, content=content)
 
@@ -83,10 +83,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
         """
-        全局 HTTP 异常处理
+        GLOBAL HTTP ANOMALY PROCESSING
 
-        :param request: FastAPI 请求对象
-        :param exc: HTTP 异常
+        :param request: FastAPI
+        :param exc: HTTP anomaly
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -109,10 +109,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(RequestValidationError)
     async def fastapi_validation_exception_handler(request: Request, exc: RequestValidationError):
         """
-        FastAPI 数据验证异常处理
+        FastAPI data validation anomaly processing
 
-        :param request: FastAPI 请求对象
-        :param exc: 验证异常
+        :param request: FastAPI
+        :param exc: authentication anomaly
         :return:
         """
         return await _validation_exception_handler(request, exc)
@@ -120,10 +120,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(ValidationError)
     async def pydantic_validation_exception_handler(request: Request, exc: ValidationError):
         """
-        Pydantic 数据验证异常处理
+        Pydantic data validation anomalies processing
 
-        :param request: 请求对象
-        :param exc: 验证异常
+        :param request:
+        :param exc: authentication anomaly
         :return:
         """
         return await _validation_exception_handler(request, exc)
@@ -131,10 +131,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(AssertionError)
     async def assertion_error_handler(request: Request, exc: AssertionError):
         """
-        断言错误处理
+        Accusations of mishandling
 
-        :param request: FastAPI 请求对象
-        :param exc: 断言错误
+        :param request: FastAPI
+        :param exc: wrong assertion
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -156,10 +156,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(BaseExceptionMixin)
     async def custom_exception_handler(request: Request, exc: BaseExceptionMixin):
         """
-        全局自定义异常处理
+        Global custom abnormalities
 
-        :param request: FastAPI 请求对象
-        :param exc: 自定义异常
+        :param request: FastAPI
+        :param exc: custom anomaly
         :return:
         """
         content = {
@@ -178,10 +178,10 @@ def register_exception(app: FastAPI):
     @app.exception_handler(Exception)
     async def all_unknown_exception_handler(request: Request, exc: Exception):
         """
-        全局未知异常处理
+        Global unknown anomalies
 
-        :param request: FastAPI 请求对象
-        :param exc: 未知异常
+        :param request: FastAPI
+        :param exc: unknown anomaly
         :return:
         """
         if settings.ENVIRONMENT == 'dev':
@@ -205,14 +205,14 @@ def register_exception(app: FastAPI):
         @app.exception_handler(StandardResponseCode.HTTP_500)
         async def cors_custom_code_500_exception_handler(request, exc):
             """
-            跨域自定义 500 异常处理
+            Cross-domain custom 500
 
             `Related issue <https://github.com/encode/starlette/issues/1175>`_
 
             `Solution <https://github.com/fastapi/fastapi/discussions/7847#discussioncomment-5144709>`_
 
-            :param request: FastAPI 请求对象
-            :param exc: 自定义异常
+            :param request: FastAPI
+            :param exc: custom anomaly
             :return:
             """
             if isinstance(exc, BaseExceptionMixin):

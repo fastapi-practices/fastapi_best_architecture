@@ -10,44 +10,44 @@ from backend.core.conf import settings
 
 
 class RedisCli(Redis):
-    """Redis 客户端"""
+    """Redis client"""
 
     def __init__(self) -> None:
-        """初始化 Redis 客户端"""
+        """Initialize the Redis client"""
         super(RedisCli, self).__init__(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             password=settings.REDIS_PASSWORD,
             db=settings.REDIS_DATABASE,
             socket_timeout=settings.REDIS_TIMEOUT,
-            socket_connect_timeout=5,  # 连接超时
-            socket_keepalive=True,  # 保持连接
-            health_check_interval=30,  # 健康检查间隔
-            decode_responses=True,  # 转码 utf-8
-            retry_on_timeout=True,  # 超时重试
-            max_connections=20,  # 最大连接数
+            socket_connect_timeout=5,  # Connection timed out
+            socket_keepalive=True,  # Keep Connection
+            health_check_interval=30,  # Health checkup interval
+            decode_responses=True,  # Transcode utf-8
+            retry_on_timeout=True,  # Try overtime
+            max_connections=20,  # Maximum number of connections
         )
 
     async def open(self) -> None:
-        """触发初始化连接"""
+        """Trigger Initialisation Connection"""
         try:
             await self.ping()
         except TimeoutError:
-            log.error('❌ 数据库 redis 连接超时')
+            log.error('❌ database retis connection timed out')
             sys.exit()
         except AuthenticationError:
-            log.error('❌ 数据库 redis 连接认证失败')
+            log.error('❌ database retis connection authentication failed')
             sys.exit()
         except Exception as e:
-            log.error('❌ 数据库 redis 连接异常 {}', e)
+            log.error('❌database redis connection abnormal', e)
             sys.exit()
 
     async def delete_prefix(self, prefix: str, exclude: str | list[str] | None = None) -> None:
         """
-        删除指定前缀的所有 key
+        Remove all specified prefixes key
 
-        :param prefix: 前缀
-        :param exclude: 排除的 key
+        :param prefix: prefix
+        :param example: excluded key
         :return:
         """
         keys = []
@@ -64,5 +64,5 @@ class RedisCli(Redis):
             await self.delete(*keys)
 
 
-# 创建 redis 客户端单例
+# create a single example of a redis client
 redis_client: RedisCli = RedisCli()

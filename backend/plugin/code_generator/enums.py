@@ -4,9 +4,9 @@ from backend.common.enums import StrEnum
 
 
 class GenModelMySQLColumnType(StrEnum):
-    """代码生成模型列类型（MySQL）"""
+    """Code Generation Model Column Type (MySQL)"""
 
-    # Python 类型映射
+    # Python-type map
     BIGINT = 'int'
     BigInteger = 'int'  # BIGINT
     BINARY = 'bytes'
@@ -53,7 +53,7 @@ class GenModelMySQLColumnType(StrEnum):
     VARBINARY = 'bytes'
     VARCHAR = 'str'  # String
 
-    # sa.dialects.mysql 导入
+    # s.dialects.mysql import
     BIT = 'bool'
     ENUM = 'Enum'
     LONGBLOB = 'bytes'
@@ -69,9 +69,9 @@ class GenModelMySQLColumnType(StrEnum):
 
 
 class GenModelPostgreSQLColumnType(StrEnum):
-    """代码生成模型列类型（PostgreSQL）"""
+    """Code Generation Model Column Type (PostgreSQL)"""
 
-    # Python 类型映射
+    # Python-type map
     BIGINT = 'int'
     BigInteger = 'int'  # BIGINT
     BINARY = 'bytes'
@@ -118,7 +118,7 @@ class GenModelPostgreSQLColumnType(StrEnum):
     VARBINARY = 'bytes'
     VARCHAR = 'str'  # String
 
-    # sa.dialects.postgresql 导入
+    # s.dialects.postgresql import
     ARRAY = 'list'
     BIT = 'bool'
     BYTEA = 'bytes'

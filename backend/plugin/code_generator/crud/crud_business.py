@@ -10,64 +10,64 @@ from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
 
 
 class CRUDGenBusiness(CRUDPlus[GenBusiness]):
-    """代码生成业务 CRUD 类"""
+    """CODE GENERATION OPERATIONS CRUD CATEGORY"""
 
     async def get(self, db: AsyncSession, pk: int) -> GenBusiness | None:
         """
-        获取代码生成业务
+        Get code generation business
 
-        :param db: 数据库会话
-        :param pk: 代码生成业务 ID
+        :param db: database session
+        :param pk: Code Generation Business ID
         :return:
         """
         return await self.select_model(db, pk)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> GenBusiness | None:
         """
-        通过 name 获取代码生成业务
+        generate business via name
 
-        :param db: 数据库会话
-        :param name: 表名
+        :param db: database session
+        :param name: table name
         :return:
         """
         return await self.select_model_by_column(db, table_name=name)
 
     async def get_all(self, db: AsyncSession) -> Sequence[GenBusiness]:
         """
-        获取所有代码生成业务
+        Get all code generation operations
 
-        :param db: 数据库会话
+        :param db: database session
         :return:
         """
         return await self.select_models(db)
 
     async def create(self, db: AsyncSession, obj: CreateGenBusinessParam) -> None:
         """
-        创建代码生成业务
+        Create code generation business
 
-        :param db: 数据库会话
-        :param obj: 创建代码生成业务参数
+        :param db: database session
+        :param obj: create code generation business parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateGenBusinessParam) -> int:
         """
-        更新代码生成业务
+        Update code generation operations
 
-        :param db: 数据库会话
-        :param pk: 代码生成业务 ID
-        :param obj: 更新代码生成业务参数
+        :param db: database session
+        :param pk: Code Generation Business ID
+        :param obj: update code generation business parameters
         :return:
         """
         return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """
-        删除代码生成业务
+        Remove Code Generation Operations
 
-        :param db: 数据库会话
-        :param pk: 代码生成业务 ID
+        :param db: database session
+        :param pk: Code Generation Business ID
         :return:
         """
         return await self.delete_model(db, pk)

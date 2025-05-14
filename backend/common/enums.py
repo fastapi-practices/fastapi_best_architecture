@@ -8,38 +8,38 @@ T = TypeVar('T', bound=Enum)
 
 
 class _EnumBase:
-    """枚举基类，提供通用方法"""
+    """A list of subcategories providing common methods"""
 
     @classmethod
     def get_member_keys(cls: Type[T]) -> list[str]:
-        """获取枚举成员名称列表"""
+        """Can not get folder: %s: %s"""
         return [name for name in cls.__members__.keys()]
 
     @classmethod
     def get_member_values(cls: Type[T]) -> list:
-        """获取枚举成员值列表"""
+        """Fetch list of member values"""
         return [item.value for item in cls.__members__.values()]
 
     @classmethod
     def get_member_dict(cls: Type[T]) -> dict[str, Any]:
-        """获取枚举成员字典"""
+        """Fetch Element Member Dictionary"""
         return {name: item.value for name, item in cls.__members__.items()}
 
 
 class IntEnum(_EnumBase, SourceIntEnum):
-    """整型枚举基类"""
+    """Integer subcategories"""
 
     pass
 
 
 class StrEnum(_EnumBase, str, Enum):
-    """字符串枚举基类"""
+    """String encoded subcategories"""
 
     pass
 
 
 class MenuType(IntEnum):
-    """菜单类型"""
+    """Menu Type"""
 
     directory = 0
     menu = 1
@@ -47,14 +47,14 @@ class MenuType(IntEnum):
 
 
 class RoleDataRuleOperatorType(IntEnum):
-    """数据规则运算符"""
+    """Data rule operators"""
 
     AND = 0
     OR = 1
 
 
 class RoleDataRuleExpressionType(IntEnum):
-    """数据规则表达式"""
+    """Data rule expression"""
 
     eq = 0  # ==
     ne = 1  # !=
@@ -67,7 +67,7 @@ class RoleDataRuleExpressionType(IntEnum):
 
 
 class MethodType(StrEnum):
-    """HTTP 请求方法"""
+    """HTTP REQUEST METHOD"""
 
     GET = 'GET'
     POST = 'POST'
@@ -78,21 +78,21 @@ class MethodType(StrEnum):
 
 
 class LoginLogStatusType(IntEnum):
-    """登录日志状态"""
+    """Login Login Status"""
 
     fail = 0
     success = 1
 
 
 class BuildTreeType(StrEnum):
-    """构建树形结构类型"""
+    """Build tree structure type"""
 
     traversal = 'traversal'
     recursive = 'recursive'
 
 
 class OperaLogCipherType(IntEnum):
-    """操作日志加密类型"""
+    """Operation Log Encryption Type"""
 
     aes = 0
     md5 = 1
@@ -101,21 +101,21 @@ class OperaLogCipherType(IntEnum):
 
 
 class StatusType(IntEnum):
-    """状态类型"""
+    """Status Type"""
 
     disable = 0
     enable = 1
 
 
 class UserSocialType(StrEnum):
-    """用户社交类型"""
+    """User Social Type"""
 
     github = 'GitHub'
     linux_do = 'LinuxDo'
 
 
 class FileType(StrEnum):
-    """文件类型"""
+    """File type"""
 
     image = 'image'
     video = 'video'

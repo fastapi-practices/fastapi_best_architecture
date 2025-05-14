@@ -21,24 +21,24 @@ from backend.utils.trace_id import get_request_trace_id
 
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
-    """操作日志中间件"""
+    """Operation log middle"""
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:
         """
-        处理请求并记录操作日志
+        Processing requests and recording operations logs
 
-        :param request: FastAPI 请求对象
-        :param call_next: 下一个中间件或路由处理函数
+        :param request: FastAPI
+        :param call_text: next intermediate or route processing function
         :return:
         """
-        # 排除记录白名单
+        # Exclude the white list of records
         path = request.url.path
         if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
             return await call_next(request)
 
-        # 请求解析
+        # Request Parsing
         try:
-            # 此信息依赖于 jwt 中间件
+            # this information depends on the jwt middle
             username = request.user.username
         except AttributeError:
             username = None
@@ -46,17 +46,17 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         args = await self.get_request_args(request)
         args = await self.desensitization(args)
 
-        # 执行请求
+        # Enforcement of requests
         start_time = timezone.now()
         request_next = await self.execute_request(request, call_next)
         end_time = timezone.now()
         cost_time = round((end_time - start_time).total_seconds() * 1000.0, 3)
 
-        # 此信息只能在请求后获取
+        # This information can only be obtained after request
         _route = request.scope.get('route')
         summary = getattr(_route, 'summary', None) or ''
 
-        # 日志创建
+        # Log Creation
         opera_log_in = CreateOperaLogParam(
             trace_id=get_request_trace_id(request),
             username=username,
@@ -80,7 +80,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         )
         create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
 
-        # 错误抛出
+        # Error Throwing
         if request_next.err:
             raise request_next.err from None
 
@@ -88,10 +88,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
     async def execute_request(self, request: Request, call_next: Any) -> RequestCallNext:
         """
-        执行请求并处理异常
+        Execute requests and handle anomalies
 
-        :param request: FastAPI 请求对象
-        :param call_next: 下一个中间件或路由处理函数
+        :param request: FastAPI
+        :param call_text: next intermediate or route processing function
         :return:
         """
         code = 200
@@ -103,8 +103,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             code, msg = self.request_exception_handler(request, code, msg)
         except Exception as e:
-            log.error(f'请求异常: {str(e)}')
-            # code 处理包含 SQLAlchemy 和 Pydantic
+            log.error(f'request abnormal: {str(e)}')
+            # code process containing SQLAlchemy and Pydantic
             code = getattr(e, 'code', code)
             msg = getattr(e, 'msg', msg)
             status = StatusType.disable
@@ -115,11 +115,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     @staticmethod
     def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
         """
-        请求异常处理器
+        Request anomaly processor
 
-        :param request: FastAPI 请求对象
-        :param code: 错误码
-        :param msg: 错误信息
+        :param request: FastAPI
+        :param code: error code
+        :param msg: error message
         :return:
         """
         exception_states = [
@@ -135,21 +135,21 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             if exception:
                 code = exception.get('code')
                 msg = exception.get('msg')
-                log.error(f'请求异常: {msg}')
+                log.error(f'request abnormal: {msg}')
                 break
         return code, msg
 
     @staticmethod
     async def get_request_args(request: Request) -> dict[str, Any]:
         """
-        获取请求参数
+        Get Request Parameters
 
-        :param request: FastAPI 请求对象
+        :param request: FastAPI
         :return:
         """
         args = dict(request.query_params)
         args.update(request.path_params)
-        # Tip: .body() 必须在 .form() 之前获取
+        # Tip: .body() must obtain before .form()
         # https://github.com/encode/starlette/discussions/1933
         body_data = await request.body()
         form_data = await request.form()
@@ -162,7 +162,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 if isinstance(json_data, dict):
                     args.update(json_data)
                 else:
-                    # 注意：非字典数据默认使用 body 作为键
+                    # note: the non-dictionaries data default using body as key
                     args.update({'body': str(body_data)})
             else:
                 args.update({'body': str(body_data)})
@@ -172,9 +172,9 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     @sync_to_async
     def desensitization(args: dict[str, Any]) -> dict[str, Any] | None:
         """
-        脱敏处理
+        Sensitization
 
-        :param args: 需要脱敏的参数字典
+        :param args: desensitive numerics required
         :return:
         """
         if not args:

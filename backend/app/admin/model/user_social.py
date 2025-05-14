@@ -14,20 +14,20 @@ if TYPE_CHECKING:
 
 
 class UserSocial(Base):
-    """用户社交表（OAuth2）"""
+    """User Social Table (OAuth2)"""
 
     __tablename__ = 'sys_user_social'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    source: Mapped[str] = mapped_column(String(20), comment='第三方用户来源')
-    open_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 open id')
-    uid: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 ID')
-    union_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='第三方用户的 union id')
-    scope: Mapped[str | None] = mapped_column(String(120), default=None, comment='第三方用户授予的权限')
-    code: Mapped[str | None] = mapped_column(String(50), default=None, comment='用户的授权 code')
+    source: Mapped[str] = mapped_column(String(20), comment='Third-party user sources')
+    open_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='open id')
+    uid: Mapped[str | None] = mapped_column(String(20), default=None, comment='ID OF THIRD-PARTY USER')
+    union_id: Mapped[str | None] = mapped_column(String(20), default=None, comment='union id of third-party users')
+    scope: Mapped[str | None] = mapped_column(String(120), default=None, comment='Authority granted by third-party users')
+    code: Mapped[str | None] = mapped_column(String(50), default=None, comment='user\'s authorization code')
 
-    # 用户社交信息一对多
+    # User social information is multiple
     user_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_user.id', ondelete='SET NULL'), default=None, comment='用户关联ID'
+        ForeignKey('sys_user.id', ondelete='SET NULL'), default=None, comment='USER LINK ID'
     )
     user: Mapped[User | None] = relationship(init=False, back_populates='socials')

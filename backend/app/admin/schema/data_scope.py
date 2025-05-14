@@ -10,37 +10,37 @@ from backend.common.schema import SchemaBase
 
 
 class DataScopeBase(SchemaBase):
-    """数据范围基础模型"""
+    """Data range base model"""
 
-    name: str = Field(description='名称')
-    status: StatusType = Field(StatusType.enable, description='状态')
+    name: str = Field(description='Name')
+    status: StatusType = Field(StatusType.enable, description='Status')
 
 
 class CreateDataScopeParam(DataScopeBase):
-    """创建数据范围参数"""
+    """Create data range parameters"""
 
 
 class UpdateDataScopeParam(DataScopeBase):
-    """更新数据范围参数"""
+    """Update data range parameters"""
 
 
 class UpdateDataScopeRuleParam(SchemaBase):
-    """更新数据范围规则参数"""
+    """Update data range rule parameters"""
 
-    rules: list[int] = Field(description='数据规则 ID 列表')
+    rules: list[int] = Field(description='DATA RULE ID LIST')
 
 
 class GetDataScopeDetail(DataScopeBase):
-    """数据范围详情"""
+    """Data range details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(description='数据范围 ID')
-    created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(None, description='更新时间')
+    id: int = Field(description='DATA RANGE ID')
+    created_time: datetime = Field(description='Created')
+    updated_time: datetime | None = Field(None, description='Update Time')
 
 
 class GetDataScopeWithRelationDetail(GetDataScopeDetail):
-    """数据范围关联详情"""
+    """Details of data range linkages"""
 
-    rules: list[GetDataRuleDetail] = Field([], description='数据规则列表')
+    rules: list[GetDataRuleDetail] = Field([], description='Data Rule List')

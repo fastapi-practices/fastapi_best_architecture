@@ -5,9 +5,9 @@ from backend.common.socketio.server import sio
 
 async def task_notification(msg: str):
     """
-    任务通知
+    Job announcement
 
-    :param msg: 通知信息
+    :param msg: notification information
     :return:
     """
     await sio.emit('task_notification', {'msg': msg})

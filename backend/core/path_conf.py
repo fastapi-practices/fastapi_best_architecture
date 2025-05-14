@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 
-# 项目根目录
+# Project Root Directory
 BASE_PATH = Path(__file__).resolve().parent.parent
 
-# alembic 迁移文件存放路径
+# alembic migration file storage path
 ALEMBIC_VERSION_DIR = BASE_PATH / 'alembic' / 'versions'
 
-# 日志文件路径
+# Log File Path
 LOG_DIR = BASE_PATH / 'log'
 
-# 静态资源目录
+# Static Resource Directory
 STATIC_DIR = BASE_PATH / 'static'
 
-# 上传文件目录
+# Upload File Directory
 UPLOAD_DIR = STATIC_DIR / 'upload'
 
-# 插件目录
+# Plugin Directory
 PLUGIN_DIR = BASE_PATH / 'plugin'
 
-# 离线 IP 数据库路径
+# OFFLINE IP DATABASE PATH
 IP2REGION_XDB = STATIC_DIR / 'ip2region.xdb'

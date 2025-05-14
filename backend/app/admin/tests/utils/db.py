@@ -12,6 +12,6 @@ _, async_test_db_session = create_async_engine_and_session(TEST_SQLALCHEMY_DATAB
 
 
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
-    """session 生成器"""
+    """session generator"""
     async with async_test_db_session() as session:
         yield session

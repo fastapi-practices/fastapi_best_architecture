@@ -16,15 +16,15 @@ from backend.plugin.notice.service.notice_service import notice_service
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
+@router.get('/{pk}', summary='Get the details of the notice announcement', dependencies=[DependsJwtAuth])
+async def get_notice(pk: Annotated[int, Path(description='ANNOUNCEMENTS ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
     notice = await notice_service.get(pk=pk)
     return response_base.success(data=notice)
 
 
 @router.get(
     '',
-    summary='分页获取所有通知公告',
+    summary='Page break for all notices',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -38,7 +38,7 @@ async def get_pagination_notices(db: CurrentSession) -> ResponseSchemaModel[Page
 
 @router.post(
     '',
-    summary='创建通知公告',
+    summary='Create Notification Bulletin',
     dependencies=[
         Depends(RequestPermission('sys:notice:add')),
         DependsRBAC,
@@ -51,13 +51,13 @@ async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新通知公告',
+    summary='Update notification bulletins',
     dependencies=[
         Depends(RequestPermission('sys:notice:edit')),
         DependsRBAC,
     ],
 )
-async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam) -> ResponseModel:
+async def update_notice(pk: Annotated[int, Path(description='ANNOUNCEMENTS ID')], obj: UpdateNoticeParam) -> ResponseModel:
     count = await notice_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -66,13 +66,13 @@ async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')],
 
 @router.delete(
     '',
-    summary='批量删除通知公告',
+    summary='Batch Delete Notification Bulletin',
     dependencies=[
         Depends(RequestPermission('sys:notice:del')),
         DependsRBAC,
     ],
 )
-async def delete_notice(pk: Annotated[list[int], Query(description='通知公告 ID 列表')]) -> ResponseModel:
+async def delete_notice(pk: Annotated[list[int], Query(description='NOTIFICATION BULLETIN ID LIST')]) -> ResponseModel:
     count = await notice_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

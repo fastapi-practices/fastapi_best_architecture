@@ -9,15 +9,15 @@ from backend.app.admin.schema.login_log import CreateLoginLogParam
 
 
 class CRUDLoginLog(CRUDPlus[LoginLog]):
-    """登录日志数据库操作类"""
+    """Login Login Database Operations Category"""
 
     async def get_list(self, username: str | None, status: int | None, ip: str | None) -> Select:
         """
-        获取登录日志列表
+        Fetch Login List
 
-        :param username: 用户名
-        :param status: 登录状态
-        :param ip: IP 地址
+        :param username:
+        :param status: login status
+        :param ip: IP address
         :return:
         """
         filters = {}
@@ -31,29 +31,29 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
 
     async def create(self, db: AsyncSession, obj: CreateLoginLogParam) -> None:
         """
-        创建登录日志
+        Create Login Log
 
-        :param db: 数据库会话
-        :param obj: 创建登录日志参数
+        :param db: database session
+        :param obj: create login parameters
         :return:
         """
         await self.create_model(db, obj, commit=True)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除登录日志
+        Remove Login Log
 
-        :param db: 数据库会话
-        :param pk: 登录日志 ID 列表
+        :param db: database session
+        :param pk: Login Login ID list
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
     async def delete_all(self, db: AsyncSession) -> int:
         """
-        删除所有日志
+        Delete All Logs
 
-        :param db: 数据库会话
+        :param db: database session
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True)

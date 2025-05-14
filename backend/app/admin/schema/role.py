@@ -11,45 +11,45 @@ from backend.common.schema import SchemaBase
 
 
 class RoleSchemaBase(SchemaBase):
-    """角色基础模型"""
+    """Role Foundation Model"""
 
-    name: str = Field(description='角色名称')
-    status: StatusType = Field(StatusType.enable, description='状态')
-    remark: str | None = Field(None, description='备注')
+    name: str = Field(description='Role Name')
+    status: StatusType = Field(StatusType.enable, description='Status')
+    remark: str | None = Field(None, description='Remarks')
 
 
 class CreateRoleParam(RoleSchemaBase):
-    """创建角色参数"""
+    """Create role parameters"""
 
 
 class UpdateRoleParam(RoleSchemaBase):
-    """更新角色参数"""
+    """Update role parameters"""
 
 
 class UpdateRoleMenuParam(SchemaBase):
-    """更新角色菜单参数"""
+    """Update Role Menu Parameter"""
 
-    menus: list[int] = Field(description='菜单 ID 列表')
+    menus: list[int] = Field(description='MENU ID LIST')
 
 
 class UpdateRoleScopeParam(SchemaBase):
-    """更新角色数据范围参数"""
+    """Update role data range parameters"""
 
-    scopes: list[int] = Field(description='数据范围 ID 列表')
+    scopes: list[int] = Field(description='DATA RANGE ID LIST')
 
 
 class GetRoleDetail(RoleSchemaBase):
-    """角色详情"""
+    """Role Details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(description='角色 ID')
-    created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(None, description='更新时间')
+    id: int = Field(description='ROLE ID')
+    created_time: datetime = Field(description='Created')
+    updated_time: datetime | None = Field(None, description='Update Time')
 
 
 class GetRoleWithRelationDetail(GetRoleDetail):
-    """角色关联详情"""
+    """Role Link Details"""
 
-    menus: list[GetMenuDetail | None] = Field([], description='菜单详情列表')
-    scopes: list[GetDataScopeDetail | None] = Field([], description='数据范围列表')
+    menus: list[GetMenuDetail | None] = Field([], description='Menu Details List')
+    scopes: list[GetDataScopeDetail | None] = Field([], description='Data Range List')

@@ -12,43 +12,43 @@ from backend.database.redis import redis_client
 
 
 class DataScopeService:
-    """数据范围服务类"""
+    """Data range service category"""
 
     @staticmethod
     async def get(*, pk: int) -> DataScope:
         """
-        获取数据范围详情
+        Details on the extent of data acquisition
 
-        :param pk: 范围 ID
+        :param pk: Range ID
         :return:
         """
         async with async_db_session() as db:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg='Data range does not exist')
             return data_scope
 
     @staticmethod
     async def get_rules(*, pk: int) -> DataScope:
         """
-        获取数据范围规则
+        Rules on access to data coverage
 
-        :param pk: 范围 ID
+        :param pk: Range ID
         :return:
         """
         async with async_db_session() as db:
             data_scope = await data_scope_dao.get_with_relation(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg='Data range does not exist')
             return data_scope
 
     @staticmethod
     async def get_select(*, name: str | None, status: int | None) -> Select:
         """
-        获取数据范围列表查询条件
+        Access data range list query conditions
 
-        :param name: 范围名称
-        :param status: 范围状态
+        :param name: range name
+        :param status: range status
         :return:
         """
         return await data_scope_dao.get_list(name, status)
@@ -56,33 +56,33 @@ class DataScopeService:
     @staticmethod
     async def create(*, obj: CreateDataScopeParam) -> None:
         """
-        创建数据范围
+        Create Data Range
 
-        :param obj: 数据范围参数
+        :param obj: data range parameters
         :return:
         """
         async with async_db_session.begin() as db:
             data_scope = await data_scope_dao.get_by_name(db, obj.name)
             if data_scope:
-                raise errors.ForbiddenError(msg='数据范围已存在')
+                raise errors.ForbiddenError(msg='Data range already exists')
             await data_scope_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDataScopeParam) -> int:
         """
-        更新数据范围
+        Update data ranges
 
-        :param pk: 范围 ID
-        :param obj: 数据范围更新参数
+        :param pk: Range ID
+        :param obj: data range update parameters
         :return:
         """
         async with async_db_session.begin() as db:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg='Data range does not exist')
             if data_scope.name != obj.name:
                 if await data_scope_dao.get_by_name(db, obj.name):
-                    raise errors.ForbiddenError(msg='数据范围已存在')
+                    raise errors.ForbiddenError(msg='Data range already exists')
             count = await data_scope_dao.update(db, pk, obj)
             for role in await data_scope.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:
@@ -92,10 +92,10 @@ class DataScopeService:
     @staticmethod
     async def update_data_scope_rule(*, pk: int, rule_ids: UpdateDataScopeRuleParam) -> int:
         """
-        更新数据范围规则
+        Update data coverage rules
 
-        :param pk: 范围 ID
-        :param rule_ids: 规则 ID 列表
+        :param pk: Range ID
+        :param rule ID list
         :return:
         """
         async with async_db_session.begin() as db:
@@ -105,9 +105,9 @@ class DataScopeService:
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         """
-        删除数据范围
+        Delete Data Range
 
-        :param pk: 范围 ID 列表
+        :param pk: Range ID list
         :return:
         """
         async with async_db_session.begin() as db:

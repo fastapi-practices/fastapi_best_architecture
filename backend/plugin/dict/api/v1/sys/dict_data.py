@@ -21,9 +21,9 @@ from backend.plugin.dict.service.dict_data_service import dict_data_service
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='Get Dictionary Details', dependencies=[DependsJwtAuth])
 async def get_dict_data(
-    pk: Annotated[int, Path(description='字典数据 ID')],
+    pk: Annotated[int, Path(description='DICTIONARY DATA ID')],
 ) -> ResponseSchemaModel[GetDictDataWithRelation]:
     data = await dict_data_service.get(pk=pk)
     return response_base.success(data=data)
@@ -31,7 +31,7 @@ async def get_dict_data(
 
 @router.get(
     '',
-    summary='分页获取所有字典',
+    summary='Page Break Get All Dictionaries',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
@@ -39,9 +39,9 @@ async def get_dict_data(
 )
 async def get_pagination_dict_datas(
     db: CurrentSession,
-    label: Annotated[str | None, Query(description='字典数据标签')] = None,
-    value: Annotated[str | None, Query(description='字典数据键值')] = None,
-    status: Annotated[int | None, Query(description='状态')] = None,
+    label: Annotated[str | None, Query(description='Dictionary Data Label')] = None,
+    value: Annotated[str | None, Query(description='Dictionary Data Key')] = None,
+    status: Annotated[int | None, Query(description='Status')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
     dict_data_select = await dict_data_service.get_select(label=label, value=value, status=status)
     page_data = await paging_data(db, dict_data_select)
@@ -50,7 +50,7 @@ async def get_pagination_dict_datas(
 
 @router.post(
     '',
-    summary='创建字典',
+    summary='Create Dictionary',
     dependencies=[
         Depends(RequestPermission('sys:dict:data:add')),
         DependsRBAC,
@@ -63,14 +63,14 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新字典',
+    summary='Update Dictionary',
     dependencies=[
         Depends(RequestPermission('sys:dict:data:edit')),
         DependsRBAC,
     ],
 )
 async def update_dict_data(
-    pk: Annotated[int, Path(description='字典数据 ID')], obj: UpdateDictDataParam
+    pk: Annotated[int, Path(description='DICTIONARY DATA ID')], obj: UpdateDictDataParam
 ) -> ResponseModel:
     count = await dict_data_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -80,13 +80,13 @@ async def update_dict_data(
 
 @router.delete(
     '',
-    summary='批量删除字典',
+    summary='Batch deletion dictionary',
     dependencies=[
         Depends(RequestPermission('sys:dict:data:del')),
         DependsRBAC,
     ],
 )
-async def delete_dict_data(pk: Annotated[list[int], Query(description='字典数据 ID 列表')]) -> ResponseModel:
+async def delete_dict_data(pk: Annotated[list[int], Query(description='DICTIONARY DATA ID LIST')]) -> ResponseModel:
     count = await dict_data_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

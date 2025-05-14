@@ -20,23 +20,23 @@ from backend.plugin.code_generator.service.column_service import gen_model_servi
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
+@router.get('/all', summary='Get all code generation operations', dependencies=[DependsJwtAuth])
 async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
     data = await gen_business_service.get_all()
     return response_base.success(data=data)
 
 
-@router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='Get code generation details', dependencies=[DependsJwtAuth])
 async def get_business(
-    pk: Annotated[int, Path(description='业务 ID')],
+    pk: Annotated[int, Path(description='OPERATIONS ID')],
 ) -> ResponseSchemaModel[GetGenBusinessDetail]:
     data = await gen_business_service.get(pk=pk)
     return response_base.success(data=data)
 
 
-@router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
+@router.get('/{pk}/models', summary='Get code generation business all models', dependencies=[DependsJwtAuth])
 async def get_business_all_models(
-    pk: Annotated[int, Path(description='业务 ID')],
+    pk: Annotated[int, Path(description='OPERATIONS ID')],
 ) -> ResponseSchemaModel[list[GetGenModelDetail]]:
     data = await gen_model_service.get_by_business(business_id=pk)
     return response_base.success(data=data)
@@ -44,7 +44,7 @@ async def get_business_all_models(
 
 @router.post(
     '',
-    summary='创建代码生成业务',
+    summary='Create code generation business',
     deprecated=True,
     dependencies=[
         Depends(RequestPermission('gen:code:business:add')),
@@ -58,14 +58,14 @@ async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新代码生成业务',
+    summary='Update code generation operations',
     dependencies=[
         Depends(RequestPermission('gen:code:business:edit')),
         DependsRBAC,
     ],
 )
 async def update_business(
-    pk: Annotated[int, Path(description='业务 ID')], obj: UpdateGenBusinessParam
+    pk: Annotated[int, Path(description='OPERATIONS ID')], obj: UpdateGenBusinessParam
 ) -> ResponseModel:
     count = await gen_business_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -75,13 +75,13 @@ async def update_business(
 
 @router.delete(
     '/{pk}',
-    summary='删除代码生成业务',
+    summary='Remove Code Generation Operations',
     dependencies=[
         Depends(RequestPermission('gen:code:business:del')),
         DependsRBAC,
     ],
 )
-async def delete_business(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseModel:
+async def delete_business(pk: Annotated[int, Path(description='OPERATIONS ID')]) -> ResponseModel:
     count = await gen_business_service.delete(pk=pk)
     if count > 0:
         return response_base.success()

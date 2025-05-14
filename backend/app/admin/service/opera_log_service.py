@@ -8,16 +8,16 @@ from backend.database.db import async_db_session
 
 
 class OperaLogService:
-    """操作日志服务类"""
+    """Operation log service class"""
 
     @staticmethod
     async def get_select(*, username: str | None, status: int | None, ip: str | None) -> Select:
         """
-        获取操作日志列表查询条件
+        Fetch operational log list query conditions
 
-        :param username: 用户名
-        :param status: 状态
-        :param ip: IP 地址
+        :param username:
+        :param status: status
+        :param ip: IP address
         :return:
         """
         return await opera_log_dao.get_list(username=username, status=status, ip=ip)
@@ -25,9 +25,9 @@ class OperaLogService:
     @staticmethod
     async def create(*, obj: CreateOperaLogParam) -> None:
         """
-        创建操作日志
+        Create Operations Log
 
-        :param obj: 操作日志创建参数
+        :param obj: operational log creation parameters
         :return:
         """
         async with async_db_session.begin() as db:
@@ -36,9 +36,9 @@ class OperaLogService:
     @staticmethod
     async def delete(*, pk: list[int]) -> int:
         """
-        删除操作日志
+        Remove Operation Log
 
-        :param pk: 日志 ID 列表
+        :param pk: Log ID list
         :return:
         """
         async with async_db_session.begin() as db:
@@ -47,7 +47,7 @@ class OperaLogService:
 
     @staticmethod
     async def delete_all() -> int:
-        """清空所有操作日志"""
+        """Empty all operations logs"""
         async with async_db_session.begin() as db:
             count = await opera_log_dao.delete_all(db)
             return count

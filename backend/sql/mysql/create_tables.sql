@@ -1,47 +1,47 @@
 create table gen_business
 (
-    id                      int auto_increment comment '主键 ID'
+    id                      int auto_increment comment 'PRIMARY ID'
         primary key,
-    app_name                varchar(50)  not null comment '应用名称（英文）',
-    table_name              varchar(255) not null comment '表名称（英文）',
-    doc_comment             varchar(255) not null comment '文档注释（用于函数/参数文档）',
-    table_comment           varchar(255) null comment '表描述',
-    class_name              varchar(50)  null comment '基础类名（默认为英文表名称）',
-    schema_name             varchar(50)  null comment 'Schema 名称 (默认为英文表名称)',
-    filename                varchar(50)  null comment '基础文件名（默认为英文表名称）',
-    default_datetime_column tinyint(1)   not null comment '是否存在默认时间列',
-    api_version             varchar(20)  not null comment '代码生成 api 版本，默认为 v1',
-    gen_path                varchar(255) null comment '代码生成路径（默认为 app 根路径）',
-    remark                  longtext     null comment '备注',
-    created_time            datetime     not null comment '创建时间',
-    updated_time            datetime     null comment '更新时间',
+    app_name                varchar(50)  not null comment 'Application name (English)',
+    table_name              varchar(255) not null comment 'Table name (English)',
+    doc_comment             varchar(255) not null comment 'Document Comment (for function/parameter documents)',
+    table_comment           varchar(255) null comment 'Table Description',
+    class_name              varchar(50)  null comment 'Base class name (defaultly English Table name)',
+    schema_name             varchar(50)  null comment 'Schema Name (Default is Table Name)',
+    filename                varchar(50)  null comment 'Base File Name (default is the English Table Name)',
+    default_datetime_column tinyint(1)   not null comment 'Existence of default timebar',
+    api_version             varchar(20)  not null comment 'code generation api version, default v1',
+    gen_path                varchar(255) null comment 'code generation path (default app root path)',
+    remark                  longtext     null comment 'Remarks',
+    created_time            datetime     not null comment 'Created',
+    updated_time            datetime     null comment 'Update Time',
     constraint table_name
         unique (table_name)
 )
-    comment '代码生成业务表';
+    comment 'Code Generation Business Sheet';
 
 create index ix_gen_business_id
     on gen_business (id);
 
 create table gen_column
 (
-    id              int auto_increment comment '主键 ID'
+    id              int auto_increment comment 'PRIMARY ID'
         primary key,
-    name            varchar(50)  not null comment '列名称',
-    comment         varchar(255) null comment '列描述',
-    type            varchar(20)  not null comment 'SQLA 模型列类型',
-    pd_type         varchar(20)  not null comment '列类型对应的 pydantic 类型',
-    `default`       longtext     null comment '列默认值',
-    sort            int          null comment '列排序',
-    length          int          not null comment '列长度',
-    is_pk           tinyint(1)   not null comment '是否主键',
-    is_nullable     tinyint(1)   not null comment '是否可为空',
-    gen_business_id int          not null comment '代码生成业务ID',
+    name            varchar(50)  not null comment 'Column Name',
+    comment         varchar(255) null comment 'Column Description',
+    type            varchar(20)  not null comment 'SQLA MODEL COLUMN TYPE',
+    pd_type         varchar(20)  not null comment 'pydantic type for column type',
+    `default`       longtext     null comment 'Column Default',
+    sort            int          null comment 'Column Sort',
+    length          int          not null comment 'Column Length',
+    is_pk           tinyint(1)   not null comment 'Whether the primary key',
+    is_nullable     tinyint(1)   not null comment 'Could it be empty',
+    gen_business_id int          not null comment 'CODE GENERATION BUSINESS ID',
     constraint gen_column_ibfk_1
         foreign key (gen_business_id) references gen_business (id)
             on delete cascade
 )
-    comment '代码生成模型列表';
+    comment 'Code Generation Model List';
 
 create index gen_business_id
     on gen_column (gen_business_id);
@@ -51,57 +51,57 @@ create index ix_gen_column_id
 
 create table sys_config
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(20) not null comment '名称',
-    type         varchar(20) null comment '类型',
-    `key`        varchar(50) not null comment '键名',
-    value        longtext    not null comment '键值',
-    is_frontend  tinyint(1)  not null comment '是否前端',
-    remark       longtext    null comment '备注',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name         varchar(20) not null comment 'Name',
+    type         varchar(20) null comment 'Type',
+    `key`        varchar(50) not null comment 'Keyname',
+    value        longtext    not null comment 'Key Value',
+    is_frontend  tinyint(1)  not null comment 'Whether to frontend',
+    remark       longtext    null comment 'Remarks',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint `key`
         unique (`key`)
 )
-    comment '参数配置表';
+    comment 'Parameter Configuration Table';
 
 create index ix_sys_config_id
     on sys_config (id);
 
 create table sys_data_scope
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(50) not null comment '名称',
-    status       int         not null comment '状态（0停用 1正常）',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name         varchar(50) not null comment 'Name',
+    status       int         not null comment 'Status (0 disabled 1)',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint name
         unique (name)
 )
-    comment '数据范围表';
+    comment 'Data Range Table';
 
 create table sys_data_rule
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(500) not null comment '名称',
-    model        varchar(50)  not null comment 'SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名',
-    `column`     varchar(20)  not null comment '模型字段名',
-    operator     int          not null comment '运算符（0：and、1：or）',
-    expression   int          not null comment '表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）',
-    value        varchar(255) not null comment '规则值',
-    scope_id     int          null comment '数据范围关联 ID',
-    created_time datetime     not null comment '创建时间',
-    updated_time datetime     null comment '更新时间',
+    name         varchar(500) not null comment 'Name',
+    model        varchar(50)  not null comment 'SQLA MODEL NAME, CORRESPONDING TO DATA_PERMISSION_MODES',
+    `column`     varchar(20)  not null comment 'Model field name',
+    operator     int          not null comment 'operators (0:and, 1:or)',
+    expression   int          not null comment 'expressions (0: =, 1:! =, 2:>, 3:>, 4:<, 5:: < , 6:in, 7:not_in)',
+    value        varchar(255) not null comment 'Rule value',
+    scope_id     int          null comment 'DATA RANGE CORRELATION ID',
+    created_time datetime     not null comment 'Created',
+    updated_time datetime     null comment 'Update Time',
     constraint name
         unique (name),
     constraint sys_data_rule_ibfk_1
         foreign key (scope_id) references sys_data_scope (id)
             on delete set null
 )
-    comment '数据规则表';
+    comment 'Data rule sheet';
 
 create index ix_sys_data_rule_id
     on sys_data_rule (id);
@@ -114,23 +114,23 @@ create index ix_sys_data_scope_id
 
 create table sys_dept
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(50) not null comment '部门名称',
-    sort         int         not null comment '排序',
-    leader       varchar(20) null comment '负责人',
-    phone        varchar(11) null comment '手机',
-    email        varchar(50) null comment '邮箱',
-    status       int         not null comment '部门状态(0停用 1正常)',
-    del_flag     tinyint(1)  not null comment '删除标志（0删除 1存在）',
-    parent_id    int         null comment '父部门ID',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name         varchar(50) not null comment 'Department name',
+    sort         int         not null comment 'Sort',
+    leader       varchar(20) null comment 'Head',
+    phone        varchar(11) null comment 'Cell phone',
+    email        varchar(50) null comment 'Mailbox',
+    status       int         not null comment 'Sector status (0 disabled 1)',
+    del_flag     tinyint(1)  not null comment 'Delete sign (0 delete 1 exists)',
+    parent_id    int         null comment 'PARENT ID',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint sys_dept_ibfk_1
         foreign key (parent_id) references sys_dept (id)
             on delete set null
 )
-    comment '部门表';
+    comment 'Sectoral table';
 
 create index ix_sys_dept_id
     on sys_dept (id);
@@ -140,38 +140,38 @@ create index ix_sys_dept_parent_id
 
 create table sys_dict_type
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(32) not null comment '字典类型名称',
-    code         varchar(32) not null comment '字典类型编码',
-    status       int         not null comment '状态（0停用 1正常）',
-    remark       longtext    null comment '备注',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name         varchar(32) not null comment 'Dictionary Type Name',
+    code         varchar(32) not null comment 'Dictionary type encoding',
+    status       int         not null comment 'Status (0 disabled 1)',
+    remark       longtext    null comment 'Remarks',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint code
         unique (code)
 )
-    comment '字典类型表';
+    comment 'Dictionary Type Table';
 
 create table sys_dict_data
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    label        varchar(32) not null comment '字典标签',
-    value        varchar(32) not null comment '字典值',
-    sort         int         not null comment '排序',
-    status       int         not null comment '状态（0停用 1正常）',
-    remark       longtext    null comment '备注',
-    type_id      int         not null comment '字典类型关联ID',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    label        varchar(32) not null comment 'Dictionary Label',
+    value        varchar(32) not null comment 'Dictionary values',
+    sort         int         not null comment 'Sort',
+    status       int         not null comment 'Status (0 disabled 1)',
+    remark       longtext    null comment 'Remarks',
+    type_id      int         not null comment 'DICTIONARY TYPE ASSOCIATION ID',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint label
         unique (label),
     constraint sys_dict_data_ibfk_1
         foreign key (type_id) references sys_dict_type (id)
             on delete cascade
 )
-    comment '字典数据表';
+    comment 'Dictionary Data Sheet';
 
 create index ix_sys_dict_data_id
     on sys_dict_data (id);
@@ -184,53 +184,53 @@ create index ix_sys_dict_type_id
 
 create table sys_login_log
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    user_uuid    varchar(50)  not null comment '用户UUID',
-    username     varchar(20)  not null comment '用户名',
-    status       int          not null comment '登录状态(0失败 1成功)',
-    ip           varchar(50)  not null comment '登录IP地址',
-    country      varchar(50)  null comment '国家',
-    region       varchar(50)  null comment '地区',
-    city         varchar(50)  null comment '城市',
-    user_agent   varchar(255) not null comment '请求头',
-    os           varchar(50)  null comment '操作系统',
-    browser      varchar(50)  null comment '浏览器',
-    device       varchar(50)  null comment '设备',
-    msg          longtext     not null comment '提示消息',
-    login_time   datetime     not null comment '登录时间',
-    created_time datetime     not null comment '创建时间'
+    user_uuid    varchar(50)  not null comment 'USERUID',
+    username     varchar(20)  not null comment 'Username',
+    status       int          not null comment 'Login status (0 failed)',
+    ip           varchar(50)  not null comment 'LOGIN IP ADDRESS',
+    country      varchar(50)  null comment 'Country',
+    region       varchar(50)  null comment 'Region',
+    city         varchar(50)  null comment 'Urban',
+    user_agent   varchar(255) not null comment 'Request Header',
+    os           varchar(50)  null comment 'Operating systems',
+    browser      varchar(50)  null comment 'Browser',
+    device       varchar(50)  null comment 'Equipment',
+    msg          longtext     not null comment 'Message',
+    login_time   datetime     not null comment 'Login Time',
+    created_time datetime     not null comment 'Created'
 )
-    comment '登录日志表';
+    comment 'Login Login Table';
 
 create index ix_sys_login_log_id
     on sys_login_log (id);
 
 create table sys_menu
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    title        varchar(50)  not null comment '菜单标题',
-    name         varchar(50)  not null comment '菜单名称',
-    path         varchar(200) not null comment '路由地址',
-    sort         int          not null comment '排序',
-    icon         varchar(100) null comment '菜单图标',
-    type         int          not null comment '菜单类型（0目录 1菜单 2按钮）',
-    component    varchar(255) null comment '组件路径',
-    perms        varchar(100) null comment '权限标识',
-    status       int          not null comment '菜单状态（0停用 1正常）',
-    display      int          not null comment '是否显示（0否 1是）',
-    cache        int          not null comment '是否缓存（0否 1是）',
-    link         longtext     null comment '外链地址',
-    remark       longtext     null comment '备注',
-    parent_id    int          null comment '父菜单ID',
-    created_time datetime     not null comment '创建时间',
-    updated_time datetime     null comment '更新时间',
+    title        varchar(50)  not null comment 'Menu Title',
+    name         varchar(50)  not null comment 'Menu Name',
+    path         varchar(200) not null comment 'Route Address',
+    sort         int          not null comment 'Sort',
+    icon         varchar(100) null comment 'Menu Icon',
+    type         int          not null comment 'Menu type (0 directory 1 menu 2 button)',
+    component    varchar(255) null comment 'Component Path',
+    perms        varchar(100) null comment 'Permission Identification',
+    status       int          not null comment 'Menu status (0 disabled 1 normal)',
+    display      int          not null comment 'Whether to show (0 no 1)',
+    cache        int          not null comment 'Cache (0 No 1)',
+    link         longtext     null comment 'Outlink Address',
+    remark       longtext     null comment 'Remarks',
+    parent_id    int          null comment 'PARENT MENU ID',
+    created_time datetime     not null comment 'Created',
+    updated_time datetime     null comment 'Update Time',
     constraint sys_menu_ibfk_1
         foreign key (parent_id) references sys_menu (id)
             on delete set null
 )
-    comment '菜单表';
+    comment 'Menu Table';
 
 create index ix_sys_menu_id
     on sys_menu (id);
@@ -240,74 +240,74 @@ create index ix_sys_menu_parent_id
 
 create table sys_notice
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    title        varchar(50) not null comment '标题',
-    type         int         not null comment '类型（0：通知、1：公告）',
-    author       varchar(16) not null comment '作者',
-    source       varchar(50) not null comment '信息来源',
-    status       int         not null comment '状态（0：隐藏、1：显示）',
-    content      longtext    not null comment '内容',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间'
+    title        varchar(50) not null comment 'Title',
+    type         int         not null comment 'Type (0: circular, 1: bulletin)',
+    author       varchar(16) not null comment 'Author',
+    source       varchar(50) not null comment 'Sources of information',
+    status       int         not null comment 'Status (0: hidden, 1: displayed)',
+    content      longtext    not null comment 'Contents',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time'
 )
-    comment '系统通知公告表';
+    comment 'System notice bulletin form';
 
 create index ix_sys_notice_id
     on sys_notice (id);
 
 create table sys_opera_log
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    trace_id     varchar(32)  not null comment '请求跟踪 ID',
-    username     varchar(20)  null comment '用户名',
-    method       varchar(20)  not null comment '请求类型',
-    title        varchar(255) not null comment '操作模块',
-    path         varchar(500) not null comment '请求路径',
-    ip           varchar(50)  not null comment 'IP地址',
-    country      varchar(50)  null comment '国家',
-    region       varchar(50)  null comment '地区',
-    city         varchar(50)  null comment '城市',
-    user_agent   varchar(255) not null comment '请求头',
-    os           varchar(50)  null comment '操作系统',
-    browser      varchar(50)  null comment '浏览器',
-    device       varchar(50)  null comment '设备',
-    args         json         null comment '请求参数',
-    status       int          not null comment '操作状态（0异常 1正常）',
-    code         varchar(20)  not null comment '操作状态码',
-    msg          longtext     null comment '提示消息',
-    cost_time    float        not null comment '请求耗时（ms）',
-    opera_time   datetime     not null comment '操作时间',
-    created_time datetime     not null comment '创建时间'
+    trace_id     varchar(32)  not null comment 'REQUEST TRACKING ID',
+    username     varchar(20)  null comment 'Username',
+    method       varchar(20)  not null comment 'Type of request',
+    title        varchar(255) not null comment 'Operation module',
+    path         varchar(500) not null comment 'Request Path',
+    ip           varchar(50)  not null comment 'IP ADDRESS',
+    country      varchar(50)  null comment 'Country',
+    region       varchar(50)  null comment 'Region',
+    city         varchar(50)  null comment 'Urban',
+    user_agent   varchar(255) not null comment 'Request Header',
+    os           varchar(50)  null comment 'Operating systems',
+    browser      varchar(50)  null comment 'Browser',
+    device       varchar(50)  null comment 'Equipment',
+    args         json         null comment 'Request parameters',
+    status       int          not null comment 'Operational status (0 anomaly 1)',
+    code         varchar(20)  not null comment 'Operational status code',
+    msg          longtext     null comment 'Message',
+    cost_time    float        not null comment 'request time-consuming (ms)',
+    opera_time   datetime     not null comment 'Operation Time',
+    created_time datetime     not null comment 'Created'
 )
-    comment '操作日志表';
+    comment 'Operations Log Table';
 
 create index ix_sys_opera_log_id
     on sys_opera_log (id);
 
 create table sys_role
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    name         varchar(20) not null comment '角色名称',
-    status       int         not null comment '角色状态（0停用 1正常）',
-    remark       longtext    null comment '备注',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name         varchar(20) not null comment 'Role Name',
+    status       int         not null comment 'Role state (0 disabled 1)',
+    remark       longtext    null comment 'Remarks',
+    created_time datetime    not null comment 'Created',
+    updated_time datetime    null comment 'Update Time',
     constraint name
         unique (name)
 )
-    comment '角色表';
+    comment 'Rolesheet';
 
 create index ix_sys_role_id
     on sys_role (id);
 
 create table sys_role_data_scope
 (
-    id            int auto_increment comment '主键 ID',
-    role_id       int not null comment '角色 ID',
-    data_scope_id int not null comment '数据范围 ID',
+    id            int auto_increment comment 'PRIMARY ID',
+    role_id       int not null comment 'ROLE ID',
+    data_scope_id int not null comment 'DATA RANGE ID',
     primary key (id, role_id, data_scope_id),
     constraint ix_sys_role_data_scope_id
         unique (id),
@@ -327,9 +327,9 @@ create index role_id
 
 create table sys_role_menu
 (
-    id      int auto_increment comment '主键ID',
-    role_id int not null comment '角色ID',
-    menu_id int not null comment '菜单ID',
+    id      int auto_increment comment 'PRIMARY KEY ID',
+    role_id int not null comment 'ROLE ID',
+    menu_id int not null comment 'MENU ID',
     primary key (id, role_id, menu_id),
     constraint ix_sys_role_menu_id
         unique (id),
@@ -349,25 +349,25 @@ create index role_id
 
 create table sys_user
 (
-    id              int auto_increment comment '主键 ID'
+    id              int auto_increment comment 'PRIMARY ID'
         primary key,
     uuid            varchar(50)    not null,
-    username        varchar(20)    not null comment '用户名',
-    nickname        varchar(20)    not null comment '昵称',
-    password        varchar(255)   null comment '密码',
-    salt            varbinary(255) null comment '加密盐',
-    email           varchar(50)    not null comment '邮箱',
-    is_superuser    tinyint(1)     not null comment '超级权限(0否 1是)',
-    is_staff        tinyint(1)     not null comment '后台管理登陆(0否 1是)',
-    status          int            not null comment '用户账号状态(0停用 1正常)',
-    is_multi_login  tinyint(1)     not null comment '是否重复登陆(0否 1是)',
-    avatar          varchar(255)   null comment '头像',
-    phone           varchar(11)    null comment '手机号',
-    join_time       datetime       not null comment '注册时间',
-    last_login_time datetime       null comment '上次登录',
-    dept_id         int            null comment '部门关联ID',
-    created_time    datetime       not null comment '创建时间',
-    updated_time    datetime       null comment '更新时间',
+    username        varchar(20)    not null comment 'Username',
+    nickname        varchar(20)    not null comment 'Nickname',
+    password        varchar(255)   null comment 'Password',
+    salt            varbinary(255) null comment 'Encrypted Salt',
+    email           varchar(50)    not null comment 'Mailbox',
+    is_superuser    tinyint(1)     not null comment 'Super permission (0 No 1)',
+    is_staff        tinyint(1)     not null comment 'Backstage management landing (0 no 1)',
+    status          int            not null comment 'User account status (0 disabled 1)',
+    is_multi_login  tinyint(1)     not null comment 'Repeated landing (0 No 1)',
+    avatar          varchar(255)   null comment 'Heads',
+    phone           varchar(11)    null comment 'Cell phone number',
+    join_time       datetime       not null comment 'Date of registration',
+    last_login_time datetime       null comment 'Last Login',
+    dept_id         int            null comment 'SECTOR-RELATED ID',
+    created_time    datetime       not null comment 'Created',
+    updated_time    datetime       null comment 'Update Time',
     constraint ix_sys_user_email
         unique (email),
     constraint ix_sys_user_username
@@ -380,7 +380,7 @@ create table sys_user
         foreign key (dept_id) references sys_dept (id)
             on delete set null
 )
-    comment '用户表';
+    comment 'User Table';
 
 create index dept_id
     on sys_user (dept_id);
@@ -393,9 +393,9 @@ create index ix_sys_user_status
 
 create table sys_user_role
 (
-    id      int auto_increment comment '主键ID',
-    user_id int not null comment '用户ID',
-    role_id int not null comment '角色ID',
+    id      int auto_increment comment 'PRIMARY KEY ID',
+    user_id int not null comment 'USER ID',
+    role_id int not null comment 'ROLE ID',
     primary key (id, user_id, role_id),
     constraint ix_sys_user_role_id
         unique (id),
@@ -415,22 +415,22 @@ create index user_id
 
 create table sys_user_social
 (
-    id           int auto_increment comment '主键 ID'
+    id           int auto_increment comment 'PRIMARY ID'
         primary key,
-    source       varchar(20)  not null comment '第三方用户来源',
-    open_id      varchar(20)  null comment '第三方用户的 open id',
-    uid          varchar(20)  null comment '第三方用户的 ID',
-    union_id     varchar(20)  null comment '第三方用户的 union id',
-    scope        varchar(120) null comment '第三方用户授予的权限',
-    code         varchar(50)  null comment '用户的授权 code',
-    user_id      int          null comment '用户关联ID',
-    created_time datetime     not null comment '创建时间',
-    updated_time datetime     null comment '更新时间',
+    source       varchar(20)  not null comment 'Third-party user sources',
+    open_id      varchar(20)  null comment 'open id',
+    uid          varchar(20)  null comment 'ID OF THIRD-PARTY USER',
+    union_id     varchar(20)  null comment 'union id of third-party users',
+    scope        varchar(120) null comment 'Authority granted by third-party users',
+    code         varchar(50)  null comment 'user\'s authorization code',
+    user_id      int          null comment 'USER LINK ID',
+    created_time datetime     not null comment 'Created',
+    updated_time datetime     null comment 'Update Time',
     constraint sys_user_social_ibfk_1
         foreign key (user_id) references sys_user (id)
             on delete set null
 )
-    comment '用户社交表（OAuth2）';
+    comment 'User Social Table (OAuth2)';
 
 create index ix_sys_user_social_id
     on sys_user_social (id);

@@ -18,9 +18,9 @@ from backend.database.redis import redis_client
 router = APIRouter()
 
 
-@router.get('', summary='获取令牌列表', dependencies=[DependsJwtAuth])
+@router.get('', summary='Get token list', dependencies=[DependsJwtAuth])
 async def get_tokens(
-    username: Annotated[str | None, Query(description='用户名')] = None,
+    username: Annotated[str | None, Query(description='Username')] = None,
 ) -> ResponseSchemaModel[list[GetTokenDetail]]:
     token_keys = await redis_client.keys(f'{settings.TOKEN_REDIS_PREFIX}:*')
     online_clients = await redis_client.smembers(settings.TOKEN_ONLINE_REDIS_PREFIX)
@@ -30,13 +30,13 @@ async def get_tokens(
         data.append(
             token_detail.model_copy(
                 update={
-                    'username': extra_info.get('username', '未知'),
-                    'nickname': extra_info.get('nickname', '未知'),
-                    'ip': extra_info.get('ip', '未知'),
-                    'os': extra_info.get('os', '未知'),
-                    'browser': extra_info.get('browser', '未知'),
-                    'device': extra_info.get('device', '未知'),
-                    'last_login_time': extra_info.get('last_login_time', '未知'),
+                    'username': extra_info.get('username', 'Unknown'),
+                    'nickname': extra_info.get('nickname', 'Unknown'),
+                    'ip': extra_info.get('ip', 'Unknown'),
+                    'os': extra_info.get('os', 'Unknown'),
+                    'browser': extra_info.get('browser', 'Unknown'),
+                    'device': extra_info.get('device', 'Unknown'),
+                    'last_login_time': extra_info.get('last_login_time', 'Unknown'),
                 }
             )
         )
@@ -48,20 +48,20 @@ async def get_tokens(
         token_detail = GetTokenDetail(
             id=token_payload.id,
             session_uuid=session_uuid,
-            username='未知',
-            nickname='未知',
-            ip='未知',
-            os='未知',
-            browser='未知',
-            device='未知',
+            username='Unknown',
+            nickname='Unknown',
+            ip='Unknown',
+            os='Unknown',
+            browser='Unknown',
+            device='Unknown',
             status=StatusType.enable if session_uuid in online_clients else StatusType.disable,
-            last_login_time='未知',
+            last_login_time='Unknown',
             expire_time=token_payload.expire_time,
         )
         extra_info = await redis_client.get(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{session_uuid}')
         if extra_info:
             extra_info = json.loads(extra_info)
-            # 排除 swagger 登录生成的 token
+            # excludes swagger login generated token
             if extra_info.get('swagger') is None:
                 if username is not None:
                     if username == extra_info.get('username'):
@@ -75,14 +75,14 @@ async def get_tokens(
 
 @router.delete(
     '/{pk}',
-    summary='踢下线',
+    summary='Kick off',
     dependencies=[
         Depends(RequestPermission('sys:token:kick')),
         DependsRBAC,
     ],
 )
 async def kick_out(
-    request: Request, pk: Annotated[int, Path(description='用户 ID')], obj: KickOutToken
+    request: Request, pk: Annotated[int, Path(description='USER ID')], obj: KickOutToken
 ) -> ResponseModel:
     superuser_verify(request)
     await revoke_token(str(pk), obj.session_uuid)

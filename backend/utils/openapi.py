@@ -6,9 +6,9 @@ from fastapi.routing import APIRoute
 
 def simplify_operation_ids(app: FastAPI) -> None:
     """
-    简化操作 ID，以便生成的客户端具有更简单的 API 函数名称
+    SIMPLIFY THE OPERATION ID SO THAT THE GENERATED CLIENT HAS A SIMPLER API FUNCTION NAME
 
-    :param app: FastAPI 应用实例
+    :param app: FastAPI application instance
     :return:
     """
     for route in app.routes:

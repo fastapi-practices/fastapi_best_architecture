@@ -6,9 +6,9 @@ from backend.plugin.code_generator.enums import GenModelMySQLColumnType, GenMode
 
 def sql_type_to_sqlalchemy(typing: str) -> str:
     """
-    将 SQL 类型转换为 SQLAlchemy 类型
+    Convert SQL type to SQLAlchemy type
 
-    :param typing: SQL 类型字符串
+    :param typeping: SQL type string
     :return:
     """
     if settings.DATABASE_TYPE == 'mysql':
@@ -22,15 +22,15 @@ def sql_type_to_sqlalchemy(typing: str) -> str:
 
 def sql_type_to_pydantic(typing: str) -> str:
     """
-    将 SQL 类型转换为 Pydantic 类型
+    Convert SQL type to Pydantic type
 
-    :param typing: SQL 类型字符串
+    :param typeping: SQL type string
     :return:
     """
     try:
         if settings.DATABASE_TYPE == 'mysql':
             return GenModelMySQLColumnType[typing].value
-        if typing == 'CHARACTER VARYING':  # postgresql 中 DDL VARCHAR 的别名
+        if typing == 'CHARACTER VARYING':  # alias of DDL Varchar in postgresql
             return 'str'
         return GenModelPostgreSQLColumnType[typing].value
     except KeyError:

@@ -6,15 +6,15 @@ from pydantic_settings import BaseSettings
 
 
 class ConfigSettings(BaseSettings):
-    """参数配置"""
+    """Parameter Configuration"""
 
-    # 参数
+    # Parameters
     CONFIG_BUILT_IN_TYPES: list[str] = ['website', 'protocol', 'policy']
 
 
 @lru_cache
 def get_config_settings() -> ConfigSettings:
-    """获取参数配置"""
+    """Get Parameter Configuration"""
     return ConfigSettings()
 
 

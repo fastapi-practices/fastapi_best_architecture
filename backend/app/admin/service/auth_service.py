@@ -30,38 +30,38 @@ from backend.utils.timezone import timezone
 
 
 class AuthService:
-    """认证服务类"""
+    """Accreditation services category"""
 
     @staticmethod
     async def user_verify(db: AsyncSession, username: str, password: str | None) -> User:
         """
-        验证用户名和密码
+        Verify username and password
 
-        :param db: 数据库会话
-        :param username: 用户名
-        :param password: 密码
+        :param db: database session
+        :param username:
+        :param password: password
         :return:
         """
         user = await user_dao.get_by_username(db, username)
         if not user:
-            raise errors.NotFoundError(msg='用户名或密码有误')
+            raise errors.NotFoundError(msg='Wrong username or password')
 
         if user.password is None:
-            raise errors.AuthorizationError(msg='用户名或密码有误')
+            raise errors.AuthorizationError(msg='Wrong username or password')
         else:
             if not password_verify(password, user.password):
-                raise errors.AuthorizationError(msg='用户名或密码有误')
+                raise errors.AuthorizationError(msg='Wrong username or password')
 
         if not user.status:
-            raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+            raise errors.AuthorizationError(msg='User is locked, please contact the system administrator')
 
         return user
 
     async def swagger_login(self, *, obj: HTTPBasicCredentials) -> tuple[str, User]:
         """
-        Swagger 文档登录
+        Swagger Document Login
 
-        :param obj: 登录凭证
+        :param obj: login certificate
         :return:
         """
         async with async_db_session.begin() as db:
@@ -79,12 +79,12 @@ class AuthService:
         self, *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
     ) -> GetLoginToken:
         """
-        用户登录
+        User Login
 
-        :param request: 请求对象
-        :param response: 响应对象
-        :param obj: 登录参数
-        :param background_tasks: 后台任务
+        :param request:
+        :param responding objects
+        :param obj: login parameters
+        :param background_tasks: backstage tasks
         :return:
         """
         async with async_db_session.begin() as db:
@@ -93,7 +93,7 @@ class AuthService:
                 user = await self.user_verify(db, obj.username, obj.password)
                 captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
-                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                    raise errors.AuthorizationError(msg='Could not close temporary folder: %s')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await redis_client.delete(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
@@ -120,11 +120,11 @@ class AuthService:
                     httponly=True,
                 )
             except errors.NotFoundError as e:
-                log.error('登陆错误: 用户名不存在')
+                log.error('Landing error: username does not exist')
                 raise errors.NotFoundError(msg=e.msg)
             except (errors.AuthorizationError, errors.CustomError) as e:
                 if not user:
-                    log.error('登陆错误: 用户密码有误')
+                    log.error('Landing error: Wrong user password')
                 task = BackgroundTask(
                     login_log_service.create,
                     **dict(
@@ -139,7 +139,7 @@ class AuthService:
                 )
                 raise errors.AuthorizationError(msg=e.msg, background=task)
             except Exception as e:
-                log.error(f'登陆错误: {e}')
+                log.error(f'landing error: {e}')
                 raise e
             else:
                 background_tasks.add_task(
@@ -151,7 +151,7 @@ class AuthService:
                         username=obj.username,
                         login_time=timezone.now(),
                         status=LoginLogStatusType.success.value,
-                        msg='登录成功',
+                        msg='Login successful',
                     ),
                 )
                 data = GetLoginToken(
@@ -165,24 +165,24 @@ class AuthService:
     @staticmethod
     async def new_token(*, request: Request) -> GetNewToken:
         """
-        获取新的访问令牌
+        Get new access tokens
 
-        :param request: FastAPI 请求对象
+        :param request: FastAPI
         :return:
         """
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
-            raise errors.TokenError(msg='Refresh Token 已过期，请重新登录')
+            raise errors.TokenError(msg='Refresh Token expired, please re-entry')
         try:
             user_id = jwt_decode(refresh_token).id
         except Exception:
-            raise errors.TokenError(msg='Refresh Token 无效')
+            raise errors.TokenError(msg='Refresh Token invalid')
         async with async_db_session() as db:
             user = await user_dao.get(db, user_id)
             if not user:
-                raise errors.NotFoundError(msg='用户名或密码有误')
+                raise errors.NotFoundError(msg='Wrong username or password')
             elif not user.status:
-                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+                raise errors.AuthorizationError(msg='User is locked, please contact the system administrator')
             new_token = await create_new_token(
                 user_id=str(user.id),
                 refresh_token=refresh_token,
@@ -206,10 +206,10 @@ class AuthService:
     @staticmethod
     async def logout(*, request: Request, response: Response) -> None:
         """
-        用户登出
+        User Logout
 
-        :param request: FastAPI 请求对象
-        :param response: FastAPI 响应对象
+        :param request: FastAPI
+        :param responding objects
         :return:
         """
         token = get_token(request)

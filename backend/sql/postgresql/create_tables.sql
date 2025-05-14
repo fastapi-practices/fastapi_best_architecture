@@ -9,17 +9,17 @@ create table sys_data_scope
     updated_time timestamp with time zone
 );
 
-comment on table sys_data_scope is '数据范围表';
+comment on table sys_data_scope is 'Data Range Table';
 
-comment on column sys_data_scope.id is '主键 ID';
+comment on column sys_data_scope.id is 'PRIMARY ID';
 
-comment on column sys_data_scope.name is '名称';
+comment on column sys_data_scope.name is 'Name';
 
-comment on column sys_data_scope.status is '状态（0停用 1正常）';
+comment on column sys_data_scope.status is 'Status (0 disabled 1)';
 
-comment on column sys_data_scope.created_time is '创建时间';
+comment on column sys_data_scope.created_time is 'Created';
 
-comment on column sys_data_scope.updated_time is '更新时间';
+comment on column sys_data_scope.updated_time is 'Update Time';
 
 create index ix_sys_data_scope_id
     on sys_data_scope (id);
@@ -42,29 +42,29 @@ create table sys_dept
     updated_time timestamp with time zone
 );
 
-comment on table sys_dept is '部门表';
+comment on table sys_dept is 'Sectoral table';
 
-comment on column sys_dept.id is '主键 ID';
+comment on column sys_dept.id is 'PRIMARY ID';
 
-comment on column sys_dept.name is '部门名称';
+comment on column sys_dept.name is 'Department name';
 
-comment on column sys_dept.sort is '排序';
+comment on column sys_dept.sort is 'Sort';
 
-comment on column sys_dept.leader is '负责人';
+comment on column sys_dept.leader is 'Head';
 
-comment on column sys_dept.phone is '手机';
+comment on column sys_dept.phone is 'Cell phone';
 
-comment on column sys_dept.email is '邮箱';
+comment on column sys_dept.email is 'Mailbox';
 
-comment on column sys_dept.status is '部门状态(0停用 1正常)';
+comment on column sys_dept.status is 'Sector status (0 disabled 1)';
 
-comment on column sys_dept.del_flag is '删除标志（0删除 1存在）';
+comment on column sys_dept.del_flag is 'Delete sign (0 delete 1 exists)';
 
-comment on column sys_dept.parent_id is '父部门ID';
+comment on column sys_dept.parent_id is 'PARENT ID';
 
-comment on column sys_dept.created_time is '创建时间';
+comment on column sys_dept.created_time is 'Created';
 
-comment on column sys_dept.updated_time is '更新时间';
+comment on column sys_dept.updated_time is 'Update Time';
 
 create index ix_sys_dept_id
     on sys_dept (id);
@@ -92,37 +92,37 @@ create table sys_login_log
     created_time timestamp with time zone not null
 );
 
-comment on table sys_login_log is '登录日志表';
+comment on table sys_login_log is 'Login Login Table';
 
-comment on column sys_login_log.id is '主键 ID';
+comment on column sys_login_log.id is 'PRIMARY ID';
 
-comment on column sys_login_log.user_uuid is '用户UUID';
+comment on column sys_login_log.user_uuid is 'USERUID';
 
-comment on column sys_login_log.username is '用户名';
+comment on column sys_login_log.username is 'Username';
 
-comment on column sys_login_log.status is '登录状态(0失败 1成功)';
+comment on column sys_login_log.status is 'Login status (0 failed)';
 
-comment on column sys_login_log.ip is '登录IP地址';
+comment on column sys_login_log.ip is 'LOGIN IP ADDRESS';
 
-comment on column sys_login_log.country is '国家';
+comment on column sys_login_log.country is 'Country';
 
-comment on column sys_login_log.region is '地区';
+comment on column sys_login_log.region is 'Region';
 
-comment on column sys_login_log.city is '城市';
+comment on column sys_login_log.city is 'Urban';
 
-comment on column sys_login_log.user_agent is '请求头';
+comment on column sys_login_log.user_agent is 'Request Header';
 
-comment on column sys_login_log.os is '操作系统';
+comment on column sys_login_log.os is 'Operating systems';
 
-comment on column sys_login_log.browser is '浏览器';
+comment on column sys_login_log.browser is 'Browser';
 
-comment on column sys_login_log.device is '设备';
+comment on column sys_login_log.device is 'Equipment';
 
-comment on column sys_login_log.msg is '提示消息';
+comment on column sys_login_log.msg is 'Message';
 
-comment on column sys_login_log.login_time is '登录时间';
+comment on column sys_login_log.login_time is 'Login Time';
 
-comment on column sys_login_log.created_time is '创建时间';
+comment on column sys_login_log.created_time is 'Created';
 
 create index ix_sys_login_log_id
     on sys_login_log (id);
@@ -151,41 +151,41 @@ create table sys_menu
     updated_time timestamp with time zone
 );
 
-comment on table sys_menu is '菜单表';
+comment on table sys_menu is 'Menu Table';
 
-comment on column sys_menu.id is '主键 ID';
+comment on column sys_menu.id is 'PRIMARY ID';
 
-comment on column sys_menu.title is '菜单标题';
+comment on column sys_menu.title is 'Menu Title';
 
-comment on column sys_menu.name is '菜单名称';
+comment on column sys_menu.name is 'Menu Name';
 
-comment on column sys_menu.path is '路由地址';
+comment on column sys_menu.path is 'Route Address';
 
-comment on column sys_menu.sort is '排序';
+comment on column sys_menu.sort is 'Sort';
 
-comment on column sys_menu.icon is '菜单图标';
+comment on column sys_menu.icon is 'Menu Icon';
 
-comment on column sys_menu.type is '菜单类型（0目录 1菜单 2按钮）';
+comment on column sys_menu.type is 'Menu type (0 directory 1 menu 2 button)';
 
-comment on column sys_menu.component is '组件路径';
+comment on column sys_menu.component is 'Component Path';
 
-comment on column sys_menu.perms is '权限标识';
+comment on column sys_menu.perms is 'Permission Identification';
 
-comment on column sys_menu.status is '菜单状态（0停用 1正常）';
+comment on column sys_menu.status is 'Menu status (0 disabled 1 normal)';
 
-comment on column sys_menu.display is '是否显示（0否 1是）';
+comment on column sys_menu.display is 'Whether to show (0 no 1)';
 
-comment on column sys_menu.cache is '是否缓存（0否 1是）';
+comment on column sys_menu.cache is 'Cache (0 No 1)';
 
-comment on column sys_menu.link is '外链地址';
+comment on column sys_menu.link is 'Outlink Address';
 
-comment on column sys_menu.remark is '备注';
+comment on column sys_menu.remark is 'Remarks';
 
-comment on column sys_menu.parent_id is '父菜单ID';
+comment on column sys_menu.parent_id is 'PARENT MENU ID';
 
-comment on column sys_menu.created_time is '创建时间';
+comment on column sys_menu.created_time is 'Created';
 
-comment on column sys_menu.updated_time is '更新时间';
+comment on column sys_menu.updated_time is 'Update Time';
 
 create index ix_sys_menu_id
     on sys_menu (id);
@@ -219,49 +219,49 @@ create table sys_opera_log
     created_time timestamp with time zone not null
 );
 
-comment on table sys_opera_log is '操作日志表';
+comment on table sys_opera_log is 'Operations Log Table';
 
-comment on column sys_opera_log.id is '主键 ID';
+comment on column sys_opera_log.id is 'PRIMARY ID';
 
-comment on column sys_opera_log.trace_id is '请求跟踪 ID';
+comment on column sys_opera_log.trace_id is 'REQUEST TRACKING ID';
 
-comment on column sys_opera_log.username is '用户名';
+comment on column sys_opera_log.username is 'Username';
 
-comment on column sys_opera_log.method is '请求类型';
+comment on column sys_opera_log.method is 'Type of request';
 
-comment on column sys_opera_log.title is '操作模块';
+comment on column sys_opera_log.title is 'Operation module';
 
-comment on column sys_opera_log.path is '请求路径';
+comment on column sys_opera_log.path is 'Request Path';
 
-comment on column sys_opera_log.ip is 'IP地址';
+comment on column sys_opera_log.ip is 'IP ADDRESS';
 
-comment on column sys_opera_log.country is '国家';
+comment on column sys_opera_log.country is 'Country';
 
-comment on column sys_opera_log.region is '地区';
+comment on column sys_opera_log.region is 'Region';
 
-comment on column sys_opera_log.city is '城市';
+comment on column sys_opera_log.city is 'Urban';
 
-comment on column sys_opera_log.user_agent is '请求头';
+comment on column sys_opera_log.user_agent is 'Request Header';
 
-comment on column sys_opera_log.os is '操作系统';
+comment on column sys_opera_log.os is 'Operating systems';
 
-comment on column sys_opera_log.browser is '浏览器';
+comment on column sys_opera_log.browser is 'Browser';
 
-comment on column sys_opera_log.device is '设备';
+comment on column sys_opera_log.device is 'Equipment';
 
-comment on column sys_opera_log.args is '请求参数';
+comment on column sys_opera_log.args is 'Request parameters';
 
-comment on column sys_opera_log.status is '操作状态（0异常 1正常）';
+comment on column sys_opera_log.status is 'Operational status (0 anomaly 1)';
 
-comment on column sys_opera_log.code is '操作状态码';
+comment on column sys_opera_log.code is 'Operational status code';
 
-comment on column sys_opera_log.msg is '提示消息';
+comment on column sys_opera_log.msg is 'Message';
 
-comment on column sys_opera_log.cost_time is '请求耗时（ms）';
+comment on column sys_opera_log.cost_time is 'request time-consuming (ms)';
 
-comment on column sys_opera_log.opera_time is '操作时间';
+comment on column sys_opera_log.opera_time is 'Operation Time';
 
-comment on column sys_opera_log.created_time is '创建时间';
+comment on column sys_opera_log.created_time is 'Created';
 
 create index ix_sys_opera_log_id
     on sys_opera_log (id);
@@ -278,19 +278,19 @@ create table sys_role
     updated_time timestamp with time zone
 );
 
-comment on table sys_role is '角色表';
+comment on table sys_role is 'Rolesheet';
 
-comment on column sys_role.id is '主键 ID';
+comment on column sys_role.id is 'PRIMARY ID';
 
-comment on column sys_role.name is '角色名称';
+comment on column sys_role.name is 'Role Name';
 
-comment on column sys_role.status is '角色状态（0停用 1正常）';
+comment on column sys_role.status is 'Role state (0 disabled 1)';
 
-comment on column sys_role.remark is '备注';
+comment on column sys_role.remark is 'Remarks';
 
-comment on column sys_role.created_time is '创建时间';
+comment on column sys_role.created_time is 'Created';
 
-comment on column sys_role.updated_time is '更新时间';
+comment on column sys_role.updated_time is 'Update Time';
 
 create index ix_sys_role_id
     on sys_role (id);
@@ -310,25 +310,25 @@ create table sys_config
     updated_time timestamp with time zone
 );
 
-comment on table sys_config is '参数配置表';
+comment on table sys_config is 'Parameter Configuration Table';
 
-comment on column sys_config.id is '主键 ID';
+comment on column sys_config.id is 'PRIMARY ID';
 
-comment on column sys_config.name is '名称';
+comment on column sys_config.name is 'Name';
 
-comment on column sys_config.type is '类型';
+comment on column sys_config.type is 'Type';
 
-comment on column sys_config.key is '键名';
+comment on column sys_config.key is 'Keyname';
 
-comment on column sys_config.value is '键值';
+comment on column sys_config.value is 'Key Value';
 
-comment on column sys_config.is_frontend is '是否前端';
+comment on column sys_config.is_frontend is 'Whether to frontend';
 
-comment on column sys_config.remark is '备注';
+comment on column sys_config.remark is 'Remarks';
 
-comment on column sys_config.created_time is '创建时间';
+comment on column sys_config.created_time is 'Created';
 
-comment on column sys_config.updated_time is '更新时间';
+comment on column sys_config.updated_time is 'Update Time';
 
 create index ix_sys_config_id
     on sys_config (id);
@@ -346,21 +346,21 @@ create table sys_dict_type
     updated_time timestamp with time zone
 );
 
-comment on table sys_dict_type is '字典类型表';
+comment on table sys_dict_type is 'Dictionary Type Table';
 
-comment on column sys_dict_type.id is '主键 ID';
+comment on column sys_dict_type.id is 'PRIMARY ID';
 
-comment on column sys_dict_type.name is '字典类型名称';
+comment on column sys_dict_type.name is 'Dictionary Type Name';
 
-comment on column sys_dict_type.code is '字典类型编码';
+comment on column sys_dict_type.code is 'Dictionary type encoding';
 
-comment on column sys_dict_type.status is '状态（0停用 1正常）';
+comment on column sys_dict_type.status is 'Status (0 disabled 1)';
 
-comment on column sys_dict_type.remark is '备注';
+comment on column sys_dict_type.remark is 'Remarks';
 
-comment on column sys_dict_type.created_time is '创建时间';
+comment on column sys_dict_type.created_time is 'Created';
 
-comment on column sys_dict_type.updated_time is '更新时间';
+comment on column sys_dict_type.updated_time is 'Update Time';
 
 create index ix_sys_dict_type_id
     on sys_dict_type (id);
@@ -379,25 +379,25 @@ create table sys_notice
     updated_time timestamp with time zone
 );
 
-comment on table sys_notice is '系统通知公告表';
+comment on table sys_notice is 'System notice bulletin form';
 
-comment on column sys_notice.id is '主键 ID';
+comment on column sys_notice.id is 'PRIMARY ID';
 
-comment on column sys_notice.title is '标题';
+comment on column sys_notice.title is 'Title';
 
-comment on column sys_notice.type is '类型（0：通知、1：公告）';
+comment on column sys_notice.type is 'Type (0: circular, 1: bulletin)';
 
-comment on column sys_notice.author is '作者';
+comment on column sys_notice.author is 'Author';
 
-comment on column sys_notice.source is '信息来源';
+comment on column sys_notice.source is 'Sources of information';
 
-comment on column sys_notice.status is '状态（0：隐藏、1：显示）';
+comment on column sys_notice.status is 'Status (0: hidden, 1: displayed)';
 
-comment on column sys_notice.content is '内容';
+comment on column sys_notice.content is 'Contents';
 
-comment on column sys_notice.created_time is '创建时间';
+comment on column sys_notice.created_time is 'Created';
 
-comment on column sys_notice.updated_time is '更新时间';
+comment on column sys_notice.updated_time is 'Update Time';
 
 create index ix_sys_notice_id
     on sys_notice (id);
@@ -422,35 +422,35 @@ create table gen_business
     updated_time            timestamp with time zone
 );
 
-comment on table gen_business is '代码生成业务表';
+comment on table gen_business is 'Code Generation Business Sheet';
 
-comment on column gen_business.id is '主键 ID';
+comment on column gen_business.id is 'PRIMARY ID';
 
-comment on column gen_business.app_name is '应用名称（英文）';
+comment on column gen_business.app_name is 'Application name (English)';
 
-comment on column gen_business.table_name is '表名称（英文）';
+comment on column gen_business.table_name is 'Table name (English)';
 
-comment on column gen_business.doc_comment is '文档注释（用于函数/参数文档）';
+comment on column gen_business.doc_comment is 'Document Comment (for function/parameter documents)';
 
-comment on column gen_business.table_comment is '表描述';
+comment on column gen_business.table_comment is 'Table Description';
 
-comment on column gen_business.class_name is '基础类名（默认为英文表名称）';
+comment on column gen_business.class_name is 'Base class name (defaultly English Table name)';
 
-comment on column gen_business.schema_name is 'Schema 名称 (默认为英文表名称)';
+comment on column gen_business.schema_name is 'Schema Name (Default is Table Name)';
 
-comment on column gen_business.filename is '基础文件名（默认为英文表名称）';
+comment on column gen_business.filename is 'Base File Name (default is the English Table Name)';
 
-comment on column gen_business.default_datetime_column is '是否存在默认时间列';
+comment on column gen_business.default_datetime_column is 'Existence of default timebar';
 
-comment on column gen_business.api_version is '代码生成 api 版本，默认为 v1';
+comment on column gen_business.api_version is 'code generation api version, default v1';
 
-comment on column gen_business.gen_path is '代码生成路径（默认为 app 根路径）';
+comment on column gen_business.gen_path is 'code generation path (default app root path)';
 
-comment on column gen_business.remark is '备注';
+comment on column gen_business.remark is 'Remarks';
 
-comment on column gen_business.created_time is '创建时间';
+comment on column gen_business.created_time is 'Created';
 
-comment on column gen_business.updated_time is '更新时间';
+comment on column gen_business.updated_time is 'Update Time';
 
 create index ix_gen_business_id
     on gen_business (id);
@@ -473,27 +473,27 @@ create table sys_data_rule
     updated_time timestamp with time zone
 );
 
-comment on table sys_data_rule is '数据规则表';
+comment on table sys_data_rule is 'Data rule sheet';
 
-comment on column sys_data_rule.id is '主键 ID';
+comment on column sys_data_rule.id is 'PRIMARY ID';
 
-comment on column sys_data_rule.name is '名称';
+comment on column sys_data_rule.name is 'Name';
 
-comment on column sys_data_rule.model is 'SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名';
+comment on column sys_data_rule.model is 'SQLA MODEL NAME, CORRESPONDING TO DATA_PERMISSION_MODES';
 
-comment on column sys_data_rule."column" is '模型字段名';
+comment on column sys_data_rule."column" is 'Model field name';
 
-comment on column sys_data_rule.operator is '运算符（0：and、1：or）';
+comment on column sys_data_rule.operator is 'operators (0:and, 1:or)';
 
-comment on column sys_data_rule.expression is '表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）';
+comment on column sys_data_rule.expression is 'expressions (0: =, 1:! =, 2:>, 3:>, 4:<, 5:: < , 6:in, 7:not_in)';
 
-comment on column sys_data_rule.value is '规则值';
+comment on column sys_data_rule.value is 'Rule value';
 
-comment on column sys_data_rule.scope_id is '数据范围关联 ID';
+comment on column sys_data_rule.scope_id is 'DATA RANGE CORRELATION ID';
 
-comment on column sys_data_rule.created_time is '创建时间';
+comment on column sys_data_rule.created_time is 'Created';
 
-comment on column sys_data_rule.updated_time is '更新时间';
+comment on column sys_data_rule.updated_time is 'Update Time';
 
 create index ix_sys_data_rule_id
     on sys_data_rule (id);
@@ -510,11 +510,11 @@ create table sys_role_menu
     primary key (id, role_id, menu_id)
 );
 
-comment on column sys_role_menu.id is '主键ID';
+comment on column sys_role_menu.id is 'PRIMARY KEY ID';
 
-comment on column sys_role_menu.role_id is '角色ID';
+comment on column sys_role_menu.role_id is 'ROLE ID';
 
-comment on column sys_role_menu.menu_id is '菜单ID';
+comment on column sys_role_menu.menu_id is 'MENU ID';
 
 create unique index ix_sys_role_menu_id
     on sys_role_menu (id);
@@ -531,11 +531,11 @@ create table sys_role_data_scope
     primary key (id, role_id, data_scope_id)
 );
 
-comment on column sys_role_data_scope.id is '主键 ID';
+comment on column sys_role_data_scope.id is 'PRIMARY ID';
 
-comment on column sys_role_data_scope.role_id is '角色 ID';
+comment on column sys_role_data_scope.role_id is 'ROLE ID';
 
-comment on column sys_role_data_scope.data_scope_id is '数据范围 ID';
+comment on column sys_role_data_scope.data_scope_id is 'DATA RANGE ID';
 
 create unique index ix_sys_role_data_scope_id
     on sys_role_data_scope (id);
@@ -567,41 +567,41 @@ create table sys_user
     updated_time    timestamp with time zone
 );
 
-comment on table sys_user is '用户表';
+comment on table sys_user is 'User Table';
 
-comment on column sys_user.id is '主键 ID';
+comment on column sys_user.id is 'PRIMARY ID';
 
-comment on column sys_user.username is '用户名';
+comment on column sys_user.username is 'Username';
 
-comment on column sys_user.nickname is '昵称';
+comment on column sys_user.nickname is 'Nickname';
 
-comment on column sys_user.password is '密码';
+comment on column sys_user.password is 'Password';
 
-comment on column sys_user.salt is '加密盐';
+comment on column sys_user.salt is 'Encrypted Salt';
 
-comment on column sys_user.email is '邮箱';
+comment on column sys_user.email is 'Mailbox';
 
-comment on column sys_user.is_superuser is '超级权限(0否 1是)';
+comment on column sys_user.is_superuser is 'Super permission (0 No 1)';
 
-comment on column sys_user.is_staff is '后台管理登陆(0否 1是)';
+comment on column sys_user.is_staff is 'Backstage management landing (0 no 1)';
 
-comment on column sys_user.status is '用户账号状态(0停用 1正常)';
+comment on column sys_user.status is 'User account status (0 disabled 1)';
 
-comment on column sys_user.is_multi_login is '是否重复登陆(0否 1是)';
+comment on column sys_user.is_multi_login is 'Repeated landing (0 No 1)';
 
-comment on column sys_user.avatar is '头像';
+comment on column sys_user.avatar is 'Heads';
 
-comment on column sys_user.phone is '手机号';
+comment on column sys_user.phone is 'Cell phone number';
 
-comment on column sys_user.join_time is '注册时间';
+comment on column sys_user.join_time is 'Date of registration';
 
-comment on column sys_user.last_login_time is '上次登录';
+comment on column sys_user.last_login_time is 'Last Login';
 
-comment on column sys_user.dept_id is '部门关联ID';
+comment on column sys_user.dept_id is 'SECTOR-RELATED ID';
 
-comment on column sys_user.created_time is '创建时间';
+comment on column sys_user.created_time is 'Created';
 
-comment on column sys_user.updated_time is '更新时间';
+comment on column sys_user.updated_time is 'Update Time';
 
 create unique index ix_sys_user_email
     on sys_user (email);
@@ -632,25 +632,25 @@ create table sys_dict_data
     updated_time timestamp with time zone
 );
 
-comment on table sys_dict_data is '字典数据表';
+comment on table sys_dict_data is 'Dictionary Data Sheet';
 
-comment on column sys_dict_data.id is '主键 ID';
+comment on column sys_dict_data.id is 'PRIMARY ID';
 
-comment on column sys_dict_data.label is '字典标签';
+comment on column sys_dict_data.label is 'Dictionary Label';
 
-comment on column sys_dict_data.value is '字典值';
+comment on column sys_dict_data.value is 'Dictionary values';
 
-comment on column sys_dict_data.sort is '排序';
+comment on column sys_dict_data.sort is 'Sort';
 
-comment on column sys_dict_data.status is '状态（0停用 1正常）';
+comment on column sys_dict_data.status is 'Status (0 disabled 1)';
 
-comment on column sys_dict_data.remark is '备注';
+comment on column sys_dict_data.remark is 'Remarks';
 
-comment on column sys_dict_data.type_id is '字典类型关联ID';
+comment on column sys_dict_data.type_id is 'DICTIONARY TYPE ASSOCIATION ID';
 
-comment on column sys_dict_data.created_time is '创建时间';
+comment on column sys_dict_data.created_time is 'Created';
 
-comment on column sys_dict_data.updated_time is '更新时间';
+comment on column sys_dict_data.updated_time is 'Update Time';
 
 create index ix_sys_dict_data_id
     on sys_dict_data (id);
@@ -673,29 +673,29 @@ create table gen_column
             on delete cascade
 );
 
-comment on table gen_column is '代码生成模型列表';
+comment on table gen_column is 'Code Generation Model List';
 
-comment on column gen_column.id is '主键 ID';
+comment on column gen_column.id is 'PRIMARY ID';
 
-comment on column gen_column.name is '列名称';
+comment on column gen_column.name is 'Column Name';
 
-comment on column gen_column.comment is '列描述';
+comment on column gen_column.comment is 'Column Description';
 
-comment on column gen_column.type is 'SQLA 模型列类型';
+comment on column gen_column.type is 'SQLA MODEL COLUMN TYPE';
 
-comment on column gen_column.pd_type is '列类型对应的 pydantic 类型';
+comment on column gen_column.pd_type is 'pydantic type for column type';
 
-comment on column gen_column."default" is '列默认值';
+comment on column gen_column."default" is 'Column Default';
 
-comment on column gen_column.sort is '列排序';
+comment on column gen_column.sort is 'Column Sort';
 
-comment on column gen_column.length is '列长度';
+comment on column gen_column.length is 'Column Length';
 
-comment on column gen_column.is_pk is '是否主键';
+comment on column gen_column.is_pk is 'Whether the primary key';
 
-comment on column gen_column.is_nullable is '是否可为空';
+comment on column gen_column.is_nullable is 'Could it be empty';
 
-comment on column gen_column.gen_business_id is '代码生成业务ID';
+comment on column gen_column.gen_business_id is 'CODE GENERATION BUSINESS ID';
 
 create index ix_gen_column_id
     on gen_column (id);
@@ -712,11 +712,11 @@ create table sys_user_role
     primary key (id, user_id, role_id)
 );
 
-comment on column sys_user_role.id is '主键ID';
+comment on column sys_user_role.id is 'PRIMARY KEY ID';
 
-comment on column sys_user_role.user_id is '用户ID';
+comment on column sys_user_role.user_id is 'USER ID';
 
-comment on column sys_user_role.role_id is '角色ID';
+comment on column sys_user_role.role_id is 'ROLE ID';
 
 create unique index ix_sys_user_role_id
     on sys_user_role (id);
@@ -738,27 +738,27 @@ create table sys_user_social
     updated_time timestamp with time zone
 );
 
-comment on table sys_user_social is '用户社交表（OAuth2）';
+comment on table sys_user_social is 'User Social Table (OAuth2)';
 
-comment on column sys_user_social.id is '主键 ID';
+comment on column sys_user_social.id is 'PRIMARY ID';
 
-comment on column sys_user_social.source is '第三方用户来源';
+comment on column sys_user_social.source is 'Third-party user sources';
 
-comment on column sys_user_social.open_id is '第三方用户的 open id';
+comment on column sys_user_social.open_id is 'open id';
 
-comment on column sys_user_social.uid is '第三方用户的 ID';
+comment on column sys_user_social.uid is 'ID OF THIRD-PARTY USER';
 
-comment on column sys_user_social.union_id is '第三方用户的 union id';
+comment on column sys_user_social.union_id is 'union id of third-party users';
 
-comment on column sys_user_social.scope is '第三方用户授予的权限';
+comment on column sys_user_social.scope is 'Authority granted by third-party users';
 
-comment on column sys_user_social.code is '用户的授权 code';
+comment on column sys_user_social.code is 'user\'s authorization code';
 
-comment on column sys_user_social.user_id is '用户关联ID';
+comment on column sys_user_social.user_id is 'USER LINK ID';
 
-comment on column sys_user_social.created_time is '创建时间';
+comment on column sys_user_social.created_time is 'Created';
 
-comment on column sys_user_social.updated_time is '更新时间';
+comment on column sys_user_social.updated_time is 'Update Time';
 
 create index ix_sys_user_social_id
     on sys_user_social (id);

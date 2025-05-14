@@ -6,50 +6,50 @@ from enum import Enum
 
 
 class CustomCodeBase(Enum):
-    """自定义状态码基类"""
+    """Custom state code base class"""
 
     @property
     def code(self) -> int:
-        """获取状态码"""
+        """Get Status Code"""
         return self.value[0]
 
     @property
     def msg(self) -> str:
-        """获取状态码信息"""
+        """Get Status Code Information"""
         return self.value[1]
 
 
 class CustomResponseCode(CustomCodeBase):
-    """自定义响应状态码"""
+    """Custom Response Status Code"""
 
-    HTTP_200 = (200, '请求成功')
-    HTTP_201 = (201, '新建请求成功')
-    HTTP_202 = (202, '请求已接受，但处理尚未完成')
-    HTTP_204 = (204, '请求成功，但没有返回内容')
-    HTTP_400 = (400, '请求错误')
-    HTTP_401 = (401, '未经授权')
-    HTTP_403 = (403, '禁止访问')
-    HTTP_404 = (404, '请求的资源不存在')
-    HTTP_410 = (410, '请求的资源已永久删除')
-    HTTP_422 = (422, '请求参数非法')
-    HTTP_425 = (425, '无法执行请求，由于服务器无法满足要求')
-    HTTP_429 = (429, '请求过多，服务器限制')
-    HTTP_500 = (500, '服务器内部错误')
-    HTTP_502 = (502, '网关错误')
-    HTTP_503 = (503, '服务器暂时无法处理请求')
-    HTTP_504 = (504, '网关超时')
+    HTTP_200 = (200, 'Request successful')
+    HTTP_201 = (201, 'New Request Successful')
+    HTTP_202 = (202, 'Request accepted, but pending')
+    HTTP_204 = (204, 'The request was successful but did not return the content')
+    HTTP_400 = (400, 'Request error')
+    HTTP_401 = (401, 'Unauthorized')
+    HTTP_403 = (403, 'Ban Access')
+    HTTP_404 = (404, 'No resources requested')
+    HTTP_410 = (410, 'Resources requested have been permanently deleted')
+    HTTP_422 = (422, 'The requested parameter is illegal')
+    HTTP_425 = (425, 'The request could not be executed because the server could not meet the requirements')
+    HTTP_429 = (429, 'Too many requests, server restrictions')
+    HTTP_500 = (500, 'Internal server error')
+    HTTP_502 = (502, 'Gateway Error')
+    HTTP_503 = (503, 'The server is temporarily unable to process the request')
+    HTTP_504 = (504, 'Gateway timeout')
 
 
 class CustomErrorCode(CustomCodeBase):
-    """自定义错误状态码"""
+    """Custom Error Status Code"""
 
-    CAPTCHA_ERROR = (40001, '验证码错误')
+    CAPTCHA_ERROR = (40001, 'Authentication code error')
 
 
 @dataclasses.dataclass
 class CustomResponse:
     """
-    提供开放式响应状态码，而不是枚举，如果你想自定义响应信息，这可能很有用
+    Provide an open response status code rather than an enumeration, which could be useful if you want to customize response information
     """
 
     code: int
@@ -57,7 +57,7 @@ class CustomResponse:
 
 
 class StandardResponseCode:
-    """标准响应状态码"""
+    """Standard Response Status Code"""
 
     """
     HTTP codes
@@ -66,91 +66,91 @@ class StandardResponseCode:
 
     And RFC 2324 - https://tools.ietf.org/html/rfc2324
     """
-    HTTP_100 = 100  # CONTINUE: 继续
-    HTTP_101 = 101  # SWITCHING_PROTOCOLS: 协议切换
-    HTTP_102 = 102  # PROCESSING: 处理中
-    HTTP_103 = 103  # EARLY_HINTS: 提示信息
-    HTTP_200 = 200  # OK: 请求成功
-    HTTP_201 = 201  # CREATED: 已创建
-    HTTP_202 = 202  # ACCEPTED: 已接受
-    HTTP_203 = 203  # NON_AUTHORITATIVE_INFORMATION: 非权威信息
-    HTTP_204 = 204  # NO_CONTENT: 无内容
-    HTTP_205 = 205  # RESET_CONTENT: 重置内容
-    HTTP_206 = 206  # PARTIAL_CONTENT: 部分内容
-    HTTP_207 = 207  # MULTI_STATUS: 多状态
-    HTTP_208 = 208  # ALREADY_REPORTED: 已报告
-    HTTP_226 = 226  # IM_USED: 使用了
-    HTTP_300 = 300  # MULTIPLE_CHOICES: 多种选择
-    HTTP_301 = 301  # MOVED_PERMANENTLY: 永久移动
-    HTTP_302 = 302  # FOUND: 临时移动
-    HTTP_303 = 303  # SEE_OTHER: 查看其他位置
-    HTTP_304 = 304  # NOT_MODIFIED: 未修改
-    HTTP_305 = 305  # USE_PROXY: 使用代理
-    HTTP_307 = 307  # TEMPORARY_REDIRECT: 临时重定向
-    HTTP_308 = 308  # PERMANENT_REDIRECT: 永久重定向
-    HTTP_400 = 400  # BAD_REQUEST: 请求错误
-    HTTP_401 = 401  # UNAUTHORIZED: 未授权
-    HTTP_402 = 402  # PAYMENT_REQUIRED: 需要付款
-    HTTP_403 = 403  # FORBIDDEN: 禁止访问
-    HTTP_404 = 404  # NOT_FOUND: 未找到
-    HTTP_405 = 405  # METHOD_NOT_ALLOWED: 方法不允许
-    HTTP_406 = 406  # NOT_ACCEPTABLE: 不可接受
-    HTTP_407 = 407  # PROXY_AUTHENTICATION_REQUIRED: 需要代理身份验证
-    HTTP_408 = 408  # REQUEST_TIMEOUT: 请求超时
-    HTTP_409 = 409  # CONFLICT: 冲突
-    HTTP_410 = 410  # GONE: 已删除
-    HTTP_411 = 411  # LENGTH_REQUIRED: 需要内容长度
-    HTTP_412 = 412  # PRECONDITION_FAILED: 先决条件失败
-    HTTP_413 = 413  # REQUEST_ENTITY_TOO_LARGE: 请求实体过大
-    HTTP_414 = 414  # REQUEST_URI_TOO_LONG: 请求 URI 过长
-    HTTP_415 = 415  # UNSUPPORTED_MEDIA_TYPE: 不支持的媒体类型
-    HTTP_416 = 416  # REQUESTED_RANGE_NOT_SATISFIABLE: 请求范围不符合要求
-    HTTP_417 = 417  # EXPECTATION_FAILED: 期望失败
-    HTTP_418 = 418  # UNUSED: 闲置
-    HTTP_421 = 421  # MISDIRECTED_REQUEST: 被错导的请求
-    HTTP_422 = 422  # UNPROCESSABLE_CONTENT: 无法处理的实体
-    HTTP_423 = 423  # LOCKED: 已锁定
-    HTTP_424 = 424  # FAILED_DEPENDENCY: 依赖失败
-    HTTP_425 = 425  # TOO_EARLY: 太早
-    HTTP_426 = 426  # UPGRADE_REQUIRED: 需要升级
-    HTTP_427 = 427  # UNASSIGNED: 未分配
-    HTTP_428 = 428  # PRECONDITION_REQUIRED: 需要先决条件
-    HTTP_429 = 429  # TOO_MANY_REQUESTS: 请求过多
-    HTTP_430 = 430  # Unassigned: 未分配
-    HTTP_431 = 431  # REQUEST_HEADER_FIELDS_TOO_LARGE: 请求头字段太大
-    HTTP_451 = 451  # UNAVAILABLE_FOR_LEGAL_REASONS: 由于法律原因不可用
-    HTTP_500 = 500  # INTERNAL_SERVER_ERROR: 服务器内部错误
-    HTTP_501 = 501  # NOT_IMPLEMENTED: 未实现
-    HTTP_502 = 502  # BAD_GATEWAY: 错误的网关
-    HTTP_503 = 503  # SERVICE_UNAVAILABLE: 服务不可用
-    HTTP_504 = 504  # GATEWAY_TIMEOUT: 网关超时
-    HTTP_505 = 505  # HTTP_VERSION_NOT_SUPPORTED: HTTP 版本不支持
-    HTTP_506 = 506  # VARIANT_ALSO_NEGOTIATES: 变体也会协商
-    HTTP_507 = 507  # INSUFFICIENT_STORAGE: 存储空间不足
-    HTTP_508 = 508  # LOOP_DETECTED: 检测到循环
-    HTTP_509 = 509  # UNASSIGNED: 未分配
-    HTTP_510 = 510  # NOT_EXTENDED: 未扩展
-    HTTP_511 = 511  # NETWORK_AUTHENTICATION_REQUIRED: 需要网络身份验证
+    HTTP_100 = 100  # CONTINUE:
+    HTTP_101 = 101  # SWITCHING_PROTOCOLS: PROTOCOL SWITCH
+    HTTP_102 = 102  # PROCESSING: PROCESSING
+    HTTP_103 = 103  # EARLY_HINTS: HINT INFORMATION
+    HTTP_200 = 200  # OK: REQUEST SUCCESSFUL
+    HTTP_201 = 201  # CREATED: CREATED
+    HTTP_202 = 202  # ACCEPTED: ACCEPTED
+    HTTP_203 = 203  # NON_AUTHORITATIVE_INFORMATION: NON-AUTHORITATIVE INFORMATION
+    HTTP_204 = 204  # NO_CONTENT: NO CONTENT
+    HTTP_205 = 205  # RENET_CONTENT: RESET CONTENT
+    HTTP_206 = 206  # PARTIAL_CONTENT: PARTLY
+    HTTP_207 = 207  # MULTI_STATUS: MULTIPLE STATES
+    HTTP_208 = 208  # ALREADY_REPORTED: REPORTED
+    HTTP_226 = 226  # IM_USED: USED
+    HTTP_300 = 300  # MULTIPLE_CHOICES: MULTIPLE CHOICES
+    HTTP_301 = 301  # MOVED_PERMANENTLY: MOVING PERMANENTLY
+    HTTP_302 = 302  # FOUND: TEMPORARY MOVEMENT
+    HTTP_303 = 303  # SEE_OTHER: VIEW OTHER LOCATIONS
+    HTTP_304 = 304  # NOT_MODIFIED: UNMODIFIED
+    HTTP_305 = 305  # USE_PROXY: USE PROXY
+    HTTP_307 = 307  # TEMPORARY_REDIRECT: TEMPORARY REORIENTATION
+    HTTP_308 = 308  # PERMANENT_REDIRECT: REDIRECT PERMANENTLY
+    HTTP_400 = 400  # BAD_REQUEST: REQUEST ERROR
+    HTTP_401 = 401  # UNUTHORIZED: UNAUTHORIZED
+    HTTP_402 = 402  # PAYMENT_REQUIRED: PAYMENT REQUIRED
+    HTTP_403 = 403  # FORBIDDEN: ACCESS RESTRICTED
+    HTTP_404 = 404  # NOT_FOUND: NOT FOUND
+    HTTP_405 = 405  # METHOD_NOT_ALLOWED: METHOD NOT PERMITTED
+    HTTP_406 = 406  # NOT_ACCEPTABLE: NOT ACCEPTABLE
+    HTTP_407 = 407  # PROXY_AUTHENTICATION_REQUIRED: REQUIRES PROXY AUTHENTICATION
+    HTTP_408 = 408  # REQUEST_TIMEOUT: REQUEST TIMEOUT
+    HTTP_409 = 409  # CONFLICT: CONFLICT
+    HTTP_410 = 410  # GONE: DELETED
+    HTTP_411 = 411  # LANGTH_REQUIRED: NEED CONTENT LENGTH
+    HTTP_412 = 412  # PROCONDITION_FAILED: PRECONDITIONS FAIL
+    HTTP_413 = 413  # REQUEST_ENTITY_TOO_LARGE: REQUESTING ENTITY TOO LARGE
+    HTTP_414 = 414  # REQUEST_URI_TOO_LONG: REQUEST URI TOO LONG
+    HTTP_415 = 415  # UNSUPPORTTED_MEDIA_TYPE: UNSUPPORTED MEDIA TYPE
+    HTTP_416 = 416  # REQUESD_RANGE_NOT_SATISFIABLE: THE REQUESTED RANGE DOES NOT MEET THE REQUIREMENTS
+    HTTP_417 = 417  # EXPECTATION_FAILED: EXPECTING FAILURE
+    HTTP_418 = 418  # UNSED: INACTIVE
+    HTTP_421 = 421  # MISDIRECTED_REQUEST: MISDIRECTED REQUEST
+    HTTP_422 = 422  # UNPROCESSABLE_CONTENT: ENTITIES UNABLE TO PROCESS
+    HTTP_423 = 423  # LOCD: LOCKED
+    HTTP_424 = 424  # FAILED_DEPENDENCY: DEPENDENCE FAILED
+    HTTP_425 = 425  # TOO EARLY
+    HTTP_426 = 426  # UPGRADE_REQUIRED: NEEDED UPGRADE
+    HTTP_427 = 427  # UNASSIGN: UNDISTRIBUTED
+    HTTP_428 = 428  # PROCONDITION_REQUIRED: PRECONDITIONS REQUIRED
+    HTTP_429 = 429  # TOO_MANY_REQUESTS: TOO MANY REQUESTS
+    HTTP_430 = 430  # Unassigned: Undistributed
+    HTTP_431 = 431  # REQUEST_HEADER_FIELDS_TOO_LARGE: REQUEST HEADER FIELD IS TOO BIG
+    HTTP_451 = 451  # UNVAILABLE_FOR_LEG_REASONS: NOT AVAILABLE FOR LEGAL REASONS
+    HTTP_500 = 500  # INTERNAL_SERVER_ERRO: SERVER INTERNAL ERROR
+    HTTP_501 = 501  # NOT_IMPLEMED: NOT ACHIEVED
+    HTTP_502 = 502  # BAD_GATEWAY: WRONG GATEWAY
+    HTTP_503 = 503  # SERVICE_UNAVAILABLE: NOT AVAILABLE
+    HTTP_504 = 504  # GATEWAY_TIMEOUT: GATEWAY TIMEOUT
+    HTTP_505 = 505  # HTTP_VERSION_NOT_SUPPORTED: HTTP VERSION NOT SUPPORTED
+    HTTP_506 = 506  # VARIANT_ALSO_NEGOTIATES:
+    HTTP_507 = 507  # INSUFFICIENT_STORAGE: INSUFFICIENT STORAGE SPACE
+    HTTP_508 = 508  # LOOP_DETECTED: CYCLE DETECTED
+    HTTP_509 = 509  # UNASSIGN: UNDISTRIBUTED
+    HTTP_510 = 510  # NOT_EXTEND: UNEXTENDED
+    HTTP_511 = 511  # NETWORK_AUTHENTICATION_REQUIRED: REQUIRES NETWORK AUTHENTICATION
 
     """
     WebSocket codes
     https://www.iana.org/assignments/websocket/websocket.xml#close-code-number
     https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
     """
-    WS_1000 = 1000  # NORMAL_CLOSURE: 正常闭合
-    WS_1001 = 1001  # GOING_AWAY: 正在离开
-    WS_1002 = 1002  # PROTOCOL_ERROR: 协议错误
-    WS_1003 = 1003  # UNSUPPORTED_DATA: 不支持的数据类型
-    WS_1005 = 1005  # NO_STATUS_RCVD: 没有接收到状态
-    WS_1006 = 1006  # ABNORMAL_CLOSURE: 异常关闭
-    WS_1007 = 1007  # INVALID_FRAME_PAYLOAD_DATA: 无效的帧负载数据
-    WS_1008 = 1008  # POLICY_VIOLATION: 策略违规
-    WS_1009 = 1009  # MESSAGE_TOO_BIG: 消息太大
-    WS_1010 = 1010  # MANDATORY_EXT: 必需的扩展
-    WS_1011 = 1011  # INTERNAL_ERROR: 内部错误
-    WS_1012 = 1012  # SERVICE_RESTART: 服务重启
-    WS_1013 = 1013  # TRY_AGAIN_LATER: 请稍后重试
-    WS_1014 = 1014  # BAD_GATEWAY: 错误的网关
-    WS_1015 = 1015  # TLS_HANDSHAKE: TLS握手错误
-    WS_3000 = 3000  # UNAUTHORIZED: 未经授权
-    WS_3003 = 3003  # FORBIDDEN: 禁止访问
+    WS_1000 = 1000  # NORMAL_CLOSURE: NORMAL CLOSED
+    WS_1001 = 1001  # GOING_AWAY: LEAVING
+    WS_1002 = 1002  # PROTOCOL_ERRO: PROTOCOL ERROR
+    WS_1003 = 1003  # UNSUPPOORD_DATA: UNSUPPORTED DATA TYPE
+    WS_1005 = 1005  # NO_STATUS_RCVD: NOT RECEIVED
+    WS_1006 = 1006  # ABNORMAL_CLOSURE: ABNORMALLY CLOSED
+    WS_1007 = 1007  # INVALD_FRAME_PAYLOAD_DATA: INVALID FRAME LOAD DATA
+    WS_1008 = 1008  # POLICY_VIOLATION: STRATEGIC INFRACTION
+    WS_1009 = 1009  # MESSAGE_TO_BIG: TOO MUCH NEWS
+    WS_1010 = 1010  # MANDATORY_EXT: REQUIRED EXTENSION
+    WS_1011 = 1011  # INTERNAL_ERRO: INTERNAL ERROR
+    WS_1012 = 1012  # SERVICE_RESTART: SERVICE RESTART
+    WS_1013 = 1013  # TRY_AGAIN_LATER: PLEASE TRY AGAIN LATER
+    WS_1014 = 1014  # BAD_GATEWAY: WRONG GATEWAY
+    WS_1015 = 1015  # TLS_HANDSHAKE: TLS HANDSHAKE ERROR
+    WS_3000 = 3000  # UNAUTHORIZED
+    WS_3003 = 3003  # FORBIDDEN: ACCESS RESTRICTED

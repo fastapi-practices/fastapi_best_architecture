@@ -12,55 +12,55 @@ from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigP
 
 
 class CRUDConfig(CRUDPlus[Config]):
-    """系统参数参数配置数据库操作类"""
+    """System Parameter Configuration Database Operator Category"""
 
     async def get(self, db: AsyncSession, pk: int) -> Config | None:
         """
-        获取参数配置详情
+        Get Parameter Configuration Details
 
-        :param db: 数据库会话
-        :param pk: 参数配置 ID
+        :param db: database session
+        :param pk: Parameter Configuration ID
         :return:
         """
         return await self.select_model_by_column(db, id=pk, type__not_in=config_settings.CONFIG_BUILT_IN_TYPES)
 
     async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config]:
         """
-        通过类型获取参数配置
+        Get Parameter Configuration Through Type
 
-        :param db: 数据库会话
-        :param type: 参数配置类型
+        :param db: database session
+        :param type: parameter configuration type
         :return:
         """
         return await self.select_models(db, type=type)
 
     async def get_by_key_and_type(self, db: AsyncSession, key: str, type: str) -> Config | None:
         """
-        通过键名和类型获取参数配置
+        Get Parameter Configuration with Keyname and Type
 
-        :param db: 数据库会话
-        :param key: 参数配置键名
-        :param type: 参数配置类型
+        :param db: database session
+        :param key: parameter configuration keyname
+        :param type: parameter configuration type
         :return:
         """
         return await self.select_model_by_column(db, key=key, type=type)
 
     async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
-        通过键名获取参数配置
+        Get Parameter Configuration Through Keyname
 
-        :param db: 数据库会话
-        :param key: 参数配置键名
+        :param db: database session
+        :param key: parameter configuration keyname
         :return:
         """
         return await self.select_model_by_column(db, key=key)
 
     async def get_list(self, name: str | None, type: str | None) -> Select:
         """
-        获取参数配置列表
+        Get Parameter Configuration List
 
-        :param name: 参数配置名称
-        :param type: 参数配置类型
+        :param name: parameter configuration name
+        :param type: parameter configuration type
         :return:
         """
         filters = {'type__not_in': config_settings.CONFIG_BUILT_IN_TYPES}
@@ -72,31 +72,31 @@ class CRUDConfig(CRUDPlus[Config]):
 
     async def create(self, db: AsyncSession, obj: CreateConfigParam) -> None:
         """
-        创建参数配置
+        Create Parameter Configuration
 
-        :param db: 数据库会话
-        :param obj: 创建参数配置参数
+        :param db: database session
+        :param obj: create parameter configuration parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateConfigParam) -> int:
         """
-        更新参数配置
+        Update Parameter Configuration
 
-        :param db: 数据库会话
-        :param pk: 参数配置 ID
-        :param obj: 更新参数配置参数
+        :param db: database session
+        :param pk: Parameter Configuration ID
+        :param obj: update parameter configuration parameters
         :return:
         """
         return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除参数配置
+        Remove Parameter Configuration
 
-        :param db: 数据库会话
-        :param pk: 参数配置 ID 列表
+        :param db: database session
+        :param pk: Parameter Configuration ID list
         :return:
         """
         return await self.delete_model_by_column(

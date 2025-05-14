@@ -17,35 +17,35 @@ if TYPE_CHECKING:
 
 
 class Menu(Base):
-    """菜单表"""
+    """Menu Table"""
 
     __tablename__ = 'sys_menu'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    title: Mapped[str] = mapped_column(String(50), comment='菜单标题')
-    name: Mapped[str] = mapped_column(String(50), comment='菜单名称')
-    path: Mapped[str] = mapped_column(String(200), comment='路由地址')
-    sort: Mapped[int] = mapped_column(default=0, comment='排序')
-    icon: Mapped[str | None] = mapped_column(String(100), default=None, comment='菜单图标')
-    type: Mapped[int] = mapped_column(default=0, comment='菜单类型（0目录 1菜单 2按钮）')
-    component: Mapped[str | None] = mapped_column(String(255), default=None, comment='组件路径')
-    perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='权限标识')
-    status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
-    display: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
-    cache: Mapped[int] = mapped_column(default=1, comment='是否缓存（0否 1是）')
+    title: Mapped[str] = mapped_column(String(50), comment='Menu Title')
+    name: Mapped[str] = mapped_column(String(50), comment='Menu Name')
+    path: Mapped[str] = mapped_column(String(200), comment='Route Address')
+    sort: Mapped[int] = mapped_column(default=0, comment='Sort')
+    icon: Mapped[str | None] = mapped_column(String(100), default=None, comment='Menu Icon')
+    type: Mapped[int] = mapped_column(default=0, comment='Menu type (0 directory 1 menu 2 button)')
+    component: Mapped[str | None] = mapped_column(String(255), default=None, comment='Component Path')
+    perms: Mapped[str | None] = mapped_column(String(100), default=None, comment='Permission Identification')
+    status: Mapped[int] = mapped_column(default=1, comment='Menu status (0 disabled 1 normal)')
+    display: Mapped[int] = mapped_column(default=1, comment='Whether to show (0 no 1)')
+    cache: Mapped[int] = mapped_column(default=1, comment='Cache (0 No 1)')
     link: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='外链地址'
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='Outlink Address'
     )
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='Remarks'
     )
 
-    # 父级菜单一对多
+    # A parent menu with more than one pair
     parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
+        ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='PARENT MENU ID'
     )
     parent: Mapped[Optional['Menu']] = relationship(init=False, back_populates='children', remote_side=[id])
     children: Mapped[Optional[list['Menu']]] = relationship(init=False, back_populates='parent')
 
-    # 菜单角色多对多
+    # Menu character pairs
     roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')

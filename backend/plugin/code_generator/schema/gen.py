@@ -6,8 +6,8 @@ from backend.common.schema import SchemaBase
 
 
 class ImportParam(SchemaBase):
-    """导入参数"""
+    """Import parameters"""
 
-    app: str = Field(description='应用名称，用于代码生成到指定 app')
-    table_schema: str = Field(description='数据库名')
-    table_name: str = Field(description='数据库表名')
+    app: str = Field(description='apply name for code generation to specify app')
+    table_schema: str = Field(description='Database Name')
+    table_name: str = Field(description='Database Table Name')

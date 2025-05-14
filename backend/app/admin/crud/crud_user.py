@@ -21,55 +21,55 @@ from backend.utils.timezone import timezone
 
 
 class CRUDUser(CRUDPlus[User]):
-    """用户数据库操作类"""
+    """User database operating class"""
 
     async def get(self, db: AsyncSession, user_id: int) -> User | None:
         """
-        获取用户详情
+        Get User Details
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         return await self.select_model(db, user_id)
 
     async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
         """
-        通过用户名获取用户
+        Getting users through a user name
 
-        :param db: 数据库会话
-        :param username: 用户名
+        :param db: database session
+        :param username:
         :return:
         """
         return await self.select_model_by_column(db, username=username)
 
     async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
         """
-        通过昵称获取用户
+        Fetch users by nickname
 
-        :param db: 数据库会话
-        :param nickname: 用户昵称
+        :param db: database session
+        :param nickname:
         :return:
         """
         return await self.select_model_by_column(db, nickname=nickname)
 
     async def update_login_time(self, db: AsyncSession, username: str) -> int:
         """
-        更新用户最后登录时间
+        Update user last login time
 
-        :param db: 数据库会话
-        :param username: 用户名
+        :param db: database session
+        :param username:
         :return:
         """
         return await self.update_model_by_column(db, {'last_login_time': timezone.now()}, username=username)
 
     async def create(self, db: AsyncSession, obj: RegisterUserParam, *, social: bool = False) -> None:
         """
-        创建用户
+        Create User
 
-        :param db: 数据库会话
-        :param obj: 注册用户参数
-        :param social: 是否社交用户
+        :param db: database session
+        :param obj: register user parameters
+        :param social: social users
         :return:
         """
         if not social:
@@ -85,10 +85,10 @@ class CRUDUser(CRUDPlus[User]):
 
     async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         """
-        添加用户
+        Add User
 
-        :param db: 数据库会话
-        :param obj: 添加用户参数
+        :param db: database session
+        :param obj: add user parameters
         :return:
         """
         salt = bcrypt.gensalt()
@@ -106,11 +106,11 @@ class CRUDUser(CRUDPlus[User]):
 
     async def update_userinfo(self, db: AsyncSession, input_user: int, obj: UpdateUserParam) -> int:
         """
-        更新用户信息
+        Update user information
 
-        :param db: 数据库会话
-        :param input_user: 用户 ID
-        :param obj: 更新用户参数
+        :param db: database session
+        :param input_user: user ID
+        :param obj: update user parameters
         :return:
         """
         return await self.update_model(db, input_user, obj)
@@ -118,11 +118,11 @@ class CRUDUser(CRUDPlus[User]):
     @staticmethod
     async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
         """
-        更新用户角色
+        Update user roles
 
-        :param db: 数据库会话
-        :param input_user: 用户对象
-        :param obj: 更新角色参数
+        :param db: database session
+        :param input_user: user objects
+        :param obj: update role parameters
         :return:
         """
         for i in list(input_user.roles):
@@ -135,54 +135,54 @@ class CRUDUser(CRUDPlus[User]):
 
     async def update_avatar(self, db: AsyncSession, input_user: int, avatar: AvatarParam) -> int:
         """
-        更新用户头像
+        Update user header
 
-        :param db: 数据库会话
-        :param input_user: 用户 ID
-        :param avatar: 头像地址
+        :param db: database session
+        :param input_user: user ID
+        :param image address
         :return:
         """
         return await self.update_model(db, input_user, {'avatar': str(avatar.url)})
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
-        删除用户
+        Remove User
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
         """
-        检查邮箱是否已被注册
+        Check if the mailbox is registered
 
-        :param db: 数据库会话
-        :param email: 电子邮箱
+        :param db: database session
+        :param email: e-mail
         :return:
         """
         return await self.select_model_by_column(db, email=email)
 
     async def reset_password(self, db: AsyncSession, pk: int, new_pwd: str) -> int:
         """
-        重置用户密码
+        Reset user password
 
-        :param db: 数据库会话
-        :param pk: 用户 ID
-        :param new_pwd: 新密码（已加密）
+        :param db: database session
+        :param pk: User ID
+        :param new_pwd: new password (encrypted)
         :return:
         """
         return await self.update_model(db, pk, {'password': new_pwd})
 
     async def get_list(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
         """
-        获取用户列表
+        Get User List
 
-        :param dept: 部门 ID
-        :param username: 用户名
-        :param phone: 电话号码
-        :param status: 用户状态
+        :param dept: Department ID
+        :param username:
+        :param phone number
+        :param status: user status
         :return:
         """
         stmt = (
@@ -212,10 +212,10 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:
         """
-        获取用户是否为超级管理员
+        Retrieving whether the user is a super administrator
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         user = await self.get(db, user_id)
@@ -223,10 +223,10 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_staff(self, db: AsyncSession, user_id: int) -> bool:
         """
-        获取用户是否可以登录后台
+        Retrieving user login backstage
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         user = await self.get(db, user_id)
@@ -234,10 +234,10 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_status(self, db: AsyncSession, user_id: int) -> int:
         """
-        获取用户状态
+        Get User Status
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         user = await self.get(db, user_id)
@@ -245,10 +245,10 @@ class CRUDUser(CRUDPlus[User]):
 
     async def get_multi_login(self, db: AsyncSession, user_id: int) -> bool:
         """
-        获取用户是否允许多端登录
+        Retrieving user permission for multiple login
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
+        :param db: database session
+        :param user_id: userID
         :return:
         """
         user = await self.get(db, user_id)
@@ -256,44 +256,44 @@ class CRUDUser(CRUDPlus[User]):
 
     async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
         """
-        设置用户超级管理员状态
+        Setup User SuperAdminister Status
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :param is_super: 是否超级管理员
+        :param db: database session
+        :param user_id: userID
+        :param is_supper: is the super administrator
         :return:
         """
         return await self.update_model(db, user_id, {'is_superuser': is_super})
 
     async def set_staff(self, db: AsyncSession, user_id: int, is_staff: bool) -> int:
         """
-        设置用户后台登录状态
+        Set user background login status
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :param is_staff: 是否可登录后台
+        :param db: database session
+        :param user_id: userID
+        :param is_staff: whether to log in backstage
         :return:
         """
         return await self.update_model(db, user_id, {'is_staff': is_staff})
 
     async def set_status(self, db: AsyncSession, user_id: int, status: int) -> int:
         """
-        设置用户状态
+        Set User Status
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :param status: 状态
+        :param db: database session
+        :param user_id: userID
+        :param status: status
         :return:
         """
         return await self.update_model(db, user_id, {'status': status})
 
     async def set_multi_login(self, db: AsyncSession, user_id: int, multi_login: bool) -> int:
         """
-        设置用户多端登录状态
+        Set user multi-end login status
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :param multi_login: 是否允许多端登录
+        :param db: database session
+        :param user_id: userID
+        :param muldi_login: whether multiple login is allowed
         :return:
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
@@ -302,11 +302,11 @@ class CRUDUser(CRUDPlus[User]):
         self, db: AsyncSession, *, user_id: int | None = None, username: str | None = None
     ) -> User | None:
         """
-        获取用户关联信息
+        Get User Link Information
 
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :param username: 用户名
+        :param db: database session
+        :param user_id: userID
+        :param username:
         :return:
         """
         stmt = select(self.model).options(

@@ -10,49 +10,49 @@ from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
 
 
 class GenBusinessService:
-    """代码生成业务服务类"""
+    """Code Generation Business Services"""
 
     @staticmethod
     async def get(*, pk: int) -> GenBusiness:
         """
-        获取指定 ID 的业务
+        GET SPECIFIED ID OPERATIONS
 
-        :param pk: 业务 ID
+        :param pk: Operations ID
         :return:
         """
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='代码生成业务不存在')
+                raise errors.NotFoundError(msg='Code Generation Business does not exist')
             return business
 
     @staticmethod
     async def get_all() -> Sequence[GenBusiness]:
-        """获取所有业务"""
+        """Get all operations"""
         async with async_db_session() as db:
             return await gen_business_dao.get_all(db)
 
     @staticmethod
     async def create(*, obj: CreateGenBusinessParam) -> None:
         """
-        创建业务
+        Create Business
 
-        :param obj: 创建业务参数
+        :param obj: create business parameters
         :return:
         """
         async with async_db_session.begin() as db:
             business = await gen_business_dao.get_by_name(db, obj.table_name)
             if business:
-                raise errors.ForbiddenError(msg='代码生成业务已存在')
+                raise errors.ForbiddenError(msg='Code Generation Business Exists')
             await gen_business_dao.create(db, obj)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateGenBusinessParam) -> int:
         """
-        更新业务
+        Business update
 
-        :param pk: 业务 ID
-        :param obj: 更新业务参数
+        :param pk: Operations ID
+        :param obj: update operational parameters
         :return:
         """
         async with async_db_session.begin() as db:
@@ -61,9 +61,9 @@ class GenBusinessService:
     @staticmethod
     async def delete(*, pk: int) -> int:
         """
-        删除业务
+        Delete Business
 
-        :param pk: 业务 ID
+        :param pk: Operations ID
         :return:
         """
         async with async_db_session.begin() as db:

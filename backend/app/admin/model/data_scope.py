@@ -15,16 +15,16 @@ if TYPE_CHECKING:
 
 
 class DataScope(Base):
-    """数据范围表"""
+    """Data Range Table"""
 
     __tablename__ = 'sys_data_scope'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(50), unique=True, comment='名称')
-    status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
+    name: Mapped[str] = mapped_column(String(50), unique=True, comment='Name')
+    status: Mapped[int] = mapped_column(default=1, comment='Status (0 disabled 1)')
 
-    # 数据范围规则一对多
+    # Data range rules are multiple
     rules: Mapped[list[DataRule]] = relationship(init=False, back_populates='scope')
 
-    # 角色数据范围多对多
+    # Role data range multiple to multiple
     roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_data_scope, back_populates='scopes')

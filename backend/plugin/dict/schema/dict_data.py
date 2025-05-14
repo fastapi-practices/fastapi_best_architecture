@@ -10,35 +10,35 @@ from backend.plugin.dict.schema.dict_type import GetDictTypeDetail
 
 
 class DictDataSchemaBase(SchemaBase):
-    """字典数据基础模型"""
+    """Dictionary Data Base Model"""
 
-    type_id: int = Field(description='字典类型 ID')
-    label: str = Field(description='字典标签')
-    value: str = Field(description='字典值')
-    sort: int = Field(description='排序')
-    status: StatusType = Field(StatusType.enable, description='状态')
-    remark: str | None = Field(None, description='备注')
+    type_id: int = Field(description='DICTIONARY TYPE ID')
+    label: str = Field(description='Dictionary Label')
+    value: str = Field(description='Dictionary values')
+    sort: int = Field(description='Sort')
+    status: StatusType = Field(StatusType.enable, description='Status')
+    remark: str | None = Field(None, description='Remarks')
 
 
 class CreateDictDataParam(DictDataSchemaBase):
-    """创建字典数据参数"""
+    """Create dictionary data parameters"""
 
 
 class UpdateDictDataParam(DictDataSchemaBase):
-    """更新字典数据参数"""
+    """Update dictionary data parameters"""
 
 
 class GetDictDataDetail(DictDataSchemaBase):
-    """字典数据详情"""
+    """Dictionary data details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(description='字典数据 ID')
-    created_time: datetime = Field(description='创建时间')
-    updated_time: datetime | None = Field(None, description='更新时间')
+    id: int = Field(description='DICTIONARY DATA ID')
+    created_time: datetime = Field(description='Created')
+    updated_time: datetime | None = Field(None, description='Update Time')
 
 
 class GetDictDataWithRelation(DictDataSchemaBase):
-    """字典数据关联详情"""
+    """Dictionary data association details"""
 
-    type: GetDictTypeDetail | None = Field(None, description='字典类型信息')
+    type: GetDictTypeDetail | None = Field(None, description='Dictionary Type Information')

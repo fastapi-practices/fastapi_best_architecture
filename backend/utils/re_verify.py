@@ -5,10 +5,10 @@ import re
 
 def search_string(pattern: str, text: str) -> bool:
     """
-    全字段正则匹配
+    All Fields Regular Match
 
-    :param pattern: 正则表达式模式
-    :param text: 待匹配的文本
+    :param pattern: regular expression mode
+    :param text: to be matched
     :return:
     """
     if not pattern or not text:
@@ -20,10 +20,10 @@ def search_string(pattern: str, text: str) -> bool:
 
 def match_string(pattern: str, text: str) -> bool:
     """
-    从字段开头正则匹配
+    Match regular from the beginning of the field
 
-    :param pattern: 正则表达式模式
-    :param text: 待匹配的文本
+    :param pattern: regular expression mode
+    :param text: to be matched
     :return:
     """
     if not pattern or not text:
@@ -35,9 +35,9 @@ def match_string(pattern: str, text: str) -> bool:
 
 def is_phone(text: str) -> bool:
     """
-    检查手机号码格式
+    Check cell phone number format
 
-    :param text: 待检查的手机号码
+    :param text: cell phone number to be checked
     :return:
     """
     if not text:

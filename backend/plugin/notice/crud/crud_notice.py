@@ -11,58 +11,58 @@ from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeP
 
 
 class CRUDNotice(CRUDPlus[Notice]):
-    """通知公告数据库操作类"""
+    """Notify bulletin database operating class"""
 
     async def get(self, db: AsyncSession, pk: int) -> Notice | None:
         """
-        获取通知公告
+        Access to notice announcements
 
-        :param db: 数据库会话
-        :param pk: 通知公告 ID
+        :param db: database session
+        :param pk: Notification bulletin ID
         :return:
         """
         return await self.select_model(db, pk)
 
     async def get_list(self) -> Select:
-        """获取通知公告列表"""
+        """Get Notification Bulletin List"""
         return await self.select_order('created_time', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[Notice]:
         """
-        获取所有通知公告
+        Get all notices posted
 
-        :param db: 数据库会话
+        :param db: database session
         :return:
         """
         return await self.select_models(db)
 
     async def create(self, db: AsyncSession, obj: CreateNoticeParam) -> None:
         """
-        创建通知公告
+        Create Notification Bulletin
 
-        :param db: 数据库会话
-        :param obj: 创建通知公告参数
+        :param db: database session
+        :param obj: create notification bulletin parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateNoticeParam) -> int:
         """
-        更新通知公告
+        Update notification bulletins
 
-        :param db: 数据库会话
-        :param pk: 通知公告 ID
-        :param obj: 更新通知公告参数
+        :param db: database session
+        :param pk: Notification bulletin ID
+        :param obj: update announcement parameters
         :return:
         """
         return await self.update_model(db, pk, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除通知公告
+        Delete Notification Bulletin
 
-        :param db: 数据库会话
-        :param pk: 通知公告 ID 列表
+        :param db: database session
+        :param pk: Notification Bulletin ID list
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)

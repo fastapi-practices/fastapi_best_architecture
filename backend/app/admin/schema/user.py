@@ -13,106 +13,106 @@ from backend.common.schema import CustomPhoneNumber, SchemaBase
 
 
 class AuthSchemaBase(SchemaBase):
-    """用户认证基础模型"""
+    """User Authentication Base Model"""
 
-    username: str = Field(description='用户名')
-    password: str | None = Field(description='密码')
+    username: str = Field(description='Username')
+    password: str | None = Field(description='Password')
 
 
 class AuthLoginParam(AuthSchemaBase):
-    """用户登录参数"""
+    """User login parameters"""
 
-    captcha: str = Field(description='验证码')
+    captcha: str = Field(description='Authentication Code')
 
 
 class RegisterUserParam(AuthSchemaBase):
-    """用户注册参数"""
+    """User registration parameters"""
 
-    nickname: str | None = Field(None, description='昵称')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
+    nickname: str | None = Field(None, description='Nickname')
+    email: EmailStr = Field(examples=['user@example.com'], description='Mailbox')
 
 
 class AddUserParam(AuthSchemaBase):
-    """添加用户参数"""
+    """Add user parameters"""
 
-    dept_id: int = Field(description='部门 ID')
-    roles: list[int] = Field(description='角色 ID 列表')
-    nickname: str | None = Field(None, description='昵称')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
+    dept_id: int = Field(description='SECTOR ID')
+    roles: list[int] = Field(description='ROLE ID LIST')
+    nickname: str | None = Field(None, description='Nickname')
+    email: EmailStr = Field(examples=['user@example.com'], description='Mailbox')
 
 
 class ResetPasswordParam(SchemaBase):
-    """重置密码参数"""
+    """Reset password parameters"""
 
-    old_password: str = Field(description='旧密码')
-    new_password: str = Field(description='新密码')
-    confirm_password: str = Field(description='确认密码')
+    old_password: str = Field(description='Old password')
+    new_password: str = Field(description='New Password')
+    confirm_password: str = Field(description='Confirm password')
 
 
 class UserInfoSchemaBase(SchemaBase):
-    """用户信息基础模型"""
+    """User information base model"""
 
-    dept_id: int | None = Field(None, description='部门 ID')
-    username: str = Field(description='用户名')
-    nickname: str = Field(description='昵称')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
-    phone: CustomPhoneNumber | None = Field(None, description='手机号')
+    dept_id: int | None = Field(None, description='SECTOR ID')
+    username: str = Field(description='Username')
+    nickname: str = Field(description='Nickname')
+    email: EmailStr = Field(examples=['user@example.com'], description='Mailbox')
+    phone: CustomPhoneNumber | None = Field(None, description='Cell phone number')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
-    """更新用户参数"""
+    """Update user parameters"""
 
 
 class UpdateUserRoleParam(SchemaBase):
-    """更新用户角色参数"""
+    """Update user role parameters"""
 
-    roles: list[int] = Field(description='角色 ID 列表')
+    roles: list[int] = Field(description='ROLE ID LIST')
 
 
 class AvatarParam(SchemaBase):
-    """更新头像参数"""
+    """Update header parameters"""
 
-    url: HttpUrl = Field(description='头像 http 地址')
+    url: HttpUrl = Field(description='image http address')
 
 
 class GetUserInfoDetail(UserInfoSchemaBase):
-    """用户信息详情"""
+    """User Info Details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept_id: int | None = Field(None, description='部门 ID')
-    id: int = Field(description='用户 ID')
-    uuid: str = Field(description='用户 UUID')
-    avatar: str | None = Field(None, description='头像')
-    status: StatusType = Field(StatusType.enable, description='状态')
-    is_superuser: bool = Field(description='是否超级管理员')
-    is_staff: bool = Field(description='是否管理员')
-    is_multi_login: bool = Field(description='是否允许多端登录')
-    join_time: datetime = Field(description='加入时间')
-    last_login_time: datetime | None = Field(None, description='最后登录时间')
+    dept_id: int | None = Field(None, description='SECTOR ID')
+    id: int = Field(description='USER ID')
+    uuid: str = Field(description='USER UUID')
+    avatar: str | None = Field(None, description='Heads')
+    status: StatusType = Field(StatusType.enable, description='Status')
+    is_superuser: bool = Field(description='Whether Super Administrator')
+    is_staff: bool = Field(description='Whether to administrate')
+    is_multi_login: bool = Field(description='Whether multiple login is allowed')
+    join_time: datetime = Field(description='Organisation')
+    last_login_time: datetime | None = Field(None, description='Last Login Time')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):
-    """用户信息关联详情"""
+    """User information contact details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptDetail | None = Field(None, description='部门信息')
-    roles: list[GetRoleWithRelationDetail] = Field(description='角色列表')
+    dept: GetDeptDetail | None = Field(None, description='Sectoral information')
+    roles: list[GetRoleWithRelationDetail] = Field(description='Role List')
 
 
 class GetCurrentUserInfoWithRelationDetail(GetUserInfoWithRelationDetail):
-    """当前用户信息关联详情"""
+    """Current user information contact details"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept: str | None = Field(None, description='部门名称')
-    roles: list[str] = Field(description='角色名称列表')
+    dept: str | None = Field(None, description='Department name')
+    roles: list[str] = Field(description='Role Name List')
 
     @model_validator(mode='before')
     @classmethod
     def handel(cls, data: Any) -> Self:
-        """处理部门和角色数据"""
+        """Processing sector and role data"""
         dept = data['dept']
         if dept:
             data['dept'] = dept['name']

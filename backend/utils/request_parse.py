@@ -16,9 +16,9 @@ from backend.database.redis import redis_client
 
 def get_request_ip(request: Request) -> str:
     """
-    获取请求的 IP 地址
+    GET THE REQUESTED IP ADDRESS
 
-    :param request: FastAPI 请求对象
+    :param request: FastAPI
     :return:
     """
     real = request.headers.get('X-Real-IP')
@@ -29,7 +29,7 @@ def get_request_ip(request: Request) -> str:
     if forwarded:
         return forwarded.split(',')[0]
 
-    # 忽略 pytest
+    # Ignore pytest
     if request.client.host == 'testclient':
         return '127.0.0.1'
     return request.client.host
@@ -37,10 +37,10 @@ def get_request_ip(request: Request) -> str:
 
 async def get_location_online(ip: str, user_agent: str) -> dict | None:
     """
-    在线获取 IP 地址属地，无法保证可用性，准确率较高
+    ONLINE ACCESS TO IP ADDRESSES, NO ASSURANCE OF AVAILABILITY AND HIGH ACCURACY
 
-    :param ip: IP 地址
-    :param user_agent: 用户代理字符串
+    :param ip: IP address
+    :param user_agent string
     :return:
     """
     async with httpx.AsyncClient(timeout=3) as client:
@@ -51,16 +51,16 @@ async def get_location_online(ip: str, user_agent: str) -> dict | None:
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
-            log.error(f'在线获取 IP 地址属地失败，错误信息：{e}')
+            log.error(f'Failed to access IP address online, error message: {e}')
             return None
 
 
 @sync_to_async
 def get_location_offline(ip: str) -> dict | None:
     """
-    离线获取 IP 地址属地，无法保证准确率，100% 可用
+    OFFLINE ACCESS TO IP ADDRESSES, NO ACCURACY GUARANTEED, 100% AVAILABLE
 
-    :param ip: IP 地址
+    :param ip: IP address
     :return:
     """
     try:
@@ -75,15 +75,15 @@ def get_location_offline(ip: str) -> dict | None:
             'city': data[3] if data[3] != '0' else None,
         }
     except Exception as e:
-        log.error(f'离线获取 IP 地址属地失败，错误信息：{e}')
+        log.error(f'Offline for IP address location failed, error message: {e}')
         return None
 
 
 async def parse_ip_info(request: Request) -> IpInfo:
     """
-    解析请求的 IP 信息
+    PARSING REQUESTED IP INFORMATION
 
-    :param request: FastAPI 请求对象
+    :param request: FastAPI
     :return:
     """
     country, region, city = None, None, None
@@ -113,9 +113,9 @@ async def parse_ip_info(request: Request) -> IpInfo:
 
 def parse_user_agent_info(request: Request) -> UserAgentInfo:
     """
-    解析请求的用户代理信息
+    Can not open message
 
-    :param request: FastAPI 请求对象
+    :param request: FastAPI
     :return:
     """
     user_agent = request.headers.get('User-Agent')

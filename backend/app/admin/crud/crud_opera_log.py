@@ -9,15 +9,15 @@ from backend.app.admin.schema.opera_log import CreateOperaLogParam
 
 
 class CRUDOperaLogDao(CRUDPlus[OperaLog]):
-    """操作日志数据库操作类"""
+    """Operation log database operating class"""
 
     async def get_list(self, username: str | None, status: int | None, ip: str | None) -> Select:
         """
-        获取操作日志列表
+        Get Operations Log List
 
-        :param username: 用户名
-        :param status: 操作状态
-        :param ip: IP 地址
+        :param username:
+        :param status: operational status
+        :param ip: IP address
         :return:
         """
         filters = {}
@@ -31,29 +31,29 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
 
     async def create(self, db: AsyncSession, obj: CreateOperaLogParam) -> None:
         """
-        创建操作日志
+        Create Operations Log
 
-        :param db: 数据库会话
-        :param obj: 创建操作日志参数
+        :param db: database session
+        :param obj: create operational log parameters
         :return:
         """
         await self.create_model(db, obj)
 
     async def delete(self, db: AsyncSession, pk: list[int]) -> int:
         """
-        删除操作日志
+        Remove Operation Log
 
-        :param db: 数据库会话
-        :param pk: 操作日志 ID 列表
+        :param db: database session
+        :param pk: Operations log ID list
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
 
     async def delete_all(self, db: AsyncSession) -> int:
         """
-        删除所有日志
+        Delete All Logs
 
-        :param db: 数据库会话
+        :param db: database session
         :return:
         """
         return await self.delete_model_by_column(db, allow_multiple=True)

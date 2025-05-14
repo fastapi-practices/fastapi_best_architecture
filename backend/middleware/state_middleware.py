@@ -7,20 +7,20 @@ from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 
 
 class StateMiddleware(BaseHTTPMiddleware):
-    """请求 state 中间件，用于解析和设置请求的附加信息"""
+    """request state middle to interpret and set additional information for the request"""
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """
-        处理请求并设置请求状态信息
+        Process requests and set up request status information
 
-        :param request: FastAPI 请求对象
-        :param call_next: 下一个中间件或路由处理函数
+        :param request: FastAPI
+        :param call_text: next intermediate or route processing function
         :return:
         """
         ip_info = await parse_ip_info(request)
         ua_info = parse_user_agent_info(request)
 
-        # 设置附加请求信息
+        # Set Additional Request Information
         request.state.ip = ip_info.ip
         request.state.country = ip_info.country
         request.state.region = ip_info.region
