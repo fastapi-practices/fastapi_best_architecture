@@ -1,72 +1,79 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import io
-import os.path
-import zipfile
-
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.params import Query
 from starlette.responses import StreamingResponse
 
-from backend.common.exception import errors
-from backend.common.response.response_schema import ResponseModel, response_base
+from backend.app.admin.service.plugin_service import plugin_service
+from backend.common.response.response_code import CustomResponseCode
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.core.path_conf import PLUGIN_DIR
-from backend.plugin.tools import install_requirements_async
 
 router = APIRouter()
 
 
+@router.get('', summary='获取所有插件', dependencies=[DependsJwtAuth])
+async def get_all_plugins() -> ResponseSchemaModel[list[dict[str, Any]]]:
+    plugins = await plugin_service.get_all()
+    return response_base.success(data=plugins)
+
+
 @router.post(
-    '/install',
-    summary='安装插件',
-    description='需使用插件 zip 压缩包进行安装',
+    '/install/zip',
+    summary='安装 zip 插件',
+    description='使用插件 zip 压缩包进行安装',
     dependencies=[
         Depends(RequestPermission('sys:plugin:install')),
         DependsRBAC,
     ],
 )
-async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
-    contents = await file.read()
-    file_bytes = io.BytesIO(contents)
-    if not zipfile.is_zipfile(file_bytes):
-        raise errors.ForbiddenError(msg='插件压缩包格式非法')
-    with zipfile.ZipFile(file_bytes) as zf:
-        # 校验压缩包
-        plugin_dir_in_zip = f'{file.filename[:-4]}/backend/plugin/'
-        members_in_plugin_dir = [name for name in zf.namelist() if name.startswith(plugin_dir_in_zip)]
-        if not members_in_plugin_dir:
-            raise errors.ForbiddenError(msg='插件压缩包内容非法')
-        plugin_name = members_in_plugin_dir[1].replace(plugin_dir_in_zip, '').replace('/', '')
-        if (
-            len(members_in_plugin_dir) <= 3
-            or f'{plugin_dir_in_zip}{plugin_name}/plugin.toml' not in members_in_plugin_dir
-            or f'{plugin_dir_in_zip}{plugin_name}/README.md' not in members_in_plugin_dir
-        ):
-            raise errors.ForbiddenError(msg='插件压缩包内缺少必要文件')
+async def install_zip_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
+    await plugin_service.install_zip(file=file)
+    return response_base.success(res=CustomResponseCode.PLUGIN_INSTALL_SUCCESS)
 
-        # 插件是否可安装
-        full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
-        if os.path.exists(full_plugin_path):
-            raise errors.ForbiddenError(msg='此插件已安装')
-        else:
-            os.makedirs(full_plugin_path, exist_ok=True)
 
-        # 解压（安装）
-        members = []
-        for member in zf.infolist():
-            if member.filename.startswith(plugin_dir_in_zip):
-                new_filename = member.filename.replace(plugin_dir_in_zip, '')
-                if new_filename:
-                    member.filename = new_filename
-                    members.append(member)
-        zf.extractall(PLUGIN_DIR, members)
-        if os.path.exists(os.path.join(full_plugin_path, 'requirements.txt')):
-            await install_requirements_async()
+@router.post(
+    '/install/git',
+    summary='安装 git 插件',
+    description='使用插件 git 仓库地址进行安装，不限制平台；如果需要凭证，需在 git 仓库地址中添加凭证信息',
+    dependencies=[
+        Depends(RequestPermission('sys:plugin:install')),
+        DependsRBAC,
+    ],
+)
+async def install_git_plugin(repo_url: Annotated[str, Query(description='插件 git 仓库地址')]) -> ResponseModel:
+    await plugin_service.install_git(repo_url=repo_url)
+    return response_base.success(res=CustomResponseCode.PLUGIN_INSTALL_SUCCESS)
 
+
+@router.post(
+    '/uninstall',
+    summary='卸载插件',
+    description='此操作会直接删除插件依赖，但不会直接删除插件，而是将插件移动到备份目录',
+    dependencies=[
+        Depends(RequestPermission('sys:plugin:uninstall')),
+        DependsRBAC,
+    ],
+)
+async def uninstall_plugin(plugin: Annotated[str, Query(description='插件名称')]) -> ResponseModel:
+    await plugin_service.uninstall(plugin=plugin)
+    return response_base.success(res=CustomResponseCode.PLUGIN_UNINSTALL_SUCCESS)
+
+
+@router.post(
+    '/status',
+    summary='更新插件状态',
+    dependencies=[
+        Depends(RequestPermission('sys:plugin:status')),
+        DependsRBAC,
+    ],
+)
+async def update_plugin_status(plugin: Annotated[str, Query(description='插件名称')]) -> ResponseModel:
+    await plugin_service.update_status(plugin=plugin)
     return response_base.success()
 
 
@@ -79,19 +86,7 @@ async def install_plugin(file: Annotated[UploadFile, File()]) -> ResponseModel:
     ],
 )
 async def build_plugin(plugin: Annotated[str, Query(description='插件名称')]) -> StreamingResponse:
-    plugin_dir = os.path.join(PLUGIN_DIR, plugin)
-    if not os.path.exists(plugin_dir):
-        raise errors.ForbiddenError(msg='插件不存在')
-
-    bio = io.BytesIO()
-    with zipfile.ZipFile(bio, 'w') as zf:
-        for root, dirs, files in os.walk(plugin_dir):
-            dirs[:] = [d for d in dirs if d != '__pycache__']
-            for file in files:
-                file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, start=plugin_dir)
-                zf.write(file_path, arcname)
-
+    bio = await plugin_service.build(plugin=plugin)
     bio.seek(0)
     return StreamingResponse(
         bio,

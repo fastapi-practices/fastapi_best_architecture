@@ -39,6 +39,10 @@ class CustomResponseCode(CustomCodeBase):
     HTTP_503 = (503, '服务器暂时无法处理请求')
     HTTP_504 = (504, '网关超时')
 
+    # Plugin
+    PLUGIN_INSTALL_SUCCESS = (200, '插件安装成功，请根据插件说明（README.md）进行相关配置并重启服务')
+    PLUGIN_UNINSTALL_SUCCESS = (200, '插件卸载成功，请根据插件说明（README.md）移除相关配置并重启服务')
+
 
 class CustomErrorCode(CustomCodeBase):
     """自定义错误状态码"""

@@ -181,9 +181,10 @@ class Settings(BaseSettings):
         'confirm_password',
     ]
 
-    # 插件配置
+    # Plugin 配置
     PLUGIN_PIP_CHINA: bool = True
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
+    PLUGIN_REDIS_PREFIX: str = 'fba:plugin'
 
     # App Admin
     # .env OAuth2
@@ -200,11 +201,11 @@ class Settings(BaseSettings):
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
 
     # App Task
-    # .env Redis 配置
+    # .env Redis
     CELERY_BROKER_REDIS_DATABASE: int
     CELERY_BACKEND_REDIS_DATABASE: int
 
-    # .env RabbitMQ 配置
+    # .env RabbitMQ
     # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
     CELERY_RABBITMQ_HOST: str
     CELERY_RABBITMQ_PORT: int
@@ -238,11 +239,9 @@ class Settings(BaseSettings):
     }
 
     # Plugin Code Generator
-    # 代码下载
     CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'
 
     # Plugin Config
-    # 参数配置
     CONFIG_BUILT_IN_TYPES: list[str] = ['website', 'protocol', 'policy']
 
     @model_validator(mode='before')
