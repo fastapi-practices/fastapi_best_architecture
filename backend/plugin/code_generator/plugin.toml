@@ -1,2 +1,8 @@
+[plugin]
+summary = '代码生成'
+version = '0.0.1'
+description = '生成通用业务代码'
+author = 'wu-clan'
+
 [app]
 router = ['v1']

@@ -24,6 +24,7 @@ dependencies = [
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool==0.1.0rc8",
     "cryptography>=44.0.0",
+    "dulwich>=0.22.8",
     "fast-captcha>=0.3.2",
     "fastapi-cli==0.0.5",
     "fastapi-limiter>=0.1.6",
@@ -37,6 +38,7 @@ dependencies = [
     "jinja2>=3.1.4",
     "loguru>=0.7.3",
     "msgspec>=0.19.0",
+    "nest-asyncio>=1.6.0",
     "path==17.0.0",
     "psutil>=6.0.0",
     "pwdlib>=0.2.1",

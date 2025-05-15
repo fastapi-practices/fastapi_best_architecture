@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -17,7 +17,9 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
+async def get_notice(
+    request: Request, pk: Annotated[int, Path(description='通知公告 ID')]
+) -> ResponseSchemaModel[GetNoticeDetail]:
     notice = await notice_service.get(pk=pk)
     return response_base.success(data=notice)
 

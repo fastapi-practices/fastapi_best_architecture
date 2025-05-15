@@ -1,3 +1,9 @@
+[plugin]
+summary = '参数配置'
+version = '0.0.1'
+description = '通常用于前端工程数据展示'
+author = 'wu-clan'
+
 [app]
 include = 'admin'
 

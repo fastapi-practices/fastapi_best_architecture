@@ -1,33 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
 import inspect
+import json
 import os
 import subprocess
 import sys
 import warnings
 
+from functools import lru_cache
 from typing import Any
 
+import nest_asyncio
 import rtoml
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from starlette.concurrency import run_in_threadpool
 
+from backend.common.enums import StatusType
+from backend.common.exception.errors import ForbiddenError
+from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
+from backend.database.redis import redis_client
+from backend.plugin.errors import PluginConfigError, PluginInjectError
 from backend.utils.import_parse import import_module_cached
 
 
-class PluginInjectError(Exception):
-    """插件注入错误"""
-
-
+@lru_cache
 def get_plugins() -> list[str]:
     """获取插件列表"""
     plugin_packages = []
 
     # 遍历插件目录
     for item in os.listdir(PLUGIN_DIR):
+        if item.endswith('.py') or item.endswith('backup') or item == '__pycache__':
+            continue
+
         item_path = os.path.join(PLUGIN_DIR, item)
 
         # 检查是否为目录且包含 __init__.py 文件
@@ -41,10 +50,7 @@ def get_plugin_models() -> list[type]:
     """获取插件所有模型类"""
     classes = []
 
-    # 获取所有插件
-    plugins = get_plugins()
-
-    for plugin in plugins:
+    for plugin in get_plugins():
         # 导入插件的模型模块
         module_path = f'backend.plugin.{plugin}.model'
         module = import_module_cached(module_path)
@@ -72,21 +78,67 @@ def load_plugin_config(plugin: str) -> dict[str, Any]:
         return rtoml.load(f)
 
 
-def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
+def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """解析插件配置"""
+
+    extra_plugins = []
+    app_plugins = []
+
+    # 事件循环嵌套: https://pypi.org/project/nest-asyncio/
+    loop = asyncio.get_running_loop()
+    nest_asyncio.apply(loop)
+
+    plugin_status = asyncio.run(redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status'))  # type: ignore
+    if not plugin_status:
+        plugin_status = {}
+
+    for plugin in get_plugins():
+        data = load_plugin_config(plugin)
+
+        plugin_info = data.get('plugin')
+        if not plugin_info:
+            raise PluginConfigError(f'插件 {plugin} 配置文件缺少 plugin 配置')
+
+        required_fields = ['summary', 'version', 'description', 'author']
+        missing_fields = [field for field in required_fields if field not in plugin_info]
+        if missing_fields:
+            raise PluginConfigError(f'插件 {plugin} 配置文件缺少必要字段: {", ".join(missing_fields)}')
+
+        if data.get('api'):
+            if not data.get('app', {}).get('include'):
+                raise PluginConfigError(f'扩展级插件 {plugin} 配置文件缺少 app.include 配置')
+            extra_plugins.append(data)
+        else:
+            if not data.get('app', {}).get('router'):
+                raise PluginConfigError(f'应用级插件 {plugin} 配置文件缺少 app.router 配置')
+            app_plugins.append(data)
+
+        # 补充插件信息
+        data['plugin']['enable'] = plugin_status.setdefault(plugin, StatusType.enable.value)
+        data['plugin']['name'] = plugin
+
+        # 缓存插件信息
+        asyncio.create_task(
+            redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(data, ensure_ascii=False))
+        )
+
+    # 缓存插件状态
+    asyncio.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))
+
+    return extra_plugins, app_plugins
+
+
+def inject_extra_router(plugin: dict[str, Any]) -> None:
     """
     扩展级插件路由注入
 
     :param plugin: 插件名称
-    :param data: 插件配置数据
     :return:
     """
-    app_include = data.get('app', {}).get('include', '')
-    if not app_include:
-        raise PluginInjectError(f'扩展级插件 {plugin} 配置文件存在错误，请检查')
-
-    plugin_api_path = os.path.join(PLUGIN_DIR, plugin, 'api')
+    plugin_name: str = plugin['plugin']['name']
+    plugin_api_path = os.path.join(PLUGIN_DIR, plugin_name, 'api')
     if not os.path.exists(plugin_api_path):
-        raise PluginInjectError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
+        raise PluginConfigError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
 
     for root, _, api_files in os.walk(plugin_api_path):
         for file in api_files:
@@ -94,7 +146,7 @@ def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                 continue
 
             # 解析插件路由配置
-            file_config = data.get('api', {}).get(f'{file[:-3]}', {})
+            file_config = plugin.get('api', {}).get(f'{file[:-3]}', {})
             prefix = file_config.get('prefix', '')
             tags = file_config.get('tags', [])
 
@@ -108,20 +160,22 @@ def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                 plugin_router = getattr(module, 'router', None)
                 if not plugin_router:
                     warnings.warn(
-                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
+                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                         FutureWarning,
                     )
                     continue
 
                 # 获取目标 app 路由
                 relative_path = os.path.relpath(root, plugin_api_path)
-                target_module_path = f'backend.app.{app_include}.api.{relative_path.replace(os.sep, ".")}'
+                target_module_path = (
+                    f'backend.app.{plugin.get("app", {}).get("include")}.api.{relative_path.replace(os.sep, ".")}'
+                )
                 target_module = import_module_cached(target_module_path)
                 target_router = getattr(target_module, 'router', None)
 
                 if not target_router or not isinstance(target_router, APIRouter):
                     raise PluginInjectError(
-                        f'扩展级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
+                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
                     )
 
                 # 将插件路由注入到目标路由中
@@ -129,94 +183,142 @@ def inject_extra_router(plugin: str, data: dict[str, Any]) -> None:
                     router=plugin_router,
                     prefix=prefix,
                     tags=[tags] if tags else [],
+                    dependencies=[Depends(PluginStatusChecker(plugin_name))],
                 )
             except Exception as e:
-                raise PluginInjectError(f'扩展级插件 {plugin} 路由注入失败：{str(e)}') from e
+                raise PluginInjectError(f'扩展级插件 {plugin_name} 路由注入失败：{str(e)}') from e
 
 
-def inject_app_router(plugin: str, data: dict[str, Any], target_router: APIRouter) -> None:
+def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
     """
     应用级插件路由注入
 
     :param plugin: 插件名称
-    :param data: 插件配置数据
     :param target_router: FastAPI 路由器
     :return:
     """
-    module_path = f'backend.plugin.{plugin}.api.router'
+    plugin_name: str = plugin['plugin']['name']
+    module_path = f'backend.plugin.{plugin_name}.api.router'
     try:
         module = import_module_cached(module_path)
-        routers = data.get('app', {}).get('router', [])
+        routers = plugin.get('app', {}).get('router')
         if not routers or not isinstance(routers, list):
-            raise PluginInjectError(f'应用级插件 {plugin} 配置文件存在错误，请检查')
+            raise PluginConfigError(f'应用级插件 {plugin_name} 配置文件存在错误，请检查')
 
         for router in routers:
             plugin_router = getattr(module, router, None)
             if not plugin_router or not isinstance(plugin_router, APIRouter):
                 raise PluginInjectError(
-                    f'应用级插件 {plugin} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
+                    f'应用级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
                 )
 
             # 将插件路由注入到目标路由中
-            target_router.include_router(plugin_router)
+            target_router.include_router(plugin_router, dependencies=[Depends(PluginStatusChecker(plugin_name))])
     except Exception as e:
-        raise PluginInjectError(f'应用级插件 {plugin} 路由注入失败：{str(e)}') from e
+        raise PluginInjectError(f'应用级插件 {plugin_name} 路由注入失败：{str(e)}') from e
 
 
 def build_final_router() -> APIRouter:
     """构建最终路由"""
+    extra_plugins, app_plugins = parse_plugin_config()
 
-    extra_plugins = []
-    app_plugins = []
-
-    for plugin in get_plugins():
-        data = load_plugin_config(plugin)
-        (extra_plugins if data.get('api') else app_plugins).append((plugin, data))
-
-    for plugin, data in extra_plugins:
-        inject_extra_router(plugin, data)
+    for plugin in extra_plugins:
+        inject_extra_router(plugin)
 
     # 主路由，必须在插件路由注入后导入
     from backend.app.router import router as main_router
 
-    for plugin, data in app_plugins:
-        inject_app_router(plugin, data, main_router)
+    for plugin in app_plugins:
+        inject_app_router(plugin, main_router)
 
     return main_router
 
 
-def _install_plugin_requirements(plugin: str, requirements_file: str) -> None:
+def install_requirements(plugin: str) -> None:
     """
-    安装单个插件的依赖
+    安装插件依赖
 
-    :param plugin: 插件名称
-    :param requirements_file: 依赖文件路径
+    :param plugin: 指定插件名，否则检查所有插件
     :return:
     """
-    try:
-        ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']
-        pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
-        if settings.PLUGIN_PIP_CHINA:
-            pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-        subprocess.check_call(ensurepip_install)
-        subprocess.check_call(pip_install)
-    except subprocess.CalledProcessError as e:
-        raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e.stderr}') from e
+    plugins = [plugin] if plugin else get_plugins()
 
-
-def install_requirements() -> None:
-    """安装插件依赖"""
-    for plugin in get_plugins():
+    for plugin in plugins:
         requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
         if os.path.exists(requirements_file):
-            _install_plugin_requirements(plugin, requirements_file)
+            try:
+                ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']
+                pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
+                if settings.PLUGIN_PIP_CHINA:
+                    pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
+                subprocess.check_call(ensurepip_install)
+                subprocess.check_call(pip_install)
+            except subprocess.CalledProcessError as e:
+                raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e.stderr}') from e
 
 
-async def install_requirements_async() -> None:
+def uninstall_requirements(plugin: str) -> None:
+    """
+    卸载插件依赖
+
+    :param plugin: 插件名称
+    :return:
+    """
+    requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+    if os.path.exists(requirements_file):
+        try:
+            pip_uninstall = [sys.executable, '-m', 'pip', 'uninstall', '-r', requirements_file, '-y']
+            subprocess.check_call(pip_uninstall)
+        except subprocess.CalledProcessError as e:
+            raise PluginInjectError(f'插件 {plugin} 依赖卸载失败：{e.stderr}') from e
+
+
+async def install_requirements_async(plugin: str | None = None) -> None:
     """
     异步安装插件依赖
 
     由于 Windows 平台限制，无法实现完美的全异步方案，详情：
     https://stackoverflow.com/questions/44633458/why-am-i-getting-notimplementederror-with-async-and-await-on-windows
     """
-    await run_in_threadpool(install_requirements)
+    await run_in_threadpool(install_requirements, plugin)
+
+
+async def uninstall_requirements_async(plugin: str) -> None:
+    """
+    异步卸载插件依赖
+
+    :param plugin: 插件名称
+    :return:
+    """
+    await run_in_threadpool(uninstall_requirements, plugin)
+
+
+class PluginStatusChecker:
+    """插件状态检查器"""
+
+    def __init__(self, plugin: str) -> None:
+        """
+        初始化插件状态检查器
+
+        :param plugin: 插件名称
+        :return:
+        """
+        self.plugin = plugin
+
+    async def __call__(self, request: Request) -> None:
+        """
+        验证插件状态
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
+        plugin_status = await redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status')
+        if not plugin_status:
+            log.error('插件状态未初始化或丢失，需重启服务自动修复')
+            raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
+
+        if self.plugin not in plugin_status:
+            log.error(f'插件 {self.plugin} 状态未初始化或丢失，需重启服务自动修复')
+            raise PluginInjectError(f'插件 {self.plugin} 状态未初始化或丢失，请联系系统管理员')
+        if not int(plugin_status.get(self.plugin)):
+            raise ForbiddenError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
