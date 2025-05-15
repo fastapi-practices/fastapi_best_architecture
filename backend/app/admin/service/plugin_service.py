@@ -53,15 +53,21 @@ class PluginService:
             raise errors.ForbiddenError(msg='插件压缩包格式非法')
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
-            plugin_dir_in_zip = file.filename[:-4]
-            members_in_plugin_dir = [name for name in zf.namelist() if name.startswith(plugin_dir_in_zip)]
+            plugin_dir = file.filename[:-4]
+            members_in_plugin_dir = [name for name in zf.namelist() if name.startswith(plugin_dir)]
             if not members_in_plugin_dir:
                 raise errors.ForbiddenError(msg='插件压缩包内容非法')
-            plugin_name = members_in_plugin_dir[1].replace(plugin_dir_in_zip, '').replace('/', '')
+            plugin_name = (
+                members_in_plugin_dir[0]
+                .replace('/', '')
+                .replace('-master', '')
+                .replace('-main', '')
+                .replace('-dev', '')
+            )
             if (
                 len(members_in_plugin_dir) <= 3
-                or f'{plugin_dir_in_zip}/plugin.toml' not in members_in_plugin_dir
-                or f'{plugin_dir_in_zip}/README.md' not in members_in_plugin_dir
+                or f'{plugin_dir}/plugin.toml' not in members_in_plugin_dir
+                or f'{plugin_dir}/README.md' not in members_in_plugin_dir
             ):
                 raise errors.ForbiddenError(msg='插件压缩包内缺少必要文件')
 
@@ -75,12 +81,12 @@ class PluginService:
             # 解压（安装）
             members = []
             for member in zf.infolist():
-                if member.filename.startswith(plugin_dir_in_zip):
-                    new_filename = member.filename.replace(plugin_dir_in_zip, '')
+                if member.filename.startswith(plugin_dir):
+                    new_filename = member.filename.replace(plugin_dir, '')
                     if new_filename:
                         member.filename = new_filename
                         members.append(member)
-            zf.extractall(PLUGIN_DIR, members)
+            zf.extractall(os.path.join(PLUGIN_DIR, plugin_name), members)
 
         await install_requirements_async(plugin_name)
 
