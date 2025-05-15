@@ -83,13 +83,8 @@ class ConfigService:
         :return:
         """
         async with async_db_session.begin() as db:
-<<<<<<< HEAD
-            if obj.type in config_settings.CONFIG_BUILT_IN_TYPES:
-                raise errors.ForbiddenError(msg='Invalid Type Parameters')
-=======
             if obj.type in settings.CONFIG_BUILT_IN_TYPES:
-                raise errors.ForbiddenError(msg='非法类型参数')
->>>>>>> 27b9cf4c64c990863af33f18e4ad426fe346a244
+                raise errors.ForbiddenError(msg='Invalid type parameter')
             config = await config_dao.get_by_key(db, obj.key)
             if config:
                 raise errors.ForbiddenError(msg=f'parameter configuration {obj.key} exists')

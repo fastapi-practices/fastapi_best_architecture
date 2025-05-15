@@ -12,7 +12,7 @@ __all__ = ['celery_app']
 
 def get_broker_url() -> str:
     """GET MESSAGE PROXY URL"""
-    if task_settings.CELERY_BROKER == 'redis':
+    if settings.CELERY_BROKER == 'redis':
         return (
             f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
             f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
@@ -64,7 +64,7 @@ def init_celery() -> celery.Celery:
     )
 
     # _Other Organiser
-    app.autodiscover_tasks(task_settings.CELERY_TASK_PACKAGES)
+    app.autodiscover_tasks(settings.CELERY_TASK_PACKAGES)
 
     return app
 
