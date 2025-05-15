@@ -85,10 +85,14 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     app_plugins = []
 
     # 事件循环嵌套: https://pypi.org/project/nest-asyncio/
-    loop = asyncio.get_running_loop()
-    nest_asyncio.apply(loop)
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.get_event_loop()
+    else:
+        nest_asyncio.apply()
 
-    plugin_status = asyncio.run(redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status'))  # type: ignore
+    plugin_status = loop.run_until_complete(redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status'))  # type: ignore
     if not plugin_status:
         plugin_status = {}
 
@@ -118,12 +122,12 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
 
         # 缓存插件信息
-        asyncio.create_task(
+        loop.create_task(
             redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(data, ensure_ascii=False))
         )
 
     # 缓存插件状态
-    asyncio.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))
+    loop.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))
 
     return extra_plugins, app_plugins
 
