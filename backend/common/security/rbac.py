@@ -70,7 +70,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
             raise AuthorizationError
     else:
         try:
-            casbin_rbac = import_module_cached('backend.plugin.casbin.utils.rbac')
+            casbin_rbac = import_module_cached('backend.plugin.casbin_rbac.rbac')
             casbin_verify = getattr(casbin_rbac, 'casbin_verify')
         except (ImportError, AttributeError) as e:
             log.error(f'正在通过 casbin 执行 RBAC 权限校验，但此插件不存在: {e}')
