@@ -1,3 +1,20 @@
+<a id="v1.3.0"></a>
+# [v1.3.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.3.0) - 2025-05-16
+
+## What's Changed
+* Update changelog for v1.2.0 by [@wu-clan](https://github.com/wu-clan) in [#598](https://github.com/fastapi-practices/fastapi_best_architecture/pull/598)
+* Simplify apps and plugins config method by [@wu-clan](https://github.com/wu-clan) in [#600](https://github.com/fastapi-practices/fastapi_best_architecture/pull/600)
+* Add plugin info config and interfaces by [@wu-clan](https://github.com/wu-clan) in [#601](https://github.com/fastapi-practices/fastapi_best_architecture/pull/601)
+* Fix the fastapi cli startup event loop by [@wu-clan](https://github.com/wu-clan) in [#602](https://github.com/fastapi-practices/fastapi_best_architecture/pull/602)
+* Optimize the zip plugin install logic by [@wu-clan](https://github.com/wu-clan) in [#603](https://github.com/fastapi-practices/fastapi_best_architecture/pull/603)
+* Update the casbin RBAC module path by [@wu-clan](https://github.com/wu-clan) in [#604](https://github.com/fastapi-practices/fastapi_best_architecture/pull/604)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.2.0...v1.3.0
+
+[Changes][v1.3.0]
+
+
 <a id="v1.2.0"></a>
 # [v1.2.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.2.0) - 2025-05-01
 
@@ -494,6 +511,7 @@
 [Changes][v1.0.0]
 
 
+[v1.3.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.2...v1.2.0
 [v1.1.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.1...v1.1.2
 [v1.1.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
