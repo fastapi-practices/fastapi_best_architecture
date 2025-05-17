@@ -92,6 +92,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     else:
         nest_asyncio.apply()
 
+    loop.create_task(redis_client.delete_prefix(f'{settings.PLUGIN_REDIS_PREFIX}:info'))
     plugin_status = loop.run_until_complete(redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status'))  # type: ignore
     if not plugin_status:
         plugin_status = {}
@@ -118,7 +119,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             app_plugins.append(data)
 
         # 补充插件信息
-        data['plugin']['enable'] = plugin_status.setdefault(plugin, StatusType.enable.value)
+        data['plugin']['enable'] = plugin_status.setdefault(plugin, str(StatusType.enable.value))
         data['plugin']['name'] = plugin
 
         # 缓存插件信息
@@ -127,7 +128,8 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         )
 
     # 缓存插件状态
-    loop.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))
+    loop.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))  # type: ignore
+    loop.create_task(redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:new'))
 
     return extra_plugins, app_plugins
 
