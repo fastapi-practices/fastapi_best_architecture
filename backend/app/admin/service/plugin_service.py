@@ -135,6 +135,8 @@ class PluginService:
         bacup_dir = os.path.join(PLUGIN_DIR, f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup')
         shutil.move(plugin_dir, bacup_dir)
         await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}')
+        await redis_client.hdel(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin)
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:new', 'ture')
 
     @staticmethod
     async def update_status(*, plugin: str):
