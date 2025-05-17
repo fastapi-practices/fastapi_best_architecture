@@ -129,7 +129,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     # 缓存插件状态
     loop.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))  # type: ignore
-    loop.create_task(redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:new'))
+    loop.create_task(redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:changed'))
 
     return extra_plugins, app_plugins
 

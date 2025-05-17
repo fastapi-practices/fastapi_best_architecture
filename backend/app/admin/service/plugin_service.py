@@ -40,9 +40,9 @@ class PluginService:
         return result
 
     @staticmethod
-    async def has_new() -> str | None:
-        """是否存在新插件"""
-        return await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:new')
+    async def changed() -> str | None:
+        """插件状态是否变更"""
+        return await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     @staticmethod
     async def install_zip(*, file: UploadFile) -> None:
@@ -94,7 +94,7 @@ class PluginService:
             zf.extractall(os.path.join(PLUGIN_DIR, plugin_name), members)
 
         await install_requirements_async(plugin_name)
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:new', 'ture')
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     @staticmethod
     async def install_git(*, repo_url: str):
@@ -118,7 +118,7 @@ class PluginService:
             raise errors.ServerError(msg='插件安装失败，请稍后重试') from e
         else:
             await install_requirements_async(repo_name)
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:new', 'ture')
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     @staticmethod
     async def uninstall(*, plugin: str):
@@ -135,6 +135,8 @@ class PluginService:
         bacup_dir = os.path.join(PLUGIN_DIR, f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup')
         shutil.move(plugin_dir, bacup_dir)
         await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}')
+        await redis_client.hdel(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin)
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     @staticmethod
     async def update_status(*, plugin: str):
