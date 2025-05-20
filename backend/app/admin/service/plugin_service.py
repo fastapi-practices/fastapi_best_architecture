@@ -153,15 +153,15 @@ class PluginService:
 
         # 更新持久缓存状态
         new_status = (
-            StatusType.enable.value
-            if plugin_info.get('plugin', {}).get('enable') == StatusType.disable.value
-            else StatusType.disable.value
+            str(StatusType.enable.value)
+            if plugin_info['plugin']['enable'] == str(StatusType.disable.value)
+            else str(StatusType.disable.value)
         )
-        plugin_info['plugin']['enable'] = str(new_status)
+        plugin_info['plugin']['enable'] = new_status
         await redis_client.set(
             f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(plugin_info, ensure_ascii=False)
         )
-        await redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin, str(new_status))
+        await redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin, new_status)
 
     @staticmethod
     async def build(*, plugin: str) -> io.BytesIO:
