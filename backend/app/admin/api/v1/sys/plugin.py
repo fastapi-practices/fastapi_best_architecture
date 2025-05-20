@@ -56,7 +56,7 @@ async def install_git_plugin(repo_url: Annotated[str, Query(description='插件 
     return response_base.success(res=CustomResponseCode.PLUGIN_INSTALL_SUCCESS)
 
 
-@router.post(
+@router.delete(
     '/uninstall',
     summary='卸载插件',
     description='此操作会直接删除插件依赖，但不会直接删除插件，而是将插件移动到备份目录',
@@ -83,7 +83,7 @@ async def update_plugin_status(plugin: Annotated[str, Query(description='插件�
     return response_base.success()
 
 
-@router.post(
+@router.get(
     '/zip',
     summary='打包插件',
     dependencies=[
