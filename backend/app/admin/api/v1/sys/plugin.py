@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Path, UploadFile
 from fastapi.params import Query
 from starlette.responses import StreamingResponse
 
@@ -84,16 +84,15 @@ async def update_plugin_status(plugin: Annotated[str, Query(description='插件�
 
 
 @router.get(
-    '/zip',
+    '/zip/{plugin}',
     summary='打包插件',
     dependencies=[
         Depends(RequestPermission('sys:plugin:zip')),
         DependsRBAC,
     ],
 )
-async def build_plugin(plugin: Annotated[str, Query(description='插件名称')]) -> StreamingResponse:
+async def build_plugin(plugin: Annotated[str, Path(description='插件名称')]) -> StreamingResponse:
     bio = await plugin_service.build(plugin=plugin)
-    bio.seek(0)
     return StreamingResponse(
         bio,
         media_type='application/x-zip-compressed',

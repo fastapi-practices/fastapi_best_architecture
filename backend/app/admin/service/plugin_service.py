@@ -184,6 +184,7 @@ class PluginService:
                     arcname = os.path.relpath(file_path, start=plugin_dir)
                     zf.write(file_path, arcname)
 
+        bio.seek(0)
         return bio
 
 
