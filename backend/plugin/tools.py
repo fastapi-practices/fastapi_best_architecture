@@ -85,8 +85,9 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     plugins = get_plugins()
 
-    # 使用独立单例，避免与线程冲突
+    # 使用独立单例，避免与主线程冲突
     current_redis_client = RedisCli()
+    run_await(current_redis_client.open)()
 
     run_await(current_redis_client.delete_prefix)(f'{settings.PLUGIN_REDIS_PREFIX}:info', exclude=plugins)
     plugin_status = run_await(current_redis_client.hgetall)(f'{settings.PLUGIN_REDIS_PREFIX}:status')
