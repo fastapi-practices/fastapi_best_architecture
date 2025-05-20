@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, File, UploadFile, Path
+from fastapi import APIRouter, Depends, File, Path, UploadFile
 from fastapi.params import Query
 from starlette.responses import StreamingResponse
 
