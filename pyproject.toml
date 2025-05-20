@@ -38,7 +38,6 @@ dependencies = [
     "jinja2>=3.1.4",
     "loguru>=0.7.3",
     "msgspec>=0.19.0",
-    "nest-asyncio>=1.6.0",
     "path==17.0.0",
     "psutil>=6.0.0",
     "pwdlib>=0.2.1",

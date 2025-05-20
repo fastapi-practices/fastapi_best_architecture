@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
 import inspect
 import json
 import os
@@ -11,7 +10,6 @@ import warnings
 from functools import lru_cache
 from typing import Any
 
-import nest_asyncio
 import rtoml
 
 from fastapi import APIRouter, Depends, Request
@@ -22,8 +20,9 @@ from backend.common.exception.errors import ForbiddenError
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
-from backend.database.redis import redis_client
+from backend.database.redis import RedisCli, redis_client
 from backend.plugin.errors import PluginConfigError, PluginInjectError
+from backend.utils._asyncio import run_await
 from backend.utils.import_parse import import_module_cached
 
 
@@ -84,20 +83,18 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     extra_plugins = []
     app_plugins = []
 
-    # 事件循环嵌套: https://pypi.org/project/nest-asyncio/
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.get_event_loop()
-    else:
-        nest_asyncio.apply()
+    plugins = get_plugins()
 
-    loop.create_task(redis_client.delete_prefix(f'{settings.PLUGIN_REDIS_PREFIX}:info'))
-    plugin_status = loop.run_until_complete(redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status'))  # type: ignore
+    # 使用独立单例，避免与主线程冲突
+    current_redis_client = RedisCli()
+    run_await(current_redis_client.open)()
+
+    run_await(current_redis_client.delete_prefix)(f'{settings.PLUGIN_REDIS_PREFIX}:info', exclude=plugins)
+    plugin_status = run_await(current_redis_client.hgetall)(f'{settings.PLUGIN_REDIS_PREFIX}:status')
     if not plugin_status:
         plugin_status = {}
 
-    for plugin in get_plugins():
+    for plugin in plugins:
         data = load_plugin_config(plugin)
 
         plugin_info = data.get('plugin')
@@ -123,13 +120,13 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
 
         # 缓存插件信息
-        loop.create_task(
-            redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(data, ensure_ascii=False))
+        run_await(current_redis_client.set)(
+            f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(data, ensure_ascii=False)
         )
 
     # 缓存插件状态
-    loop.create_task(redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status))  # type: ignore
-    loop.create_task(redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:changed'))
+    run_await(current_redis_client.hset)(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status)
+    run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     return extra_plugins, app_plugins
 
