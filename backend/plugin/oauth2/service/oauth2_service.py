@@ -6,10 +6,8 @@ from fast_captcha import text_captcha
 from fastapi import BackgroundTasks, Request, Response
 
 from backend.app.admin.crud.crud_user import user_dao
-from backend.app.admin.crud.crud_user_social import user_social_dao
 from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import RegisterUserParam
-from backend.app.admin.schema.user_social import CreateUserSocialParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.exception.errors import AuthorizationError
@@ -17,6 +15,8 @@ from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
+from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.utils.timezone import timezone
 
 
@@ -45,15 +45,18 @@ class OAuth2Service:
         async with async_db_session.begin() as db:
             # 获取 OAuth2 平台用户信息
             social_id = user.get('id')
+            social_nickname = user.get('name')
+
             social_username = user.get('username')
             if social == UserSocialType.github:
                 social_username = user.get('login')
-            social_nickname = user.get('name')
+
             social_email = user.get('email')
-            if social == UserSocialType.linux_do:  # 不提供明文邮箱的平台
+            if social == UserSocialType.linux_do:
                 social_email = f'{social_username}@linux.do'
             if not social_email:
                 raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
+
             # 创建系统用户
             sys_user = await user_dao.check_email(db, social_email)
             if not sys_user:
@@ -73,7 +76,7 @@ class OAuth2Service:
             sys_user_id = sys_user.id
             user_social = await user_social_dao.get(db, sys_user_id, social.value)
             if not user_social:
-                new_user_social = CreateUserSocialParam(source=social.value, uid=str(social_id), user_id=sys_user_id)
+                new_user_social = CreateUserSocialParam(source=social.value, sid=str(social_id), user_id=sys_user_id)
                 await user_social_dao.create(db, new_user_social)
             # 创建 token
             access_token = await jwt.create_access_token(

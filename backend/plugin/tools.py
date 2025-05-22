@@ -149,9 +149,9 @@ def inject_extra_router(plugin: dict[str, Any]) -> None:
                 continue
 
             # 解析插件路由配置
-            file_config = plugin.get('api', {}).get(f'{file[:-3]}', {})
-            prefix = file_config.get('prefix', '')
-            tags = file_config.get('tags', [])
+            file_config = plugin['api'][file[:-3]]
+            prefix = file_config['prefix']
+            tags = file_config['tags']
 
             # 获取插件路由模块
             file_path = os.path.join(root, file)
@@ -204,7 +204,7 @@ def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
     module_path = f'backend.plugin.{plugin_name}.api.router'
     try:
         module = import_module_cached(module_path)
-        routers = plugin.get('app', {}).get('router')
+        routers = plugin['app']['router']
         if not routers or not isinstance(routers, list):
             raise PluginConfigError(f'应用级插件 {plugin_name} 配置文件存在错误，请检查')
 

@@ -8,4 +8,3 @@ from backend.app.admin.model.menu import Menu
 from backend.app.admin.model.opera_log import OperaLog
 from backend.app.admin.model.role import Role
 from backend.app.admin.model.user import User
-from backend.app.admin.model.user_social import UserSocial

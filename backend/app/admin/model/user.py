@@ -15,7 +15,7 @@ from backend.database.db import uuid4_str
 from backend.utils.timezone import timezone
 
 if TYPE_CHECKING:
-    from backend.app.admin.model import Dept, Role, UserSocial
+    from backend.app.admin.model import Dept, Role
 
 
 class User(Base):
@@ -54,9 +54,6 @@ class User(Base):
         ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, comment='部门关联ID'
     )
     dept: Mapped[Dept | None] = relationship(init=False, back_populates='users')
-
-    # 用户社交信息一对多
-    socials: Mapped[list[UserSocial]] = relationship(init=False, back_populates='user')
 
     # 用户角色多对多
     roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_user_role, back_populates='users')
