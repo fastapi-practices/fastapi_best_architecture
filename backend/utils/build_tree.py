@@ -101,8 +101,8 @@ def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
             'meta': {
                 'title': node['title'],
                 'icon': node['icon'],
-                'link': node['link'] if node['type'] == 3 else '',
-                'iframeSrc': node['link'] if node['type'] == 4 else '',
+                'iframeSrc': node['link'] if node['type'] == 3 else '',
+                'link': node['link'] if node['type'] == 4 else '',
                 'keepAlive': node['cache'],
                 'hideInMenu': not bool(node['display']),
                 'menuVisibleWithForbidden': not bool(node['status']),
