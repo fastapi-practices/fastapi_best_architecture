@@ -76,7 +76,7 @@ class OAuth2Service:
             sys_user_id = sys_user.id
             user_social = await user_social_dao.get(db, sys_user_id, social.value)
             if not user_social:
-                new_user_social = CreateUserSocialParam(user_id=sys_user_id, source=social.value, sid=str(social_id))
+                new_user_social = CreateUserSocialParam(source=social.value, sid=str(social_id), user_id=sys_user_id)
                 await user_social_dao.create(db, new_user_social)
             # 创建 token
             access_token = await jwt.create_access_token(
