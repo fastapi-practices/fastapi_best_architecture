@@ -13,11 +13,11 @@ class MenuSchemaBase(SchemaBase):
 
     title: str = Field(description='菜单标题')
     name: str = Field(description='菜单名称')
-    path: str = Field(description='路由路径')
+    path: str | None = Field(None, description='路由地址')
     parent_id: int | None = Field(None, description='菜单父级 ID')
     sort: int = Field(0, ge=0, description='排序')
     icon: str | None = Field(None, description='图标')
-    type: MenuType = Field(MenuType.directory, description='菜单类型（0目录 1菜单 2按钮）')
+    type: MenuType = Field(MenuType.directory, description='菜单类型（0目录 1菜单 2按钮 3内嵌 4外链）')
     component: str | None = Field(None, description='组件路径')
     perms: str | None = Field(None, description='权限标识')
     status: StatusType = Field(StatusType.enable, description='状态')

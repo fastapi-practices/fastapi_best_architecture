@@ -93,16 +93,16 @@ def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
     :param row: 原始数据行序列
     :return:
     """
-    # 需要移除的原始字段
-    remove_keys = {'title', 'icon', 'link', 'cache', 'display', 'status'}
+    meta_keys = {'title', 'icon', 'link', 'cache', 'display', 'status'}
 
     vben5_nodes = [
         {
-            **{k: v for k, v in node.items() if k not in remove_keys},
+            **{k: v for k, v in node.items() if k not in meta_keys},
             'meta': {
                 'title': node['title'],
                 'icon': node['icon'],
-                'link': node['link'],
+                'iframeSrc': node['link'] if node['type'] == 3 else '',
+                'link': node['link'] if node['type'] == 4 else '',
                 'keepAlive': node['cache'],
                 'hideInMenu': not bool(node['display']),
                 'menuVisibleWithForbidden': not bool(node['status']),
