@@ -97,8 +97,6 @@ fastapi-cli==0.0.5
     #   fastapi-best-architecture
 fastapi-limiter==0.1.6
     # via fastapi-best-architecture
-fastapi-oauth20==0.0.1
-    # via fastapi-best-architecture
 fastapi-pagination==0.13.0
     # via fastapi-best-architecture
 filelock==3.18.0
@@ -123,9 +121,7 @@ httpcore==1.0.7
 httptools==0.6.4
     # via uvicorn
 httpx==0.28.1
-    # via
-    #   fastapi
-    #   fastapi-oauth20
+    # via fastapi
 humanize==4.12.2
     # via flower
 identify==2.6.9

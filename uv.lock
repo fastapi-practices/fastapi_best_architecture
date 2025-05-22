@@ -603,7 +603,6 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "fastapi-cli" },
     { name = "fastapi-limiter" },
-    { name = "fastapi-oauth20" },
     { name = "fastapi-pagination" },
     { name = "flower" },
     { name = "gevent" },
@@ -657,7 +656,6 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = "==0.115.11" },
     { name = "fastapi-cli", specifier = "==0.0.5" },
     { name = "fastapi-limiter", specifier = ">=0.1.6" },
-    { name = "fastapi-oauth20", specifier = ">=0.0.1" },
     { name = "fastapi-pagination", specifier = ">=0.13.0" },
     { name = "flower", specifier = ">=2.0.0" },
     { name = "gevent", specifier = ">=24.11.1" },
@@ -721,18 +719,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7f/99/c7903234488d4dca5f9bccb4f88c2f582a234f0dca33348781c9cf8a48c6/fastapi_limiter-0.1.6.tar.gz", hash = "sha256:6f5fde8efebe12eb33861bdffb91009f699369a3c2862cdc7c1d9acf912ff443" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/cd/b5/6f6b4d18bee1cafc857eae12738b3a03b7d1102b833668be868938c57b9d/fastapi_limiter-0.1.6-py3-none-any.whl", hash = "sha256:2e53179a4208b8f2c8795e38bb001324d3dc37d2800ff49fd28ec5caabf7a240" },
-]
-
-[[package]]
-name = "fastapi-oauth20"
-version = "0.0.1"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "httpx" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/8e/66/25d4ece161689184f47130bc7ea5bf9c73113c2e628cf586546aa574d8d1/fastapi_oauth20-0.0.1.tar.gz", hash = "sha256:22bf6564f3af42a94cb597f8e20af1366e89e19af49291d15784a4c14059d4c9" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/cf/87/7e0423109ba2c0f8a0794eedff5bb1f79792e5d8d0941ba0b26f962e3e5c/fastapi_oauth20-0.0.1-py3-none-any.whl", hash = "sha256:921fe0e874cb4186998f74b1d951c360400aceb5ca3889a85c806d865a991f88" },
 ]
 
 [[package]]

@@ -11,7 +11,7 @@ class UserSocialSchemaBase(SchemaBase):
 
     source: UserSocialType = Field(description='社交平台')
     open_id: str | None = Field(None, description='开放平台 ID')
-    uid: str | None = Field(None, description='用户 ID')
+    sid: str | None = Field(None, description='第三方用户 ID')
     union_id: str | None = Field(None, description='开放平台唯一 ID')
     scope: str | None = Field(None, description='授权范围')
     code: str | None = Field(None, description='授权码')

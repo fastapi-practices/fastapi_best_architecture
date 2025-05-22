@@ -3,15 +3,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import UserSocial
-from backend.app.admin.schema.user_social import CreateUserSocialParam
-from backend.common.enums import UserSocialType
+from backend.plugin.oauth2.model import UserSocial
+from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 
 
 class CRUDUserSocial(CRUDPlus[UserSocial]):
     """用户社交账号数据库操作类"""
 
-    async def get(self, db: AsyncSession, pk: int, source: UserSocialType) -> UserSocial | None:
+    async def get(self, db: AsyncSession, pk: int, source: str) -> UserSocial | None:
         """
         获取用户社交账号绑定详情
 

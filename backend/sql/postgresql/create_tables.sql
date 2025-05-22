@@ -727,7 +727,7 @@ create table sys_user_social
         primary key,
     source       varchar(20)              not null,
     open_id      varchar(20),
-    uid          varchar(20),
+    sid          varchar(20),
     union_id     varchar(20),
     scope        varchar(120),
     code         varchar(50),
@@ -744,11 +744,11 @@ comment on column sys_user_social.id is '主键 ID';
 
 comment on column sys_user_social.source is '第三方用户来源';
 
-comment on column sys_user_social.open_id is '第三方用户的 open id';
+comment on column sys_user_social.open_id is '第三方用户 open id';
 
-comment on column sys_user_social.uid is '第三方用户的 ID';
+comment on column sys_user_social.uid is '第三方用户 ID';
 
-comment on column sys_user_social.union_id is '第三方用户的 union id';
+comment on column sys_user_social.union_id is '第三方用户 union id';
 
 comment on column sys_user_social.scope is '第三方用户授予的权限';
 
