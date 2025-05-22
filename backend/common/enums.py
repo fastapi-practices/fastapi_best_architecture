@@ -44,6 +44,8 @@ class MenuType(IntEnum):
     directory = 0
     menu = 1
     button = 2
+    link = 3
+    embedded = 4
 
 
 class RoleDataRuleOperatorType(IntEnum):
