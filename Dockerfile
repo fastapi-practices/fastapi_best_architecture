@@ -2,8 +2,7 @@
 ARG SERVER_TYPE=fastapi_server
 
 # === Python environment from uv ===
-FROM python:3.10-slim AS builder
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
 
 # Used for build Python packages
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
