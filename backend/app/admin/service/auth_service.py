@@ -211,7 +211,10 @@ class AuthService:
         :param response: FastAPI 响应对象
         :return:
         """
-        token = get_token(request)
+        try:
+            token = get_token(request)
+        except errors.TokenError:
+            return
         token_payload = jwt_decode(token)
         user_id = token_payload.id
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
