@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.app.admin.schema.token import GetTokenDetail, KickOutToken
+from backend.app.admin.schema.token import GetTokenDetail
 from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
@@ -18,8 +18,8 @@ from backend.database.redis import redis_client
 router = APIRouter()
 
 
-@router.get('', summary='获取令牌列表', dependencies=[DependsJwtAuth])
-async def get_tokens(
+@router.get('', summary='获取在线用户', dependencies=[DependsJwtAuth])
+async def get_online(
     username: Annotated[str | None, Query(description='用户名')] = None,
 ) -> ResponseSchemaModel[list[GetTokenDetail]]:
     token_keys = await redis_client.keys(f'{settings.TOKEN_REDIS_PREFIX}:*')
@@ -82,8 +82,10 @@ async def get_tokens(
     ],
 )
 async def kick_out(
-    request: Request, pk: Annotated[int, Path(description='用户 ID')], obj: KickOutToken
+    request: Request,
+    pk: Annotated[int, Path(description='用户 ID')],
+    session_uuid: Annotated[str, Query(description='会话 UUID')],
 ) -> ResponseModel:
     superuser_verify(request)
-    await revoke_token(str(pk), obj.session_uuid)
+    await revoke_token(str(pk), session_uuid)
     return response_base.success()
