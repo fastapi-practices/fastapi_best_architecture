@@ -262,7 +262,7 @@ termcolor==2.5.0
     # via pytest-sugar
 tomli==2.2.1 ; python_full_version < '3.11'
     # via pytest
-tornado==6.4.2
+tornado==6.5.1
     # via flower
 typer==0.15.2
     # via fastapi-cli
