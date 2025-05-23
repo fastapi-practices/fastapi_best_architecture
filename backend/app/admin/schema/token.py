@@ -35,12 +35,6 @@ class GetLoginToken(AccessTokenBase):
     user: GetUserInfoDetail = Field(description='用户信息')
 
 
-class KickOutToken(SchemaBase):
-    """踢出令牌"""
-
-    session_uuid: str = Field(description='会话 UUID')
-
-
 class GetTokenDetail(SchemaBase):
     """令牌详情"""
 
