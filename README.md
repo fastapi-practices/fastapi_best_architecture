@@ -4,11 +4,9 @@
 
 # FastAPI Best Architecture
 
-English | [简体中文](./README.zh-CN.md)
-
 Enterprise-level backend architecture solution
 
-**🔥Continuously updated and maintained🔥**
+English | [简体中文](./README.zh-CN.md)
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
@@ -21,11 +19,9 @@ Enterprise-level backend architecture solution
 ![Docker](https://img.shields.io/badge/Docker-%232496ED?logo=docker&logoColor=white)
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white)](https://discord.com/invite/yNN3wTbVAC)
 ![Discord](https://img.shields.io/discord/1185035164577972344)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fastapi-practices/fastapi_best_architecture)
 
 </div>
-
-> [!NOTE]
-> This repository as a template library open to any person or enterprise can be used for free!
 
 ## Pseudo 3-tier architecture
 
@@ -45,43 +41,7 @@ pattern, use templates to transform it to your heart's content!
 | data access    | dao / mapper   | crud                      |
 | model          | model / entity | model                     |
 
-## Features
-
-- [x] Global FastAPI PEP 593 Annotated parameter style
-- [x] Comprehensive async/await + asgiref asynchronous design
-- [x] Adheres to RESTful API specifications
-- [x] Uses SQLAlchemy 2.0 with new syntax
-- [x] Uses Pydantic v2 version
-- [x] Implements role-menu RBAC access control
-- [x] Integrates Casbin RBAC access control
-- [x] Supports Celery asynchronous tasks
-- [x] Custom-developed JWT authentication middleware
-- [x] Supports global custom time zones
-- [x] Supports Docker / Docker-compose deployment
-- [x] Integrates Pytest unit testing
-
-## Built-in Functions
-
-- [x] User Management: Assign roles and permissions
-- [x] Department Management: Configure organizational structure (company, department, team, etc.)
-- [x] Menu Management: Set up menus and button-level permissions
-- [x] Role Management: Configure roles, assign menus and permissions
-- [x] Dictionary Management: Maintain common parameters and configurations
-- [x] Parameter Management: Dynamically configure commonly used system parameters
-- [x] Notification Announcements: Publish and maintain system notification and announcement information
-- [x] Token Management: Detect online status, support forced logout
-- [x] Multi-device Login: Support one-click switching between multi-device login modes
-- [x] OAuth 2.0: Built-in custom-developed OAuth 2.0 authorization login
-- [x] Plugin System: Hot-swappable plugin design to reduce coupling
-- [x] Scheduled Tasks: Support scheduled, asynchronous tasks, and function calls
-- [x] Code Generation: Automatically generate code with preview, write, and download support
-- [x] Operation Logs: Record and query normal and abnormal operations
-- [x] Login Logs: Record and query normal and abnormal logins
-- [x] Cache Monitoring: Query system cache information and command statistics
-- [x] Service Monitoring: View server hardware information and status
-- [x] API Documentation: Automatically generate online interactive API documentation
-
-## Development and deployment
+## Help
 
 For more details, please check
 the [official documentation](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
