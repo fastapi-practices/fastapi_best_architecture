@@ -1,3 +1,20 @@
+<a id="v1.4.1"></a>
+# [v1.4.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.4.1) - 2025-05-25
+
+## What's Changed
+* Update changelog for v1.4.0 by [@wu-clan](https://github.com/wu-clan) in [#621](https://github.com/fastapi-practices/fastapi_best_architecture/pull/621)
+* Update the menu path and type columns by [@wu-clan](https://github.com/wu-clan) in [#622](https://github.com/fastapi-practices/fastapi_best_architecture/pull/622)
+* Add the deepwiki badge to README by [@wu-clan](https://github.com/wu-clan) in [#623](https://github.com/fastapi-practices/fastapi_best_architecture/pull/623)
+* Refactor the system token to online users by [@wu-clan](https://github.com/wu-clan) in [#624](https://github.com/fastapi-practices/fastapi_best_architecture/pull/624)
+* Update the token check for logout interface by [@wu-clan](https://github.com/wu-clan) in [#625](https://github.com/fastapi-practices/fastapi_best_architecture/pull/625)
+* Update the token decode for logout interface by [@wu-clan](https://github.com/wu-clan) in [#629](https://github.com/fastapi-practices/fastapi_best_architecture/pull/629)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.0...v1.4.1
+
+[Changes][v1.4.1]
+
+
 <a id="v1.4.0"></a>
 # [v1.4.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.4.0) - 2025-05-22
 
@@ -532,6 +549,7 @@
 [Changes][v1.0.0]
 
 
+[v1.4.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.2...v1.2.0
