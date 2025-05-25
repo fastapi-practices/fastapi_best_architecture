@@ -213,12 +213,15 @@ class AuthService:
         """
         try:
             token = get_token(request)
+            token_payload = jwt_decode(token)
+            user_id = token_payload.id
+            refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         except errors.TokenError:
             return
-        token_payload = jwt_decode(token)
-        user_id = token_payload.id
-        refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
-        response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
+        finally:
+            response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
+
+        # 清理缓存
         if request.user.is_multi_login:
             await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
             if refresh_token:
