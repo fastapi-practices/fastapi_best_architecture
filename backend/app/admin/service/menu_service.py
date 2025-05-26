@@ -57,11 +57,16 @@ class MenuService:
             roles = request.user.roles
             menu_tree = []
             if roles:
-                all_menus = []
+                unique_menus = {}
                 for role in roles:
-                    all_menus.extend(role.menus)
-                all_ids = [menu.id for menu in all_menus]
-                valid_menu_ids = [menu.id for menu in all_menus if menu.parent_id is None or menu.parent_id in all_ids]
+                    for menu in role.menus:
+                        unique_menus[menu.id] = menu
+                all_ids = set(unique_menus.keys())
+                valid_menu_ids = [
+                    menu_id
+                    for menu_id, menu in unique_menus.items()
+                    if menu.parent_id is None or menu.parent_id in all_ids
+                ]
                 menu_data = await menu_dao.get_sidebar(db, request.user.is_superuser, valid_menu_ids)
                 menu_tree = get_vben5_tree_data(menu_data)
             return menu_tree
