@@ -40,7 +40,7 @@ async def get_user_all_roles(
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
 async def get_role_all_menus(
     pk: Annotated[int, Path(description='角色 ID')],
-) -> ResponseSchemaModel[list[dict[str, Any]]]:
+) -> ResponseSchemaModel[list[dict[str, Any] | None]]:
     menu = await role_service.get_menu_tree(pk=pk)
     return response_base.success(data=menu)
 
