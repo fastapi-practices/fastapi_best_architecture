@@ -69,7 +69,7 @@ class RoleService:
         return await role_dao.get_list(name=name, status=status)
 
     @staticmethod
-    async def get_menu_tree(*, pk: int) -> list[dict[str, Any]]:
+    async def get_menu_tree(*, pk: int) -> list[dict[str, Any] | None]:
         """
         获取角色的菜单树形结构
 
@@ -80,9 +80,7 @@ class RoleService:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
-            menu_ids = [menu.id for menu in role.menus]
-            menu_select = await menu_dao.get_role_menus(db, False, menu_ids)
-            menu_tree = get_tree_data(menu_select)
+            menu_tree = get_tree_data(role.menus) if role.menus else []
             return menu_tree
 
     @staticmethod
