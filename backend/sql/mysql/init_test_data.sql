@@ -35,3 +35,12 @@ values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b
 
 insert into sys_user_role (id, user_id, role_id)
 values  (1, 1, 1);
+
+-- Reset auto-increment values for each table based on max id
+ALTER TABLE sys_dept AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_dept);
+ALTER TABLE sys_api AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_api);
+ALTER TABLE sys_menu AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_menu);
+ALTER TABLE sys_role AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_role);
+ALTER TABLE sys_role_menu AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_role_menu);
+ALTER TABLE sys_user AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_user);
+ALTER TABLE sys_user_role AUTO_INCREMENT = (SELECT COALESCE(MAX(id), 0) + 1 FROM sys_user_role);
