@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import TYPE_CHECKING
 
 from fastapi import Request
 from sqlalchemy import ColumnElement, and_, or_
@@ -12,9 +11,6 @@ from backend.common.exception import errors
 from backend.common.exception.errors import ServerError
 from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import_data_model
-
-if TYPE_CHECKING:
-    from backend.app.admin.model import DataRule
 
 
 class RequestPermission:
@@ -60,35 +56,34 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
     :param request: FastAPI 请求对象
     :return:
     """
-    # 获取用户角色和数据范围
-    data_scopes = []
+    # 获取数据范围
+    unique_data_scopes = {}
     for role in request.user.roles:
         for scope in role.scopes:
             if scope.status:
-                data_scopes.append(scope)
+                unique_data_scopes[scope.id] = scope
+
+    # 转换为列表
+    data_scopes = list(unique_data_scopes.values())
 
     # 超级管理员和无规则用户不做过滤
     if request.user.is_superuser or not data_scopes:
         return or_(1 == 1)
 
     # 获取数据范围规则
-    data_rule_list: list[DataRule] = []
+    unique_data_rules = {}
     for data_scope in data_scopes:
         data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope.id)
-        data_rule_list.extend(data_scope_with_relation.rules)
+        for rule in data_scope_with_relation.rules:
+            unique_data_rules[rule.id] = rule
 
-    # 去重
-    seen_data_rule_ids = set()
-    new_data_rule_list = []
-    for rule in data_rule_list:
-        if rule.id not in seen_data_rule_ids:
-            seen_data_rule_ids.add(rule.id)
-            new_data_rule_list.append(rule)
+    # 转换为列表
+    data_rule_list = list(unique_data_rules.values())
 
     where_and_list = []
     where_or_list = []
 
-    for data_rule in new_data_rule_list:
+    for data_rule in data_rule_list:
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
