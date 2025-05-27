@@ -5,7 +5,6 @@ import json
 import os
 import shutil
 import zipfile
-from fileinput import filename
 
 from typing import Any
 
