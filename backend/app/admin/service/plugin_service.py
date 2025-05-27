@@ -58,21 +58,14 @@ class PluginService:
             raise errors.ForbiddenError(msg='插件压缩包格式非法')
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
-            plugin_dir = file.filename[:-4]
-            members_in_plugin_dir = [name for name in zf.namelist() if name.startswith(plugin_dir)]
-            if not members_in_plugin_dir:
+            plugin_namelist = zf.namelist()
+            plugin_name = plugin_namelist[0].split('/')[0]
+            if not plugin_namelist or plugin_name not in file.filename:
                 raise errors.ForbiddenError(msg='插件压缩包内容非法')
-            plugin_name = (
-                members_in_plugin_dir[0]
-                .replace('/', '')
-                .replace('-master', '')
-                .replace('-main', '')
-                .replace('-dev', '')
-            )
             if (
-                len(members_in_plugin_dir) <= 3
-                or f'{plugin_dir}/plugin.toml' not in members_in_plugin_dir
-                or f'{plugin_dir}/README.md' not in members_in_plugin_dir
+                len(plugin_namelist) <= 3
+                or f'{plugin_name}/plugin.toml' not in plugin_namelist
+                or f'{plugin_name}/README.md' not in plugin_namelist
             ):
                 raise errors.ForbiddenError(msg='插件压缩包内缺少必要文件')
 
@@ -86,8 +79,8 @@ class PluginService:
             # 解压（安装）
             members = []
             for member in zf.infolist():
-                if member.filename.startswith(plugin_dir):
-                    new_filename = member.filename.replace(plugin_dir, '')
+                if member.filename.startswith(plugin_name):
+                    new_filename = member.filename.replace(plugin_name, '')
                     if new_filename:
                         member.filename = new_filename
                         members.append(member)
@@ -182,7 +175,7 @@ class PluginService:
                 for file in files:
                     file_path = os.path.join(root, file)
                     arcname = os.path.relpath(file_path, start=plugin_dir)
-                    zf.write(file_path, arcname)
+                    zf.write(file_path, os.path.join(plugin, arcname))
 
         bio.seek(0)
         return bio
