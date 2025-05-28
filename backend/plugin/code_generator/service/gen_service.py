@@ -175,8 +175,9 @@ class GenService:
                 code_folder.mkdir(parents=True, exist_ok=True)
 
                 init_filepath = code_folder.joinpath('__init__.py')
-                async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
-                    await f.write(gen_template.init_content)
+                if not os.path.exists(init_filepath):
+                    async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
+                        await f.write(gen_template.init_content)
 
                 # api __init__.py
                 if 'api' in str_code_filepath:
