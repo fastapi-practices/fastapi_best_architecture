@@ -38,7 +38,6 @@ values  (1, 1, 1);
 
 -- Reset auto-increment values for each table based on max id
 SELECT setval(pg_get_serial_sequence('sys_dept', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_dept;
-SELECT setval(pg_get_serial_sequence('sys_api', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_api;
 SELECT setval(pg_get_serial_sequence('sys_menu', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_menu;
 SELECT setval(pg_get_serial_sequence('sys_role', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_role;
 SELECT setval(pg_get_serial_sequence('sys_role_menu', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_role_menu;
