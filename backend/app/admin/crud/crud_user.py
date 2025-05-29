@@ -11,10 +11,8 @@ from sqlalchemy_crud_plus import CRUDPlus
 from backend.app.admin.model import Dept, Role, User
 from backend.app.admin.schema.user import (
     AddUserParam,
-    AvatarParam,
     RegisterUserParam,
     UpdateUserParam,
-    UpdateUserRoleParam,
 )
 from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
@@ -97,14 +95,13 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
 
-        role_list = []
-        for role_id in obj.roles:
-            role_list.append(await db.get(Role, role_id))
-        new_user.roles.extend(role_list)
+        stmt = select(Role).where(Role.id.in_(obj.roles))
+        roles = await db.execute(stmt)
+        new_user.roles = roles.scalars().all()
 
         db.add(new_user)
 
-    async def update_userinfo(self, db: AsyncSession, input_user: int, obj: UpdateUserParam) -> int:
+    async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
         """
         更新用户信息
 
@@ -113,36 +110,14 @@ class CRUDUser(CRUDPlus[User]):
         :param obj: 更新用户参数
         :return:
         """
-        return await self.update_model(db, input_user, obj)
+        role_ids = obj.roles
+        del obj.roles
+        count = await self.update_model(db, input_user.id, obj)
 
-    @staticmethod
-    async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
-        """
-        更新用户角色
-
-        :param db: 数据库会话
-        :param input_user: 用户对象
-        :param obj: 更新角色参数
-        :return:
-        """
-        for i in list(input_user.roles):
-            input_user.roles.remove(i)
-
-        role_list = []
-        for role_id in obj.roles:
-            role_list.append(await db.get(Role, role_id))
-        input_user.roles.extend(role_list)
-
-    async def update_avatar(self, db: AsyncSession, input_user: int, avatar: AvatarParam) -> int:
-        """
-        更新用户头像
-
-        :param db: 数据库会话
-        :param input_user: 用户 ID
-        :param avatar: 头像地址
-        :return:
-        """
-        return await self.update_model(db, input_user, {'avatar': str(avatar.url)})
+        stmt = select(Role).where(Role.id.in_(role_ids))
+        roles = await db.execute(stmt)
+        input_user.roles = roles.scalars().all()
+        return count
 
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """

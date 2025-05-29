@@ -55,6 +55,7 @@ class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
+    avatar: HttpUrl | None = Field(None, description='头像')
     email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
     phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
@@ -62,17 +63,7 @@ class UserInfoSchemaBase(SchemaBase):
 class UpdateUserParam(UserInfoSchemaBase):
     """更新用户参数"""
 
-
-class UpdateUserRoleParam(SchemaBase):
-    """更新用户角色参数"""
-
     roles: list[int] = Field(description='角色 ID 列表')
-
-
-class AvatarParam(SchemaBase):
-    """更新头像参数"""
-
-    url: HttpUrl = Field(description='头像 http 地址')
 
 
 class GetUserInfoDetail(UserInfoSchemaBase):
