@@ -11,11 +11,9 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.user import (
     AddUserParam,
-    AvatarParam,
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
-    UpdateUserRoleParam,
 )
 from backend.common.exception import errors
 from backend.common.security.jwt import get_hash_password, get_token, jwt_decode, password_verify, superuser_verify
@@ -152,50 +150,11 @@ class UserService:
                 email = await user_dao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
-            count = await user_dao.update_userinfo(db, user.id, obj)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
-            return count
-
-    @staticmethod
-    async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
-        """
-        更新用户角色
-
-        :param request: FastAPI 请求对象
-        :param username: 用户名
-        :param obj: 角色更新参数
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            if not request.user.is_superuser and request.user.username != username:
-                raise errors.ForbiddenError(msg='你只能修改自己的信息')
-            input_user = await user_dao.get_with_relation(db, username=username)
-            if not input_user:
-                raise errors.NotFoundError(msg='用户不存在')
             for role_id in obj.roles:
                 role = await role_dao.get(db, role_id)
                 if not role:
                     raise errors.NotFoundError(msg='角色不存在')
-            await user_dao.update_role(db, input_user, obj)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{input_user.id}')
-
-    @staticmethod
-    async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
-        """
-        更新用户头像
-
-        :param request: FastAPI 请求对象
-        :param username: 用户名
-        :param avatar: 头像参数
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            if request.user.username != username:
-                raise errors.AuthorizationError(msg='你只能修改自己的信息')
-            user = await user_dao.get_by_username(db, username)
-            if not user:
-                raise errors.NotFoundError(msg='用户不存在')
-            count = await user_dao.update_avatar(db, user.id, avatar)
+            count = await user_dao.update(db, user, obj)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 

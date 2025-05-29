@@ -6,13 +6,11 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 
 from backend.app.admin.schema.user import (
     AddUserParam,
-    AvatarParam,
     GetCurrentUserInfoWithRelationDetail,
     GetUserInfoWithRelationDetail,
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
-    UpdateUserRoleParam,
 )
 from backend.app.admin.service.user_service import user_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
@@ -65,31 +63,6 @@ async def update_user(
     request: Request, username: Annotated[str, Path(description='用户名')], obj: UpdateUserParam
 ) -> ResponseModel:
     count = await user_service.update(request=request, username=username, obj=obj)
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
-
-
-@router.put(
-    '/{username}/role',
-    summary='更新用户角色',
-    dependencies=[
-        Depends(RequestPermission('sys:user:role:edit')),
-        DependsRBAC,
-    ],
-)
-async def update_user_role(
-    request: Request, username: Annotated[str, Path(description='用户名')], obj: UpdateUserRoleParam
-) -> ResponseModel:
-    await user_service.update_roles(request=request, username=username, obj=obj)
-    return response_base.success()
-
-
-@router.put('/{username}/avatar', summary='更新头像', dependencies=[DependsJwtAuth])
-async def update_avatar(
-    request: Request, username: Annotated[str, Path(description='用户名')], avatar: AvatarParam
-) -> ResponseModel:
-    count = await user_service.update_avatar(request=request, username=username, avatar=avatar)
     if count > 0:
         return response_base.success()
     return response_base.fail()
