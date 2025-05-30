@@ -126,8 +126,7 @@ class RoleService:
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
             if role.name != obj.name:
-                role = await role_dao.get_by_name(db, obj.name)
-                if role:
+                if await role_dao.get_by_name(db, obj.name):
                     raise errors.ForbiddenError(msg='角色已存在')
             count = await role_dao.update(db, pk, obj)
             for user in await role.awaitable_attrs.users:
@@ -144,7 +143,7 @@ class RoleService:
         :return:
         """
         async with async_db_session.begin() as db:
-            role = await role_dao.get_with_relation(db, pk)
+            role = await role_dao.get(db, pk)
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
             for menu_id in menu_ids.menus:
