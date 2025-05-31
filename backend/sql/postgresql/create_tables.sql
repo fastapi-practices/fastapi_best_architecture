@@ -268,14 +268,15 @@ create index ix_sys_opera_log_id
 
 create table sys_role
 (
-    id           serial
+    id               serial
         primary key,
-    name         varchar(20)              not null
+    name             varchar(20)              not null
         unique,
-    status       integer                  not null,
-    remark       text,
-    created_time timestamp with time zone not null,
-    updated_time timestamp with time zone
+    status           integer                  not null,
+    is_filter_scopes integer                  not null,
+    remark           text,
+    created_time     timestamp with time zone not null,
+    updated_time     timestamp with time zone
 );
 
 comment on table sys_role is '角色表';
@@ -285,6 +286,8 @@ comment on column sys_role.id is '主键 ID';
 comment on column sys_role.name is '角色名称';
 
 comment on column sys_role.status is '角色状态（0停用 1正常）';
+
+comment on column sys_role.is_filter_scopes is '过滤数据权限(0否 1是)';
 
 comment on column sys_role.remark is '备注';
 

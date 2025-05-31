@@ -288,13 +288,14 @@ create index ix_sys_opera_log_id
 
 create table sys_role
 (
-    id           int auto_increment comment '主键 ID'
+    id               int auto_increment comment '主键 ID'
         primary key,
-    name         varchar(20) not null comment '角色名称',
-    status       int         not null comment '角色状态（0停用 1正常）',
-    remark       longtext    null comment '备注',
-    created_time datetime    not null comment '创建时间',
-    updated_time datetime    null comment '更新时间',
+    name             varchar(20) not null comment '角色名称',
+    status           int         not null comment '角色状态（0停用 1正常）',
+    is_filter_scopes tinyint(1)  not null comment '过滤数据权限(0否 1是)',
+    remark           longtext    null comment '备注',
+    created_time     datetime    not null comment '创建时间',
+    updated_time     datetime    null comment '更新时间',
     constraint name
         unique (name)
 )

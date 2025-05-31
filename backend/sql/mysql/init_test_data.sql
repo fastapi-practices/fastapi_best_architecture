@@ -25,14 +25,14 @@ values  (1, '测试', 'Test', 'test', 0, null, 0, null, null, 0, 0, 0, null, nul
         (21, '官网', 'Site', '', 998, 'dashicons:admin-site', 4, null, null, 1, 1, 0, 'https://fastapi-practices.github.io/fastapi_best_architecture_docs/', null, null, '2024-07-27 19:22:24', null),
         (22, '赞助', 'Sponsor', '', 999, 'material-icon-theme:github-sponsors', 4, null, null, 1, 1, 0, 'https://wu-clan.github.io/sponsor/', null, null, '2024-07-27 12:39:57', null);
 
-insert into sys_role (id, name, status, remark, created_time, updated_time)
-values  (1, 'test', 1, null, '2023-06-26 17:13:45', null);
+insert into sys_role (id, name, status, is_filter_scopes, remark, created_time, updated_time)
+values  (1, 'test', 1, 1, null, '2023-06-26 17:13:45', null);
 
 insert into sys_role_menu (id, role_id, menu_id)
 values  (1, 1, 1);
 
 insert into sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
-values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', 0x24326224313224387932654E7563583139566A6D5A33745968424C634F, 'admin@example.com', 1, 1, 1, 0, null, null, '2023-06-26 17:13:45', '2024-11-18 13:53:57', 1, '2023-06-26 17:13:45', '2024-11-18 13:53:57');
+values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', 0x24326224313224387932654E7563583139566A6D5A33745968424C634F, 'admin@example.com', 1, 1, 1, 1, null, null, '2023-06-26 17:13:45', '2024-11-18 13:53:57', 1, '2023-06-26 17:13:45', '2024-11-18 13:53:57');
 
 insert into sys_user_role (id, user_id, role_id)
 values  (1, 1, 1);

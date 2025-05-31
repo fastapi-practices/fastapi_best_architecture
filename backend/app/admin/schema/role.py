@@ -15,7 +15,7 @@ class RoleSchemaBase(SchemaBase):
 
     name: str = Field(description='角色名称')
     status: StatusType = Field(StatusType.enable, description='状态')
-    is_filter_scopes: bool = Field(False, description='过滤数据权限')
+    is_filter_scopes: bool = Field(True, description='过滤数据权限')
     remark: str | None = Field(None, description='备注')
 
 
