@@ -164,7 +164,7 @@ class ServerInfo:
             'mem_vms': ServerInfo.format_bytes(mem_info.vms),
             'mem_rss': ServerInfo.format_bytes(mem_info.rss),
             'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),
-            'startup': start_time,
+            'startup': timezone.t_str(start_time),
             'elapsed': elapsed,
         }
 
