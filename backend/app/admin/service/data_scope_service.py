@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
@@ -27,6 +29,13 @@ class DataScopeService:
             if not data_scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
             return data_scope
+
+    @staticmethod
+    async def get_all() -> Sequence[DataScope]:
+        """获取所有数据范围"""
+        async with async_db_session() as db:
+            data_scopes = await data_scope_dao.get_all(db)
+            return data_scopes
 
     @staticmethod
     async def get_rules(*, pk: int) -> DataScope:
