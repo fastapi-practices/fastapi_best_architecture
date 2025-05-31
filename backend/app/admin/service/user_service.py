@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 import random
 
+from typing import Sequence
+
 from fastapi import Request
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.crud.crud_user import user_dao
-from backend.app.admin.model import User
+from backend.app.admin.model import Role, User
 from backend.app.admin.schema.user import (
     AddUserParam,
     RegisterUserParam,
@@ -81,16 +83,16 @@ class UserService:
             await user_dao.add(db, obj)
 
     @staticmethod
-    async def pwd_reset(*, request: Request, obj: ResetPasswordParam) -> int:
+    async def pwd_reset(*, username: str, obj: ResetPasswordParam) -> int:
         """
         重置用户密码
 
-        :param request: FastAPI 请求对象
+        :param username: 用户名
         :param obj: 密码重置参数
         :return:
         """
         async with async_db_session.begin() as db:
-            user = await user_dao.get(db, request.user.id)
+            user = await user_dao.get_by_username(db, username)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             if not password_verify(obj.old_password, user.password):
@@ -98,11 +100,11 @@ class UserService:
             if obj.new_password != obj.confirm_password:
                 raise errors.ForbiddenError(msg='密码输入不一致')
             new_pwd = get_hash_password(obj.new_password, user.salt)
-            count = await user_dao.reset_password(db, request.user.id, new_pwd)
+            count = await user_dao.reset_password(db, user.id, new_pwd)
             key_prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{request.user.id}',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user.id}',
-                f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}',
+                f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
+                f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}',
             ]
             for prefix in key_prefix:
                 await redis_client.delete_prefix(prefix)
@@ -121,6 +123,33 @@ class UserService:
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             return user
+
+    @staticmethod
+    async def get_roles(*, username: str) -> Sequence[Role]:
+        """
+        获取用户所有角色
+
+        :param username: 用户名
+        :return:
+        """
+        async with async_db_session() as db:
+            user = await user_dao.get_with_relation(db, username=username)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            return user.roles
+
+    @staticmethod
+    async def get_select(*, dept: int, username: str, phone: str, status: int) -> Select:
+        """
+        获取用户列表查询条件
+
+        :param dept: 部门 ID
+        :param username: 用户名
+        :param phone: 手机号
+        :param status: 状态
+        :return:
+        """
+        return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
@@ -157,19 +186,6 @@ class UserService:
             count = await user_dao.update(db, user, obj)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
-
-    @staticmethod
-    async def get_select(*, dept: int, username: str, phone: str, status: int) -> Select:
-        """
-        获取用户列表查询条件
-
-        :param dept: 部门 ID
-        :param username: 用户名
-        :param phone: 手机号
-        :param status: 状态
-        :return:
-        """
-        return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def update_permission(*, request: Request, pk: int) -> int:

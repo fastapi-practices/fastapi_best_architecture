@@ -29,14 +29,6 @@ async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
     return response_base.success(data=data)
 
 
-@router.get('/{pk}/all', summary='获取用户所有角色', dependencies=[DependsJwtAuth])
-async def get_user_all_roles(
-    pk: Annotated[int, Path(description='用户 ID')],
-) -> ResponseSchemaModel[list[GetRoleDetail]]:
-    data = await role_service.get_users(pk=pk)
-    return response_base.success(data=data)
-
-
 @router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
 async def get_role_all_menus(
     pk: Annotated[int, Path(description='角色 ID')],
@@ -106,7 +98,7 @@ async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: Up
 
 
 @router.put(
-    '/{pk}/menu',
+    '/{pk}/menus',
     summary='更新角色菜单',
     dependencies=[
         Depends(RequestPermission('sys:role:menu:edit')),
@@ -123,7 +115,7 @@ async def update_role_menus(
 
 
 @router.put(
-    '/{pk}/scope',
+    '/{pk}/scopes',
     summary='更新角色数据范围',
     dependencies=[
         Depends(RequestPermission('sys:role:scope:edit')),
