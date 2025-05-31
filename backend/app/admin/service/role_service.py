@@ -46,18 +46,6 @@ class RoleService:
             return roles
 
     @staticmethod
-    async def get_users(*, pk: int) -> Sequence[Role]:
-        """
-        获取用户的角色列表
-
-        :param pk: 用户 ID
-        :return:
-        """
-        async with async_db_session() as db:
-            roles = await role_dao.get_users(db, user_id=pk)
-            return roles
-
-    @staticmethod
     async def get_select(*, name: str | None, status: int | None) -> Select:
         """
         获取角色列表查询条件

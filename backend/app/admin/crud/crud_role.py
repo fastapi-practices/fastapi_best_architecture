@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import DataScope, Menu, Role, User
+from backend.app.admin.model import DataScope, Menu, Role
 from backend.app.admin.schema.role import (
     CreateRoleParam,
     UpdateRoleMenuParam,
@@ -53,18 +53,6 @@ class CRUDRole(CRUDPlus[Role]):
         :return:
         """
         return await self.select_models(db)
-
-    async def get_users(self, db: AsyncSession, user_id: int) -> Sequence[Role]:
-        """
-        获取用户角色列表
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        stmt = select(self.model).join(self.model.users).where(User.id == user_id)
-        roles = await db.execute(stmt)
-        return roles.scalars().all()
 
     async def get_list(self, name: str | None, status: int | None) -> Select:
         """
