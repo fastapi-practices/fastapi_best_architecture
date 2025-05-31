@@ -56,6 +56,11 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
     :param request: FastAPI 请求对象
     :return:
     """
+    # 是否过滤数据权限
+    for role in request.user.roles:
+        if role.is_filter_scopes:
+            return or_(1 == 1)
+
     # 获取数据范围
     unique_data_scopes = {}
     for role in request.user.roles:
