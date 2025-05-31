@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select, and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
@@ -43,6 +45,15 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         stmt = select(self.model).options(selectinload(self.model.rules)).where(self.model.id == pk)
         data_scope = await db.execute(stmt)
         return data_scope.scalars().first()
+
+    async def get_all(self, db: AsyncSession) -> Sequence[DataScope]:
+        """
+        获取所有数据范围
+
+        :param db: 数据库会话
+        :return:
+        """
+        return await self.select_models(db)
 
     async def get_list(self, name: str | None, status: int | None) -> Select:
         """

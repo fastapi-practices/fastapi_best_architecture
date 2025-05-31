@@ -22,6 +22,12 @@ from backend.database.db import CurrentSession
 router = APIRouter()
 
 
+@router.get('/all', summary='获取所有数据范围', dependencies=[DependsJwtAuth])
+async def get_all_data_scope() -> ResponseSchemaModel[list[GetDataScopeDetail]]:
+    data = await data_scope_service.get_all()
+    return response_base.success(data=data)
+
+
 @router.get('/{pk}', summary='获取数据范围详情', dependencies=[DependsJwtAuth])
 async def get_data_scope(
     pk: Annotated[int, Path(description='数据范围 ID')],
