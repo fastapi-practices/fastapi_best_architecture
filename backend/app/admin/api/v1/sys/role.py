@@ -106,7 +106,7 @@ async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: Up
 
 
 @router.put(
-    '/{pk}/menus',
+    '/{pk}/menu',
     summary='更新角色菜单',
     dependencies=[
         Depends(RequestPermission('sys:role:menu:edit')),
@@ -123,7 +123,7 @@ async def update_role_menus(
 
 
 @router.put(
-    '/{pk}/scopes',
+    '/{pk}/scope',
     summary='更新角色数据范围',
     dependencies=[
         Depends(RequestPermission('sys:role:scope:edit')),
