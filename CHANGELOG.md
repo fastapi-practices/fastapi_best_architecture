@@ -1,3 +1,24 @@
+<a id="v1.4.3"></a>
+# [v1.4.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.4.3) - 2025-06-02
+
+## What's Changed
+* Update changelog for v1.4.2 by [@wu-clan](https://github.com/wu-clan) in [#639](https://github.com/fastapi-practices/fastapi_best_architecture/pull/639)
+* Fix the role update business variables by [@wu-clan](https://github.com/wu-clan) in [#640](https://github.com/fastapi-practices/fastapi_best_architecture/pull/640)
+* Fix the menu delete interface arg description by [@wu-clan](https://github.com/wu-clan) in [#641](https://github.com/fastapi-practices/fastapi_best_architecture/pull/641)
+* Fix the filter of query all menus by [@wu-clan](https://github.com/wu-clan) in [#642](https://github.com/fastapi-practices/fastapi_best_architecture/pull/642)
+* Refactor routes to better align with RESTful by [@wu-clan](https://github.com/wu-clan) in [#645](https://github.com/fastapi-practices/fastapi_best_architecture/pull/645)
+* Update the server startup time to string by [@wu-clan](https://github.com/wu-clan) in [#646](https://github.com/fastapi-practices/fastapi_best_architecture/pull/646)
+* Add get all data scope rules interface by [@wu-clan](https://github.com/wu-clan) in [#647](https://github.com/fastapi-practices/fastapi_best_architecture/pull/647)
+* Add data permission condition for filter data by [@wu-clan](https://github.com/wu-clan) in [#648](https://github.com/fastapi-practices/fastapi_best_architecture/pull/648)
+* Update default value for role filter scopes by [@wu-clan](https://github.com/wu-clan) in [#649](https://github.com/fastapi-practices/fastapi_best_architecture/pull/649)
+* Fix data permission condition for filter data by [@wu-clan](https://github.com/wu-clan) in [#650](https://github.com/fastapi-practices/fastapi_best_architecture/pull/650)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.2...v1.4.3
+
+[Changes][v1.4.3]
+
+
 <a id="v1.4.2"></a>
 # [v1.4.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.4.2) - 2025-05-29
 
@@ -570,6 +591,7 @@
 [Changes][v1.0.0]
 
 
+[v1.4.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.2...v1.4.3
 [v1.4.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.1...v1.4.2
 [v1.4.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.3.0...v1.4.0
