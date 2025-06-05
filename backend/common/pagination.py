@@ -111,31 +111,89 @@ class PageData(_PageDetails, Generic[SchemaT]):
     items: Sequence[SchemaT]
 
 
-async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
+async def paging_data(db: AsyncSession, select: Select) -> dict:
     """
     基于 SQLAlchemy 创建分页数据
 
-    :param db: 数据库会话
-    :param select: SQL 查询语句
+    :param db:
+    :param select:
     :return:
     """
-    paginated_data: _CustomPage = await apaginate(db, select)
+    paginated_data: _CustomPage = await paginate(db, select)
+    
+    # 【！重要】处理所有动态字段（不限于c1-c20, n1-n20）
+    # 获取原始数据并保留所有字段，包括动态添加的属性
     page_data = paginated_data.model_dump()
-
-    # 确保items中的每个对象都保留其所有属性（包括动态字段）
+    
+    # 确保items中的每个对象都保留其所有属性（包括所有动态字段）
     if 'items' in page_data and page_data['items']:
         for i, item in enumerate(page_data['items']):
             # 检查原始对象是否有__dict__属性（SQLAlchemy模型对象通常有）
             if hasattr(paginated_data.items[i], '__dict__'):
                 # 获取原始对象的所有属性
                 obj_dict = paginated_data.items[i].__dict__
-                # 添加所有以'c'或'n'开头的动态字段（如c1-c20, n1-n20）
+                # 添加所有属性（排除SQLAlchemy内部属性）
                 for key, value in obj_dict.items():
-                    if (key.startswith('c') or key.startswith('n')) and key[1:].isdigit():
-                        if key not in item:
-                            item[key] = value
-
+                    # 排除SQLAlchemy内部属性（以_开头）和已存在的属性
+                    if not key.startswith('_') and key not in item:
+                        item[key] = value
+                
+                # 递归处理嵌套对象中的动态字段
+                for key, value in item.items():
+                    # 处理嵌套字典
+                    if isinstance(value, dict):
+                        _process_nested_dict(paginated_data.items[i], key, value)
+                    # 处理嵌套列表
+                    elif isinstance(value, list):
+                        _process_nested_list(paginated_data.items[i], key, value)
+    
     return page_data
+
+def _process_nested_dict(original_obj, key, dict_value):
+    """递归处理嵌套字典中的动态字段"""
+    # 检查原始对象中对应的属性是否存在
+    if hasattr(original_obj, key) and hasattr(getattr(original_obj, key), '__dict__'):
+        original_nested = getattr(original_obj, key)
+        nested_dict = original_nested.__dict__
+        
+        # 添加所有属性（排除SQLAlchemy内部属性）
+        for nested_key, nested_value in nested_dict.items():
+            if not nested_key.startswith('_') and nested_key not in dict_value:
+                dict_value[nested_key] = nested_value
+        
+        # 继续递归处理更深层次的嵌套
+        for nested_key, nested_value in dict_value.items():
+            if isinstance(nested_value, dict):
+                _process_nested_dict(original_nested, nested_key, nested_value)
+            elif isinstance(nested_value, list):
+                _process_nested_list(original_nested, nested_key, nested_value)
+
+def _process_nested_list(original_obj, key, list_value):
+    """递归处理嵌套列表中的动态字段"""
+    # 检查原始对象中对应的属性是否存在
+    if hasattr(original_obj, key) and isinstance(getattr(original_obj, key), list):
+        original_list = getattr(original_obj, key)
+        
+        # 处理列表中的每个元素
+        for i, item in enumerate(list_value):
+            if i < len(original_list):
+                original_item = original_list[i]
+                
+                # 处理字典类型的列表元素
+                if isinstance(item, dict) and hasattr(original_item, '__dict__'):
+                    item_dict = original_item.__dict__
+                    
+                    # 添加所有属性（排除SQLAlchemy内部属性）
+                    for item_key, item_value in item_dict.items():
+                        if not item_key.startswith('_') and item_key not in item:
+                            item[item_key] = item_value
+                    
+                    # 继续递归处理更深层次的嵌套
+                    for item_key, item_value in item.items():
+                        if isinstance(item_value, dict):
+                            _process_nested_dict(original_item, item_key, item_value)
+                        elif isinstance(item_value, list):
+                            _process_nested_list(original_item, item_key, item_value)
 
 
 # 分页依赖注入
