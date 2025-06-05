@@ -121,6 +121,20 @@ async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
     """
     paginated_data: _CustomPage = await apaginate(db, select)
     page_data = paginated_data.model_dump()
+
+    # 确保items中的每个对象都保留其所有属性（包括动态字段）
+    if 'items' in page_data and page_data['items']:
+        for i, item in enumerate(page_data['items']):
+            # 检查原始对象是否有__dict__属性（SQLAlchemy模型对象通常有）
+            if hasattr(paginated_data.items[i], '__dict__'):
+                # 获取原始对象的所有属性
+                obj_dict = paginated_data.items[i].__dict__
+                # 添加所有以'c'或'n'开头的动态字段（如c1-c20, n1-n20）
+                for key, value in obj_dict.items():
+                    if (key.startswith('c') or key.startswith('n')) and key[1:].isdigit():
+                        if key not in item:
+                            item[key] = value
+
     return page_data
 
 

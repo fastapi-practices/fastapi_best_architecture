@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email, create_model
 
 from backend.core.conf import settings
 
@@ -126,3 +126,24 @@ class SchemaBase(BaseModel):
         use_enum_values=True,
         json_encoders={datetime: lambda x: x.strftime(settings.DATETIME_FORMAT)},
     )
+
+class SchemaBaseNoId(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+    
+    
+# 动态创建字段定义
+fields = {}
+for i in range(1, 21):
+    field_name = f'c{i}'
+    # 使用新版Pydantic的字段定义方式
+    fields[field_name] = (Optional[str], Field(default=None))
+for i in range(1, 21):
+    field_name = f'n{i}'
+    # 使用新版Pydantic的字段定义方式
+    fields[field_name] = (Optional[float], Field(default=None))
+
+# 使用 create_model 动态创建 SchemaBaseOut 类
+SchemaBaseOut = create_model(
+    'SchemaBaseOut',  # 模型名称
+    **fields  # 字段名和对应的类型及默认值
+)
