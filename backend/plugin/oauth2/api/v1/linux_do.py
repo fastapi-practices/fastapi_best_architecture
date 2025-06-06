@@ -47,4 +47,6 @@ async def linux_do_login(
         user=user,
         social=UserSocialType.linux_do,
     )
-    return RedirectResponse(url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}')
+    return RedirectResponse(
+        url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}'
+    )
