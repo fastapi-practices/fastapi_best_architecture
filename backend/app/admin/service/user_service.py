@@ -13,7 +13,6 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import Role, User
 from backend.app.admin.schema.user import (
     AddUserParam,
-    RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
 )
@@ -26,29 +25,6 @@ from backend.database.redis import redis_client
 
 class UserService:
     """用户服务类"""
-
-    @staticmethod
-    async def register(*, obj: RegisterUserParam) -> None:
-        """
-        注册新用户
-
-        :param obj: 用户注册参数
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            if not obj.password:
-                raise errors.ForbiddenError(msg='密码为空')
-            username = await user_dao.get_by_username(db, obj.username)
-            if username:
-                raise errors.ForbiddenError(msg='用户已注册')
-            obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
-            nickname = await user_dao.get_by_nickname(db, obj.nickname)
-            if nickname:
-                raise errors.ForbiddenError(msg='昵称已注册')
-            email = await user_dao.check_email(db, obj.email)
-            if email:
-                raise errors.ForbiddenError(msg='邮箱已注册')
-            await user_dao.create(db, obj)
 
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
@@ -70,9 +46,6 @@ class UserService:
                 raise errors.ForbiddenError(msg='昵称已注册')
             if not obj.password:
                 raise errors.ForbiddenError(msg='密码为空')
-            email = await user_dao.check_email(db, obj.email)
-            if email:
-                raise errors.ForbiddenError(msg='邮箱已注册')
             dept = await dept_dao.get(db, obj.dept_id)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
@@ -175,10 +148,6 @@ class UserService:
                 nickname = await user_dao.get_by_nickname(db, obj.nickname)
                 if nickname:
                     raise errors.ForbiddenError(msg='昵称已注册')
-            if user.email != obj.email:
-                email = await user_dao.check_email(db, obj.email)
-                if email:
-                    raise errors.ForbiddenError(msg='邮箱已注册')
             for role_id in obj.roles:
                 role = await role_dao.get(db, role_id)
                 if not role:
