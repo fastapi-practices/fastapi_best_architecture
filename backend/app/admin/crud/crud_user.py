@@ -114,6 +114,17 @@ class CRUDUser(CRUDPlus[User]):
         input_user.roles = roles.scalars().all()
         return count
 
+    async def update_avatar(self, db: AsyncSession, user_id: int, avatar: str) -> int:
+        """
+        更新用户头像
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :param avatar: 头像地址
+        :return:
+        """
+        return await self.update_model(db, user_id, {'avatar': avatar})
+
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
         删除用户

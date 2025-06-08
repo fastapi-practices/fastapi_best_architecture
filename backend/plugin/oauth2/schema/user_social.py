@@ -9,12 +9,8 @@ from backend.common.schema import SchemaBase
 class UserSocialSchemaBase(SchemaBase):
     """用户社交基础模型"""
 
+    sid: str = Field(description='第三方用户 ID')
     source: UserSocialType = Field(description='社交平台')
-    open_id: str | None = Field(None, description='开放平台 ID')
-    sid: str | None = Field(None, description='第三方用户 ID')
-    union_id: str | None = Field(None, description='开放平台唯一 ID')
-    scope: str | None = Field(None, description='授权范围')
-    code: str | None = Field(None, description='授权码')
 
 
 class CreateUserSocialParam(UserSocialSchemaBase):

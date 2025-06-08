@@ -7,10 +7,9 @@ from fastapi import BackgroundTasks, Request, Response
 
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.schema.token import GetLoginToken
-from backend.app.admin.schema.user import RegisterUserParam
+from backend.app.admin.schema.user import AddOAuth2UserParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType, UserSocialType
-from backend.common.exception.errors import AuthorizationError
 from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -43,55 +42,65 @@ class OAuth2Service:
         :return:
         """
         async with async_db_session.begin() as db:
-            # 获取 OAuth2 平台用户信息
-            social_id = user.get('id')
-            social_nickname = user.get('name')
+            sid = user.get('uuid')
+            username = user.get('username')
+            nickname = user.get('nickname')
+            email = user.get('email')
+            avatar = user.get('avatar_url')
 
-            social_username = user.get('username')
             if social == UserSocialType.github:
-                social_username = user.get('login')
+                sid = user.get('id')
+                username = user.get('login')
+                nickname = user.get('name')
 
-            social_email = user.get('email')
             if social == UserSocialType.linux_do:
-                social_email = f'{social_username}@linux.do'
-            if not social_email:
-                raise AuthorizationError(msg=f'授权失败，{social.value} 账户未绑定邮箱')
+                sid = user.get('id')
+                nickname = user.get('name')
 
-            # 创建系统用户
-            sys_user = await user_dao.check_email(db, social_email)
-            if not sys_user:
-                sys_user = await user_dao.get_by_username(db, social_username)
-                if sys_user:
-                    social_username = f'{social_username}#{text_captcha(5)}'
-                sys_user = await user_dao.get_by_nickname(db, social_nickname)
-                if sys_user:
-                    social_username = f'{social_nickname}#{text_captcha(5)}'
-                new_sys_user = RegisterUserParam(
-                    username=social_username, password=None, nickname=social_username, email=social_email
-                )
-                await user_dao.create(db, new_sys_user, social=True)
-                await db.flush()
-                sys_user = await user_dao.check_email(db, social_email)
-            # 绑定社交用户
-            sys_user_id = sys_user.id
-            user_social = await user_social_dao.get(db, sys_user_id, social.value)
+            sys_user = None
+            user_social = await user_social_dao.get_by_sid(db, str(sid), str(social.value))
             if not user_social:
-                new_user_social = CreateUserSocialParam(source=social.value, sid=str(social_id), user_id=sys_user_id)
-                await user_social_dao.create(db, new_user_social)
+                if email:
+                    sys_user = await user_dao.check_email(db, email)
+
+                    # 创建系统用户
+                    if not sys_user:
+                        while await user_dao.get_by_username(db, username):
+                            username = f'{username}_{text_captcha(5)}'
+                        new_sys_user = AddOAuth2UserParam(
+                            username=username,
+                            password='123456',  # 默认密码，可修改系统用户表进行默认密码检测并配合前端进行修改密码提示
+                            nickname=nickname,
+                            email=email,
+                            avatar=avatar,
+                        )
+                        await user_dao.add_by_oauth2(db, new_sys_user)
+                        await db.flush()
+                        sys_user = await user_dao.get_by_username(db, username)
+
+                    # 绑定社交用户
+                    new_user_social = CreateUserSocialParam(sid=str(sid), source=social.value, user_id=sys_user.id)
+                    await user_social_dao.create(db, new_user_social)
+
+            if not sys_user:
+                sys_user = await user_dao.get(db, user_social.user_id)
+                if avatar:
+                    await user_dao.update_avatar(db, sys_user.id, avatar)
+
             # 创建 token
             access_token = await jwt.create_access_token(
-                str(sys_user_id),
+                str(sys_user.id),
                 sys_user.is_multi_login,
                 # extra info
                 username=sys_user.username,
-                nickname=sys_user.nickname,
+                nickname=sys_user.nickname or f'#{text_captcha(5)}',
                 last_login_time=timezone.t_str(timezone.now()),
                 ip=request.state.ip,
                 os=request.state.os,
                 browser=request.state.browser,
                 device=request.state.device,
             )
-            refresh_token = await jwt.create_refresh_token(str(sys_user_id), multi_login=sys_user.is_multi_login)
+            refresh_token = await jwt.create_refresh_token(str(sys_user.id), multi_login=sys_user.is_multi_login)
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
             login_log = dict(
@@ -115,8 +124,8 @@ class OAuth2Service:
             data = GetLoginToken(
                 access_token=access_token.access_token,
                 access_token_expire_time=access_token.access_token_expire_time,
-                user=sys_user,  # type: ignore
                 session_uuid=access_token.session_uuid,
+                user=sys_user,  # type: ignore
             )
             return data
 
