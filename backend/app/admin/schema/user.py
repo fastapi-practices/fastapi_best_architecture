@@ -38,6 +38,7 @@ class AddOAuth2UserParam(AuthSchemaBase):
 
     nickname: str | None = Field(None, description='昵称')
     email: EmailStr = Field(description='邮箱')
+    avatar: HttpUrl | None = Field(None, description='头像地址')
 
 
 class ResetPasswordParam(SchemaBase):
@@ -54,7 +55,7 @@ class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
-    avatar: HttpUrl | None = Field(None, description='头像')
+    avatar: HttpUrl | None = Field(None, description='头像地址')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
