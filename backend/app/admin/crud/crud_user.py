@@ -94,6 +94,11 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj = obj.model_dump()
         dict_obj.update({'is_staff': True, 'salt': salt})
         new_user = self.model(**dict_obj)
+
+        stmt = select(Role)
+        role = await db.execute(stmt)
+        new_user.roles = [role.scalars().first()]  # 默认绑定第一个角色
+
         db.add(new_user)
 
     async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
