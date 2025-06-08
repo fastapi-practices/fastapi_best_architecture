@@ -9,7 +9,6 @@ from backend.app.admin.schema.user import (
     AddUserParam,
     GetCurrentUserInfoWithRelationDetail,
     GetUserInfoWithRelationDetail,
-    RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
 )
@@ -22,12 +21,6 @@ from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
 
 router = APIRouter()
-
-
-@router.post('/register', summary='注册用户')
-async def register_user(obj: RegisterUserParam) -> ResponseModel:
-    await user_service.register(obj=obj)
-    return response_base.success()
 
 
 @router.post('/add', summary='添加用户', dependencies=[DependsRBAC])

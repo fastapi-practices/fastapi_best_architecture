@@ -9,7 +9,7 @@ from typing_extensions import Self
 from backend.app.admin.schema.dept import GetDeptDetail
 from backend.app.admin.schema.role import GetRoleWithRelationDetail
 from backend.common.enums import StatusType
-from backend.common.schema import CustomPhoneNumber, SchemaBase
+from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
 
 
 class AuthSchemaBase(SchemaBase):
@@ -25,20 +25,19 @@ class AuthLoginParam(AuthSchemaBase):
     captcha: str = Field(description='验证码')
 
 
-class RegisterUserParam(AuthSchemaBase):
-    """用户注册参数"""
-
-    nickname: str | None = Field(None, description='昵称')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
-
-
 class AddUserParam(AuthSchemaBase):
     """添加用户参数"""
 
     dept_id: int = Field(description='部门 ID')
     roles: list[int] = Field(description='角色 ID 列表')
     nickname: str | None = Field(None, description='昵称')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
+
+
+class AddOAuth2UserParam(AuthSchemaBase):
+    """添加 OAuth2 用户参数"""
+
+    nickname: str | None = Field(None, description='昵称')
+    email: EmailStr = Field(description='邮箱')
 
 
 class ResetPasswordParam(SchemaBase):
@@ -56,8 +55,6 @@ class UserInfoSchemaBase(SchemaBase):
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
     avatar: HttpUrl | None = Field(None, description='头像')
-    email: EmailStr = Field(examples=['user@example.com'], description='邮箱')
-    phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
@@ -74,7 +71,8 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     id: int = Field(description='用户 ID')
     uuid: str = Field(description='用户 UUID')
-    avatar: str | None = Field(None, description='头像')
+    email: CustomEmailStr | None = Field(None, description='邮箱')
+    phone: CustomPhoneNumber | None = Field(None, description='手机号')
     status: StatusType = Field(StatusType.enable, description='状态')
     is_superuser: bool = Field(description='是否超级管理员')
     is_staff: bool = Field(description='是否管理员')

@@ -10,8 +10,8 @@ from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept, Role, User
 from backend.app.admin.schema.user import (
+    AddOAuth2UserParam,
     AddUserParam,
-    RegisterUserParam,
     UpdateUserParam,
 )
 from backend.common.security.jwt import get_hash_password
@@ -61,26 +61,6 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model_by_column(db, {'last_login_time': timezone.now()}, username=username)
 
-    async def create(self, db: AsyncSession, obj: RegisterUserParam, *, social: bool = False) -> None:
-        """
-        创建用户
-
-        :param db: 数据库会话
-        :param obj: 注册用户参数
-        :param social: 是否社交用户
-        :return:
-        """
-        if not social:
-            salt = bcrypt.gensalt()
-            obj.password = get_hash_password(obj.password, salt)
-            dict_obj = obj.model_dump()
-            dict_obj.update({'is_staff': True, 'salt': salt})
-        else:
-            dict_obj = obj.model_dump()
-            dict_obj.update({'is_staff': True, 'salt': None})
-        new_user = self.model(**dict_obj)
-        db.add(new_user)
-
     async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         """
         添加用户
@@ -99,6 +79,21 @@ class CRUDUser(CRUDPlus[User]):
         roles = await db.execute(stmt)
         new_user.roles = roles.scalars().all()
 
+        db.add(new_user)
+
+    async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
+        """
+        通过 OAuth2 添加用户
+
+        :param db: 数据库会话
+        :param obj: 注册用户参数
+        :return:
+        """
+        salt = bcrypt.gensalt()
+        obj.password = get_hash_password(obj.password, salt)
+        dict_obj = obj.model_dump()
+        dict_obj.update({'is_staff': True, 'salt': salt})
+        new_user = self.model(**dict_obj)
         db.add(new_user)
 
     async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
@@ -131,7 +126,7 @@ class CRUDUser(CRUDPlus[User]):
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
         """
-        检查邮箱是否已被注册
+        检查邮箱是否已被绑定
 
         :param db: 数据库会话
         :param email: 电子邮箱
