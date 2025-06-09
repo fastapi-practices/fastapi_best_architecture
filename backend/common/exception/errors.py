@@ -85,7 +85,7 @@ class GatewayError(BaseExceptionMixin):
 class AuthorizationError(BaseExceptionMixin):
     """授权异常"""
 
-    code = StandardResponseCode.HTTP_401
+    code = StandardResponseCode.HTTP_403
 
     def __init__(self, *, msg: str = 'Permission Denied', data: Any = None, background: BackgroundTask | None = None):
         super().__init__(msg=msg, data=data, background=background)
