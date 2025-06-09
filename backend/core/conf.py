@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     # FastAPI
     FASTAPI_API_V1_PATH: str = '/api/v1'
     FASTAPI_TITLE: str = 'FastAPI'
-    FASTAPI_VERSION: str = '0.0.1'
+    FASTAPI_VERSION: str = '1.5.0'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
     FASTAPI_DOCS_URL: str = '/docs'
     FASTAPI_REDOC_URL: str = '/redoc'
