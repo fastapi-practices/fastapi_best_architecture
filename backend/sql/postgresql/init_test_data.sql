@@ -98,6 +98,19 @@ values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b
 insert into sys_user_role (id, user_id, role_id)
 values  (1, 1, 1);
 
+insert into sys_data_scope (id, name, status, created_time, updated_time)
+values  (1, '测试部门数据权限', 1, '2025-06-09 16:53:29', null),
+        (2, '测试部门及以下数据权限', 1, '2025-06-09 16:53:40', null);
+
+insert into sys_data_rule (id, name, model, column, operator, expression, value, created_time, updated_time)
+values  (1, '部门名称等于测试', '部门', 'name', 1, 0, '测试', '2025-06-09 16:56:06', null),
+        (2, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', '2025-06-09 17:16:14', null);
+
+insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
+values  (1, 1, 1),
+        (2, 2, 1),
+        (3, 2, 2);
+
 -- Reset auto-increment values for each table based on max id
 SELECT setval(pg_get_serial_sequence('sys_dept', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_dept;
 SELECT setval(pg_get_serial_sequence('sys_menu', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_menu;
@@ -105,3 +118,6 @@ SELECT setval(pg_get_serial_sequence('sys_role', 'id'),COALESCE(MAX(id), 0) + 1,
 SELECT setval(pg_get_serial_sequence('sys_role_menu', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_role_menu;
 SELECT setval(pg_get_serial_sequence('sys_user', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_user;
 SELECT setval(pg_get_serial_sequence('sys_user_role', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_user_role;
+SELECT setval(pg_get_serial_sequence('sys_data_scope', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_data_scope;
+SELECT setval(pg_get_serial_sequence('sys_data_rule', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_data_rule;
+SELECT setval(pg_get_serial_sequence('sys_data_scope_rule', 'id'),COALESCE(MAX(id), 0) + 1, true) FROM sys_data_scope_rule;

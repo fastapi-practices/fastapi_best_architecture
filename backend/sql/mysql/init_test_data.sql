@@ -1,7 +1,7 @@
 insert into sys_dept (id, name, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
 values  (1, '测试', 0, null, null, null, 1, 0, null, '2025-05-26 17:13:45', null);
 
-insert into fba.sys_menu (id, title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
+insert into sys_menu (id, title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
 values  (1, '概览', 'Dashboard', 'dashboard', 0, 'ant-design:dashboard-outlined', 0, null, null, 1, 1, 1, '', null, null, '2025-06-09 17:26:18', null),
         (2, '系统管理', 'System', 'system', 1, 'eos-icons:admin', 0, null, null, 1, 1, 1, '', null, null, '2025-06-09 17:30:01', null),
         (3, '系统自动化', 'Automation', 'automation', 2, 'material-symbols:automation', 0, null, null, 1, 1, 1, '', null, null, '2025-06-09 17:31:41', null),
@@ -97,3 +97,16 @@ values  (1, 'af4c804f-3966-4949-ace2-3bb7416ea926', 'admin', '用户88888', '$2b
 
 insert into sys_user_role (id, user_id, role_id)
 values  (1, 1, 1);
+
+insert into sys_data_scope (id, name, status, created_time, updated_time)
+values  (1, '测试部门数据权限', 1, '2025-06-09 16:53:29', null),
+        (2, '测试部门及以下数据权限', 1, '2025-06-09 16:53:40', null);
+
+insert into sys_data_rule (id, name, model, column, operator, expression, value, created_time, updated_time)
+values  (1, '部门名称等于测试', '部门', 'name', 1, 0, '测试', '2025-06-09 16:56:06', null),
+        (2, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', '2025-06-09 17:16:14', null);
+
+insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
+values  (1, 1, 1),
+        (2, 2, 1),
+        (3, 2, 2);
