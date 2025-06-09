@@ -83,14 +83,7 @@ async def update_plugin_status(plugin: Annotated[str, Path(description='插件�
     return response_base.success()
 
 
-@router.get(
-    '/{plugin}',
-    summary='打包并下载插件',
-    dependencies=[
-        Depends(RequestPermission('sys:plugin:zip')),
-        DependsRBAC,
-    ],
-)
+@router.get('/{plugin}', summary='打包并下载插件', dependencies=[DependsJwtAuth])
 async def build_plugin(plugin: Annotated[str, Path(description='插件名称')]) -> StreamingResponse:
     bio = await plugin_service.build(plugin=plugin)
     return StreamingResponse(
