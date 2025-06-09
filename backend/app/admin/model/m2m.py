@@ -33,3 +33,23 @@ sys_role_data_scope = Table(
         comment='数据范围 ID',
     ),
 )
+
+sys_data_scope_rule = Table(
+    'sys_data_scope_rule',
+    MappedBase.metadata,
+    Column('id', INT, primary_key=True, unique=True, index=True, autoincrement=True, comment='主键ID'),
+    Column(
+        'data_scope_id',
+        Integer,
+        ForeignKey('sys_data_scope.id', ondelete='CASCADE'),
+        primary_key=True,
+        comment='数据范围 ID',
+    ),
+    Column(
+        'data_rule_id',
+        Integer,
+        ForeignKey('sys_data_rule.id', ondelete='CASCADE'),
+        primary_key=True,
+        comment='数据规则 ID',
+    ),
+)

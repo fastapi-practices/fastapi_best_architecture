@@ -31,7 +31,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         :param name: 规则名称
         :return:
         """
-        stmt = select(self.model).options(noload(self.model.scope)).order_by(desc(self.model.created_time))
+        stmt = select(self.model).options(noload(self.model.scopes)).order_by(desc(self.model.created_time))
 
         filters = []
         if name is not None:
