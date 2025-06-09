@@ -54,7 +54,7 @@ async def generate_path(pk: Annotated[int, Path(description='业务 ID')]) -> Re
     summary='代码生成',
     description='文件磁盘写入，请谨慎操作',
     dependencies=[
-        Depends(RequestPermission('gen:code:generate')),
+        Depends(RequestPermission('gen:code:write')),
         DependsRBAC,
     ],
 )
