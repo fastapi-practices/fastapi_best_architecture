@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.app.admin.model.m2m import sys_data_scope_rule
 from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
@@ -28,8 +29,5 @@ class DataRule(Base):
     )
     value: Mapped[str] = mapped_column(String(255), comment='规则值')
 
-    # 数据范围规则一对多
-    scope_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_data_scope.id', ondelete='SET NULL'), default=None, comment='数据范围关联 ID'
-    )
-    scope: Mapped[DataScope] = relationship(init=False, back_populates='rules')
+    # 数据范围规则多对多
+    scopes: Mapped[list[DataScope]] = relationship(init=False, secondary=sys_data_scope_rule, back_populates='rules')
