@@ -60,7 +60,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         :return:
         """
         stmt = select(self.model).order_by(asc(self.model.sort))
-        filters = [self.model.type.in_([0, 1])]
+        filters = [self.model.type.in_([0, 1, 3, 4])]
         if not superuser:
             filters.append(self.model.id.in_(menu_ids))
         stmt = stmt.where(and_(*filters))
