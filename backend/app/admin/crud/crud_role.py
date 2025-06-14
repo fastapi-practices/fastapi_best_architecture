@@ -59,9 +59,9 @@ class CRUDRole(CRUDPlus[Role]):
         filters = {}
 
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters['name__like'] = f'%{name}%'
         if status is not None:
-            filters.update(status__eq=status)
+            filters['status'] = status
 
         return await self.select_order(
             'id', load_strategies={'users': 'noload', 'menus': 'noload', 'scopes': 'noload'}, **filters

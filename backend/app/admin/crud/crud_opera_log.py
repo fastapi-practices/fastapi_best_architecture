@@ -23,11 +23,11 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         filters = {}
 
         if username is not None:
-            filters.update(username__like=f'%{username}%')
+            filters['username__like'] = f'%{username}%'
         if status is not None:
-            filters.update(status__eq=status)
+            filters['status__eq'] = status
         if ip is not None:
-            filters.update(ip__like=f'%{ip}%')
+            filters['ip__like'] = f'%{ip}%'
 
         return await self.select_order('created_time', 'desc', **filters)
 

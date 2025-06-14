@@ -63,11 +63,11 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         filters = {}
 
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters['name__like'] = f'%{name}%'
         if status is not None:
-            filters.update(status=status)
+            filters['status'] = status
 
-        return await self.select_order('id', load_strategies={'rules': 'noload', 'roles': 'noload'})
+        return await self.select_order('id', load_strategies={'rules': 'noload', 'roles': 'noload'}, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDataScopeParam) -> None:
         """

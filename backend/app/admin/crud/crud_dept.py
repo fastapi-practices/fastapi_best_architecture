@@ -54,16 +54,16 @@ class CRUDDept(CRUDPlus[Dept]):
         :param status: 部门状态
         :return:
         """
-        filters = {'del_flag__eq': 0}
+        filters = {'del_flag': 0}
 
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters['name__like'] = f'%{name}%'
         if leader is not None:
-            filters.update(leader__like=f'%{leader}%')
+            filters['leader__like'] = f'%{leader}%'
         if phone is not None:
-            filters.update(phone__startswith=phone)
+            filters['phone__startswith'] = phone
         if status is not None:
-            filters.update(status=status)
+            filters['status'] = status
 
         data_filtered = await filter_data_permission(db, request)
         return await self.select_models_order(db, 'sort', None, data_filtered, **filters)

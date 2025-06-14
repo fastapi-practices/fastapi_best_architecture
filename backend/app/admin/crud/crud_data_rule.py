@@ -33,7 +33,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         filters = {}
 
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters['name__like'] = f'%{name}%'
 
         return await self.select_order('id', load_strategies={'scopes': 'noload'}, **filters)
 

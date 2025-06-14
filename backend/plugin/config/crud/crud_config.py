@@ -66,9 +66,9 @@ class CRUDConfig(CRUDPlus[Config]):
         filters = {'type__not_in': settings.CONFIG_BUILT_IN_TYPES}
 
         if name is not None:
-            filters.update(name__like=f'%{name}%')
+            filters['name__like'] = f'%{name}%'
         if type is not None:
-            filters.update(type__like=f'%{type}%')
+            filters['type__like'] = f'%{type}%'
 
         return await self.select_order('created_time', 'desc', **filters)
 
