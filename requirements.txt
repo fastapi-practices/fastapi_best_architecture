@@ -252,7 +252,7 @@ sqlalchemy==2.0.40
     #   alembic
     #   fastapi-best-architecture
     #   sqlalchemy-crud-plus
-sqlalchemy-crud-plus==1.8.0
+sqlalchemy-crud-plus==1.10.0
     # via fastapi-best-architecture
 starlette==0.46.1
     # via

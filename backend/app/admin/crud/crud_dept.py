@@ -3,9 +3,7 @@
 from typing import Sequence
 
 from fastapi import Request
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept
@@ -57,6 +55,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :return:
         """
         filters = {'del_flag__eq': 0}
+
         if name is not None:
             filters.update(name__like=f'%{name}%')
         if leader is not None:
@@ -65,7 +64,9 @@ class CRUDDept(CRUDPlus[Dept]):
             filters.update(phone__startswith=phone)
         if status is not None:
             filters.update(status=status)
-        return await self.select_models_order(db, 'sort', None, await filter_data_permission(db, request), **filters)
+
+        data_filtered = await filter_data_permission(db, request)
+        return await self.select_models_order(db, 'sort', None, data_filtered, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
         """
@@ -106,9 +107,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id: 部门 ID
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.users)).where(self.model.id == dept_id)
-        result = await db.execute(stmt)
-        return result.scalars().first()
+        return await self.select_model(db, dept_id, load_strategies=['users'])
 
     async def get_children(self, db: AsyncSession, dept_id: int) -> Sequence[Dept | None]:
         """
@@ -118,9 +117,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id: 部门 ID
         :return:
         """
-        stmt = select(self.model).where(self.model.parent_id == dept_id, self.model.del_flag == 0)
-        result = await db.execute(stmt)
-        return result.scalars().all()
+        return await self.select_models(db, parent_id=dept_id, del_flag=0)
 
 
 dept_dao: CRUDDept = CRUDDept(Dept)
