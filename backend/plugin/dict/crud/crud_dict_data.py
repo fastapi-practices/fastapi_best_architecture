@@ -30,14 +30,14 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param status: 字典状态
         :return:
         """
-        filters = []
+        filters = {}
 
         if label is not None:
-            filters.append(self.model.label.like(f'%{label}%'))
+            filters['label__like'] = f'%{label}%'
         if value is not None:
-            filters.append(self.model.value.like(f'%{value}%'))
+            filters['value__like'] = f'%{value}%'
         if status is not None:
-            filters.append(self.model.status == status)
+            filters['status'] = status
 
         return await self.select_order('id', 'desc', *filters)
 

@@ -30,16 +30,16 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param status: 字典状态
         :return:
         """
-        filters = []
+        filters = {}
 
         if name is not None:
-            filters.append(self.model.name.like(f'%{name}%'))
+            filters['name__like'] = f'%{name}%'
         if code is not None:
-            filters.append(self.model.code.like(f'%{code}%'))
+            filters['code__like'] = f'%{code}%'
         if status is not None:
-            filters.append(self.model.status == status)
+            filters['status'] = status
 
-        return await self.select_order('id', 'desc', *filters)
+        return await self.select_order('id', 'desc', **filters)
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """

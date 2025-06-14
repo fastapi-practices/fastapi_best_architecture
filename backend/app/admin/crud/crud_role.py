@@ -64,7 +64,13 @@ class CRUDRole(CRUDPlus[Role]):
             filters['status'] = status
 
         return await self.select_order(
-            'id', load_strategies={'users': 'noload', 'menus': 'noload', 'scopes': 'noload'}, **filters
+            'id',
+            load_strategies={
+                'users': 'noload',
+                'menus': 'noload',
+                'scopes': 'noload',
+            },
+            **filters,
         )
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:

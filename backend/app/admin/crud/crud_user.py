@@ -171,25 +171,25 @@ class CRUDUser(CRUDPlus[User]):
         :param status: 用户状态
         :return:
         """
-        filters = []
+        filters = {}
 
         if dept:
-            filters.append(self.model.dept_id == dept)
+            filters['dept_id'] = dept
         if username:
-            filters.append(self.model.username.like(f'%{username}%'))
+            filters['username__like'] = f'%{username}%'
         if phone:
-            filters.append(self.model.phone.like(f'%{phone}%'))
+            filters['phone_like'] = f'%{phone}%'
         if status is not None:
-            filters.append(self.model.status == status)
+            filters['status'] = status
 
         return await self.select_order(
             'id',
             'desc',
-            *filters,
             load_options=[
                 selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
                 selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.scopes)),
             ],
+            **filters,
         )
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:
@@ -291,18 +291,18 @@ class CRUDUser(CRUDPlus[User]):
         :param username: 用户名
         :return:
         """
-        filters = []
+        filters = {}
 
         if user_id:
-            filters.append(self.model.id == user_id)
+            filters['id'] = user_id
         if username:
-            filters.append(self.model.username == username)
+            filters['username'] = username
 
         return await self.select_model_by_column(
             db,
-            *filters,
             load_options=[selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.scopes))],
             load_strategies=['dept'],
+            **filters,
         )
 
 

@@ -66,7 +66,7 @@ class CRUDDept(CRUDPlus[Dept]):
             filters['status'] = status
 
         data_filtered = await filter_data_permission(db, request)
-        return await self.select_models_order(db, 'sort', None, data_filtered, **filters)
+        return await self.select_models_order(db, 'sort', 'desc', data_filtered, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
         """
