@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, and_, desc, select
+from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule, DataScope
@@ -42,9 +41,7 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         :param pk: 范围 ID
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.rules)).where(self.model.id == pk)
-        data_scope = await db.execute(stmt)
-        return data_scope.scalars().first()
+        return await self.select_model(db, pk, load_strategies=['rules'])
 
     async def get_all(self, db: AsyncSession) -> Sequence[DataScope]:
         """
@@ -63,22 +60,14 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         :param status: 范围状态
         :return:
         """
-        stmt = (
-            select(self.model)
-            .options(noload(self.model.rules), noload(self.model.roles))
-            .order_by(desc(self.model.created_time))
-        )
+        filters = {}
 
-        filters = []
         if name is not None:
-            filters.append(self.model.name.like(f'%{name}%'))
+            filters['name__like'] = f'%{name}%'
         if status is not None:
-            filters.append(self.model.status == status)
+            filters['status'] = status
 
-        if filters:
-            stmt = stmt.where(and_(*filters))
-
-        return stmt
+        return await self.select_order('id', load_strategies={'rules': 'noload', 'roles': 'noload'}, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDataScopeParam) -> None:
         """

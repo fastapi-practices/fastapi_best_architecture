@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import bcrypt
 
-from sqlalchemy import and_, desc, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
 from sqlalchemy.sql import Select
@@ -171,29 +171,26 @@ class CRUDUser(CRUDPlus[User]):
         :param status: 用户状态
         :return:
         """
-        stmt = (
-            select(self.model)
-            .options(
+        filters = {}
+
+        if dept:
+            filters['dept_id'] = dept
+        if username:
+            filters['username__like'] = f'%{username}%'
+        if phone:
+            filters['phone_like'] = f'%{phone}%'
+        if status is not None:
+            filters['status'] = status
+
+        return await self.select_order(
+            'id',
+            'desc',
+            load_options=[
                 selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
                 selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.scopes)),
-            )
-            .order_by(desc(self.model.join_time))
+            ],
+            **filters,
         )
-
-        filters = []
-        if dept:
-            filters.append(self.model.dept_id == dept)
-        if username:
-            filters.append(self.model.username.like(f'%{username}%'))
-        if phone:
-            filters.append(self.model.phone.like(f'%{phone}%'))
-        if status is not None:
-            filters.append(self.model.status == status)
-
-        if filters:
-            stmt = stmt.where(and_(*filters))
-
-        return stmt
 
     async def get_super(self, db: AsyncSession, user_id: int) -> bool:
         """
@@ -294,22 +291,19 @@ class CRUDUser(CRUDPlus[User]):
         :param username: 用户名
         :return:
         """
-        stmt = select(self.model).options(
-            selectinload(self.model.dept),
-            selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.scopes)),
-        )
+        filters = {}
 
-        filters = []
         if user_id:
-            filters.append(self.model.id == user_id)
+            filters['id'] = user_id
         if username:
-            filters.append(self.model.username == username)
+            filters['username'] = username
 
-        if filters:
-            stmt = stmt.where(and_(*filters))
-
-        user = await db.execute(stmt)
-        return user.scalars().first()
+        return await self.select_model_by_column(
+            db,
+            load_options=[selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.scopes))],
+            load_strategies=['dept'],
+            **filters,
+        )
 
 
 user_dao: CRUDUser = CRUDUser(User)

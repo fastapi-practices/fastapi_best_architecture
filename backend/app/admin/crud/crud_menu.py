@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import and_, asc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Menu
@@ -44,10 +42,12 @@ class CRUDMenu(CRUDPlus[Menu]):
         :return:
         """
         filters = {}
+
         if title is not None:
-            filters.update(title__like=f'%{title}%')
+            filters['title__like'] = f'%{title}%'
         if status is not None:
-            filters.update(status=status)
+            filters['status'] = status
+
         return await self.select_models_order(db, 'sort', **filters)
 
     async def get_sidebar(self, db: AsyncSession, superuser: bool, menu_ids: list[int | None]) -> Sequence[Menu]:
@@ -59,13 +59,12 @@ class CRUDMenu(CRUDPlus[Menu]):
         :param menu_ids: 菜单 ID 列表
         :return:
         """
-        stmt = select(self.model).order_by(asc(self.model.sort))
-        filters = [self.model.type.in_([0, 1, 3, 4])]
+        filters = {'type__in': [0, 1, 3, 4]}
+
         if not superuser:
-            filters.append(self.model.id.in_(menu_ids))
-        stmt = stmt.where(and_(*filters))
-        menu = await db.execute(stmt)
-        return menu.scalars().all()
+            filters['id__in'] = menu_ids
+
+        return await self.select_models_order(db, 'sort', 'asc', **filters)
 
     async def create(self, db: AsyncSession, obj: CreateMenuParam) -> None:
         """
@@ -106,9 +105,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         :param menu_id: 菜单 ID
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.children)).where(self.model.id == menu_id)
-        result = await db.execute(stmt)
-        menu = result.scalars().first()
+        menu = await self.select_model(db, menu_id, load_strategies=['children'])
         return menu.children
 
 

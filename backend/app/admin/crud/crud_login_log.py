@@ -21,12 +21,14 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         :return:
         """
         filters = {}
+
         if username is not None:
-            filters.update(username__like=f'%{username}%')
+            filters['username__like'] = f'%{username}%'
         if status is not None:
-            filters.update(status=status)
+            filters['status'] = status
         if ip is not None:
-            filters.update(ip__like=f'%{ip}%')
+            filters['ip__like'] = f'%{ip}%'
+
         return await self.select_order('created_time', 'desc', **filters)
 
     async def create(self, db: AsyncSession, obj: CreateLoginLogParam) -> None:

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from sqlalchemy import Select, and_, desc, select
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import noload, selectinload
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.dict.model import DictData
@@ -31,20 +30,16 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param status: 字典状态
         :return:
         """
-        stmt = select(self.model).options(noload(self.model.type)).order_by(desc(self.model.sort))
+        filters = {}
 
-        filters = []
         if label is not None:
-            filters.append(self.model.label.like(f'%{label}%'))
+            filters['label__like'] = f'%{label}%'
         if value is not None:
-            filters.append(self.model.value.like(f'%{value}%'))
+            filters['value__like'] = f'%{value}%'
         if status is not None:
-            filters.append(self.model.status == status)
+            filters['status'] = status
 
-        if filters:
-            stmt = stmt.where(and_(*filters))
-
-        return stmt
+        return await self.select_order('id', 'desc', *filters)
 
     async def get_by_label(self, db: AsyncSession, label: str) -> DictData | None:
         """
@@ -95,9 +90,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param pk: 字典数据 ID
         :return:
         """
-        stmt = select(self.model).options(selectinload(self.model.type)).where(self.model.id == pk)
-        dict_data = await db.execute(stmt)
-        return dict_data.scalars().first()
+        return await self.select_model(db, pk, load_strategies=['type'])
 
 
 dict_data_dao: CRUDDictData = CRUDDictData(DictData)
