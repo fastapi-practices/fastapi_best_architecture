@@ -103,7 +103,7 @@ insert into sys_data_scope (id, name, status, created_time, updated_time)
 values  (1, '测试部门数据权限', 1, '2025-06-09 16:53:29', null),
         (2, '测试部门及以下数据权限', 1, '2025-06-09 16:53:40', null);
 
-insert into sys_data_rule (id, name, model, `column`, operator, expression, `value`, created_time, updated_time)
+insert into sys_data_rule (id, name, model, "column", operator, expression, "value", created_time, updated_time)
 values  (1, '部门名称等于测试', '部门', 'name', 1, 0, '测试', '2025-06-09 16:56:06', null),
         (2, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', '2025-06-09 17:16:14', null);
 
