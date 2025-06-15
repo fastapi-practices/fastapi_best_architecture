@@ -3,10 +3,11 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import DateTime
+from sqlalchemy import BigInteger, DateTime
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
 
+from backend.utils.snowflake import snowflake
 from backend.utils.timezone import timezone
 
 # 通用 Mapped 类型主键, 需手动添加，参考以下使用方式
@@ -14,6 +15,15 @@ from backend.utils.timezone import timezone
 # DataClassBase && Base -> id: Mapped[id_key] = mapped_column(init=False)
 id_key = Annotated[
     int, mapped_column(primary_key=True, index=True, autoincrement=True, sort_order=-999, comment='主键 ID')
+]
+
+
+# 雪花算法ID，使用方法同 id_key
+snowflake_id_key = Annotated[
+    int,
+    mapped_column(
+        BigInteger, primary_key=True, index=True, default=snowflake.generate, sort_order=-999, comment='雪花算法主键 ID'
+    ),
 ]
 
 
