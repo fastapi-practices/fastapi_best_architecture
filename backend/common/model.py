@@ -28,6 +28,7 @@ id_key = Annotated[
 
 
 # 雪花算法 Mapped 类型主键，使用方法与 id_key 相同
+# 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html
 snowflake_id_key = Annotated[
     int,
     mapped_column(
