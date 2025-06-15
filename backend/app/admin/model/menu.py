@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -42,7 +42,7 @@ class Menu(Base):
 
     # 父级菜单一对多
     parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
+        BigInteger, ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
     )
     parent: Mapped[Optional['Menu']] = relationship(init=False, back_populates='children', remote_side=[id])
     children: Mapped[Optional[list['Menu']]] = relationship(init=False, back_populates='parent')

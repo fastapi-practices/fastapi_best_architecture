@@ -7,7 +7,7 @@ from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import DataClassBase, id_key
+from backend.common.model import DataClassBase, snowflake_id_key
 from backend.utils.timezone import timezone
 
 
@@ -16,7 +16,7 @@ class LoginLog(DataClassBase):
 
     __tablename__ = 'sys_login_log'
 
-    id: Mapped[id_key] = mapped_column(init=False)
+    id: Mapped[snowflake_id_key] = mapped_column(init=False)
     user_uuid: Mapped[str] = mapped_column(String(50), comment='用户UUID')
     username: Mapped[str] = mapped_column(String(20), comment='用户名')
     status: Mapped[int] = mapped_column(insert_default=0, comment='登录状态(0失败 1成功)')

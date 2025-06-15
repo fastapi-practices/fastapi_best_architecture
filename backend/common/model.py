@@ -14,15 +14,30 @@ from backend.utils.timezone import timezone
 # MappedBase -> id: Mapped[id_key]
 # DataClassBase && Base -> id: Mapped[id_key] = mapped_column(init=False)
 id_key = Annotated[
-    int, mapped_column(primary_key=True, index=True, autoincrement=True, sort_order=-999, comment='主键 ID')
+    int,
+    mapped_column(
+        BigInteger,
+        primary_key=True,
+        unique=True,
+        index=True,
+        autoincrement=True,
+        sort_order=-999,
+        comment='主键 ID',
+    ),
 ]
 
 
-# 雪花算法ID，使用方法同 id_key
+# 雪花算法 Mapped 类型主键，使用方法与 id_key 相同
 snowflake_id_key = Annotated[
     int,
     mapped_column(
-        BigInteger, primary_key=True, index=True, default=snowflake.generate, sort_order=-999, comment='雪花算法主键 ID'
+        BigInteger,
+        primary_key=True,
+        unique=True,
+        index=True,
+        default=snowflake.generate,
+        sort_order=-999,
+        comment='雪花算法主键 ID',
     ),
 ]
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy import BigInteger, Boolean, ForeignKey, String
 from sqlalchemy.dialects.postgresql import INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -32,7 +32,7 @@ class Dept(Base):
 
     # 父级部门一对多
     parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
+        BigInteger, ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
     )
     parent: Mapped[Optional['Dept']] = relationship(init=False, back_populates='children', remote_side=[id])
     children: Mapped[Optional[list['Dept']]] = relationship(init=False, back_populates='parent')
