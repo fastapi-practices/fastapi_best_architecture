@@ -86,7 +86,7 @@ class Snowflake:
         timestamp = self._current_millis()
 
         if timestamp < self.last_timestamp:
-            raise errors.ForbiddenError(msg=f'系统时间倒退，拒绝生成 ID 直到 {self.last_timestamp}')
+            raise errors.ServerError(msg=f'系统时间倒退，拒绝生成 ID 直到 {self.last_timestamp}')
 
         if timestamp == self.last_timestamp:
             self.sequence = (self.sequence + 1) & SnowflakeConfig.SEQUENCE_MASK
