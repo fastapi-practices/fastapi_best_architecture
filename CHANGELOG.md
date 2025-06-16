@@ -1,3 +1,19 @@
+<a id="v1.5.1"></a>
+# [v1.5.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.5.1) - 2025-06-16
+
+## What's Changed
+* Update changelog for v1.5.0 by [@wu-clan](https://github.com/wu-clan) in [#664](https://github.com/fastapi-practices/fastapi_best_architecture/pull/664)
+* Fix the sidebar menu type filtering by [@wu-clan](https://github.com/wu-clan) in [#667](https://github.com/fastapi-practices/fastapi_best_architecture/pull/667)
+* Bump sqlalchemy crud plus version to 1.10.0 by [@wu-clan](https://github.com/wu-clan) in [#668](https://github.com/fastapi-practices/fastapi_best_architecture/pull/668)
+* Fix the postgresql sql script syntax error by [@downdawn](https://github.com/downdawn) in [#669](https://github.com/fastapi-practices/fastapi_best_architecture/pull/669)
+* Add Initial Snowflake ID Support by [@downdawn](https://github.com/downdawn) in [#670](https://github.com/fastapi-practices/fastapi_best_architecture/pull/670)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
+
+[Changes][v1.5.1]
+
+
 <a id="v1.5.0"></a>
 # [v1.5.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.5.0) - 2025-06-09
 
@@ -614,6 +630,7 @@
 [Changes][v1.0.0]
 
 
+[v1.5.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.3...v1.5.0
 [v1.4.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.2...v1.4.3
 [v1.4.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.1...v1.4.2
