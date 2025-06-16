@@ -22,7 +22,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
 from backend.plugin.errors import PluginConfigError, PluginInjectError
-from backend.utils._asyncio import run_await
+from backend.utils._await import run_await
 from backend.utils.import_parse import import_module_cached
 
 

@@ -4,7 +4,9 @@ import time
 
 from dataclasses import dataclass
 
+from backend.common.dataclasses import SnowflakeInfo
 from backend.common.exception import errors
+from backend.core.conf import settings
 
 
 @dataclass(frozen=True)
@@ -103,25 +105,25 @@ class Snowflake:
         )
 
     @staticmethod
-    def parse_id(snowflake_id: int) -> dict:
+    def parse_id(snowflake_id: int) -> SnowflakeInfo:
         """
-        解析雪花ID，获取其包含的详细信息
+        解析雪花 ID，获取其包含的详细信息
 
         :param snowflake_id: 雪花ID
-        :return: 包含时间戳、集群ID、节点ID和序列号的字典
+        :return:
         """
         timestamp = (snowflake_id >> SnowflakeConfig.TIMESTAMP_LEFT_SHIFT) + SnowflakeConfig.EPOCH
         cluster_id = (snowflake_id >> SnowflakeConfig.DATACENTER_ID_SHIFT) & SnowflakeConfig.MAX_DATACENTER_ID
         node_id = (snowflake_id >> SnowflakeConfig.WORKER_ID_SHIFT) & SnowflakeConfig.MAX_WORKER_ID
         sequence = snowflake_id & SnowflakeConfig.SEQUENCE_MASK
 
-        return {
-            "timestamp": timestamp,
-            "datetime": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp / 1000)),
-            "cluster_id": cluster_id,
-            "node_id": node_id,
-            "sequence": sequence
-        }
+        return SnowflakeInfo(
+            timestamp=timestamp,
+            datetime=time.strftime(settings.DATETIME_FORMAT, time.localtime(timestamp / 1000)),
+            cluster_id=cluster_id,
+            node_id=node_id,
+            sequence=sequence,
+        )
 
 
 snowflake = Snowflake()
