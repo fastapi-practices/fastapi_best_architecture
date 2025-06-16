@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
@@ -23,5 +23,7 @@ class UserSocial(Base):
     source: Mapped[str] = mapped_column(String(20), comment='第三方用户来源')
 
     # 用户社交信息一对多
-    user_id: Mapped[int] = mapped_column(ForeignKey('sys_user.id', ondelete='CASCADE'), comment='用户关联ID')
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey('sys_user.id', ondelete='CASCADE'), comment='用户关联ID'
+    )
     user: Mapped[User | None] = relationship(init=False, backref='socials')

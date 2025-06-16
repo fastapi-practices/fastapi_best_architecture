@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import TYPE_CHECKING, Union
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -33,6 +33,6 @@ class GenColumn(DataClassBase):
 
     # 代码生成业务模型一对多
     gen_business_id: Mapped[int] = mapped_column(
-        ForeignKey('gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
+        BigInteger, ForeignKey('gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
     )
     gen_business: Mapped[Union['GenBusiness', None]] = relationship(init=False, back_populates='gen_column')
