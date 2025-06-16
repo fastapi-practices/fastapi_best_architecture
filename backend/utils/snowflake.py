@@ -102,5 +102,26 @@ class Snowflake:
             | self.sequence
         )
 
+    @staticmethod
+    def parse_id(snowflake_id: int) -> dict:
+        """
+        解析雪花ID，获取其包含的详细信息
+
+        :param snowflake_id: 雪花ID
+        :return: 包含时间戳、集群ID、节点ID和序列号的字典
+        """
+        timestamp = (snowflake_id >> SnowflakeConfig.TIMESTAMP_LEFT_SHIFT) + SnowflakeConfig.EPOCH
+        cluster_id = (snowflake_id >> SnowflakeConfig.DATACENTER_ID_SHIFT) & SnowflakeConfig.MAX_DATACENTER_ID
+        node_id = (snowflake_id >> SnowflakeConfig.WORKER_ID_SHIFT) & SnowflakeConfig.MAX_WORKER_ID
+        sequence = snowflake_id & SnowflakeConfig.SEQUENCE_MASK
+
+        return {
+            "timestamp": timestamp,
+            "datetime": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp / 1000)),
+            "cluster_id": cluster_id,
+            "node_id": node_id,
+            "sequence": sequence
+        }
+
 
 snowflake = Snowflake()
