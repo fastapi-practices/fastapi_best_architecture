@@ -4,7 +4,6 @@ from fastapi import Depends, Request
 
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception import errors
-from backend.common.exception.errors import AuthorizationError, TokenError
 from backend.common.log import log
 from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
@@ -27,7 +26,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
 
     # JWT 授权状态强制校验
     if not request.auth.scopes:
-        raise TokenError
+        raise errors.TokenError
 
     # 超级管理员免校验
     if request.user.is_superuser:
@@ -36,17 +35,17 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
     # 检测用户角色
     user_roles = request.user.roles
     if not user_roles or all(status == 0 for status in user_roles):
-        raise AuthorizationError(msg='用户未分配角色，请联系系统管理员')
+        raise errors.AuthorizationError(msg='用户未分配角色，请联系系统管理员')
 
     # 检测用户所属角色菜单
     if not any(len(role.menus) > 0 for role in user_roles):
-        raise AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
+        raise errors.AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
 
     # 检测后台管理操作权限
     method = request.method
     if method != MethodType.GET or method != MethodType.OPTIONS:
         if not request.user.is_staff:
-            raise AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
+            raise errors.AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
 
     # RBAC 鉴权
     if settings.RBAC_ROLE_MENU_MODE:
@@ -72,7 +71,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
             if menu.perms and menu.status == StatusType.enable:
                 allow_perms.extend(menu.perms.split(','))
         if path_auth_perm not in allow_perms:
-            raise AuthorizationError
+            raise errors.AuthorizationError
     else:
         try:
             casbin_rbac = import_module_cached('backend.plugin.casbin_rbac.rbac')

@@ -16,14 +16,21 @@ from fastapi import APIRouter, Depends, Request
 from starlette.concurrency import run_in_threadpool
 
 from backend.common.enums import StatusType
-from backend.common.exception.errors import ForbiddenError
+from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.errors import PluginConfigError, PluginInjectError
 from backend.utils._await import run_await
 from backend.utils.import_parse import import_module_cached
+
+
+class PluginConfigError(Exception):
+    """插件信息错误"""
+
+
+class PluginInjectError(Exception):
+    """插件注入错误"""
 
 
 @lru_cache
@@ -324,4 +331,4 @@ class PluginStatusChecker:
             log.error(f'插件 {self.plugin} 状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError(f'插件 {self.plugin} 状态未初始化或丢失，请联系系统管理员')
         if not int(plugin_status.get(self.plugin)):
-            raise ForbiddenError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
+            raise errors.ForbiddenError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')

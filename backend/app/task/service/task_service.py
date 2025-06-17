@@ -7,7 +7,6 @@ from starlette.concurrency import run_in_threadpool
 from backend.app.task.celery import celery_app
 from backend.app.task.schema.task import RunParam, TaskResult
 from backend.common.exception import errors
-from backend.common.exception.errors import NotFoundError
 
 
 class TaskService:
@@ -31,7 +30,7 @@ class TaskService:
         try:
             result = AsyncResult(id=tid, app=celery_app)
         except NotRegistered:
-            raise NotFoundError(msg='任务不存在')
+            raise errors.NotFoundError(msg='任务不存在')
         return TaskResult(
             result=result.result,
             traceback=result.traceback,
@@ -55,7 +54,7 @@ class TaskService:
         try:
             result = AsyncResult(id=tid, app=celery_app)
         except NotRegistered:
-            raise NotFoundError(msg='任务不存在')
+            raise errors.NotFoundError(msg='任务不存在')
         result.revoke(terminate=True)
 
     @staticmethod
