@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.model import User
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken, TokenPayload
-from backend.common.exception.errors import AuthorizationError, TokenError
+from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -80,11 +80,11 @@ def jwt_decode(token: str) -> TokenPayload:
         user_id = payload.get('sub')
         expire_time = payload.get('exp')
         if not user_id:
-            raise TokenError(msg='Token 无效')
+            raise errors.TokenError(msg='Token 无效')
     except ExpiredSignatureError:
-        raise TokenError(msg='Token 已过期')
+        raise errors.TokenError(msg='Token 已过期')
     except (JWTError, Exception):
-        raise TokenError(msg='Token 无效')
+        raise errors.TokenError(msg='Token 无效')
     return TokenPayload(id=int(user_id), session_uuid=session_uuid, expire_time=expire_time)
 
 
@@ -160,7 +160,7 @@ async def create_new_token(user_id: str, refresh_token: str, multi_login: bool, 
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
     if not redis_refresh_token or redis_refresh_token != refresh_token:
-        raise TokenError(msg='Refresh Token 已过期，请重新登录')
+        raise errors.TokenError(msg='Refresh Token 已过期，请重新登录')
     new_access_token = await create_access_token(user_id, multi_login, **kwargs)
     return NewToken(
         new_access_token=new_access_token.access_token,
@@ -191,7 +191,7 @@ def get_token(request: Request) -> str:
     authorization = request.headers.get('Authorization')
     scheme, token = get_authorization_scheme_param(authorization)
     if not authorization or scheme.lower() != 'bearer':
-        raise TokenError(msg='Token 无效')
+        raise errors.TokenError(msg='Token 无效')
     return token
 
 
@@ -207,18 +207,18 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
 
     user = await user_dao.get_with_relation(db, user_id=pk)
     if not user:
-        raise TokenError(msg='Token 无效')
+        raise errors.TokenError(msg='Token 无效')
     if not user.status:
-        raise AuthorizationError(msg='用户已被锁定，请联系系统管理员')
+        raise errors.AuthorizationError(msg='用户已被锁定，请联系系统管理员')
     if user.dept_id:
         if not user.dept.status:
-            raise AuthorizationError(msg='用户所属部门已被锁定，请联系系统管理员')
+            raise errors.AuthorizationError(msg='用户所属部门已被锁定，请联系系统管理员')
         if user.dept.del_flag:
-            raise AuthorizationError(msg='用户所属部门已被删除，请联系系统管理员')
+            raise errors.AuthorizationError(msg='用户所属部门已被删除，请联系系统管理员')
     if user.roles:
         role_status = [role.status for role in user.roles]
         if all(status == 0 for status in role_status):
-            raise AuthorizationError(msg='用户所属角色已被锁定，请联系系统管理员')
+            raise errors.AuthorizationError(msg='用户所属角色已被锁定，请联系系统管理员')
     return user
 
 
@@ -231,7 +231,7 @@ def superuser_verify(request: Request) -> bool:
     """
     superuser = request.user.is_superuser
     if not superuser or not request.user.is_staff:
-        raise AuthorizationError
+        raise errors.AuthorizationError
     return superuser
 
 
@@ -246,10 +246,10 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
     user_id = token_payload.id
     redis_token = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
     if not redis_token:
-        raise TokenError(msg='Token 已过期')
+        raise errors.TokenError(msg='Token 已过期')
 
     if token != redis_token:
-        raise TokenError(msg='Token 已失效')
+        raise errors.TokenError(msg='Token 已失效')
 
     cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
     if not cache_user:

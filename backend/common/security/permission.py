@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
-from backend.common.exception.errors import ServerError
 from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import_data_model
 
@@ -40,7 +39,7 @@ class RequestPermission:
         """
         if settings.RBAC_ROLE_MENU_MODE:
             if not isinstance(self.value, str):
-                raise ServerError
+                raise errors.ServerError
             # 附加权限标识到请求状态
             request.state.permission = self.value
 
