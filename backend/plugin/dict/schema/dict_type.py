@@ -25,6 +25,12 @@ class UpdateDictTypeParam(DictTypeSchemaBase):
     """更新字典类型参数"""
 
 
+class DeleteDictTypeParam(SchemaBase):
+    """删除字典类型参数"""
+
+    pks: list[int] = Field(description='字典类型 ID 列表')
+
+
 class GetDictTypeDetail(DictTypeSchemaBase):
     """字典类型详情"""
 

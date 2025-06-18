@@ -7,7 +7,7 @@ from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictData
-from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
+from backend.plugin.dict.schema.dict_data import CreateDictDataParam, DeleteDictDataParam, UpdateDictDataParam
 
 
 class DictDataService:
@@ -79,15 +79,15 @@ class DictDataService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteDictDataParam) -> int:
         """
-        删除字典数据
+        批量删除字典数据
 
-        :param pk: 字典数据 ID 列表
+        :param obj: 字典数据 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await dict_data_dao.delete(db, pk)
+            count = await dict_data_dao.delete(db, obj.pks)
             return count
 
 

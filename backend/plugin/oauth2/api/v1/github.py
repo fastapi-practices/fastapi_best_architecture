@@ -17,7 +17,7 @@ _github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_logi
 
 
 @router.get('', summary='获取 Github 授权链接')
-async def github_oauth2(request: Request) -> ResponseSchemaModel[str]:
+async def get_github_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
     auth_url = await _github_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
     return response_base.success(data=auth_url)
 
@@ -28,7 +28,7 @@ async def github_oauth2(request: Request) -> ResponseSchemaModel[str]:
     description='Github 授权后，自动重定向到当前地址并获取用户信息，通过用户信息自动创建系统用户',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
-async def github_login(
+async def github_oauth2_callback(
     request: Request,
     response: Response,
     background_tasks: BackgroundTasks,

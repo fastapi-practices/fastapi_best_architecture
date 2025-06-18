@@ -231,7 +231,7 @@ def superuser_verify(request: Request) -> bool:
     """
     superuser = request.user.is_superuser
     if not superuser or not request.user.is_staff:
-        raise errors.AuthorizationError
+        raise errors.AuthorizationError()
     return superuser
 
 

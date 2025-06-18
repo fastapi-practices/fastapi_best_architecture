@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from backend.app.admin.schema.opera_log import GetOperaLogDetail
+from backend.app.admin.schema.opera_log import DeleteOperaLogParam, GetOperaLogDetail
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -24,7 +24,7 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_pagination_opera_logs(
+async def get_opera_logs_paged(
     db: CurrentSession,
     username: Annotated[str | None, Query(description='用户名')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
@@ -43,8 +43,8 @@ async def get_pagination_opera_logs(
         DependsRBAC,
     ],
 )
-async def delete_opera_log(pk: Annotated[list[int], Query(description='操作日志 ID 列表')]) -> ResponseModel:
-    count = await opera_log_service.delete(pk=pk)
+async def delete_opera_logs(obj: DeleteOperaLogParam) -> ResponseModel:
+    count = await opera_log_service.delete(obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -54,7 +54,7 @@ async def delete_opera_log(pk: Annotated[list[int], Query(description='操作日
     '/all',
     summary='清空操作日志',
     dependencies=[
-        Depends(RequestPermission('log:opera:empty')),
+        Depends(RequestPermission('log:opera:clear')),
         DependsRBAC,
     ],
 )

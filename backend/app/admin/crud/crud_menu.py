@@ -50,18 +50,17 @@ class CRUDMenu(CRUDPlus[Menu]):
 
         return await self.select_models_order(db, 'sort', **filters)
 
-    async def get_sidebar(self, db: AsyncSession, superuser: bool, menu_ids: list[int | None]) -> Sequence[Menu]:
+    async def get_sidebar(self, db: AsyncSession, menu_ids: list[int] | None) -> Sequence[Menu]:
         """
-        获取角色菜单列表
+        获取用户的菜单侧边栏
 
         :param db: 数据库会话
-        :param superuser: 是否超级管理员
         :param menu_ids: 菜单 ID 列表
         :return:
         """
         filters = {'type__in': [0, 1, 3, 4]}
 
-        if not superuser:
+        if menu_ids:
             filters['id__in'] = menu_ids
 
         return await self.select_models_order(db, 'sort', 'asc', **filters)

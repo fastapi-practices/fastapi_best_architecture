@@ -16,7 +16,7 @@ from backend.plugin.code_generator.service.gen_service import gen_service
 router = APIRouter()
 
 
-@router.get('', summary='获取数据库表')
+@router.get('/tables', summary='获取数据库表')
 async def get_all_tables(
     table_schema: Annotated[str, Query(description='数据库名')] = 'fba',
 ) -> ResponseSchemaModel[list[str]]:
@@ -25,10 +25,10 @@ async def get_all_tables(
 
 
 @router.post(
-    '/import',
+    '/imports',
     summary='导入代码生成业务和模型列',
     dependencies=[
-        Depends(RequestPermission('gen:code:import')),
+        Depends(RequestPermission('codegen:table:import')),
         DependsRBAC,
     ],
 )
@@ -37,24 +37,24 @@ async def import_table(obj: ImportParam) -> ResponseModel:
     return response_base.success()
 
 
-@router.get('/{pk}/preview', summary='生成代码预览', dependencies=[DependsJwtAuth])
+@router.get('/{pk}/previews', summary='代码生成预览', dependencies=[DependsJwtAuth])
 async def preview_code(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseSchemaModel[dict[str, bytes]]:
     data = await gen_service.preview(pk=pk)
     return response_base.success(data=data)
 
 
-@router.get('/{pk}/code/path', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
-async def generate_path(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseSchemaModel[list[str]]:
+@router.get('/{pk}/paths', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
+async def get_generate_paths(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseSchemaModel[list[str]]:
     data = await gen_service.get_generate_path(pk=pk)
     return response_base.success(data=data)
 
 
 @router.post(
-    '/{pk}/code',
+    '/{pk}/generation',
     summary='代码生成',
     description='文件磁盘写入，请谨慎操作',
     dependencies=[
-        Depends(RequestPermission('gen:code:write')),
+        Depends(RequestPermission('codegen:local:write')),
         DependsRBAC,
     ],
 )

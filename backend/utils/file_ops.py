@@ -28,12 +28,11 @@ def build_filename(file: UploadFile) -> str:
     return new_filename
 
 
-def file_verify(file: UploadFile, file_type: FileType) -> None:
+def file_verify(file: UploadFile) -> None:
     """
     文件验证
 
     :param file: FastAPI 上传文件对象
-    :param file_type: 文件类型枚举
     :return:
     """
     filename = file.filename
@@ -41,12 +40,12 @@ def file_verify(file: UploadFile, file_type: FileType) -> None:
     if not file_ext:
         raise errors.ForbiddenError(msg='未知的文件类型')
 
-    if file_type == FileType.image:
+    if file_ext == FileType.image:
         if file_ext not in settings.UPLOAD_IMAGE_EXT_INCLUDE:
             raise errors.ForbiddenError(msg='此图片格式暂不支持')
         if file.size > settings.UPLOAD_IMAGE_SIZE_MAX:
             raise errors.ForbiddenError(msg='图片超出最大限制，请重新选择')
-    elif file_type == FileType.video:
+    elif file_ext == FileType.video:
         if file_ext not in settings.UPLOAD_VIDEO_EXT_INCLUDE:
             raise errors.ForbiddenError(msg='此视频格式暂不支持')
         if file.size > settings.UPLOAD_VIDEO_SIZE_MAX:

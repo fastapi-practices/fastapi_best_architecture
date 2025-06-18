@@ -32,7 +32,7 @@ class MenuService:
             return menu
 
     @staticmethod
-    async def get_menu_tree(*, title: str | None, status: int | None) -> list[dict[str, Any]]:
+    async def get_tree(*, title: str | None, status: int | None) -> list[dict[str, Any]]:
         """
         获取菜单树形结构
 
@@ -54,21 +54,17 @@ class MenuService:
         :return:
         """
         async with async_db_session() as db:
-            roles = request.user.roles
-            menu_tree = []
-            if roles:
-                unique_menus = {}
-                for role in roles:
-                    for menu in role.menus:
-                        unique_menus[menu.id] = menu
-                all_ids = set(unique_menus.keys())
-                valid_menu_ids = [
-                    menu_id
-                    for menu_id, menu in unique_menus.items()
-                    if menu.parent_id is None or menu.parent_id in all_ids
-                ]
-                menu_data = await menu_dao.get_sidebar(db, request.user.is_superuser, valid_menu_ids)
-                menu_tree = get_vben5_tree_data(menu_data)
+            if request.user.is_superuser:
+                menu_data = await menu_dao.get_sidebar(db, None)
+            else:
+                roles = request.user.roles
+                menu_ids = set()
+                if roles:
+                    for role in roles:
+                        for menu in role.menus:
+                            menu_ids.add(menu.id)
+                    menu_data = await menu_dao.get_sidebar(db, list(menu_ids))
+            menu_tree = get_vben5_tree_data(menu_data)
             return menu_tree
 
     @staticmethod

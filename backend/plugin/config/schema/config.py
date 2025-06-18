@@ -7,14 +7,6 @@ from pydantic import ConfigDict, Field
 from backend.common.schema import SchemaBase
 
 
-class SaveBuiltInConfigParam(SchemaBase):
-    """保存内置参数配置参数"""
-
-    name: str = Field(description='参数配置名称')
-    key: str = Field(description='参数配置键名')
-    value: str = Field(description='参数配置值')
-
-
 class ConfigSchemaBase(SchemaBase):
     """参数配置基础模型"""
 

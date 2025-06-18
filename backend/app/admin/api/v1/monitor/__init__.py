@@ -10,4 +10,4 @@ router = APIRouter(prefix='/monitors')
 
 router.include_router(redis_router, prefix='/redis', tags=['redis监控'])
 router.include_router(server_router, prefix='/server', tags=['服务器监控'])
-router.include_router(token_router, prefix='/online', tags=['在线用户'])
+router.include_router(token_router, prefix='/sessions', tags=['会话监控'])
