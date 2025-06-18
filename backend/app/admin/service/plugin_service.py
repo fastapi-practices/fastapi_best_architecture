@@ -113,8 +113,7 @@ class PluginService:
             await install_requirements_async(repo_name)
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
-    @staticmethod
-    async def install(*, type: PluginType, file: UploadFile | None = None, repo_url: str | None = None):
+    async def install(self, *, type: PluginType, file: UploadFile | None = None, repo_url: str | None = None):
         """
         安装插件
 
@@ -126,11 +125,11 @@ class PluginService:
         if type == PluginType.zip:
             if not file:
                 raise errors.ForbiddenError(msg='ZIP 压缩包不能为空')
-            await PluginService.install_zip(file=file)
+            await self.install_zip(file=file)
         elif type == PluginType.git:
             if not repo_url:
                 raise errors.ForbiddenError(msg='Git 仓库地址不能为空')
-            await PluginService.install_git(repo_url=repo_url)
+            await self.install_git(repo_url=repo_url)
 
     @staticmethod
     async def uninstall(*, plugin: str):
