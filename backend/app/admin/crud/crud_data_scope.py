@@ -107,7 +107,7 @@ class CRUDDataScope(CRUDPlus[DataScope]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除数据范围
+        批量删除数据范围
 
         :param db: 数据库会话
         :param pks: 范围 ID 列表

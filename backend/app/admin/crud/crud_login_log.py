@@ -43,7 +43,7 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除登录日志
+        批量删除登录日志
 
         :param db: 数据库会话
         :param pks: 登录日志 ID 列表

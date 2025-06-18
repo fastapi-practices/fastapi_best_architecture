@@ -74,7 +74,7 @@ class CRUDDictType(CRUDPlus[DictType]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除字典类型
+        批量删除字典类型
 
         :param db: 数据库会话
         :param pks: 字典类型 ID 列表

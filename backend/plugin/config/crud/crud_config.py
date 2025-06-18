@@ -73,7 +73,7 @@ class CRUDConfig(CRUDPlus[Config]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除参数配置
+        批量删除参数配置
 
         :param db: 数据库会话
         :param pks: 参数配置 ID 列表

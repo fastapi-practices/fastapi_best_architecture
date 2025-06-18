@@ -79,7 +79,7 @@ class CRUDDataRule(CRUDPlus[DataRule]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除规则
+        批量删除规则
 
         :param db: 数据库会话
         :param pks: 规则 ID 列表

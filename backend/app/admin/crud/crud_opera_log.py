@@ -43,7 +43,7 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除操作日志
+        批量删除操作日志
 
         :param db: 数据库会话
         :param pks: 操作日志 ID 列表

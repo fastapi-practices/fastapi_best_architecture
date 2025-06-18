@@ -59,7 +59,7 @@ class CRUDNotice(CRUDPlus[Notice]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除通知公告
+        批量删除通知公告
 
         :param db: 数据库会话
         :param pks: 通知公告 ID 列表

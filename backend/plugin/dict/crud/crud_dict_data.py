@@ -74,7 +74,7 @@ class CRUDDictData(CRUDPlus[DictData]):
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除字典数据
+        批量删除字典数据
 
         :param db: 数据库会话
         :param pks: 字典数据 ID 列表
