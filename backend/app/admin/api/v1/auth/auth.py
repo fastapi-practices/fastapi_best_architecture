@@ -35,7 +35,7 @@ async def login(
     return response_base.success(data=data)
 
 
-@router.get('/codes', summary='获取所有授权码', dependencies=[DependsJwtAuth])
+@router.get('/codes', summary='获取所有授权码', description='适配 vben admin v5', dependencies=[DependsJwtAuth])
 async def get_codes(request: Request) -> ResponseSchemaModel[list[str]]:
     codes = await auth_service.get_codes(request=request)
     return response_base.success(data=codes)
