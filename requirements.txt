@@ -290,7 +290,7 @@ ua-parser==1.0.1
     # via user-agents
 ua-parser-builtins==0.18.0.post1
     # via ua-parser
-urllib3==2.4.0
+urllib3==2.5.0
     # via dulwich
 user-agents==2.2.0
     # via fastapi-best-architecture
