@@ -6,7 +6,12 @@ from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_data_rule import data_rule_dao
 from backend.app.admin.model import DataRule
-from backend.app.admin.schema.data_rule import CreateDataRuleParam, GetDataRuleColumnDetail, UpdateDataRuleParam
+from backend.app.admin.schema.data_rule import (
+    CreateDataRuleParam,
+    DeleteDataRuleParam,
+    GetDataRuleColumnDetail,
+    UpdateDataRuleParam,
+)
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -105,15 +110,15 @@ class DataRuleService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteDataRuleParam) -> int:
         """
-        删除数据规则
+        批量删除数据规则
 
-        :param pk: 规则 ID 列表
+        :param obj: 规则 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await data_rule_dao.delete(db, pk)
+            count = await data_rule_dao.delete(db, obj.pks)
             return count
 
 

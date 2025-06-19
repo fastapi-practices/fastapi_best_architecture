@@ -20,15 +20,15 @@ async def get_dept(pk: Annotated[int, Path(description='部门 ID')]) -> Respons
     return response_base.success(data=data)
 
 
-@router.get('', summary='获取所有部门展示树', dependencies=[DependsJwtAuth])
-async def get_all_depts(
+@router.get('', summary='获取部门树', dependencies=[DependsJwtAuth])
+async def get_dept_tree(
     request: Request,
     name: Annotated[str | None, Query(description='部门名称')] = None,
     leader: Annotated[str | None, Query(description='部门负责人')] = None,
     phone: Annotated[str | None, Query(description='联系电话')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
-    dept = await dept_service.get_dept_tree(request=request, name=name, leader=leader, phone=phone, status=status)
+    dept = await dept_service.get_tree(request=request, name=name, leader=leader, phone=phone, status=status)
     return response_base.success(data=dept)
 
 

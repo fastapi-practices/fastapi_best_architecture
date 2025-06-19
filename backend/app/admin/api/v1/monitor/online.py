@@ -19,7 +19,7 @@ router = APIRouter()
 
 
 @router.get('', summary='获取在线用户', dependencies=[DependsJwtAuth])
-async def get_online(
+async def get_sessions(
     username: Annotated[str | None, Query(description='用户名')] = None,
 ) -> ResponseSchemaModel[list[GetTokenDetail]]:
     token_keys = await redis_client.keys(f'{settings.TOKEN_REDIS_PREFIX}:*')
@@ -75,13 +75,13 @@ async def get_online(
 
 @router.delete(
     '/{pk}',
-    summary='踢下线',
+    summary='强制下线',
     dependencies=[
-        Depends(RequestPermission('sys:token:kick')),
+        Depends(RequestPermission('sys:session:delete')),
         DependsRBAC,
     ],
 )
-async def kick_out(
+async def delete_session(
     request: Request,
     pk: Annotated[int, Path(description='用户 ID')],
     session_uuid: Annotated[str, Query(description='会话 UUID')],

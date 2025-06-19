@@ -12,6 +12,7 @@ from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
 from backend.plugin.dict.schema.dict_data import (
     CreateDictDataParam,
+    DeleteDictDataParam,
     GetDictDataDetail,
     GetDictDataWithRelation,
     UpdateDictDataParam,
@@ -21,7 +22,7 @@ from backend.plugin.dict.service.dict_data_service import dict_data_service
 router = APIRouter()
 
 
-@router.get('/{pk}', summary='获取字典详情', dependencies=[DependsJwtAuth])
+@router.get('/{pk}', summary='获取字典数据详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(
     pk: Annotated[int, Path(description='字典数据 ID')],
 ) -> ResponseSchemaModel[GetDictDataWithRelation]:
@@ -31,13 +32,13 @@ async def get_dict_data(
 
 @router.get(
     '',
-    summary='分页获取所有字典',
+    summary='分页获取所有字典数据',
     dependencies=[
         DependsJwtAuth,
         DependsPagination,
     ],
 )
-async def get_pagination_dict_datas(
+async def get_dict_datas_paged(
     db: CurrentSession,
     label: Annotated[str | None, Query(description='字典数据标签')] = None,
     value: Annotated[str | None, Query(description='字典数据键值')] = None,
@@ -50,9 +51,9 @@ async def get_pagination_dict_datas(
 
 @router.post(
     '',
-    summary='创建字典',
+    summary='创建字典数据',
     dependencies=[
-        Depends(RequestPermission('sys:dict:data:add')),
+        Depends(RequestPermission('dict:data:add')),
         DependsRBAC,
     ],
 )
@@ -63,9 +64,9 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
 
 @router.put(
     '/{pk}',
-    summary='更新字典',
+    summary='更新字典数据',
     dependencies=[
-        Depends(RequestPermission('sys:dict:data:edit')),
+        Depends(RequestPermission('dict:data:edit')),
         DependsRBAC,
     ],
 )
@@ -80,14 +81,14 @@ async def update_dict_data(
 
 @router.delete(
     '',
-    summary='批量删除字典',
+    summary='批量删除字典数据',
     dependencies=[
-        Depends(RequestPermission('sys:dict:data:del')),
+        Depends(RequestPermission('dict:data:del')),
         DependsRBAC,
     ],
 )
-async def delete_dict_data(pk: Annotated[list[int], Query(description='字典数据 ID 列表')]) -> ResponseModel:
-    count = await dict_data_service.delete(pk=pk)
+async def delete_dict_datas(obj: DeleteDictDataParam) -> ResponseModel:
+    count = await dict_data_service.delete(obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

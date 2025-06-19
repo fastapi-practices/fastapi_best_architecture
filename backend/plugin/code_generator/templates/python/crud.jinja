@@ -55,15 +55,15 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
         """
         return await self.update_model(db, pk, obj)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除{{ doc_comment }}
+        批量删除{{ doc_comment }}
 
         :param db: 数据库会话
-        :param pk: {{ doc_comment }} ID
+        :param pks: {{ doc_comment }} ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 {{ instance_name }}_dao: CRUD{{ class_name }} = CRUD{{ class_name }}({{ class_name }})

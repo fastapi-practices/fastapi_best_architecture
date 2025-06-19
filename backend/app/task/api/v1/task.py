@@ -14,12 +14,6 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('', summary='获取可执行任务', dependencies=[DependsJwtAuth])
-async def get_all_tasks() -> ResponseSchemaModel[list[str]]:
-    tasks = await task_service.get_list()
-    return response_base.success(data=tasks)
-
-
 @router.get(
     '/{tid}',
     summary='获取任务详情',
@@ -27,12 +21,18 @@ async def get_all_tasks() -> ResponseSchemaModel[list[str]]:
     description='此接口被视为作废，建议使用 flower 查看任务详情',
     dependencies=[DependsJwtAuth],
 )
-async def get_task_detail(tid: Annotated[str, Path(description='任务 UUID')]) -> ResponseSchemaModel[TaskResult]:
-    status = task_service.get_detail(tid=tid)
+async def get_task(tid: Annotated[str, Path(description='任务 UUID')]) -> ResponseSchemaModel[TaskResult]:
+    status = task_service.get(tid=tid)
     return response_base.success(data=status)
 
 
-@router.post(
+@router.get('', summary='获取所有任务', dependencies=[DependsJwtAuth])
+async def get_all_tasks() -> ResponseSchemaModel[list[str]]:
+    tasks = await task_service.get_all()
+    return response_base.success(data=tasks)
+
+
+@router.delete(
     '/{tid}',
     summary='撤销任务',
     dependencies=[
@@ -46,8 +46,8 @@ async def revoke_task(tid: Annotated[str, Path(description='任务 UUID')]) -> R
 
 
 @router.post(
-    '',
-    summary='执行任务',
+    '/runs',
+    summary='运行任务',
     dependencies=[
         Depends(RequestPermission('sys:task:run')),
         DependsRBAC,

@@ -28,6 +28,12 @@ class UpdateDictDataParam(DictDataSchemaBase):
     """更新字典数据参数"""
 
 
+class DeleteDictDataParam(SchemaBase):
+    """删除字典数据参数"""
+
+    pks: list[int] = Field(description='字典数据 ID 列表')
+
+
 class GetDictDataDetail(DictDataSchemaBase):
     """字典数据详情"""
 

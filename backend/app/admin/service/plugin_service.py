@@ -11,7 +11,7 @@ from typing import Any
 from dulwich import porcelain
 from fastapi import UploadFile
 
-from backend.common.enums import StatusType
+from backend.common.enums import PluginType, StatusType
 from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
@@ -41,7 +41,7 @@ class PluginService:
 
     @staticmethod
     async def changed() -> str | None:
-        """插件状态是否变更"""
+        """检查插件是否发生变更"""
         return await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     @staticmethod
@@ -112,6 +112,24 @@ class PluginService:
         else:
             await install_requirements_async(repo_name)
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+
+    async def install(self, *, type: PluginType, file: UploadFile | None = None, repo_url: str | None = None):
+        """
+        安装插件
+
+        :param type: 插件类型
+        :param file: 插件 zip 压缩包
+        :param repo_url: git 仓库地址
+        :return:
+        """
+        if type == PluginType.zip:
+            if not file:
+                raise errors.ForbiddenError(msg='ZIP 压缩包不能为空')
+            await self.install_zip(file=file)
+        elif type == PluginType.git:
+            if not repo_url:
+                raise errors.ForbiddenError(msg='Git 仓库地址不能为空')
+            await self.install_git(repo_url=repo_url)
 
     @staticmethod
     async def uninstall(*, plugin: str):

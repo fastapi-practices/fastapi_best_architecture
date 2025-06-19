@@ -5,7 +5,7 @@ from sqlalchemy import Select
 from backend.common.exception import errors
 from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
-from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
+from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
 
 
 class DictTypeService:
@@ -57,15 +57,15 @@ class DictTypeService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteDictTypeParam) -> int:
         """
-        删除字典类型
+        批量删除字典类型
 
-        :param pk: 字典类型 ID 列表
+        :param obj: 字典类型 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await dict_type_dao.delete(db, pk)
+            count = await dict_type_dao.delete(db, obj.pks)
             return count
 
 

@@ -30,6 +30,12 @@ class UpdateDataScopeRuleParam(SchemaBase):
     rules: list[int] = Field(description='数据规则 ID 列表')
 
 
+class DeleteDataScopeParam(SchemaBase):
+    """删除数据范围参数"""
+
+    pks: list[int] = Field(description='数据范围 ID 列表')
+
+
 class GetDataScopeDetail(DataScopeBase):
     """数据范围详情"""
 

@@ -41,6 +41,12 @@ class UpdateOperaLogParam(OperaLogSchemaBase):
     """更新操作日志参数"""
 
 
+class DeleteOperaLogParam(SchemaBase):
+    """删除操作日志参数"""
+
+    pks: list[int] = Field(description='操作日志 ID 列表')
+
+
 class GetOperaLogDetail(OperaLogSchemaBase):
     """操作日志详情"""
 

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.admin.schema.role import (
     CreateRoleParam,
+    DeleteRoleParam,
     GetRoleDetail,
     GetRoleWithRelationDetail,
     UpdateRoleMenuParam,
@@ -29,8 +30,8 @@ async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
     return response_base.success(data=data)
 
 
-@router.get('/{pk}/menus', summary='获取角色所有菜单', dependencies=[DependsJwtAuth])
-async def get_role_all_menus(
+@router.get('/{pk}/menus', summary='获取角色菜单树', dependencies=[DependsJwtAuth])
+async def get_role_menu_tree(
     pk: Annotated[int, Path(description='角色 ID')],
 ) -> ResponseSchemaModel[list[dict[str, Any] | None]]:
     menu = await role_service.get_menu_tree(pk=pk)
@@ -38,15 +39,13 @@ async def get_role_all_menus(
 
 
 @router.get('/{pk}/scopes', summary='获取角色所有数据范围', dependencies=[DependsJwtAuth])
-async def get_role_all_scopes(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
+async def get_role_scopes(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[list[int]]:
     rule = await role_service.get_scopes(pk=pk)
     return response_base.success(data=rule)
 
 
 @router.get('/{pk}', summary='获取角色详情', dependencies=[DependsJwtAuth])
-async def get_role(
-    pk: Annotated[int, Path(description='角色 ID')],
-) -> ResponseSchemaModel[GetRoleWithRelationDetail]:
+async def get_role(pk: Annotated[int, Path(description='角色 ID')]) -> ResponseSchemaModel[GetRoleWithRelationDetail]:
     data = await role_service.get(pk=pk)
     return response_base.success(data=data)
 
@@ -59,7 +58,7 @@ async def get_role(
         DependsPagination,
     ],
 )
-async def get_pagination_roles(
+async def get_roles_paged(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='角色名称')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
@@ -139,8 +138,8 @@ async def update_role_scopes(
         DependsRBAC,
     ],
 )
-async def delete_role(pk: Annotated[list[int], Query(description='角色 ID 列表')]) -> ResponseModel:
-    count = await role_service.delete(pk=pk)
+async def delete_roles(obj: DeleteRoleParam) -> ResponseModel:
+    count = await role_service.delete(obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

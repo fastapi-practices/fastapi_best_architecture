@@ -77,15 +77,15 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         """
         return await self.update_model(db, pk, obj)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除规则
+        批量删除规则
 
         :param db: 数据库会话
-        :param pk: 规则 ID 列表
+        :param pks: 规则 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 data_rule_dao: CRUDDataRule = CRUDDataRule(DataRule)

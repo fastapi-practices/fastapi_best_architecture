@@ -30,7 +30,7 @@ async def get_model(pk: Annotated[int, Path(description='模型 ID')]) -> Respon
     '',
     summary='创建代码生成模型',
     dependencies=[
-        Depends(RequestPermission('gen:code:model:add')),
+        Depends(RequestPermission('codegen:model:add')),
         DependsRBAC,
     ],
 )
@@ -43,7 +43,7 @@ async def create_model(obj: CreateGenModelParam) -> ResponseModel:
     '/{pk}',
     summary='更新代码生成模型',
     dependencies=[
-        Depends(RequestPermission('gen:code:model:edit')),
+        Depends(RequestPermission('codegen:model:edit')),
         DependsRBAC,
     ],
 )
@@ -58,7 +58,7 @@ async def update_model(pk: Annotated[int, Path(description='模型 ID')], obj: U
     '/{pk}',
     summary='删除代码生成模型',
     dependencies=[
-        Depends(RequestPermission('gen:code:model:del')),
+        Depends(RequestPermission('codegen:model:del')),
         DependsRBAC,
     ],
 )

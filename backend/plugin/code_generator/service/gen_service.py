@@ -99,7 +99,7 @@ class GenService:
         :param business: 业务对象
         :return:
         """
-        gen_models = await gen_model_service.get_by_business(business_id=business.id)
+        gen_models = await gen_model_service.get_models(business_id=business.id)
         if not gen_models:
             raise errors.NotFoundError(msg='代码生成模型表为空')
 
