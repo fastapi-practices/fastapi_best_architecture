@@ -10,6 +10,7 @@ from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
 from backend.app.admin.schema.role import (
     CreateRoleParam,
+    DeleteRoleParam,
     UpdateRoleMenuParam,
     UpdateRoleParam,
     UpdateRoleScopeParam,
@@ -166,17 +167,17 @@ class RoleService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteRoleParam) -> int:
         """
-        删除角色
+        批量删除角色
 
-        :param pk: 角色 ID 列表
+        :param obj: 角色 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await role_dao.delete(db, pk)
-            for _pk in pk:
-                role = await role_dao.get(db, _pk)
+            count = await role_dao.delete(db, obj.pks)
+            for pk in obj.pks:
+                role = await role_dao.get(db, pk)
                 if role:
                     for user in await role.awaitable_attrs.users:
                         await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

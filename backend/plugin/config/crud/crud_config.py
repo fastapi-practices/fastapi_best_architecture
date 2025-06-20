@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Sequence
 
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,27 +22,6 @@ class CRUDConfig(CRUDPlus[Config]):
         :return:
         """
         return await self.select_model_by_column(db, id=pk, type__not_in=settings.CONFIG_BUILT_IN_TYPES)
-
-    async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config]:
-        """
-        通过类型获取参数配置
-
-        :param db: 数据库会话
-        :param type: 参数配置类型
-        :return:
-        """
-        return await self.select_models(db, type=type)
-
-    async def get_by_key_and_type(self, db: AsyncSession, key: str, type: str) -> Config | None:
-        """
-        通过键名和类型获取参数配置
-
-        :param db: 数据库会话
-        :param key: 参数配置键名
-        :param type: 参数配置类型
-        :return:
-        """
-        return await self.select_model_by_column(db, key=key, type=type)
 
     async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
@@ -93,16 +71,16 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.update_model(db, pk, obj)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除参数配置
+        批量删除参数配置
 
         :param db: 数据库会话
-        :param pk: 参数配置 ID 列表
+        :param pks: 参数配置 ID 列表
         :return:
         """
         return await self.delete_model_by_column(
-            db, allow_multiple=True, id__in=pk, type__not_in=settings.CONFIG_BUILT_IN_TYPES
+            db, allow_multiple=True, id__in=pks, type__not_in=settings.CONFIG_BUILT_IN_TYPES
         )
 
 

@@ -27,6 +27,12 @@ class UpdateRoleParam(RoleSchemaBase):
     """更新角色参数"""
 
 
+class DeleteRoleParam(SchemaBase):
+    """删除角色参数"""
+
+    pks: list[int] = Field(description='角色 ID 列表')
+
+
 class UpdateRoleMenuParam(SchemaBase):
     """更新角色菜单参数"""
 

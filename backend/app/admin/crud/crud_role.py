@@ -134,15 +134,15 @@ class CRUDRole(CRUDPlus[Role]):
         current_role.scopes = scopes.scalars().all()
         return len(current_role.scopes)
 
-    async def delete(self, db: AsyncSession, role_id: list[int]) -> int:
+    async def delete(self, db: AsyncSession, role_ids: list[int]) -> int:
         """
-        删除角色
+        批量删除角色
 
         :param db: 数据库会话
-        :param role_id: 角色 ID 列表
+        :param role_ids: 角色 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=role_id)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=role_ids)
 
 
 role_dao: CRUDRole = CRUDRole(Role)

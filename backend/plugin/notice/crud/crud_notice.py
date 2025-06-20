@@ -57,15 +57,15 @@ class CRUDNotice(CRUDPlus[Notice]):
         """
         return await self.update_model(db, pk, obj)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除通知公告
+        批量删除通知公告
 
         :param db: 数据库会话
-        :param pk: 通知公告 ID 列表
+        :param pks: 通知公告 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 notice_dao: CRUDNotice = CRUDNotice(Notice)

@@ -20,12 +20,6 @@ from backend.plugin.code_generator.service.column_service import gen_model_servi
 router = APIRouter()
 
 
-@router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
-async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
-    data = await gen_business_service.get_all()
-    return response_base.success(data=data)
-
-
 @router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
 async def get_business(
     pk: Annotated[int, Path(description='业务 ID')],
@@ -34,11 +28,17 @@ async def get_business(
     return response_base.success(data=data)
 
 
+@router.get('', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
+async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
+    data = await gen_business_service.get_all()
+    return response_base.success(data=data)
+
+
 @router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
 async def get_business_all_models(
     pk: Annotated[int, Path(description='业务 ID')],
 ) -> ResponseSchemaModel[list[GetGenModelDetail]]:
-    data = await gen_model_service.get_by_business(business_id=pk)
+    data = await gen_model_service.get_models(business_id=pk)
     return response_base.success(data=data)
 
 
@@ -47,7 +47,7 @@ async def get_business_all_models(
     summary='创建代码生成业务',
     deprecated=True,
     dependencies=[
-        Depends(RequestPermission('gen:code:business:add')),
+        Depends(RequestPermission('codegen:business:add')),
         DependsRBAC,
     ],
 )
@@ -60,7 +60,7 @@ async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
     '/{pk}',
     summary='更新代码生成业务',
     dependencies=[
-        Depends(RequestPermission('gen:code:business:edit')),
+        Depends(RequestPermission('codegen:business:edit')),
         DependsRBAC,
     ],
 )
@@ -77,7 +77,7 @@ async def update_business(
     '/{pk}',
     summary='删除代码生成业务',
     dependencies=[
-        Depends(RequestPermission('gen:code:business:del')),
+        Depends(RequestPermission('codegen:business:del')),
         DependsRBAC,
     ],
 )

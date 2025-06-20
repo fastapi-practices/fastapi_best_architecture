@@ -64,23 +64,20 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
             return or_(1 == 1)
 
     # 获取数据范围
-    unique_data_scopes = {}
+    data_scope_ids = set()
     for role in request.user.roles:
         for scope in role.scopes:
             if scope.status:
-                unique_data_scopes[scope.id] = scope
-
-    # 转换为列表
-    data_scopes = list(unique_data_scopes.values())
+                data_scope_ids.add(scope.id)
 
     # 无规则用户不做过滤
-    if not data_scopes:
+    if not list(data_scope_ids):
         return or_(1 == 1)
 
     # 获取数据范围规则
     unique_data_rules = {}
-    for data_scope in data_scopes:
-        data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope.id)
+    for data_scope_id in list(data_scope_ids):
+        data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope_id)
         for rule in data_scope_with_relation.rules:
             unique_data_rules[rule.id] = rule
 

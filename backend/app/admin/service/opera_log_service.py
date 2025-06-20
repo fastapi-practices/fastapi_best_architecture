@@ -3,7 +3,7 @@
 from sqlalchemy import Select
 
 from backend.app.admin.crud.crud_opera_log import opera_log_dao
-from backend.app.admin.schema.opera_log import CreateOperaLogParam
+from backend.app.admin.schema.opera_log import CreateOperaLogParam, DeleteOperaLogParam
 from backend.database.db import async_db_session
 
 
@@ -34,15 +34,15 @@ class OperaLogService:
             await opera_log_dao.create(db, obj)
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteOperaLogParam) -> int:
         """
-        删除操作日志
+        批量删除操作日志
 
-        :param pk: 日志 ID 列表
+        :param obj: 日志 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await opera_log_dao.delete(db, pk)
+            count = await opera_log_dao.delete(db, obj.pks)
             return count
 
     @staticmethod

@@ -27,6 +27,12 @@ class UpdateDataRuleParam(DataRuleSchemaBase):
     """更新数据规则参数"""
 
 
+class DeleteDataRuleParam(SchemaBase):
+    """删除数据规则参数"""
+
+    pks: list[int] = Field(description='规则 ID 列表')
+
+
 class GetDataRuleDetail(DataRuleSchemaBase):
     """数据规则详情"""
 

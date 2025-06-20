@@ -8,7 +8,7 @@ from backend.common.exception import errors
 from backend.database.db import async_db_session
 from backend.plugin.notice.crud.crud_notice import notice_dao
 from backend.plugin.notice.model import Notice
-from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam
+from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
 
 
 class NoticeService:
@@ -68,15 +68,15 @@ class NoticeService:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: DeleteNoticeParam) -> int:
         """
-        删除通知公告
+        批量删除通知公告
 
-        :param pk: 通知公告 ID 列表
+        :param obj: 通知公告 ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await notice_dao.delete(db, pk)
+            count = await notice_dao.delete(db, obj.pks)
             return count
 
 

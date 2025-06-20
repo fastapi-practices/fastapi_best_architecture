@@ -36,7 +36,7 @@ class GenModelService:
         return types
 
     @staticmethod
-    async def get_by_business(*, business_id: int) -> Sequence[GenColumn]:
+    async def get_models(*, business_id: int) -> Sequence[GenColumn]:
         """
         获取指定业务的所有模型
 

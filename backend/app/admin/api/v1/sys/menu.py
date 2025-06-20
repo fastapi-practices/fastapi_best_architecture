@@ -14,7 +14,7 @@ from backend.common.security.rbac import DependsRBAC
 router = APIRouter()
 
 
-@router.get('/sidebar', summary='获取用户菜单侧边栏', description='适配 vben5', dependencies=[DependsJwtAuth])
+@router.get('/sidebar', summary='获取用户菜单侧边栏', description='已适配 vben admin v5', dependencies=[DependsJwtAuth])
 async def get_user_sidebar(request: Request) -> ResponseSchemaModel[list[dict[str, Any] | None]]:
     menu = await menu_service.get_sidebar(request=request)
     return response_base.success(data=menu)
@@ -26,12 +26,12 @@ async def get_menu(pk: Annotated[int, Path(description='菜单 ID')]) -> Respons
     return response_base.success(data=data)
 
 
-@router.get('', summary='获取所有菜单展示树', dependencies=[DependsJwtAuth])
-async def get_all_menus(
+@router.get('', summary='获取菜单树', dependencies=[DependsJwtAuth])
+async def get_menu_tree(
     title: Annotated[str | None, Query(description='菜单标题')] = None,
     status: Annotated[int | None, Query(description='状体')] = None,
 ) -> ResponseSchemaModel[list[dict[str, Any]]]:
-    menu = await menu_service.get_menu_tree(title=title, status=status)
+    menu = await menu_service.get_tree(title=title, status=status)
     return response_base.success(data=menu)
 
 

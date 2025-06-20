@@ -72,15 +72,15 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.update_model(db, pk, obj)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除字典类型
+        批量删除字典类型
 
         :param db: 数据库会话
-        :param pk: 字典类型 ID 列表
+        :param pks: 字典类型 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 dict_type_dao: CRUDDictType = CRUDDictType(DictType)

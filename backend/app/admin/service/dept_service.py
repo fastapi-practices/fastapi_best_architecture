@@ -32,7 +32,7 @@ class DeptService:
             return dept
 
     @staticmethod
-    async def get_dept_tree(
+    async def get_tree(
         *, request: Request, name: str | None, leader: str | None, phone: str | None, status: int | None
     ) -> list[dict[str, Any]]:
         """

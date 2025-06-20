@@ -27,6 +27,12 @@ class UpdateNoticeParam(NoticeSchemaBase):
     """更新通知公告参数"""
 
 
+class DeleteNoticeParam(SchemaBase):
+    """删除通知公告参数"""
+
+    pks: list[int] = Field(description='通知公告 ID 列表')
+
+
 class GetNoticeDetail(NoticeSchemaBase):
     """通知公告详情"""
 

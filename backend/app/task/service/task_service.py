@@ -11,16 +11,7 @@ from backend.common.exception import errors
 
 class TaskService:
     @staticmethod
-    async def get_list() -> list[str]:
-        """获取所有已注册的 Celery 任务列表"""
-        registered_tasks = await run_in_threadpool(celery_app.control.inspect().registered)
-        if not registered_tasks:
-            raise errors.ForbiddenError(msg='Celery 服务未启动')
-        tasks = list(registered_tasks.values())[0]
-        return tasks
-
-    @staticmethod
-    def get_detail(*, tid: str) -> TaskResult:
+    def get(*, tid: str) -> TaskResult:
         """
         获取指定任务的详细信息
 
@@ -42,6 +33,15 @@ class TaskService:
             retries=result.retries,
             queue=result.queue,
         )
+
+    @staticmethod
+    async def get_all() -> list[str]:
+        """获取所有已注册的 Celery 任务列表"""
+        registered_tasks = await run_in_threadpool(celery_app.control.inspect().registered)
+        if not registered_tasks:
+            raise errors.ForbiddenError(msg='Celery 服务未启动')
+        tasks = list(registered_tasks.values())[0]
+        return tasks
 
     @staticmethod
     def revoke(*, tid: str) -> None:

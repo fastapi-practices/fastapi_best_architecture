@@ -105,15 +105,15 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         current_data_scope.rules = rules.scalars().all()
         return len(current_data_scope.rules)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除数据范围
+        批量删除数据范围
 
         :param db: 数据库会话
-        :param pk: 范围 ID 列表
+        :param pks: 范围 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 data_scope_dao: CRUDDataScope = CRUDDataScope(DataScope)

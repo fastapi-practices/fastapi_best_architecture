@@ -5,6 +5,7 @@ from fastapi.security import HTTPBasicCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTask, BackgroundTasks
 
+from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
@@ -162,9 +163,34 @@ class AuthService:
                 return data
 
     @staticmethod
-    async def new_token(*, request: Request) -> GetNewToken:
+    async def get_codes(*, request: Request) -> list[str]:
         """
-        获取新的访问令牌
+        获取用户权限码
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
+        codes = set()
+        if request.user.is_superuser:
+            async with async_db_session.begin() as db:
+                menus = await menu_dao.get_all(db, None, None)
+                for menu in menus:
+                    if menu.perms:
+                        codes.add(*menu.perms.split(','))
+        else:
+            roles = request.user.roles
+            if roles:
+                for role in roles:
+                    for menu in role.menus:
+                        if menu.perms:
+                            codes.add(*menu.perms.split(','))
+
+        return list(codes)
+
+    @staticmethod
+    async def refresh_token(*, request: Request) -> GetNewToken:
+        """
+        刷新令牌
 
         :param request: FastAPI 请求对象
         :return:

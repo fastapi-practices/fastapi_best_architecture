@@ -4,7 +4,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Get{{ schema_name }}Detail, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ table_name }} import (
+    Create{{ schema_name }}Param,
+    Delete{{ schema_name }}Param,
+    Get{{ schema_name }}Detail,
+    Update{{ schema_name }}Param,
+)
 from backend.app.{{ app_name }}.service.{{ table_name }}_service import {{ table_name }}_service
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -30,7 +35,7 @@ async def get_{{ table_name }}(pk: Annotated[int, Path(description='{{ doc_comme
         DependsPagination,
     ],
 )
-async def get_pagination_{{ table_name }}s(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
+async def get_{{ table_name }}s_paged(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
     {{ table_name }}_select = await {{ table_name }}_service.get_select()
     page_data = await paging_data(db, {{ table_name }}_select)
     return response_base.success(data=page_data)
@@ -72,8 +77,8 @@ async def update_{{ table_name }}(pk: Annotated[int, Path(description='{{ doc_co
         DependsRBAC,
     ],
 )
-async def delete_{{ table_name }}(pk: Annotated[list[int], Query(description='{{ doc_comment }} ID 列表')]) -> ResponseModel:
-    count = await {{ table_name }}_service.delete(pk=pk)
+async def delete_{{ table_name }}s(obj: Delete{{ schema_name }}Param) -> ResponseModel:
+    count = await {{ table_name }}_service.delete(obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

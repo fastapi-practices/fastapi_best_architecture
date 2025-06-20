@@ -41,15 +41,15 @@ class CRUDLoginLog(CRUDPlus[LoginLog]):
         """
         await self.create_model(db, obj, commit=True)
 
-    async def delete(self, db: AsyncSession, pk: list[int]) -> int:
+    async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
-        删除登录日志
+        批量删除登录日志
 
         :param db: 数据库会话
-        :param pk: 登录日志 ID 列表
+        :param pks: 登录日志 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pk)
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
     async def delete_all(self, db: AsyncSession) -> int:
         """

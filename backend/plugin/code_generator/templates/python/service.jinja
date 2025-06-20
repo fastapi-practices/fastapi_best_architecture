@@ -6,7 +6,7 @@ from sqlalchemy import Select
 
 from backend.app.{{ app_name }}.crud.crud_{{ table_name }} import {{ table_name }}_dao
 from backend.app.{{ app_name }}.model import {{ class_name }}
-from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Delete{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
 from backend.database.db import async_db_session
 
@@ -63,15 +63,15 @@ class {{ class_name }}Service:
             return count
 
     @staticmethod
-    async def delete(*, pk: list[int]) -> int:
+    async def delete(*, obj: Delete{{ schema_name }}Param) -> int:
         """
         删除{{ doc_comment }}
 
-        :param pk: {{ doc_comment }} ID 列表
+        :param obj: {{ doc_comment }} ID 列表
         :return:
         """
         async with async_db_session.begin() as db:
-            count = await {{ table_name }}_dao.delete(db, pk)
+            count = await {{ table_name }}_dao.delete(db, obj.pks)
             return count
 
 
