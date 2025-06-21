@@ -67,13 +67,13 @@ class AuthService:
         async with async_db_session.begin() as db:
             user = await self.user_verify(db, obj.username, obj.password)
             await user_dao.update_login_time(db, obj.username)
-            a_token = await create_access_token(
-                str(user.id),
+            access_token = await create_access_token(
+                user.id,
                 user.is_multi_login,
                 # extra info
                 swagger=True,
             )
-            return a_token.access_token, user
+            return access_token.access_token, user
 
     async def login(
         self, *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
@@ -99,24 +99,24 @@ class AuthService:
                 await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 await user_dao.update_login_time(db, obj.username)
                 await db.refresh(user)
-                a_token = await create_access_token(
-                    str(user.id),
+                access_token = await create_access_token(
+                    user.id,
                     user.is_multi_login,
                     # extra info
                     username=user.username,
                     nickname=user.nickname,
-                    last_login_time=timezone.t_str(user.last_login_time),
+                    last_login_time=timezone.to_str(user.last_login_time),
                     ip=request.state.ip,
                     os=request.state.os,
                     browser=request.state.browser,
                     device=request.state.device,
                 )
-                r_token = await create_refresh_token(str(user.id), user.is_multi_login)
+                refresh_token = await create_refresh_token(access_token.session_uuid, user.id, user.is_multi_login)
                 response.set_cookie(
                     key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                    value=r_token.refresh_token,
+                    value=refresh_token.refresh_token,
                     max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    expires=timezone.f_utc(r_token.refresh_token_expire_time),
+                    expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
                     httponly=True,
                 )
             except errors.NotFoundError as e:
@@ -155,9 +155,9 @@ class AuthService:
                     ),
                 )
                 data = GetLoginToken(
-                    access_token=a_token.access_token,
-                    access_token_expire_time=a_token.access_token_expire_time,
-                    session_uuid=a_token.session_uuid,
+                    access_token=access_token.access_token,
+                    access_token_expire_time=access_token.access_token_expire_time,
+                    session_uuid=access_token.session_uuid,
                     user=user,  # type: ignore
                 )
                 return data
@@ -198,24 +198,22 @@ class AuthService:
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
             raise errors.TokenError(msg='Refresh Token 已过期，请重新登录')
-        try:
-            user_id = jwt_decode(refresh_token).id
-        except Exception:
-            raise errors.TokenError(msg='Refresh Token 无效')
+        token_payload = jwt_decode(refresh_token)
         async with async_db_session() as db:
-            user = await user_dao.get(db, user_id)
+            user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg='用户名或密码有误')
+                raise errors.NotFoundError(msg='用户不存在')
             elif not user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             new_token = await create_new_token(
-                user_id=str(user.id),
-                refresh_token=refresh_token,
-                multi_login=user.is_multi_login,
+                refresh_token,
+                token_payload.session_uuid,
+                user.id,
+                user.is_multi_login,
                 # extra info
                 username=user.username,
                 nickname=user.nickname,
-                last_login_time=timezone.t_str(user.last_login_time),
+                last_login_time=timezone.to_str(user.last_login_time),
                 ip=request.state.ip,
                 os=request.state.os,
                 browser=request.state.browser,
@@ -241,6 +239,7 @@ class AuthService:
             token = get_token(request)
             token_payload = jwt_decode(token)
             user_id = token_payload.id
+            session_uuid = token_payload.session_uuid
             refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         except errors.TokenError:
             return
@@ -249,13 +248,15 @@ class AuthService:
 
         # 清理缓存
         if request.user.is_multi_login:
-            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
+            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{session_uuid}')
+            await redis_client.delete(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:{session_uuid}')
             if refresh_token:
                 await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
         else:
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:',
+                f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:',
             ]
             for prefix in key_prefix:
                 await redis_client.delete_prefix(prefix)
