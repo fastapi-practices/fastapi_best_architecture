@@ -44,9 +44,10 @@ async def get_sessions(
     for key in token_keys:
         token = await redis_client.get(key)
         token_payload = jwt_decode(token)
+        user_id = token_payload.id
         session_uuid = token_payload.session_uuid
         token_detail = GetTokenDetail(
-            id=token_payload.id,
+            id=user_id,
             session_uuid=session_uuid,
             username='未知',
             nickname='未知',
@@ -58,7 +59,7 @@ async def get_sessions(
             last_login_time='未知',
             expire_time=token_payload.expire_time,
         )
-        extra_info = await redis_client.get(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{session_uuid}')
+        extra_info = await redis_client.get(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:{session_uuid}')
         if extra_info:
             extra_info = json.loads(extra_info)
             # 排除 swagger 登录生成的 token
@@ -87,5 +88,5 @@ async def delete_session(
     session_uuid: Annotated[str, Query(description='会话 UUID')],
 ) -> ResponseModel:
     superuser_verify(request)
-    await revoke_token(str(pk), session_uuid)
+    await revoke_token(pk, session_uuid)
     return response_base.success()

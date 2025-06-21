@@ -150,7 +150,7 @@ class ServerInfo:
 
         try:
             create_time = datetime.fromtimestamp(process.create_time(), tz=tz.utc)
-            start_time = timezone.f_datetime(create_time)
+            start_time = timezone.from_datetime(create_time)
         except (psutil.NoSuchProcess, OSError):
             start_time = timezone.now()
 
@@ -164,7 +164,7 @@ class ServerInfo:
             'mem_vms': ServerInfo.format_bytes(mem_info.vms),
             'mem_rss': ServerInfo.format_bytes(mem_info.rss),
             'mem_free': ServerInfo.format_bytes(mem_info.vms - mem_info.rss),
-            'startup': timezone.t_str(start_time),
+            'startup': timezone.to_str(start_time),
             'elapsed': elapsed,
         }
 
