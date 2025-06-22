@@ -246,20 +246,10 @@ class AuthService:
         finally:
             response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
 
-        # 清理缓存
-        if request.user.is_multi_login:
-            await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{session_uuid}')
-            await redis_client.delete(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:{session_uuid}')
-            if refresh_token:
-                await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
-        else:
-            key_prefix = [
-                f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:',
-                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:',
-                f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:',
-            ]
-            for prefix in key_prefix:
-                await redis_client.delete_prefix(prefix)
+        await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{session_uuid}')
+        await redis_client.delete(f'{settings.TOKEN_EXTRA_INFO_REDIS_PREFIX}:{user_id}:{session_uuid}')
+        if refresh_token:
+            await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{refresh_token}')
 
 
 auth_service: AuthService = AuthService()
