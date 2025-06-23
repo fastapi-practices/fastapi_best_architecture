@@ -1,12 +1,6 @@
--- ----------------------------
--- 初始化部门数据
--- ----------------------------
 insert into sys_dept (id, name, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
 values (2047437120000000100, '测试', 0, null, null, null, 1, 0, null, now(), null);
 
--- ----------------------------
--- 初始化菜单数据
--- ----------------------------
 insert into sys_menu (id, title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
 values
 -- 顶级菜单
@@ -42,7 +36,7 @@ values
 -- 二级子菜单
 (2047437120000000129, '数据范围', 'SysDataScope', 'sys-data-scope', 6, 'cuida:scope-outline', 1, '/system/data-permission/scope/index', null, 1, 1, 1, '', null, 2047437120000000114, now(), null),
 (2047437120000000130, '数据规则', 'SysDataRule', 'sys-data-rule', 7, 'material-symbols:rule', 1, '/system/data-permission/rule/index', null, 1, 1, 1, '', null, 2047437120000000114, now(), null),
--- 按钮权限（简化版，只包含主要的）
+-- 按钮权限
 (2047437120000000201, '新增', 'AddSysDept', null, 0, null, 2, null, 'sys:dept:add', 1, 0, 1, '', null, 2047437120000000110, now(), null),
 (2047437120000000202, '修改', 'EditSysDept', null, 0, null, 2, null, 'sys:dept:edit', 1, 0, 1, '', null, 2047437120000000110, now(), null),
 (2047437120000000203, '删除', 'DeleteSysDept', null, 0, null, 2, null, 'sys:dept:del', 1, 0, 1, '', null, 2047437120000000110, now(), null),
@@ -52,17 +46,46 @@ values
 (2047437120000000207, '删除', 'DeleteSysRole', null, 0, null, 2, null, 'sys:role:del', 1, 0, 1, '', null, 2047437120000000112, now(), null),
 (2047437120000000208, '新增', 'AddSysMenu', null, 0, null, 2, null, 'sys:menu:add', 1, 0, 1, '', null, 2047437120000000113, now(), null),
 (2047437120000000209, '修改', 'EditSysMenu', null, 0, null, 2, null, 'sys:menu:edit', 1, 0, 1, '', null, 2047437120000000113, now(), null),
-(2047437120000000210, '删除', 'DeleteSysMenu', null, 0, null, 2, null, 'sys:menu:del', 1, 0, 1, '', null, 2047437120000000113, now(), null);
+(2047437120000000210, '删除', 'DeleteSysMenu', null, 0, null, 2, null, 'sys:menu:del', 1, 0, 1, '', null, 2047437120000000113, now(), null),
+(2047437120000000211, '新增', 'AddSysDataScope', null, 0, null, 2, null, 'data:scope:add', 1, 0, 1, '', null, 2047437120000000129, now(), null),
+(2047437120000000212, '修改', 'EditSysDataScope', null, 0, null, 2, null, 'data:scope:edit', 1, 0, 1, '', null, 2047437120000000129, now(), null),
+(2047437120000000213, '修改数据范围规则', 'EditDataScopeRule', null, 0, null, 2, null, 'data:scope:rule:edit', 1, 0, 1, '', null, 2047437120000000129, now(), null),
+(2047437120000000214, '删除', 'DeleteSysDataScope', null, 0, null, 2, null, 'data:scope:del', 1, 0, 1, '', null, 2047437120000000129, now(), null),
+(2047437120000000215, '新增', 'AddSysDataRule', null, 0, null, 2, null, 'data:rule:add', 1, 0, 1, '', null, 2047437120000000130, now(), null),
+(2047437120000000216, '修改', 'EditSysDataRule', null, 0, null, 2, null, 'data:rule:edit', 1, 0, 1, '', null, 2047437120000000130, now(), null),
+(2047437120000000217, '删除', 'DeleteSysDataRule', null, 0, null, 2, null, 'data:rule:del', 1, 0, 1, '', null, 2047437120000000130, now(), null),
+(2047437120000000218, '安装插件', 'InstallSysPlugin', null, 0, null, 2, null, 'sys:plugin:install', 1, 0, 1, '', null, 2047437120000000115, now(), null),
+(2047437120000000219, '卸载', 'UninstallSysPlugin', null, 0, null, 2, null, 'sys:plugin:uninstall', 1, 0, 1, '', null, 2047437120000000115, now(), null),
+(2047437120000000220, '修改', 'EditSysPlugin', null, 0, null, 2, null, 'sys:plugin:edit', 1, 0, 1, '', null, 2047437120000000115, now(), null),
+(2047437120000000221, '新增', 'AddSysConfig', null, 0, null, 2, null, 'sys:config:add', 1, 0, 1, '', null, 2047437120000000116, now(), null),
+(2047437120000000222, '修改', 'EditSysConfig', null, 0, null, 2, null, 'sys:config:edit', 1, 0, 1, '', null, 2047437120000000116, now(), null),
+(2047437120000000223, '删除', 'DeleteSysConfig', null, 0, null, 2, null, 'sys:config:del', 1, 0, 1, '', null, 2047437120000000116, now(), null),
+(2047437120000000224, '新增类型', 'AddSysDictType', null, 0, null, 2, null, 'dict:type:add', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000225, '修改类型', 'EditSysDictType', null, 0, null, 2, null, 'dict:type:edit', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000226, '删除类型', 'DeleteSysDictType', null, 0, null, 2, null, 'dict:type:del', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000227, '新增', 'AddSysDictData', null, 0, null, 2, null, 'dict:data:add', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000228, '修改', 'EditSysDictData', null, 0, null, 2, null, 'dict:data:edit', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000229, '删除', 'DeleteSysDictData', null, 0, null, 2, null, 'dict:data:del', 1, 0, 1, '', null, 2047437120000000117, now(), null),
+(2047437120000000230, '新增', 'AddSysNotice', null, 0, null, 2, null, 'sys:notice:add', 1, 0, 1, '', null, 2047437120000000118, now(), null),
+(2047437120000000231, '修改', 'EditSysNotice', null, 0, null, 2, null, 'sys:notice:edit', 1, 0, 1, '', null, 2047437120000000118, now(), null),
+(2047437120000000232, '删除', 'DeleteSysNotice', null, 0, null, 2, null, 'sys:notice:del', 1, 0, 1, '', null, 2047437120000000118, now(), null),
+(2047437120000000233, '新增业务', 'AddSysGenCodeBusiness', null, 0, null, 2, null, 'codegen:business:add', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000234, '修改业务', 'EditGenCodeBusiness', null, 0, null, 2, null, 'codegen:business:edit', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000235, '删除业务', 'DeleteGenCodeBusiness', null, 0, null, 2, null, 'codegen:business:del', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000236, '新增模型', 'AddGenCodeModel', null, 0, null, 2, null, 'codegen:model:add', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000237, '修改模型', 'EditGenCodeModel', null, 0, null, 2, null, 'codegen:model:edit', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000238, '删除模型', 'DeleteGenCodeModel', null, 0, null, 2, null, 'codegen:model:del', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000239, '导入', 'ImportGenCode', null, 0, null, 2, null, 'codegen:table:import', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000240, '写入', 'WriteGenCode', null, 0, null, 2, null, 'codegen:local:write', 1, 0, 1, '', null, 2047437120000000119, now(), null),
+(2047437120000000241, '删除', 'DeleteSysLoginLog', null, 0, null, 2, null, 'log:login:del', 1, 0, 1, '', null, 2047437120000000121, now(), null),
+(2047437120000000242, '清空', 'EmptyLoginLog', null, 0, null, 2, null, 'log:login:clear', 1, 0, 1, '', null, 2047437120000000121, now(), null),
+(2047437120000000243, '删除', 'DeleteOperaLog', null, 0, null, 2, null, 'log:opera:del', 1, 0, 1, '', null, 2047437120000000122, now(), null),
+(2047437120000000244, '清空', 'EmptyOperaLog', null, 0, null, 2, null, 'log:opera:clear', 1, 0, 1, '', null, 2047437120000000122, now(), null),
+(2047437120000000245, '下线', 'KickSysToken', null, 0, null, 2, null, 'sys:session:delete', 1, 0, 1, '', null, 2047437120000000123, now(), null);
 
--- ----------------------------
--- 初始化角色数据
--- ----------------------------
 insert into sys_role (id, name, status, is_filter_scopes, remark, created_time, updated_time)
 values (2047437120000000300, '测试', 1, 1, null, now(), null);
 
--- ----------------------------
--- 初始化角色菜单关系数据
--- ----------------------------
 insert into sys_role_menu (id, role_id, menu_id)
 values
 (2047437120000000301, 2047437120000000300, 2047437120000000101),
@@ -70,87 +93,24 @@ values
 (2047437120000000303, 2047437120000000300, 2047437120000000103),
 (2047437120000000304, 2047437120000000300, 2047437120000000104);
 
--- ----------------------------
--- 初始化用户数据
--- ----------------------------
 insert into sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
 values (2047437120000000400, gen_random_uuid(), 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', decode('24326224313224387932654E7563583139566A6D5A33745968424C634F', 'hex'), 'admin@example.com', 1, 1, 1, 1, null, null, now(), now(), 2047437120000000100, now(), null);
 
--- ----------------------------
--- 初始化用户角色关系数据
--- ----------------------------
 insert into sys_user_role (id, user_id, role_id)
 values (2047437120000000401, 2047437120000000400, 2047437120000000300);
 
--- ----------------------------
--- 初始化数据范围数据
--- ----------------------------
 insert into sys_data_scope (id, name, status, created_time, updated_time)
 values
 (2047437120000000500, '测试部门数据权限', 1, now(), null),
 (2047437120000000501, '测试部门及以下数据权限', 1, now(), null);
 
--- ----------------------------
--- 初始化数据规则数据
--- ----------------------------
 insert into sys_data_rule (id, name, model, "column", operator, expression, "value", created_time, updated_time)
 values
 (2047437120000000600, '部门名称等于测试', '部门', 'name', 1, 0, '测试', now(), null),
 (2047437120000000601, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', now(), null);
 
--- ----------------------------
--- 初始化数据范围规则关系数据
--- ----------------------------
 insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
 values
 (2047437120000000700, 2047437120000000500, 2047437120000000600),
 (2047437120000000701, 2047437120000000501, 2047437120000000600),
 (2047437120000000702, 2047437120000000501, 2047437120000000601);
-
--- ----------------------------
--- 初始化数据字典类型
--- ----------------------------
-insert into sys_dict_type (id, name, code, status, remark, created_time, updated_time)
-values
-(2047437120000000800, '通用状态', 'sys_status', 1, '系统通用状态：启用/停用', now(), null),
-(2047437120000000801, '菜单类型', 'sys_menu_type', 1, '系统菜单类型', now(), null),
-(2047437120000000802, '登录日志状态', 'sys_login_status', 1, '用户登录日志状态', now(), null),
-(2047437120000000803, '数据规则运算符', 'sys_data_rule_operator', 1, '数据权限规则运算符', now(), null),
-(2047437120000000804, '数据规则表达式', 'sys_data_rule_expression', 1, '数据权限规则表达式', now(), null),
-(2047437120000000805, '前端参数配置', 'sys_frontend_config', 1, '前端参数配置类型', now(), null),
-(2047437120000000806, '过滤数据权限', 'sys_data_permission', 1, '数据权限过滤类型', now(), null),
-(2047437120000000807, '菜单显示', 'sys_menu_display', 1, '菜单是否显示', now(), null),
-(2047437120000000808, '菜单缓存', 'sys_menu_cache', 1, '菜单是否缓存', now(), null);
-
--- ----------------------------
--- 初始化数据字典数据
--- ----------------------------
-insert into sys_dict_data (id, label, value, sort, status, remark, type_id, created_time, updated_time)
-values
-(2047437120000000900, '停用', '0', 1, 1, '系统停用状态', 2047437120000000800, now(), null),
-(2047437120000000901, '正常', '1', 2, 1, '系统正常状态', 2047437120000000800, now(), null),
-(2047437120000000902, '目录', '0', 1, 1, '菜单目录类型', 2047437120000000801, now(), null),
-(2047437120000000903, '菜单', '1', 2, 1, '普通菜单类型', 2047437120000000801, now(), null),
-(2047437120000000904, '按钮', '2', 3, 1, '按钮权限类型', 2047437120000000801, now(), null),
-(2047437120000000905, '内嵌', '3', 4, 1, '内嵌页面类型', 2047437120000000801, now(), null),
-(2047437120000000906, '外链', '4', 5, 1, '外部链接类型', 2047437120000000801, now(), null),
-(2047437120000000907, '失败', '0', 1, 1, '登录失败状态', 2047437120000000802, now(), null),
-(2047437120000000908, '成功', '1', 2, 1, '登录成功状态', 2047437120000000802, now(), null),
-(2047437120000000909, 'AND', '0', 1, 1, '逻辑与运算符', 2047437120000000803, now(), null),
-(2047437120000000910, 'OR', '1', 2, 1, '逻辑或运算符', 2047437120000000803, now(), null),
-(2047437120000000911, '等于(==)', '0', 1, 1, '等于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000912, '不等于(!=)', '1', 2, 1, '不等于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000913, '大于(>)', '2', 3, 1, '大于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000914, '大于等于(>=)', '3', 4, 1, '大于等于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000915, '小于(<)', '4', 5, 1, '小于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000916, '小于等于(<=)', '5', 6, 1, '小于等于比较表达式', 2047437120000000804, now(), null),
-(2047437120000000917, '包含(in)', '6', 7, 1, '包含表达式', 2047437120000000804, now(), null),
-(2047437120000000918, '不包含(not in)', '7', 8, 1, '不包含表达式', 2047437120000000804, now(), null),
-(2047437120000000919, '否', '0', 1, 1, '不是前端参数配置', 2047437120000000805, now(), null),
-(2047437120000000920, '是', '1', 2, 1, '是前端参数配置', 2047437120000000805, now(), null),
-(2047437120000000921, '否', '0', 1, 1, '不进行数据权限过滤', 2047437120000000806, now(), null),
-(2047437120000000922, '是', '1', 2, 1, '进行数据权限过滤', 2047437120000000806, now(), null),
-(2047437120000000923, '隐藏', '0', 1, 1, '菜单隐藏', 2047437120000000807, now(), null),
-(2047437120000000924, '显示', '1', 2, 1, '菜单显示', 2047437120000000807, now(), null),
-(2047437120000000925, '不缓存', '0', 1, 1, '菜单不缓存', 2047437120000000808, now(), null),
-(2047437120000000926, '缓存', '1', 2, 1, '菜单缓存', 2047437120000000808, now(), null);
