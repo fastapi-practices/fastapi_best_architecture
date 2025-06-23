@@ -89,18 +89,20 @@ class OAuth2Service:
 
             # 创建 token
             access_token = await jwt.create_access_token(
-                str(sys_user.id),
+                sys_user.id,
                 sys_user.is_multi_login,
                 # extra info
                 username=sys_user.username,
                 nickname=sys_user.nickname or f'#{text_captcha(5)}',
-                last_login_time=timezone.t_str(timezone.now()),
+                last_login_time=timezone.to_str(timezone.now()),
                 ip=request.state.ip,
                 os=request.state.os,
                 browser=request.state.browser,
                 device=request.state.device,
             )
-            refresh_token = await jwt.create_refresh_token(str(sys_user.id), multi_login=sys_user.is_multi_login)
+            refresh_token = await jwt.create_refresh_token(
+                access_token.session_uuid, sys_user.id, sys_user.is_multi_login
+            )
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
             login_log = dict(
@@ -118,7 +120,7 @@ class OAuth2Service:
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
                 value=refresh_token.refresh_token,
                 max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                expires=timezone.f_utc(refresh_token.refresh_token_expire_time),
+                expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
                 httponly=True,
             )
             data = GetLoginToken(
