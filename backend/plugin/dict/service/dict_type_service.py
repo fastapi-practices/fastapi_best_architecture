@@ -5,11 +5,26 @@ from sqlalchemy import Select
 from backend.common.exception import errors
 from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
+from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
 
 
 class DictTypeService:
     """字典类型服务类"""
+
+    @staticmethod
+    async def get(*, pk) -> DictType:
+        """
+        获取字典类型详情
+
+        :param pk: 字典类型 ID
+        :return:
+        """
+        async with async_db_session() as db:
+            dict_type = await dict_type_dao.get(db, pk)
+            if not dict_type:
+                raise errors.NotFoundError(msg='字典类型不存在')
+            return dict_type
 
     @staticmethod
     async def get_select(*, name: str | None, code: str | None, status: int | None) -> Select:

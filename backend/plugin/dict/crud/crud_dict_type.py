@@ -39,7 +39,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_order('id', 'desc', **filters)
+        return await self.select_order('id', 'desc', load_strategies={'datas': 'noload'}, **filters)
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """

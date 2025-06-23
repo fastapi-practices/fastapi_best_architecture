@@ -21,6 +21,14 @@ from backend.plugin.dict.service.dict_type_service import dict_type_service
 router = APIRouter()
 
 
+@router.get('/{pk}', summary='获取字典类型详情', dependencies=[DependsJwtAuth])
+async def get_dict_type(
+    pk: Annotated[int, Path(description='字典类型 ID')],
+) -> ResponseSchemaModel[GetDictTypeDetail]:
+    data = await dict_type_service.get(pk=pk)
+    return response_base.success(data=data)
+
+
 @router.get(
     '',
     summary='分页获取所有字典类型',
