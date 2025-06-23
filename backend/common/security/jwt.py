@@ -32,8 +32,9 @@ class CustomHTTPBearer(HTTPBearer):
     """
     自定义 HTTPBearer 认证类
 
-    https://github.com/fastapi/fastapi/issues/10177
+    Issues: https://github.com/fastapi/fastapi/issues/10177
     """
+
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
         try:
             return await super().__call__(request)
@@ -174,7 +175,7 @@ async def create_refresh_token(session_uuid: str, user_id: int, multi_login: boo
 
 
 async def create_new_token(
-        refresh_token: str, session_uuid: str, user_id: int, multi_login: bool, **kwargs
+    refresh_token: str, session_uuid: str, user_id: int, multi_login: bool, **kwargs
 ) -> NewToken:
     """
     生成新的 token

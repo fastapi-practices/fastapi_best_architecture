@@ -222,16 +222,17 @@ class UserService:
         :param type: 权限类型
         :return:
         """
-        if type == UserPermissionType.superuser:
-            count = await self.update_superuser(request=request, pk=pk)
-        elif type == UserPermissionType.staff:
-            count = await self.update_staff(request=request, pk=pk)
-        elif type == UserPermissionType.status:
-            count = await self.update_status(request=request, pk=pk)
-        elif type == UserPermissionType.multi_login:
-            count = await self.update_multi_login(request=request, pk=pk)
-        else:
-            raise errors.RequestError(msg='权限类型不存在')
+        match type:
+            case UserPermissionType.superuser:
+                count = await self.update_superuser(request=request, pk=pk)
+            case UserPermissionType.staff:
+                count = await self.update_staff(request=request, pk=pk)
+            case UserPermissionType.status:
+                count = await self.update_status(request=request, pk=pk)
+            case UserPermissionType.multi_login:
+                count = await self.update_multi_login(request=request, pk=pk)
+            case _:
+                raise errors.RequestError(msg='权限类型不存在')
         return count
 
     @staticmethod
