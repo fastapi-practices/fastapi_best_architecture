@@ -242,9 +242,6 @@ class Settings(BaseSettings):
     # Plugin Code Generator
     CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'
 
-    # Plugin Config
-    CONFIG_BUILT_IN_TYPES: list[str] = ['website', 'protocol', 'policy']
-
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:

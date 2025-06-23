@@ -5,7 +5,6 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.core.conf import settings
 from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigParam
 
@@ -21,7 +20,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pk: 参数配置 ID
         :return:
         """
-        return await self.select_model_by_column(db, id=pk, type__not_in=settings.CONFIG_BUILT_IN_TYPES)
+        return await self.select_model_by_column(db, id=pk)
 
     async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
@@ -41,7 +40,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param type: 参数配置类型
         :return:
         """
-        filters = {'type__not_in': settings.CONFIG_BUILT_IN_TYPES}
+        filters = {}
 
         if name is not None:
             filters['name__like'] = f'%{name}%'
@@ -79,9 +78,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param pks: 参数配置 ID 列表
         :return:
         """
-        return await self.delete_model_by_column(
-            db, allow_multiple=True, id__in=pks, type__not_in=settings.CONFIG_BUILT_IN_TYPES
-        )
+        return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
 config_dao: CRUDConfig = CRUDConfig(Config)
