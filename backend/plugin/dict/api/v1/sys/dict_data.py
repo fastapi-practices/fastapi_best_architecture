@@ -22,6 +22,12 @@ from backend.plugin.dict.service.dict_data_service import dict_data_service
 router = APIRouter()
 
 
+@router.get('/all', summary='获取所有字典数据', dependencies=[DependsJwtAuth])
+async def get_all_dict_datas() -> ResponseSchemaModel[list[GetDictDataDetail]]:
+    data = await dict_data_service.get_all()
+    return response_base.success(data=data)
+
+
 @router.get('/{pk}', summary='获取字典数据详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(
     pk: Annotated[int, Path(description='字典数据 ID')],

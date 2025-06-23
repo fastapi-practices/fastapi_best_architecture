@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
@@ -21,6 +23,15 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_model(db, pk)
 
+    async def get_all(self, db: AsyncSession) -> Sequence[DictData]:
+        """
+        获取所有字典数据
+
+        :param db: 数据库会话
+        :return:
+        """
+        return await self.select_models(db, load_strategies={'type': 'noload'})
+
     async def get_list(self, label: str | None, value: str | None, status: int | None) -> Select:
         """
         获取字典数据列表
@@ -39,7 +50,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_order('id', 'desc', *filters)
+        return await self.select_order('id', 'desc', load_strategies={'type': 'noload'}, **filters)
 
     async def get_by_label(self, db: AsyncSession, label: str) -> DictData | None:
         """
