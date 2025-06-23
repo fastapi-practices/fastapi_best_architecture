@@ -32,9 +32,7 @@ class CustomHTTPBearer(HTTPBearer):
     """
     自定义 HTTPBearer 认证类
 
-    重写 __call__ 方法，当认证失败时：
-    - 如果原始异常是 403 状态码，则抛出 401 状态码的 TokenError
-    - 其他异常保持原样抛出
+    https://github.com/fastapi/fastapi/issues/10177
     """
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
         try:
