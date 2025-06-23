@@ -58,7 +58,7 @@ class DictDataService:
         async with async_db_session.begin() as db:
             dict_data = await dict_data_dao.get_by_label(db, obj.label)
             if dict_data:
-                raise errors.ForbiddenError(msg='字典数据已存在')
+                raise errors.ConflictError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
@@ -79,7 +79,7 @@ class DictDataService:
                 raise errors.NotFoundError(msg='字典数据不存在')
             if dict_data.label != obj.label:
                 if await dict_data_dao.get_by_label(db, obj.label):
-                    raise errors.ForbiddenError(msg='字典数据已存在')
+                    raise errors.ConflictError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')

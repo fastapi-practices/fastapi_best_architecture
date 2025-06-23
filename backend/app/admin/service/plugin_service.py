@@ -55,24 +55,24 @@ class PluginService:
         contents = await file.read()
         file_bytes = io.BytesIO(contents)
         if not zipfile.is_zipfile(file_bytes):
-            raise errors.ForbiddenError(msg='插件压缩包格式非法')
+            raise errors.RequestError(msg='插件压缩包格式非法')
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
             plugin_namelist = zf.namelist()
             plugin_name = plugin_namelist[0].split('/')[0]
             if not plugin_namelist or plugin_name not in file.filename:
-                raise errors.ForbiddenError(msg='插件压缩包内容非法')
+                raise errors.RequestError(msg='插件压缩包内容非法')
             if (
                 len(plugin_namelist) <= 3
                 or f'{plugin_name}/plugin.toml' not in plugin_namelist
                 or f'{plugin_name}/README.md' not in plugin_namelist
             ):
-                raise errors.ForbiddenError(msg='插件压缩包内缺少必要文件')
+                raise errors.RequestError(msg='插件压缩包内缺少必要文件')
 
             # 插件是否可安装
             full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
             if os.path.exists(full_plugin_path):
-                raise errors.ForbiddenError(msg='此插件已安装')
+                raise errors.ConflictError(msg='此插件已安装')
             else:
                 os.makedirs(full_plugin_path, exist_ok=True)
 
@@ -99,11 +99,11 @@ class PluginService:
         """
         match = is_git_url(repo_url)
         if not match:
-            raise errors.ForbiddenError(msg='Git 仓库地址格式非法')
+            raise errors.RequestError(msg='Git 仓库地址格式非法')
         repo_name = match.group('repo')
         plugins = await redis_client.lrange(settings.PLUGIN_REDIS_PREFIX, 0, -1)
         if repo_name in plugins:
-            raise errors.ForbiddenError(msg=f'{repo_name} 插件已安装')
+            raise errors.ConflictError(msg=f'{repo_name} 插件已安装')
         try:
             porcelain.clone(repo_url, os.path.join(PLUGIN_DIR, repo_name), checkout=True)
         except Exception as e:
@@ -124,11 +124,11 @@ class PluginService:
         """
         if type == PluginType.zip:
             if not file:
-                raise errors.ForbiddenError(msg='ZIP 压缩包不能为空')
+                raise errors.RequestError(msg='ZIP 压缩包不能为空')
             await self.install_zip(file=file)
         elif type == PluginType.git:
             if not repo_url:
-                raise errors.ForbiddenError(msg='Git 仓库地址不能为空')
+                raise errors.RequestError(msg='Git 仓库地址不能为空')
             await self.install_git(repo_url=repo_url)
 
     @staticmethod
@@ -141,7 +141,7 @@ class PluginService:
         """
         plugin_dir = os.path.join(PLUGIN_DIR, plugin)
         if not os.path.exists(plugin_dir):
-            raise errors.ForbiddenError(msg='插件不存在')
+            raise errors.NotFoundError(msg='插件不存在')
         await uninstall_requirements_async(plugin)
         bacup_dir = os.path.join(PLUGIN_DIR, f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup')
         shutil.move(plugin_dir, bacup_dir)
@@ -159,7 +159,7 @@ class PluginService:
         """
         plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}')
         if not plugin_info:
-            raise errors.ForbiddenError(msg='插件不存在')
+            raise errors.NotFoundError(msg='插件不存在')
         plugin_info = json.loads(plugin_info)
 
         # 更新持久缓存状态
@@ -184,7 +184,7 @@ class PluginService:
         """
         plugin_dir = os.path.join(PLUGIN_DIR, plugin)
         if not os.path.exists(plugin_dir):
-            raise errors.ForbiddenError(msg='插件不存在')
+            raise errors.NotFoundError(msg='插件不存在')
 
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:

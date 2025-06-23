@@ -93,7 +93,7 @@ class AuthService:
                 user = await self.user_verify(db, obj.username, obj.password)
                 captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
-                    raise errors.ForbiddenError(msg='验证码失效，请重新获取')
+                    raise errors.RequestError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
@@ -122,7 +122,7 @@ class AuthService:
             except errors.NotFoundError as e:
                 log.error('登陆错误: 用户名不存在')
                 raise errors.NotFoundError(msg=e.msg)
-            except (errors.ForbiddenError, errors.CustomError) as e:
+            except (errors.RequestError, errors.CustomError) as e:
                 if not user:
                     log.error('登陆错误: 用户密码有误')
                 task = BackgroundTask(
