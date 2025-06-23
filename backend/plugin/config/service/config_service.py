@@ -4,7 +4,6 @@
 from sqlalchemy import Select
 
 from backend.common.exception import errors
-from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.model import Config
@@ -51,8 +50,6 @@ class ConfigService:
         :return:
         """
         async with async_db_session.begin() as db:
-            if obj.type in settings.CONFIG_BUILT_IN_TYPES:
-                raise errors.RequestError(msg='非法类型参数')
             config = await config_dao.get_by_key(db, obj.key)
             if config:
                 raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
