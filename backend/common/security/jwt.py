@@ -6,8 +6,9 @@ from datetime import timedelta
 from typing import Any
 from uuid import uuid4
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
+from fastapi.security.http import HTTPAuthorizationCredentials
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import ExpiredSignatureError, JWTError, jwt
 from pwdlib import PasswordHash
@@ -19,14 +20,33 @@ from backend.app.admin.model import User
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken, TokenPayload
 from backend.common.exception import errors
+from backend.common.exception.errors import TokenError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
 from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 
+
+class CustomHTTPBearer(HTTPBearer):
+    """
+    自定义 HTTPBearer 认证类
+
+    重写 __call__ 方法，当认证失败时：
+    - 如果原始异常是 403 状态码，则抛出 401 状态码的 TokenError
+    - 其他异常保持原样抛出
+    """
+    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
+        try:
+            return await super().__call__(request)
+        except HTTPException as e:
+            if e.status_code == 403:
+                raise TokenError()
+            raise e
+
+
 # JWT authorizes dependency injection
-DependsJwtAuth = Depends(HTTPBearer())
+DependsJwtAuth = Depends(CustomHTTPBearer())
 
 password_hash = PasswordHash((BcryptHasher(),))
 
@@ -156,7 +176,7 @@ async def create_refresh_token(session_uuid: str, user_id: int, multi_login: boo
 
 
 async def create_new_token(
-    refresh_token: str, session_uuid: str, user_id: int, multi_login: bool, **kwargs
+        refresh_token: str, session_uuid: str, user_id: int, multi_login: bool, **kwargs
 ) -> NewToken:
     """
     生成新的 token

@@ -78,7 +78,7 @@ class DataScopeService:
         async with async_db_session.begin() as db:
             data_scope = await data_scope_dao.get_by_name(db, obj.name)
             if data_scope:
-                raise errors.ForbiddenError(msg='数据范围已存在')
+                raise errors.ConflictError(msg='数据范围已存在')
             await data_scope_dao.create(db, obj)
 
     @staticmethod
@@ -96,7 +96,7 @@ class DataScopeService:
                 raise errors.NotFoundError(msg='数据范围不存在')
             if data_scope.name != obj.name:
                 if await data_scope_dao.get_by_name(db, obj.name):
-                    raise errors.ForbiddenError(msg='数据范围已存在')
+                    raise errors.ConflictError(msg='数据范围已存在')
             count = await data_scope_dao.update(db, pk, obj)
             for role in await data_scope.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:
