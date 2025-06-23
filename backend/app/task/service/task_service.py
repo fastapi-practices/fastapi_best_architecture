@@ -39,7 +39,7 @@ class TaskService:
         """获取所有已注册的 Celery 任务列表"""
         registered_tasks = await run_in_threadpool(celery_app.control.inspect().registered)
         if not registered_tasks:
-            raise errors.ForbiddenError(msg='Celery 服务未启动')
+            raise errors.ServerError(msg='Celery 服务未启动')
         tasks = list(registered_tasks.values())[0]
         return tasks
 

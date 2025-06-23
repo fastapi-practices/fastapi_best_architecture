@@ -81,10 +81,10 @@ class UserService:
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if await user_dao.get_by_username(db, obj.username):
-                raise errors.ForbiddenError(msg='用户名已注册')
+                raise errors.ConflictError(msg='用户名已注册')
             obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(88888, 99999)}'
             if not obj.password:
-                raise errors.ForbiddenError(msg='密码不允许为空')
+                raise errors.RequestError(msg='密码不允许为空')
             if not await dept_dao.get(db, obj.dept_id):
                 raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
@@ -110,7 +110,7 @@ class UserService:
                 raise errors.ForbiddenError(msg='只能修改自己的信息')
             if obj.username != user.username:
                 if await user_dao.get_by_username(db, obj.username):
-                    raise errors.ForbiddenError(msg='用户名已注册')
+                    raise errors.ConflictError(msg='用户名已注册')
             for role_id in obj.roles:
                 if not await role_dao.get(db, role_id):
                     raise errors.NotFoundError(msg='角色不存在')
@@ -222,16 +222,17 @@ class UserService:
         :param type: 权限类型
         :return:
         """
-        if type == UserPermissionType.superuser:
-            count = await self.update_superuser(request=request, pk=pk)
-        elif type == UserPermissionType.staff:
-            count = await self.update_staff(request=request, pk=pk)
-        elif type == UserPermissionType.status:
-            count = await self.update_status(request=request, pk=pk)
-        elif type == UserPermissionType.multi_login:
-            count = await self.update_multi_login(request=request, pk=pk)
-        else:
-            raise errors.ForbiddenError(msg='权限类型不存在')
+        match type:
+            case UserPermissionType.superuser:
+                count = await self.update_superuser(request=request, pk=pk)
+            case UserPermissionType.staff:
+                count = await self.update_staff(request=request, pk=pk)
+            case UserPermissionType.status:
+                count = await self.update_status(request=request, pk=pk)
+            case UserPermissionType.multi_login:
+                count = await self.update_multi_login(request=request, pk=pk)
+            case _:
+                raise errors.RequestError(msg='权限类型不存在')
         return count
 
     @staticmethod
@@ -248,9 +249,9 @@ class UserService:
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             if not password_verify(obj.old_password, user.password):
-                raise errors.ForbiddenError(msg='原密码错误')
+                raise errors.RequestError(msg='原密码错误')
             if obj.new_password != obj.confirm_password:
-                raise errors.ForbiddenError(msg='密码输入不一致')
+                raise errors.RequestError(msg='密码输入不一致')
             new_pwd = get_hash_password(obj.new_password, user.salt)
             count = await user_dao.reset_password(db, user.id, new_pwd)
             key_prefix = [

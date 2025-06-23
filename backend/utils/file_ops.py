@@ -38,18 +38,18 @@ def file_verify(file: UploadFile) -> None:
     filename = file.filename
     file_ext = filename.split('.')[-1].lower()
     if not file_ext:
-        raise errors.ForbiddenError(msg='未知的文件类型')
+        raise errors.RequestError(msg='未知的文件类型')
 
     if file_ext == FileType.image:
         if file_ext not in settings.UPLOAD_IMAGE_EXT_INCLUDE:
-            raise errors.ForbiddenError(msg='此图片格式暂不支持')
+            raise errors.RequestError(msg='此图片格式暂不支持')
         if file.size > settings.UPLOAD_IMAGE_SIZE_MAX:
-            raise errors.ForbiddenError(msg='图片超出最大限制，请重新选择')
+            raise errors.RequestError(msg='图片超出最大限制，请重新选择')
     elif file_ext == FileType.video:
         if file_ext not in settings.UPLOAD_VIDEO_EXT_INCLUDE:
-            raise errors.ForbiddenError(msg='此视频格式暂不支持')
+            raise errors.RequestError(msg='此视频格式暂不支持')
         if file.size > settings.UPLOAD_VIDEO_SIZE_MAX:
-            raise errors.ForbiddenError(msg='视频超出最大限制，请重新选择')
+            raise errors.RequestError(msg='视频超出最大限制，请重新选择')
 
 
 async def upload_file(file: UploadFile) -> str:

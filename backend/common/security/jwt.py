@@ -6,8 +6,9 @@ from datetime import timedelta
 from typing import Any
 from uuid import uuid4
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
+from fastapi.security.http import HTTPAuthorizationCredentials
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import ExpiredSignatureError, JWTError, jwt
 from pwdlib import PasswordHash
@@ -19,14 +20,32 @@ from backend.app.admin.model import User
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken, TokenPayload
 from backend.common.exception import errors
+from backend.common.exception.errors import TokenError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
 from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 
+
+class CustomHTTPBearer(HTTPBearer):
+    """
+    自定义 HTTPBearer 认证类
+
+    Issues: https://github.com/fastapi/fastapi/issues/10177
+    """
+
+    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
+        try:
+            return await super().__call__(request)
+        except HTTPException as e:
+            if e.status_code == 403:
+                raise TokenError()
+            raise e
+
+
 # JWT authorizes dependency injection
-DependsJwtAuth = Depends(HTTPBearer())
+DependsJwtAuth = Depends(CustomHTTPBearer())
 
 password_hash = PasswordHash((BcryptHasher(),))
 

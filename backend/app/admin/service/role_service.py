@@ -98,7 +98,7 @@ class RoleService:
         async with async_db_session.begin() as db:
             role = await role_dao.get_by_name(db, obj.name)
             if role:
-                raise errors.ForbiddenError(msg='角色已存在')
+                raise errors.ConflictError(msg='角色已存在')
             await role_dao.create(db, obj)
 
     @staticmethod
@@ -116,7 +116,7 @@ class RoleService:
                 raise errors.NotFoundError(msg='角色不存在')
             if role.name != obj.name:
                 if await role_dao.get_by_name(db, obj.name):
-                    raise errors.ForbiddenError(msg='角色已存在')
+                    raise errors.ConflictError(msg='角色已存在')
             count = await role_dao.update(db, pk, obj)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
