@@ -6,7 +6,6 @@ from pydantic import ConfigDict, Field
 
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
-from backend.plugin.dict.schema.dict_type import GetDictTypeDetail
 
 
 class DictDataSchemaBase(SchemaBase):
@@ -42,9 +41,3 @@ class GetDictDataDetail(DictDataSchemaBase):
     id: int = Field(description='字典数据 ID')
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')
-
-
-class GetDictDataWithRelation(DictDataSchemaBase):
-    """字典数据关联详情"""
-
-    type: GetDictTypeDetail | None = Field(None, description='字典类型信息')
