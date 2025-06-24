@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import re
 import shutil
 import zipfile
 
@@ -59,17 +60,18 @@ class PluginService:
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
             plugin_namelist = zf.namelist()
-            plugin_name = plugin_namelist[0].split('/')[0]
-            if not plugin_namelist or plugin_name not in file.filename:
+            zip_plugin_dir = plugin_namelist[0].split('/')[0]
+            if not plugin_namelist:
                 raise errors.RequestError(msg='插件压缩包内容非法')
             if (
                 len(plugin_namelist) <= 3
-                or f'{plugin_name}/plugin.toml' not in plugin_namelist
-                or f'{plugin_name}/README.md' not in plugin_namelist
+                or f'{zip_plugin_dir}/plugin.toml' not in plugin_namelist
+                or f'{zip_plugin_dir}/README.md' not in plugin_namelist
             ):
                 raise errors.RequestError(msg='插件压缩包内缺少必要文件')
 
             # 插件是否可安装
+            plugin_name = re.match(r'^([a-zA-Z0-9_]+)', file.filename.split('.')[0].strip()).group()
             full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
             if os.path.exists(full_plugin_path):
                 raise errors.ConflictError(msg='此插件已安装')
@@ -79,14 +81,14 @@ class PluginService:
             # 解压（安装）
             members = []
             for member in zf.infolist():
-                if member.filename.startswith(plugin_name):
-                    new_filename = member.filename.replace(plugin_name, '')
+                if member.filename.startswith(zip_plugin_dir):
+                    new_filename = member.filename.replace(zip_plugin_dir, '')
                     if new_filename:
                         member.filename = new_filename
                         members.append(member)
-            zf.extractall(os.path.join(PLUGIN_DIR, plugin_name), members)
+            zf.extractall(full_plugin_path, members)
 
-        await install_requirements_async(plugin_name)
+        await install_requirements_async(zip_plugin_dir)
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     @staticmethod
