@@ -76,7 +76,7 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
     }
     request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
     content.update(trace_id=get_request_trace_id(request))
-    return MsgSpecJSONResponse(status_code=422, content=content)
+    return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_422, content=content)
 
 
 def register_exception(app: FastAPI):

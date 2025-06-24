@@ -8,7 +8,7 @@ from starlette.responses import StreamingResponse
 
 from backend.app.admin.service.plugin_service import plugin_service
 from backend.common.enums import PluginType
-from backend.common.response.response_code import CustomResponseCode
+from backend.common.response.response_code import CustomResponse
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -44,7 +44,9 @@ async def install_plugin(
     repo_url: Annotated[str | None, Query(description='插件 git 仓库地址')] = None,
 ) -> ResponseModel:
     await plugin_service.install(type=type, file=file, repo_url=repo_url)
-    return response_base.success(res=CustomResponseCode.PLUGIN_INSTALL_SUCCESS)
+    return response_base.success(
+        res=CustomResponse(code=200, msg='插件安装成功，请根据插件说明（README.md）进行相关配置并重启服务')
+    )
 
 
 @router.delete(
@@ -58,7 +60,9 @@ async def install_plugin(
 )
 async def uninstall_plugin(plugin: Annotated[str, Path(description='插件名称')]) -> ResponseModel:
     await plugin_service.uninstall(plugin=plugin)
-    return response_base.success(res=CustomResponseCode.PLUGIN_UNINSTALL_SUCCESS)
+    return response_base.success(
+        res=CustomResponse(code=200, msg='插件卸载成功，请根据插件说明（README.md）移除相关配置并重启服务')
+    )
 
 
 @router.put(
