@@ -12,6 +12,7 @@ class DictDataSchemaBase(SchemaBase):
     """字典数据基础模型"""
 
     type_id: int = Field(description='字典类型 ID')
+    type_code: str = Field(description='字典类型编码')
     label: str = Field(description='字典标签')
     value: str = Field(description='字典值')
     sort: int = Field(description='排序')

@@ -32,10 +32,13 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_models(db, load_strategies={'type': 'noload'})
 
-    async def get_list(self, label: str | None, value: str | None, status: int | None, type_id: int | None) -> Select:
+    async def get_list(
+        self, type_code: str | None, label: str | None, value: str | None, status: int | None, type_id: int | None
+    ) -> Select:
         """
         获取字典数据列表
 
+        :param type_code: 字典类型编码
         :param label: 字典数据标签
         :param value: 字典数据键值
         :param status: 字典状态
@@ -44,6 +47,8 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         filters = {}
 
+        if type_code is not None:
+            filters['type_code'] = type_code
         if label is not None:
             filters['label__like'] = f'%{label}%'
         if value is not None:
