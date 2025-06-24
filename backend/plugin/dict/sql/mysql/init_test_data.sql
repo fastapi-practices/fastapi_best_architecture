@@ -1,0 +1,41 @@
+insert into sys_dict_type (id, name, code, status, remark, created_time, updated_time)
+values
+(1, '通用状态', 'sys_status', 1, '系统通用状态：启用/停用', now(), null),
+(2, '菜单类型', 'sys_menu_type', 1, '系统菜单类型', now(), null),
+(3, '登录日志状态', 'sys_login_status', 1, '用户登录日志状态', now(), null),
+(4, '数据规则运算符', 'sys_data_rule_operator', 1, '数据权限规则运算符', now(), null),
+(5, '数据规则表达式', 'sys_data_rule_expression', 1, '数据权限规则表达式', now(), null),
+(6, '前端参数配置', 'sys_frontend_config', 1, '前端参数配置类型', now(), null),
+(7, '过滤数据权限', 'sys_data_permission', 1, '数据权限过滤类型', now(), null),
+(8, '菜单显示', 'sys_menu_display', 1, '菜单是否显示', now(), null),
+(9, '菜单缓存', 'sys_menu_cache', 1, '菜单是否缓存', now(), null);
+
+insert into sys_dict_data (id, label, value, sort, status, remark, type_id, created_time, updated_time)
+values
+(1, '停用', 0, 1, 1, '系统停用状态', 1, now(), null),
+(2, '正常', 1, 2, 1, '系统正常状态', 1, now(), null),
+(3, '目录', 0, 1, 1, '菜单目录类型', 2, now(), null),
+(4, '菜单', 1, 2, 1, '普通菜单类型', 2, now(), null),
+(5, '按钮', 2, 3, 1, '按钮权限类型', 2, now(), null),
+(6, '内嵌', 3, 4, 1, '内嵌页面类型', 2, now(), null),
+(7, '外链', 4, 5, 1, '外部链接类型', 2, now(), null),
+(8, '失败', 0, 1, 1, '登录失败状态', 3, now(), null),
+(9, '成功', 1, 2, 1, '登录成功状态', 3, now(), null),
+(10, 'AND', 0, 1, 1, '逻辑与运算符', 4, now(), null),
+(11, 'OR', 1, 2, 1, '逻辑或运算符', 4, now(), null),
+(12, '等于(==)', 0, 1, 1, '等于比较表达式', 5, now(), null),
+(13, '不等于(!=)', 1, 2, 1, '不等于比较表达式', 5, now(), null),
+(14, '大于(>)', 2, 3, 1, '大于比较表达式', 5, now(), null),
+(15, '大于等于(>=)', 3, 4, 1, '大于等于比较表达式', 5, now(), null),
+(16, '小于(<)', 4, 5, 1, '小于比较表达式', 5, now(), null),
+(17, '小于等于(<=)', 5, 6, 1, '小于等于比较表达式', 5, now(), null),
+(18, '包含(in)', 6, 7, 1, '包含表达式', 5, now(), null),
+(19, '不包含(not in)', 7, 8, 1, '不包含表达式', 5, now(), null),
+(20, '否', 0, 1, 1, '不是前端参数配置', 6, now(), null),
+(21, '是', 1, 2, 1, '是前端参数配置', 6, now(), null),
+(22, '否', 0, 1, 1, '不进行数据权限过滤', 7, now(), null),
+(23, '是', 1, 2, 1, '进行数据权限过滤', 7, now(), null),
+(24, '隐藏', 0, 1, 1, '菜单隐藏', 8, now(), null),
+(25, '显示', 1, 2, 1, '菜单显示', 8, now(), null),
+(26, '不缓存', 0, 1, 1, '菜单不缓存', 9, now(), null),
+(27, '缓存', 1, 2, 1, '菜单缓存', 9, now(), null);
