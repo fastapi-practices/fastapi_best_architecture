@@ -1,3 +1,29 @@
+<a id="v1.5.2"></a>
+# [v1.5.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.5.2) - 2025-06-24
+
+## What's Changed
+* Update changelog for v1.5.1 by [@wu-clan](https://github.com/wu-clan) in [#671](https://github.com/fastapi-practices/fastapi_best_architecture/pull/671)
+* Fix some error class import by [@wu-clan](https://github.com/wu-clan) in [#672](https://github.com/fastapi-practices/fastapi_best_architecture/pull/672)
+* Optimize routes to better align with RESTful by [@wu-clan](https://github.com/wu-clan) in [#673](https://github.com/fastapi-practices/fastapi_best_architecture/pull/673)
+* Add the snowflake ID sql script by [@wu-clan](https://github.com/wu-clan) in [#675](https://github.com/fastapi-practices/fastapi_best_architecture/pull/675)
+* Optimize token detection and caching logic by [@wu-clan](https://github.com/wu-clan) in [#677](https://github.com/fastapi-practices/fastapi_best_architecture/pull/677)
+* Update cache cleanup for logout interface by [@wu-clan](https://github.com/wu-clan) in [#678](https://github.com/fastapi-practices/fastapi_best_architecture/pull/678)
+* Add dictionary type and datas queries by [@wu-clan](https://github.com/wu-clan) in [#679](https://github.com/fastapi-practices/fastapi_best_architecture/pull/679)
+* Optimize api with semantic HTTP status codes by [@downdawn](https://github.com/downdawn) in [#681](https://github.com/fastapi-practices/fastapi_best_architecture/pull/681)
+* Fix the code with outdated system config by [@wu-clan](https://github.com/wu-clan) in [#683](https://github.com/fastapi-practices/fastapi_best_architecture/pull/683)
+* Update dict data label column config by [@wu-clan](https://github.com/wu-clan) in [#684](https://github.com/fastapi-practices/fastapi_best_architecture/pull/684)
+* Update the init test data for SQL scripts by [@wu-clan](https://github.com/wu-clan) in [#685](https://github.com/fastapi-practices/fastapi_best_architecture/pull/685)
+* Simplify custom response status codes by [@wu-clan](https://github.com/wu-clan) in [#686](https://github.com/fastapi-practices/fastapi_best_architecture/pull/686)
+* Optimize the zip plug-in file name parsing by [@wu-clan](https://github.com/wu-clan) in [#687](https://github.com/fastapi-practices/fastapi_best_architecture/pull/687)
+* Add built-in plugin missing files by [@wu-clan](https://github.com/wu-clan) in [#688](https://github.com/fastapi-practices/fastapi_best_architecture/pull/688)
+* Update the dict pagination query parameters by [@wu-clan](https://github.com/wu-clan) in [#689](https://github.com/fastapi-practices/fastapi_best_architecture/pull/689)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
+
+[Changes][v1.5.2]
+
+
 <a id="v1.5.1"></a>
 # [v1.5.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.5.1) - 2025-06-16
 
@@ -630,6 +656,7 @@
 [Changes][v1.0.0]
 
 
+[v1.5.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
 [v1.5.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.3...v1.5.0
 [v1.4.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.2...v1.4.3
