@@ -21,7 +21,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         :param pk: 字典数据 ID
         :return:
         """
-        return await self.select_model(db, pk)
+        return await self.select_model(db, pk, load_strategies={'type': 'noload'})
 
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:
         """
@@ -32,23 +32,31 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_models(db, load_strategies={'type': 'noload'})
 
-    async def get_list(self, label: str | None, value: str | None, status: int | None) -> Select:
+    async def get_list(
+        self, type_code: str | None, label: str | None, value: str | None, status: int | None, type_id: int | None
+    ) -> Select:
         """
         获取字典数据列表
 
+        :param type_code: 字典类型编码
         :param label: 字典数据标签
         :param value: 字典数据键值
         :param status: 字典状态
+        :param type_id: 字典类型 ID
         :return:
         """
         filters = {}
 
+        if type_code is not None:
+            filters['type_code'] = type_code
         if label is not None:
             filters['label__like'] = f'%{label}%'
         if value is not None:
             filters['value__like'] = f'%{value}%'
         if status is not None:
             filters['status'] = status
+        if type_id is not None:
+            filters['type_id'] = type_id
 
         return await self.select_order('id', 'desc', load_strategies={'type': 'noload'}, **filters)
 

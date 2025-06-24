@@ -21,6 +21,7 @@ class DictData(Base):
     __tablename__ = 'sys_dict_data'
 
     id: Mapped[id_key] = mapped_column(init=False)
+    type_code: Mapped[str] = mapped_column(String(32), comment='对应的字典类型编码')
     label: Mapped[str] = mapped_column(String(32), comment='字典标签')
     value: Mapped[str] = mapped_column(String(32), comment='字典值')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')

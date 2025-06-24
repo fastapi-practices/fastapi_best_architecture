@@ -14,7 +14,6 @@ from backend.plugin.dict.schema.dict_data import (
     CreateDictDataParam,
     DeleteDictDataParam,
     GetDictDataDetail,
-    GetDictDataWithRelation,
     UpdateDictDataParam,
 )
 from backend.plugin.dict.service.dict_data_service import dict_data_service
@@ -31,7 +30,7 @@ async def get_all_dict_datas() -> ResponseSchemaModel[list[GetDictDataDetail]]:
 @router.get('/{pk}', summary='获取字典数据详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(
     pk: Annotated[int, Path(description='字典数据 ID')],
-) -> ResponseSchemaModel[GetDictDataWithRelation]:
+) -> ResponseSchemaModel[GetDictDataDetail]:
     data = await dict_data_service.get(pk=pk)
     return response_base.success(data=data)
 
@@ -46,11 +45,15 @@ async def get_dict_data(
 )
 async def get_dict_datas_paged(
     db: CurrentSession,
+    type_code: Annotated[str | None, Query(description='字典类型编码')] = None,
     label: Annotated[str | None, Query(description='字典数据标签')] = None,
     value: Annotated[str | None, Query(description='字典数据键值')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
+    type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
-    dict_data_select = await dict_data_service.get_select(label=label, value=value, status=status)
+    dict_data_select = await dict_data_service.get_select(
+        type_code=type_code, label=label, value=value, status=status, type_id=type_id
+    )
     page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
 
