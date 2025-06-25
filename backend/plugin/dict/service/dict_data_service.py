@@ -68,7 +68,7 @@ class DictDataService:
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
-            await dict_data_dao.create(db, obj)
+            await dict_data_dao.create(db, obj, dict_type.code)
 
     @staticmethod
     async def update(*, pk: int, obj: UpdateDictDataParam) -> int:
@@ -89,7 +89,7 @@ class DictDataService:
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
-            count = await dict_data_dao.update(db, pk, obj)
+            count = await dict_data_dao.update(db, pk, obj, dict_type.code)
             return count
 
     @staticmethod
