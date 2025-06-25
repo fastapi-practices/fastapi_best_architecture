@@ -70,26 +70,33 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_model_by_column(db, label=label)
 
-    async def create(self, db: AsyncSession, obj: CreateDictDataParam) -> None:
+    async def create(self, db: AsyncSession, obj: CreateDictDataParam, type_code: str) -> None:
         """
         创建字典数据
 
         :param db: 数据库会话
         :param obj: 创建字典数据参数
+        :param type_code: 字典类型编码
         :return:
         """
-        await self.create_model(db, obj)
+        dict_obj = obj.model_dump()
+        dict_obj.update({'type_code': type_code})
+        new_data = self.model(**dict_obj)
+        db.add(new_data)
 
-    async def update(self, db: AsyncSession, pk: int, obj: UpdateDictDataParam) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateDictDataParam, type_code: str) -> int:
         """
         更新字典数据
 
         :param db: 数据库会话
         :param pk: 字典数据 ID
         :param obj: 更新字典数据参数
+        :param type_code: 字典类型编码
         :return:
         """
-        return await self.update_model(db, pk, obj)
+        dict_obj = obj.model_dump()
+        dict_obj.update({'type_code': type_code})
+        return await self.update_model(db, pk, dict_obj)
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
