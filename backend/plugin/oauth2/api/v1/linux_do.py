@@ -16,7 +16,7 @@ _linux_do_client = LinuxDoOAuth20(
     settings.OAUTH2_LINUX_DO_CLIENT_ID,
     settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
 )
-_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, redirect_route_name='linux_do_login')
+_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, redirect_route_name='linux_do_oauth2_callback')
 
 
 @router.get('', summary='获取 LinuxDo 授权链接')
