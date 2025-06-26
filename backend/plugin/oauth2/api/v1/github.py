@@ -13,7 +13,7 @@ from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 router = APIRouter()
 
 _github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_GITHUB_CLIENT_SECRET)
-_github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_login')
+_github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_oauth2_callback')
 
 
 @router.get('', summary='获取 Github 授权链接')
