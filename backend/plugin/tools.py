@@ -87,7 +87,7 @@ def load_plugin_config(plugin: str) -> dict[str, Any]:
 def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """解析插件配置"""
 
-    extra_plugins = []
+    extend_plugins = []
     app_plugins = []
 
     plugins = get_plugins()
@@ -114,9 +114,16 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             raise PluginConfigError(f'插件 {plugin} 配置文件缺少必要字段: {", ".join(missing_fields)}')
 
         if data.get('api'):
-            if not data.get('app', {}).get('include'):
-                raise PluginConfigError(f'扩展级插件 {plugin} 配置文件缺少 app.include 配置')
-            extra_plugins.append(data)
+            # TODO: 删除过时的 include 配置
+            include = data.get('app', {}).get('include')
+            if include:
+                warnings.warn(
+                    f'插件 {plugin} 配置 app.include 即将在未来版本中弃用，请尽快更新配置为 app.extend, 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/plugin/dev.html#%E6%8F%92%E4%BB%B6%E9%85%8D%E7%BD%AE',
+                    FutureWarning,
+                )
+            if not include and not data.get('app', {}).get('extend'):
+                raise PluginConfigError(f'扩展级插件 {plugin} 配置文件缺少 app.extend 配置')
+            extend_plugins.append(data)
         else:
             if not data.get('app', {}).get('router'):
                 raise PluginConfigError(f'应用级插件 {plugin} 配置文件缺少 app.router 配置')
@@ -135,10 +142,10 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     run_await(current_redis_client.hset)(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status)
     run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
-    return extra_plugins, app_plugins
+    return extend_plugins, app_plugins
 
 
-def inject_extra_router(plugin: dict[str, Any]) -> None:
+def inject_extend_router(plugin: dict[str, Any]) -> None:
     """
     扩展级插件路由注入
 
@@ -177,9 +184,9 @@ def inject_extra_router(plugin: dict[str, Any]) -> None:
 
                 # 获取目标 app 路由
                 relative_path = os.path.relpath(root, plugin_api_path)
-                target_module_path = (
-                    f'backend.app.{plugin.get("app", {}).get("include")}.api.{relative_path.replace(os.sep, ".")}'
-                )
+                # TODO: 删除过时的 include 配置
+                app_name = plugin.get('app', {}).get('include') or plugin.get('app', {}).get('extend')
+                target_module_path = f'backend.app.{app_name}.api.{relative_path.replace(os.sep, ".")}'
                 target_module = import_module_cached(target_module_path)
                 target_router = getattr(target_module, 'router', None)
 
@@ -230,12 +237,12 @@ def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
 
 def build_final_router() -> APIRouter:
     """构建最终路由"""
-    extra_plugins, app_plugins = parse_plugin_config()
+    extend_plugins, app_plugins = parse_plugin_config()
 
-    for plugin in extra_plugins:
-        inject_extra_router(plugin)
+    for plugin in extend_plugins:
+        inject_extend_router(plugin)
 
-    # 主路由，必须在插件路由注入后导入
+    # 主路由，必须在扩展级插件路由注入后，应用级插件路由注入前导入
     from backend.app.router import router as main_router
 
     for plugin in app_plugins:

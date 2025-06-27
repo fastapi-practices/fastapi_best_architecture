@@ -5,7 +5,7 @@ description = '通常用于前端工程数据展示'
 author = 'wu-clan'
 
 [app]
-include = 'admin'
+extend = 'admin'
 
 [api.config]
 prefix = '/configs'
