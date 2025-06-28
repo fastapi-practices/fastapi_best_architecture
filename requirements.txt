@@ -95,9 +95,7 @@ fastapi==0.115.11
     #   fastapi-limiter
     #   fastapi-pagination
 fastapi-cli==0.0.5
-    # via
-    #   fastapi
-    #   fastapi-best-architecture
+    # via fastapi
 fastapi-limiter==0.1.6
     # via fastapi-best-architecture
 fastapi-pagination==0.13.0
