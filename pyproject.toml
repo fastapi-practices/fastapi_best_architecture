@@ -1,6 +1,5 @@
 [project]
 name = "fastapi_best_architecture"
-version = "0.0.1"
 description = """
 A RBAC (Role-Based Access Control) permission control system built on FastAPI, featuring a unique pseudo-three-tier
 architecture design, with built-in basic implementation of fastapi admin as a template library, free and open-source.
@@ -10,7 +9,8 @@ authors = [
 ]
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10"
+dynamic = ['version']
 dependencies = [
     "aiofiles>=24.1.0",
     "alembic>=1.14.1",
@@ -19,6 +19,7 @@ dependencies = [
     "asyncmy>=0.2.10",
     "asyncpg>=0.30.0",
     "bcrypt>=4.2.1",
+    "cappa>=0.28.0",
     "celery==5.3.6",
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
@@ -26,7 +27,6 @@ dependencies = [
     "cryptography>=44.0.0",
     "dulwich>=0.22.8",
     "fast-captcha>=0.3.2",
-    "fastapi-cli==0.0.5",
     "fastapi-limiter>=0.1.6",
     "fastapi-pagination>=0.13.0",
     "fastapi[standard]==0.115.11",
@@ -66,10 +66,22 @@ server = [
 ]
 
 [tool.uv]
-package = false
 python-downloads = "manual"
 default-groups = ["dev", "lint"]
 
 [[tool.uv.index]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[tool.hatch.version]
+path = "backend/__init__.py"
+
+[project.scripts]
+fba = "backend.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
