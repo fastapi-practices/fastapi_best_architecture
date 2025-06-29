@@ -20,7 +20,7 @@ with Progress(
     console=console,
 ) as progress:
     task = progress.add_task('安装插件依赖...', total=len(plugins))
-    for i, plugin in enumerate(plugins):
+    for plugin in plugins:
         install_requirements(plugin)
         progress.advance(task)
 
