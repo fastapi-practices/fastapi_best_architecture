@@ -7,4 +7,4 @@ from backend.utils.console import console
 
 
 def get_version() -> str | None:
-    console.print(f'\n[cyan]{__version__}[/]')
+    console.print(f'[cyan]{__version__}[/]')

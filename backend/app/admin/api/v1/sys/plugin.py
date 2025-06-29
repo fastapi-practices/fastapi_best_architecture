@@ -43,9 +43,11 @@ async def install_plugin(
     file: Annotated[UploadFile | None, File()] = None,
     repo_url: Annotated[str | None, Query(description='插件 git 仓库地址')] = None,
 ) -> ResponseModel:
-    await plugin_service.install(type=type, file=file, repo_url=repo_url)
+    plugin_name = await plugin_service.install(type=type, file=file, repo_url=repo_url)
     return response_base.success(
-        res=CustomResponse(code=200, msg='插件安装成功，请根据插件说明（README.md）进行相关配置并重启服务')
+        res=CustomResponse(
+            code=200, msg=f'插件 {plugin_name} 安装成功，请根据插件说明（README.md）进行相关配置并重启服务'
+        )
     )
 
 
@@ -61,7 +63,7 @@ async def install_plugin(
 async def uninstall_plugin(plugin: Annotated[str, Path(description='插件名称')]) -> ResponseModel:
     await plugin_service.uninstall(plugin=plugin)
     return response_base.success(
-        res=CustomResponse(code=200, msg='插件卸载成功，请根据插件说明（README.md）移除相关配置并重启服务')
+        res=CustomResponse(code=200, msg=f'插件 {plugin} 卸载成功，请根据插件说明（README.md）移除相关配置并重启服务')
     )
 
 

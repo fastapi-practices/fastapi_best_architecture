@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import Annotated
 
+import cappa
 import uvicorn
 
-from cappa import Arg, Subcommands, invoke
 from rich.panel import Panel
 from rich.progress import (
     Progress,
@@ -16,8 +16,11 @@ from rich.progress import (
 from rich.text import Text
 
 from backend import console, get_version
+from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
 from backend.plugin.tools import get_plugins, install_requirements
+from backend.utils._await import run_await
+from backend.utils.file_ops import install_git_plugin, install_zip_plugin
 
 
 def run(host: str, port: int, reload: bool, workers: int | None) -> None:
@@ -53,14 +56,35 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
     console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
-    uvicorn.run(app='backend.main:app', host=host, port=port, reload=reload, workers=workers)
+    uvicorn.run(app='backend.main:app', host=host, port=port, reload=not reload, workers=workers)
 
 
+def install_plugin(path: str, repo_url: str) -> None:
+    if not path and not repo_url:
+        raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
+    if path and repo_url:
+        raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
+
+    plugin_name = None
+    console.print(Text('开始安装插件...', style='bold cyan'))
+
+    try:
+        if path:
+            plugin_name = run_await(install_zip_plugin)(file=path)
+        if repo_url:
+            plugin_name = run_await(install_git_plugin)(repo_url=repo_url)
+    except Exception as e:
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+
+    console.print(Text(f'插件 {plugin_name} 安装成功', style='bold cyan'))
+
+
+@cappa.command(help='运行服务')
 @dataclass
 class Run:
     host: Annotated[
         str,
-        Arg(
+        cappa.Arg(
             long=True,
             default='127.0.0.1',
             help='提供服务的主机 IP 地址，对于本地开发，请使用 `127.0.0.1`。'
@@ -69,28 +93,44 @@ class Run:
     ]
     port: Annotated[
         int,
-        Arg(long=True, default=8000, help='提供服务的主机端口号'),
+        cappa.Arg(long=True, default=8000, help='提供服务的主机端口号'),
     ]
-    reload: Annotated[
+    no_reload: Annotated[
         bool,
-        Arg(long=True, default=True, help='启用在（代码）文件更改时自动重新加载服务器'),
+        cappa.Arg(long=True, default=False, help='禁用在（代码）文件更改时自动重新加载服务器'),
     ]
     workers: Annotated[
         int | None,
-        Arg(long=True, default=None, help='使用多个工作进程。与 `--reload` 标志互斥'),
+        cappa.Arg(long=True, default=None, help='使用多个工作进程。与 `--reload` 标志互斥'),
     ]
 
     def __call__(self):
-        run(host=self.host, port=self.port, reload=self.reload, workers=self.workers)
+        run(host=self.host, port=self.port, reload=self.no_reload, workers=self.workers)
+
+
+@cappa.command(help='新增插件')
+@dataclass
+class Add:
+    path: Annotated[
+        str | None,
+        cappa.Arg(long=True, help='ZIP 插件的本地完整路径'),
+    ]
+    repo_url: Annotated[
+        str | None,
+        cappa.Arg(long=True, help='Git 插件的仓库地址'),
+    ]
+
+    def __call__(self):
+        install_plugin(path=self.path, repo_url=self.repo_url)
 
 
 @dataclass
 class FbaCli:
     version: Annotated[
         bool,
-        Arg(short='-V', long=True, default=False, help='打印 fba 当前版本号'),
+        cappa.Arg(short='-V', long=True, default=False, help='打印当前版本号'),
     ]
-    subcmd: Subcommands[Run | None] = None
+    subcmd: cappa.Subcommands[Run | Add | None] = None
 
     def __call__(self):
         if self.version:
@@ -98,4 +138,5 @@ class FbaCli:
 
 
 def main() -> None:
-    invoke(FbaCli)
+    output = cappa.Output(error_format='[red]Error[/]: {message}\n\n更多信息，尝试 "[cyan]--help[/]"')
+    cappa.invoke(FbaCli, output=output)
