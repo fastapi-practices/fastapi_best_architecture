@@ -56,10 +56,9 @@ class PluginService:
             if not file:
                 raise errors.RequestError(msg='ZIP 压缩包不能为空')
             return await install_zip_plugin(file)
-        elif type == PluginType.git:
-            if not repo_url:
-                raise errors.RequestError(msg='Git 仓库地址不能为空')
-            return await install_git_plugin(repo_url)
+        if not repo_url:
+            raise errors.RequestError(msg='Git 仓库地址不能为空')
+        return await install_git_plugin(repo_url)
 
     @staticmethod
     async def uninstall(*, plugin: str):
