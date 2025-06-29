@@ -81,7 +81,7 @@ async def upload_file(file: UploadFile) -> str:
     return filename
 
 
-async def install_zip_plugin(file: UploadFile | str):
+async def install_zip_plugin(file: UploadFile | str) -> str:
     """
     安装 ZIP 插件
 
@@ -135,8 +135,10 @@ async def install_zip_plugin(file: UploadFile | str):
     await install_requirements_async(plugin_dir_name)
     await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
+    return plugin_name
 
-async def install_git_plugin(repo_url: str):
+
+async def install_git_plugin(repo_url: str) -> str:
     """
     安装 Git 插件
 
@@ -157,3 +159,5 @@ async def install_git_plugin(repo_url: str):
 
     await install_requirements_async(repo_name)
     await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+
+    return repo_name

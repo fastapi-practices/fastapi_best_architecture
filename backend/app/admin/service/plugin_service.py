@@ -43,7 +43,7 @@ class PluginService:
         return await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     @staticmethod
-    async def install(*, type: PluginType, file: UploadFile | None = None, repo_url: str | None = None):
+    async def install(*, type: PluginType, file: UploadFile | None = None, repo_url: str | None = None) -> str:
         """
         安装插件
 
@@ -55,11 +55,11 @@ class PluginService:
         if type == PluginType.zip:
             if not file:
                 raise errors.RequestError(msg='ZIP 压缩包不能为空')
-            await install_zip_plugin(file)
+            return await install_zip_plugin(file)
         elif type == PluginType.git:
             if not repo_url:
                 raise errors.RequestError(msg='Git 仓库地址不能为空')
-            await install_git_plugin(repo_url)
+            return await install_git_plugin(repo_url)
 
     @staticmethod
     async def uninstall(*, plugin: str):

@@ -59,6 +59,26 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     uvicorn.run(app='backend.main:app', host=host, port=port, reload=not reload, workers=workers)
 
 
+def install_plugin(path: str, repo_url: str) -> None:
+    if not path and not repo_url:
+        raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
+    if path and repo_url:
+        raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
+
+    plugin_name = None
+    console.print(Text('开始安装插件...', style='bold cyan'))
+
+    try:
+        if path:
+            plugin_name = run_await(install_zip_plugin)(file=path)
+        if repo_url:
+            plugin_name = run_await(install_git_plugin)(repo_url=repo_url)
+    except Exception as e:
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+
+    console.print(Text(f'插件 {plugin_name} 安装成功', style='bold cyan'))
+
+
 @cappa.command(help='运行服务')
 @dataclass
 class Run:
@@ -91,21 +111,17 @@ class Run:
 @cappa.command(help='新增插件')
 @dataclass
 class Add:
-    path: Annotated[str | None, cappa.Arg(long=True, help='ZIP 插件的本地完整路径')]
-    repo_url: Annotated[str | None, cappa.Arg(long=True, help='Git 插件的仓库地址')]
+    path: Annotated[
+        str | None,
+        cappa.Arg(long=True, help='ZIP 插件的本地完整路径'),
+    ]
+    repo_url: Annotated[
+        str | None,
+        cappa.Arg(long=True, help='Git 插件的仓库地址'),
+    ]
 
     def __call__(self):
-        if not self.path and not self.repo_url:
-            raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
-        if self.path and self.repo_url:
-            raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
-        try:
-            if self.path:
-                run_await(install_zip_plugin)(file=self.path)
-            if self.repo_url:
-                run_await(install_git_plugin)(repo_url=self.repo_url)
-        except Exception as e:
-            raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+        install_plugin(path=self.path, repo_url=self.repo_url)
 
 
 @dataclass
