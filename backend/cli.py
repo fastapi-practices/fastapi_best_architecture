@@ -101,7 +101,7 @@ class Run:
     ]
     workers: Annotated[
         int | None,
-        cappa.Arg(long=True, default=None, help='使用多个工作进程。与 `--reload` 标志互斥'),
+        cappa.Arg(long=True, default=None, help='使用多个工作进程，必须与 `--no-reload` 同时使用'),
     ]
 
     def __call__(self):
