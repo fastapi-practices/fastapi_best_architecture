@@ -88,11 +88,11 @@ async def install_zip_plugin(file: UploadFile | str):
     :param file: FastAPI 上传文件对象或文件完整路径
     :return:
     """
-    if isinstance(file, UploadFile):
-        contents = await file.read()
-    else:
+    if isinstance(file, str):
         async with aiofiles.open(file, mode='rb') as fb:
             contents = await fb.read()
+    else:
+        contents = await file.read()
     file_bytes = io.BytesIO(contents)
     if not zipfile.is_zipfile(file_bytes):
         raise errors.RequestError(msg='插件压缩包格式非法')
@@ -112,9 +112,9 @@ async def install_zip_plugin(file: UploadFile | str):
         # 插件是否可安装
         plugin_name = re.match(
             r'^([a-zA-Z0-9_]+)',
-            file.filename.split('.')[0].strip()
-            if isinstance(file, UploadFile)
-            else file.split(os.sep)[-1].split('.')[0].strip(),
+            file.split(os.sep)[-1].split('.')[0].strip()
+            if isinstance(file, str)
+            else file.filename.split('.')[0].strip(),
         ).group()
         full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
         if os.path.exists(full_plugin_path):

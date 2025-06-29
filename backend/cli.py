@@ -56,7 +56,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
     console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
-    uvicorn.run(app='backend.main:app', host=host, port=port, reload=reload, workers=workers)
+    uvicorn.run(app='backend.main:app', host=host, port=port, reload=not reload, workers=workers)
 
 
 @cappa.command(help='运行服务')
@@ -75,9 +75,9 @@ class Run:
         int,
         cappa.Arg(long=True, default=8000, help='提供服务的主机端口号'),
     ]
-    reload: Annotated[
+    no_reload: Annotated[
         bool,
-        cappa.Arg(long=True, default=True, help='启用在（代码）文件更改时自动重新加载服务器'),
+        cappa.Arg(long=True, default=False, help='禁用在（代码）文件更改时自动重新加载服务器'),
     ]
     workers: Annotated[
         int | None,
@@ -85,7 +85,7 @@ class Run:
     ]
 
     def __call__(self):
-        run(host=self.host, port=self.port, reload=self.reload, workers=self.workers)
+        run(host=self.host, port=self.port, reload=self.no_reload, workers=self.workers)
 
 
 @cappa.command(help='新增插件')
