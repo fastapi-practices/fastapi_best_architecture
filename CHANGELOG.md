@@ -1,3 +1,26 @@
+<a id="v1.6.0"></a>
+# [v1.6.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.6.0) - 2025-06-30
+
+## What's Changed
+* Update changelog for v1.5.2 by [@wu-clan](https://github.com/wu-clan) in [#690](https://github.com/fastapi-practices/fastapi_best_architecture/pull/690)
+* Optimize dict create and update logic by [@wu-clan](https://github.com/wu-clan) in [#691](https://github.com/fastapi-practices/fastapi_best_architecture/pull/691)
+* Fix the OAuth2 redirect route names by [@wu-clan](https://github.com/wu-clan) in [#693](https://github.com/fastapi-practices/fastapi_best_architecture/pull/693)
+* Update the SQL to adapt frontend plugin by [@wu-clan](https://github.com/wu-clan) in [#694](https://github.com/fastapi-practices/fastapi_best_architecture/pull/694)
+* Update the extension plugin config by [@wu-clan](https://github.com/wu-clan) in [#695](https://github.com/fastapi-practices/fastapi_best_architecture/pull/695)
+* Add the test user to SQL scripts by [@wu-clan](https://github.com/wu-clan) in [#696](https://github.com/fastapi-practices/fastapi_best_architecture/pull/696)
+* Add custom CLI for service startup by [@wu-clan](https://github.com/wu-clan) in [#697](https://github.com/fastapi-practices/fastapi_best_architecture/pull/697)
+* Add CLI support for plugin install by [@wu-clan](https://github.com/wu-clan) in [#698](https://github.com/fastapi-practices/fastapi_best_architecture/pull/698)
+* Update the help for CLI run worker by [@wu-clan](https://github.com/wu-clan) in [#699](https://github.com/fastapi-practices/fastapi_best_architecture/pull/699)
+* Optimize the installation of plugin dependencies by [@wu-clan](https://github.com/wu-clan) in [#700](https://github.com/fastapi-practices/fastapi_best_architecture/pull/700)
+* Update the Dockerfile to adapt latest code by [@wu-clan](https://github.com/wu-clan) in [#701](https://github.com/fastapi-practices/fastapi_best_architecture/pull/701)
+* Update the version number to 1.6.0 by [@wu-clan](https://github.com/wu-clan) in [#702](https://github.com/fastapi-practices/fastapi_best_architecture/pull/702)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
+
+[Changes][v1.6.0]
+
+
 <a id="v1.5.2"></a>
 # [v1.5.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.5.2) - 2025-06-24
 
@@ -656,6 +679,7 @@
 [Changes][v1.0.0]
 
 
+[v1.6.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
 [v1.5.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
 [v1.5.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.3...v1.5.0
