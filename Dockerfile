@@ -36,11 +36,6 @@ COPY . /fba
 
 COPY --from=builder /usr/local /usr/local
 
-# Install plugin dependencies
-WORKDIR /fba
-ENV PYTHONPATH=/fba
-RUN python3 backend/scripts/init_plugin.py
-
 # === FastAPI server image ===
 FROM base_server AS fastapi_server
 

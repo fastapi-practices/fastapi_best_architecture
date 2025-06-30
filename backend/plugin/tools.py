@@ -8,11 +8,13 @@ import sys
 import warnings
 
 from functools import lru_cache
+from importlib.metadata import PackageNotFoundError, distribution
 from typing import Any
 
 import rtoml
 
 from fastapi import APIRouter, Depends, Request
+from packaging.requirements import Requirement
 from starlette.concurrency import run_in_threadpool
 
 from backend.common.enums import StatusType
@@ -31,6 +33,10 @@ class PluginConfigError(Exception):
 
 class PluginInjectError(Exception):
     """插件注入错误"""
+
+
+class PluginInstallError(Exception):
+    """插件安装错误"""
 
 
 @lru_cache
@@ -262,7 +268,24 @@ def install_requirements(plugin: str | None) -> None:
 
     for plugin in plugins:
         requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        missing_dependencies = False
         if os.path.exists(requirements_file):
+            with open(requirements_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    try:
+                        req = Requirement(line)
+                        dependency = req.name.lower()
+                    except Exception as e:
+                        raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {str(e)}') from e
+                    try:
+                        distribution(dependency)
+                    except PackageNotFoundError:
+                        missing_dependencies = True
+
+        if missing_dependencies:
             try:
                 ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']
                 pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
@@ -271,7 +294,7 @@ def install_requirements(plugin: str | None) -> None:
                 subprocess.check_call(ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 subprocess.check_call(pip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except subprocess.CalledProcessError as e:
-                raise PluginInjectError(f'插件 {plugin} 依赖安装失败：{e.stderr}') from e
+                raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
 
 
 def uninstall_requirements(plugin: str) -> None:
@@ -285,9 +308,9 @@ def uninstall_requirements(plugin: str) -> None:
     if os.path.exists(requirements_file):
         try:
             pip_uninstall = [sys.executable, '-m', 'pip', 'uninstall', '-r', requirements_file, '-y']
-            subprocess.check_call(pip_uninstall)
+            subprocess.check_call(pip_uninstall, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as e:
-            raise PluginInjectError(f'插件 {plugin} 依赖卸载失败：{e.stderr}') from e
+            raise PluginInstallError(f'插件 {plugin} 依赖卸载失败：{e}') from e
 
 
 async def install_requirements_async(plugin: str | None = None) -> None:

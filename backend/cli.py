@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+
 from dataclasses import dataclass
 from typing import Annotated
 
@@ -7,44 +9,20 @@ import cappa
 import uvicorn
 
 from rich.panel import Panel
-from rich.progress import (
-    Progress,
-    SpinnerColumn,
-    TextColumn,
-    TimeElapsedColumn,
-)
 from rich.text import Text
 
 from backend import console, get_version
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
-from backend.plugin.tools import get_plugins, install_requirements
 from backend.utils._await import run_await
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin
 
 
 def run(host: str, port: int, reload: bool, workers: int | None) -> None:
-    console.print(Text('检测插件依赖...', style='bold cyan'))
-
-    plugins = get_plugins()
-
-    with Progress(
-        SpinnerColumn(finished_text='[bold green]插件依赖安装完成[/]'),
-        TextColumn('[green]{task.completed}/{task.total}[/]'),
-        TimeElapsedColumn(),
-        console=console,
-    ) as progress:
-        task = progress.add_task('安装插件依赖...', total=len(plugins))
-        for i, plugin in enumerate(plugins):
-            install_requirements(plugin)
-            progress.advance(task)
-
     url = f'http://{host}:{port}'
     docs_url = url + settings.FASTAPI_DOCS_URL
     redoc_url = url + settings.FASTAPI_REDOC_URL
     openapi_url = url + settings.FASTAPI_OPENAPI_URL
-
-    console.print(Text('启动 fba 服务...', style='bold magenta'))
 
     panel_content = Text()
     panel_content.append(f'📝 Swagger 文档: {docs_url}\n', style='blue')
@@ -56,7 +34,14 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
     console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
-    uvicorn.run(app='backend.main:app', host=host, port=port, reload=not reload, workers=workers)
+    uvicorn.run(
+        app='backend.main:app',
+        host=host,
+        port=port,
+        reload=not reload,
+        reload_excludes=[os.path.abspath('../.venv' if 'backend' in os.getcwd() else '.venv')],
+        workers=workers,
+    )
 
 
 def install_plugin(path: str, repo_url: str) -> None:
