@@ -13,6 +13,7 @@ services:
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
       - fba_static:/fba/backend/app/static
+      - fba_static_upload:/fba/backend/static/upload
     networks:
       - fba_network
     command:

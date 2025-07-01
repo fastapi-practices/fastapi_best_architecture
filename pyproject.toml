@@ -60,8 +60,8 @@ lint = [
     "pre-commit>=4.0.0",
 ]
 server = [
-    "gunicorn>=21.2.0",
     "aio-pika>=9.4.3",
+    "granian>=2.4.0",
     "wait-for-it>=2.2.2",
 ]
 
