@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import asyncio
 import os
 
 from dataclasses import dataclass
@@ -14,7 +15,6 @@ from rich.text import Text
 from backend import console, get_version
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
-from backend.utils._await import run_await
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin
 
 
@@ -44,7 +44,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
 
-def install_plugin(path: str, repo_url: str) -> None:
+async def install_plugin(path: str, repo_url: str) -> None:
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
     if path and repo_url:
@@ -55,9 +55,9 @@ def install_plugin(path: str, repo_url: str) -> None:
 
     try:
         if path:
-            plugin_name = run_await(install_zip_plugin)(file=path)
+            plugin_name = await install_zip_plugin(file=path)
         if repo_url:
-            plugin_name = run_await(install_git_plugin)(repo_url=repo_url)
+            plugin_name = await install_git_plugin(repo_url=repo_url)
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
@@ -105,8 +105,8 @@ class Add:
         cappa.Arg(long=True, help='Git 插件的仓库地址'),
     ]
 
-    def __call__(self):
-        install_plugin(path=self.path, repo_url=self.repo_url)
+    async def __call__(self):
+        await install_plugin(path=self.path, repo_url=self.repo_url)
 
 
 @dataclass
@@ -124,4 +124,4 @@ class FbaCli:
 
 def main() -> None:
     output = cappa.Output(error_format='[red]Error[/]: {message}\n\n更多信息，尝试 "[cyan]--help[/]"')
-    cappa.invoke(FbaCli, output=output)
+    asyncio.run(cappa.invoke_async(FbaCli, output=output))
