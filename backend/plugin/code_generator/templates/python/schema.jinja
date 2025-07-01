@@ -10,7 +10,7 @@ from backend.common.schema import SchemaBase
 class {{ schema_name }}SchemaBase(SchemaBase):
     """{{ doc_comment }}基础模型"""
     {% for model in models %}
-    {{ model.name }}: {% if model.nullable %}{{ model.pd_type }} | None = Field(None, description='{{ model.comment }}'){% else %}{{ model.pd_type }} = Field(description='{{ model.comment }}'){% endif %}
+    {{ model.name }}: {% if model.is_nullable %}{{ model.pd_type }} | None = Field(None, description='{{ model.comment }}'){% else %}{{ model.pd_type }} = Field(description='{{ model.comment }}'){% endif %}
 
     {% endfor %}
 
