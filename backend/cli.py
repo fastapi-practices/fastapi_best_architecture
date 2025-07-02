@@ -4,6 +4,7 @@ import asyncio
 import os
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Annotated
 
 import cappa
@@ -39,7 +40,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         host=host,
         port=port,
         reload=not reload,
-        reload_excludes=[os.path.abspath('../.venv' if 'backend' in os.getcwd() else '.venv')],
+        reload_excludes=[os.path.abspath('.venv' if Path(Path.cwd() / '.venv').is_dir() else '../.venv')],
         workers=workers,
     )
 
