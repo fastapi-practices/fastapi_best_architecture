@@ -49,7 +49,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
 
 
 async def install_plugin(
-    path: str, repo_url: str, execute_sql: bool, db_type: DataBaseType, pk_type: PrimaryKeyType
+    path: str, repo_url: str, no_sql: bool, db_type: DataBaseType, pk_type: PrimaryKeyType
 ) -> None:
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
@@ -68,7 +68,7 @@ async def install_plugin(
         console.print(Text(f'插件 {plugin_name} 安装成功', style='bold green'))
 
         sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
-        if sql_file and execute_sql:
+        if sql_file and not no_sql:
             console.print(Text('开始自动执行插件 SQL 脚本...', style='bold cyan'))
             await execute_sql_scripts(sql_file)
 
@@ -128,23 +128,24 @@ class Add:
         str | None,
         cappa.Arg(long=True, help='Git 插件的仓库地址'),
     ]
-    execute_sql: Annotated[
+    no_sql: Annotated[
         bool,
-        cappa.Arg(long=True, default=False, help='启用插件安装后自动执行 SQL 脚本'),
+        cappa.Arg(long=True, default=False, help='禁用插件 SQL 脚本自动执行'),
     ]
     db_type: Annotated[
         DataBaseType,
-        cappa.Arg(long=True, default='mysql', help='指定数据库类型，需启用 `--sql`'),
+        cappa.Arg(long=True, default='mysql', help='执行插件 SQL 脚本的数据库类型'),
     ]
     pk_type: Annotated[
         PrimaryKeyType,
-        cappa.Arg(long=True, default='autoincrement', help='指定数据库主键类型，需启用 `--sql`'),
+        cappa.Arg(long=True, default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
     ]
 
     async def __call__(self):
-        await install_plugin(self.path, self.repo_url, self.execute_sql, self.db_type, self.pk_type)
+        await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
 
 
+@cappa.command(help='一个高效的 fba 命令行界面')
 @dataclass
 class FbaCli:
     version: Annotated[
@@ -153,7 +154,7 @@ class FbaCli:
     ]
     sql: Annotated[
         str,
-        cappa.Arg(long=True, default='', help='脚本文件绝对路径，使用当前数据库配置在事务中执行 SQL 脚本'),
+        cappa.Arg(long=True, default='', help='在事务中执行 SQL 脚本'),
     ]
     subcmd: cappa.Subcommands[Run | Add | None] = None
 
