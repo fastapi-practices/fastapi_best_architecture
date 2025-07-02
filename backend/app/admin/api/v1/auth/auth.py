@@ -47,7 +47,7 @@ async def refresh_token(request: Request) -> ResponseSchemaModel[GetNewToken]:
     return response_base.success(data=data)
 
 
-@router.post('/logout', summary='用户登出', dependencies=[DependsJwtAuth])
+@router.post('/logout', summary='用户登出')
 async def logout(request: Request, response: Response) -> ResponseModel:
     await auth_service.logout(request=request, response=response)
     return response_base.success()
