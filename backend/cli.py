@@ -11,11 +11,15 @@ import uvicorn
 
 from rich.panel import Panel
 from rich.text import Text
+from sqlalchemy import text
 
 from backend import console, get_version
+from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
-from backend.utils.file_ops import install_git_plugin, install_zip_plugin
+from backend.database.db import async_db_session
+from backend.plugin.tools import get_plugin_sql
+from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
 
 
 def run(host: str, port: int, reload: bool, workers: int | None) -> None:
@@ -44,7 +48,9 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
 
-async def install_plugin(path: str, repo_url: str) -> None:
+async def install_plugin(
+    path: str, repo_url: str, execute_sql: bool, db_type: DataBaseType, pk_type: PrimaryKeyType
+) -> None:
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
     if path and repo_url:
@@ -58,10 +64,28 @@ async def install_plugin(path: str, repo_url: str) -> None:
             plugin_name = await install_zip_plugin(file=path)
         if repo_url:
             plugin_name = await install_git_plugin(repo_url=repo_url)
+
+        console.print(Text(f'插件 {plugin_name} 安装成功', style='bold green'))
+
+        sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
+        if sql_file and execute_sql:
+            console.print(Text('开始自动执行插件 SQL 脚本...', style='bold cyan'))
+            await execute_sql_scripts(sql_file)
+
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
-    console.print(Text(f'插件 {plugin_name} 安装成功', style='bold cyan'))
+
+async def execute_sql_scripts(sql_scripts: str) -> None:
+    async with async_db_session.begin() as db:
+        try:
+            stmts = await parse_sql_script(sql_scripts)
+            for stmt in stmts:
+                await db.execute(text(stmt))
+        except Exception as e:
+            raise cappa.Exit(f'SQL 脚本执行失败：{e}', code=1)
+
+    console.print(Text('SQL 脚本已执行完成', style='bold green'))
 
 
 @cappa.command(help='运行服务')
@@ -104,9 +128,21 @@ class Add:
         str | None,
         cappa.Arg(long=True, help='Git 插件的仓库地址'),
     ]
+    execute_sql: Annotated[
+        bool,
+        cappa.Arg(long=True, default=False, help='启用插件安装后自动执行 SQL 脚本'),
+    ]
+    db_type: Annotated[
+        DataBaseType,
+        cappa.Arg(long=True, default='mysql', help='指定数据库类型，需启用 `--sql`'),
+    ]
+    pk_type: Annotated[
+        PrimaryKeyType,
+        cappa.Arg(long=True, default='autoincrement', help='指定数据库主键类型，需启用 `--sql`'),
+    ]
 
     async def __call__(self):
-        await install_plugin(path=self.path, repo_url=self.repo_url)
+        await install_plugin(self.path, self.repo_url, self.execute_sql, self.db_type, self.pk_type)
 
 
 @dataclass
@@ -115,11 +151,17 @@ class FbaCli:
         bool,
         cappa.Arg(short='-V', long=True, default=False, help='打印当前版本号'),
     ]
+    sql: Annotated[
+        str,
+        cappa.Arg(long=True, default='', help='脚本文件绝对路径，使用当前数据库配置在事务中执行 SQL 脚本'),
+    ]
     subcmd: cappa.Subcommands[Run | Add | None] = None
 
-    def __call__(self):
+    async def __call__(self):
         if self.version:
             get_version()
+        if self.sql:
+            await execute_sql_scripts(self.sql)
 
 
 def main() -> None:

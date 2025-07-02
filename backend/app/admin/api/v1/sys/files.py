@@ -8,7 +8,7 @@ from backend.common.dataclasses import UploadUrl
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.utils.file_ops import file_verify, upload_file
+from backend.utils.file_ops import upload_file, upload_file_verify
 
 router = APIRouter()
 
@@ -22,6 +22,6 @@ router = APIRouter()
     ],
 )
 async def upload_files(file: Annotated[UploadFile, File()]) -> ResponseSchemaModel[UploadUrl]:
-    file_verify(file)
+    upload_file_verify(file)
     filename = await upload_file(file)
     return response_base.success(data={'url': f'/static/upload/{filename}'})

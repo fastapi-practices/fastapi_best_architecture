@@ -48,6 +48,7 @@ dependencies = [
     "rtoml>=0.12.0",
     "sqlalchemy-crud-plus>=1.10.0",
     "sqlalchemy[asyncio]>=2.0.40",
+    "sqlparse>=0.5.3",
     "user-agents==2.2.0",
 ]
 

@@ -9,6 +9,7 @@ import aiofiles
 
 from dulwich import porcelain
 from fastapi import UploadFile
+from sqlparse import split
 
 from backend.common.enums import FileType
 from backend.common.exception import errors
@@ -35,7 +36,7 @@ def build_filename(file: UploadFile) -> str:
     return new_filename
 
 
-def file_verify(file: UploadFile) -> None:
+def upload_file_verify(file: UploadFile) -> None:
     """
     文件验证
 
@@ -161,3 +162,26 @@ async def install_git_plugin(repo_url: str) -> str:
     await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     return repo_name
+
+
+async def parse_sql_script(filepath: str) -> list[str]:
+    """
+    解析 SQL 脚本
+
+    :param filepath: 脚本文件路径
+    :return:
+    """
+    if not os.path.exists(filepath):
+        raise errors.NotFoundError(msg='SQL 脚本文件不存在')
+
+    async with aiofiles.open(filepath, mode='r', encoding='utf-8') as f:
+        contents = await f.read(1024)
+        while additional_contents := await f.read(1024):
+            contents += additional_contents
+
+    statements = split(contents)
+    for statement in statements:
+        if not any(statement.lower().startswith(_) for _ in ['select', 'insert']):
+            raise errors.RequestError(msg='SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT')
+
+    return statements

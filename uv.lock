@@ -678,6 +678,7 @@ dependencies = [
     { name = "rtoml" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "sqlalchemy-crud-plus" },
+    { name = "sqlparse" },
     { name = "user-agents" },
 ]
 
@@ -731,6 +732,7 @@ requires-dist = [
     { name = "rtoml", specifier = ">=0.12.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.40" },
     { name = "sqlalchemy-crud-plus", specifier = ">=1.10.0" },
+    { name = "sqlparse", specifier = ">=0.5.3" },
     { name = "user-agents", specifier = "==2.2.0" },
 ]
 
@@ -2238,6 +2240,15 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/9b/47/fa0059f2ba24a0e8a6ded068460e23063a0b62b93ce1f3aa23fb7ae002fd/sqlalchemy_crud_plus-1.10.0.tar.gz", hash = "sha256:ce81cb0aac7f1e5cd1d6be794712d8f2a93f127c0936f4c3a2c79f3039eb2f62" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/a2/72/a7553fb70a41559d74654d9111644e8326d5d420588b59f39de872a3da8f/sqlalchemy_crud_plus-1.10.0-py3-none-any.whl", hash = "sha256:44db51256b57aa00757e48ade1e8be5ce6b6bd334fdd6d1fed5a22e97c6b0a6b" },
+]
+
+[[package]]
+name = "sqlparse"
+version = "0.5.3"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/e5/40/edede8dd6977b0d3da179a342c198ed100dd2aba4be081861ee5911e4da4/sqlparse-0.5.3.tar.gz", hash = "sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/a9/5c/bfd6bd0bf979426d405cc6e71eceb8701b148b16c21d2dc3c261efc61c7b/sqlparse-0.5.3-py3-none-any.whl", hash = "sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca" },
 ]
 
 [[package]]
