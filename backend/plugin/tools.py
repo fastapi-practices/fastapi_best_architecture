@@ -17,7 +17,7 @@ from fastapi import APIRouter, Depends, Request
 from packaging.requirements import Requirement
 from starlette.concurrency import run_in_threadpool
 
-from backend.common.enums import StatusType
+from backend.common.enums import DataBaseType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
@@ -73,6 +73,34 @@ def get_plugin_models() -> list[type]:
                 classes.append(obj)
 
     return classes
+
+
+async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
+    """
+    获取插件 SQL 脚本
+
+    :param plugin: 插件名称
+    :param db_type: 数据库类型
+    :param pk_type: 主键类型
+    :return:
+    """
+    if db_type == DataBaseType.mysql.value:
+        mysql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'mysql')
+        if pk_type == PrimaryKeyType.autoincrement:
+            sql_file = os.path.join(mysql_dir, 'init.sql')
+        else:
+            sql_file = os.path.join(mysql_dir, 'init_snowflake.sql')
+    else:
+        postgresql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'postgresql')
+        if pk_type == PrimaryKeyType.autoincrement.value:
+            sql_file = os.path.join(postgresql_dir, 'init.sql')
+        else:
+            sql_file = os.path.join(postgresql_dir, 'init_snowflake.sql')
+
+    if not os.path.exists(sql_file):
+        return None
+
+    return sql_file
 
 
 def load_plugin_config(plugin: str) -> dict[str, Any]:
