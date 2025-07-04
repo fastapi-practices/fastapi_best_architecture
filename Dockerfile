@@ -49,23 +49,6 @@ RUN mkdir -p /var/log/fastapi_server
 
 EXPOSE 8001
 
-# Granian env
-ENV GRANIAN_HOST=0.0.0.0 \
-    GRANIAN_PORT=8001 \
-    # 并行工作进程数
-    GRANIAN_WORKERS=1 \
-    # 监听队列
-    GRANIAN_BACKLOG=1024 \
-    # 每个工作进程处理超时时间
-    GRANIAN_WORKERS_KILL_TIMEOUT=120 \
-    # 每个工作进程最大并发量
-    GRANIAN_BACKPRESSURE=2000 \
-    # PID 文件
-    GRANIAN_PID_FILE='/var/run/granian.pid' \
-    # 日志
-    GRANIAN_LOG_ENABLED=true \
-    GRANIAN_LOG_LEVEL='debug'
-
 CMD ["/usr/local/bin/granian", "main:app", "--interface", "asgi", "--host", "0.0.0.0", "--port","8000"]
 
 # === Celery server image ===
