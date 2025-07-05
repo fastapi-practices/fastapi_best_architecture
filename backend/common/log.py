@@ -94,7 +94,7 @@ def set_custom_logfile() -> None:
     log_config = {
         'format': settings.LOG_FILE_FORMAT,
         'enqueue': True,
-        'rotation': '5 MB',
+        'rotation': '00:00',
         'retention': '7 days',
         'compression': 'tar.gz',
     }

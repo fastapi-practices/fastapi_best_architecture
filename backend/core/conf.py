@@ -157,9 +157,7 @@ class Settings(BaseSettings):
     LOG_ERROR_FILE_LEVEL: str = 'ERROR'
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
     LOG_ERROR_FILENAME: str = 'fba_error.log'
-    LOG_FILE_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
-    )
+    LOG_FILE_FORMAT: str = '{time:YYYY-MM-DD HH:mm:ss.SSS} | <lvl>{level: <8}</> | {correlation_id} | <lvl>{message}</>'
 
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [

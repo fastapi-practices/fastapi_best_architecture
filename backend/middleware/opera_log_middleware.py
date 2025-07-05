@@ -81,6 +81,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             except AttributeError:
                 username = None
 
+            # 日志记录
+            log.debug(f'请求地址：[{request.state.ip}]')
+            log.debug(f'请求参数：{args}')
+
             # 日志创建
             opera_log_in = CreateOperaLogParam(
                 trace_id=get_request_trace_id(request),

@@ -20,10 +20,11 @@ class AccessMiddleware(BaseHTTPMiddleware):
         :param call_next: 下一个中间件或路由处理函数
         :return:
         """
-        log.info(
-            f'发送请求：[{request.client.host}] - [{request.method}] - '
-            f'[{request.url.path if not request.url.query else request.url.path + "/" + request.url.query}]'
-        )
+        path = request.url.path if not request.url.query else request.url.path + '/' + request.url.query
+
+        if request.method != 'OPTIONS':
+            log.info(f'--> 请求开始[{path}]')
+            log.info(f'请求方式：[{request.method}]')
 
         perf_time = time.perf_counter()
         request.state.perf_time = perf_time
@@ -34,7 +35,10 @@ class AccessMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         elapsed = (time.perf_counter() - perf_time) * 1000
-        log.info(f'接口耗时：{elapsed:.3f}ms')
-        log.info(f'请求结束：{response.status_code}')
+
+        if request.method != 'OPTIONS':
+            log.info(f'接口耗时：[{elapsed:.3f}]ms')
+            log.info(f'接口状态：[{response.status_code}]')
+            log.info('<-- 请求结束')
 
         return response
