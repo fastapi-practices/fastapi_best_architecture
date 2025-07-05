@@ -8,8 +8,9 @@ import sys
 from asgi_correlation_id import correlation_id
 from loguru import logger
 
-from backend.core import path_conf
 from backend.core.conf import settings
+from backend.core.path_conf import LOG_DIR
+from backend.utils.timezone import timezone
 
 
 class InterceptHandler(logging.Handler):
@@ -58,11 +59,11 @@ def setup_logging() -> None:
         # Debug log handlers
         # logging.debug(f'{logging.getLogger(name)}, {logging.getLogger(name).propagate}')
 
-    # 定义 correlation_id 默认过滤函数
+    # correlation_id 过滤器
     # https://github.com/snok/asgi-correlation-id/issues/7
     def correlation_id_filter(record):
-        cid = correlation_id.get(settings.LOG_CID_DEFAULT_VALUE)
-        record['correlation_id'] = cid[: settings.LOG_CID_UUID_LENGTH]
+        cid = correlation_id.get(settings.TRACE_ID_LOG_DEFAULT_VALUE)
+        record['correlation_id'] = cid[: settings.TRACE_ID_LOG_UUID_LENGTH]
         return record
 
     # 配置 loguru 处理器
@@ -81,13 +82,20 @@ def setup_logging() -> None:
 
 def set_custom_logfile() -> None:
     """设置自定义日志文件"""
-    log_path = path_conf.LOG_DIR
-    if not os.path.exists(log_path):
-        os.mkdir(log_path)
+    if not os.path.exists(LOG_DIR):
+        os.mkdir(LOG_DIR)
 
     # 日志文件
-    log_access_file = os.path.join(log_path, settings.LOG_ACCESS_FILENAME)
-    log_error_file = os.path.join(log_path, settings.LOG_ERROR_FILENAME)
+    log_access_file = os.path.join(LOG_DIR, settings.LOG_ACCESS_FILENAME)
+    log_error_file = os.path.join(LOG_DIR, settings.LOG_ERROR_FILENAME)
+
+    # 日志压缩回调
+    def compression(filepath):
+        filename = filepath.split(os.sep)[-1]
+        original_filename = filename.split('.')[0]
+        if '-' in original_filename:
+            return os.path.join(LOG_DIR, f'{original_filename}.log')
+        return os.path.join(LOG_DIR, f'{original_filename}_{timezone.now().strftime("%Y-%m-%d")}.log')
 
     # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
@@ -96,7 +104,7 @@ def set_custom_logfile() -> None:
         'enqueue': True,
         'rotation': '00:00',
         'retention': '7 days',
-        'compression': 'tar.gz',
+        'compression': lambda filepath: os.rename(filepath, compression(filepath)),
     }
 
     # 标准输出文件
