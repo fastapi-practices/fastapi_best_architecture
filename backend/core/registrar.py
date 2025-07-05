@@ -20,6 +20,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_table
 from backend.database.redis import redis_client
+from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
@@ -69,8 +70,8 @@ def register_app() -> FastAPI:
     )
 
     # 注册组件
-    register_socket_app(app)
     register_logger()
+    register_socket_app(app)
     register_static_file(app)
     register_middleware(app)
     register_router(app)
@@ -110,29 +111,20 @@ def register_middleware(app: FastAPI) -> None:
     :param app: FastAPI 应用实例
     :return:
     """
-    # Opera log (必须)
+    # Opera log
     app.add_middleware(OperaLogMiddleware)
 
-    # JWT auth (必须)
+    # State
+    app.add_middleware(StateMiddleware)
+
+    # JWT auth
     app.add_middleware(
         AuthenticationMiddleware,
         backend=JwtAuthMiddleware(),
         on_error=JwtAuthMiddleware.auth_exception_handler,
     )
 
-    # Access log
-    if settings.MIDDLEWARE_ACCESS:
-        from backend.middleware.access_middleware import AccessMiddleware
-
-        app.add_middleware(AccessMiddleware)
-
-    # State
-    app.add_middleware(StateMiddleware)
-
-    # Trace ID (必须)
-    app.add_middleware(CorrelationIdMiddleware, validator=False)
-
-    # CORS（必须放在最下面）
+    # CORS
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
 
@@ -144,6 +136,12 @@ def register_middleware(app: FastAPI) -> None:
             allow_headers=['*'],
             expose_headers=settings.CORS_EXPOSE_HEADERS,
         )
+
+    # Access log
+    app.add_middleware(AccessMiddleware)
+
+    # Trace ID
+    app.add_middleware(CorrelationIdMiddleware, validator=False)
 
 
 def register_router(app: FastAPI) -> None:

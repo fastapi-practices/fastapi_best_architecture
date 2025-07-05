@@ -53,8 +53,8 @@ class Settings(BaseSettings):
     FASTAPI_STATIC_FILES: bool = True
 
     # 数据库
-    DATABASE_ECHO: bool = False
-    DATABASE_POOL_ECHO: bool = False
+    DATABASE_ECHO: bool | Literal['debug'] = False
+    DATABASE_POOL_ECHO: bool | Literal['debug'] = False
     DATABASE_SCHEMA: str = 'fba'
     DATABASE_CHARSET: str = 'utf8mb4'
 
@@ -115,7 +115,6 @@ class Settings(BaseSettings):
 
     # 中间件配置
     MIDDLEWARE_CORS: bool = True
-    MIDDLEWARE_ACCESS: bool = True
 
     # 请求限制配置
     REQUEST_LIMITER_REDIS_PREFIX: str = 'fba:limiter'
@@ -151,18 +150,14 @@ class Settings(BaseSettings):
     LOG_CID_DEFAULT_VALUE: str = '-'
     LOG_CID_UUID_LENGTH: int = 32  # 日志 correlation_id 长度，必须小于等于 32
     LOG_STD_LEVEL: str = 'INFO'
+    LOG_STD_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
+    )
     LOG_ACCESS_FILE_LEVEL: str = 'INFO'
     LOG_ERROR_FILE_LEVEL: str = 'ERROR'
-    LOG_STD_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
-        '<cyan> {correlation_id} </> | <lvl>{message}</>'
-    )
-    LOG_FILE_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | '
-        '<cyan> {correlation_id} </> | <lvl>{message}</>'
-    )
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
     LOG_ERROR_FILENAME: str = 'fba_error.log'
+    LOG_FILE_FORMAT: str = '{time:YYYY-MM-DD HH:mm:ss.SSS} | <lvl>{level: <8}</> | {correlation_id} | <lvl>{message}</>'
 
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [

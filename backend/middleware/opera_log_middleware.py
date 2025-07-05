@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import time
+
 from asyncio import create_task
 from typing import Any
 
@@ -11,12 +13,10 @@ from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
-from backend.common.dataclasses import RequestCallNext
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
-from backend.utils.timezone import timezone
 from backend.utils.trace_id import get_request_trace_id
 
 
@@ -31,113 +31,89 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         :param call_next: 下一个中间件或路由处理函数
         :return:
         """
-        # 排除记录白名单
-        path = request.url.path
-        if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
-            return await call_next(request)
-
-        # 请求解析
-        try:
-            # 此信息依赖于 jwt 中间件
-            username = request.user.username
-        except AttributeError:
-            username = None
-        method = request.method
-        args = await self.get_request_args(request)
-        args = await self.desensitization(args)
-
-        # 执行请求
-        start_time = timezone.now()
-        request_next = await self.execute_request(request, call_next)
-        end_time = timezone.now()
-        cost_time = round((end_time - start_time).total_seconds() * 1000.0, 3)
-
-        # 此信息只能在请求后获取
-        _route = request.scope.get('route')
-        summary = getattr(_route, 'summary', None) or ''
-
-        # 日志创建
-        opera_log_in = CreateOperaLogParam(
-            trace_id=get_request_trace_id(request),
-            username=username,
-            method=method,
-            title=summary,
-            path=path,
-            ip=request.state.ip,
-            country=request.state.country,
-            region=request.state.region,
-            city=request.state.city,
-            user_agent=request.state.user_agent,
-            os=request.state.os,
-            browser=request.state.browser,
-            device=request.state.device,
-            args=args,
-            status=request_next.status,
-            code=request_next.code,
-            msg=request_next.msg,
-            cost_time=cost_time,
-            opera_time=start_time,
-        )
-        create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
-
-        # 错误抛出
-        if request_next.err:
-            raise request_next.err from None
-
-        return request_next.response
-
-    async def execute_request(self, request: Request, call_next: Any) -> RequestCallNext:
-        """
-        执行请求并处理异常
-
-        :param request: FastAPI 请求对象
-        :param call_next: 下一个中间件或路由处理函数
-        :return:
-        """
-        code = 200
-        msg = 'Success'
-        status = StatusType.enable
-        err = None
         response = None
-        try:
+        path = request.url.path
+
+        if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
             response = await call_next(request)
-            code, msg = self.request_exception_handler(request, code, msg)
-        except Exception as e:
-            log.error(f'请求异常: {str(e)}')
-            # code 处理包含 SQLAlchemy 和 Pydantic
-            code = getattr(e, 'code', code)
-            msg = getattr(e, 'msg', msg)
-            status = StatusType.disable
-            err = e
+        else:
+            method = request.method
+            args = await self.get_request_args(request)
+            args = await self.desensitization(args)
 
-        return RequestCallNext(code=str(code), msg=msg, status=status, err=err, response=response)
+            # 执行请求
+            elapsed = 0.0
+            code = 200
+            msg = 'Success'
+            status = StatusType.enable
+            error = None
+            try:
+                response = await call_next(request)
+                elapsed = (time.perf_counter() - request.state.perf_time) * 1000
+                for state in [
+                    '__request_http_exception__',
+                    '__request_validation_exception__',
+                    '__request_assertion_error__',
+                    '__request_custom_exception__',
+                    '__request_all_unknown_exception__',
+                    '__request_cors_500_exception__',
+                ]:
+                    exception = getattr(request.state, state, None)
+                    if exception:
+                        code = exception.get('code')
+                        msg = exception.get('msg')
+                        log.error(f'请求异常: {msg}')
+                        break
+            except Exception as e:
+                log.error(f'请求异常: {str(e)}')
+                code = getattr(e, 'code', code)  # 兼容 SQLAlchemy 异常用法
+                msg = getattr(e, 'msg', msg)
+                status = StatusType.disable
+                error = e
 
-    @staticmethod
-    def request_exception_handler(request: Request, code: int, msg: str) -> tuple[str, str]:
-        """
-        请求异常处理器
+            # 此信息只能在请求后获取
+            _route = request.scope.get('route')
+            summary = getattr(_route, 'summary', '')
 
-        :param request: FastAPI 请求对象
-        :param code: 错误码
-        :param msg: 错误信息
-        :return:
-        """
-        exception_states = [
-            '__request_http_exception__',
-            '__request_validation_exception__',
-            '__request_assertion_error__',
-            '__request_custom_exception__',
-            '__request_all_unknown_exception__',
-            '__request_cors_500_exception__',
-        ]
-        for state in exception_states:
-            exception = getattr(request.state, state, None)
-            if exception:
-                code = exception.get('code')
-                msg = exception.get('msg')
-                log.error(f'请求异常: {msg}')
-                break
-        return code, msg
+            try:
+                # 此信息来源于 JWT 认证中间件
+                username = request.user.username
+            except AttributeError:
+                username = None
+
+            # 日志记录
+            log.debug(f'请求地址：[{request.state.ip}]')
+            log.debug(f'请求参数：{args}')
+
+            # 日志创建
+            opera_log_in = CreateOperaLogParam(
+                trace_id=get_request_trace_id(request),
+                username=username,
+                method=method,
+                title=summary,
+                path=path,
+                ip=request.state.ip,
+                country=request.state.country,
+                region=request.state.region,
+                city=request.state.city,
+                user_agent=request.state.user_agent,
+                os=request.state.os,
+                browser=request.state.browser,
+                device=request.state.device,
+                args=args,
+                status=status,
+                code=str(code),
+                msg=msg,
+                cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
+                opera_time=request.state.start_time,
+            )
+            create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
+
+            # 错误抛出
+            if error:
+                raise error from None
+
+        return response
 
     @staticmethod
     async def get_request_args(request: Request) -> dict[str, Any]:
@@ -147,25 +123,39 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         :param request: FastAPI 请求对象
         :return:
         """
-        args = dict(request.query_params)
-        args.update(request.path_params)
+        args = {}
+        query_params = dict(request.query_params)
+        if query_params:
+            args['query_params'] = query_params
+        path_params = request.path_params
+        if path_params:
+            args['path_params'] = path_params
         # Tip: .body() 必须在 .form() 之前获取
         # https://github.com/encode/starlette/discussions/1933
+        content_type = request.headers.get('Content-Type', '').split(';')
         body_data = await request.body()
-        form_data = await request.form()
-        if len(form_data) > 0:
-            args.update({k: v.filename if isinstance(v, UploadFile) else v for k, v in form_data.items()})
-        elif body_data:
-            content_type = request.headers.get('Content-Type', '').split(';')
-            if 'application/json' in content_type:
+        if body_data:
+            # 注意：非 json 数据默认使用 body 作为键
+            if 'application/json' not in content_type:
+                args['data'] = str(body_data)
+            else:
                 json_data = await request.json()
                 if isinstance(json_data, dict):
-                    args.update(json_data)
+                    args['json'] = json_data
                 else:
-                    # 注意：非字典数据默认使用 body 作为键
-                    args.update({'body': str(body_data)})
+                    args['data'] = str(body_data)
+        form_data = await request.form()
+        if len(form_data) > 0:
+            for k, v in form_data.items():
+                if isinstance(v, UploadFile):
+                    form_data = {k: v.filename}
+                else:
+                    form_data = {k: v}
+            if 'multipart/form-data' not in content_type:
+                args['x-www-form-urlencoded'] = form_data
             else:
-                args.update({'body': str(body_data)})
+                args['form-data'] = form_data
+
         return args
 
     @staticmethod

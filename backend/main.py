@@ -8,14 +8,14 @@ from backend.core.registrar import register_app
 from backend.plugin.tools import get_plugins, install_requirements
 from backend.utils.timezone import timezone
 
-_print_log_style = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | fba      |  -  | '
-console.print(Text(f'{_print_log_style}检测插件依赖...', style='bold cyan'))
+_log_prefix = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | {"INFO": <8} | - | '
+console.print(Text(f'{_log_prefix}检测插件依赖...', style='bold cyan'))
 
 _plugins = get_plugins()
 
 with Progress(
-    SpinnerColumn(finished_text=f'[bold green]{_print_log_style}插件准备就绪[/]'),
-    TextColumn('[bold green]{task.completed}/{task.total}[/]'),
+    SpinnerColumn(finished_text=f'[bold green]{_log_prefix}插件准备就绪[/]'),
+    TextColumn('{task.completed}/{task.total}', style='bold green'),
     TimeElapsedColumn(),
     console=console,
 ) as progress:
@@ -24,6 +24,6 @@ with Progress(
         install_requirements(plugin)
         progress.advance(task)
 
-console.print(Text(f'{_print_log_style}启动服务...', style='bold magenta'))
+console.print(Text(f'{_log_prefix}启动服务...', style='bold magenta'))
 
 app = register_app()
