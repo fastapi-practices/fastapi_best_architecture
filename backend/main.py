@@ -8,7 +8,7 @@ from backend.core.registrar import register_app
 from backend.plugin.tools import get_plugins, install_requirements
 from backend.utils.timezone import timezone
 
-_print_log_style = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | fba      |  -  | '
+_print_log_style = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | fba      | - | '
 console.print(Text(f'{_print_log_style}检测插件依赖...', style='bold cyan'))
 
 _plugins = get_plugins()
