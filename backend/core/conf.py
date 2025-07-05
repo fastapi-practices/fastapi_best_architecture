@@ -143,16 +143,17 @@ class Settings(BaseSettings):
     IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24  # 1 天
 
-    # 追踪 ID
+    # 日志（Trace ID)
     TRACE_ID_REQUEST_HEADER_KEY: str = 'X-Request-ID'
+    TRACE_ID_LOG_DEFAULT_VALUE: str = '-'
+    TRACE_ID_LOG_UUID_LENGTH: int = 32  # UUID 长度，必须小于等于 32
 
-    # 日志
-    LOG_CID_DEFAULT_VALUE: str = '-'
-    LOG_CID_UUID_LENGTH: int = 32  # 日志 correlation_id 长度，必须小于等于 32
+    # 日志（控制台）
     LOG_STD_LEVEL: str = 'INFO'
     LOG_STD_FORMAT: str = (
         '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
     )
+    # 日志（文件）
     LOG_ACCESS_FILE_LEVEL: str = 'INFO'
     LOG_ERROR_FILE_LEVEL: str = 'ERROR'
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
