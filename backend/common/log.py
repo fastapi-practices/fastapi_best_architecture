@@ -8,7 +8,6 @@ import sys
 from asgi_correlation_id import correlation_id
 from loguru import logger
 
-from backend.core import path_conf
 from backend.core.conf import settings
 from backend.core.path_conf import LOG_DIR
 from backend.utils.timezone import timezone
