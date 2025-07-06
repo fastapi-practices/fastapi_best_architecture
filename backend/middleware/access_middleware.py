@@ -23,8 +23,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
         path = request.url.path if not request.url.query else request.url.path + '/' + request.url.query
 
         if request.method != 'OPTIONS':
-            log.info(f'--> 请求开始[{path}]')
-            log.info(f'请求方式：[{request.method}]')
+            log.debug(f'--> 请求开始[{path}]')
 
         perf_time = time.perf_counter()
         request.state.perf_time = perf_time
@@ -37,8 +36,11 @@ class AccessMiddleware(BaseHTTPMiddleware):
         elapsed = (time.perf_counter() - perf_time) * 1000
 
         if request.method != 'OPTIONS':
-            log.info(f'接口耗时：[{elapsed:.3f}]ms')
-            log.info(f'接口状态：[{response.status_code}]')
-            log.info('<-- 请求结束')
+            log.debug('<-- 请求结束')
+
+            log.info(
+                f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
+                f'{path} | {elapsed:.3f}ms'
+            )
 
         return response

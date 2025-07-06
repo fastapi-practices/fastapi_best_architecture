@@ -12,4 +12,4 @@ def get_request_trace_id(request: Request) -> str:
     :param request: FastAPI 请求对象
     :return:
     """
-    return request.headers.get(settings.TRACE_ID_REQUEST_HEADER_KEY) or settings.LOG_CID_DEFAULT_VALUE
+    return request.headers.get(settings.TRACE_ID_REQUEST_HEADER_KEY) or settings.TRACE_ID_LOG_DEFAULT_VALUE

@@ -82,6 +82,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 username = None
 
             # 日志记录
+            log.debug(f'接口摘要：[{summary}]')
             log.debug(f'请求地址：[{request.state.ip}]')
             log.debug(f'请求参数：{args}')
 
