@@ -26,8 +26,12 @@ def init_celery() -> celery.Celery:
         backend=f'db+{settings.DATABASE_TYPE + "+pymysql" if settings.DATABASE_TYPE == "mysql" else settings.DATABASE_TYPE}'  # noqa: E501
         f'://{settings.DATABASE_USER}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_SCHEMA}',
         database_engine_options={'echo': settings.DATABASE_ECHO},
+        database_table_names={
+            'task': 'task_result',
+            'group': 'task_group_result',
+        },
         result_extended=True,
-        result_expires=0,
+        # result_expires=0,  # 任务结果自动清理
         beat_schedule=LOCAL_BEAT_SCHEDULE,
         beat_scheduler='app.task.utils.schedulers:DatabaseScheduler',
         task_cls='app.task.tasks.base:TaskBase',
