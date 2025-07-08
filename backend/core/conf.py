@@ -199,7 +199,6 @@ class Settings(BaseSettings):
     # App Task
     # .env Redis
     CELERY_BROKER_REDIS_DATABASE: int
-    CELERY_BACKEND_REDIS_DATABASE: int
 
     # .env RabbitMQ
     # docker run -d --hostname fba-mq --name fba-mq  -p 5672:5672 -p 15672:15672 rabbitmq:latest
