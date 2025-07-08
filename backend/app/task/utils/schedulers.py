@@ -15,8 +15,8 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import DatabaseError, InterfaceError
 
 from backend.app.task.enums import PeriodType, TaskSchedulerType
-from backend.app.task.model.task import TaskScheduler
-from backend.app.task.schema.task import CreateTaskSchedulerParam
+from backend.app.task.model.scheduler import TaskScheduler
+from backend.app.task.schema.scheduler import CreateTaskSchedulerParam
 from backend.app.task.utils.tzcrontab import TzAwareCrontab
 from backend.common.exception import errors
 from backend.core.conf import settings
@@ -33,7 +33,7 @@ logger = get_logger('fba.schedulers')
 
 
 class ModelEntry(ScheduleEntry):
-    """任务计划实体"""
+    """任务调度实体"""
 
     def __init__(self, model: TaskScheduler, app=None):
         super().__init__(
@@ -154,7 +154,7 @@ class ModelEntry(ScheduleEntry):
 
     @classmethod
     async def from_entry(cls, name, app=None, **entry):
-        """保存或更新本地任务计划"""
+        """保存或更新本地任务调度"""
         async with async_db_session.begin() as db:
             stmt = select(TaskScheduler).where(TaskScheduler.name == name)
             query = await db.execute(stmt)
@@ -291,7 +291,7 @@ class DatabaseScheduler(Scheduler):
         self.update_from_dict(self.app.conf.beat_schedule)
 
     async def get_all_task_schedules(self):
-        """获取所有任务计划"""
+        """获取所有任务调度"""
         async with async_db_session() as db:
             logger.debug('DatabaseScheduler: Fetching database schedule')
             stmt = select(TaskScheduler).where(TaskScheduler.enabled == 1)
@@ -302,8 +302,8 @@ class DatabaseScheduler(Scheduler):
                 s[task.name] = self.Entry(task, app=self.app)
             return s
 
-    def schedule_changed(self):
-        """任务计划变更状态"""
+    def schedule_changed(self) -> bool:
+        """任务调度变更状态"""
         now = timezone.now()
         last_update = run_await(redis_client.get)(f'{settings.CELERY_BACKEND_REDIS_PREFIX}last_update')
         if not last_update:
@@ -315,7 +315,6 @@ class DatabaseScheduler(Scheduler):
                     return True
         finally:
             self._last_update = now
-        return False
 
     def reserve(self, entry):
         """重写父函数"""
@@ -385,7 +384,7 @@ class DatabaseScheduler(Scheduler):
 
     @property
     def schedule(self) -> dict[str, ModelEntry]:
-        """获取任务计划"""
+        """获取任务调度"""
         initial = update = False
         if self._initial_read:
             logger.debug('DatabaseScheduler: initial read')

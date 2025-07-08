@@ -4,7 +4,7 @@ from backend.common.enums import IntEnum, StrEnum
 
 
 class TaskSchedulerType(IntEnum):
-    """任务计划类型"""
+    """任务调度类型"""
 
     INTERVAL = 0
     CRONTAB = 1

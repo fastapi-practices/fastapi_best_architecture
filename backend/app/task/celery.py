@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import celery
 import celery_aio_pool
 
+from backend.app.task.model.result import OVERWRITE_CELERY_RESULT_GROUP_TABLE_NAME, OVERWRITE_CELERY_RESULT_TABLE_NAME
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.core.conf import settings
 
@@ -27,8 +27,8 @@ def init_celery() -> celery.Celery:
         f'://{settings.DATABASE_USER}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_SCHEMA}',
         database_engine_options={'echo': settings.DATABASE_ECHO},
         database_table_names={
-            'task': 'task_result',
-            'group': 'task_group_result',
+            'task': OVERWRITE_CELERY_RESULT_TABLE_NAME,
+            'group': OVERWRITE_CELERY_RESULT_GROUP_TABLE_NAME,
         },
         result_extended=True,
         # result_expires=0,  # 任务结果自动清理
