@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+
 import celery
 import celery_aio_pool
 
 from backend.app.task.model.result import OVERWRITE_CELERY_RESULT_GROUP_TABLE_NAME, OVERWRITE_CELERY_RESULT_TABLE_NAME
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.core.conf import settings
+from backend.core.path_conf import BASE_PATH
+
+
+def find_task_packages():
+    packages = []
+    for root, dirs, files in os.walk(os.path.join(BASE_PATH, 'app', 'task', 'tasks')):
+        if 'tasks.py' in files:
+            package = root.replace(str(BASE_PATH) + os.path.sep, '').replace(os.path.sep, '.')
+            packages.append(package)
+    return packages
 
 
 def init_celery() -> celery.Celery:
@@ -43,7 +55,7 @@ def init_celery() -> celery.Celery:
     )
 
     # 自动发现任务
-    app.autodiscover_tasks(settings.CELERY_TASK_PACKAGES)
+    app.autodiscover_tasks(find_task_packages())
 
     return app
 

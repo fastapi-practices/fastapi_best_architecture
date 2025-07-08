@@ -78,11 +78,9 @@ class TaskScheduler(Base):
     @classmethod
     def update_changed(cls, mapper, connection, target):
         now = timezone.now()
-        last_update = asyncio.create_task(redis_client.get(f'{settings.CELERY_BACKEND_REDIS_PREFIX}last_update'))
+        last_update = asyncio.create_task(redis_client.get(f'{settings.CELERY_REDIS_PREFIX}last_update'))
         if not last_update:
-            asyncio.create_task(
-                redis_client.set(f'{settings.CELERY_BACKEND_REDIS_PREFIX}last_update', timezone.to_str(now))
-            )
+            asyncio.create_task(redis_client.set(f'{settings.CELERY_REDIS_PREFIX}last_update', timezone.to_str(now)))
 
 
 # 事件监听器

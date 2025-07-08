@@ -36,10 +36,8 @@ def get_app_models():
     return classes
 
 
-# import app models
+# import all app models for auto create db tables
 for cls in get_app_models():
     class_name = cls.__name__
-    if class_name in globals():
-        print(f'\nWarning: Class "{class_name}" already exists in global namespace.')
-    else:
+    if class_name not in globals():
         globals()[class_name] = cls

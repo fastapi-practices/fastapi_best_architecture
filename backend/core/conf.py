@@ -210,12 +210,7 @@ class Settings(BaseSettings):
 
     # 基础配置
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
-    CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
-    CELERY_BACKEND_REDIS_TIMEOUT: int = 5
-    CELERY_TASK_PACKAGES: list[str] = [
-        'app.task.tasks',
-        'app.task.tasks.db_log',
-    ]
+    CELERY_REDIS_PREFIX: str = 'fba:celery:'
     CELERY_TASK_MAX_RETRIES: int = 5
 
     # Plugin Code Generator

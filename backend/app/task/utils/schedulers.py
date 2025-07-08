@@ -305,9 +305,9 @@ class DatabaseScheduler(Scheduler):
     def schedule_changed(self) -> bool:
         """任务调度变更状态"""
         now = timezone.now()
-        last_update = run_await(redis_client.get)(f'{settings.CELERY_BACKEND_REDIS_PREFIX}last_update')
+        last_update = run_await(redis_client.get)(f'{settings.CELERY_REDIS_PREFIX}last_update')
         if not last_update:
-            run_await(redis_client.set)(f'{settings.CELERY_BACKEND_REDIS_PREFIX}last_update', timezone.to_str(now))
+            run_await(redis_client.set)(f'{settings.CELERY_REDIS_PREFIX}last_update', timezone.to_str(now))
             return False
         try:
             if last_update and self._last_update:
