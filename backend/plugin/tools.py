@@ -45,15 +45,15 @@ def get_plugins() -> list[str]:
     plugin_packages = []
 
     # 遍历插件目录
-    for item in os.listdir(PLUGIN_DIR):
-        if item.endswith('.py') or item.endswith('backup') or item == '__pycache__':
+    for d in os.listdir(PLUGIN_DIR):
+        if not os.path.isdir(os.path.join(PLUGIN_DIR, d)) and d == '__pycache__':
             continue
 
-        item_path = os.path.join(PLUGIN_DIR, item)
+        item_path = os.path.join(PLUGIN_DIR, d)
 
         # 检查是否为目录且包含 __init__.py 文件
         if os.path.isdir(item_path) and '__init__.py' in os.listdir(item_path):
-            plugin_packages.append(item)
+            plugin_packages.append(d)
 
     return plugin_packages
 
