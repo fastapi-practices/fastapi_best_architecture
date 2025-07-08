@@ -46,7 +46,7 @@ def get_plugins() -> list[str]:
 
     # 遍历插件目录
     for item in os.listdir(PLUGIN_DIR):
-        if item.endswith('.py') or item.endswith('backup') or item == '__pycache__':
+        if not os.path.isdir(os.path.join(PLUGIN_DIR, item)) and item == '__pycache__':
             continue
 
         item_path = os.path.join(PLUGIN_DIR, item)
