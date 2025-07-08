@@ -3,7 +3,6 @@
 from functools import lru_cache
 from typing import Any, Literal
 
-from celery.schedules import crontab
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -214,26 +213,10 @@ class Settings(BaseSettings):
     CELERY_BACKEND_REDIS_PREFIX: str = 'fba:celery:'
     CELERY_BACKEND_REDIS_TIMEOUT: int = 5
     CELERY_TASK_PACKAGES: list[str] = [
-        'app.task.celery_task',
-        'app.task.celery_task.db_log',
+        'app.task.tasks',
+        'app.task.tasks.db_log',
     ]
     CELERY_TASK_MAX_RETRIES: int = 5
-
-    # 定时任务配置
-    CELERY_SCHEDULE: dict[str, dict[str, Any]] = {
-        'exec-every-10-seconds': {
-            'task': 'task_demo_async',
-            'schedule': 10,
-        },
-        'exec-every-sunday': {
-            'task': 'delete_db_opera_log',
-            'schedule': crontab('0', '0', day_of_week='6'),
-        },
-        'exec-every-15-of-month': {
-            'task': 'delete_db_login_log',
-            'schedule': crontab('0', '0', day_of_month='15'),
-        },
-    }
 
     # Plugin Code Generator
     CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'

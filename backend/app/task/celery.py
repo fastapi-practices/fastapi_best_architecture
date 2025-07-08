@@ -1,44 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
 
 import celery
 import celery_aio_pool
 
+from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.core.conf import settings
-
-__all__ = ['celery_app']
-
-
-def get_broker_url() -> str:
-    """获取消息代理 URL"""
-    if settings.CELERY_BROKER == 'redis':
-        return (
-            f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-            f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
-        )
-    return (
-        f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{settings.CELERY_RABBITMQ_PASSWORD}@'
-        f'{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}'
-    )
-
-
-def get_result_backend() -> str:
-    """获取结果后端 URL"""
-    return (
-        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-        f'{settings.REDIS_PORT}/{settings.CELERY_BACKEND_REDIS_DATABASE}'
-    )
-
-
-def get_result_backend_transport_options() -> dict[str, Any]:
-    """获取结果后端传输选项"""
-    return {
-        'global_keyprefix': settings.CELERY_BACKEND_REDIS_PREFIX,
-        'retry_policy': {
-            'timeout': settings.CELERY_BACKEND_REDIS_TIMEOUT,
-        },
-    }
 
 
 def init_celery() -> celery.Celery:
@@ -54,12 +21,28 @@ def init_celery() -> celery.Celery:
         'fba_celery',
         enable_utc=False,
         timezone=settings.DATETIME_TIMEZONE,
-        beat_schedule=settings.CELERY_SCHEDULE,
-        broker_url=get_broker_url(),
+        beat_schedule=LOCAL_BEAT_SCHEDULE,
+        broker_url=(
+            f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
+            f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
+        )
+        if settings.CELERY_BROKER == 'redis'
+        else (
+            f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{settings.CELERY_RABBITMQ_PASSWORD}@'
+            f'{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}'
+        ),
         broker_connection_retry_on_startup=True,
-        result_backend=get_result_backend(),
-        result_backend_transport_options=get_result_backend_transport_options(),
-        task_cls='app.task.celery_task.base:TaskBase',
+        result_backend=(
+            f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
+            f'{settings.REDIS_PORT}/{settings.CELERY_BACKEND_REDIS_DATABASE}'
+        ),
+        result_backend_transport_options={
+            'global_keyprefix': settings.CELERY_BACKEND_REDIS_PREFIX,
+            'retry_policy': {
+                'timeout': settings.CELERY_BACKEND_REDIS_TIMEOUT,
+            },
+        },
+        task_cls='app.task.tasks.base:TaskBase',
         task_track_started=True,
     )
 

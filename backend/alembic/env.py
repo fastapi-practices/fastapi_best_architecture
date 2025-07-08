@@ -13,17 +13,14 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 sys.path.append('../')
 
+from backend.app import get_app_models
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
 from backend.plugin.tools import get_plugin_models
 
-# import your new model here
-from backend.app.admin.model import *  # noqa: F401
-from backend.plugin.code_generator.model import *  # noqa: F401
-
-# import plugin model
-for cls in get_plugin_models():
+# import models
+for cls in get_plugin_models() + get_app_models():
     class_name = cls.__name__
     if class_name in globals():
         print(f'\nWarning: Class "{class_name}" already exists in global namespace.')
