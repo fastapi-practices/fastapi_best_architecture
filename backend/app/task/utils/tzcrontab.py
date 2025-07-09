@@ -83,7 +83,4 @@ def crontab_verify(filed: Literal['m', 'h', 'dow', 'dom', 'moy'], value: str, ra
         if raise_exc:
             raise errors.RequestError(msg=f'crontab 值 {value} 非法')
 
-    if not valid:
-        return False
-
-    raise True
+    raise valid
