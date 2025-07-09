@@ -20,16 +20,16 @@ dependencies = [
     "asyncpg>=0.30.0",
     "bcrypt>=4.2.1",
     "cappa>=0.28.0",
-    "celery==5.3.6",
+    "celery>=5.3.6",
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
-    "celery-aio-pool==0.1.0rc8",
+    "celery-aio-pool>=0.1.0rc8",
     "cryptography>=44.0.0",
     "dulwich>=0.22.8",
     "fast-captcha>=0.3.2",
     "fastapi-limiter>=0.1.6",
     "fastapi-pagination>=0.13.0",
-    "fastapi[standard]==0.115.11",
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.115.11",
     "flower>=2.0.0",
     "gevent>=24.11.1",
     "ip2loc>=1.0.0",
@@ -37,7 +37,7 @@ dependencies = [
     "jinja2>=3.1.4",
     "loguru>=0.7.3",
     "msgspec>=0.19.0",
-    "path==17.0.0",
+    "path>=17.0.0",
     "psutil>=6.0.0",
     "pwdlib>=0.2.1",
     "pydantic>=2.11.0",
@@ -50,7 +50,7 @@ dependencies = [
     "sqlalchemy-crud-plus>=1.10.0",
     "sqlalchemy[asyncio]>=2.0.40",
     "sqlparse>=0.5.3",
-    "user-agents==2.2.0",
+    "user-agents>=2.2.0",
 ]
 
 [dependency-groups]

@@ -3,7 +3,6 @@
 import asyncio
 import json
 import math
-import re
 
 from datetime import datetime, timedelta
 from multiprocessing.util import Finalize
@@ -17,7 +16,7 @@ from sqlalchemy.exc import DatabaseError, InterfaceError
 from backend.app.task.enums import PeriodType, TaskSchedulerType
 from backend.app.task.model.scheduler import TaskScheduler
 from backend.app.task.schema.scheduler import CreateTaskSchedulerParam
-from backend.app.task.utils.tzcrontab import TzAwareCrontab
+from backend.app.task.utils.tzcrontab import TzAwareCrontab, crontab_verify
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -173,9 +172,6 @@ class ModelEntry(ScheduleEntry):
     async def to_model_schedule(name: str, task: str, schedule: schedules.schedule | TzAwareCrontab):
         schedule = schedules.maybe_schedule(schedule)
 
-        def cron_exp(value):
-            return (value is not None and re.sub(r'[\s\[\]\{\}]', '', str(value))) or '*'
-
         async with async_db_session() as db:
             if isinstance(schedule, schedules.schedule):
                 every = max(schedule.run_every.total_seconds(), 0)
@@ -193,11 +189,19 @@ class ModelEntry(ScheduleEntry):
             elif isinstance(schedule, schedules.crontab):
                 spec = {
                     'type': TaskSchedulerType.CRONTAB.value,
-                    'crontab_minute': cron_exp(schedule._orig_minute),
-                    'crontab_hour': cron_exp(schedule._orig_hour),
-                    'crontab_day_of_week': cron_exp(schedule._orig_day_of_week),
-                    'crontab_day_of_month': cron_exp(schedule._orig_day_of_month),
-                    'crontab_month_of_year': cron_exp(schedule._orig_month_of_year),
+                    'crontab_minute': schedule._orig_minute
+                    if crontab_verify('m', schedule._orig_minute, False)
+                    else '*',
+                    'crontab_hour': schedule._orig_hour if crontab_verify('h', schedule._orig_hour, False) else '*',
+                    'crontab_day_of_week': schedule._orig_day_of_week
+                    if crontab_verify('dom', schedule._orig_day_of_week, False)
+                    else '*',
+                    'crontab_day_of_month': schedule._orig_day_of_month
+                    if crontab_verify('dom', schedule._orig_day_of_month, False)
+                    else '*',
+                    'crontab_month_of_year': schedule._orig_month_of_year
+                    if crontab_verify('moy', schedule._orig_month_of_year, False)
+                    else '*',
                 }
                 stmt = select(TaskScheduler).filter_by(**spec)
                 query = await db.execute(stmt)
