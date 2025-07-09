@@ -192,50 +192,6 @@ class CRUDUser(CRUDPlus[User]):
             **filters,
         )
 
-    async def get_super(self, db: AsyncSession, user_id: int) -> bool:
-        """
-        获取用户是否为超级管理员
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        user = await self.get(db, user_id)
-        return user.is_superuser
-
-    async def get_staff(self, db: AsyncSession, user_id: int) -> bool:
-        """
-        获取用户是否可以登录后台
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        user = await self.get(db, user_id)
-        return user.is_staff
-
-    async def get_status(self, db: AsyncSession, user_id: int) -> int:
-        """
-        获取用户状态
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        user = await self.get(db, user_id)
-        return user.status
-
-    async def get_multi_login(self, db: AsyncSession, user_id: int) -> bool:
-        """
-        获取用户是否允许多端登录
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        user = await self.get(db, user_id)
-        return user.is_multi_login
-
     async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
         """
         设置用户超级管理员状态
