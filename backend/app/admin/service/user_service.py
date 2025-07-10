@@ -134,8 +134,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             if pk == request.user.id:
                 raise errors.ForbiddenError(msg='禁止修改自身权限')
-            super_status = await user_dao.get_super(db, pk)
-            count = await user_dao.set_super(db, pk, not super_status)
+            count = await user_dao.set_super(db, pk, not user.status)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
@@ -155,8 +154,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             if pk == request.user.id:
                 raise errors.ForbiddenError(msg='禁止修改自身权限')
-            staff_status = await user_dao.get_staff(db, pk)
-            count = await user_dao.set_staff(db, pk, not staff_status)
+            count = await user_dao.set_staff(db, pk, not user.is_staff)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
@@ -176,8 +174,7 @@ class UserService:
                 raise errors.NotFoundError(msg='用户不存在')
             if pk == request.user.id:
                 raise errors.ForbiddenError(msg='禁止修改自身权限')
-            status = await user_dao.get_status(db, pk)
-            count = await user_dao.set_status(db, pk, 0 if status == 1 else 1)
+            count = await user_dao.set_status(db, pk, 0 if user.status == 1 else 1)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
 
@@ -195,7 +192,7 @@ class UserService:
             user = await user_dao.get(db, pk)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            multi_login = await user_dao.get_multi_login(db, pk) if pk != user.id else request.user.is_multi_login
+            multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
             new_multi_login = not multi_login
             count = await user_dao.set_multi_login(db, pk, new_multi_login)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
