@@ -197,6 +197,10 @@ class Settings(BaseSettings):
     CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
     CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
 
+    # 短信验证码
+    TENCENTCLOUD_SECRET_ID: str
+    TENCENTCLOUD_SECRET_KEY: str
+
     # App Task
     # .env Redis
     CELERY_BROKER_REDIS_DATABASE: int

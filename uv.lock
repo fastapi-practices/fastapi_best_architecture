@@ -1,5 +1,5 @@
 version = 1
-revision = 1
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -680,6 +680,7 @@ dependencies = [
     { name = "sqlalchemy-crud-plus" },
     { name = "sqlparse" },
     { name = "user-agents" },
+    { name = "zope-event" },
 ]
 
 [package.dev-dependencies]
@@ -719,7 +720,7 @@ requires-dist = [
     { name = "ip2loc", specifier = ">=1.0.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
-    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "loguru", specifier = "==0.7.3" },
     { name = "msgspec", specifier = ">=0.19.0" },
     { name = "path", specifier = "==17.0.0" },
     { name = "psutil", specifier = ">=6.0.0" },
@@ -734,6 +735,7 @@ requires-dist = [
     { name = "sqlalchemy-crud-plus", specifier = ">=1.10.0" },
     { name = "sqlparse", specifier = ">=0.5.3" },
     { name = "user-agents", specifier = "==2.2.0" },
+    { name = "zope-event", specifier = "==5.0" },
 ]
 
 [package.metadata.requires-dev]
