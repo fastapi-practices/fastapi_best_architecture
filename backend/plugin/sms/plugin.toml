@@ -1,0 +1,8 @@
+[plugin]
+summary = '腾讯云短信服务'
+version = '0.0.1'
+description = '使用腾讯云短信服务发送短信验证码'
+wechat = 'RanY_Luck'
+
+[app]
+router = ['v1'] 
