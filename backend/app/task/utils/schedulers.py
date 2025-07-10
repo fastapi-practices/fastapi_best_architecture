@@ -309,14 +309,15 @@ class DatabaseScheduler(Scheduler):
     def schedule_changed(self) -> bool:
         """任务调度变更状态"""
         now = timezone.now()
-        last_update = run_await(redis_client.get)(f'{settings.CELERY_REDIS_PREFIX}last_update')
+        last_update = run_await(redis_client.get)(f'{settings.CELERY_REDIS_PREFIX}:last_update')
         if not last_update:
-            run_await(redis_client.set)(f'{settings.CELERY_REDIS_PREFIX}last_update', timezone.to_str(now))
+            run_await(redis_client.set)(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now))
             return False
+
+        last, ts = self._last_update, timezone.from_str(last_update)
         try:
-            if last_update and self._last_update:
-                if timezone.from_str(last_update) > self._last_update:
-                    return True
+            if ts and ts > (last if last else ts):
+                return True
         finally:
             self._last_update = now
 
@@ -337,10 +338,10 @@ class DatabaseScheduler(Scheduler):
                 try:
                     tasks = self.schedule
                     run_await(tasks[name].save)()
-                    logger.debug(f'保存任务 {name} 状态到数据库')
+                    logger.debug(f'保存任务 {name} 最新状态到数据库')
                     _tried.add(name)
                 except KeyError as e:
-                    logger.error(f'保存任务 {name} 状态失败：{e} ')
+                    logger.error(f'保存任务 {name} 最新状态失败：{e} ')
                     _failed.add(name)
         except DatabaseError as e:
             logger.exception('同步时出现数据库错误: %r', e)

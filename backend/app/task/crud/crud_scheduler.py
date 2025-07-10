@@ -89,7 +89,7 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :param status: 状态
         :return:
         """
-        return await self.update_model(db, pk, {'status': status})
+        return await self.update_model(db, pk, {'enabled': status})
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """

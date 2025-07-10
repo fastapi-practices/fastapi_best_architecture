@@ -43,15 +43,13 @@ def init_celery() -> celery.Celery:
             'group': OVERWRITE_CELERY_RESULT_GROUP_TABLE_NAME,
         },
         result_extended=True,
-        # result_expires=0,  # 任务结果自动清理
+        # result_expires=0,  # 任务结果自动清理，0 或 None 表示不清理
         beat_schedule=LOCAL_BEAT_SCHEDULE,
         beat_scheduler='app.task.utils.schedulers:DatabaseScheduler',
         task_cls='app.task.tasks.base:TaskBase',
         task_track_started=True,
         enable_utc=False,
         timezone=settings.DATETIME_TIMEZONE,
-        # TODO: Update this work if celery version >= 6.0.0
-        worker_pool=celery_aio_pool.pool.AsyncIOPool,
     )
 
     # 自动发现任务

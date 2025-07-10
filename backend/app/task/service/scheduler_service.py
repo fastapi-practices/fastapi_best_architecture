@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
+
 from typing import Sequence
 
 from sqlalchemy import Select
@@ -126,19 +128,6 @@ class TaskSchedulerService:
             return count
 
     @staticmethod
-    async def revoke(*, task_id: str) -> None:
-        """
-        撤销指定的任务
-
-        :param task_id: 任务 UUID
-        :return:
-        """
-        workers = await run_in_threadpool(celery_app.control.ping())
-        if not workers:
-            raise errors.ServerError(msg='Celery Worker 未启动，请联系超级管理员')
-        celery_app.control.revoke(task_id, terminate=True)
-
-    @staticmethod
     async def execute(*, pk: int) -> None:
         """
         执行任务
@@ -147,17 +136,30 @@ class TaskSchedulerService:
         :return:
         """
         async with async_db_session() as db:
-            workers = await run_in_threadpool(celery_app.control.ping())
+            workers = await run_in_threadpool(celery_app.control.ping, timeout=0.5)
             if not workers:
-                raise errors.ServerError(msg='Celery Worker 未启动，请联系超级管理员')
+                raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
             celery_app.send_task(
                 name=task_scheduler.task,
-                args=task_scheduler.args,
-                kwargs=task_scheduler.kwargs,
+                args=json.loads(task_scheduler.args),
+                kwargs=json.loads(task_scheduler.kwargs),
             )
+
+    @staticmethod
+    async def revoke(*, task_id: str) -> None:
+        """
+        撤销指定的任务
+
+        :param task_id: 任务 UUID
+        :return:
+        """
+        workers = await run_in_threadpool(celery_app.control.ping, timeout=0.5)
+        if not workers:
+            raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
+        celery_app.control.revoke(task_id)
 
 
 task_scheduler_service: TaskSchedulerService = TaskSchedulerService()

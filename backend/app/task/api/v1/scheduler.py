@@ -17,13 +17,15 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有任务调度', dependencies=[DependsJwtAuth])
-async def get_all_task_schedulers() -> ResponseModel:
+async def get_all_task_schedulers() -> ResponseSchemaModel[list[GetTaskSchedulerDetail]]:
     schedulers = await task_scheduler_service.get_all()
     return response_base.success(data=schedulers)
 
 
 @router.get('/{pk}', summary='获取任务调度详情', dependencies=[DependsJwtAuth])
-async def get_task_scheduler(pk: Annotated[int, Path(description='任务调度 ID')]):
+async def get_task_scheduler(
+    pk: Annotated[int, Path(description='任务调度 ID')],
+) -> ResponseSchemaModel[GetTaskSchedulerDetail]:
     task_scheduler = await task_scheduler_service.get(pk=pk)
     return response_base.success(data=task_scheduler)
 
@@ -54,7 +56,7 @@ async def get_task_scheduler_paged(
         DependsRBAC,
     ],
 )
-async def create_task_scheduler(obj: CreateTaskSchedulerParam):
+async def create_task_scheduler(obj: CreateTaskSchedulerParam) -> ResponseModel:
     await task_scheduler_service.create(obj=obj)
     return response_base.success()
 
@@ -67,7 +69,9 @@ async def create_task_scheduler(obj: CreateTaskSchedulerParam):
         DependsRBAC,
     ],
 )
-async def update_task_scheduler(pk: Annotated[int, Path(description='任务调度 ID')], obj: UpdateTaskSchedulerParam):
+async def update_task_scheduler(
+    pk: Annotated[int, Path(description='任务调度 ID')], obj: UpdateTaskSchedulerParam
+) -> ResponseModel:
     count = await task_scheduler_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
@@ -82,7 +86,7 @@ async def update_task_scheduler(pk: Annotated[int, Path(description='任务调�
         DependsRBAC,
     ],
 )
-async def update_task_scheduler_status(pk: Annotated[int, Path(description='任务调度 ID')]):
+async def update_task_scheduler_status(pk: Annotated[int, Path(description='任务调度 ID')]) -> ResponseModel:
     count = await task_scheduler_service.update_status(pk=pk)
     if count > 0:
         return response_base.success()
@@ -97,7 +101,7 @@ async def update_task_scheduler_status(pk: Annotated[int, Path(description='任�
         DependsRBAC,
     ],
 )
-async def delete_task_scheduler(pk: Annotated[int, Path(description='任务调度 ID')]):
+async def delete_task_scheduler(pk: Annotated[int, Path(description='任务调度 ID')]) -> ResponseModel:
     count = await task_scheduler_service.delete(pk=pk)
     if count > 0:
         return response_base.success()
@@ -112,7 +116,7 @@ async def delete_task_scheduler(pk: Annotated[int, Path(description='任务调�
         DependsRBAC,
     ],
 )
-async def execute_task(pk: Annotated[int, Path(description='任务调度 ID')]) -> ResponseSchemaModel[str]:
+async def execute_task(pk: Annotated[int, Path(description='任务调度 ID')]) -> ResponseModel:
     await task_scheduler_service.execute(pk=pk)
     return response_base.success()
 

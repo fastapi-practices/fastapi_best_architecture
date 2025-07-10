@@ -209,7 +209,7 @@ class Settings(BaseSettings):
 
     # 基础配置
     CELERY_BROKER: Literal['rabbitmq', 'redis'] = 'redis'
-    CELERY_REDIS_PREFIX: str = 'fba:celery:'
+    CELERY_REDIS_PREFIX: str = 'fba:celery'
     CELERY_TASK_MAX_RETRIES: int = 5
 
     # Plugin Code Generator

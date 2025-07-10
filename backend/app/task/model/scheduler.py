@@ -9,10 +9,10 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     String,
+    event,
 )
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import INTEGER, TEXT
-from sqlalchemy.event import listen
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.exception import errors
@@ -66,26 +66,28 @@ class TaskScheduler(Base):
 
     @staticmethod
     def before_insert_or_update(mapper, connection, target):
-        """插入或更新前的验证"""
+        print('before_insert_or_update', mapper, connection, target)
         if target.expire_seconds is not None and target.expire_time:
             raise errors.ConflictError(msg='expires 和 expire_seconds 只能设置一个')
 
     @classmethod
     def changed(cls, mapper, connection, target):
+        print('changed', mapper, connection, target)
         if not target.no_changes:
             cls.update_changed(mapper, connection, target)
 
     @classmethod
     def update_changed(cls, mapper, connection, target):
+        print('update_changed', mapper, connection, target)
         now = timezone.now()
-        last_update = asyncio.create_task(redis_client.get(f'{settings.CELERY_REDIS_PREFIX}last_update'))
+        last_update = asyncio.create_task(redis_client.get(f'{settings.CELERY_REDIS_PREFIX}:last_update'))
         if not last_update:
-            asyncio.create_task(redis_client.set(f'{settings.CELERY_REDIS_PREFIX}last_update', timezone.to_str(now)))
+            asyncio.create_task(redis_client.set(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now)))
 
 
 # 事件监听器
-listen(TaskScheduler, 'before_insert', TaskScheduler.before_insert_or_update)
-listen(TaskScheduler, 'before_update', TaskScheduler.before_insert_or_update)
-listen(TaskScheduler, 'after_insert', TaskScheduler.update_changed)
-listen(TaskScheduler, 'after_delete', TaskScheduler.update_changed)
-listen(TaskScheduler, 'after_update', TaskScheduler.changed)
+event.listen(TaskScheduler, 'before_insert', TaskScheduler.before_insert_or_update)
+event.listen(TaskScheduler, 'before_update', TaskScheduler.before_insert_or_update)
+event.listen(TaskScheduler, 'after_insert', TaskScheduler.update_changed)
+event.listen(TaskScheduler, 'after_delete', TaskScheduler.update_changed)
+event.listen(TaskScheduler, 'after_update', TaskScheduler.changed)
