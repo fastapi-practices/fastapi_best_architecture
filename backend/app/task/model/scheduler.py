@@ -38,7 +38,6 @@ class TaskScheduler(Base):
     start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment='任务开始触发的时间')
     expire_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment='任务不再触发的截止时间')
     expire_seconds: Mapped[int | None] = mapped_column(comment='任务不再触发的秒数时间差')
-    last_run_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment='任务最后触发的时间')
     type: Mapped[int] = mapped_column(comment='调度类型（0间隔 1定时）')
     interval_every: Mapped[int | None] = mapped_column(comment='任务再次运行前的间隔周期数')
     interval_period: Mapped[str | None] = mapped_column(String(255), comment='任务运行之间的周期类型')
@@ -58,6 +57,9 @@ class TaskScheduler(Base):
         Boolean().with_variant(INTEGER, 'postgresql'), default=True, comment='是否启用任务'
     )
     total_run_count: Mapped[int] = mapped_column(default=0, comment='任务触发的总次数')
+    last_run_time: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=None, comment='任务最后触发的时间'
+    )
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )
@@ -66,23 +68,22 @@ class TaskScheduler(Base):
 
     @staticmethod
     def before_insert_or_update(mapper, connection, target):
-        print('before_insert_or_update', mapper, connection, target)
         if target.expire_seconds is not None and target.expire_time:
             raise errors.ConflictError(msg='expires 和 expire_seconds 只能设置一个')
 
     @classmethod
     def changed(cls, mapper, connection, target):
-        print('changed', mapper, connection, target)
         if not target.no_changes:
             cls.update_changed(mapper, connection, target)
 
     @classmethod
-    def update_changed(cls, mapper, connection, target):
-        print('update_changed', mapper, connection, target)
+    async def update_changed_async(cls):
         now = timezone.now()
-        last_update = asyncio.create_task(redis_client.get(f'{settings.CELERY_REDIS_PREFIX}:last_update'))
-        if not last_update:
-            asyncio.create_task(redis_client.set(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now)))
+        await redis_client.set(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now))
+
+    @classmethod
+    def update_changed(cls, mapper, connection, target):
+        asyncio.create_task(cls.update_changed_async())
 
 
 # 事件监听器

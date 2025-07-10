@@ -13,7 +13,8 @@ from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTa
 class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
     """任务调度数据库操作类"""
 
-    async def get(self, db: AsyncSession, pk: int) -> TaskScheduler | None:
+    @staticmethod
+    async def get(db: AsyncSession, pk: int) -> TaskScheduler | None:
         """
         获取任务调度
 
@@ -67,7 +68,8 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :param obj: 创建任务调度参数
         :return:
         """
-        await self.create_model(db, obj)
+        await self.create_model(db, obj, flush=True)
+        TaskScheduler.no_changes = False
 
     async def update(self, db: AsyncSession, pk: int, obj: UpdateTaskSchedulerParam) -> int:
         """
@@ -78,7 +80,11 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :param obj: 更新任务调度参数
         :return:
         """
-        return await self.update_model(db, pk, obj)
+        task_scheduler = await self.get(db, pk)
+        for key, value in obj.model_dump(exclude_unset=True).items():
+            setattr(task_scheduler, key, value)
+        TaskScheduler.no_changes = False
+        return 1
 
     async def set_status(self, db: AsyncSession, pk: int, status: bool) -> int:
         """
@@ -89,7 +95,10 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :param status: 状态
         :return:
         """
-        return await self.update_model(db, pk, {'enabled': status})
+        task_scheduler = await self.get(db, pk)
+        setattr(task_scheduler, 'enabled', status)
+        TaskScheduler.no_changes = False
+        return 1
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """
@@ -99,7 +108,10 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :param pk: 任务调度 ID
         :return:
         """
-        return await self.delete_model(db, pk)
+        task_scheduler = await self.get(db, pk)
+        await db.delete(task_scheduler)
+        TaskScheduler.no_changes = False
+        return 1
 
 
 task_scheduler_dao: CRUDTaskScheduler = CRUDTaskScheduler(TaskScheduler)

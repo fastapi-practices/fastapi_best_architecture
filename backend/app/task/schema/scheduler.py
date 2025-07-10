@@ -22,7 +22,6 @@ class TaskSchedulerSchemeBase(SchemaBase):
     start_time: datetime | None = Field(default=None, description='任务开始触发的时间')
     expire_time: datetime | None = Field(default=None, description='任务不再触发的截止时间')
     expire_seconds: int | None = Field(default=None, description='任务不再触发的秒数时间差')
-    last_run_time: datetime | None = Field(default=None, description='任务最后触发的时间')
     type: TaskSchedulerType = Field(default=TaskSchedulerType.INTERVAL, description='任务调度类型（0间隔 1定时）')
     interval_every: int | None = Field(default=None, description='任务再次运行前的间隔周期数')
     interval_period: PeriodType | None = Field(default=None, description='任务运行之间的周期类型')
@@ -32,7 +31,6 @@ class TaskSchedulerSchemeBase(SchemaBase):
     crontab_day_of_month: str | None = Field(default='*', description='运行的每月日期，"*" 表示全部')
     crontab_month_of_year: str | None = Field(default='*', description='运行的月份，"*" 表示全部')
     one_off: bool = Field(default=False, description='是否仅运行一次')
-    total_run_count: int = Field(default=0, description='任务触发的总次数')
     remark: str | None = Field(default=None, description='备注')
 
 

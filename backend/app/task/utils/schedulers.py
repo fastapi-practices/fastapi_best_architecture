@@ -10,7 +10,7 @@ from multiprocessing.util import Finalize
 from celery import current_app, schedules
 from celery.beat import ScheduleEntry, Scheduler
 from celery.utils.log import get_logger
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.exc import DatabaseError, InterfaceError
 
 from backend.app.task.enums import PeriodType, TaskSchedulerType
@@ -163,8 +163,8 @@ class ModelEntry(ScheduleEntry):
                 task = TaskScheduler(**temp)
                 db.add(task)
             else:
-                stmt = update(TaskScheduler).where(TaskScheduler.name == name).values(**temp)
-                await db.execute(stmt)
+                for key, value in temp.items():
+                    setattr(task, key, value)
             res = cls(task, app=app)
             return res
 
@@ -228,7 +228,7 @@ class ModelEntry(ScheduleEntry):
         kwargs: dict | None = None,
         options: dict = None,
         **entry,
-    ):
+    ) -> dict:
         model_schedule = await cls.to_model_schedule(name, task, schedule)
         model_dict = select_as_dict(model_schedule)
         for k in ['id', 'created_time', 'updated_time']:
@@ -254,7 +254,7 @@ class ModelEntry(ScheduleEntry):
         expires: datetime = None,
         expire_seconds: int = None,
         one_off: bool = False,
-    ):
+    ) -> dict:
         data = {
             'queue': queue,
             'exchange': exchange,
@@ -294,7 +294,7 @@ class DatabaseScheduler(Scheduler):
         self.install_default_entries(tasks)
         self.update_from_dict(self.app.conf.beat_schedule)
 
-    async def get_all_task_schedules(self):
+    async def get_all_task_schedulers(self):
         """获取所有任务调度"""
         async with async_db_session() as db:
             logger.debug('DatabaseScheduler: Fetching database schedule')
@@ -402,7 +402,7 @@ class DatabaseScheduler(Scheduler):
         if update:
             logger.debug('beat: Synchronizing schedule...')
             self.sync()
-            self._schedule = run_await(self.get_all_task_schedules)()
+            self._schedule = run_await(self.get_all_task_schedulers)()
             # 计划已更改，使 Scheduler.tick 中的堆无效
             if not initial:
                 self._heap = []
