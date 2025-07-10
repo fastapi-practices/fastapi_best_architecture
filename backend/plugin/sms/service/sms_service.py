@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 from typing import List, Optional
 # 导入腾讯云SDK
 from tencentcloud.common import credential

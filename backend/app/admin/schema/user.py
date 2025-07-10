@@ -25,6 +25,13 @@ class AuthLoginParam(AuthSchemaBase):
     captcha: str = Field(description='验证码')
 
 
+class SmsLoginParam(SchemaBase):
+    """短信验证码登录参数"""
+
+    phone: str = Field(description='手机号')
+    code: str = Field(description='短信验证码')
+
+
 class AddUserParam(AuthSchemaBase):
     """添加用户参数"""
 

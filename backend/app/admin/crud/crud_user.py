@@ -31,15 +31,27 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.select_model(db, user_id)
 
-    async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
+    @staticmethod
+    async def get_by_username(db: AsyncSession, username: str) -> User | None:
         """
-        通过用户名获取用户
-
+        根据用户名获取用户
+        
         :param db: 数据库会话
         :param username: 用户名
         :return:
         """
-        return await self.select_model_by_column(db, username=username)
+        return await db.scalar(select(User).where(User.username == username))
+
+    @staticmethod
+    async def get_by_phone(db: AsyncSession, phone: str) -> User | None:
+        """
+        根据手机号获取用户
+        
+        :param db: 数据库会话
+        :param phone: 手机号
+        :return:
+        """
+        return await db.scalar(select(User).where(User.phone == phone))
 
     async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
         """

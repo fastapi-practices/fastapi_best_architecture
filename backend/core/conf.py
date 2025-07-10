@@ -8,6 +8,7 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BASE_PATH
+import os
 
 
 class Settings(BaseSettings):
@@ -200,6 +201,11 @@ class Settings(BaseSettings):
     # 短信验证码
     TENCENTCLOUD_SECRET_ID: str
     TENCENTCLOUD_SECRET_KEY: str
+    SMS_LOGIN_REDIS_PREFIX: str = "fba:sms:login"
+    SMS_LOGIN_EXPIRE_SECONDS: int = 300  # 短信验证码有效期，5分钟
+    SMS_LOGIN_TEMPLATE_ID: str  # 短信登录模板ID
+    SMS_SIGN_NAME: str  # 短信签名
+    SMS_SDK_APP_ID: str  # 短信应用ID
 
     # App Task
     # .env Redis
