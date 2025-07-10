@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
-import os
 
 from dataclasses import dataclass
 from typing import Annotated
@@ -12,12 +11,12 @@ import granian
 from rich.panel import Panel
 from rich.text import Text
 from sqlalchemy import text
+from watchfiles import PythonFilter
 
 from backend import console, get_version
 from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
-from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
 from backend.plugin.tools import get_plugin_sql
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
@@ -45,10 +44,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         address=host,
         port=port,
         reload=not reload,
-        reload_ignore_paths=[
-            os.path.join(BASE_PATH.parent / '.venv'),
-            os.path.join(BASE_PATH / 'log'),
-        ],
+        reload_filter=PythonFilter(),
         workers=workers or 1,
     ).serve()
 

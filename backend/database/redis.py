@@ -20,12 +20,10 @@ class RedisCli(Redis):
             password=settings.REDIS_PASSWORD,
             db=settings.REDIS_DATABASE,
             socket_timeout=settings.REDIS_TIMEOUT,
-            socket_connect_timeout=5,  # 连接超时
+            socket_connect_timeout=settings.REDIS_TIMEOUT,
             socket_keepalive=True,  # 保持连接
             health_check_interval=30,  # 健康检查间隔
             decode_responses=True,  # 转码 utf-8
-            retry_on_timeout=True,  # 超时重试
-            max_connections=20,  # 最大连接数
         )
 
     async def open(self) -> None:
