@@ -662,6 +662,7 @@ dependencies = [
     { name = "fastapi-pagination" },
     { name = "flower" },
     { name = "gevent" },
+    { name = "granian" },
     { name = "ip2loc" },
     { name = "itsdangerous" },
     { name = "jinja2" },
@@ -692,7 +693,6 @@ lint = [
 ]
 server = [
     { name = "aio-pika" },
-    { name = "granian" },
     { name = "wait-for-it" },
 ]
 
@@ -716,6 +716,7 @@ requires-dist = [
     { name = "fastapi-pagination", specifier = ">=0.13.0" },
     { name = "flower", specifier = ">=2.0.0" },
     { name = "gevent", specifier = ">=24.11.1" },
+    { name = "granian", specifier = ">=2.4.0" },
     { name = "ip2loc", specifier = ">=1.0.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
@@ -744,7 +745,6 @@ dev = [
 lint = [{ name = "pre-commit", specifier = ">=4.0.0" }]
 server = [
     { name = "aio-pika", specifier = ">=9.4.3" },
-    { name = "granian", specifier = ">=2.4.0" },
     { name = "wait-for-it", specifier = ">=2.2.2" },
 ]
 
