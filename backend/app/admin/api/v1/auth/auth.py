@@ -29,22 +29,9 @@ async def login_swagger(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def login(
-    request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+        request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
 ) -> ResponseSchemaModel[GetLoginToken]:
     data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
-    return response_base.success(data=data)
-
-
-@router.post(
-    '/login/sms',
-    summary='短信验证码登录',
-    description='使用手机号和短信验证码登录',
-    dependencies=[Depends(RateLimiter(times=5, minutes=1))],
-)
-async def login_by_sms(
-    request: Request, response: Response, obj: SmsLoginParam, background_tasks: BackgroundTasks
-) -> ResponseSchemaModel[GetLoginToken]:
-    data = await auth_service.login_by_sms(request=request, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)
 
 
