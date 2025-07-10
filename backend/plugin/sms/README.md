@@ -11,6 +11,26 @@
 2. 在腾讯云控制台申请短信签名和模板
 3. 在系统中配置相关参数
 4. 调用API发送短信 
+5. 必须在环境变量`.env`中添加以下内容：
+```text
+# SMS
+TENCENTCLOUD_SECRET_ID='' # 腾讯云密钥ID
+TENCENTCLOUD_SECRET_KEY='' # 腾讯云密钥KEY
+SMS_LOGIN_TEMPLATE_ID='' # 短信登录模板ID
+SMS_SIGN_NAME='' # 短信签名
+SMS_SDK_APP_ID='' # 短信应用ID
+```
+6. 在 `core/conf.py` 中添加以下内容
+```text
+# 短信验证码
+TENCENTCLOUD_SECRET_ID: str
+TENCENTCLOUD_SECRET_KEY: str
+SMS_LOGIN_REDIS_PREFIX: str = "fba:sms:login"
+SMS_LOGIN_EXPIRE_SECONDS: int = 300  # 短信验证码有效期，5分钟
+SMS_LOGIN_TEMPLATE_ID: str  # 短信登录模板ID
+SMS_SIGN_NAME: str  # 短信签名
+SMS_SDK_APP_ID: str  # 短信应用ID
+```
 
 ## 例子
 ```text

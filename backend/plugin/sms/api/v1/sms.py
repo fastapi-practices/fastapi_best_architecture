@@ -36,7 +36,7 @@ async def send_login_code(phone: str = Body(..., embed=True)) -> ResponseSchemaM
     发送登录短信验证码，生成5位数验证码，存储在Redis中，有效期5分钟
     """
     # 生成5位数随机验证码
-    verification_code = ''.join(random.choices('0123456789', k=5))
+    verification_code = ''.join(random.choices('0123456789', k=6))
 
     # 存储验证码到Redis，设置5分钟过期时间
     await redis_client.set(
