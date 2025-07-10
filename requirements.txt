@@ -57,6 +57,7 @@ click==8.2.1
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   granian
     #   rich-toolkit
     #   typer
     #   uvicorn
@@ -106,6 +107,8 @@ filelock==3.18.0
 flower==2.0.1
     # via fastapi-best-architecture
 gevent==25.5.1
+    # via fastapi-best-architecture
+granian==2.4.1
     # via fastapi-best-architecture
 greenlet==3.2.3
     # via
