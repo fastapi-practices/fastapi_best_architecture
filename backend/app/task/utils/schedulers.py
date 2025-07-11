@@ -176,6 +176,7 @@ class ModelEntry(ScheduleEntry):
             if isinstance(schedule, schedules.schedule):
                 every = max(schedule.run_every.total_seconds(), 0)
                 spec = {
+                    'name': name,
                     'type': TaskSchedulerType.INTERVAL.value,
                     'interval_every': every,
                     'interval_period': PeriodType.SECONDS.value,
@@ -184,10 +185,10 @@ class ModelEntry(ScheduleEntry):
                 query = await db.execute(stmt)
                 obj = query.scalars().first()
                 if not obj:
-                    obj = TaskScheduler(**CreateTaskSchedulerParam(name=name, task=task, **spec).model_dump())
-                return obj
+                    obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             elif isinstance(schedule, schedules.crontab):
                 spec = {
+                    'name': name,
                     'type': TaskSchedulerType.CRONTAB.value,
                     'crontab_minute': schedule._orig_minute
                     if crontab_verify('m', schedule._orig_minute, False)
@@ -207,16 +208,11 @@ class ModelEntry(ScheduleEntry):
                 query = await db.execute(stmt)
                 obj = query.scalars().first()
                 if not obj:
-                    obj = TaskScheduler(
-                        **CreateTaskSchedulerParam(
-                            name=name,
-                            task=task,
-                            **spec,
-                        ).model_dump()
-                    )
-                return obj
+                    obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             else:
                 raise errors.NotFoundError(msg=f'暂不支持的计划类型：{schedule}')
+
+            return obj
 
     @classmethod
     async def _unpack_fields(
