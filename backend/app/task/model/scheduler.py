@@ -29,7 +29,7 @@ class TaskScheduler(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(50), unique=True, comment='任务名称')
-    task: Mapped[str] = mapped_column(String(255), comment='要运行的 Celery 任务（模块化字符串）')
+    task: Mapped[str] = mapped_column(String(255), comment='要运行的 Celery 任务')
     args: Mapped[str | None] = mapped_column(JSON(), comment='任务可接收的位置参数')
     kwargs: Mapped[str | None] = mapped_column(JSON(), comment='任务可接收的关键字参数')
     queue: Mapped[str | None] = mapped_column(String(255), comment='CELERY_TASK_QUEUES 中定义的队列')

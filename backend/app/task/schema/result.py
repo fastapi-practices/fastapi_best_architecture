@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import Any
 
 from pydantic import ConfigDict, Field
 
@@ -12,7 +13,7 @@ class TaskResultSchemaBase(SchemaBase):
 
     task_id: str = Field(description='任务 ID')
     status: str = Field(description='执行状态')
-    result: bytes | None = Field(description='执行结果')
+    result: Any | None = Field(description='执行结果')
     date_done: datetime | None = Field(description='结束时间')
     traceback: str | None = Field(description='错误回溯')
     name: str | None = Field(description='任务名称')
