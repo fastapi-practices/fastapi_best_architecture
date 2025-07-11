@@ -13,7 +13,7 @@ class TaskSchedulerSchemeBase(SchemaBase):
     """任务调度参数"""
 
     name: str = Field(description='任务名称')
-    task: str = Field(description='要运行的 Celery 任务（模块化字符串）')
+    task: str = Field(description='要运行的 Celery 任务')
     args: JsonValue | None = Field(default='[]', description='任务可接收的位置参数')
     kwargs: JsonValue | None = Field(default='{}', description='任务可接收的关键字参数')
     queue: str | None = Field(default=None, description='CELERY_TASK_QUEUES 中定义的队列')
@@ -48,5 +48,8 @@ class GetTaskSchedulerDetail(TaskSchedulerSchemeBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(description='任务调度 ID')
+    enabled: bool = Field(description='是否启用任务')
+    total_run_count: int = Field(description='已运行总次数')
+    last_run_time: datetime | None = Field(None, description='最后运行时间')
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')

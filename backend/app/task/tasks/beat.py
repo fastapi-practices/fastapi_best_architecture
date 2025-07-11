@@ -5,20 +5,20 @@ from celery.schedules import schedule
 from backend.app.task.utils.tzcrontab import TzAwareCrontab
 
 LOCAL_BEAT_SCHEDULE = {
-    'exec_every_10_seconds': {
-        'task': 'task_demo_async',
-        'schedule': schedule(10),
+    '测试同步任务': {
+        'task': 'task_demo',
+        'schedule': schedule(5),
     },
-    'exec_every_1_minute_of_hour': {
+    '测试异步任务': {
         'task': 'task_demo_async',
         'schedule': TzAwareCrontab('1'),
     },
-    'exec_every_sunday': {
-        'task': 'delete_db_opera_log',
+    '清理操作日志': {
+        'task': 'app.task.tasks.db_log.tasks.delete_db_opera_log',
         'schedule': TzAwareCrontab('0', '0', day_of_week='6'),
     },
-    'exec_every_15_of_month': {
-        'task': 'delete_db_login_log',
+    '清理登录日志': {
+        'task': 'app.task.tasks.db_log.tasks.delete_db_login_log',
         'schedule': TzAwareCrontab('0', '0', day_of_month='15'),
     },
 }
