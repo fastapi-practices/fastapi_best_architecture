@@ -41,15 +41,7 @@ class TaskScheduler(Base):
     type: Mapped[int] = mapped_column(comment='调度类型（0间隔 1定时）')
     interval_every: Mapped[int | None] = mapped_column(comment='任务再次运行前的间隔周期数')
     interval_period: Mapped[str | None] = mapped_column(String(255), comment='任务运行之间的周期类型')
-    crontab_minute: Mapped[str | None] = mapped_column(String(60 * 4), default='*', comment='运行的分钟，"*" 表示全部')
-    crontab_hour: Mapped[str | None] = mapped_column(String(24 * 4), default='*', comment='运行的小时，"*" 表示全部')
-    crontab_day_of_week: Mapped[str | None] = mapped_column(String(64), default='*', comment='运行的星期，"*" 表示全部')
-    crontab_day_of_month: Mapped[str | None] = mapped_column(
-        String(31 * 4), default='*', comment='运行的每月日期，"*" 表示全部'
-    )
-    crontab_month_of_year: Mapped[str | None] = mapped_column(
-        String(64), default='*', comment='运行的月份，"*" 表示全部'
-    )
+    crontab: Mapped[str | None] = mapped_column(String(50), default='* * * * *', comment='任务运行的 Crontab 计划')
     one_off: Mapped[bool] = mapped_column(
         Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='是否仅运行一次'
     )

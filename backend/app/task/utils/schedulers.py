@@ -47,13 +47,14 @@ class ModelEntry(ScheduleEntry):
                 and model.interval_period is not None
             ):
                 self.schedule = schedules.schedule(timedelta(**{model.interval_period: model.interval_every}))
-            elif model.type == TaskSchedulerType.CRONTAB and model.crontab_minute is not None:
+            elif model.type == TaskSchedulerType.CRONTAB and model.crontab is not None:
+                crontab_split = model.crontab.split(' ')
                 self.schedule = TzAwareCrontab(
-                    minute=model.crontab_minute,
-                    hour=model.crontab_hour or '*',
-                    day_of_week=model.crontab_day_of_week or '*',
-                    day_of_month=model.crontab_day_of_month or '*',
-                    month_of_year=model.crontab_month_of_year or '*',
+                    minute=crontab_split[0],
+                    hour=crontab_split[1],
+                    day_of_week=crontab_split[2],
+                    day_of_month=crontab_split[3],
+                    month_of_year=crontab_split[4],
                 )
             else:
                 raise errors.NotFoundError(msg=f'{self.name} 计划为空！')
@@ -63,8 +64,8 @@ class ModelEntry(ScheduleEntry):
             asyncio.create_task(self._disable(model))
 
         try:
-            self.args = json.loads(model.args) if model.args else []
-            self.kwargs = json.loads(model.kwargs) if model.kwargs else {}
+            self.args = json.loads(model.args) if model.args else None
+            self.kwargs = json.loads(model.kwargs) if model.kwargs else None
         except ValueError as exc:
             logger.error(f'禁用参数错误的任务：{self.name}；error: {str(exc)}')
             asyncio.create_task(self._disable(model))
@@ -187,22 +188,21 @@ class ModelEntry(ScheduleEntry):
                 if not obj:
                     obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             elif isinstance(schedule, schedules.crontab):
+                crontab_minute = schedule._orig_minute if crontab_verify('m', schedule._orig_minute, False) else '*'
+                crontab_hour = schedule._orig_hour if crontab_verify('h', schedule._orig_hour, False) else '*'
+                crontab_day_of_week = (
+                    schedule._orig_day_of_week if crontab_verify('dom', schedule._orig_day_of_week, False) else '*'
+                )
+                crontab_day_of_month = (
+                    schedule._orig_day_of_month if crontab_verify('dom', schedule._orig_day_of_month, False) else '*'
+                )
+                crontab_month_of_year = (
+                    schedule._orig_month_of_year if crontab_verify('moy', schedule._orig_month_of_year, False) else '*'
+                )
                 spec = {
                     'name': name,
                     'type': TaskSchedulerType.CRONTAB.value,
-                    'crontab_minute': schedule._orig_minute
-                    if crontab_verify('m', schedule._orig_minute, False)
-                    else '*',
-                    'crontab_hour': schedule._orig_hour if crontab_verify('h', schedule._orig_hour, False) else '*',
-                    'crontab_day_of_week': schedule._orig_day_of_week
-                    if crontab_verify('dom', schedule._orig_day_of_week, False)
-                    else '*',
-                    'crontab_day_of_month': schedule._orig_day_of_month
-                    if crontab_verify('dom', schedule._orig_day_of_month, False)
-                    else '*',
-                    'crontab_month_of_year': schedule._orig_month_of_year
-                    if crontab_verify('moy', schedule._orig_month_of_year, False)
-                    else '*',
+                    'crontab': f'{crontab_minute} {crontab_hour} {crontab_day_of_week} {crontab_day_of_month} {crontab_month_of_year}',  # noqa: E501
                 }
                 stmt = select(TaskScheduler).filter_by(**spec)
                 query = await db.execute(stmt)
@@ -233,8 +233,8 @@ class ModelEntry(ScheduleEntry):
             except KeyError:
                 continue
         model_dict.update(
-            args=json.dumps(args or []),
-            kwargs=json.dumps(kwargs or {}),
+            args=json.dumps(args) if args else None,
+            kwargs=json.dumps(kwargs) if kwargs else None,
             **cls._unpack_options(**options or {}),
             **entry,
         )
