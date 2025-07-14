@@ -74,7 +74,7 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     uuid: str = Field(description='用户 UUID')
     email: CustomEmailStr | None = Field(None, description='邮箱')
     phone: CustomPhoneNumber | None = Field(None, description='手机号')
-    status: StatusType = Field(StatusType.enable, description='状态')
+    status: StatusType = Field(description='状态')
     is_superuser: bool = Field(description='是否超级管理员')
     is_staff: bool = Field(description='是否管理员')
     is_multi_login: bool = Field(description='是否允许多端登录')

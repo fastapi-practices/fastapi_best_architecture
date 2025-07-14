@@ -13,7 +13,7 @@ class DataScopeBase(SchemaBase):
     """数据范围基础模型"""
 
     name: str = Field(description='名称')
-    status: StatusType = Field(StatusType.enable, description='状态')
+    status: StatusType = Field(description='状态')
 
 
 class CreateDataScopeParam(DataScopeBase):
