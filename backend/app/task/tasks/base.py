@@ -45,5 +45,4 @@ class TaskBase(Task):
         :param einfo: 异常信息
         :return:
         """
-        loop = asyncio.get_event_loop()
-        loop.create_task(task_notification(msg=f'任务 {task_id} 执行失败'))
+        asyncio.create_task(task_notification(msg=f'任务 {task_id} 执行失败'))

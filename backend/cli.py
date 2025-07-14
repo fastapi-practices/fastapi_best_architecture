@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
-import os
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Annotated
 
 import cappa
-import uvicorn
+import granian
 
 from rich.panel import Panel
 from rich.text import Text
 from sqlalchemy import text
+from watchfiles import PythonFilter
 
 from backend import console, get_version
 from backend.common.enums import DataBaseType, PrimaryKeyType
@@ -39,14 +38,15 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     )
 
     console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
-    uvicorn.run(
-        app='backend.main:app',
-        host=host,
+    granian.Granian(
+        target='backend.main:app',
+        interface='asgi',
+        address=host,
         port=port,
         reload=not reload,
-        reload_excludes=[os.path.abspath('.venv' if Path(Path.cwd() / '.venv').is_dir() else '../.venv')],
-        workers=workers,
-    )
+        reload_filter=PythonFilter(),
+        workers=workers or 1,
+    ).serve()
 
 
 async def install_plugin(

@@ -3,7 +3,7 @@
 -e .
 aiofiles==24.1.0
     # via fastapi-best-architecture
-alembic==1.15.1
+alembic==1.16.3
     # via fastapi-best-architecture
 amqp==5.3.1
     # via kombu
@@ -16,7 +16,7 @@ anyio==4.9.0
     #   watchfiles
 asgi-correlation-id==4.3.4
     # via fastapi-best-architecture
-asgiref==3.8.1
+asgiref==3.9.1
     # via fastapi-best-architecture
 async-timeout==5.0.1 ; python_full_version < '3.11.3'
     # via
@@ -32,16 +32,16 @@ bidict==0.23.1
     # via python-socketio
 billiard==4.2.1
     # via celery
-cappa==0.28.0
+cappa==0.28.1
     # via fastapi-best-architecture
-celery==5.3.6
+celery==5.5.3
     # via
     #   celery-aio-pool
     #   fastapi-best-architecture
     #   flower
 celery-aio-pool==0.1.0rc8
     # via fastapi-best-architecture
-certifi==2025.1.31
+certifi==2025.7.9
     # via
     #   httpcore
     #   httpx
@@ -51,17 +51,19 @@ cffi==1.17.1 ; platform_python_implementation != 'PyPy'
     #   gevent
 cfgv==3.4.0
     # via pre-commit
-click==8.1.8
+click==8.2.1
     # via
     #   celery
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   granian
+    #   rich-toolkit
     #   typer
     #   uvicorn
 click-didyoumean==0.3.1
     # via celery
-click-plugins==1.1.1
+click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
@@ -71,61 +73,63 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   loguru
     #   pytest
     #   uvicorn
-cryptography==44.0.2
+cryptography==45.0.5
     # via fastapi-best-architecture
 distlib==0.3.9
     # via virtualenv
 dnspython==2.7.0
     # via email-validator
-dulwich==0.22.8
+dulwich==0.23.2
     # via fastapi-best-architecture
 ecdsa==0.19.1
     # via python-jose
 email-validator==2.2.0
     # via fastapi
-exceptiongroup==1.2.2 ; python_full_version < '3.11'
+exceptiongroup==1.3.0 ; python_full_version < '3.11'
     # via
     #   anyio
     #   pytest
 fast-captcha==0.3.2
     # via fastapi-best-architecture
-fastapi==0.115.11
+fastapi==0.116.0
     # via
     #   fastapi-best-architecture
     #   fastapi-limiter
     #   fastapi-pagination
-fastapi-cli==0.0.5
+fastapi-cli==0.0.8
     # via fastapi
 fastapi-limiter==0.1.6
     # via fastapi-best-architecture
-fastapi-pagination==0.13.0
+fastapi-pagination==0.13.3
     # via fastapi-best-architecture
 filelock==3.18.0
     # via virtualenv
 flower==2.0.1
     # via fastapi-best-architecture
-gevent==24.11.1
+gevent==25.5.1
     # via fastapi-best-architecture
-greenlet==3.1.1
+granian==2.4.1
+    # via fastapi-best-architecture
+greenlet==3.2.3
     # via
     #   gevent
     #   sqlalchemy
-h11==0.14.0
+h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
     #   wsproto
-hiredis==3.1.0
+hiredis==3.2.1
     # via redis
-httpcore==1.0.7
+httpcore==1.0.9
     # via httpx
 httptools==0.6.4
     # via uvicorn
 httpx==0.28.1
     # via fastapi
-humanize==4.12.2
+humanize==4.12.3
     # via flower
-identify==2.6.9
+identify==2.6.12
     # via pre-commit
 idna==3.10
     # via
@@ -142,11 +146,11 @@ jinja2==3.1.6
     # via
     #   fastapi
     #   fastapi-best-architecture
-kombu==5.5.1
+kombu==5.5.4
     # via celery
 loguru==0.7.3
     # via fastapi-best-architecture
-mako==1.3.9
+mako==1.3.10
     # via alembic
 markdown-it-py==3.0.0
     # via rich
@@ -160,63 +164,68 @@ msgspec==0.19.0
     # via fastapi-best-architecture
 nodeenv==1.9.1
     # via pre-commit
-packaging==24.2
+packaging==25.0
     # via
     #   asgi-correlation-id
+    #   kombu
     #   pytest
     #   pytest-sugar
-path==17.0.0
+path==17.1.0
     # via fastapi-best-architecture
-pillow==11.1.0
+pillow==11.3.0
     # via fast-captcha
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via virtualenv
-pluggy==1.5.0
+pluggy==1.6.0
     # via pytest
 pre-commit==4.2.0
-prometheus-client==0.21.1
+prometheus-client==0.22.1
     # via flower
-prompt-toolkit==3.0.50
+prompt-toolkit==3.0.51
     # via click-repl
 psutil==7.0.0
     # via fastapi-best-architecture
 pwdlib==0.2.1
     # via fastapi-best-architecture
-pyasn1==0.4.8
+pyasn1==0.6.1
     # via
     #   python-jose
     #   rsa
 pycparser==2.22 ; platform_python_implementation != 'PyPy'
     # via cffi
-pydantic==2.11.0
+pydantic==2.11.7
     # via
     #   fastapi
     #   fastapi-best-architecture
     #   fastapi-pagination
     #   pydantic-settings
     #   sqlalchemy-crud-plus
-pydantic-core==2.33.0
+pydantic-core==2.33.2
     # via pydantic
-pydantic-settings==2.8.1
+pydantic-settings==2.10.1
     # via fastapi-best-architecture
-pygments==2.19.1
-    # via rich
-pytest==8.3.5
+pygments==2.19.2
+    # via
+    #   pytest
+    #   rich
+pymysql==1.1.1
+    # via fastapi-best-architecture
+pytest==8.4.1
     # via pytest-sugar
 pytest-sugar==1.0.0
 python-dateutil==2.9.0.post0
     # via celery
-python-dotenv==1.1.0
+python-dotenv==1.1.1
     # via
     #   pydantic-settings
     #   uvicorn
-python-engineio==4.11.2
+python-engineio==4.12.2
     # via python-socketio
-python-jose==3.4.0
+python-jose==3.5.0
     # via fastapi-best-architecture
 python-multipart==0.0.20
     # via fastapi
-python-socketio==5.12.1
+python-socketio==5.13.0
     # via fastapi-best-architecture
 pytz==2025.2
     # via flower
@@ -224,19 +233,22 @@ pyyaml==6.0.2
     # via
     #   pre-commit
     #   uvicorn
-redis==5.2.1
+redis==6.2.0
     # via
     #   fastapi-best-architecture
     #   fastapi-limiter
-rich==13.9.4
+rich==14.0.0
     # via
     #   cappa
+    #   rich-toolkit
     #   typer
-rsa==4.9
+rich-toolkit==0.14.8
+    # via fastapi-cli
+rsa==4.9.1
     # via python-jose
 rtoml==0.12.0
     # via fastapi-best-architecture
-setuptools==78.1.0
+setuptools==80.9.0
     # via
     #   zope-event
     #   zope-interface
@@ -250,7 +262,7 @@ six==1.17.0
     #   python-dateutil
 sniffio==1.3.1
     # via anyio
-sqlalchemy==2.0.40
+sqlalchemy==2.0.41
     # via
     #   alembic
     #   fastapi-best-architecture
@@ -259,51 +271,55 @@ sqlalchemy-crud-plus==1.10.0
     # via fastapi-best-architecture
 sqlparse==0.5.3
     # via fastapi-best-architecture
-starlette==0.46.1
+starlette==0.46.2
     # via
     #   asgi-correlation-id
     #   fastapi
-termcolor==2.5.0
+termcolor==3.1.0
     # via pytest-sugar
 tomli==2.2.1 ; python_full_version < '3.11'
-    # via pytest
-tornado==6.4.2
+    # via
+    #   alembic
+    #   pytest
+tornado==6.5.1
     # via flower
 type-lens==0.2.3
     # via cappa
-typer==0.15.2
+typer==0.16.0
     # via fastapi-cli
-typing-extensions==4.13.0
+typing-extensions==4.14.1
     # via
     #   alembic
     #   anyio
     #   asgiref
     #   cappa
+    #   exceptiongroup
     #   fastapi
     #   fastapi-pagination
     #   pydantic
     #   pydantic-core
     #   rich
+    #   rich-toolkit
     #   sqlalchemy
     #   type-lens
     #   typer
     #   typing-inspection
     #   uvicorn
-typing-inspection==0.4.0
-    # via pydantic
-tzdata==2025.1
+typing-inspection==0.4.1
     # via
-    #   celery
-    #   kombu
+    #   pydantic
+    #   pydantic-settings
+tzdata==2025.2
+    # via kombu
 ua-parser==1.0.1
     # via user-agents
 ua-parser-builtins==0.18.0.post1
     # via ua-parser
-urllib3==2.4.0
+urllib3==2.5.0
     # via dulwich
 user-agents==2.2.0
     # via fastapi-best-architecture
-uvicorn==0.34.0
+uvicorn==0.35.0
     # via
     #   fastapi
     #   fastapi-cli
@@ -314,9 +330,9 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.29.3
+virtualenv==20.31.2
     # via pre-commit
-watchfiles==1.0.4
+watchfiles==1.1.0
     # via uvicorn
 wcwidth==0.2.13
     # via prompt-toolkit
@@ -326,7 +342,7 @@ win32-setctime==1.2.0 ; sys_platform == 'win32'
     # via loguru
 wsproto==1.2.0
     # via simple-websocket
-zope-event==5.0
+zope-event==5.1
     # via gevent
 zope-interface==7.2
     # via gevent
