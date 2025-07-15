@@ -22,7 +22,7 @@ class TaskSchedulerSchemeBase(SchemaBase):
     start_time: datetime | None = Field(default=None, description='任务开始触发的时间')
     expire_time: datetime | None = Field(default=None, description='任务不再触发的截止时间')
     expire_seconds: int | None = Field(default=None, description='任务不再触发的秒数时间差')
-    type: TaskSchedulerType = Field(default=TaskSchedulerType.INTERVAL, description='任务调度类型（0间隔 1定时）')
+    type: TaskSchedulerType = Field(description='任务调度类型（0间隔 1定时）')
     interval_every: int | None = Field(default=None, description='任务再次运行前的间隔周期数')
     interval_period: PeriodType | None = Field(default=None, description='任务运行之间的周期类型')
     crontab: str = Field(default='* * * * *', description='运行的 Crontab 表达式')

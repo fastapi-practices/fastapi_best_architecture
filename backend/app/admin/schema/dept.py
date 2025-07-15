@@ -17,7 +17,7 @@ class DeptSchemaBase(SchemaBase):
     leader: str | None = Field(None, description='负责人')
     phone: CustomPhoneNumber | None = Field(None, description='联系电话')
     email: CustomEmailStr | None = Field(None, description='邮箱')
-    status: StatusType = Field(StatusType.enable, description='状态')
+    status: StatusType = Field(description='状态')
 
 
 class CreateDeptParam(DeptSchemaBase):

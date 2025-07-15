@@ -26,7 +26,7 @@ class OperaLogSchemaBase(SchemaBase):
     browser: str | None = Field(None, description='浏览器')
     device: str | None = Field(None, description='设备')
     args: dict[str, Any] | None = Field(None, description='请求参数')
-    status: StatusType = Field(StatusType.enable, description='状态')
+    status: StatusType = Field(description='状态')
     code: str = Field(description='状态码')
     msg: str | None = Field(None, description='消息')
     cost_time: float = Field(description='耗时')
