@@ -9,17 +9,8 @@ from backend.database.redis import redis_client
 
 # 创建 Socket.IO 服务器实例
 sio = socketio.AsyncServer(
-    # 集成 Celery 实现消息订阅
     client_manager=socketio.AsyncRedisManager(
-        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:'
-        f'{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
-    )
-    if settings.CELERY_BROKER == 'redis'
-    else socketio.AsyncAioPikaManager(
-        (
-            f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{settings.CELERY_RABBITMQ_PASSWORD}@'
-            f'{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}'
-        )
+        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DATABASE}'
     ),
     async_mode='asgi',
     cors_allowed_origins=settings.CORS_ALLOWED_ORIGINS,
@@ -30,7 +21,7 @@ sio = socketio.AsyncServer(
 
 @sio.event
 async def connect(sid, environ, auth):
-    """处理 WebSocket 连接事件"""
+    """Socket 连接事件"""
     if not auth:
         log.error('WebSocket 连接失败：无授权')
         return False
@@ -57,6 +48,6 @@ async def connect(sid, environ, auth):
 
 
 @sio.event
-async def disconnect(sid: str) -> None:
-    """处理 WebSocket 断开连接事件"""
+async def disconnect(sid) -> None:
+    """Socket 断开连接事件"""
     await redis_client.spop(settings.TOKEN_ONLINE_REDIS_PREFIX)

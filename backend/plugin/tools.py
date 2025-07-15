@@ -84,7 +84,7 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
     :param pk_type: 主键类型
     :return:
     """
-    if db_type == DataBaseType.mysql.value:
+    if db_type == DataBaseType.mysql:
         mysql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'mysql')
         if pk_type == PrimaryKeyType.autoincrement:
             sql_file = os.path.join(mysql_dir, 'init.sql')
@@ -92,7 +92,7 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
             sql_file = os.path.join(mysql_dir, 'init_snowflake.sql')
     else:
         postgresql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'postgresql')
-        if pk_type == PrimaryKeyType.autoincrement.value:
+        if pk_type == PrimaryKeyType.autoincrement:
             sql_file = os.path.join(postgresql_dir, 'init.sql')
         else:
             sql_file = os.path.join(postgresql_dir, 'init_snowflake.sql')

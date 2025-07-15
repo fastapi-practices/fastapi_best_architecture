@@ -64,6 +64,15 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get_by_name(db, obj.name)
             if task_scheduler:
                 raise errors.ConflictError(msg='任务调度已存在')
+            if obj.type == TaskSchedulerType.CRONTAB:
+                crontab_split = obj.crontab.split(' ')
+                if len(crontab_split) != 5:
+                    raise errors.RequestError(msg='Crontab 表达式非法')
+                crontab_verify('m', crontab_split[0])
+                crontab_verify('h', crontab_split[1])
+                crontab_verify('dow', crontab_split[2])
+                crontab_verify('dom', crontab_split[3])
+                crontab_verify('moy', crontab_split[4])
             await task_scheduler_dao.create(db, obj)
 
     @staticmethod
@@ -83,11 +92,14 @@ class TaskSchedulerService:
                 if await task_scheduler_dao.get_by_name(db, obj.name):
                     raise errors.ConflictError(msg='任务调度已存在')
             if task_scheduler.type == TaskSchedulerType.CRONTAB:
-                crontab_verify('m', task_scheduler.crontab_minute)
-                crontab_verify('h', task_scheduler.crontab_hour)
-                crontab_verify('dow', task_scheduler.crontab_day_of_week)
-                crontab_verify('dom', task_scheduler.crontab_day_of_month)
-                crontab_verify('moy', task_scheduler.crontab_month_of_year)
+                crontab_split = obj.crontab.split(' ')
+                if len(crontab_split) != 5:
+                    raise errors.RequestError(msg='Crontab 表达式非法')
+                crontab_verify('m', crontab_split[0])
+                crontab_verify('h', crontab_split[1])
+                crontab_verify('dow', crontab_split[2])
+                crontab_verify('dom', crontab_split[3])
+                crontab_verify('moy', crontab_split[4])
             count = await task_scheduler_dao.update(db, pk, obj)
             return count
 
@@ -103,12 +115,6 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
-            if task_scheduler.type == TaskSchedulerType.CRONTAB:
-                crontab_verify('m', task_scheduler.crontab_minute)
-                crontab_verify('h', task_scheduler.crontab_hour)
-                crontab_verify('dow', task_scheduler.crontab_day_of_week)
-                crontab_verify('dom', task_scheduler.crontab_day_of_month)
-                crontab_verify('moy', task_scheduler.crontab_month_of_year)
             count = await task_scheduler_dao.set_status(db, pk, not task_scheduler.enabled)
             return count
 
