@@ -150,8 +150,8 @@ class TaskSchedulerService:
                 raise errors.NotFoundError(msg='任务调度不存在')
             celery_app.send_task(
                 name=task_scheduler.task,
-                args=json.loads(task_scheduler.args),
-                kwargs=json.loads(task_scheduler.kwargs),
+                args=json.loads(task_scheduler.args) if task_scheduler.args else None,
+                kwargs=json.loads(task_scheduler.kwargs) if task_scheduler.kwargs else None,
             )
 
     @staticmethod
