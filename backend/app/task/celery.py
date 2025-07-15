@@ -15,7 +15,7 @@ def find_task_packages():
     packages = []
     for root, dirs, files in os.walk(os.path.join(BASE_PATH, 'app', 'task', 'tasks')):
         if 'tasks.py' in files:
-            package = root.replace(str(BASE_PATH) + os.path.sep, '').replace(os.path.sep, '.')
+            package = root.replace(str(BASE_PATH.parent) + os.path.sep, '').replace(os.path.sep, '.')
             packages.append(package)
     return packages
 
@@ -45,8 +45,8 @@ def init_celery() -> celery.Celery:
         result_extended=True,
         # result_expires=0,  # 任务结果自动清理，0 或 None 表示不清理
         beat_schedule=LOCAL_BEAT_SCHEDULE,
-        beat_scheduler='app.task.utils.schedulers:DatabaseScheduler',
-        task_cls='app.task.tasks.base:TaskBase',
+        beat_scheduler='backend.app.task.utils.schedulers:DatabaseScheduler',
+        task_cls='backend.app.task.tasks.base:TaskBase',
         task_track_started=True,
         enable_utc=False,
         timezone=settings.DATETIME_TIMEZONE,
