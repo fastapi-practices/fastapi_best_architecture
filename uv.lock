@@ -709,7 +709,7 @@ requires-dist = [
     { name = "fastapi-pagination", specifier = ">=0.13.0" },
     { name = "flower", specifier = ">=2.0.0" },
     { name = "gevent", specifier = ">=25.5.1" },
-    { name = "granian", specifier = ">=2.4.0" },
+    { name = "granian", specifier = ">=2.4.2" },
     { name = "ip2loc", specifier = ">=1.0.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
