@@ -83,11 +83,10 @@ class LoginLogService:
             return count
 
     @staticmethod
-    async def delete_all() -> int:
+    async def delete_all() -> None:
         """清空所有登录日志"""
         async with async_db_session.begin() as db:
-            count = await login_log_dao.delete_all(db)
-            return count
+            await login_log_dao.delete_all(db)
 
 
 login_log_service: LoginLogService = LoginLogService()

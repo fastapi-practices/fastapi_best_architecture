@@ -156,7 +156,6 @@ class TaskSchedulerService:
             else:
                 celery_app.send_task(name=task_scheduler.task, args=args, kwargs=kwargs)
 
-
     @staticmethod
     async def revoke(*, task_id: str) -> None:
         """

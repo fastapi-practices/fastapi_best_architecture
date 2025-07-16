@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
+import subprocess
 
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Literal
 
 import cappa
 import granian
@@ -44,9 +45,37 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         address=host,
         port=port,
         reload=not reload,
-        reload_filter=PythonFilter(),
+        reload_filter=PythonFilter,
         workers=workers or 1,
     ).serve()
+
+
+def run_celery_worker(log_level: Literal['info', 'debug']) -> None:
+    try:
+        subprocess.run(['celery', '-A', 'backend.app.task.celery', 'worker', '-l', f'{log_level}', '-P', 'gevent'])
+    except KeyboardInterrupt:
+        pass
+
+
+def run_celery_beat(log_level: Literal['info', 'debug']) -> None:
+    try:
+        subprocess.run(['celery', '-A', 'backend.app.task.celery', 'beat', '-l', f'{log_level}'])
+    except KeyboardInterrupt:
+        pass
+
+
+def run_celery_flower(port: int, basic_auth: str) -> None:
+    try:
+        subprocess.run([
+            'celery',
+            '-A',
+            'backend.app.task.celery',
+            'flower',
+            f'--port={port}',
+            f'--basic-auth={basic_auth}',
+        ])
+    except KeyboardInterrupt:
+        pass
 
 
 async def install_plugin(
@@ -89,7 +118,7 @@ async def execute_sql_scripts(sql_scripts: str) -> None:
     console.print(Text('SQL 脚本已执行完成', style='bold green'))
 
 
-@cappa.command(help='运行服务')
+@cappa.command(help='运行 API 服务')
 @dataclass
 class Run:
     host: Annotated[
@@ -116,6 +145,49 @@ class Run:
 
     def __call__(self):
         run(host=self.host, port=self.port, reload=self.no_reload, workers=self.workers)
+
+
+@cappa.command(help='从当前主机启动 Celery worker 服务')
+@dataclass
+class Worker:
+    log_level: Annotated[
+        Literal['info', 'debug'],
+        cappa.Arg(long=True, short='-l', default='info', help='日志输出级别'),
+    ]
+
+    def __call__(self):
+        run_celery_worker(log_level=self.log_level)
+
+
+@cappa.command(help='从当前主机启动 Celery beat 服务')
+@dataclass
+class Beat:
+    log_level: Annotated[
+        Literal['info', 'debug'],
+        cappa.Arg(long=True, short='-l', default='info', help='日志输出级别'),
+    ]
+
+    def __call__(self):
+        run_celery_beat(log_level=self.log_level)
+
+
+@cappa.command(help='从当前主机启动 Celery flower 服务')
+@dataclass
+class Flower:
+    port: Annotated[int, cappa.Arg(long=True, default=8555, help='提供服务的主机端口号')]
+    basic_auth: Annotated[str, cappa.Arg(long=True, default='admin:123456', help='页面登录的用户名和密码')]
+
+    def __call__(self):
+        run_celery_flower(port=self.port, basic_auth=self.basic_auth)
+
+
+@cappa.command(help='运行 Celery 服务')
+@dataclass
+class Celery:
+    subcmd: cappa.Subcommands[Worker | Beat | Flower | None] = None
+
+    def __call__(self):
+        console.print('\n更多信息，尝试 "[cyan]--help[/]"')
 
 
 @cappa.command(help='新增插件')
@@ -151,13 +223,13 @@ class Add:
 class FbaCli:
     version: Annotated[
         bool,
-        cappa.Arg(short='-V', long=True, default=False, help='打印当前版本号'),
+        cappa.Arg(short='-V', long=True, default=False, show_default=False, help='打印当前版本号'),
     ]
     sql: Annotated[
         str,
-        cappa.Arg(long=True, default='', help='在事务中执行 SQL 脚本'),
+        cappa.Arg(value_name='PATH', long=True, default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
-    subcmd: cappa.Subcommands[Run | Add | None] = None
+    subcmd: cappa.Subcommands[Run | Celery | Add | None] = None
 
     async def __call__(self):
         if self.version:

@@ -59,7 +59,5 @@ async def delete_login_logs(obj: DeleteLoginLogParam) -> ResponseModel:
     ],
 )
 async def delete_all_login_logs() -> ResponseModel:
-    count = await login_log_service.delete_all()
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
+    await login_log_service.delete_all()
+    return response_base.success()
