@@ -44,7 +44,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         address=host,
         port=port,
         reload=not reload,
-        reload_filter=PythonFilter(),
+        reload_filter=PythonFilter,
         workers=workers or 1,
     ).serve()
 
