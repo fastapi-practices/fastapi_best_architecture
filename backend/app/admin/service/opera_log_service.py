@@ -46,11 +46,10 @@ class OperaLogService:
             return count
 
     @staticmethod
-    async def delete_all() -> int:
+    async def delete_all() -> None:
         """清空所有操作日志"""
         async with async_db_session.begin() as db:
-            count = await opera_log_dao.delete_all(db)
-            return count
+            await opera_log_dao.delete_all(db)
 
 
 opera_log_service: OperaLogService = OperaLogService()
