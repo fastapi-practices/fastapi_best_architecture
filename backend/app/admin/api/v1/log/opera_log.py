@@ -59,7 +59,5 @@ async def delete_opera_logs(obj: DeleteOperaLogParam) -> ResponseModel:
     ],
 )
 async def delete_all_opera_logs() -> ResponseModel:
-    count = await opera_log_service.delete_all()
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
+    await opera_log_service.delete_all()
+    return response_base.success()
