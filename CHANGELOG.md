@@ -1,3 +1,38 @@
+<a id="v1.7.0"></a>
+# [v1.7.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.7.0) - 2025-07-16
+
+## What's Changed
+* Update the changelog for v1.6.0 by [@wu-clan](https://github.com/wu-clan) in [#703](https://github.com/fastapi-practices/fastapi_best_architecture/pull/703)
+* Update the CLI to be executed async by [@wu-clan](https://github.com/wu-clan) in [#704](https://github.com/fastapi-practices/fastapi_best_architecture/pull/704)
+* Fix the code generation schema template by [@wu-clan](https://github.com/wu-clan) in [#706](https://github.com/fastapi-practices/fastapi_best_architecture/pull/706)
+* Replace gunicorn deployment to granian by [@wu-clan](https://github.com/wu-clan) in [#705](https://github.com/fastapi-practices/fastapi_best_architecture/pull/705)
+* Fix the code generation delete schema template by [@wu-clan](https://github.com/wu-clan) in [#708](https://github.com/fastapi-practices/fastapi_best_architecture/pull/708)
+* Update the refresh token verify mechanism by [@wu-clan](https://github.com/wu-clan) in [#710](https://github.com/fastapi-practices/fastapi_best_architecture/pull/710)
+* Update the reload excludes for CLI run by [@wu-clan](https://github.com/wu-clan) in [#709](https://github.com/fastapi-practices/fastapi_best_architecture/pull/709)
+* Add CLI support for execute sql scripts by [@wu-clan](https://github.com/wu-clan) in [#711](https://github.com/fastapi-practices/fastapi_best_architecture/pull/711)
+* Update the granian env to command params by [@wu-clan](https://github.com/wu-clan) in [#712](https://github.com/fastapi-practices/fastapi_best_architecture/pull/712)
+* Update the middleware logging accuracy by [@wu-clan](https://github.com/wu-clan) in [#713](https://github.com/fastapi-practices/fastapi_best_architecture/pull/713)
+* Update the log output default style by [@wu-clan](https://github.com/wu-clan) in [#714](https://github.com/fastapi-practices/fastapi_best_architecture/pull/714)
+* Optimize the analysis of get plugins by [@wu-clan](https://github.com/wu-clan) in [#716](https://github.com/fastapi-practices/fastapi_best_architecture/pull/716)
+* Simplify user permission database queries by [@wu-clan](https://github.com/wu-clan) in [#717](https://github.com/fastapi-practices/fastapi_best_architecture/pull/717)
+* Update the CLI startup service mode by [@wu-clan](https://github.com/wu-clan) in [#718](https://github.com/fastapi-practices/fastapi_best_architecture/pull/718)
+* Add support for celery dynamic tasks by [@wu-clan](https://github.com/wu-clan) in [#715](https://github.com/fastapi-practices/fastapi_best_architecture/pull/715)
+* Fix the celery task scheduler query by [@wu-clan](https://github.com/wu-clan) in [#719](https://github.com/fastapi-practices/fastapi_best_architecture/pull/719)
+* Update the celery task comment and name by [@wu-clan](https://github.com/wu-clan) in [#720](https://github.com/fastapi-practices/fastapi_best_architecture/pull/720)
+* Optimize celery integrations and events by [@wu-clan](https://github.com/wu-clan) in [#721](https://github.com/fastapi-practices/fastapi_best_architecture/pull/721)
+* Simplify celery task crontab config by [@wu-clan](https://github.com/wu-clan) in [#722](https://github.com/fastapi-practices/fastapi_best_architecture/pull/722)
+* Delete the default value of schema enum data by [@wu-clan](https://github.com/wu-clan) in [#723](https://github.com/fastapi-practices/fastapi_best_architecture/pull/723)
+* Fix the parsing of execution task params by [@wu-clan](https://github.com/wu-clan) in [#725](https://github.com/fastapi-practices/fastapi_best_architecture/pull/725)
+* Bump granian from 2.4.0 to 2.4.2 by [@wu-clan](https://github.com/wu-clan) in [#727](https://github.com/fastapi-practices/fastapi_best_architecture/pull/727)
+* Add CLI support for startup celery services by [@wu-clan](https://github.com/wu-clan) in [#724](https://github.com/fastapi-practices/fastapi_best_architecture/pull/724)
+* Fix login and operation log clearing by [@wu-clan](https://github.com/wu-clan) in [#728](https://github.com/fastapi-practices/fastapi_best_architecture/pull/728)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
+
+[Changes][v1.7.0]
+
+
 <a id="v1.6.0"></a>
 # [v1.6.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.6.0) - 2025-06-30
 
@@ -679,6 +714,7 @@
 [Changes][v1.0.0]
 
 
+[v1.7.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
 [v1.5.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
 [v1.5.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
