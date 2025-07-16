@@ -148,10 +148,20 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
+            # 安全解析 args 和 kwargs
+            try:
+                args = json.loads(task_scheduler.args) if task_scheduler.args else []
+            except (TypeError, json.JSONDecodeError):
+                args = []
+
+            try:
+                kwargs = json.loads(task_scheduler.kwargs) if task_scheduler.kwargs else {}
+            except (TypeError, json.JSONDecodeError):
+                kwargs = {}
             celery_app.send_task(
                 name=task_scheduler.task,
-                args=json.loads(task_scheduler.args),
-                kwargs=json.loads(task_scheduler.kwargs),
+                args=args,
+                kwargs=kwargs,
             )
 
     @staticmethod
