@@ -6,7 +6,7 @@
 
 Enterprise-level backend architecture solution
 
-English | [简体中文](./README.zh-CN.md)
+[O'zbek](./README.uz.md) | English | [简体中文](./README.zh-CN.md)
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
@@ -34,7 +34,7 @@ But please note that we don't have a traditional multi-app structure (django, sp
 pattern, use templates to transform it to your heart's content!
 
 | workflow       | java           | fastapi_best_architecture |
-|----------------|----------------|---------------------------|
+| -------------- | -------------- | ------------------------- |
 | view           | controller     | api                       |
 | data transmit  | dto            | schema                    |
 | business logic | service + impl | service                   |

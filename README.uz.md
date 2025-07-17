@@ -1,12 +1,12 @@
 <div align="center">
 
-<img alt="Logo 包含了 FBA 三个字母抽象结合，形成了一个类似从地面扩散投影上来的闪电" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
+<img alt="Logo FBA uch harfning abstrakt birikmasini o'z ichiga oladi va yerdan tarqaladigan chaqmoq shaklida ko'rinadi" width="320" src="https://wu-clan.github.io/picx-images-hosting/logo/fba.png">
 
 # FastAPI Best Architecture
 
-企业级后端架构解决方案
+Korxona darajasidagi backend arxitektura yechimi
 
-简体中文 | [English](./README.md) | [O'zbek](./README.uz.md)
+O'zbek | [English](./README.md) | [简体中文](./README.zh-CN.md)
 
 [![GitHub](https://img.shields.io/github/license/fastapi-practices/fastapi_best_architecture)](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
@@ -23,33 +23,33 @@
 
 </div>
 
-## 伪三层架构
+## Soxta 3-qatlamli arxitektura
 
-mvc 架构作为常规设计模式，在 python web 中也很常见，但是三层架构更令人着迷
+MVC arxitekturasi Python web dasturlashda keng tarqalgan dizayn namunasi hisoblanadi, lekin 3-qatlamli arxitektura undan ham qiziqroq
 
-在 python web 开发中，三层架构的概念并没有通用标准，所以这里我们称之为伪三层架构
+Python web dasturlashda 3-qatlamli arxitektura uchun umumiy standart yo'q, shuning uchun biz buni soxta 3-qatlamli arxitektura deb ataymiz
 
-但请注意，我们并没有传统的多应用程序结构（django、springBoot...），如果您不喜欢这种模式，可以使用模板对其进行随意改造！
+Lekin shuni yodda tutingki, bizda an'anaviy ko'p-ilovalar tuzilishi yo'q (django, springBoot...). Agar bu namuna sizga yoqmasa, uni template orqali o'z xohishingizcha o'zgartirishingiz mumkin!
 
-| 工作流程 | java           | fastapi_best_architecture |
-| -------- | -------------- | ------------------------- |
-| 视图     | controller     | api                       |
-| 数据传输 | dto            | schema                    |
-| 业务逻辑 | service + impl | service                   |
-| 数据访问 | dao / mapper   | crud                      |
-| 模型     | model / entity | model                     |
+| ish jarayoni   | java           | fastapi_best_architecture |
+| -------------- | -------------- | ------------------------- |
+| view           | controller     | api                       |
+| data transmit  | dto            | schema                    |
+| business logic | service + impl | service                   |
+| data access    | dao / mapper   | crud                      |
+| model          | model / entity | model                     |
 
-## 帮助
+## Yordam
 
-更多详情请查看 [官方文档](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)
+Batafsil ma'lumot uchun [rasmiy hujjatlar](https://fastapi-practices.github.io/fastapi_best_architecture_docs/)ga murojaat qiling
 
-## 贡献者
+## Hissa qo'shuvchilar
 
 <a href="https://github.com/fastapi-practices/fastapi_best_architecture/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=fastapi-practices/fastapi_best_architecture"/>
 </a>
 
-## 特别鸣谢
+## Alohida minnatdorchilik
 
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Pydantic](https://docs.pydantic.dev/latest/)
@@ -58,16 +58,16 @@ mvc 架构作为常规设计模式，在 python web 中也很常见，但是三�
 - [Ruff](https://beta.ruff.rs/docs/)
 - ...
 
-## 互动
+## Muloqot
 
 [Discord](https://wu-clan.github.io/homepage/)
 
-## 赞助我们
+## Homiylik qiling
 
-如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励：[:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
+Agar bu dastur sizga yordam bergan bo'lsa, bizga qahva uchun homiylik qilishingiz mumkin: [:coffee: Homiylik :coffee:](https://wu-clan.github.io/sponsor/)
 
-## 许可证
+## Litsenziya
 
-本项目由 [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) 许可证的条款进行许可
+Ushbu loyiha [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) litsenziyasi shartlari asosida litsenziyalangan
 
 [![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)
