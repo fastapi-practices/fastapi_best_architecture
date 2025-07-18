@@ -9,6 +9,7 @@ from multiprocessing.util import Finalize
 
 from celery import current_app, schedules
 from celery.beat import ScheduleEntry, Scheduler
+from celery.signals import beat_init
 from celery.utils.log import get_logger
 from sqlalchemy import select
 from sqlalchemy.exc import DatabaseError, InterfaceError
@@ -27,6 +28,35 @@ from backend.utils.timezone import timezone
 
 # 此计划程序必须比常规的 5 分钟更频繁地唤醒，因为它需要考虑对计划的外部更改
 DEFAULT_MAX_INTERVAL = 5  # seconds
+
+# 计划锁定时长，避免重复运行
+DEFAULT_MAX_LOCK = 300  # seconds
+
+# Copied from:
+# https://github.com/andymccurdy/redis-py/blob/master/redis/lock.py#L33
+# Changes:
+#     The second line from the bottom: The original Lua script intends
+#     to extend time to (lock remaining time + additional time); while
+#     the script here extend time to an expected expiration time.
+# KEYS[1] - lock name
+# ARGS[1] - token
+# ARGS[2] - additional milliseconds
+# return 1 if the locks time was extended, otherwise 0
+LUA_EXTEND_TO_SCRIPT = """
+    local token = redis.call('get', KEYS[1])
+    if not token or token ~= ARGV[1] then
+        return 0
+    end
+    local expiration = redis.call('pttl', KEYS[1])
+    if not expiration then
+        expiration = 0
+    end
+    if expiration < 0 then
+        return 0
+    end
+    redis.call('pexpire', KEYS[1], ARGV[2])
+    return 1
+"""
 
 logger = get_logger('fba.schedulers')
 
@@ -260,12 +290,17 @@ class ModelEntry(ScheduleEntry):
 
 
 class DatabaseScheduler(Scheduler):
+    """数据库调度程序"""
+
     Entry = ModelEntry
 
     _schedule = None
     _last_update = None
     _initial_read = True
     _heap_invalidated = False
+
+    lock = None
+    lock_key = f'{settings.CELERY_REDIS_PREFIX}:beat_lock'
 
     def __init__(self, *args, **kwargs):
         self.app = kwargs['app']
@@ -314,6 +349,16 @@ class DatabaseScheduler(Scheduler):
         # 需要按名称存储条目，因为条目可能会发生变化
         self._dirty.add(new_entry.name)
         return new_entry
+
+    def close(self):
+        """重写父函数"""
+        if self.lock:
+            logger.info('beat: Releasing lock')
+            if run_await(self.lock.owned)():
+                run_await(self.lock.release)()
+            self.lock = None
+
+        self.sync()
 
     def sync(self):
         """重写父函数"""
@@ -401,3 +446,29 @@ class DatabaseScheduler(Scheduler):
 
         # logger.debug(self._schedule)
         return self._schedule
+
+
+@beat_init.connect
+def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
+    """
+    尝试在启动时获取锁
+
+    :param sender: 接收方应响应的发送方
+    :return:
+    """
+    scheduler = sender.scheduler
+    if not scheduler.lock_key:
+        return
+
+    logger.debug('beat: Acquiring lock...')
+    lock = redis_client.lock(
+        scheduler.lock_key,
+        timeout=DEFAULT_MAX_LOCK,
+        sleep=scheduler.max_interval,
+    )
+    # overwrite redis-py's extend script
+    # which will add additional timeout instead of extend to a new timeout
+    lock.lua_extend = redis_client.register_script(LUA_EXTEND_TO_SCRIPT)
+    run_await(lock.acquire)()
+    logger.info('beat: Acquired lock')
+    scheduler.lock = lock
