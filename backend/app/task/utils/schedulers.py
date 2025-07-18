@@ -188,21 +188,12 @@ class ModelEntry(ScheduleEntry):
                 if not obj:
                     obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             elif isinstance(schedule, schedules.crontab):
-                crontab_minute = schedule._orig_minute if crontab_verify('m', schedule._orig_minute, False) else '*'
-                crontab_hour = schedule._orig_hour if crontab_verify('h', schedule._orig_hour, False) else '*'
-                crontab_day_of_week = (
-                    schedule._orig_day_of_week if crontab_verify('dom', schedule._orig_day_of_week, False) else '*'
-                )
-                crontab_day_of_month = (
-                    schedule._orig_day_of_month if crontab_verify('dom', schedule._orig_day_of_month, False) else '*'
-                )
-                crontab_month_of_year = (
-                    schedule._orig_month_of_year if crontab_verify('moy', schedule._orig_month_of_year, False) else '*'
-                )
+                crontab = f'{schedule._orig_minute} {schedule._orig_hour} {schedule._orig_day_of_week} {schedule._orig_day_of_month} {schedule._orig_month_of_year}'  # noqa: E501
+                crontab_verify(crontab)
                 spec = {
                     'name': name,
                     'type': TaskSchedulerType.CRONTAB.value,
-                    'crontab': f'{crontab_minute} {crontab_hour} {crontab_day_of_week} {crontab_day_of_month} {crontab_month_of_year}',  # noqa: E501
+                    'crontab': crontab,
                 }
                 stmt = select(TaskScheduler).filter_by(**spec)
                 query = await db.execute(stmt)
