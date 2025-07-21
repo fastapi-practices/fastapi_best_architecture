@@ -11,6 +11,7 @@ from celery import current_app, schedules
 from celery.beat import ScheduleEntry, Scheduler
 from celery.signals import beat_init
 from celery.utils.log import get_logger
+from redis.asyncio.lock import Lock
 from sqlalchemy import select
 from sqlalchemy.exc import DatabaseError, InterfaceError
 
@@ -29,8 +30,11 @@ from backend.utils.timezone import timezone
 # 此计划程序必须比常规的 5 分钟更频繁地唤醒，因为它需要考虑对计划的外部更改
 DEFAULT_MAX_INTERVAL = 5  # seconds
 
-# 计划锁定时长，避免重复运行
-DEFAULT_MAX_LOCK = 300  # seconds
+# 计划锁时长，避免重复创建
+DEFAULT_MAX_LOCK_TIMEOUT = 300  # seconds
+
+# 锁检测周期，应小于计划锁时长
+DEFAULT_LOCK_INTERVAL = 60  # seconds
 
 # Copied from:
 # https://github.com/andymccurdy/redis-py/blob/master/redis/lock.py#L33
@@ -299,7 +303,7 @@ class DatabaseScheduler(Scheduler):
     _initial_read = True
     _heap_invalidated = False
 
-    lock = None
+    lock: Lock | None = None
     lock_key = f'{settings.CELERY_REDIS_PREFIX}:beat_lock'
 
     def __init__(self, *args, **kwargs):
@@ -448,6 +452,22 @@ class DatabaseScheduler(Scheduler):
         return self._schedule
 
 
+async def extend_scheduler_lock(lock):
+    """
+    延长调度程序锁
+
+    :param lock: 计划程序锁
+    :return:
+    """
+    while True:
+        await asyncio.sleep(DEFAULT_LOCK_INTERVAL)
+        if lock:
+            try:
+                await lock.extend(DEFAULT_MAX_LOCK_TIMEOUT)
+            except Exception as e:
+                logger.error(f'Failed to extend lock: {e}')
+
+
 @beat_init.connect
 def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
     """
@@ -463,7 +483,7 @@ def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
     logger.debug('beat: Acquiring lock...')
     lock = redis_client.lock(
         scheduler.lock_key,
-        timeout=DEFAULT_MAX_LOCK,
+        timeout=DEFAULT_MAX_LOCK_TIMEOUT,
         sleep=scheduler.max_interval,
     )
     # overwrite redis-py's extend script
@@ -472,3 +492,6 @@ def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
     run_await(lock.acquire)()
     logger.info('beat: Acquired lock')
     scheduler.lock = lock
+
+    loop = asyncio.get_event_loop()
+    loop.create_task(extend_scheduler_lock(scheduler.lock))
