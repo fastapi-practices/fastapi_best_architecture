@@ -294,7 +294,7 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
             user = GetUserInfoWithRelationDetail(**select_as_dict(current_user))
             await redis_client.setex(
                 f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
-                settings.JWT_USER_REDIS_EXPIRE_SECONDS,
+                settings.TOKEN_EXPIRE_SECONDS,
                 user.model_dump_json(),
             )
     else:

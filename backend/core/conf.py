@@ -75,7 +75,6 @@ class Settings(BaseSettings):
 
     # JWT
     JWT_USER_REDIS_PREFIX: str = 'fba:user'
-    JWT_USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 7 天
 
     # RBAC
     RBAC_ROLE_MENU_MODE: bool = True
