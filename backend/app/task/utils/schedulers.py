@@ -362,7 +362,7 @@ class DatabaseScheduler(Scheduler):
                 run_await(self.lock.release)()
             self.lock = None
 
-        self.sync()
+        super().close()
 
     def sync(self):
         """重写父函数"""
