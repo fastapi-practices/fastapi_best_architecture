@@ -273,7 +273,7 @@ sqlalchemy-crud-plus==1.10.0
     # via fastapi-best-architecture
 sqlparse==0.5.3
     # via fastapi-best-architecture
-starlette==0.47.1
+starlette==0.47.2
     # via
     #   asgi-correlation-id
     #   fastapi
