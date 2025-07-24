@@ -59,8 +59,12 @@ class JwtAuthMiddleware(AuthenticationBackend):
         if not token:
             return None
 
-        if request.url.path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
+        path = request.url.path
+        if path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
             return None
+        for pattern in settings.TOKEN_REQUEST_PATH_EXCLUDE_PATTERN:
+            if pattern.match(path):
+                return None
 
         scheme, token = get_authorization_scheme_param(token)
         if scheme.lower() != 'bearer':
