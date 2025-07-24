@@ -184,10 +184,7 @@ class Flower:
 @cappa.command(help='运行 Celery 服务')
 @dataclass
 class Celery:
-    subcmd: cappa.Subcommands[Worker | Beat | Flower | None] = None
-
-    def __call__(self):
-        console.print('\n更多信息，尝试 "[cyan]--help[/]"')
+    subcmd: cappa.Subcommands[Worker | Beat | Flower]
 
 
 @cappa.command(help='新增插件')
