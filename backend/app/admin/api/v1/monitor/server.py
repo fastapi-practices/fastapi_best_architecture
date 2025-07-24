@@ -1,24 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from starlette.concurrency import run_in_threadpool
 
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.utils.server_info import server_info
 
 router = APIRouter()
 
 
-@router.get(
-    '',
-    summary='server 监控',
-    dependencies=[
-        Depends(RequestPermission('sys:monitor:server')),
-        DependsJwtAuth,
-    ],
-)
+@router.get('', summary='server 监控', dependencies=[DependsJwtAuth])
 async def get_server_info() -> ResponseModel:
     data = {
         # 扔到线程池，避免阻塞
