@@ -175,17 +175,19 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         encrypt_key_include = settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE
         encrypt_secret_key = settings.OPERA_LOG_ENCRYPT_SECRET_KEY
 
-        for key, value in args.items():
-            if key in encrypt_key_include:
-                match encrypt_type:
-                    case OperaLogCipherType.aes:
-                        args[key] = (AESCipher(encrypt_secret_key).encrypt(value)).hex()
-                    case OperaLogCipherType.md5:
-                        args[key] = Md5Cipher.encrypt(value)
-                    case OperaLogCipherType.itsdangerous:
-                        args[key] = ItsDCipher(encrypt_secret_key).encrypt(value)
-                    case OperaLogCipherType.plan:
-                        pass
-                    case _:
-                        args[key] = '******'
+        for arg_type, arg in args.items():
+            if isinstance(arg, dict):
+                for key, value in arg.items():
+                    if key in encrypt_key_include:
+                        match encrypt_type:
+                            case OperaLogCipherType.aes:
+                                args[arg_type][key] = (AESCipher(encrypt_secret_key).encrypt(value)).hex()
+                            case OperaLogCipherType.md5:
+                                args[arg_type][key] = Md5Cipher.encrypt(value)
+                            case OperaLogCipherType.itsdangerous:
+                                args[arg_type][key] = ItsDCipher(encrypt_secret_key).encrypt(value)
+                            case OperaLogCipherType.plan:
+                                pass
+                            case _:
+                                args[arg_type][key] = '******'
         return args
