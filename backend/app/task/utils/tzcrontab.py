@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Literal
 
 from celery import schedules
 from celery.schedules import ParseException, crontab_parser
@@ -53,34 +52,22 @@ class TzAwareCrontab(schedules.crontab):
         )
 
 
-def crontab_verify(filed: Literal['m', 'h', 'dow', 'dom', 'moy'], value: str, raise_exc: bool = True) -> bool:
+def crontab_verify(crontab: str) -> None:
     """
     验证 Celery crontab 表达式
 
-    :param filed: 验证的字段
-    :param value: 验证的值
-    :param raise_exc: 是否抛出异常
+    :param crontab: 计划表达式
     :return:
     """
-    valid = True
+    crontab_split = crontab.split(' ')
+    if len(crontab_split) != 5:
+        raise errors.RequestError(msg='Crontab 表达式非法')
 
     try:
-        match filed:
-            case 'm':
-                crontab_parser(60, 0).parse(value)
-            case 'h':
-                crontab_parser(24, 0).parse(value)
-            case 'dow':
-                crontab_parser(7, 0).parse(value)
-            case 'dom':
-                crontab_parser(31, 1).parse(value)
-            case 'moy':
-                crontab_parser(12, 1).parse(value)
-            case _:
-                raise errors.ServerError(msg=f'无效字段：{filed}')
+        crontab_parser(60, 0).parse(crontab_split[0])  # minute
+        crontab_parser(24, 0).parse(crontab_split[1])  # hour
+        crontab_parser(7, 0).parse(crontab_split[2])  # day_of_week
+        crontab_parser(31, 1).parse(crontab_split[3])  # day_of_month
+        crontab_parser(12, 1).parse(crontab_split[4])  # month_of_year
     except ParseException:
-        valid = False
-        if raise_exc:
-            raise errors.RequestError(msg=f'crontab 值 {value} 非法')
-
-    return valid
+        raise errors.RequestError(msg='Crontab 表达式非法')
