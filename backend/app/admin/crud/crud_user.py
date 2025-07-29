@@ -89,10 +89,8 @@ class CRUDUser(CRUDPlus[User]):
         :param obj: 注册用户参数
         :return:
         """
-        salt = bcrypt.gensalt()
-        obj.password = get_hash_password(obj.password, salt)
         dict_obj = obj.model_dump()
-        dict_obj.update({'is_staff': True, 'salt': salt})
+        dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
 
         stmt = select(Role)
@@ -156,10 +154,12 @@ class CRUDUser(CRUDPlus[User]):
 
         :param db: 数据库会话
         :param pk: 用户 ID
-        :param new_pwd: 新密码（已加密）
+        :param new_pwd: 新密码
         :return:
         """
-        return await self.update_model(db, pk, {'password': new_pwd})
+        salt = bcrypt.gensalt()
+        new_pwd = get_hash_password(new_pwd, salt)
+        return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
 
     async def get_list(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
         """
