@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
+from pydantic import ConfigDict, Field, HttpUrl, model_validator
 from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptDetail
@@ -16,7 +16,7 @@ class AuthSchemaBase(SchemaBase):
     """用户认证基础模型"""
 
     username: str = Field(description='用户名')
-    password: str | None = Field(description='密码')
+    password: str = Field(description='密码')
 
 
 class AuthLoginParam(AuthSchemaBase):
@@ -28,16 +28,19 @@ class AuthLoginParam(AuthSchemaBase):
 class AddUserParam(AuthSchemaBase):
     """添加用户参数"""
 
+    nickname: str | None = Field(None, description='昵称')
+    email: CustomEmailStr | None = Field(None, description='邮箱')
+    phone: CustomPhoneNumber | None = Field(None, description='手机号码')
     dept_id: int = Field(description='部门 ID')
     roles: list[int] = Field(description='角色 ID 列表')
-    nickname: str | None = Field(None, description='昵称')
 
 
 class AddOAuth2UserParam(AuthSchemaBase):
     """添加 OAuth2 用户参数"""
 
+    password: str | None = Field(None, description='密码')
     nickname: str | None = Field(None, description='昵称')
-    email: EmailStr = Field(description='邮箱')
+    email: CustomEmailStr | None = Field(None, description='邮箱')
     avatar: HttpUrl | None = Field(None, description='头像地址')
 
 
@@ -56,6 +59,8 @@ class UserInfoSchemaBase(SchemaBase):
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
     avatar: HttpUrl | None = Field(None, description='头像地址')
+    email: CustomEmailStr | None = Field(None, description='邮箱')
+    phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
 
 class UpdateUserParam(UserInfoSchemaBase):
@@ -72,8 +77,6 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     id: int = Field(description='用户 ID')
     uuid: str = Field(description='用户 UUID')
-    email: CustomEmailStr | None = Field(None, description='邮箱')
-    phone: CustomPhoneNumber | None = Field(None, description='手机号')
     status: StatusType = Field(description='状态')
     is_superuser: bool = Field(description='是否超级管理员')
     is_staff: bool = Field(description='是否管理员')
