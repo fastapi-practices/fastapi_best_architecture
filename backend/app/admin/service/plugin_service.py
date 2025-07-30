@@ -29,7 +29,7 @@ class PluginService:
         keys = []
         result = []
 
-        async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:info:*'):
+        async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:*'):
             keys.append(key)
 
         for info in await redis_client.mget(*keys):
@@ -74,8 +74,7 @@ class PluginService:
         await uninstall_requirements_async(plugin)
         bacup_dir = os.path.join(PLUGIN_DIR, f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup')
         shutil.move(plugin_dir, bacup_dir)
-        await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}')
-        await redis_client.hdel(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin)
+        await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     @staticmethod
@@ -86,7 +85,7 @@ class PluginService:
         :param plugin: 插件名称
         :return:
         """
-        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}')
+        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if not plugin_info:
             raise errors.NotFoundError(msg='插件不存在')
         plugin_info = json.loads(plugin_info)
@@ -98,10 +97,7 @@ class PluginService:
             else str(StatusType.disable.value)
         )
         plugin_info['plugin']['enable'] = new_status
-        await redis_client.set(
-            f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(plugin_info, ensure_ascii=False)
-        )
-        await redis_client.hset(f'{settings.PLUGIN_REDIS_PREFIX}:status', plugin, new_status)
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(plugin_info, ensure_ascii=False))
 
     @staticmethod
     async def build(*, plugin: str) -> io.BytesIO:

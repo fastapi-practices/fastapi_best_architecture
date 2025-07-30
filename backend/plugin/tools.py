@@ -130,10 +130,10 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     current_redis_client = RedisCli()
     run_await(current_redis_client.open)()
 
-    run_await(current_redis_client.delete_prefix)(f'{settings.PLUGIN_REDIS_PREFIX}:info', exclude=plugins)
-    plugin_status = run_await(current_redis_client.hgetall)(f'{settings.PLUGIN_REDIS_PREFIX}:status')
-    if not plugin_status:
-        plugin_status = {}
+    # 清理未知插件信息
+    run_await(current_redis_client.delete_prefix)(
+        settings.PLUGIN_REDIS_PREFIX, exclude=[f'{settings.PLUGIN_REDIS_PREFIX}:{key}' for key in plugins]
+    )
 
     for plugin in plugins:
         data = load_plugin_config(plugin)
@@ -164,16 +164,19 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             app_plugins.append(data)
 
         # 补充插件信息
-        data['plugin']['enable'] = plugin_status.setdefault(plugin, str(StatusType.enable.value))
+        plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
+        if plugin_cache_info:
+            data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+        else:
+            data['plugin']['enable'] = str(StatusType.enable.value)
         data['plugin']['name'] = plugin
 
-        # 缓存插件信息
+        # 缓存最新插件信息
         run_await(current_redis_client.set)(
-            f'{settings.PLUGIN_REDIS_PREFIX}:info:{plugin}', json.dumps(data, ensure_ascii=False)
+            f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(data, ensure_ascii=False)
         )
 
-    # 缓存插件状态
-    run_await(current_redis_client.hset)(f'{settings.PLUGIN_REDIS_PREFIX}:status', mapping=plugin_status)
+    # 重置插件变更状态
     run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     return extend_plugins, app_plugins
@@ -380,13 +383,10 @@ class PluginStatusChecker:
         :param request: FastAPI 请求对象
         :return:
         """
-        plugin_status = await redis_client.hgetall(f'{settings.PLUGIN_REDIS_PREFIX}:status')
-        if not plugin_status:
+        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{self.plugin}')
+        if not plugin_info:
             log.error('插件状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
 
-        if self.plugin not in plugin_status:
-            log.error(f'插件 {self.plugin} 状态未初始化或丢失，需重启服务自动修复')
-            raise PluginInjectError(f'插件 {self.plugin} 状态未初始化或丢失，请联系系统管理员')
-        if not int(plugin_status.get(self.plugin)):
+        if not int(json.loads(plugin_info)['plugin']['enable']):
             raise errors.ServerError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
