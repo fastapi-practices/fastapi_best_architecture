@@ -3,8 +3,9 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_serializer
 
+from backend.app.task import celery_app
 from backend.common.schema import SchemaBase
 
 
@@ -36,3 +37,7 @@ class GetTaskResultDetail(TaskResultSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(description='任务结果 ID')
+
+    @field_serializer('args', 'kwargs', when_used='unless-none')
+    def serialize_params(self, value: bytes | None, _info) -> Any:
+        return celery_app.backend.decode(value)
