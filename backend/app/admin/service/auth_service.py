@@ -33,7 +33,7 @@ class AuthService:
     """认证服务类"""
 
     @staticmethod
-    async def user_verify(db: AsyncSession, username: str, password: str | None) -> User:
+    async def user_verify(db: AsyncSession, username: str, password: str) -> User:
         """
         验证用户名和密码
 

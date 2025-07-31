@@ -57,35 +57,36 @@ class OAuth2Service:
                 sid = user.get('id')
                 nickname = user.get('name')
 
-            sys_user = None
             user_social = await user_social_dao.get_by_sid(db, str(sid), str(social.value))
-            if not user_social:
-                if email:
-                    sys_user = await user_dao.check_email(db, email)
-
-                    # 创建系统用户
-                    if not sys_user:
-                        while await user_dao.get_by_username(db, username):
-                            username = f'{username}_{text_captcha(5)}'
-                        new_sys_user = AddOAuth2UserParam(
-                            username=username,
-                            password='123456',  # 默认密码，可修改系统用户表进行默认密码检测并配合前端进行修改密码提示
-                            nickname=nickname,
-                            email=email,
-                            avatar=avatar,
-                        )
-                        await user_dao.add_by_oauth2(db, new_sys_user)
-                        await db.flush()
-                        sys_user = await user_dao.get_by_username(db, username)
-
-                    # 绑定社交用户
-                    new_user_social = CreateUserSocialParam(sid=str(sid), source=social.value, user_id=sys_user.id)
-                    await user_social_dao.create(db, new_user_social)
-
-            if not sys_user:
+            if user_social:
                 sys_user = await user_dao.get(db, user_social.user_id)
-                if avatar:
+                # 更新用户头像
+                if not sys_user.avatar and avatar is not None:
                     await user_dao.update_avatar(db, sys_user.id, avatar)
+            else:
+                sys_user = None
+                # 检测系统用户是否已存在
+                if email:
+                    sys_user = await user_dao.check_email(db, email)  # 通过邮箱验证绑定保证邮箱真实性
+
+                # 创建系统用户
+                if not sys_user:
+                    while await user_dao.get_by_username(db, username):
+                        username = f'{username}_{text_captcha(5)}'
+                    new_sys_user = AddOAuth2UserParam(
+                        username=username,
+                        password=None,
+                        nickname=nickname,
+                        email=email,
+                        avatar=avatar,
+                    )
+                    await user_dao.add_by_oauth2(db, new_sys_user)
+                    await db.flush()
+                    sys_user = await user_dao.get_by_username(db, username)
+
+                # 绑定社交账号
+                new_user_social = CreateUserSocialParam(sid=str(sid), source=social.value, user_id=sys_user.id)
+                await user_social_dao.create(db, new_user_social)
 
             # 创建 token
             access_token = await jwt.create_access_token(

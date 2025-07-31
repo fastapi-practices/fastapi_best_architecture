@@ -18,7 +18,7 @@ from backend.app.admin.schema.user import (
 )
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
-from backend.common.security.jwt import get_hash_password, get_token, jwt_decode, password_verify, superuser_verify
+from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -249,8 +249,7 @@ class UserService:
                 raise errors.RequestError(msg='原密码错误')
             if obj.new_password != obj.confirm_password:
                 raise errors.RequestError(msg='密码输入不一致')
-            new_pwd = get_hash_password(obj.new_password, user.salt)
-            count = await user_dao.reset_password(db, user.id, new_pwd)
+            count = await user_dao.reset_password(db, user.id, obj.new_password)
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
                 f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
