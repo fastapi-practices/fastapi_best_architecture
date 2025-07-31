@@ -117,6 +117,17 @@ class CRUDUser(CRUDPlus[User]):
         input_user.roles = roles.scalars().all()
         return count
 
+    async def update_nickname(self, db: AsyncSession, user_id: int, nickname: str) -> int:
+        """
+        更新用户昵称
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :param nickname: 用户昵称
+        :return:
+        """
+        return await self.update_model(db, user_id, {'nickname': nickname})
+
     async def update_avatar(self, db: AsyncSession, user_id: int, avatar: str) -> int:
         """
         更新用户头像
@@ -148,17 +159,17 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.select_model_by_column(db, email=email)
 
-    async def reset_password(self, db: AsyncSession, pk: int, new_pwd: str) -> int:
+    async def reset_password(self, db: AsyncSession, pk: int, password: str) -> int:
         """
         重置用户密码
 
         :param db: 数据库会话
         :param pk: 用户 ID
-        :param new_pwd: 新密码
+        :param password: 新密码
         :return:
         """
         salt = bcrypt.gensalt()
-        new_pwd = get_hash_password(new_pwd, salt)
+        new_pwd = get_hash_password(password, salt)
         return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
 
     async def get_list(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
