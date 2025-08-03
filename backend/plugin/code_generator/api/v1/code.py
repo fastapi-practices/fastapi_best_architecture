@@ -10,8 +10,8 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
-from backend.plugin.code_generator.schema.gen import ImportParam
-from backend.plugin.code_generator.service.gen_service import gen_service
+from backend.plugin.code_generator.schema.code import ImportParam
+from backend.plugin.code_generator.service.code_service import gen_service
 
 router = APIRouter()
 
