@@ -15,6 +15,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
 from backend.common.exception.exception_handler import register_exception
+from backend.common.i18n.middleware import I18nMiddleware
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
@@ -124,6 +125,12 @@ def register_middleware(app: FastAPI) -> None:
         on_error=JwtAuthMiddleware.auth_exception_handler,
     )
 
+    # I18n
+    app.add_middleware(I18nMiddleware, default_language='zh-CN')
+
+    # Access log
+    app.add_middleware(AccessMiddleware)
+
     # CORS
     if settings.MIDDLEWARE_CORS:
         from fastapi.middleware.cors import CORSMiddleware
@@ -136,9 +143,6 @@ def register_middleware(app: FastAPI) -> None:
             allow_headers=['*'],
             expose_headers=settings.CORS_EXPOSE_HEADERS,
         )
-
-    # Access log
-    app.add_middleware(AccessMiddleware)
 
     # Trace ID
     app.add_middleware(CorrelationIdMiddleware, validator=False)
