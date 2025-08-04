@@ -142,18 +142,5 @@ class TaskSchedulerService:
             else:
                 celery_app.send_task(name=task_scheduler.task, args=args, kwargs=kwargs)
 
-    @staticmethod
-    async def revoke(*, task_id: str) -> None:
-        """
-        撤销指定的任务
-
-        :param task_id: 任务 UUID
-        :return:
-        """
-        workers = await run_in_threadpool(celery_app.control.ping, timeout=0.5)
-        if not workers:
-            raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
-        celery_app.control.revoke(task_id)
-
 
 task_scheduler_service: TaskSchedulerService = TaskSchedulerService()
