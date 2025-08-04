@@ -18,7 +18,7 @@ LOCAL_BEAT_SCHEDULE = {
         'task': 'task_demo_params',
         'schedule': TzAwareCrontab('1'),
         'args': ['你好，'],
-        'kwargs': {'b': '世界'},
+        'kwargs': {'world': '世界'},
     },
     '清理操作日志': {
         'task': 'backend.app.task.tasks.db_log.tasks.delete_db_opera_log',
