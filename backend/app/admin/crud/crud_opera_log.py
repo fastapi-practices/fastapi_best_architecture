@@ -42,6 +42,17 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         """
         await self.create_model(db, obj)
 
+    async def batch_create(self, db: AsyncSession, obj_list: list[CreateOperaLogParam]) -> None:
+        """
+        批量创建操作日志
+
+        :param db: 数据库会话
+        :param obj_list: 创建操作日志参数列表
+        :return:
+        """
+        db.add_all([OperaLog(**obj.model_dump()) for obj in obj_list])
+        await db.flush()
+
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
         批量删除操作日志

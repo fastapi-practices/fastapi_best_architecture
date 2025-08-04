@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import time
 
-from asyncio import create_task
 from typing import Any
 
 from asgiref.sync import sync_to_async
@@ -108,7 +107,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
                 opera_time=request.state.start_time,
             )
-            create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
+            await opera_log_service.create_in_queue(obj=opera_log_in)
 
             # 错误抛出
             if error:
