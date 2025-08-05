@@ -115,7 +115,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    async def get_request_args(self, request: Request) -> dict[str, Any]:
+    async def get_request_args(self, request: Request) -> dict[str, Any] | None:
         """
         获取请求参数
 
@@ -164,20 +164,17 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             else:
                 args['form-data'] = await self.desensitization(form_data)
 
-        return args
+        return None if not args else args
 
     @staticmethod
     @sync_to_async
-    def desensitization(args: dict[str, Any]) -> dict[str, Any] | None:
+    def desensitization(args: dict[str, Any]) -> dict[str, Any]:
         """
         脱敏处理
 
         :param args: 需要脱敏的参数字典
         :return:
         """
-        if not args:
-            return None
-
         for key, value in args.items():
             if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
                 match settings.OPERA_LOG_ENCRYPT_TYPE:
