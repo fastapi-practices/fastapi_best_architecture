@@ -6,7 +6,7 @@ from asyncio import Queue
 from typing import List
 
 # 操作日志队列
-opera_log_queue: Queue = Queue()
+opera_log_queue: Queue = Queue(maxsize=100000)
 
 
 async def get_many_from_queue(queue: Queue, max_items: int, timeout: float) -> List:
@@ -27,12 +27,14 @@ async def get_many_from_queue(queue: Queue, max_items: int, timeout: float) -> L
         列表中的项目数量可能会少于 `max_items`。
     """
     results = []
+
+    async def collector():
+        while len(results) < max_items:
+            item = await queue.get()
+            results.append(item)
+
     try:
-        # 设置一个总的超时范围
-        async with asyncio.timeout(timeout):
-            while len(results) < max_items:
-                item = await queue.get()
-                results.append(item)
+        await asyncio.wait_for(collector(), timeout=timeout)
     except asyncio.TimeoutError:
         pass  # 超时后返回已有的 items
     return results

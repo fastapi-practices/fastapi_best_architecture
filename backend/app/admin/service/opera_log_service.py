@@ -54,6 +54,7 @@ class OperaLogService:
         """
         while True:
             try:
+                # TODO max_items timeout Queue.maxsize 应该设置为可配置, 在 setting ?
                 logs = await get_many_from_queue(opera_log_queue, max_items=100, timeout=1)
                 if logs:
                     log.info(
