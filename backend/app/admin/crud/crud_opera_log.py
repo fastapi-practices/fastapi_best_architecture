@@ -50,8 +50,7 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         :param obj_list: 创建操作日志参数列表
         :return:
         """
-        db.add_all([OperaLog(**obj.model_dump()) for obj in obj_list])
-        await db.flush()
+        await self.create_models(db, obj_list)
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """

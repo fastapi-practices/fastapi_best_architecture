@@ -15,7 +15,6 @@ from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
-from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
@@ -50,7 +49,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
         http_callback=http_limit_callback,
     )
     # 启动操作日志消费者
-    app.state.opera_log_consumer = create_task(opera_log_service.batch_create_consumer())
+    app.state.opera_log_consumer = create_task(OperaLogMiddleware.batch_create_consumer())
 
     yield
 

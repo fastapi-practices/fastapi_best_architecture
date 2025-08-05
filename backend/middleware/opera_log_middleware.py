@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 
+from asyncio import Queue
 from typing import Any
 
 from asgiref.sync import sync_to_async
@@ -14,6 +15,7 @@ from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
+from backend.common.queue import get_many_from_queue
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
@@ -21,6 +23,9 @@ from backend.utils.trace_id import get_request_trace_id
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
+
+    # 操作日志队列, 指定默认队列长度为100000
+    opera_log_queue: Queue = Queue(maxsize=100000)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:
         """
@@ -107,7 +112,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
                 opera_time=request.state.start_time,
             )
-            await opera_log_service.create_in_queue(obj=opera_log_in)
+            await self.opera_log_queue.put(opera_log_in)
 
             # 错误抛出
             if error:
@@ -190,3 +195,21 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                             case _:
                                 args[arg_type][key] = '******'
         return args
+
+    @staticmethod
+    async def batch_create_consumer() -> None:
+        """批量创建操作日志消费者"""
+        while True:
+            opera_log_queue = OperaLogMiddleware.opera_log_queue
+            logs = await get_many_from_queue(opera_log_queue, max_items=100, timeout=1)
+            if len(logs) < 1:
+                continue
+            log.info(f'处理日志: {len(logs)} 条.')
+            try:
+                await opera_log_service.batch_create(obj_list=logs)
+            except Exception as e:
+                log.error(f'批量创建操作日志失败: {e}, logs: {logs}')
+            finally:
+                # 防止队列阻塞
+                if not opera_log_queue.empty():
+                    opera_log_queue.task_done()
