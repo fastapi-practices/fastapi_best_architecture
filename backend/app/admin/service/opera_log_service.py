@@ -56,11 +56,13 @@ class OperaLogService:
             try:
                 logs = await get_many_from_queue(opera_log_queue, max_items=100, timeout=1)
                 if logs:
-                    log.info(f"处理日志: {len(logs)} 条.", )
+                    log.info(
+                        f'处理日志: {len(logs)} 条.',
+                    )
                     async with async_db_session.begin() as db:
                         await opera_log_dao.batch_create(db, logs)
                 else:
-                    log.debug("无日志可处理")
+                    log.debug('无日志可处理')
 
             except Exception as e:
                 log.error(f'批量创建操作日志失败: {e}')

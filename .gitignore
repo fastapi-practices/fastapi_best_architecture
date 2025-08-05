@@ -9,3 +9,4 @@ venv/
 .pytest_cache/
 .env
 docker-compose-dev.yml
+GEMINI.md
