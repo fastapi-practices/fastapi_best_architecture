@@ -48,8 +48,8 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
         prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
         http_callback=http_limit_callback,
     )
-    # 启动操作日志消费者
-    app.state.opera_log_consumer = create_task(OperaLogMiddleware.batch_create_consumer())
+    # 创建操作日志任务
+    create_task(OperaLogMiddleware.consumer())
 
     yield
 

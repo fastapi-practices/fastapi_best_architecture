@@ -34,15 +34,15 @@ class OperaLogService:
             await opera_log_dao.create(db, obj)
 
     @staticmethod
-    async def batch_create(*, obj_list: list[CreateOperaLogParam]) -> None:
+    async def bulk_create(*, objs: list[CreateOperaLogParam]) -> None:
         """
         批量创建操作日志
 
-        :param obj: 操作日志创建参数
+        :param objs: 操作日志创建参数列表
         :return:
         """
         async with async_db_session.begin() as db:
-            await opera_log_dao.batch_create(db, obj_list)
+            await opera_log_dao.bulk_create(db, objs)
 
     @staticmethod
     async def delete(*, obj: DeleteOperaLogParam) -> int:

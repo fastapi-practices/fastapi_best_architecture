@@ -15,7 +15,7 @@ from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
-from backend.common.queue import get_many_from_queue
+from backend.common.queue import batch_dequeue
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
@@ -24,7 +24,6 @@ from backend.utils.trace_id import get_request_trace_id
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
-    # 操作日志队列, 指定默认队列长度为100000
     opera_log_queue: Queue = Queue(maxsize=100000)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:
@@ -196,20 +195,20 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                                 args[arg_type][key] = '******'
         return args
 
-    @staticmethod
-    async def batch_create_consumer() -> None:
-        """批量创建操作日志消费者"""
+    @classmethod
+    async def consumer(cls) -> None:
+        """操作日志消费者"""
         while True:
-            opera_log_queue = OperaLogMiddleware.opera_log_queue
-            logs = await get_many_from_queue(opera_log_queue, max_items=100, timeout=1)
-            if len(logs) < 1:
-                continue
-            log.info(f'处理日志: {len(logs)} 条.')
-            try:
-                await opera_log_service.batch_create(obj_list=logs)
-            except Exception as e:
-                log.error(f'批量创建操作日志失败: {e}, logs: {logs}')
-            finally:
-                # 防止队列阻塞
-                if not opera_log_queue.empty():
-                    opera_log_queue.task_done()
+            logs = await batch_dequeue(
+                cls.opera_log_queue,
+                max_items=settings.OPERA_LOG_QUEUE_MAX,
+                timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
+            )
+            if logs:
+                try:
+                    if settings.DATABASE_ECHO:
+                        log.info('自动执行【操作日志批量创建】任务...')
+                    await opera_log_service.bulk_create(objs=logs)
+                finally:
+                    if not cls.opera_log_queue.empty():
+                        cls.opera_log_queue.task_done()

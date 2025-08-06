@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     FASTAPI_STATIC_FILES: bool = True
 
     # 数据库
-    DATABASE_ECHO: bool | Literal['debug'] = False
+    DATABASE_ECHO: bool | Literal['debug'] = True
     DATABASE_POOL_ECHO: bool | Literal['debug'] = False
     DATABASE_SCHEMA: str = 'fba'
     DATABASE_CHARSET: str = 'utf8mb4'
@@ -177,6 +177,8 @@ class Settings(BaseSettings):
         'new_password',
         'confirm_password',
     ]
+    OPERA_LOG_QUEUE_MAX: int = 100
+    OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
     # Plugin 配置
     PLUGIN_PIP_CHINA: bool = True
