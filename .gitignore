@@ -7,6 +7,3 @@ venv/
 .python-version
 .ruff_cache/
 .pytest_cache/
-.env
-docker-compose-dev.yml
-GEMINI.md
