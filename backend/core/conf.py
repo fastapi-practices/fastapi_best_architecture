@@ -143,22 +143,24 @@ class Settings(BaseSettings):
     IP_LOCATION_REDIS_PREFIX: str = 'fba:ip:location'
     IP_LOCATION_EXPIRE_SECONDS: int = 60 * 60 * 24  # 1 天
 
-    # 日志（Trace ID)
+    # Trace ID
     TRACE_ID_REQUEST_HEADER_KEY: str = 'X-Request-ID'
+    TRACE_ID_LOG_LENGTH: int = 32  # UUID 长度，必须小于等于 32
     TRACE_ID_LOG_DEFAULT_VALUE: str = '-'
-    TRACE_ID_LOG_UUID_LENGTH: int = 32  # UUID 长度，必须小于等于 32
+
+    # 日志
+    LOG_FORMAT: str = (
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
+    )
 
     # 日志（控制台）
     LOG_STD_LEVEL: str = 'INFO'
-    LOG_STD_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
-    )
+
     # 日志（文件）
-    LOG_ACCESS_FILE_LEVEL: str = 'INFO'
-    LOG_ERROR_FILE_LEVEL: str = 'ERROR'
+    LOG_FILE_ACCESS_LEVEL: str = 'INFO'
+    LOG_FILE_ERROR_LEVEL: str = 'ERROR'
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
     LOG_ERROR_FILENAME: str = 'fba_error.log'
-    LOG_FILE_FORMAT: str = '{time:YYYY-MM-DD HH:mm:ss.SSS} | <lvl>{level: <8}</> | {correlation_id} | <lvl>{message}</>'
 
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
