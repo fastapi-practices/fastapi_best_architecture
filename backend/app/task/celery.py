@@ -13,7 +13,8 @@ from backend.core.path_conf import BASE_PATH
 
 def find_task_packages():
     packages = []
-    for root, dirs, files in os.walk(os.path.join(BASE_PATH, 'app', 'task', 'tasks')):
+    task_dir = os.path.join(BASE_PATH, 'app', 'task', 'tasks')
+    for root, dirs, files in os.walk(task_dir):
         if 'tasks.py' in files:
             package = root.replace(str(BASE_PATH.parent) + os.path.sep, '').replace(os.path.sep, '.')
             packages.append(package)
@@ -54,7 +55,8 @@ def init_celery() -> celery.Celery:
     )
 
     # 自动发现任务
-    app.autodiscover_tasks(find_task_packages())
+    packages = find_task_packages()
+    app.autodiscover_tasks(packages)
 
     return app
 

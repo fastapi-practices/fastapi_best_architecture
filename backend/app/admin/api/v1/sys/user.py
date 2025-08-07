@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Body, Depends, Path, Query, Request
 
 from backend.app.admin.schema.role import GetRoleDetail
 from backend.app.admin.schema.user import (
@@ -71,7 +71,7 @@ async def create_user(request: Request, obj: AddUserParam) -> ResponseSchemaMode
     return response_base.success(data=data)
 
 
-@router.put('/{pk}', summary='更新用户信息', dependencies=[DependsJwtAuth])
+@router.put('/{pk}', summary='更新用户信息', dependencies=[DependsRBAC])
 async def update_user(
     request: Request, pk: Annotated[int, Path(description='用户 ID')], obj: UpdateUserParam
 ) -> ResponseModel:
@@ -93,11 +93,41 @@ async def update_user_permission(
     return response_base.fail()
 
 
-@router.put('/{pk}/password', summary='重置用户密码', dependencies=[DependsJwtAuth])
+@router.put('/me/password', summary='更新当前用户密码', dependencies=[DependsJwtAuth])
+async def update_user_password(request: Request, obj: ResetPasswordParam) -> ResponseModel:
+    count = await user_service.update_password(request=request, obj=obj)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.put('/{pk}/password', summary='重置用户密码', dependencies=[DependsRBAC])
 async def reset_user_password(
-    pk: Annotated[int, Path(description='用户 ID')], obj: ResetPasswordParam
+    request: Request,
+    pk: Annotated[int, Path(description='用户 ID')],
+    password: Annotated[str, Body(embed=True, description='新密码')],
 ) -> ResponseModel:
-    count = await user_service.reset_pwd(pk=pk, obj=obj)
+    count = await user_service.reset_password(request=request, pk=pk, password=password)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.put('/me/nickname', summary='更新当前用户昵称', dependencies=[DependsJwtAuth])
+async def update_user_nickname(
+    request: Request, nickname: Annotated[str, Body(embed=True, description='用户昵称')]
+) -> ResponseModel:
+    count = await user_service.update_nickname(request=request, nickname=nickname)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
+@router.put('/me/avatar', summary='更新当前用户头像', dependencies=[DependsJwtAuth])
+async def update_user_avatar(
+    request: Request, avatar: Annotated[str, Body(embed=True, description='用户头像地址')]
+) -> ResponseModel:
+    count = await user_service.update_avatar(request=request, avatar=avatar)
     if count > 0:
         return response_base.success()
     return response_base.fail()

@@ -39,7 +39,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         else:
             method = request.method
             args = await self.get_request_args(request)
-            args = await self.desensitization(args)
 
             # 执行请求
             elapsed = 0.0
@@ -116,8 +115,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    @staticmethod
-    async def get_request_args(request: Request) -> dict[str, Any]:
+    async def get_request_args(self, request: Request) -> dict[str, Any] | None:
         """
         获取请求参数
 
@@ -125,26 +123,35 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         :return:
         """
         args = {}
+
+        # 查询参数
         query_params = dict(request.query_params)
         if query_params:
-            args['query_params'] = query_params
+            args['query_params'] = await self.desensitization(query_params)
+
+        # 路径参数
         path_params = request.path_params
         if path_params:
-            args['path_params'] = path_params
+            args['path_params'] = await self.desensitization(path_params)
+
         # Tip: .body() 必须在 .form() 之前获取
         # https://github.com/encode/starlette/discussions/1933
         content_type = request.headers.get('Content-Type', '').split(';')
+
+        # 请求体
         body_data = await request.body()
         if body_data:
-            # 注意：非 json 数据默认使用 body 作为键
+            # 注意：非 json 数据默认使用 data 作为键
             if 'application/json' not in content_type:
                 args['data'] = str(body_data)
             else:
                 json_data = await request.json()
                 if isinstance(json_data, dict):
-                    args['json'] = json_data
+                    args['json'] = await self.desensitization(json_data)
                 else:
                     args['data'] = str(body_data)
+
+        # 表单参数
         form_data = await request.form()
         if len(form_data) > 0:
             for k, v in form_data.items():
@@ -153,41 +160,33 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 else:
                     form_data = {k: v}
             if 'multipart/form-data' not in content_type:
-                args['x-www-form-urlencoded'] = form_data
+                args['x-www-form-urlencoded'] = await self.desensitization(form_data)
             else:
-                args['form-data'] = form_data
+                args['form-data'] = await self.desensitization(form_data)
 
-        return args
+        return None if not args else args
 
     @staticmethod
     @sync_to_async
-    def desensitization(args: dict[str, Any]) -> dict[str, Any] | None:
+    def desensitization(args: dict[str, Any]) -> dict[str, Any]:
         """
         脱敏处理
 
         :param args: 需要脱敏的参数字典
         :return:
         """
-        if not args:
-            return None
+        for key, value in args.items():
+            if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
+                match settings.OPERA_LOG_ENCRYPT_TYPE:
+                    case OperaLogCipherType.aes:
+                        args[key] = (AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(value)).hex()
+                    case OperaLogCipherType.md5:
+                        args[key] = Md5Cipher.encrypt(value)
+                    case OperaLogCipherType.itsdangerous:
+                        args[key] = ItsDCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(value)
+                    case OperaLogCipherType.plan:
+                        pass
+                    case _:
+                        args[key] = '******'
 
-        encrypt_type = settings.OPERA_LOG_ENCRYPT_TYPE
-        encrypt_key_include = settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE
-        encrypt_secret_key = settings.OPERA_LOG_ENCRYPT_SECRET_KEY
-
-        for arg_type, arg in args.items():
-            if isinstance(arg, dict):
-                for key, value in arg.items():
-                    if key in encrypt_key_include:
-                        match encrypt_type:
-                            case OperaLogCipherType.aes:
-                                args[arg_type][key] = (AESCipher(encrypt_secret_key).encrypt(value)).hex()
-                            case OperaLogCipherType.md5:
-                                args[arg_type][key] = Md5Cipher.encrypt(value)
-                            case OperaLogCipherType.itsdangerous:
-                                args[arg_type][key] = ItsDCipher(encrypt_secret_key).encrypt(value)
-                            case OperaLogCipherType.plan:
-                                pass
-                            case _:
-                                args[arg_type][key] = '******'
         return args

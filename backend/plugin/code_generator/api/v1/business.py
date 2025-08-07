@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 
+from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession
 from backend.plugin.code_generator.schema.business import (
     CreateGenBusinessParam,
     GetGenBusinessDetail,
@@ -28,10 +30,21 @@ async def get_business(
     return response_base.success(data=data)
 
 
-@router.get('', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
-async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
-    data = await gen_business_service.get_all()
-    return response_base.success(data=data)
+@router.get(
+    '',
+    summary='分页获取所有代码生成业务',
+    dependencies=[
+        DependsJwtAuth,
+        DependsPagination,
+    ],
+)
+async def get_businesses_paged(
+    db: CurrentSession,
+    table_name: Annotated[str | None, Query(description='代码生成业务表名称')] = None,
+) -> ResponseSchemaModel[PageData[GetGenBusinessDetail]]:
+    business_select = await gen_business_service.get_select(table_name=table_name)
+    page_data = await paging_data(db, business_select)
+    return response_base.success(data=page_data)
 
 
 @router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])

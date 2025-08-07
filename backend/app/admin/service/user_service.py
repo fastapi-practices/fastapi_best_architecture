@@ -103,11 +103,10 @@ class UserService:
         :return:
         """
         async with async_db_session.begin() as db:
+            superuser_verify(request)
             user = await user_dao.get_with_relation(db, user_id=pk)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            if request.user.username != user.username:
-                raise errors.ForbiddenError(msg='只能修改自己的信息')
             if obj.username != user.username:
                 if await user_dao.get_by_username(db, obj.username):
                     raise errors.ConflictError(msg='用户名已注册')
@@ -119,98 +118,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_superuser(*, request: Request, pk: int) -> int:
-        """
-        更新用户管理员状态
-
-        :param request: FastAPI 请求对象
-        :param pk: 用户 ID
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            superuser_verify(request)
-            user = await user_dao.get(db, pk)
-            if not user:
-                raise errors.NotFoundError(msg='用户不存在')
-            if pk == request.user.id:
-                raise errors.ForbiddenError(msg='禁止修改自身权限')
-            count = await user_dao.set_super(db, pk, not user.status)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
-            return count
-
-    @staticmethod
-    async def update_staff(*, request: Request, pk: int) -> int:
-        """
-        更新用户职员状态
-
-        :param request: FastAPI 请求对象
-        :param pk: 用户 ID
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            superuser_verify(request)
-            user = await user_dao.get(db, pk)
-            if not user:
-                raise errors.NotFoundError(msg='用户不存在')
-            if pk == request.user.id:
-                raise errors.ForbiddenError(msg='禁止修改自身权限')
-            count = await user_dao.set_staff(db, pk, not user.is_staff)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
-            return count
-
-    @staticmethod
-    async def update_status(*, request: Request, pk: int) -> int:
-        """
-        更新用户状态
-
-        :param request: FastAPI 请求对象
-        :param pk: 用户 ID
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            superuser_verify(request)
-            user = await user_dao.get(db, pk)
-            if not user:
-                raise errors.NotFoundError(msg='用户不存在')
-            if pk == request.user.id:
-                raise errors.ForbiddenError(msg='禁止修改自身权限')
-            count = await user_dao.set_status(db, pk, 0 if user.status == 1 else 1)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
-            return count
-
-    @staticmethod
-    async def update_multi_login(*, request: Request, pk: int) -> int:
-        """
-        更新用户多端登录状态
-
-        :param request: FastAPI 请求对象
-        :param pk: 用户 ID
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            superuser_verify(request)
-            user = await user_dao.get(db, pk)
-            if not user:
-                raise errors.NotFoundError(msg='用户不存在')
-            multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
-            new_multi_login = not multi_login
-            count = await user_dao.set_multi_login(db, pk, new_multi_login)
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
-            token = get_token(request)
-            token_payload = jwt_decode(token)
-            if pk == user.id:
-                # 系统管理员修改自身时，除当前 token 外，其他 token 失效
-                if not new_multi_login:
-                    key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
-                    await redis_client.delete_prefix(key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}')
-            else:
-                # 系统管理员修改他人时，他人 token 全部失效
-                if not new_multi_login:
-                    key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
-                    await redis_client.delete_prefix(key_prefix)
-            return count
-
-    async def update_permission(self, *, request: Request, pk: int, type: UserPermissionType) -> int:
+    async def update_permission(*, request: Request, pk: int, type: UserPermissionType) -> int:
         """
         更新用户权限
 
@@ -219,30 +127,133 @@ class UserService:
         :param type: 权限类型
         :return:
         """
-        match type:
-            case UserPermissionType.superuser:
-                count = await self.update_superuser(request=request, pk=pk)
-            case UserPermissionType.staff:
-                count = await self.update_staff(request=request, pk=pk)
-            case UserPermissionType.status:
-                count = await self.update_status(request=request, pk=pk)
-            case UserPermissionType.multi_login:
-                count = await self.update_multi_login(request=request, pk=pk)
-            case _:
-                raise errors.RequestError(msg='权限类型不存在')
+        async with async_db_session.begin() as db:
+            superuser_verify(request)
+            match type:
+                case UserPermissionType.superuser:
+                    user = await user_dao.get(db, pk)
+                    if not user:
+                        raise errors.NotFoundError(msg='用户不存在')
+                    if pk == request.user.id:
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
+                    count = await user_dao.set_super(db, pk, not user.status)
+                case UserPermissionType.staff:
+                    user = await user_dao.get(db, pk)
+                    if not user:
+                        raise errors.NotFoundError(msg='用户不存在')
+                    if pk == request.user.id:
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
+                    count = await user_dao.set_staff(db, pk, not user.is_staff)
+                case UserPermissionType.status:
+                    user = await user_dao.get(db, pk)
+                    if not user:
+                        raise errors.NotFoundError(msg='用户不存在')
+                    if pk == request.user.id:
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
+                    count = await user_dao.set_status(db, pk, 0 if user.status == 1 else 1)
+                case UserPermissionType.multi_login:
+                    user = await user_dao.get(db, pk)
+                    if not user:
+                        raise errors.NotFoundError(msg='用户不存在')
+                    multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
+                    new_multi_login = not multi_login
+                    count = await user_dao.set_multi_login(db, pk, new_multi_login)
+                    token = get_token(request)
+                    token_payload = jwt_decode(token)
+                    if pk == user.id:
+                        # 系统管理员修改自身时，除当前 token 外，其他 token 失效
+                        if not new_multi_login:
+                            key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
+                            await redis_client.delete_prefix(
+                                key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}'
+                            )
+                    else:
+                        # 系统管理员修改他人时，他人 token 全部失效
+                        if not new_multi_login:
+                            key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
+                            await redis_client.delete_prefix(key_prefix)
+                case _:
+                    raise errors.RequestError(msg='权限类型不存在')
+
+        await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
 
     @staticmethod
-    async def reset_pwd(*, pk: int, obj: ResetPasswordParam) -> int:
+    async def reset_password(*, request: Request, pk: int, password: str) -> int:
         """
         重置用户密码
 
+        :param request: FastAPI 请求对象
         :param pk: 用户 ID
+        :param password: 新密码
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            superuser_verify(request)
+            user = await user_dao.get(db, pk)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            count = await user_dao.reset_password(db, user.id, password)
+            key_prefix = [
+                f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
+                f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
+                f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}',
+            ]
+            for prefix in key_prefix:
+                await redis_client.delete(prefix)
+            return count
+
+    @staticmethod
+    async def update_nickname(*, request: Request, nickname: str) -> int:
+        """
+        更新用户昵称
+
+        :param request: FastAPI 请求对象
+        :param nickname: 用户昵称
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            token = get_token(request)
+            token_payload = jwt_decode(token)
+            user = await user_dao.get(db, token_payload.id)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            count = await user_dao.update_nickname(db, token_payload.id, nickname)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+            return count
+
+    @staticmethod
+    async def update_avatar(*, request: Request, avatar: str) -> int:
+        """
+        更新用户头像
+
+        :param request: FastAPI 请求对象
+        :param avatar: 头像地址
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            token = get_token(request)
+            token_payload = jwt_decode(token)
+            user = await user_dao.get(db, token_payload.id)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            count = await user_dao.update_avatar(db, token_payload.id, avatar)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+            return count
+
+    @staticmethod
+    async def update_password(*, request: Request, obj: ResetPasswordParam) -> int:
+        """
+        更新用户密码
+
+        :param request: FastAPI 请求对象
         :param obj: 密码重置参数
         :return:
         """
         async with async_db_session.begin() as db:
-            user = await user_dao.get(db, pk)
+            token = get_token(request)
+            token_payload = jwt_decode(token)
+            user = await user_dao.get(db, token_payload.id)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
             if not password_verify(obj.old_password, user.password):

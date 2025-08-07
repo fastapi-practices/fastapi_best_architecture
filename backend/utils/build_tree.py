@@ -6,15 +6,18 @@ from backend.common.enums import BuildTreeType
 from backend.utils.serializers import RowData, select_list_serialize
 
 
-def get_tree_nodes(row: Sequence[RowData]) -> list[dict[str, Any]]:
+def get_tree_nodes(row: Sequence[RowData], is_sort: bool, sort_key: str) -> list[dict[str, Any]]:
     """
     获取所有树形结构节点
 
     :param row: 原始数据行序列
+    :param is_sort: 是否启用结果排序
+    :param sort_key: 基于此键对结果进行进行排序
     :return:
     """
     tree_nodes = select_list_serialize(row)
-    tree_nodes.sort(key=lambda x: x['sort'])
+    if is_sort:
+        tree_nodes.sort(key=lambda x: x[sort_key])
     return tree_nodes
 
 
@@ -65,7 +68,12 @@ def recursive_to_tree(nodes: list[dict[str, Any]], *, parent_id: int | None = No
 
 
 def get_tree_data(
-    row: Sequence[RowData], build_type: BuildTreeType = BuildTreeType.traversal, *, parent_id: int | None = None
+    row: Sequence[RowData],
+    build_type: BuildTreeType = BuildTreeType.traversal,
+    *,
+    parent_id: int | None = None,
+    is_sort: bool = True,
+    sort_key: str = 'sort',
 ) -> list[dict[str, Any]]:
     """
     获取树形结构数据
@@ -73,9 +81,11 @@ def get_tree_data(
     :param row: 原始数据行序列
     :param build_type: 构建树形结构的算法类型，默认为遍历算法
     :param parent_id: 父节点 ID，仅在递归算法中使用
+    :param is_sort: 是否启用结果排序
+    :param sort_key: 基于此键对结果进行进行排序
     :return:
     """
-    nodes = get_tree_nodes(row)
+    nodes = get_tree_nodes(row, is_sort, sort_key)
     match build_type:
         case BuildTreeType.traversal:
             tree = traversal_to_tree(nodes)
@@ -86,11 +96,13 @@ def get_tree_data(
     return tree
 
 
-def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
+def get_vben5_tree_data(row: Sequence[RowData], is_sort: bool = True, sort_key: str = 'sort') -> list[dict[str, Any]]:
     """
     获取 vben5 菜单树形结构数据
 
     :param row: 原始数据行序列
+    :param is_sort: 是否启用结果排序
+    :param sort_key: 基于此键对结果进行进行排序
     :return:
     """
     meta_keys = {'title', 'icon', 'link', 'cache', 'display', 'status'}
@@ -108,7 +120,7 @@ def get_vben5_tree_data(row: Sequence[RowData]) -> list[dict[str, Any]]:
                 'menuVisibleWithForbidden': not bool(node['status']),
             },
         }
-        for node in get_tree_nodes(row)
+        for node in get_tree_nodes(row, is_sort, sort_key)
     ]
 
     return traversal_to_tree(vben5_nodes)

@@ -258,8 +258,8 @@ class ModelEntry(ScheduleEntry):
             except KeyError:
                 continue
         model_dict.update(
-            args=json.dumps(args) if args else None,
-            kwargs=json.dumps(kwargs) if kwargs else None,
+            args=json.dumps(args, ensure_ascii=False) if args else None,
+            kwargs=json.dumps(kwargs, ensure_ascii=False) if kwargs else None,
             **cls._unpack_options(**options or {}),
             **entry,
         )
