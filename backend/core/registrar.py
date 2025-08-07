@@ -18,7 +18,7 @@ from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
-from backend.database.db import create_table
+from backend.database.db import create_tables
 from backend.database.redis import redis_client
 from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -40,7 +40,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     :return:
     """
     # 创建数据库表
-    await create_table()
+    await create_tables()
     # 初始化 limiter
     await FastAPILimiter.init(
         redis=redis_client,
