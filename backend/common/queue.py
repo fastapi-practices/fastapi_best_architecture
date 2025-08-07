@@ -16,17 +16,14 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
     """
     items = []
 
-    loop = asyncio.get_event_loop()
-    end_time = loop.time() + timeout
-
-    while len(items) < max_items:
-        remaining = end_time - loop.time()
-        if remaining <= 0:
-            break
-        try:
-            item = await asyncio.wait_for(queue.get(), timeout=remaining)
+    async def collector():
+        while len(items) < max_items:
+            item = await queue.get()
             items.append(item)
-        except asyncio.TimeoutError:
-            break
+
+    try:
+        await asyncio.wait_for(collector(), timeout=timeout)
+    except asyncio.TimeoutError:
+        pass
 
     return items

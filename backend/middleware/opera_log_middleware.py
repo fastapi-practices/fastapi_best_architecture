@@ -201,7 +201,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         while True:
             logs = await batch_dequeue(
                 cls.opera_log_queue,
-                max_items=settings.OPERA_LOG_QUEUE_MAX,
+                max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
                 timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
             )
             if logs:
