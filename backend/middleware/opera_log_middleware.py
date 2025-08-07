@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 
-from asyncio import create_task
+from asyncio import Queue
 from typing import Any
 
 from asgiref.sync import sync_to_async
@@ -15,6 +15,7 @@ from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
+from backend.common.queue import batch_dequeue
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
@@ -22,6 +23,8 @@ from backend.utils.trace_id import get_request_trace_id
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
+
+    opera_log_queue: Queue = Queue(maxsize=100000)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:
         """
@@ -107,7 +110,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
                 opera_time=request.state.start_time,
             )
-            create_task(opera_log_service.create(obj=opera_log_in))  # noqa: ignore
+            await self.opera_log_queue.put(opera_log_in)
 
             # 错误抛出
             if error:
@@ -190,3 +193,21 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         args[key] = '******'
 
         return args
+
+    @classmethod
+    async def consumer(cls) -> None:
+        """操作日志消费者"""
+        while True:
+            logs = await batch_dequeue(
+                cls.opera_log_queue,
+                max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
+                timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
+            )
+            if logs:
+                try:
+                    if settings.DATABASE_ECHO:
+                        log.info('自动执行【操作日志批量创建】任务...')
+                    await opera_log_service.bulk_create(objs=logs)
+                finally:
+                    if not cls.opera_log_queue.empty():
+                        cls.opera_log_queue.task_done()

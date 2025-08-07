@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+from asyncio import create_task
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -47,6 +48,8 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
         prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
         http_callback=http_limit_callback,
     )
+    # 创建操作日志任务
+    create_task(OperaLogMiddleware.consumer())
 
     yield
 

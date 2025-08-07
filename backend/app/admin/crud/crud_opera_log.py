@@ -37,10 +37,20 @@ class CRUDOperaLogDao(CRUDPlus[OperaLog]):
         创建操作日志
 
         :param db: 数据库会话
-        :param obj: 创建操作日志参数
+        :param obj: 操作日志创建参数
         :return:
         """
         await self.create_model(db, obj)
+
+    async def bulk_create(self, db: AsyncSession, objs: list[CreateOperaLogParam]) -> None:
+        """
+        批量创建操作日志
+
+        :param db: 数据库会话
+        :param objs: 操作日志创建参数列表
+        :return:
+        """
+        await self.create_models(db, objs)
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """

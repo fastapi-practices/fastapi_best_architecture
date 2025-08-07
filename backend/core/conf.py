@@ -179,6 +179,8 @@ class Settings(BaseSettings):
         'new_password',
         'confirm_password',
     ]
+    OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 100
+    OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
     # Plugin 配置
     PLUGIN_PIP_CHINA: bool = True
