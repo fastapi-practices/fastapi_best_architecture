@@ -10,18 +10,19 @@ from typing import Sequence
 import aiofiles
 
 from pydantic.alias_generators import to_pascal
+from sqlalchemy import RowMapping
 
 from backend.common.exception import errors
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.crud.crud_code import gen_dao
-from backend.plugin.code_generator.crud.crud_column import gen_model_dao
+from backend.plugin.code_generator.crud.crud_column import gen_column_dao
 from backend.plugin.code_generator.model import GenBusiness
 from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
 from backend.plugin.code_generator.schema.code import ImportParam
-from backend.plugin.code_generator.schema.column import CreateGenModelParam
-from backend.plugin.code_generator.service.column_service import gen_model_service
+from backend.plugin.code_generator.schema.column import CreateGenColumnParam
+from backend.plugin.code_generator.service.column_service import gen_column_service
 from backend.plugin.code_generator.utils.code_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
@@ -30,7 +31,7 @@ class GenService:
     """代码生成服务类"""
 
     @staticmethod
-    async def get_tables(*, table_schema: str) -> Sequence[str]:
+    async def get_tables(*, table_schema: str) -> Sequence[RowMapping]:
         """
         获取指定 schema 下的所有表名
 
@@ -43,7 +44,7 @@ class GenService:
     @staticmethod
     async def import_business_and_model(*, obj: ImportParam) -> None:
         """
-        导入业务和模型数据
+        导入业务和模型列数据
 
         :param obj: 导入参数对象
         :return:
@@ -64,8 +65,8 @@ class GenService:
                     table_name=table_name,
                     doc_comment=table_info[1] or table_name.split('_')[-1],
                     table_comment=table_info[1],
-                    class_name=table_name,
-                    schema_name=table_name,
+                    class_name=to_pascal(table_name),
+                    schema_name=to_pascal(table_name),
                     filename=table_name,
                 ).model_dump()
             )
@@ -76,9 +77,9 @@ class GenService:
             for column in column_info:
                 column_type = column[-1].split('(')[0].upper()
                 pd_type = sql_type_to_pydantic(column_type)
-                await gen_model_dao.create(
+                await gen_column_dao.create(
                     db,
-                    CreateGenModelParam(
+                    CreateGenColumnParam(
                         name=column[0],
                         comment=column[-2],
                         type=column_type,
@@ -99,7 +100,7 @@ class GenService:
         :param business: 业务对象
         :return:
         """
-        gen_models = await gen_model_service.get_models(business_id=business.id)
+        gen_models = await gen_column_service.get_columns(business_id=business.id)
         if not gen_models:
             raise errors.NotFoundError(msg='代码生成模型表为空')
 
@@ -126,7 +127,20 @@ class GenService:
             codes = {}
             for tpl, code in tpl_code_map.items():
                 if tpl.startswith('python'):
-                    codes[tpl.replace('.jinja', '.py').split('/')[-1]] = code.encode('utf-8')
+                    rootpath = f'fastapi_best_architecture/backend/app/{business.app_name}'
+                    template_name = tpl.split('/')[-1]
+                    match template_name:
+                        case 'api.jinja':
+                            filepath = f'{rootpath}/api/{business.api_version}/{business.app_name}.py'
+                        case 'crud.jinja':
+                            filepath = f'{rootpath}/crud/crud_{business.app_name}.py'
+                        case 'model.jinja':
+                            filepath = f'{rootpath}/model/{business.app_name}.py'
+                        case 'schema.jinja':
+                            filepath = f'{rootpath}/schema/{business.app_name}.py'
+                        case 'service.jinja':
+                            filepath = f'{rootpath}/service/{business.app_name}_service.py'
+                    codes[filepath] = code.encode('utf-8')
 
             return codes
 

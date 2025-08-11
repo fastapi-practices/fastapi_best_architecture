@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Row, text
+from sqlalchemy import Row, RowMapping, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
@@ -12,7 +12,7 @@ class CRUDGen:
     """代码生成 CRUD 类"""
 
     @staticmethod
-    async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[str]:
+    async def get_all_tables(db: AsyncSession, table_schema: str) -> Sequence[RowMapping]:
         """
         获取所有表名
 
@@ -22,20 +22,23 @@ class CRUDGen:
         """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
-            SELECT table_name AS table_name FROM information_schema.tables 
-            WHERE table_name NOT LIKE 'sys_gen_%' 
+            SELECT table_name AS table_name, table_comment AS table_comment
+            FROM information_schema.tables
+            WHERE table_name NOT LIKE 'sys_gen_%'
             AND table_schema = :table_schema;
             """
         else:
             sql = """
-            SELECT table_name AS table_name FROM information_schema.tables 
-            WHERE table_name NOT LIKE 'sys_gen_%' 
-            AND table_catalog = :table_schema
-            AND table_schema = 'public'; -- schema 通常是 'public'
+            SELECT c.relname AS table_name, obj_description(c.oid) AS table_comment
+            FROM pg_class c
+            LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind = 'r'
+            AND n.nspname = 'public' -- schema 通常是 'public'
+            AND c.relname NOT LIKE 'sys_gen_%';
             """
         stmt = text(sql).bindparams(table_schema=table_schema)
         result = await db.execute(stmt)
-        return result.scalars().all()
+        return result.mappings().all()
 
     @staticmethod
     async def get_table(db: AsyncSession, table_name: str) -> Row[tuple]:
@@ -48,18 +51,19 @@ class CRUDGen:
         """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
-            SELECT table_name AS table_name, table_comment AS table_comment FROM information_schema.tables 
+            SELECT table_name AS table_name, table_comment AS table_comment 
+            FROM information_schema.tables 
             WHERE table_name NOT LIKE 'sys_gen_%' 
             AND table_name = :table_name;
             """
         else:
             sql = """
-            SELECT t.tablename AS table_name,
-            pg_catalog.obj_description(t.tablename::regclass, 'pg_class') AS table_comment
-            FROM pg_tables t
-            WHERE t.tablename NOT LIKE 'sys_gen_%'
-            AND t.tablename = :table_name
-            AND t.schemaname = 'public'; -- schema 通常是 'public'
+            SELECT c.relname AS table_name, obj_description(c.oid) AS table_comment
+            FROM pg_class c
+            LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind = 'r'
+            AND n.nspname = 'public' -- schema 通常是 'public'
+            AND c.relname NOT LIKE 'sys_gen_%';
             """
         stmt = text(sql).bindparams(table_name=table_name)
         result = await db.execute(stmt)

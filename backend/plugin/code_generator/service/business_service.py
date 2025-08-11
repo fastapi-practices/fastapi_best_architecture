@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
 
 from sqlalchemy import Select
 
@@ -26,6 +27,12 @@ class GenBusinessService:
             if not business:
                 raise errors.NotFoundError(msg='代码生成业务不存在')
             return business
+
+    @staticmethod
+    async def get_all() -> Sequence[GenBusiness]:
+        """获取所有业务"""
+        async with async_db_session() as db:
+            return await gen_business_dao.get_all(db)
 
     @staticmethod
     async def get_select(*, table_name: str) -> Select:

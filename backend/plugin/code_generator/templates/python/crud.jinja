@@ -23,7 +23,7 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
 
     async def get_list(self) -> Select:
         """获取{{ doc_comment }}列表"""
-        return await self.select_order('created_time', 'desc')
+        return await self.select_order('id', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ class_name }}]:
         """
