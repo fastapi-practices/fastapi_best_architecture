@@ -33,5 +33,5 @@ class GenBusiness(Base):
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )
-    # 代码生成业务模型一对多
+    # 代码生成业务模型列一对多
     gen_column: Mapped[list['GenColumn']] = relationship(init=False, back_populates='gen_business')

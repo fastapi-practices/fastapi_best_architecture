@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.code_generator.model import GenColumn
-from backend.plugin.code_generator.schema.column import CreateGenModelParam, UpdateGenModelParam
+from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
 
 
-class CRUDGenModel(CRUDPlus[GenColumn]):
-    """代码生成模型 CRUD 类"""
+class CRUDGenColumn(CRUDPlus[GenColumn]):
+    """代码生成模型列 CRUD 类"""
 
     async def get(self, db: AsyncSession, pk: int) -> GenColumn | None:
         """
@@ -32,24 +32,24 @@ class CRUDGenModel(CRUDPlus[GenColumn]):
         """
         return await self.select_models_order(db, sort_columns='sort', gen_business_id=business_id)
 
-    async def create(self, db: AsyncSession, obj: CreateGenModelParam, pd_type: str | None) -> None:
+    async def create(self, db: AsyncSession, obj: CreateGenColumnParam, pd_type: str | None) -> None:
         """
-        创建代码生成模型
+        创建代码生成模型列
 
         :param db: 数据库会话
-        :param obj: 创建代码生成模型参数
+        :param obj: 创建代码生成模型列参数
         :param pd_type: Pydantic 类型
         :return:
         """
         await self.create_model(db, obj, pd_type=pd_type)
 
-    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenModelParam, pd_type: str | None) -> int:
+    async def update(self, db: AsyncSession, pk: int, obj: UpdateGenColumnParam, pd_type: str | None) -> int:
         """
-        更新代码生成模型
+        更新代码生成模型列
 
         :param db: 数据库会话
-        :param pk: 代码生成模型 ID
-        :param obj: 更新代码生成模型参数
+        :param pk: 代码生成模型列 ID
+        :param obj: 更新代码生成模型列参数
         :param pd_type: Pydantic 类型
         :return:
         """
@@ -57,13 +57,13 @@ class CRUDGenModel(CRUDPlus[GenColumn]):
 
     async def delete(self, db: AsyncSession, pk: int) -> int:
         """
-        删除代码生成模型
+        删除代码生成模型列
 
         :param db: 数据库会话
-        :param pk: 代码生成模型 ID
+        :param pk: 代码生成模型列 ID
         :return:
         """
         return await self.delete_model(db, pk)
 
 
-gen_model_dao: CRUDGenModel = CRUDGenModel(GenColumn)
+gen_column_dao: CRUDGenColumn = CRUDGenColumn(GenColumn)
