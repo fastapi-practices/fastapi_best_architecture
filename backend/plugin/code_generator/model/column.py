@@ -31,7 +31,7 @@ class GenColumn(DataClassBase):
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
     is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
 
-    # 代码生成业务模型一对多
+    # 代码生成业务模型列一对多
     gen_business_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey('gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
     )

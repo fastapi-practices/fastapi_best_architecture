@@ -15,11 +15,17 @@ from backend.plugin.code_generator.schema.business import (
     GetGenBusinessDetail,
     UpdateGenBusinessParam,
 )
-from backend.plugin.code_generator.schema.column import GetGenModelDetail
+from backend.plugin.code_generator.schema.column import GetGenColumnDetail
 from backend.plugin.code_generator.service.business_service import gen_business_service
-from backend.plugin.code_generator.service.column_service import gen_model_service
+from backend.plugin.code_generator.service.column_service import gen_column_service
 
 router = APIRouter()
+
+
+@router.get('/all', summary='获取所有代码生成业务', dependencies=[DependsJwtAuth])
+async def get_all_businesses() -> ResponseSchemaModel[list[GetGenBusinessDetail]]:
+    data = await gen_business_service.get_all()
+    return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取代码生成业务详情', dependencies=[DependsJwtAuth])
@@ -47,11 +53,11 @@ async def get_businesses_paged(
     return response_base.success(data=page_data)
 
 
-@router.get('/{pk}/models', summary='获取代码生成业务所有模型', dependencies=[DependsJwtAuth])
-async def get_business_all_models(
+@router.get('/{pk}/columns', summary='获取代码生成业务所有模型列', dependencies=[DependsJwtAuth])
+async def get_business_all_columns(
     pk: Annotated[int, Path(description='业务 ID')],
-) -> ResponseSchemaModel[list[GetGenModelDetail]]:
-    data = await gen_model_service.get_models(business_id=pk)
+) -> ResponseSchemaModel[list[GetGenColumnDetail]]:
+    data = await gen_column_service.get_columns(business_id=pk)
     return response_base.success(data=data)
 
 
