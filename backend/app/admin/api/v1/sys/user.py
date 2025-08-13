@@ -133,6 +133,18 @@ async def update_user_avatar(
     return response_base.fail()
 
 
+@router.put('/me/email', summary='更新当前用户邮箱', dependencies=[DependsJwtAuth])
+async def update_user_email(
+    request: Request,
+    captcha: Annotated[str, Body(embed=True, description='邮箱验证码')],
+    email: Annotated[str, Body(embed=True, description='用户邮箱')],
+) -> ResponseModel:
+    count = await user_service.update_email(request=request, captcha=captcha, email=email)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
+
+
 @router.delete(
     path='/{pk}',
     summary='删除用户',
