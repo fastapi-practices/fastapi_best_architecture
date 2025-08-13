@@ -226,6 +226,20 @@ class Settings(BaseSettings):
     # 基础配置
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
+    ##################################################
+    # [ Plugin ] email
+    ##################################################
+    # .env
+    EMAIL_USERNAME: str
+    EMAIL_PASSWORD: str
+
+    # 基础配置
+    EMAIL_HOST: str = 'smtp.qq.com'
+    EMAIL_PORT: int = 465
+    EMAIL_SSL: bool = True
+    EMAIL_CAPTCHA_REDIS_PREFIX: str = 'fba:email:captcha'
+    EMAIL_CAPTCHA_EXPIRE_SECONDS: int = 60 * 3  # 3 分钟
+
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:

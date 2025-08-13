@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
 
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,6 +22,16 @@ class CRUDConfig(CRUDPlus[Config]):
         :return:
         """
         return await self.select_model_by_column(db, id=pk)
+
+    async def get_by_type(self, db: AsyncSession, type: str) -> Sequence[Config | None]:
+        """
+        通过键名获取参数配置
+
+        :param db: 数据库会话
+        :param type: 参数配置类型
+        :return:
+        """
+        return await self.select_models(db, type=type)
 
     async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
