@@ -1,0 +1,8 @@
+[plugin]
+summary = '电子邮件'
+version = '0.0.1'
+description = '发送电子邮件，例如验证码、通知等'
+author = 'wu-clan'
+
+[app]
+router = ['v1']

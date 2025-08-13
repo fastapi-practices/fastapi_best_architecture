@@ -18,6 +18,7 @@ from backend.app.admin.schema.user import (
 )
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
+from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -206,7 +207,7 @@ class UserService:
     @staticmethod
     async def update_nickname(*, request: Request, nickname: str) -> int:
         """
-        更新用户昵称
+        更新当前用户昵称
 
         :param request: FastAPI 请求对象
         :param nickname: 用户昵称
@@ -225,7 +226,7 @@ class UserService:
     @staticmethod
     async def update_avatar(*, request: Request, avatar: str) -> int:
         """
-        更新用户头像
+        更新当前用户头像
 
         :param request: FastAPI 请求对象
         :param avatar: 头像地址
@@ -242,9 +243,35 @@ class UserService:
             return count
 
     @staticmethod
+    async def update_email(*, request: Request, captcha: str, email: str) -> int:
+        """
+        更新当前用户邮箱
+
+        :param request: FastAPI 请求对象
+        :param captcha: 邮箱验证码
+        :param email: 邮箱
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            token = get_token(request)
+            token_payload = jwt_decode(token)
+            user = await user_dao.get(db, token_payload.id)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
+            if not captcha_code:
+                raise errors.RequestError(msg='验证码已失效，请重新获取')
+            if captcha != captcha_code:
+                raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+            await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
+            count = await user_dao.update_email(db, token_payload.id, email)
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+            return count
+
+    @staticmethod
     async def update_password(*, request: Request, obj: ResetPasswordParam) -> int:
         """
-        更新用户密码
+        更新当前用户密码
 
         :param request: FastAPI 请求对象
         :param obj: 密码重置参数
