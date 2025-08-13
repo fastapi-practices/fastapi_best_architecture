@@ -5,7 +5,6 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
-from backend.core.conf import settings
 from backend.utils.timezone import timezone
 
 # 自定义验证错误信息，参考：
@@ -128,6 +127,6 @@ class SchemaBase(BaseModel):
         json_encoders={
             datetime: lambda x: timezone.to_str(timezone.from_datetime(x))
             if x.tzinfo is not None
-            else x.strftime(settings.DATETIME_FORMAT)
+            else timezone.to_str(x)
         },
     )
