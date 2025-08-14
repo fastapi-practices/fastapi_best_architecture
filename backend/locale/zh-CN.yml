@@ -74,14 +74,14 @@ error:
     zip_missing_files: 插件压缩包内缺少必要文件
   rate_limit_exceeded: 请求过于频繁，请稍后重试
   refresh_token_expired: Refresh Token 已过期，请重新登录
-  request_params_invalid: '请求参数非法: {message}'
+  request_params_invalid: 请求参数非法：{message}
   role:
     exists: 角色已存在
     not_found: 角色不存在
   snowflake:
-    cluster_id_invalid: '集群编号必须在 0-{max} 之间'
-    node_id_invalid: '节点编号必须在 0-{max} 之间'
-    system_time_error: 系统时间倒退，拒绝生成 ID 直到 {last_timestamp}'
+    cluster_id_invalid: 集群编号必须在 0-{max} 之间
+    node_id_invalid: 节点编号必须在 0-{max} 之间
+    system_time_error: 系统时间倒退，拒绝生成 ID 直到 {last_timestamp}
   sql:
     file_not_found: SQL 脚本文件不存在
     syntax_not_allowed: SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT
