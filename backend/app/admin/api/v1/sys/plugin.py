@@ -46,7 +46,7 @@ async def install_plugin(
 ) -> ResponseModel:
     plugin = await plugin_service.install(type=type, file=file, repo_url=repo_url)
     return response_base.success(
-        res=CustomResponse(code=200, msg=t('success.plugin_install_success', plugin_name=plugin))
+        res=CustomResponse(code=200, msg=t('success.plugin.install_success', plugin=plugin))
     )
 
 
@@ -62,7 +62,7 @@ async def install_plugin(
 async def uninstall_plugin(plugin: Annotated[str, Path(description='插件名称')]) -> ResponseModel:
     await plugin_service.uninstall(plugin=plugin)
     return response_base.success(
-        res=CustomResponse(code=200, msg=t('success.plugin_uninstall_success', plugin_name=plugin))
+        res=CustomResponse(code=200, msg=t('success.plugin.uninstall_success', plugin=plugin))
     )
 
 

@@ -226,5 +226,5 @@ success:
     oauth2_success: 登录成功（OAuth2）
     success: 登录成功
   plugin:
-    install_success: '插件 {plugin_name} 安装成功，请根据插件说明（README.md）进行相关配置并重启服务'
-    uninstall_success: '插件 {plugin_name} 卸载成功，请根据插件说明（README.md）移除相关配置并重启服务'
+    install_success: '插件 {plugin} 安装成功，请根据插件说明（README.md）进行相关配置并重启服务'
+    uninstall_success: '插件 {plugin} 卸载成功，请根据插件说明（README.md）移除相关配置并重启服务'

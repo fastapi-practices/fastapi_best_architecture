@@ -252,8 +252,8 @@
       "success": "Login success"
     },
     "plugin": {
-      "install_success": "Plugin {plugin_name} installed successfully, please refer to the plugin documentation (README.md) for related configuration and restart the service",
-      "uninstall_success": "Plugin {plugin_name} uninstalled successfully, please remove related configuration according to the plugin documentation (README.md) and restart the service"
+      "install_success": "Plugin {plugin} installed successfully, please refer to the plugin documentation (README.md) for related configuration and restart the service",
+      "uninstall_success": "Plugin {plugin} uninstalled successfully, please remove related configuration according to the plugin documentation (README.md) and restart the service"
     }
   }
 }
