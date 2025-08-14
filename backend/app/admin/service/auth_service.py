@@ -13,6 +13,7 @@ from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import (
@@ -44,16 +45,16 @@ class AuthService:
         """
         user = await user_dao.get_by_username(db, username)
         if not user:
-            raise errors.NotFoundError(msg='用户名或密码有误')
+            raise errors.NotFoundError(msg=t('error.username_or_password_error'))
 
         if user.password is None:
-            raise errors.AuthorizationError(msg='用户名或密码有误')
+            raise errors.AuthorizationError(msg=t('error.username_or_password_error'))
         else:
             if not password_verify(password, user.password):
-                raise errors.AuthorizationError(msg='用户名或密码有误')
+                raise errors.AuthorizationError(msg=t('error.username_or_password_error'))
 
         if not user.status:
-            raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+            raise errors.AuthorizationError(msg=t('error.user.locked'))
 
         return user
 
@@ -93,7 +94,7 @@ class AuthService:
                 user = await self.user_verify(db, obj.username, obj.password)
                 captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
-                    raise errors.RequestError(msg='验证码失效，请重新获取')
+                    raise errors.RequestError(msg=t('error.captcha.expired'))
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
@@ -137,7 +138,7 @@ class AuthService:
                         msg=e.msg,
                     ),
                 )
-                raise errors.RequestError(msg=e.msg, background=task)
+                raise errors.RequestError(code=e.code, msg=e.msg, background=task)
             except Exception as e:
                 log.error(f'登陆错误: {e}')
                 raise e
@@ -151,7 +152,7 @@ class AuthService:
                         username=obj.username,
                         login_time=timezone.now(),
                         status=LoginLogStatusType.success.value,
-                        msg='登录成功',
+                        msg=t('success.login.success'),
                     ),
                 )
                 data = GetLoginToken(
@@ -197,17 +198,17 @@ class AuthService:
         """
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
-            raise errors.RequestError(msg='Refresh Token 已过期，请重新登录')
+            raise errors.RequestError(msg=t('error.refresh_token_expired'))
         token_payload = jwt_decode(refresh_token)
         async with async_db_session() as db:
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg='用户不存在')
+                raise errors.NotFoundError(msg=t('error.user.not_found'))
             elif not user.status:
-                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+                raise errors.AuthorizationError(msg=t('error.user.locked'))
             if not user.is_multi_login:
                 if await redis_client.keys(match=f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
-                    raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
+                    raise errors.ForbiddenError(msg=t('error.user.login_elsewhere'))
             new_token = await create_new_token(
                 refresh_token,
                 token_payload.session_uuid,

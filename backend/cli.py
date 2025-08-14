@@ -45,6 +45,8 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         address=host,
         port=port,
         reload=not reload,
+        # https://github.com/emmett-framework/granian/issues/659
+        # reload_filter=PythonFilter(extra_extensions=['.json', '.yaml', '.yml']),
         reload_filter=PythonFilter,
         workers=workers or 1,
     ).serve()

@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.routing import APIRoute
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 from backend.common.response.response_code import StandardResponseCode
 
@@ -41,7 +42,7 @@ async def http_limit_callback(request: Request, response: Response, expire: int)
     """
     expires = ceil(expire / 1000)
     raise errors.HTTPError(
-        code=StandardResponseCode.HTTP_429, msg='请求过于频繁，请稍后重试', headers={'Retry-After': str(expires)}
+        code=StandardResponseCode.HTTP_429, msg=t('error.limit_reached'), headers={'Retry-After': str(expires)}
     )
 
 

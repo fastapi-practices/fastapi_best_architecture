@@ -16,13 +16,13 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
 from backend.common.exception.exception_handler import register_exception
-from backend.common.i18n.middleware import I18nMiddleware
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_tables
 from backend.database.redis import redis_client
 from backend.middleware.access_middleware import AccessMiddleware
+from backend.middleware.i18n_middleware import I18nMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
@@ -43,21 +43,24 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # 创建数据库表
     await create_tables()
+
+    # 初始化 redis
+    await redis_client.open()
+
     # 初始化 limiter
     await FastAPILimiter.init(
         redis=redis_client,
         prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
         http_callback=http_limit_callback,
     )
+
     # 创建操作日志任务
     create_task(OperaLogMiddleware.consumer())
 
     yield
 
     # 关闭 redis 连接
-    await redis_client.close()
-    # 关闭 limiter
-    await FastAPILimiter.close()
+    await redis_client.aclose()
 
 
 def register_app() -> FastAPI:
@@ -129,10 +132,7 @@ def register_middleware(app: FastAPI) -> None:
     )
 
     # I18n
-    app.add_middleware(I18nMiddleware, default_language='zh-CN')
-
-    # Access log
-    app.add_middleware(AccessMiddleware)
+    app.add_middleware(I18nMiddleware)
 
     # CORS
     if settings.MIDDLEWARE_CORS:
@@ -146,6 +146,9 @@ def register_middleware(app: FastAPI) -> None:
             allow_headers=['*'],
             expose_headers=settings.CORS_EXPOSE_HEADERS,
         )
+
+    # Access log
+    app.add_middleware(AccessMiddleware)
 
     # Trace ID
     app.add_middleware(CorrelationIdMiddleware, validator=False)

@@ -13,6 +13,7 @@ from backend.app.admin.schema.data_scope import (
     UpdateDataScopeRuleParam,
 )
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -32,7 +33,7 @@ class DataScopeService:
         async with async_db_session() as db:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg=t('error.data_scope.not_found'))
             return data_scope
 
     @staticmethod
@@ -53,7 +54,7 @@ class DataScopeService:
         async with async_db_session() as db:
             data_scope = await data_scope_dao.get_with_relation(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg=t('error.data_scope.not_found'))
             return data_scope
 
     @staticmethod
@@ -78,7 +79,7 @@ class DataScopeService:
         async with async_db_session.begin() as db:
             data_scope = await data_scope_dao.get_by_name(db, obj.name)
             if data_scope:
-                raise errors.ConflictError(msg='数据范围已存在')
+                raise errors.ConflictError(msg=t('error.data_scope.exists'))
             await data_scope_dao.create(db, obj)
 
     @staticmethod
@@ -93,10 +94,10 @@ class DataScopeService:
         async with async_db_session.begin() as db:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
-                raise errors.NotFoundError(msg='数据范围不存在')
+                raise errors.NotFoundError(msg=t('error.data_scope.not_found'))
             if data_scope.name != obj.name:
                 if await data_scope_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='数据范围已存在')
+                    raise errors.ConflictError(msg=t('error.data_scope.exists'))
             count = await data_scope_dao.update(db, pk, obj)
             for role in await data_scope.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:

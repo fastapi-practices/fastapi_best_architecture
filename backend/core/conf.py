@@ -191,6 +191,9 @@ class Settings(BaseSettings):
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
     PLUGIN_REDIS_PREFIX: str = 'fba:plugin'
 
+    # I18n 配置
+    I18N_DEFAULT_LANGUAGE: str = 'zh-CN'
+
     ##################################################
     # [ App ] task
     ##################################################

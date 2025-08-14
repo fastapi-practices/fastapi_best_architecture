@@ -6,6 +6,7 @@
   },
   "error": {
     "captcha_error": "Captcha error",
+    "captcha_expired": "The captcha has expired, please get it again",
     "json_parse_failed": "JSON parsing failed",
     "invalid_request_params": "Invalid request parameters: {message}",
     "user_not_found": "User not found",
@@ -25,7 +26,30 @@
     "upload_file_failed": "File upload failed",
     "plugin_install_failed": "Plugin installation failed, please try again later",
     "model_parse_failed": "Data model column dynamic parsing failed, please contact system super administrator",
-    "permission_check_failed": "Permission check failed, please contact system administrator"
+    "permission_check_failed": "Permission check failed, please contact system administrator",
+    "language_not_found": "Current language pack is not initialized or does not exist",
+    "email_config_missing": "Missing email dynamic configuration, please check system parameter configuration - email configuration",
+    "crontab_invalid": "Crontab expression is invalid",
+    "snowflake_cluster_id_invalid": "Cluster ID must be between 0-{SnowflakeConfig.MAX_DATACENTER_ID}",
+    "snowflake_node_id_invalid": "Node ID must be between 0-{SnowflakeConfig.MAX_WORKER_ID}",
+    "celery_worker_unavailable": "Celery Worker is temporarily unavailable, please try again later",
+    "token_invalid": "Token is invalid",
+    "token_expired": "Token has expired",
+    "rate_limit_exceeded": "Request too frequent, please try again later",
+    "file_type_unknown": "Unknown file type",
+    "image_format_not_supported": "This image format is not supported",
+    "image_size_exceeded": "Image exceeds maximum limit, please select again",
+    "video_format_not_supported": "This video format is not supported",
+    "video_size_exceeded": "Video exceeds maximum limit, please select again",
+    "plugin_zip_invalid": "Plugin zip package format is invalid",
+    "plugin_zip_content_invalid": "Plugin zip package content is invalid",
+    "plugin_zip_missing_files": "Required files are missing in the plugin zip package",
+    "plugin_already_installed": "This plugin is already installed",
+    "git_url_invalid": "Git repository URL format is invalid",
+    "sql_file_not_found": "SQL script file does not exist",
+    "sql_illegal_operation": "Illegal operations found in SQL script file, only SELECT and INSERT are allowed",
+    "demo_mode_forbidden": "This operation is forbidden in demo mode"
+
   },
   "success": {
     "login_success": "Login successful",
@@ -147,4 +171,4 @@
     "redis_auth_failed": "❌ Database redis connection authentication failed",
     "connection_failed": "❌ Database connection failed {error}"
   }
-} 
+}

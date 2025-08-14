@@ -8,11 +8,9 @@ from starlette.middleware.cors import CORSMiddleware
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.common.exception.errors import BaseExceptionMixin
+from backend.common.i18n import t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
-from backend.common.schema import (
-    CUSTOM_VALIDATION_ERROR_MESSAGES,
-)
 from backend.core.conf import settings
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.trace_id import get_request_trace_id
@@ -46,7 +44,7 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
     """
     errors = []
     for error in exc.errors():
-        custom_message = CUSTOM_VALIDATION_ERROR_MESSAGES.get(error['type'])
+        custom_message = t(f'pydantic.{error["type"]}')
         if custom_message:
             ctx = error.get('ctx')
             if not ctx:
@@ -61,13 +59,13 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
-        message = 'json解析失败'
+        message = t('error.json_parse_failed')
     else:
         error_input = error.get('input')
         field = str(error.get('loc')[-1])
         error_msg = error.get('msg')
-        message = f'{field} {error_msg}，输入：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
-    msg = f'请求参数非法: {message}'
+        message = f'{field} {error_msg}：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
+    msg = f'{t("request_params_invalid", message=message)}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
     content = {
         'code': StandardResponseCode.HTTP_422,

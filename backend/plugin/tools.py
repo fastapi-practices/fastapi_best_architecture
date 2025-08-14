@@ -128,7 +128,6 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     # 使用独立单例，避免与主线程冲突
     current_redis_client = RedisCli()
-    run_await(current_redis_client.open)()
 
     # 清理未知插件信息
     run_await(current_redis_client.delete_prefix)(
