@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -40,6 +41,20 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         :return:
         """
         return await self.select_models(db)
+
+    async def get_list(self, table_name: str | None) -> Select:
+        """
+        获取所有代码生成业务
+
+        :param table_name: 业务表名
+        :return:
+        """
+        filters = {}
+
+        if table_name is not None:
+            filters['table_name__like'] = f'%{table_name}%'
+
+        return await self.select_order('id', 'desc', load_strategies={'gen_column': 'noload'}, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateGenBusinessParam) -> None:
         """

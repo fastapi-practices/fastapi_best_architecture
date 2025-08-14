@@ -3,7 +3,7 @@
 from backend.common.enums import StrEnum
 
 
-class GenModelMySQLColumnType(StrEnum):
+class GenMySQLColumnType(StrEnum):
     """代码生成模型列类型（MySQL）"""
 
     # Python 类型映射
@@ -68,7 +68,7 @@ class GenModelMySQLColumnType(StrEnum):
     YEAR = 'int'
 
 
-class GenModelPostgreSQLColumnType(StrEnum):
+class GenPostgreSQLColumnType(StrEnum):
     """代码生成模型列类型（PostgreSQL）"""
 
     # Python 类型映射

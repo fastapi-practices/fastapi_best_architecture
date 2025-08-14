@@ -6,7 +6,7 @@ from backend.common.schema import SchemaBase
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_sqlalchemy
 
 
-class GenModelSchemaBase(SchemaBase):
+class GenColumnSchemaBase(SchemaBase):
     """代码生成模型基础模型"""
 
     name: str = Field(description='列名称')
@@ -26,16 +26,16 @@ class GenModelSchemaBase(SchemaBase):
         return sql_type_to_sqlalchemy(v)
 
 
-class CreateGenModelParam(GenModelSchemaBase):
-    """创建代码生成模型参数"""
+class CreateGenColumnParam(GenColumnSchemaBase):
+    """创建代码生成模型列参数"""
 
 
-class UpdateGenModelParam(GenModelSchemaBase):
-    """更新代码生成模型参数"""
+class UpdateGenColumnParam(GenColumnSchemaBase):
+    """更新代码生成模型列参数"""
 
 
-class GetGenModelDetail(GenModelSchemaBase):
-    """获取代码生成模型详情"""
+class GetGenColumnDetail(GenColumnSchemaBase):
+    """获取代码生成模型列详情"""
 
     model_config = ConfigDict(from_attributes=True)
 

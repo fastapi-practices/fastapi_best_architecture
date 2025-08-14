@@ -8,47 +8,47 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.schema.column import CreateGenModelParam, GetGenModelDetail, UpdateGenModelParam
-from backend.plugin.code_generator.service.column_service import gen_model_service
+from backend.plugin.code_generator.schema.column import CreateGenColumnParam, GetGenColumnDetail, UpdateGenColumnParam
+from backend.plugin.code_generator.service.column_service import gen_column_service
 
 router = APIRouter()
 
 
 @router.get('/types', summary='获取代码生成模型列类型', dependencies=[DependsJwtAuth])
-async def get_model_types() -> ResponseSchemaModel[list[str]]:
-    model_types = await gen_model_service.get_types()
-    return response_base.success(data=model_types)
+async def get_column_types() -> ResponseSchemaModel[list[str]]:
+    column_types = await gen_column_service.get_types()
+    return response_base.success(data=column_types)
 
 
-@router.get('/{pk}', summary='获取代码生成模型详情', dependencies=[DependsJwtAuth])
-async def get_model(pk: Annotated[int, Path(description='模型 ID')]) -> ResponseSchemaModel[GetGenModelDetail]:
-    data = await gen_model_service.get(pk=pk)
+@router.get('/{pk}', summary='获取代码生成模型列详情', dependencies=[DependsJwtAuth])
+async def get_column(pk: Annotated[int, Path(description='模型列 ID')]) -> ResponseSchemaModel[GetGenColumnDetail]:
+    data = await gen_column_service.get(pk=pk)
     return response_base.success(data=data)
 
 
 @router.post(
     '',
-    summary='创建代码生成模型',
+    summary='创建代码生成模型列',
     dependencies=[
-        Depends(RequestPermission('codegen:model:add')),
+        Depends(RequestPermission('codegen:column:add')),
         DependsRBAC,
     ],
 )
-async def create_model(obj: CreateGenModelParam) -> ResponseModel:
-    await gen_model_service.create(obj=obj)
+async def create_column(obj: CreateGenColumnParam) -> ResponseModel:
+    await gen_column_service.create(obj=obj)
     return response_base.success()
 
 
 @router.put(
     '/{pk}',
-    summary='更新代码生成模型',
+    summary='更新代码生成模型列',
     dependencies=[
-        Depends(RequestPermission('codegen:model:edit')),
+        Depends(RequestPermission('codegen:column:edit')),
         DependsRBAC,
     ],
 )
-async def update_model(pk: Annotated[int, Path(description='模型 ID')], obj: UpdateGenModelParam) -> ResponseModel:
-    count = await gen_model_service.update(pk=pk, obj=obj)
+async def update_column(pk: Annotated[int, Path(description='模型列 ID')], obj: UpdateGenColumnParam) -> ResponseModel:
+    count = await gen_column_service.update(pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -56,14 +56,14 @@ async def update_model(pk: Annotated[int, Path(description='模型 ID')], obj: U
 
 @router.delete(
     '/{pk}',
-    summary='删除代码生成模型',
+    summary='删除代码生成模型列',
     dependencies=[
-        Depends(RequestPermission('codegen:model:del')),
+        Depends(RequestPermission('codegen:column:del')),
         DependsRBAC,
     ],
 )
-async def delete_model(pk: Annotated[int, Path(description='模型 ID')]) -> ResponseModel:
-    count = await gen_model_service.delete(pk=pk)
+async def delete_column(pk: Annotated[int, Path(description='模型列 ID')]) -> ResponseModel:
+    count = await gen_column_service.delete(pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
+from sqlalchemy import Select
+
 from backend.common.exception import errors
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
@@ -31,6 +33,16 @@ class GenBusinessService:
         """获取所有业务"""
         async with async_db_session() as db:
             return await gen_business_dao.get_all(db)
+
+    @staticmethod
+    async def get_select(*, table_name: str) -> Select:
+        """
+        获取代码生成业务列表查询条件
+
+        :param table_name: 业务表名
+        :return:
+        """
+        return await gen_business_dao.get_list(table_name=table_name)
 
     @staticmethod
     async def create(*, obj: CreateGenBusinessParam) -> None:

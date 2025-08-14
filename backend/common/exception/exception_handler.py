@@ -52,9 +52,9 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
             if not ctx:
                 error['msg'] = custom_message
             else:
-                error['msg'] = custom_message.format(**ctx)
                 ctx_error = ctx.get('error')
                 if ctx_error:
+                    error['msg'] = custom_message.format(**ctx)
                     error['ctx']['error'] = (
                         ctx_error.__str__().replace("'", '"') if isinstance(ctx_error, Exception) else None
                     )

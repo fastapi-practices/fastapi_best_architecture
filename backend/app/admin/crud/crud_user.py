@@ -139,6 +139,17 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'avatar': avatar})
 
+    async def update_email(self, db: AsyncSession, user_id: int, email: str) -> int:
+        """
+        更新用户邮箱
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :param email: 邮箱
+        :return:
+        """
+        return await self.update_model(db, user_id, {'email': email})
+
     async def delete(self, db: AsyncSession, user_id: int) -> int:
         """
         删除用户
