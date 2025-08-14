@@ -8,7 +8,7 @@ from starlette.middleware.cors import CORSMiddleware
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.common.exception.errors import BaseExceptionMixin
-from backend.common.i18n import t
+from backend.common.i18n import i18n, t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
 from backend.core.conf import settings
@@ -44,18 +44,20 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
     """
     errors = []
     for error in exc.errors():
-        custom_message = t(f'pydantic.{error["type"]}')
-        if custom_message:
-            ctx = error.get('ctx')
-            if not ctx:
-                error['msg'] = custom_message
-            else:
-                ctx_error = ctx.get('error')
-                if ctx_error:
-                    error['msg'] = custom_message.format(**ctx)
-                    error['ctx']['error'] = (
-                        ctx_error.__str__().replace("'", '"') if isinstance(ctx_error, Exception) else None
-                    )
+        # 非 en-US 语言下，使用自定义错误信息
+        if i18n.current_language != 'en-US':
+            custom_message = t(f'pydantic.{error["type"]}')
+            if custom_message:
+                ctx = error.get('ctx')
+                if not ctx:
+                    error['msg'] = custom_message
+                else:
+                    ctx_error = ctx.get('error')
+                    if ctx_error:
+                        error['msg'] = custom_message.format(**ctx)
+                        error['ctx']['error'] = (
+                            ctx_error.__str__().replace("'", '"') if isinstance(ctx_error, Exception) else None
+                        )
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
