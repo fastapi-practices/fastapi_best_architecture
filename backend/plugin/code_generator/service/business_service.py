@@ -5,6 +5,7 @@ from typing import Sequence
 from sqlalchemy import Select
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.model import GenBusiness
@@ -25,7 +26,7 @@ class GenBusinessService:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='代码生成业务不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.business_not_found'))
             return business
 
     @staticmethod
@@ -55,7 +56,7 @@ class GenBusinessService:
         async with async_db_session.begin() as db:
             business = await gen_business_dao.get_by_name(db, obj.table_name)
             if business:
-                raise errors.ConflictError(msg='代码生成业务已存在')
+                raise errors.ConflictError(msg=t('error.plugin.code_generator.business_exists'))
             await gen_business_dao.create(db, obj)
 
     @staticmethod

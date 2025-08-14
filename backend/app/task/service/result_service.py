@@ -6,6 +6,7 @@ from backend.app.task.crud.crud_result import task_result_dao
 from backend.app.task.model.result import TaskResult
 from backend.app.task.schema.result import DeleteTaskResultParam
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.database.db import async_db_session
 
 
@@ -21,7 +22,7 @@ class TaskResultService:
         async with async_db_session() as db:
             result = await task_result_dao.get(db, pk)
             if not result:
-                raise errors.NotFoundError(msg='任务结果不存在')
+                raise errors.NotFoundError(msg=t('error.task.result_not_found'))
             return result
 
     @staticmethod

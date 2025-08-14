@@ -8,6 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from backend.app.task import celery_app
 from backend.app.task.schema.control import TaskRegisteredDetail
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -21,7 +22,7 @@ async def get_task_registered() -> ResponseSchemaModel[list[TaskRegisteredDetail
     inspector = celery_app.control.inspect(timeout=0.5)
     registered = await run_in_threadpool(inspector.registered)
     if not registered:
-        raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
+        raise errors.ServerError(msg=t('error.celery_worker_unavailable'))
     task_registered = []
     celery_app_tasks = celery_app.tasks
     for _, tasks in registered.items():
@@ -46,6 +47,6 @@ async def get_task_registered() -> ResponseSchemaModel[list[TaskRegisteredDetail
 async def revoke_task(task_id: Annotated[str, Path(description='任务 UUID')]) -> ResponseModel:
     workers = await run_in_threadpool(celery_app.control.ping, timeout=0.5)
     if not workers:
-        raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
+        raise errors.ServerError(msg=t('error.celery_worker_unavailable'))
     celery_app.control.revoke(task_id)
     return response_base.success()

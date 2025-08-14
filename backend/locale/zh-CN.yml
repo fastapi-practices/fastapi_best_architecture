@@ -1,17 +1,13 @@
-database:
-  connection_failed: '❌ 数据库连接失败 {error}'
-  redis:
-    auth_failed: ❌ Redis 连接认证失败
 error:
   captcha:
     error: 验证码错误
     expired: 验证码已过期，请重新获取
-  celery_worker_unavailable: Celery Worker 暂不可用，请稍后重试
-  crontab_invalid: Crontab 表达式非法
-  demo_mode_forbidden: 演示环境下禁止执行此操作
+  demo_mode: 演示环境下禁止执行此操作
   data_rule:
     not_found: 数据规则不存在
     exists: 数据规则已存在
+    model_not_found: 数据规则模型不存在
+    model_column_not_found: 数据规则模型列不存在
     available_models: 数据规则可用模型不存在
   data_scope:
     not_found: 数据范围不存在
@@ -36,10 +32,11 @@ error:
     exists: 角色已存在
   email_config_missing: 缺少邮件动态配置，请检查系统参数配置-邮件配置
   file_type_unknown: 未知的文件类型
-  image_format_not_supported: 此图片格式暂不支持
-  image_size_exceeded: 图片超出最大限制，请重新选择
+  image:
+    format_not_supported: 此图片格式暂不支持
+    size_exceeded: 图片超出最大限制，请重新选择
   json_parse_failed: json 解析失败
-  language_not_found: Current language pack is not initialized or does not exist
+  language_not_found: 当前语言包未初始化或不存在
   limit_reached: 请求过于频繁，请稍后重试
   model_parse_failed: 数据模型列动态解析失败，请联系系统超级管理员
   password:
@@ -55,30 +52,70 @@ error:
     zip_content_invalid: 插件压缩包内容非法
     zip_missing_files: 插件压缩包内缺少必要文件
     already_installed: 此插件已安装
+    disabled: 插件 {plugin} 未启用，请联系系统管理员
+    code_generator:
+      business_not_found: 代码生成业务不存在
+      business_exists: 代码生成业务已存在
+      table_not_found: 数据库表不存在
+      table_business_exists: 已存在相同数据库表业务
+      column_table_not_found: 代码生成模型列表不存在
+      column_not_found: 代码生成模型列不存在
+      column_exists: 代码生成模型列已存在
+      column_name_exists: 代码生成模型列名称已存在
+    config:
+      not_found: 参数配置不存在
+      exists: 参数配置已存在
+    dict:
+      data:
+        not_found: 字典数据不存在
+        exists: 字典数据已存在
+      type:
+        not_found: 字典类型不存在
+        exists: 字典类型已存在
+    notice:
+      not_found: 通知公告不存在
   rate_limit_exceeded: 请求过于频繁，请稍后重试
   refresh_token_expired: Refresh Token 已过期，请重新登录
   request_params_invalid: '请求参数非法: {message}'
-  snowflake_cluster_id_invalid: '集群编号必须在 0-{SnowflakeConfig.MAX_DATACENTER_ID} 之间'
-  snowflake_node_id_invalid: '节点编号必须在 0-{SnowflakeConfig.MAX_WORKER_ID} 之间'
-  sql_file_not_found: SQL 脚本文件不存在
-  sql_illegal_operation: SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT
-  token_expired: Token 已过期
-  token_invalid: Token 无效
+  snowflake:
+    cluster_id_invalid: '集群编号必须在 0-{max} 之间'
+    node_id_invalid: '节点编号必须在 0-{max} 之间'
+    system_time_error: 系统时间倒退，拒绝生成 ID 直到 {last_timestamp}'
+  sql:
+    file_not_found: SQL 脚本文件不存在
+    syntax_not_allowed: SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT
+  task:
+    celery_worker_unavailable: Celery Worker 暂不可用，请稍后重试
+    crontab_invalid: Crontab 表达式非法
+    result_not_found: 任务结果不存在
+    scheduler_not_found: 任务调度不存在
+    scheduler_exists: 任务调度已存在
+    params_invalid: 执行失败，任务参数非法
+    scheduler_type_invalid: 暂不支持的计划类型：{type}
+    schedule_not_found: '{name} 计划为空！'
+  token:
+    expired: Token 已过期
+    invalid: Token 无效
   upload_file_failed: 上传文件失败
   user:
     not_found: 用户不存在
     locked: '用户已被锁定, 请联系统管理员'
-    forbidden: 用户已被禁止后台管理操作，请联系系统管理员
+    not_staff: 用户已被禁止后台管理操作，请联系系统管理员
     no_role: 用户未分配角色，请联系系统管理员
     no_menu: 用户未分配菜单，请联系系统管理员
     login_elsewhere: 此用户已在异地登录，请重新登录并及时修改密码
     perm:
       type_not_found: 权限类型不存在
       edit_self_not_allowed: 禁止修改自身权限
+    dept_locked: 用户所属部门已被锁定，请联系系统管理员
+    dept_deleted: 用户所属部门已被删除，请联系系统管理员
+    role_locked: 用户所属角色已被锁定，请联系系统管理员
   username_or_password_error: 用户名或密码有误
   username_exists: 用户名已存在
-  video_format_not_supported: 此视频格式暂不支持
-  video_size_exceeded: 视频超出最大限制，请重新选择
+  video:
+    format_not_supported: 此视频格式暂不支持
+    size_exceeded: 视频超出最大限制，请重新选择
+  expires_and_expire_seconds_conflict: expires 和 expire_seconds 只能设置一个
 pydantic:
   # 自定义验证错误信息，参考：
   # https://github.com/pydantic/pydantic-core/blob/a5cb7382643415b716b1a7a5392914e50f726528/tests/test_errors.py#L266
@@ -191,15 +228,3 @@ success:
   plugin:
     install_success: '插件 {plugin_name} 安装成功，请根据插件说明（README.md）进行相关配置并重启服务'
     uninstall_success: '插件 {plugin_name} 卸载成功，请根据插件说明（README.md）移除相关配置并重启服务'
-  task:
-    execute_success: '任务 {task_id} 执行成功'
-task:
-  add_to_db_failed: '添加任务 {name} 到数据库失败'
-  clean_login_log: 清理登录日志
-  execute_failed: '任务 {task_id} 执行失败'
-  params_invalid: 执行失败，任务参数非法
-  save_status_failed: '保存任务 {name} 最新状态失败：{error}'
-websocket:
-  auth_failed: WebSocket 连接失败：授权失败，请检查
-  connection_failed: 'WebSocket 连接失败：{error}'
-  no_auth: WebSocket 连接失败：无授权

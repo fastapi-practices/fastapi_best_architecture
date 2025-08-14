@@ -16,6 +16,7 @@ from sqlalchemy.dialects.postgresql import INTEGER, TEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.model import Base, id_key
 from backend.core.conf import settings
 from backend.database.redis import redis_client
@@ -61,7 +62,7 @@ class TaskScheduler(Base):
     @staticmethod
     def before_insert_or_update(mapper, connection, target):
         if target.expire_seconds is not None and target.expire_time:
-            raise errors.ConflictError(msg='expires 和 expire_seconds 只能设置一个')
+            raise errors.ConflictError(msg=t('error.expires_and_expire_seconds_conflict'))
 
     @classmethod
     def changed(cls, mapper, connection, target):

@@ -13,6 +13,7 @@ from sqlparse import split
 
 from backend.common.enums import FileType
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR, UPLOAD_DIR
@@ -46,18 +47,18 @@ def upload_file_verify(file: UploadFile) -> None:
     filename = file.filename
     file_ext = filename.split('.')[-1].lower()
     if not file_ext:
-        raise errors.RequestError(msg='未知的文件类型')
+        raise errors.RequestError(msg=t('error.file_type_unknown'))
 
     if file_ext == FileType.image:
         if file_ext not in settings.UPLOAD_IMAGE_EXT_INCLUDE:
-            raise errors.RequestError(msg='此图片格式暂不支持')
+            raise errors.RequestError(msg=t('error.image.format_not_supported'))
         if file.size > settings.UPLOAD_IMAGE_SIZE_MAX:
-            raise errors.RequestError(msg='图片超出最大限制，请重新选择')
+            raise errors.RequestError(msg=t('error.image.size_exceeded'))
     elif file_ext == FileType.video:
         if file_ext not in settings.UPLOAD_VIDEO_EXT_INCLUDE:
-            raise errors.RequestError(msg='此视频格式暂不支持')
+            raise errors.RequestError(msg=t('error.video.format_not_supported'))
         if file.size > settings.UPLOAD_VIDEO_SIZE_MAX:
-            raise errors.RequestError(msg='视频超出最大限制，请重新选择')
+            raise errors.RequestError(msg=t('error.video.size_exceeded'))
 
 
 async def upload_file(file: UploadFile) -> str:
@@ -77,7 +78,7 @@ async def upload_file(file: UploadFile) -> str:
                 await fb.write(content)
     except Exception as e:
         log.error(f'上传文件 {filename} 失败：{str(e)}')
-        raise errors.RequestError(msg='上传文件失败')
+        raise errors.RequestError(msg=t('error.upload_file_failed'))
     await file.close()
     return filename
 
@@ -96,19 +97,19 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
         contents = await file.read()
     file_bytes = io.BytesIO(contents)
     if not zipfile.is_zipfile(file_bytes):
-        raise errors.RequestError(msg='插件压缩包格式非法')
+        raise errors.RequestError(msg=t('error.plugin.zip_invalid'))
     with zipfile.ZipFile(file_bytes) as zf:
         # 校验压缩包
         plugin_namelist = zf.namelist()
         plugin_dir_name = plugin_namelist[0].split('/')[0]
         if not plugin_namelist:
-            raise errors.RequestError(msg='插件压缩包内容非法')
+            raise errors.RequestError(msg=t('error.plugin.zip_content_invalid'))
         if (
             len(plugin_namelist) <= 3
             or f'{plugin_dir_name}/plugin.toml' not in plugin_namelist
             or f'{plugin_dir_name}/README.md' not in plugin_namelist
         ):
-            raise errors.RequestError(msg='插件压缩包内缺少必要文件')
+            raise errors.RequestError(msg=t('error.plugin.zip_missing_files'))
 
         # 插件是否可安装
         plugin_name = re.match(
@@ -119,7 +120,7 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
         ).group()
         full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
         if os.path.exists(full_plugin_path):
-            raise errors.ConflictError(msg='此插件已安装')
+            raise errors.ConflictError(msg=t('error.plugin.already_installed'))
         else:
             os.makedirs(full_plugin_path, exist_ok=True)
 
@@ -148,15 +149,15 @@ async def install_git_plugin(repo_url: str) -> str:
     """
     match = is_git_url(repo_url)
     if not match:
-        raise errors.RequestError(msg='Git 仓库地址格式非法')
+        raise errors.RequestError(msg=t('error.plugin.git_url_invalid'))
     repo_name = match.group('repo')
     if os.path.exists(os.path.join(PLUGIN_DIR, repo_name)):
-        raise errors.ConflictError(msg=f'{repo_name} 插件已安装')
+        raise errors.ConflictError(msg=t('error.plugin.already_installed'))
     try:
         porcelain.clone(repo_url, os.path.join(PLUGIN_DIR, repo_name), checkout=True)
     except Exception as e:
         log.error(f'插件安装失败: {e}')
-        raise errors.ServerError(msg='插件安装失败，请稍后重试') from e
+        raise errors.ServerError(msg=t('error.plugin.install_failed')) from e
 
     await install_requirements_async(repo_name)
     await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
@@ -172,7 +173,7 @@ async def parse_sql_script(filepath: str) -> list[str]:
     :return:
     """
     if not os.path.exists(filepath):
-        raise errors.NotFoundError(msg='SQL 脚本文件不存在')
+        raise errors.NotFoundError(msg=t('error.sql.file_not_found'))
 
     async with aiofiles.open(filepath, mode='r', encoding='utf-8') as f:
         contents = await f.read(1024)
@@ -182,6 +183,6 @@ async def parse_sql_script(filepath: str) -> list[str]:
     statements = split(contents)
     for statement in statements:
         if not any(statement.lower().startswith(_) for _ in ['select', 'insert']):
-            raise errors.RequestError(msg='SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT')
+            raise errors.RequestError(msg=t('error.sql.syntax_not_allowed'))
 
     return statements

@@ -19,6 +19,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.common.enums import DataBaseType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
@@ -388,4 +389,4 @@ class PluginStatusChecker:
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
 
         if not int(json.loads(plugin_info)['plugin']['enable']):
-            raise errors.ServerError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
+            raise errors.ServerError(msg=t('error.plugin.disabled', plugin=self.plugin))

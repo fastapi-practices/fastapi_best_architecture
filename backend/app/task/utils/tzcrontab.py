@@ -6,6 +6,7 @@ from celery import schedules
 from celery.schedules import ParseException, crontab_parser
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.utils.timezone import timezone
 
 
@@ -61,7 +62,7 @@ def crontab_verify(crontab: str) -> None:
     """
     crontab_split = crontab.split(' ')
     if len(crontab_split) != 5:
-        raise errors.RequestError(msg='Crontab 表达式非法')
+        raise errors.RequestError(msg=t('error.crontab_invalid'))
 
     try:
         crontab_parser(60, 0).parse(crontab_split[0])  # minute
@@ -70,4 +71,4 @@ def crontab_verify(crontab: str) -> None:
         crontab_parser(31, 1).parse(crontab_split[3])  # day_of_month
         crontab_parser(12, 1).parse(crontab_split[4])  # month_of_year
     except ParseException:
-        raise errors.RequestError(msg='Crontab 表达式非法')
+        raise errors.RequestError(msg=t('error.crontab_invalid'))

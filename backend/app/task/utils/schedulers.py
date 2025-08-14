@@ -20,6 +20,7 @@ from backend.app.task.model.scheduler import TaskScheduler
 from backend.app.task.schema.scheduler import CreateTaskSchedulerParam
 from backend.app.task.utils.tzcrontab import TzAwareCrontab, crontab_verify
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -91,7 +92,7 @@ class ModelEntry(ScheduleEntry):
                     month_of_year=crontab_split[4],
                 )
             else:
-                raise errors.NotFoundError(msg=f'{self.name} 计划为空！')
+                raise errors.NotFoundError(msg=t('error.task.schedule_not_found', name=self.name))
             # logger.debug('Schedule: {}'.format(self.schedule))
         except Exception as e:
             logger.error(f'禁用计划为空的任务 {self.name}，详情：{e}')
@@ -235,7 +236,7 @@ class ModelEntry(ScheduleEntry):
                 if not obj:
                     obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             else:
-                raise errors.NotFoundError(msg=f'暂不支持的计划类型：{schedule}')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_type_invalid', type=schedule))
 
             return obj
 

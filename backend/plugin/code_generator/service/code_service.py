@@ -13,6 +13,7 @@ from pydantic.alias_generators import to_pascal
 from sqlalchemy import RowMapping
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
@@ -52,11 +53,11 @@ class GenService:
         async with async_db_session.begin() as db:
             table_info = await gen_dao.get_table(db, obj.table_name)
             if not table_info:
-                raise errors.NotFoundError(msg='数据库表不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.table_not_found'))
 
             business_info = await gen_business_dao.get_by_name(db, obj.table_name)
             if business_info:
-                raise errors.ConflictError(msg='已存在相同数据库表业务')
+                raise errors.ConflictError(msg=t('error.plugin.code_generator.table_business_exists'))
 
             table_name = table_info[0]
             new_business = GenBusiness(
@@ -102,7 +103,7 @@ class GenService:
         """
         gen_models = await gen_column_service.get_columns(business_id=business.id)
         if not gen_models:
-            raise errors.NotFoundError(msg='代码生成模型表为空')
+            raise errors.NotFoundError(msg=t('error.plugin.code_generator.column_table_not_found'))
 
         gen_vars = gen_template.get_vars(business, gen_models)
         return {
@@ -120,7 +121,7 @@ class GenService:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='业务不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.business_not_found'))
 
             tpl_code_map = await self.render_tpl_code(business=business)
 
@@ -155,7 +156,7 @@ class GenService:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='业务不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.business_not_found'))
 
             gen_path = business.gen_path or 'fba-backend-app-dir'
             target_files = gen_template.get_code_gen_paths(business)
@@ -172,7 +173,7 @@ class GenService:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='业务不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.business_not_found'))
 
             tpl_code_map = await self.render_tpl_code(business=business)
             gen_path = business.gen_path or os.path.join(BASE_PATH, 'app')
@@ -227,7 +228,7 @@ class GenService:
         async with async_db_session() as db:
             business = await gen_business_dao.get(db, pk)
             if not business:
-                raise errors.NotFoundError(msg='业务不存在')
+                raise errors.NotFoundError(msg=t('error.plugin.code_generator.business_not_found'))
 
             bio = io.BytesIO()
             with zipfile.ZipFile(bio, 'w') as zf:

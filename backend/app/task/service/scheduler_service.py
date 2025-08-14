@@ -14,6 +14,7 @@ from backend.app.task.model import TaskScheduler
 from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
 from backend.app.task.utils.tzcrontab import crontab_verify
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.database.db import async_db_session
 
 
@@ -31,7 +32,7 @@ class TaskSchedulerService:
         async with async_db_session() as db:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
-                raise errors.NotFoundError(msg='任务调度不存在')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_not_found'))
             return task_scheduler
 
     @staticmethod
@@ -63,7 +64,7 @@ class TaskSchedulerService:
         async with async_db_session.begin() as db:
             task_scheduler = await task_scheduler_dao.get_by_name(db, obj.name)
             if task_scheduler:
-                raise errors.ConflictError(msg='任务调度已存在')
+                raise errors.ConflictError(msg=t('error.task.scheduler_exists'))
             if obj.type == TaskSchedulerType.CRONTAB:
                 crontab_verify(obj.crontab)
             await task_scheduler_dao.create(db, obj)
@@ -80,10 +81,10 @@ class TaskSchedulerService:
         async with async_db_session.begin() as db:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
-                raise errors.NotFoundError(msg='任务调度不存在')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_not_found'))
             if task_scheduler.name != obj.name:
                 if await task_scheduler_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='任务调度已存在')
+                    raise errors.ConflictError(msg=t('error.task.scheduler_exists'))
             if task_scheduler.type == TaskSchedulerType.CRONTAB:
                 crontab_verify(obj.crontab)
             count = await task_scheduler_dao.update(db, pk, obj)
@@ -100,7 +101,7 @@ class TaskSchedulerService:
         async with async_db_session.begin() as db:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
-                raise errors.NotFoundError(msg='任务调度不存在')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_not_found'))
             count = await task_scheduler_dao.set_status(db, pk, not task_scheduler.enabled)
             return count
 
@@ -115,7 +116,7 @@ class TaskSchedulerService:
         async with async_db_session.begin() as db:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
-                raise errors.NotFoundError(msg='任务调度不存在')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_not_found'))
             count = await task_scheduler_dao.delete(db, pk)
             return count
 
@@ -130,15 +131,15 @@ class TaskSchedulerService:
         async with async_db_session() as db:
             workers = await run_in_threadpool(celery_app.control.ping, timeout=0.5)
             if not workers:
-                raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
+                raise errors.ServerError(msg=t('error.celery_worker_unavailable'))
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
-                raise errors.NotFoundError(msg='任务调度不存在')
+                raise errors.NotFoundError(msg=t('error.task.scheduler_not_found'))
             try:
                 args = json.loads(task_scheduler.args) if task_scheduler.args else None
                 kwargs = json.loads(task_scheduler.kwargs) if task_scheduler.kwargs else None
             except (TypeError, json.JSONDecodeError):
-                raise errors.RequestError(msg='执行失败，任务参数非法')
+                raise errors.RequestError(msg=t('error.task.params_invalid'))
             else:
                 celery_app.send_task(name=task_scheduler.task, args=args, kwargs=kwargs)
 

@@ -3,6 +3,7 @@
 from fastapi import Request
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.core.conf import settings
 
 
@@ -21,4 +22,4 @@ async def demo_site(request: Request) -> None:
         and method != 'OPTIONS'
         and (method, path) not in settings.DEMO_MODE_EXCLUDE
     ):
-        raise errors.ForbiddenError(msg='演示环境下禁止执行此操作')
+        raise errors.ForbiddenError(msg=t('error.demo_mode'))

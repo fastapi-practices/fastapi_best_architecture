@@ -13,6 +13,7 @@ from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
@@ -86,7 +87,7 @@ async def send_email(
             configs = {d['key']: d for d in select_list_serialize(dynamic_email_config)}
             if configs.get('EMAIL_STATUS'):
                 if len(dynamic_email_config) < 6:
-                    raise errors.NotFoundError(msg='缺少邮件动态配置，请检查系统参数配置-邮件配置')
+                    raise errors.NotFoundError(msg=t('error.email_config_missing'))
                 smtp_client = SMTP(
                     hostname=configs.get('EMAIL_HOST'),
                     port=configs.get('EMAIL_PORT'),

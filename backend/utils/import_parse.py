@@ -6,6 +6,7 @@ from functools import lru_cache
 from typing import Any, Type, TypeVar
 
 from backend.common.exception import errors
+from backend.common.i18n import t
 from backend.common.log import log
 
 T = TypeVar('T')
@@ -35,4 +36,4 @@ def dynamic_import_data_model(module_path: str) -> Type[T]:
         return getattr(module, class_name)
     except (ImportError, AttributeError) as e:
         log.error(f'动态导入数据模型失败：{e}')
-        raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
+        raise errors.ServerError(msg=t('error.model_parse_failed'))
