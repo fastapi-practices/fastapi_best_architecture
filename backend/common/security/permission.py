@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import_data_model
 
@@ -92,7 +91,7 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
-            raise errors.NotFoundError(msg=t('error.data_rule.model_not_found'))
+            raise errors.NotFoundError(msg='数据规则模型不存在')
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
 
         # 验证规则列
@@ -101,7 +100,7 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
         ]
         column = data_rule.column
         if column not in model_columns:
-            raise errors.NotFoundError(msg=t('error.data_rule.model_column_not_found'))
+            raise errors.NotFoundError(msg='数据规则模型列不存在')
 
         # 构建过滤条件
         column_obj = getattr(model_ins, column)

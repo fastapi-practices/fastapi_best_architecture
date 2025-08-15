@@ -13,7 +13,6 @@ from backend.app.admin.schema.data_rule import (
     UpdateDataRuleParam,
 )
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.utils.import_parse import dynamic_import_data_model
@@ -33,7 +32,7 @@ class DataRuleService:
         async with async_db_session() as db:
             data_rule = await data_rule_dao.get(db, pk)
             if not data_rule:
-                raise errors.NotFoundError(msg=t('error.data_rule.not_found'))
+                raise errors.NotFoundError(msg='数据规则不存在')
             return data_rule
 
     @staticmethod
@@ -50,7 +49,7 @@ class DataRuleService:
         :return:
         """
         if model not in settings.DATA_PERMISSION_MODELS:
-            raise errors.NotFoundError(msg=t('error.data_rule.available_models'))
+            raise errors.NotFoundError(msg='数据规则可用模型不存在')
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[model])
 
         model_columns = [
@@ -88,7 +87,7 @@ class DataRuleService:
         async with async_db_session.begin() as db:
             data_rule = await data_rule_dao.get_by_name(db, obj.name)
             if data_rule:
-                raise errors.ConflictError(msg=t('error.data_rule.exists'))
+                raise errors.ConflictError(msg='数据规则已存在')
             await data_rule_dao.create(db, obj)
 
     @staticmethod
@@ -103,10 +102,10 @@ class DataRuleService:
         async with async_db_session.begin() as db:
             data_rule = await data_rule_dao.get(db, pk)
             if not data_rule:
-                raise errors.NotFoundError(msg=t('error.data_rule.not_found'))
+                raise errors.NotFoundError(msg='数据规则不存在')
             if data_rule.name != obj.name:
                 if await data_rule_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg=t('error.data_rule.exists'))
+                    raise errors.ConflictError(msg='数据规则已存在')
             count = await data_rule_dao.update(db, pk, obj)
             return count
 

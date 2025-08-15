@@ -3,7 +3,6 @@
 from sqlalchemy import Select
 
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictType
@@ -24,7 +23,7 @@ class DictTypeService:
         async with async_db_session() as db:
             dict_type = await dict_type_dao.get(db, pk)
             if not dict_type:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.type.not_found'))
+                raise errors.NotFoundError(msg='字典类型不存在')
             return dict_type
 
     @staticmethod
@@ -50,7 +49,7 @@ class DictTypeService:
         async with async_db_session.begin() as db:
             dict_type = await dict_type_dao.get_by_code(db, obj.code)
             if dict_type:
-                raise errors.ConflictError(msg=t('error.plugin.dict.type.exists'))
+                raise errors.ConflictError(msg='字典类型已存在')
             await dict_type_dao.create(db, obj)
 
     @staticmethod
@@ -65,10 +64,10 @@ class DictTypeService:
         async with async_db_session.begin() as db:
             dict_type = await dict_type_dao.get(db, pk)
             if not dict_type:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.type.not_found'))
+                raise errors.NotFoundError(msg='字典类型不存在')
             if dict_type.code != obj.code:
                 if await dict_type_dao.get_by_code(db, obj.code):
-                    raise errors.ConflictError(msg=t('error.plugin.dict.type.exists'))
+                    raise errors.ConflictError(msg='字典类型已存在')
             count = await dict_type_dao.update(db, pk, obj)
             return count
 

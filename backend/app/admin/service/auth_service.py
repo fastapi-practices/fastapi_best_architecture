@@ -45,16 +45,16 @@ class AuthService:
         """
         user = await user_dao.get_by_username(db, username)
         if not user:
-            raise errors.NotFoundError(msg=t('error.username_or_password_error'))
+            raise errors.NotFoundError(msg='用户名或密码有误')
 
         if user.password is None:
-            raise errors.AuthorizationError(msg=t('error.username_or_password_error'))
+            raise errors.AuthorizationError(msg='用户名或密码有误')
         else:
             if not password_verify(password, user.password):
-                raise errors.AuthorizationError(msg=t('error.username_or_password_error'))
+                raise errors.AuthorizationError(msg='用户名或密码有误')
 
         if not user.status:
-            raise errors.AuthorizationError(msg=t('error.user.locked'))
+            raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
 
         return user
 
@@ -198,17 +198,17 @@ class AuthService:
         """
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
-            raise errors.RequestError(msg=t('error.refresh_token_expired'))
+            raise errors.RequestError(msg='Refresh Token 已过期，请重新登录')
         token_payload = jwt_decode(refresh_token)
         async with async_db_session() as db:
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             elif not user.status:
-                raise errors.AuthorizationError(msg=t('error.user.locked'))
+                raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             if not user.is_multi_login:
                 if await redis_client.keys(match=f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
-                    raise errors.ForbiddenError(msg=t('error.user.login_elsewhere'))
+                    raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
             new_token = await create_new_token(
                 refresh_token,
                 token_payload.session_uuid,

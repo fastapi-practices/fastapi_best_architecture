@@ -61,13 +61,13 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
-        message = t('error.json_parse_failed')
+        message = 'json解析失败'
     else:
         error_input = error.get('input')
         field = str(error.get('loc')[-1])
         error_msg = error.get('msg')
-        message = f'{field} {error_msg}：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
-    msg = f'{t("request_params_invalid", message=message)}'
+        message = f'{field} {error_msg}，输入：{error_input}' if settings.ENVIRONMENT == 'dev' else error_msg
+    msg = f'请求参数非法: {message}'
     data = {'errors': errors} if settings.ENVIRONMENT == 'dev' else None
     content = {
         'code': StandardResponseCode.HTTP_422,

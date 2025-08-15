@@ -4,7 +4,6 @@
 from sqlalchemy import Select
 
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.database.db import async_db_session
 from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.model import Config
@@ -28,7 +27,7 @@ class ConfigService:
         async with async_db_session() as db:
             config = await config_dao.get(db, pk)
             if not config:
-                raise errors.NotFoundError(msg=t('error.plugin.config.not_found'))
+                raise errors.NotFoundError(msg='参数配置不存在')
             return config
 
     @staticmethod
@@ -53,7 +52,7 @@ class ConfigService:
         async with async_db_session.begin() as db:
             config = await config_dao.get_by_key(db, obj.key)
             if config:
-                raise errors.ConflictError(msg=t('error.plugin.config.exists'))
+                raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
             await config_dao.create(db, obj)
 
     @staticmethod
@@ -68,11 +67,11 @@ class ConfigService:
         async with async_db_session.begin() as db:
             config = await config_dao.get(db, pk)
             if not config:
-                raise errors.NotFoundError(msg=t('error.plugin.config.not_found'))
+                raise errors.NotFoundError(msg='参数配置不存在')
             if config.key != obj.key:
                 config = await config_dao.get_by_key(db, obj.key)
                 if config:
-                    raise errors.ConflictError(msg=t('error.plugin.config.exists'))
+                    raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
             count = await config_dao.update(db, pk, obj)
             return count
 

@@ -18,7 +18,6 @@ from backend.app.admin.schema.user import (
 )
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
 from backend.core.conf import settings
@@ -41,7 +40,7 @@ class UserService:
         async with async_db_session() as db:
             user = await user_dao.get_with_relation(db, user_id=pk, username=username)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             return user
 
     @staticmethod
@@ -55,7 +54,7 @@ class UserService:
         async with async_db_session() as db:
             user = await user_dao.get_with_relation(db, user_id=pk)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             return user.roles
 
     @staticmethod
@@ -83,15 +82,15 @@ class UserService:
         async with async_db_session.begin() as db:
             superuser_verify(request)
             if await user_dao.get_by_username(db, obj.username):
-                raise errors.ConflictError(msg=t('error.user.username_exists'))
+                raise errors.ConflictError(msg='用户名已注册')
             obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(88888, 99999)}'
             if not obj.password:
-                raise errors.RequestError(msg=t('error.password.required'))
+                raise errors.RequestError(msg='密码不允许为空')
             if not await dept_dao.get(db, obj.dept_id):
-                raise errors.NotFoundError(msg=t('error.dept.not_found'))
+                raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
                 if not await role_dao.get(db, role_id):
-                    raise errors.NotFoundError(msg=t('error.role.not_found'))
+                    raise errors.NotFoundError(msg='角色不存在')
             await user_dao.add(db, obj)
 
     @staticmethod
@@ -108,13 +107,13 @@ class UserService:
             superuser_verify(request)
             user = await user_dao.get_with_relation(db, user_id=pk)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             if obj.username != user.username:
                 if await user_dao.get_by_username(db, obj.username):
-                    raise errors.ConflictError(msg=t('error.user.username_exists'))
+                    raise errors.ConflictError(msg='用户名已注册')
             for role_id in obj.roles:
                 if not await role_dao.get(db, role_id):
-                    raise errors.NotFoundError(msg=t('error.role.not_found'))
+                    raise errors.NotFoundError(msg='角色不存在')
             count = await user_dao.update(db, user, obj)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
@@ -135,28 +134,28 @@ class UserService:
                 case UserPermissionType.superuser:
                     user = await user_dao.get(db, pk)
                     if not user:
-                        raise errors.NotFoundError(msg=t('error.user.not_found'))
+                        raise errors.NotFoundError(msg='用户不存在')
                     if pk == request.user.id:
-                        raise errors.ForbiddenError(msg=t('error.user.perm.edit_self_not_allowed'))
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
                     count = await user_dao.set_super(db, pk, not user.status)
                 case UserPermissionType.staff:
                     user = await user_dao.get(db, pk)
                     if not user:
-                        raise errors.NotFoundError(msg=t('error.user.not_found'))
+                        raise errors.NotFoundError(msg='用户不存在')
                     if pk == request.user.id:
-                        raise errors.ForbiddenError(msg=t('error.user.perm.edit_self_not_allowed'))
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
                     count = await user_dao.set_staff(db, pk, not user.is_staff)
                 case UserPermissionType.status:
                     user = await user_dao.get(db, pk)
                     if not user:
-                        raise errors.NotFoundError(msg=t('error.user.not_found'))
+                        raise errors.NotFoundError(msg='用户不存在')
                     if pk == request.user.id:
-                        raise errors.ForbiddenError(msg=t('error.user.perm.edit_self_not_allowed'))
+                        raise errors.ForbiddenError(msg='禁止修改自身权限')
                     count = await user_dao.set_status(db, pk, 0 if user.status == 1 else 1)
                 case UserPermissionType.multi_login:
                     user = await user_dao.get(db, pk)
                     if not user:
-                        raise errors.NotFoundError(msg=t('error.user.not_found'))
+                        raise errors.NotFoundError(msg='用户不存在')
                     multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
                     new_multi_login = not multi_login
                     count = await user_dao.set_multi_login(db, pk, new_multi_login)
@@ -175,7 +174,7 @@ class UserService:
                             key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
                             await redis_client.delete_prefix(key_prefix)
                 case _:
-                    raise errors.RequestError(msg=t('error.perm.type_not_found'))
+                    raise errors.RequestError(msg='权限类型不存在')
 
         await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
@@ -194,7 +193,7 @@ class UserService:
             superuser_verify(request)
             user = await user_dao.get(db, pk)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.reset_password(db, user.id, password)
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
@@ -219,7 +218,7 @@ class UserService:
             token_payload = jwt_decode(token)
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.update_nickname(db, token_payload.id, nickname)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
@@ -238,7 +237,7 @@ class UserService:
             token_payload = jwt_decode(token)
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.update_avatar(db, token_payload.id, avatar)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count
@@ -258,10 +257,10 @@ class UserService:
             token_payload = jwt_decode(token)
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
             if not captcha_code:
-                raise errors.RequestError(msg=t('error.captcha.expired'))
+                raise errors.RequestError(msg='验证码已失效，请重新获取')
             if captcha != captcha_code:
                 raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
             await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
@@ -283,11 +282,11 @@ class UserService:
             token_payload = jwt_decode(token)
             user = await user_dao.get(db, token_payload.id)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             if not password_verify(obj.old_password, user.password):
-                raise errors.RequestError(msg=t('error.password.old_error'))
+                raise errors.RequestError(msg='原密码错误')
             if obj.new_password != obj.confirm_password:
-                raise errors.RequestError(msg=t('error.password.mismatch'))
+                raise errors.RequestError(msg='密码输入不一致')
             count = await user_dao.reset_password(db, user.id, obj.new_password)
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
@@ -309,7 +308,7 @@ class UserService:
         async with async_db_session.begin() as db:
             user = await user_dao.get(db, pk)
             if not user:
-                raise errors.NotFoundError(msg=t('error.user.not_found'))
+                raise errors.NotFoundError(msg='用户不存在')
             count = await user_dao.delete(db, user.id)
             key_prefix = [
                 f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',

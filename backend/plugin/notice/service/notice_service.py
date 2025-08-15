@@ -5,7 +5,6 @@ from typing import Sequence
 from sqlalchemy import Select
 
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.database.db import async_db_session
 from backend.plugin.notice.crud.crud_notice import notice_dao
 from backend.plugin.notice.model import Notice
@@ -26,7 +25,7 @@ class NoticeService:
         async with async_db_session() as db:
             notice = await notice_dao.get(db, pk)
             if not notice:
-                raise errors.NotFoundError(msg=t('error.plugin.notice.not_found'))
+                raise errors.NotFoundError(msg='通知公告不存在')
             return notice
 
     @staticmethod
@@ -64,7 +63,7 @@ class NoticeService:
         async with async_db_session.begin() as db:
             notice = await notice_dao.get(db, pk)
             if not notice:
-                raise errors.NotFoundError(msg=t('error.plugin.notice.not_found'))
+                raise errors.NotFoundError(msg='通知公告不存在')
             count = await notice_dao.update(db, pk, obj)
             return count
 

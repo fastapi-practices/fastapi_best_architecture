@@ -12,7 +12,6 @@ from fastapi import UploadFile
 
 from backend.common.enums import PluginType, StatusType
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
@@ -55,10 +54,10 @@ class PluginService:
         """
         if type == PluginType.zip:
             if not file:
-                raise errors.RequestError(msg=t('error.plugin.zip_invalid'))
+                raise errors.RequestError(msg='ZIP 压缩包不能为空')
             return await install_zip_plugin(file)
         if not repo_url:
-            raise errors.RequestError(msg=t('error.plugin.git_url_invalid'))
+            raise errors.RequestError(msg='Git 仓库地址不能为空')
         return await install_git_plugin(repo_url)
 
     @staticmethod
@@ -71,7 +70,7 @@ class PluginService:
         """
         plugin_dir = os.path.join(PLUGIN_DIR, plugin)
         if not os.path.exists(plugin_dir):
-            raise errors.NotFoundError(msg=t('error.plugin.not_found'))
+            raise errors.NotFoundError(msg='插件不存在')
         await uninstall_requirements_async(plugin)
         bacup_dir = os.path.join(PLUGIN_DIR, f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup')
         shutil.move(plugin_dir, bacup_dir)
@@ -88,7 +87,7 @@ class PluginService:
         """
         plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if not plugin_info:
-            raise errors.NotFoundError(msg=t('error.plugin.not_found'))
+            raise errors.NotFoundError(msg='插件不存在')
         plugin_info = json.loads(plugin_info)
 
         # 更新持久缓存状态
@@ -110,7 +109,7 @@ class PluginService:
         """
         plugin_dir = os.path.join(PLUGIN_DIR, plugin)
         if not os.path.exists(plugin_dir):
-            raise errors.NotFoundError(msg=t('error.plugin.not_found'))
+            raise errors.NotFoundError(msg='插件不存在')
 
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:

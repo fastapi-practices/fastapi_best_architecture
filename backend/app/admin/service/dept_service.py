@@ -8,7 +8,6 @@ from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -29,7 +28,7 @@ class DeptService:
         async with async_db_session() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
-                raise errors.NotFoundError(msg=t('error.dept.not_found'))
+                raise errors.NotFoundError(msg='部门不存在')
             return dept
 
     @staticmethod
@@ -62,11 +61,11 @@ class DeptService:
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_by_name(db, obj.name)
             if dept:
-                raise errors.ConflictError(msg=t('error.dept.exists'))
+                raise errors.ConflictError(msg='部门名称已存在')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:
-                    raise errors.NotFoundError(msg=t('error.dept.not_found'))
+                    raise errors.NotFoundError(msg='父级部门不存在')
             await dept_dao.create(db, obj)
 
     @staticmethod
@@ -81,16 +80,16 @@ class DeptService:
         async with async_db_session.begin() as db:
             dept = await dept_dao.get(db, pk)
             if not dept:
-                raise errors.NotFoundError(msg=t('error.dept.not_found'))
+                raise errors.NotFoundError(msg='部门不存在')
             if dept.name != obj.name:
                 if await dept_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg=t('error.dept.exists'))
+                    raise errors.ConflictError(msg='部门名称已存在')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:
-                    raise errors.NotFoundError(msg=t('error.dept.parent.not_found'))
+                    raise errors.NotFoundError(msg='父级部门不存在')
             if obj.parent_id == dept.id:
-                raise errors.ForbiddenError(msg=t('error.dept.parent.related_self_not_allowed'))
+                raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await dept_dao.update(db, pk, obj)
             return count
 
@@ -105,10 +104,10 @@ class DeptService:
         async with async_db_session.begin() as db:
             dept = await dept_dao.get_with_relation(db, pk)
             if dept.users:
-                raise errors.ConflictError(msg=t('error.dept.exists_users'))
+                raise errors.ConflictError(msg='部门下存在用户，无法删除')
             children = await dept_dao.get_children(db, pk)
             if children:
-                raise errors.ConflictError(msg=t('error.dept.exists_children'))
+                raise errors.ConflictError(msg='部门下存在子部门，无法删除')
             count = await dept_dao.delete(db, pk)
             for user in dept.users:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

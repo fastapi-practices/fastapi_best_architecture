@@ -16,7 +16,6 @@ from backend.app.admin.schema.role import (
     UpdateRoleScopeParam,
 )
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -37,7 +36,7 @@ class RoleService:
         async with async_db_session() as db:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             return role
 
     @staticmethod
@@ -69,7 +68,7 @@ class RoleService:
         async with async_db_session() as db:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             menu_tree = get_tree_data(role.menus) if role.menus else []
             return menu_tree
 
@@ -84,7 +83,7 @@ class RoleService:
         async with async_db_session() as db:
             role = await role_dao.get_with_relation(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             scope_ids = [scope.id for scope in role.scopes]
             return scope_ids
 
@@ -99,7 +98,7 @@ class RoleService:
         async with async_db_session.begin() as db:
             role = await role_dao.get_by_name(db, obj.name)
             if role:
-                raise errors.ConflictError(msg=t('error.role.exists'))
+                raise errors.ConflictError(msg='角色已存在')
             await role_dao.create(db, obj)
 
     @staticmethod
@@ -114,10 +113,10 @@ class RoleService:
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             if role.name != obj.name:
                 if await role_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg=t('error.role.exists'))
+                    raise errors.ConflictError(msg='角色已存在')
             count = await role_dao.update(db, pk, obj)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
@@ -135,11 +134,11 @@ class RoleService:
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             for menu_id in menu_ids.menus:
                 menu = await menu_dao.get(db, menu_id)
                 if not menu:
-                    raise errors.NotFoundError(msg=t('error.role.not_found'))
+                    raise errors.NotFoundError(msg='菜单不存在')
             count = await role_dao.update_menus(db, pk, menu_ids)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
@@ -157,11 +156,11 @@ class RoleService:
         async with async_db_session.begin() as db:
             role = await role_dao.get(db, pk)
             if not role:
-                raise errors.NotFoundError(msg=t('error.role.not_found'))
+                raise errors.NotFoundError(msg='角色不存在')
             for scope_id in scope_ids.scopes:
                 scope = await data_scope_dao.get(db, scope_id)
                 if not scope:
-                    raise errors.NotFoundError(msg=t('error.data_scope.not_found'))
+                    raise errors.NotFoundError(msg='数据范围不存在')
             count = await role_dao.update_scopes(db, pk, scope_ids)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

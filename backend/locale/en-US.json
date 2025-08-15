@@ -4,157 +4,16 @@
       "error": "Captcha error",
       "expired": "Captcha has expired, please try again"
     },
-    "data_rule": {
-      "available_models": "Data rule available models do not exist",
-      "exists": "Data rule already exists",
-      "model_column_not_found": "Data rule model column does not exist",
-      "model_not_found": "Data rule model does not exist",
-      "not_found": "Data rule does not exist"
-    },
-    "data_scope": {
-      "exists": "Data scope already exists",
-      "not_found": "Data scope does not exist"
-    },
-    "demo_mode": "This operation is prohibited in demo mode",
-    "dept": {
-      "exists": "Department already exists",
-      "exists_children": "Department has sub-departments, cannot be deleted",
-      "exists_users": "Department has users, cannot be deleted",
-      "not_found": "Department does not exist",
-      "parent": {
-        "not_found": "Parent department does not exist",
-        "related_self_not_allowed": "Cannot associate itself as parent"
-      }
-    },
-    "email_config_missing": "Missing email dynamic configuration, please check system parameter configuration - email configuration",
-    "expires_and_expire_seconds_conflict": "Only one of expires and expire_seconds can be set",
-    "file_type_unknown": "Unknown file type",
-    "image": {
-      "format_not_supported": "This image format is not supported",
-      "size_exceeded": "Image exceeds maximum limit, please reselect"
-    },
-    "json_parse_failed": "JSON parsing failed",
-    "language_not_found": "Current language pack is not initialized or does not exist",
-    "limit_reached": "Request too frequent, please try again later",
-    "menu": {
-      "exists": "Menu already exists",
-      "exists_children": "Menu has sub-menus, cannot be deleted",
-      "not_found": "Menu does not exist",
-      "parent": {
-        "not_found": "Parent menu does not exist",
-        "related_self_not_allowed": "Cannot associate itself as parent"
-      }
-    },
-    "model_parse_failed": "Data model column dynamic parsing failed, please contact system administrator",
-    "password": {
-      "mismatch": "Password mismatch",
-      "old_error": "Old password error",
-      "required": "Password cannot be empty"
-    },
-    "permission_check_failed": "Permission verification failed, please contact system administrator",
-    "plugin": {
-      "already_installed": "This plugin is already installed",
-      "code_generator": {
-        "business_exists": "Code generation business already exists",
-        "business_not_found": "Code generation business does not exist",
-        "column_exists": "Code generation model column already exists",
-        "column_name_exists": "Code generation model column name already exists",
-        "column_not_found": "Code generation model column does not exist",
-        "column_table_not_found": "Code generation model list does not exist",
-        "table_business_exists": "Same database table business already exists",
-        "table_not_found": "Database table does not exist"
-      },
-      "config": {
-        "exists": "Parameter configuration already exists",
-        "not_found": "Parameter configuration does not exist"
-      },
-      "dict": {
-        "data": {
-          "exists": "Dictionary data already exists",
-          "not_found": "Dictionary data does not exist"
-        },
-        "type": {
-          "exists": "Dictionary type already exists",
-          "not_found": "Dictionary type does not exist"
-        }
-      },
-      "disabled": "Plugin {plugin} is not enabled, please contact system administrator",
-      "git_url_invalid": "Git repository URL format is invalid",
-      "install_failed": "Plugin installation failed, please try again later",
-      "not_found": "Plugin does not exist",
-      "notice": {
-        "not_found": "Notice announcement does not exist"
-      },
-      "zip_content_invalid": "Plugin zip content is invalid",
-      "zip_invalid": "Plugin zip format is invalid",
-      "zip_missing_files": "Missing required files in plugin zip"
-    },
-    "rate_limit_exceeded": "Request too frequent, please try again later",
-    "refresh_token_expired": "Refresh Token has expired, please login again",
-    "request_params_invalid": "Request parameters invalid: {message}",
-    "role": {
-      "exists": "Role already exists",
-      "not_found": "Role does not exist"
-    },
-    "snowflake": {
-      "cluster_id_invalid": "Cluster ID must be between 0-{max}",
-      "node_id_invalid": "Node ID must be between 0-{max}",
-      "system_time_error": "System time has regressed, refusing to generate ID until {last_timestamp}"
-    },
-    "sql": {
-      "file_not_found": "SQL script file does not exist",
-      "syntax_not_allowed": "SQL script file contains illegal operations, only SELECT and INSERT are allowed"
-    },
-    "task": {
-      "celery_worker_unavailable": "Celery Worker is temporarily unavailable, please try again later",
-      "crontab_invalid": "Crontab expression is invalid",
-      "params_invalid": "Execution failed, task parameters are invalid",
-      "result_not_found": "Task result does not exist",
-      "schedule_not_found": "{name} schedule is empty!",
-      "scheduler_exists": "Task scheduler already exists",
-      "scheduler_not_found": "Task scheduler does not exist",
-      "scheduler_type_invalid": "Unsupported schedule type: {type}"
-    },
-    "token": {
-      "expired": "Token has expired",
-      "invalid": "Token is invalid"
-    },
-    "upload_file_failed": "File upload failed",
-    "user": {
-      "dept_deleted": "User's department has been deleted, please contact system administrator",
-      "dept_locked": "User's department has been locked, please contact system administrator",
-      "locked": "User has been locked, please contact system administrator",
-      "login_elsewhere": "This user has logged in elsewhere, please login again and change password in time",
-      "no_menu": "User has not been assigned menu, please contact system administrator",
-      "no_role": "User has not been assigned role, please contact system administrator",
-      "not_found": "User does not exist",
-      "not_staff": "User has been prohibited from backend management operations, please contact system administrator",
-      "perm": {
-        "edit_self_not_allowed": "Not allowed to modify own permissions",
-        "type_not_found": "Permission type does not exist"
-      },
-      "role_locked": "User's role has been locked, please contact system administrator"
-    },
-    "username_exists": "Username already exists",
-    "username_or_password_error": "Username or password error",
-    "video": {
-      "format_not_supported": "This video format is not supported",
-      "size_exceeded": "Video exceeds maximum limit, please reselect"
-    }
+    "language_not_found": "Current language pack is not initialized or does not exist"
   },
   "response": {
     "error": "Request error",
-    "server_error": "Server internal error",
     "success": "Request success"
   },
   "success": {
     "login": {
       "oauth2_success": "Login success (OAuth2)",
       "success": "Login success"
-    },
-    "plugin": {
-      "install_success": "Plugin {plugin} installed successfully, please refer to the plugin documentation (README.md) for related configuration and restart the service",
-      "uninstall_success": "Plugin {plugin} uninstalled successfully, please remove related configuration according to the plugin documentation (README.md) and restart the service"
     }
   }
 }

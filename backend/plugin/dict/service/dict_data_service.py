@@ -5,7 +5,6 @@ from typing import Sequence
 from sqlalchemy import Select
 
 from backend.common.exception import errors
-from backend.common.i18n import t
 from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
@@ -27,7 +26,7 @@ class DictDataService:
         async with async_db_session() as db:
             dict_data = await dict_data_dao.get(db, pk)
             if not dict_data:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.data.not_found'))
+                raise errors.NotFoundError(msg='字典数据不存在')
             return dict_data
 
     @staticmethod
@@ -65,10 +64,10 @@ class DictDataService:
         async with async_db_session.begin() as db:
             dict_data = await dict_data_dao.get_by_label(db, obj.label)
             if dict_data:
-                raise errors.ConflictError(msg=t('error.plugin.dict.data.exists'))
+                raise errors.ConflictError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.data.not_found'))
+                raise errors.NotFoundError(msg='字典类型不存在')
             await dict_data_dao.create(db, obj, dict_type.code)
 
     @staticmethod
@@ -83,13 +82,13 @@ class DictDataService:
         async with async_db_session.begin() as db:
             dict_data = await dict_data_dao.get(db, pk)
             if not dict_data:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.data.not_found'))
+                raise errors.NotFoundError(msg='字典数据不存在')
             if dict_data.label != obj.label:
                 if await dict_data_dao.get_by_label(db, obj.label):
-                    raise errors.ConflictError(msg=t('error.plugin.dict.data.exists'))
+                    raise errors.ConflictError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
-                raise errors.NotFoundError(msg=t('error.plugin.dict.type.not_found'))
+                raise errors.NotFoundError(msg='字典类型不存在')
             count = await dict_data_dao.update(db, pk, obj, dict_type.code)
             return count
 
