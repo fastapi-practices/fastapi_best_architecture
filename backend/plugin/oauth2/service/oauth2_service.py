@@ -10,6 +10,7 @@ from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import AddOAuth2UserParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType, UserSocialType
+from backend.common.i18n import t
 from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -113,7 +114,7 @@ class OAuth2Service:
                 username=sys_user.username,
                 login_time=timezone.now(),
                 status=LoginLogStatusType.success.value,
-                msg='登录成功（OAuth2）',
+                msg=t('success.login.oauth2_success'),
             )
             background_tasks.add_task(login_log_service.create, **login_log)
             await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
