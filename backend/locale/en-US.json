@@ -1,0 +1,19 @@
+{
+  "error": {
+    "captcha": {
+      "error": "Captcha error",
+      "expired": "Captcha has expired, please try again"
+    },
+    "language_not_found": "Current language pack is not initialized or does not exist"
+  },
+  "response": {
+    "error": "Request error",
+    "success": "Request success"
+  },
+  "success": {
+    "login": {
+      "oauth2_success": "Login success (OAuth2)",
+      "success": "Login success"
+    }
+  }
+}

@@ -38,9 +38,15 @@ class CustomError(BaseExceptionMixin):
 class RequestError(BaseExceptionMixin):
     """请求异常"""
 
-    code = StandardResponseCode.HTTP_400
-
-    def __init__(self, *, msg: str = 'Bad Request', data: Any = None, background: BackgroundTask | None = None):
+    def __init__(
+        self,
+        *,
+        code: int = StandardResponseCode.HTTP_400,
+        msg: str = 'Bad Request',
+        data: Any = None,
+        background: BackgroundTask | None = None,
+    ):
+        self.code = code
         super().__init__(msg=msg, data=data, background=background)
 
 
