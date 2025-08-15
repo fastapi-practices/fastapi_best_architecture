@@ -1,3 +1,47 @@
+<a id="v1.8.0"></a>
+# [v1.8.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.0) - 2025-08-15
+
+## What's Changed
+* Update changelog for v1.7.0 by [@wu-clan](https://github.com/wu-clan) in [#729](https://github.com/fastapi-practices/fastapi_best_architecture/pull/729)
+* Simplify task crontab expression validation by [@wu-clan](https://github.com/wu-clan) in [#733](https://github.com/fastapi-practices/fastapi_best_architecture/pull/733)
+* Add distributed lock for scheduled task by [@wu-clan](https://github.com/wu-clan) in [#732](https://github.com/fastapi-practices/fastapi_best_architecture/pull/732)
+* Update the default cache period for userinfo by [@wu-clan](https://github.com/wu-clan) in [#734](https://github.com/fastapi-practices/fastapi_best_architecture/pull/734)
+* Fix celery CLI option to required by [@wu-clan](https://github.com/wu-clan) in [#737](https://github.com/fastapi-practices/fastapi_best_architecture/pull/737)
+* Add auth whitelist regular expression config by [@wu-clan](https://github.com/wu-clan) in [#738](https://github.com/fastapi-practices/fastapi_best_architecture/pull/738)
+* Fix the opera log field encryption by [@wu-clan](https://github.com/wu-clan) in [#739](https://github.com/fastapi-practices/fastapi_best_architecture/pull/739)
+* Update the OAuth2 login password policy by [@wu-clan](https://github.com/wu-clan) in [#741](https://github.com/fastapi-practices/fastapi_best_architecture/pull/741)
+* Add update support for user email and phone by [@wu-clan](https://github.com/wu-clan) in [#742](https://github.com/fastapi-practices/fastapi_best_architecture/pull/742)
+* Fix the error trigger when model auto import by [@wu-clan](https://github.com/wu-clan) in [#743](https://github.com/fastapi-practices/fastapi_best_architecture/pull/743)
+* Simplify the plugin status update logic by [@wu-clan](https://github.com/wu-clan) in [#744](https://github.com/fastapi-practices/fastapi_best_architecture/pull/744)
+* Add some interfaces for user profiles by [@wu-clan](https://github.com/wu-clan) in [#745](https://github.com/fastapi-practices/fastapi_best_architecture/pull/745)
+* Add schedule task demo that contains params by [@wu-clan](https://github.com/wu-clan) in [#746](https://github.com/fastapi-practices/fastapi_best_architecture/pull/746)
+* Fix the kwargs params of schedule task by [@wu-clan](https://github.com/wu-clan) in [#747](https://github.com/fastapi-practices/fastapi_best_architecture/pull/747)
+* Refactor code generation files and routes by [@wu-clan](https://github.com/wu-clan) in [#748](https://github.com/fastapi-practices/fastapi_best_architecture/pull/748)
+* Refactor task routes and add control routes by [@wu-clan](https://github.com/wu-clan) in [#749](https://github.com/fastapi-practices/fastapi_best_architecture/pull/749)
+* Fix message format in validation exception handler by [@wu-clan](https://github.com/wu-clan) in [#755](https://github.com/fastapi-practices/fastapi_best_architecture/pull/755)
+* Update the opera log desensitization method by [@wu-clan](https://github.com/wu-clan) in [#756](https://github.com/fastapi-practices/fastapi_best_architecture/pull/756)
+* Add business pagination in the code generator by [@wu-clan](https://github.com/wu-clan) in [#757](https://github.com/fastapi-practices/fastapi_best_architecture/pull/757)
+* Optimize the data sort logic of tree nodes by [@wu-clan](https://github.com/wu-clan) in [#758](https://github.com/fastapi-practices/fastapi_best_architecture/pull/758)
+* Update log output config and format by [@wu-clan](https://github.com/wu-clan) in [#759](https://github.com/fastapi-practices/fastapi_best_architecture/pull/759)
+* Update the naming of table creation function by [@wu-clan](https://github.com/wu-clan) in [#760](https://github.com/fastapi-practices/fastapi_best_architecture/pull/760)
+* Optimize the opera log storage logic through queue by [@IAseven](https://github.com/IAseven) in [#750](https://github.com/fastapi-practices/fastapi_best_architecture/pull/750)
+* Optimize naming and preview in code generation by [@wu-clan](https://github.com/wu-clan) in [#764](https://github.com/fastapi-practices/fastapi_best_architecture/pull/764)
+* Update the description for the run file by [@wu-clan](https://github.com/wu-clan) in [#766](https://github.com/fastapi-practices/fastapi_best_architecture/pull/766)
+* Optimize the timezone datetime return encoder by [@wu-clan](https://github.com/wu-clan) in [#767](https://github.com/fastapi-practices/fastapi_best_architecture/pull/767)
+* Update the content layout of the config file by [@wu-clan](https://github.com/wu-clan) in [#768](https://github.com/fastapi-practices/fastapi_best_architecture/pull/768)
+* Add a standalone email sending plugin by [@wu-clan](https://github.com/wu-clan) in [#769](https://github.com/fastapi-practices/fastapi_best_architecture/pull/769)
+* Add i18n support for response message by [@downdawn](https://github.com/downdawn) in [#753](https://github.com/fastapi-practices/fastapi_best_architecture/pull/753)
+* Update the menu title in SQL scripts by [@wu-clan](https://github.com/wu-clan) in [#770](https://github.com/fastapi-practices/fastapi_best_architecture/pull/770)
+* Update the version number to 1.8.0 by [@wu-clan](https://github.com/wu-clan) in [#771](https://github.com/fastapi-practices/fastapi_best_architecture/pull/771)
+
+## New Contributors
+* [@IAseven](https://github.com/IAseven) made their first contribution in [#750](https://github.com/fastapi-practices/fastapi_best_architecture/pull/750)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
+
+[Changes][v1.8.0]
+
+
 <a id="v1.7.0"></a>
 # [v1.7.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.7.0) - 2025-07-16
 
@@ -714,6 +758,7 @@
 [Changes][v1.0.0]
 
 
+[v1.8.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
 [v1.5.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
