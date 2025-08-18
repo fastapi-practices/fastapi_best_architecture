@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from celery import schedules
-from celery.schedules import ParseException, crontab_parser, crontab
+from celery.schedules import ParseException, crontab
 
 from backend.common.exception import errors
 from backend.utils.timezone import timezone
