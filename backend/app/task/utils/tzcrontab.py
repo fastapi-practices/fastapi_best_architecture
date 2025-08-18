@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from celery import schedules
-from celery.schedules import ParseException, crontab_parser
+from celery.schedules import ParseException, crontab
 
 from backend.common.exception import errors
 from backend.utils.timezone import timezone
@@ -52,22 +52,17 @@ class TzAwareCrontab(schedules.crontab):
         )
 
 
-def crontab_verify(crontab: str) -> None:
+def crontab_verify(crontab_str: str) -> None:
     """
     验证 Celery crontab 表达式
 
-    :param crontab: 计划表达式
+    :param crontab_str: 计划表达式
     :return:
     """
-    crontab_split = crontab.split(' ')
+    crontab_split = crontab_str.split(' ')
     if len(crontab_split) != 5:
         raise errors.RequestError(msg='Crontab 表达式非法')
-
     try:
-        crontab_parser(60, 0).parse(crontab_split[0])  # minute
-        crontab_parser(24, 0).parse(crontab_split[1])  # hour
-        crontab_parser(7, 0).parse(crontab_split[2])  # day_of_week
-        crontab_parser(31, 1).parse(crontab_split[3])  # day_of_month
-        crontab_parser(12, 1).parse(crontab_split[4])  # month_of_year
+        crontab(*crontab_split)
     except ParseException:
         raise errors.RequestError(msg='Crontab 表达式非法')
