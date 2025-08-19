@@ -14,10 +14,19 @@ from backend.plugin.config.schema.config import (
     CreateConfigParam,
     GetConfigDetail,
     UpdateConfigParam,
+    UpdateConfigsParam,
 )
 from backend.plugin.config.service.config_service import config_service
 
 router = APIRouter()
+
+
+@router.get('/all', summary='获取所有参数配置', dependencies=[DependsJwtAuth])
+async def get_all_configs(
+    type: Annotated[str | None, Query(description='参数配置类型')] = None,
+) -> ResponseSchemaModel[list[GetConfigDetail]]:
+    configs = await config_service.get_all(type=type)
+    return response_base.success(data=configs)
 
 
 @router.get('/{pk}', summary='获取参数配置详情', dependencies=[DependsJwtAuth])
@@ -55,6 +64,14 @@ async def get_configs_paged(
 async def create_config(obj: CreateConfigParam) -> ResponseModel:
     await config_service.create(obj=obj)
     return response_base.success()
+
+
+@router.put('', summary='批量更新参数配置', dependencies=[Depends(RequestPermission('sys.config.edits')), DependsRBAC])
+async def bulk_update_config(objs: list[UpdateConfigsParam]) -> ResponseModel:
+    count = await config_service.bulk_update(objs=objs)
+    if count > 0:
+        return response_base.success()
+    return response_base.fail()
 
 
 @router.put(

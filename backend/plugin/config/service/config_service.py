@@ -10,6 +10,7 @@ from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import (
     CreateConfigParam,
     UpdateConfigParam,
+    UpdateConfigsParam,
 )
 
 
@@ -29,6 +30,17 @@ class ConfigService:
             if not config:
                 raise errors.NotFoundError(msg='参数配置不存在')
             return config
+
+    @staticmethod
+    async def get_all(*, type: str | None):
+        """
+        获取所有参数配置
+
+        :param type: 参数配置类型
+        :return:
+        """
+        async with async_db_session() as db:
+            return await config_dao.get_all(db, type)
 
     @staticmethod
     async def get_select(*, name: str | None, type: str | None) -> Select:
@@ -73,6 +85,27 @@ class ConfigService:
                 if config:
                     raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
             count = await config_dao.update(db, pk, obj)
+            return count
+
+    @staticmethod
+    async def bulk_update(*, objs: list[UpdateConfigsParam]) -> int:
+        """
+        批量更新参数配置
+
+        :param objs: 参数配置批量更新参数
+        :return:
+        """
+        async with async_db_session.begin() as db:
+            for batch in range(0, len(objs), 1000):
+                for obj in objs:
+                    config = await config_dao.get(db, obj.id)
+                    if not config:
+                        raise errors.NotFoundError(msg='参数配置不存在')
+                    if config.key != obj.key:
+                        config = await config_dao.get_by_key(db, obj.key)
+                        if config:
+                            raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
+            count = await config_dao.bulk_update(db, objs)
             return count
 
     @staticmethod
