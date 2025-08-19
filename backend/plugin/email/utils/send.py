@@ -68,13 +68,6 @@ async def send_email(
     """
     # 动态配置
     dynamic_email_config = None
-    _email_type_key = 'EMAIL'
-    _email_status_key = 'EMAIL_STATUS'
-    _email_host_key = 'EMAIL_HOST'
-    _email_port_key = 'EMAIL_PORT'
-    _email_ssl_key = 'EMAIL_SSL'
-    _email_username_key = 'EMAIL_USERNAME'
-    _email_password_key = 'EMAIL_PASSWORD'
 
     # 检查 config 插件配置
     def get_config_table(conn):
@@ -85,24 +78,24 @@ async def send_email(
         exists = await coon.run_sync(get_config_table)
 
     if exists:
-        dynamic_email_config = await config_dao.get_all(db, _email_type_key)
+        dynamic_email_config = await config_dao.get_by_type(db, 'email')
 
     try:
         # 动态配置发送
         if dynamic_email_config:
             configs = {d['key']: d for d in select_list_serialize(dynamic_email_config)}
-            if configs.get(_email_status_key):
+            if configs.get('EMAIL_STATUS'):
                 if len(dynamic_email_config) < 6:
                     raise errors.NotFoundError(msg='缺少邮件动态配置，请检查系统参数配置-邮件配置')
                 smtp_client = SMTP(
-                    hostname=configs.get(_email_host_key),
-                    port=configs.get(_email_port_key),
-                    use_tls=configs.get(_email_ssl_key) == '1',
+                    hostname=configs.get('EMAIL_HOST'),
+                    port=configs.get('EMAIL_PORT'),
+                    use_tls=configs.get('EMAIL_SSL') == '1',
                 )
-                message = await render_message(subject, configs.get(_email_username_key), content, template)  # type: ignore
+                message = await render_message(subject, configs.get('EMAIL_USERNAME'), content, template)  # type: ignore
                 async with smtp_client:
-                    await smtp_client.login(configs.get(_email_username_key), configs.get(_email_password_key))  # type: ignore
-                    await smtp_client.sendmail(configs.get(_email_username_key), recipients, message)  # type: ignore
+                    await smtp_client.login(configs.get('EMAIL_USERNAME'), configs.get('EMAIL_PASSWORD'))  # type: ignore
+                    await smtp_client.sendmail(configs.get('EMAIL_USERNAME'), recipients, message)  # type: ignore
 
         # 本地配置发送
         message = await render_message(subject, settings.EMAIL_USERNAME, content, template)
