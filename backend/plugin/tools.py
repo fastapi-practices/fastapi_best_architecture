@@ -178,6 +178,9 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     # 重置插件变更状态
     run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
+    # 关闭连接
+    run_await(current_redis_client.aclose)()
+
     return extend_plugins, app_plugins
 
 

@@ -452,7 +452,7 @@ class DatabaseScheduler(Scheduler):
         return self._schedule
 
 
-async def extend_scheduler_lock(lock):
+async def extend_scheduler_lock(lock: Lock):
     """
     延长调度程序锁
 
@@ -461,7 +461,7 @@ async def extend_scheduler_lock(lock):
     """
     while True:
         await asyncio.sleep(DEFAULT_LOCK_INTERVAL)
-        if lock:
+        if await lock.owned():
             try:
                 await lock.extend(DEFAULT_MAX_LOCK_TIMEOUT)
             except Exception as e:
@@ -482,7 +482,7 @@ def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
 
     logger.debug('beat: Acquiring lock...')
     lock = redis_client.lock(
-        scheduler.lock_key,
+        name=scheduler.lock_key,
         timeout=DEFAULT_MAX_LOCK_TIMEOUT,
         sleep=scheduler.max_interval,
     )
