@@ -41,7 +41,7 @@ def init_celery() -> celery.Celery:
         result_extended=True,
         database_engine_options={'echo': settings.DATABASE_ECHO},
         # result_expires=0,
-        beat_sync_every=1,
+        # beat_sync_every=1,
         beat_schedule=LOCAL_BEAT_SCHEDULE,
         beat_scheduler='backend.app.task.utils.schedulers:DatabaseScheduler',
         task_cls='backend.app.task.tasks.base:TaskBase',
