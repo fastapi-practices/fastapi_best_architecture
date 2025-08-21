@@ -11,5 +11,5 @@ class SessionManager(CelerySessionManager):
     def __init__(self):
         super().__init__()
 
-        # 禁止创建 celery 任务结果表
+        # 禁止自动创建 celery 内部定义的任务结果表
         self.prepared = True
