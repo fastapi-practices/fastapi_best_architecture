@@ -65,6 +65,11 @@ def get_plugin_models() -> list[type]:
     for plugin in get_plugins():
         # 导入插件的模型模块
         module_path = f'backend.plugin.{plugin}.model'
+
+        module_file = os.path.join(PLUGIN_DIR, plugin, "model.py")
+        if not os.path.exists(module_file):  # 先检查文件是否存在
+            continue
+
         module = import_module_cached(module_path)
 
         # 获取模块中的所有类
