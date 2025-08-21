@@ -4,7 +4,7 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.task.model.result import TaskResult
+from backend.app.task.model import TaskResult
 
 
 class CRUDTaskResult(CRUDPlus[TaskResult]):
