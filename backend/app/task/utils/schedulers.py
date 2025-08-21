@@ -31,36 +31,7 @@ from backend.utils.timezone import timezone
 DEFAULT_MAX_INTERVAL = 5  # seconds
 
 # 计划锁时长，避免重复创建
-DEFAULT_MAX_LOCK_TIMEOUT = 300  # seconds
-
-# 锁检测周期，应小于计划锁时长
-DEFAULT_LOCK_INTERVAL = 60  # seconds
-
-# Copied from:
-# https://github.com/andymccurdy/redis-py/blob/master/redis/lock.py#L33
-# Changes:
-#     The second line from the bottom: The original Lua script intends
-#     to extend time to (lock remaining time + additional time); while
-#     the script here extend time to an expected expiration time.
-# KEYS[1] - lock name
-# ARGS[1] - token
-# ARGS[2] - additional milliseconds
-# return 1 if the locks time was extended, otherwise 0
-LUA_EXTEND_TO_SCRIPT = """
-    local token = redis.call('get', KEYS[1])
-    if not token or token ~= ARGV[1] then
-        return 0
-    end
-    local expiration = redis.call('pttl', KEYS[1])
-    if not expiration then
-        expiration = 0
-    end
-    if expiration < 0 then
-        return 0
-    end
-    redis.call('pexpire', KEYS[1], ARGV[2])
-    return 1
-"""
+DEFAULT_MAX_LOCK_TIMEOUT = DEFAULT_MAX_INTERVAL * 5  # seconds
 
 logger = get_logger('fba.schedulers')
 
@@ -313,39 +284,26 @@ class DatabaseScheduler(Scheduler):
         self._finalize = Finalize(self, self.sync, exitpriority=5)
         self.max_interval = kwargs.get('max_interval') or self.app.conf.beat_max_loop_interval or DEFAULT_MAX_INTERVAL
 
-    def setup_schedule(self):
+    def install_default_entries(self, data):
         """重写父函数"""
-        logger.info('setup_schedule')
-        tasks = self.schedule
-        self.install_default_entries(tasks)
-        self.update_from_dict(self.app.conf.beat_schedule)
+        entries = {}
+        if self.app.conf.result_expires:
+            entries.setdefault(
+                'celery.backend_cleanup',
+                {
+                    'task': 'celery.backend_cleanup',
+                    'schedule': schedules.crontab('0', '4', '*'),
+                    'options': {'expire_seconds': 12 * 3600},
+                },
+            )
+        self.update_from_dict(entries)
 
-    async def get_all_task_schedulers(self):
-        """获取所有任务调度"""
-        async with async_db_session() as db:
-            logger.debug('DatabaseScheduler: Fetching database schedule')
-            stmt = select(TaskScheduler).where(TaskScheduler.enabled == 1)
-            query = await db.execute(stmt)
-            tasks = query.scalars().all()
-            s = {}
-            for task in tasks:
-                s[task.name] = self.Entry(task, app=self.app)
-            return s
-
-    def schedule_changed(self) -> bool:
-        """任务调度变更状态"""
-        now = timezone.now()
-        last_update = run_await(redis_client.get)(f'{settings.CELERY_REDIS_PREFIX}:last_update')
-        if not last_update:
-            run_await(redis_client.set)(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now))
+    def schedules_equal(self, *args, **kwargs):
+        """重写父函数"""
+        if self._heap_invalidated:
+            self._heap_invalidated = False
             return False
-
-        last, ts = self._last_update, timezone.from_str(last_update)
-        try:
-            if ts and ts > (last if last else ts):
-                return True
-        finally:
-            self._last_update = now
+        return super().schedules_equal(*args, **kwargs)
 
     def reserve(self, entry):
         """重写父函数"""
@@ -354,15 +312,12 @@ class DatabaseScheduler(Scheduler):
         self._dirty.add(new_entry.name)
         return new_entry
 
-    def close(self):
+    def setup_schedule(self):
         """重写父函数"""
-        if self.lock:
-            logger.info('beat: Releasing lock')
-            if run_await(self.lock.owned)():
-                run_await(self.lock.release)()
-            self.lock = None
-
-        super().close()
+        logger.info('setup_schedule')
+        tasks = self.schedule
+        self.install_default_entries(tasks)
+        self.update_from_dict(self.app.conf.beat_schedule)
 
     def sync(self):
         """重写父函数"""
@@ -387,6 +342,25 @@ class DatabaseScheduler(Scheduler):
             # 请稍后重试（仅针对失败的）
             self._dirty |= _failed
 
+    def tick(self, **kwargs):
+        """重写父函数"""
+        if self.lock:
+            logger.debug('beat: Extending lock...')
+            run_await(self.lock.extend)(DEFAULT_MAX_LOCK_TIMEOUT, replace_ttl=True)
+
+        result = super().tick(**kwargs)
+        return result
+
+    def close(self):
+        """重写父函数"""
+        if self.lock:
+            logger.info('beat: Releasing lock')
+            if run_await(self.lock.owned)():
+                run_await(self.lock.release)()
+            self.lock = None
+
+        super().close()
+
     def update_from_dict(self, beat_dict: dict):
         """重写父函数"""
         s = {}
@@ -402,26 +376,32 @@ class DatabaseScheduler(Scheduler):
         tasks = self.schedule
         tasks.update(s)
 
-    def install_default_entries(self, data):
-        """重写父函数"""
-        entries = {}
-        if self.app.conf.result_expires:
-            entries.setdefault(
-                'celery.backend_cleanup',
-                {
-                    'task': 'celery.backend_cleanup',
-                    'schedule': schedules.crontab('0', '4', '*'),
-                    'options': {'expire_seconds': 12 * 3600},
-                },
-            )
-        self.update_from_dict(entries)
-
-    def schedules_equal(self, *args, **kwargs):
-        """重写父函数"""
-        if self._heap_invalidated:
-            self._heap_invalidated = False
+    def schedule_changed(self) -> bool:
+        """任务调度变更状态"""
+        now = timezone.now()
+        last_update = run_await(redis_client.get)(f'{settings.CELERY_REDIS_PREFIX}:last_update')
+        if not last_update:
+            run_await(redis_client.set)(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now))
             return False
-        return super().schedules_equal(*args, **kwargs)
+
+        last, ts = self._last_update, timezone.from_str(last_update)
+        try:
+            if ts and ts > (last if last else ts):
+                return True
+        finally:
+            self._last_update = now
+
+    async def get_all_task_schedulers(self):
+        """获取所有任务调度"""
+        async with async_db_session() as db:
+            logger.debug('DatabaseScheduler: Fetching database schedule')
+            stmt = select(TaskScheduler).where(TaskScheduler.enabled == 1)
+            query = await db.execute(stmt)
+            tasks = query.scalars().all()
+            s = {}
+            for task in tasks:
+                s[task.name] = self.Entry(task, app=self.app)
+            return s
 
     @property
     def schedule(self) -> dict[str, ModelEntry]:
@@ -452,24 +432,8 @@ class DatabaseScheduler(Scheduler):
         return self._schedule
 
 
-async def extend_scheduler_lock(lock):
-    """
-    延长调度程序锁
-
-    :param lock: 计划程序锁
-    :return:
-    """
-    while True:
-        await asyncio.sleep(DEFAULT_LOCK_INTERVAL)
-        if lock:
-            try:
-                await lock.extend(DEFAULT_MAX_LOCK_TIMEOUT)
-            except Exception as e:
-                logger.error(f'Failed to extend lock: {e}')
-
-
 @beat_init.connect
-def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
+def acquire_distributed_beat_lock(sender=None, **kwargs):
     """
     尝试在启动时获取锁
 
@@ -486,12 +450,7 @@ def acquire_distributed_beat_lock(sender=None, *args, **kwargs):
         timeout=DEFAULT_MAX_LOCK_TIMEOUT,
         sleep=scheduler.max_interval,
     )
-    # overwrite redis-py's extend script
-    # which will add additional timeout instead of extend to a new timeout
-    lock.lua_extend = redis_client.register_script(LUA_EXTEND_TO_SCRIPT)
+
     run_await(lock.acquire)()
     logger.info('beat: Acquired lock')
     scheduler.lock = lock
-
-    loop = asyncio.get_event_loop()
-    loop.create_task(extend_scheduler_lock(scheduler.lock))
