@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import inspect
 import json
 import os
 import subprocess
@@ -24,7 +23,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
 from backend.utils._await import run_await
-from backend.utils.import_parse import import_module_cached
+from backend.utils.import_parse import get_model_object, import_module_cached
 
 
 class PluginConfigError(Exception):
@@ -60,24 +59,15 @@ def get_plugins() -> list[str]:
 
 def get_plugin_models() -> list[type]:
     """获取插件所有模型类"""
-    classes = []
+    objs = []
 
     for plugin in get_plugins():
-        # 导入插件的模型模块
         module_path = f'backend.plugin.{plugin}.model'
+        obj = get_model_object(module_path)
+        if obj:
+            objs.append(obj)
 
-        module_file = os.path.join(PLUGIN_DIR, plugin, "model.py")
-        if not os.path.exists(module_file):  # 先检查文件是否存在
-            continue
-
-        module = import_module_cached(module_path)
-
-        # 获取模块中的所有类
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj):
-                classes.append(obj)
-
-    return classes
+    return objs
 
 
 async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
