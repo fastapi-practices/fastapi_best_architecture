@@ -7,7 +7,6 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BASE_PATH
-import os
 
 
 class Settings(BaseSettings):
@@ -20,27 +19,8 @@ class Settings(BaseSettings):
         case_sensitive=True,
     )
 
-    # .env 环境
-    ENVIRONMENT: Literal['dev', 'pro']
-
-    # .env 数据库
-    DATABASE_TYPE: Literal['mysql', 'postgresql']
-    DATABASE_HOST: str
-    DATABASE_PORT: int
-    DATABASE_USER: str
-    DATABASE_PASSWORD: str
-
-    # .env Redis
-    REDIS_HOST: str
-    REDIS_PORT: int
-    REDIS_PASSWORD: str
-    REDIS_DATABASE: int
-
-    # .env Token
-    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
-
-    # .env 操作日志加密密钥
-    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
+    # .env 当前环境
+    ENVIRONMENT: Literal['dev', 'prod']
 
     # FastAPI
     FASTAPI_API_V1_PATH: str = '/api/v1'
@@ -52,14 +32,30 @@ class Settings(BaseSettings):
     FASTAPI_OPENAPI_URL: str | None = '/openapi'
     FASTAPI_STATIC_FILES: bool = True
 
+    # .env 数据库
+    DATABASE_TYPE: Literal['mysql', 'postgresql']
+    DATABASE_HOST: str
+    DATABASE_PORT: int
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
+
     # 数据库
     DATABASE_ECHO: bool | Literal['debug'] = False
     DATABASE_POOL_ECHO: bool | Literal['debug'] = False
     DATABASE_SCHEMA: str = 'fba'
     DATABASE_CHARSET: str = 'utf8mb4'
 
+    # .env Redis
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
+    REDIS_DATABASE: int
+
     # Redis
     REDIS_TIMEOUT: int = 5
+
+    # .env Token
+    TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
 
     # Token
     TOKEN_ALGORITHM: str = 'HS256'
@@ -90,7 +86,11 @@ class Settings(BaseSettings):
     COOKIE_REFRESH_TOKEN_KEY: str = 'fba_refresh_token'
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 7 天
 
-    # 数据权限配置
+    # 验证码
+    CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
+    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
+
+    # 数据权限
     DATA_PERMISSION_MODELS: dict[str, str] = {  # 允许进行数据过滤的 SQLA 模型，它必须以模块字符串的方式定义
         '部门': 'backend.app.admin.model.Dept',
     }
@@ -163,6 +163,9 @@ class Settings(BaseSettings):
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
     LOG_ERROR_FILENAME: str = 'fba_error.log'
 
+    # .env 操作日志
+    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
+
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
         '/favicon.ico',
@@ -188,30 +191,12 @@ class Settings(BaseSettings):
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
     PLUGIN_REDIS_PREFIX: str = 'fba:plugin'
 
-    # App Admin
-    # .env OAuth2
-    OAUTH2_GITHUB_CLIENT_ID: str
-    OAUTH2_GITHUB_CLIENT_SECRET: str
-    OAUTH2_LINUX_DO_CLIENT_ID: str
-    OAUTH2_LINUX_DO_CLIENT_SECRET: str
+    # I18n 配置
+    I18N_DEFAULT_LANGUAGE: str = 'zh-CN'
 
-    # OAuth2
-    OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
-
-    # 验证码
-    CAPTCHA_LOGIN_REDIS_PREFIX: str = 'fba:login:captcha'
-    CAPTCHA_LOGIN_EXPIRE_SECONDS: int = 60 * 5  # 3 分钟
-
-    # 短信验证码
-    TENCENTCLOUD_SECRET_ID: str
-    TENCENTCLOUD_SECRET_KEY: str
-    SMS_LOGIN_REDIS_PREFIX: str = "fba:sms:login"
-    SMS_LOGIN_EXPIRE_SECONDS: int = 300  # 短信验证码有效期，5分钟
-    SMS_LOGIN_TEMPLATE_ID: str  # 短信登录模板ID
-    SMS_SIGN_NAME: str  # 短信签名
-    SMS_SDK_APP_ID: str  # 短信应用ID
-
-    # App Task
+    ##################################################
+    # [ App ] task
+    ##################################################
     # .env Redis
     CELERY_BROKER_REDIS_DATABASE: int
 
@@ -227,18 +212,47 @@ class Settings(BaseSettings):
     CELERY_REDIS_PREFIX: str = 'fba:celery'
     CELERY_TASK_MAX_RETRIES: int = 5
 
-    # Plugin Code Generator
+    ##################################################
+    # [ Plugin ] code_generator
+    ##################################################
     CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str = 'fba_generator'
+
+    ##################################################
+    # [ Plugin ] oauth2
+    ##################################################
+    # .env
+    OAUTH2_GITHUB_CLIENT_ID: str
+    OAUTH2_GITHUB_CLIENT_SECRET: str
+    OAUTH2_LINUX_DO_CLIENT_ID: str
+    OAUTH2_LINUX_DO_CLIENT_SECRET: str
+
+    # 基础配置
+    OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
+
+    ##################################################
+    # [ Plugin ] email
+    ##################################################
+    # .env
+    EMAIL_USERNAME: str
+    EMAIL_PASSWORD: str
+
+    # 基础配置
+    EMAIL_HOST: str = 'smtp.qq.com'
+    EMAIL_PORT: int = 465
+    EMAIL_SSL: bool = True
+    EMAIL_CAPTCHA_REDIS_PREFIX: str = 'fba:email:captcha'
+    EMAIL_CAPTCHA_EXPIRE_SECONDS: int = 60 * 3  # 3 分钟
 
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:
         """检查环境变量"""
-        if values.get('ENVIRONMENT') == 'pro':
+        if values.get('ENVIRONMENT') == 'prod':
             # FastAPI
             values['FASTAPI_OPENAPI_URL'] = None
             values['FASTAPI_STATIC_FILES'] = False
-            # Task
+
+            # task
             values['CELERY_BROKER'] = 'rabbitmq'
 
         return values

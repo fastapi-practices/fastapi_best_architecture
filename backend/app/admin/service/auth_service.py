@@ -9,7 +9,7 @@ from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
-from backend.app.admin.schema.user import AuthLoginParam, SmsLoginParam
+from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -153,108 +153,6 @@ class AuthService:
                         login_time=timezone.now(),
                         status=LoginLogStatusType.success.value,
                         msg=t('success.login.success'),
-                    ),
-                )
-                data = GetLoginToken(
-                    access_token=access_token.access_token,
-                    access_token_expire_time=access_token.access_token_expire_time,
-                    session_uuid=access_token.session_uuid,
-                    user=user,  # type: ignore
-                )
-                return data
-
-    async def login_by_sms(
-        self, *, request: Request, response: Response, obj: SmsLoginParam, background_tasks: BackgroundTasks
-    ) -> GetLoginToken:
-        """
-        短信验证码登录
-
-        :param request: 请求对象
-        :param response: 响应对象
-        :param obj: 短信登录参数
-        :param background_tasks: 后台任务
-        :return:
-        """
-        async with async_db_session.begin() as db:
-            user = None
-            try:
-                # 从Redis获取验证码
-                sms_code = await redis_client.get(f'{settings.SMS_LOGIN_REDIS_PREFIX}:{obj.phone}')
-                if not sms_code:
-                    raise errors.RequestError(msg='验证码失效，请重新获取')
-                if sms_code != obj.code:
-                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR, msg='验证码错误')
-
-                # 验证码正确，删除Redis中的验证码
-                await redis_client.delete(f'{settings.SMS_LOGIN_REDIS_PREFIX}:{obj.phone}')
-
-                # 根据手机号获取用户
-                user = await user_dao.get_by_phone(db, obj.phone)
-                if not user:
-                    raise errors.NotFoundError(msg='该手机号未注册')
-
-                if not user.status:
-                    raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-
-                # 更新登录时间
-                await user_dao.update_login_time(db, user.username)
-                await db.refresh(user)
-
-                # 创建访问令牌
-                access_token = await create_access_token(
-                    user.id,
-                    user.is_multi_login,
-                    # extra info
-                    username=user.username,
-                    nickname=user.nickname,
-                    last_login_time=timezone.to_str(user.last_login_time),
-                    ip=request.state.ip,
-                    os=request.state.os,
-                    browser=request.state.browser,
-                    device=request.state.device,
-                )
-
-                # 创建刷新令牌
-                refresh_token = await create_refresh_token(access_token.session_uuid, user.id, user.is_multi_login)
-                response.set_cookie(
-                    key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                    value=refresh_token.refresh_token,
-                    max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                    expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
-                    httponly=True,
-                )
-            except errors.NotFoundError as e:
-                log.error(f'短信登录错误: {e.msg}')
-                raise errors.NotFoundError(msg=e.msg)
-            except (errors.RequestError, errors.CustomError) as e:
-                log.error(f'短信登录错误: {e.msg}')
-                task = BackgroundTask(
-                    login_log_service.create,
-                    **dict(
-                        db=db,
-                        request=request,
-                        user_uuid=user.uuid if user else uuid4_str(),
-                        username=user.username if user else obj.phone,
-                        login_time=timezone.now(),
-                        status=LoginLogStatusType.fail.value,
-                        msg=e.msg,
-                    ),
-                )
-                raise errors.RequestError(msg=e.msg, background=task)
-            except Exception as e:
-                log.error(f'短信登录错误: {e}')
-                raise e
-            else:
-                background_tasks.add_task(
-                    login_log_service.create,
-                    **dict(
-                        db=db,
-                        request=request,
-                        user_uuid=user.uuid,
-                        username=user.username,
-                        login_time=timezone.now(),
-                        status=LoginLogStatusType.success.value,
-                        msg='短信验证码登录成功',
                     ),
                 )
                 data = GetLoginToken(
