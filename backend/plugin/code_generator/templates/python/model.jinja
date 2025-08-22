@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+{% if default_datetime_column %}
 from datetime import datetime
+
+{% endif %}
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -12,10 +15,10 @@ from sqlalchemy.dialects import postgresql
 {% endif -%}
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import {% if default_datetime_column %}Base{% else %}MappedBase{% endif %}, id_key
+from backend.common.model import {% if default_datetime_column %}Base{% else %}DataClassBase{% endif %}, id_key
 
 
-class {{ class_name }}({% if default_datetime_column %}Base{% else %}MappedBase{% endif %}):
+class {{ class_name }}({% if default_datetime_column %}Base{% else %}DataClassBase{% endif %}):
     """{{ table_comment }}"""
 
     __tablename__ = '{{ table_name }}'
