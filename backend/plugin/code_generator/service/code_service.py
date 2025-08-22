@@ -125,21 +125,21 @@ class GenService:
             tpl_code_map = await self.render_tpl_code(business=business)
 
             codes = {}
-            for tpl, code in tpl_code_map.items():
-                if tpl.startswith('python'):
+            for tpl_path, code in tpl_code_map.items():
+                if tpl_path.startswith('python'):
                     rootpath = f'fastapi_best_architecture/backend/app/{business.app_name}'
-                    template_name = tpl.split('/')[-1]
+                    template_name = tpl_path.split('/')[-1]
                     match template_name:
                         case 'api.jinja':
-                            filepath = f'{rootpath}/api/{business.api_version}/{business.app_name}.py'
+                            filepath = f'{rootpath}/api/{business.api_version}/{business.filename}.py'
                         case 'crud.jinja':
-                            filepath = f'{rootpath}/crud/crud_{business.app_name}.py'
+                            filepath = f'{rootpath}/crud/crud_{business.filename}.py'
                         case 'model.jinja':
-                            filepath = f'{rootpath}/model/{business.app_name}.py'
+                            filepath = f'{rootpath}/model/{business.filename}.py'
                         case 'schema.jinja':
-                            filepath = f'{rootpath}/schema/{business.app_name}.py'
+                            filepath = f'{rootpath}/schema/{business.filename}.py'
                         case 'service.jinja':
-                            filepath = f'{rootpath}/service/{business.app_name}_service.py'
+                            filepath = f'{rootpath}/service/{business.filename}_service.py'
                     codes[filepath] = code.encode('utf-8')
 
             return codes
@@ -157,7 +157,7 @@ class GenService:
             if not business:
                 raise errors.NotFoundError(msg='业务不存在')
 
-            gen_path = business.gen_path or 'fba-backend-app-dir'
+            gen_path = business.gen_path or '.../backend/app/'
             target_files = gen_template.get_code_gen_paths(business)
 
             return [os.path.join(gen_path, *target_file.split('/')) for target_file in target_files]

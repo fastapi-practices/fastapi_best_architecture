@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+{% if default_datetime_column %}
 from datetime import datetime
 
+{% endif %}
 from pydantic import ConfigDict, Field
 
 from backend.common.schema import SchemaBase
