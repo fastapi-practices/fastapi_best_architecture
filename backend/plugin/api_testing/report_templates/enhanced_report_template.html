@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.name }} - 接口自动化测试报告</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .report-header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+        }
+        .report-title {
+            margin: 0;
+            color: #333;
+        }
+        .report-meta {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .meta-item {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 10px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .summary {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+        }
+        .summary-title {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #333;
+        }
+        .summary-data {
+            display: flex;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+        .summary-item {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+        }
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .success-value { color: #28a745; }
+        .fail-value { color: #dc3545; }
+        .summary-label {
+            color: #666;
+        }
+        .steps {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .steps-title {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #333;
+        }
+        .step-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .step-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+        }
+        .step-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #28a745;
+        }
+        .status-fail {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        .step-content {
+            display: none;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .step-section {
+            margin-bottom: 15px;
+        }
+        .step-section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        .request-url {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .code-block {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .badge {
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .badge-success {
+            background-color: #d4edda;
+            color: #28a745;
+        }
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+            border: 1px solid transparent;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .tab.active {
+            background-color: #fff;
+            border-color: #dee2e6;
+            border-bottom-color: transparent;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .curl-command {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+        .failure-analysis {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .failure-primary {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        .failure-secondary {
+            margin-bottom: 10px;
+        }
+        .failure-suggestion {
+            background-color: #e2f0d9;
+            border-left: 5px solid #6c9e52;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .diff-table th {
+            background-color: #f5f5f5;
+        }
+        .diff-expected {
+            background-color: #d4edda;
+        }
+        .diff-actual {
+            background-color: #f8d7da;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #e9ecef;
+        }
+        .timeline-item {
+            position: relative;
+            margin-left: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+            border: 2px solid #fff;
+        }
+        .timeline-item.failure::before {
+            background: #dc3545;
+        }
+        .timeline-time {
+            color: #6c757d;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .chart-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+    <!-- 添加Chart.js支持饼图渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="report-header">
+        <h1 class="report-title">{{ report.name }}</h1>
+        <div class="report-meta">
+            <div class="meta-item">
+                <div class="meta-label">项目名称:</div>
+                <div>{{ report.project_name }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">测试用例:</div>
+                <div>{{ report.test_case_name }}</div>
+            </div>
+            {% if report.environment %}
+            <div class="meta-item">
+                <div class="meta-label">测试环境:</div>
+                <div>{{ report.environment }}</div>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <div class="meta-label">开始时间:</div>
+                <div>{{ report.start_time.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">结束时间:</div>
+                <div>{{ report.end_time.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">总耗时:</div>
+                <div>{{ '{:.2f}'.format(report.duration / 1000) }} 秒</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary">
+        <h2 class="summary-title">测试摘要</h2>
+        <div class="chart-container">
+            <canvas id="summaryChart" height="100"></canvas>
+        </div>
+        <div class="summary-data">
+            <div class="summary-item">
+                <div class="summary-value">{{ report.total_steps }}</div>
+                <div class="summary-label">总步骤</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value success-value">{{ report.success_steps }}</div>
+                <div class="summary-label">成功</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value fail-value">{{ report.fail_steps }}</div>
+                <div class="summary-label">失败</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value {% if report.success %}success-value{% else %}fail-value{% endif %}">
+                    {{ '{:.0%}'.format(report.success_steps / report.total_steps) if report.total_steps > 0 else '0%' }}
+                </div>
+                <div class="summary-label">通过率</div>
+            </div>
+        </div>
+    </div>
+
+    {% if report.fail_steps > 0 %}
+    <div class="summary">
+        <h2 class="summary-title">失败概览</h2>
+        <div class="timeline">
+            {% for step in report.steps %}
+            {% if not step.success %}
+            <div class="timeline-item failure">
+                <div class="timeline-time">{{ step.start_time.strftime('%H:%M:%S') }}</div>
+                <div><strong>{{ step.order }}. {{ step.name }}</strong></div>
+                <div>{{ step.failure_analysis.primary_cause.message if step.failure_analysis else '未能分析失败原因' }}</div>
+                {% if step.failure_analysis and step.failure_analysis.primary_cause.suggestion %}
+                <div class="failure-suggestion">
+                    <strong>建议:</strong> {{ step.failure_analysis.primary_cause.suggestion }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="steps">
+        <h2 class="steps-title">测试步骤详情</h2>
+        {% for step in report.steps %}
+        <div class="step-item">
+            <div class="step-header" onclick="toggleStepContent('step-{{ loop.index }}')">
+                <h3 class="step-name">{{ step.order }}. {{ step.name }}</h3>
+                <span class="step-status {% if step.success %}status-success{% else %}status-fail{% endif %}">
+                    {% if step.success %}成功{% else %}失败{% endif %}
+                </span>
+            </div>
+            <div class="step-content" id="step-{{ loop.index }}">
+                <!-- 标签页导航 -->
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('step-{{ loop.index }}-request', this)">请求详情</div>
+                    <div class="tab" onclick="switchTab('step-{{ loop.index }}-response', this)">响应详情</div>
+                    <div class="tab" onclick="switchTab('step-{{ loop.index }}-assertion', this)">断言结果</div>
+                    {% if step.sql_results %}
+                    <div class="tab" onclick="switchTab('step-{{ loop.index }}-sql', this)">SQL结果</div>
+                    {% endif %}
+                    {% if not step.success %}
+                    <div class="tab" onclick="switchTab('step-{{ loop.index }}-failure', this)">失败分析</div>
+                    {% endif %}
+                    <div class="tab" onclick="switchTab('step-{{ loop.index }}-curl', this)">cURL命令</div>
+                </div>
+
+                <!-- 请求详情标签页 -->
+                <div id="step-{{ loop.index }}-request" class="tab-content active">
+                    <div class="step-section">
+                        <div class="step-section-title">请求信息</div>
+                        <div class="request-url">{{ step.method }} {{ step.url }}</div>
+                        
+                        <h4>请求头</h4>
+                        {% if step.request_data.headers %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.headers.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p>无</p>
+                        {% endif %}
+                        
+                        {% if step.request_data.params %}
+                        <h4>查询参数</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.params.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                        
+                        {% if step.request_data.json_data %}
+                        <h4>请求体 (JSON)</h4>
+                        <div class="code-block">{{ step.request_data.json_data | tojson(indent=2) }}</div>
+                        {% elif step.request_data.data %}
+                        <h4>请求体 (表单)</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.data.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 响应详情标签页 -->
+                <div id="step-{{ loop.index }}-response" class="tab-content">
+                    <div class="step-section">
+                        <div class="step-section-title">响应信息</div>
+                        <table>
+                            <tr>
+                                <td>状态码</td>
+                                <td>{{ step.response.status_code }}</td>
+                            </tr>
+                            <tr>
+                                <td>响应时间</td>
+                                <td>{{ '{:.2f}'.format(step.response.elapsed_time) }} 毫秒</td>
+                            </tr>
+                        </table>
+                        
+                        <h4>响应头</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.response.headers.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        {% if step.response.json_data %}
+                        <h4>响应体 (JSON)</h4>
+                        <div class="code-block">{{ step.response.json_data | tojson(indent=2) }}</div>
+                        {% else %}
+                        <h4>响应体</h4>
+                        <div class="code-block">{{ step.response.text }}</div>
+                        {% endif %}
+                        
+                        {% if step.variables %}
+                        <h4>提取的变量</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>变量名</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.variables.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- 断言结果标签页 -->
+                <div id="step-{{ loop.index }}-assertion" class="tab-content">
+                    <div class="step-section">
+                        <div class="step-section-title">断言结果</div>
+                        {% if step.assertions %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>断言类型</th>
+                                    <th>路径</th>
+                                    <th>预期值</th>
+                                    <th>实际值</th>
+                                    <th>结果</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assertion in step.assertions %}
+                                <tr>
+                                    <td>{{ assertion.assertion.type }}</td>
+                                    <td>{{ assertion.assertion.path if assertion.assertion.path else '-' }}</td>
+                                    <td>{{ assertion.assertion.expected if assertion.assertion.expected is not none else '-' }}</td>
+                                    <td>{{ assertion.actual if assertion.actual is not none else '-' }}</td>
+                                    <td>
+                                        <span class="badge {% if assertion.success %}badge-success{% else %}badge-danger{% endif %}">
+                                            {% if assertion.success %}通过{% else %}失败{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p>没有断言</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- SQL结果标签页 -->
+                {% if step.sql_results %}
+                <div id="step-{{ loop.index }}-sql" class="tab-content">
+                    <div class="step-section">
+                        <div class="step-section-title">SQL执行结果</div>
+                        {% for sql_result in step.sql_results %}
+                        <div style="margin-bottom: 20px;">
+                            <h4>{{ sql_result.name }}</h4>
+                            <div class="code-block">{{ sql_result.query }}</div>
+                            
+                            <p>
+                                状态: 
+                                <span class="badge {% if sql_result.success %}badge-success{% else %}badge-danger{% endif %}">
+                                    {% if sql_result.success %}成功{% else %}失败{% endif %}
+                                </span>
+                            </p>
+                            
+                            {% if sql_result.error %}
+                            <p>错误信息: {{ sql_result.error }}</p>
+                            {% endif %}
+                            
+                            {% if sql_result.affected_rows is not none %}
+                            <p>影响行数: {{ sql_result.affected_rows }}</p>
+                            {% endif %}
+                            
+                            {% if sql_result.data %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {% for key in sql_result.data[0].keys() %}
+                                        <th>{{ key }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in sql_result.data %}
+                                    <tr>
+                                        {% for value in row.values() %}
+                                        <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                            
+                            {% if sql_result.extracted_variables %}
+                            <h5>提取的变量</h5>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>变量名</th>
+                                        <th>值</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in sql_result.extracted_variables.items() %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 失败分析标签页 -->
+                {% if not step.success %}
+                <div id="step-{{ loop.index }}-failure" class="tab-content">
+                    <div class="step-section">
+                        <div class="step-section-title">失败分析</div>
+                        {% if step.failure_analysis %}
+                        <div class="failure-analysis">
+                            <div class="failure-primary">
+                                <strong>主要原因:</strong> {{ step.failure_analysis.primary_cause.message }}
+                            </div>
+                            
+                            {% if step.failure_analysis.secondary_causes %}
+                            <div class="failure-secondary">
+                                <strong>其他因素:</strong>
+                                <ul>
+                                {% for cause in step.failure_analysis.secondary_causes %}
+                                    <li>{{ cause.message }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            {% if step.failure_analysis.primary_cause.suggestion %}
+                            <div class="failure-suggestion">
+                                <strong>解决建议:</strong> {{ step.failure_analysis.primary_cause.suggestion }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if step.failure_analysis.diff_data %}
+                            <div style="margin-top: 15px;">
+                                <strong>差异分析:</strong>
+                                {% for key, diff in step.failure_analysis.diff_data.items() %}
+                                <div style="margin-top: 10px;">
+                                    <div>{{ diff.path }}</div>
+                                    <table class="diff-table">
+                                        <tr>
+                                            <th>对比项</th>
+                                            <th>值</th>
+                                        </tr>
+                                        <tr class="diff-expected">
+                                            <td>期望值</td>
+                                            <td>{{ diff.expected }}</td>
+                                        </tr>
+                                        <tr class="diff-actual">
+                                            <td>实际值</td>
+                                            <td>{{ diff.actual }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <p>无法分析失败原因</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- cURL命令标签页 -->
+                <div id="step-{{ loop.index }}-curl" class="tab-content">
+                    <div class="step-section">
+                        <div class="step-section-title">cURL命令</div>
+                        <div class="curl-command">{{ step.curl_command }}</div>
+                        <button class="copy-button" onclick="copyToClipboard('{{ step.curl_command }}')">复制命令</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="footer">
+        <p>生成时间: {{ current_time }} | API自动化测试报告</p>
+    </div>
+
+    <script>
+        // 切换测试步骤的显示/隐藏
+        function toggleStepContent(stepId) {
+            var content = document.getElementById(stepId);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        // 切换标签页
+        function switchTab(tabContentId, tabElement) {
+            // 获取标签容器
+            var tabContainer = tabElement.parentElement;
+            
+            // 隐藏同级的所有标签内容
+            var tabContents = tabContainer.parentElement.querySelectorAll('.tab-content');
+            tabContents.forEach(function(content) {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的激活状态
+            var tabs = tabContainer.querySelectorAll('.tab');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            
+            // 激活选中的标签和内容
+            tabElement.classList.add('active');
+            document.getElementById(tabContentId).classList.add('active');
+        }
+        
+        // 复制cURL命令到剪贴板
+        function copyToClipboard(text) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            alert('已复制到剪贴板');
+        }
+        
+        // 绘制摘要饼图
+        window.onload = function() {
+            var ctx = document.getElementById('summaryChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['成功', '失败'],
+                    datasets: [{
+                        data: [{{ report.success_steps }}, {{ report.fail_steps }}],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+[plugin]
+summary = '接口自动化测试'
+version = '0.0.1'
+description = '基于httpx的接口自动化测试工具，支持请求发送、断言验证、SQL执行和测试报告生成'
+author = 'ranyong'
+
+[app]
+router = ['v1']
