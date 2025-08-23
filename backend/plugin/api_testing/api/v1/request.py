@@ -4,19 +4,16 @@
 接口请求API
 """
 from typing import Any, Dict
-
-from fastapi import APIRouter, Depends, File, Form, UploadFile
-from fastapi.responses import JSONResponse
-
-from backend.common.response.response_schema import response_base
+from fastapi import APIRouter
 from backend.plugin.api_testing.schema.request import ApiRequestSchema, ApiResponseSchema
 from backend.plugin.api_testing.utils.http_client import send_request
+from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
 
 @router.post("/send", response_model=Dict[str, Any], summary="发送API请求")
-async def send_api_request(request_data: ApiRequestSchema) -> JSONResponse:
+async def send_api_request(request_data: ApiRequestSchema) -> ResponseModel | ResponseSchemaModel:
     """
     发送API请求接口
     
@@ -30,14 +27,14 @@ async def send_api_request(request_data: ApiRequestSchema) -> JSONResponse:
             try:
                 with open(file_path, "rb") as file:
                     files[field_name] = (file_path.split("/")[-1], file.read())
-            except Exception as e:
-                return response_base.fail(msg=f"文件读取错误: {str(e)}")
-    
+            except Exception as error:
+                return response_base.fail()
+
     # 处理认证信息
     auth = None
     if request_data.auth and len(request_data.auth) >= 2:
         auth = (request_data.auth[0], request_data.auth[1])
-    
+
     # 发送请求
     try:
         response = await send_request(
@@ -51,7 +48,7 @@ async def send_api_request(request_data: ApiRequestSchema) -> JSONResponse:
             auth=auth,
             options=request_data.options
         )
-        
+
         # 构建响应
         response_data = ApiResponseSchema(
             url=response.url,
@@ -65,7 +62,8 @@ async def send_api_request(request_data: ApiRequestSchema) -> JSONResponse:
             json_data=response.json_data,
             error=response.error
         )
-        
+
         return response_base.success(data=response_data.model_dump())
-    except Exception as e:
-        return response_base.fail(msg=f"请求发送失败: {str(e)}")
+    except Exception as error:
+        # self._handle_exception(error)
+        return response_base.fail()

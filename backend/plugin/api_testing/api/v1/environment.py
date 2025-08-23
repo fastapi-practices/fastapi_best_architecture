@@ -8,80 +8,77 @@ from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, Body, Path, Query
 from fastapi.responses import JSONResponse
 
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 from backend.plugin.api_testing.utils.environment import (
-    EnvironmentManager, EnvironmentModel, VariableManager, VariableModel, 
+    EnvironmentManager, EnvironmentModel, VariableManager, VariableModel,
     VariableScope, EnvironmentType
 )
 
 router = APIRouter()
 
+
 # 环境管理接口
 @router.post("/environments", summary="创建环境")
-async def create_environment(environment: EnvironmentModel) -> JSONResponse:
+async def create_environment(environment: EnvironmentModel) -> ResponseModel | ResponseSchemaModel:
     """
     创建环境
     """
     success = await EnvironmentManager.create_environment(environment)
     if success:
-        return response_base.success(data=environment.model_dump(), msg="环境创建成功")
+        return response_base.success(data=environment.model_dump())
     else:
-        return response_base.fail(msg="环境创建失败")
+        return response_base.fail()
 
 
 @router.get("/environments/{environment_id}", summary="获取环境信息")
-async def get_environment(environment_id: int = Path(..., description="环境ID")) -> JSONResponse:
+async def get_environment(environment_id: int = Path(description="环境ID")) -> ResponseModel | ResponseSchemaModel:
     """
     获取环境信息
     """
     environment = await EnvironmentManager.get_environment(environment_id)
     if environment:
-        return response_base.success(data=environment.model_dump(), msg="环境获取成功")
+        return response_base.success(data=environment.model_dump())
     else:
-        return response_base.fail(msg="环境不存在")
+        return response_base.fail()
 
 
 @router.put("/environments/{environment_id}", summary="更新环境信息")
 async def update_environment(
-    environment: EnvironmentModel,
-    environment_id: int = Path(..., description="环境ID")
-) -> JSONResponse:
+        environment: EnvironmentModel,
+        environment_id: int = Path(description="环境ID")
+) -> ResponseModel | ResponseSchemaModel:
     """
     更新环境信息
     """
     # 确保路径参数和请求体ID一致
     if environment.id != environment_id:
-        return response_base.fail(msg="环境ID不匹配")
-        
+        return response_base.fail()
     success = await EnvironmentManager.update_environment(environment)
     if success:
-        return response_base.success(data=environment.model_dump(), msg="环境更新成功")
+        return response_base.success(data=environment.model_dump())
     else:
-        return response_base.fail(msg="环境更新失败")
+        return response_base.fail()
 
 
 @router.delete("/environments/{environment_id}", summary="删除环境")
-async def delete_environment(environment_id: int = Path(..., description="环境ID")) -> JSONResponse:
+async def delete_environment(environment_id: int = Path(description="环境ID")) -> ResponseModel | ResponseSchemaModel:
     """
     删除环境
     """
     success = await EnvironmentManager.delete_environment(environment_id)
     if success:
-        return response_base.success(msg="环境删除成功")
+        return response_base.success(data=f"删除环境ID为:{environment_id} 成功")
     else:
-        return response_base.fail(msg="环境删除失败")
+        return response_base.fail()
 
 
 @router.get("/environments", summary="获取环境列表")
-async def list_environments(project_id: int = Query(..., description="项目ID")) -> JSONResponse:
+async def list_environments(project_id: int = Query(..., description="项目ID")) -> ResponseModel | ResponseSchemaModel:
     """
     获取项目环境列表
     """
     environments = await EnvironmentManager.list_environments(project_id)
-    return response_base.success(
-        data=[env.model_dump() for env in environments],
-        msg="获取环境列表成功"
-    )
+    return response_base.success(data=[env.model_dump() for env in environments])
 
 
 @router.get("/environments/default", summary="获取默认环境")
@@ -98,8 +95,8 @@ async def get_default_environment(project_id: int = Query(..., description="项�
 
 @router.put("/environments/{environment_id}/default", summary="设置默认环境")
 async def set_default_environment(
-    project_id: int = Query(..., description="项目ID"),
-    environment_id: int = Path(..., description="环境ID")
+        project_id: int = Query(..., description="项目ID"),
+        environment_id: int = Path(..., description="环境ID")
 ) -> JSONResponse:
     """
     设置项目默认环境
@@ -126,10 +123,10 @@ async def create_variable(variable: VariableModel) -> JSONResponse:
 
 @router.get("/variables", summary="获取变量列表")
 async def list_variables(
-    scope: VariableScope,
-    project_id: Optional[int] = Query(None, description="项目ID"),
-    environment_id: Optional[int] = Query(None, description="环境ID"),
-    case_id: Optional[int] = Query(None, description="用例ID")
+        scope: VariableScope,
+        project_id: Optional[int] = Query(None, description="项目ID"),
+        environment_id: Optional[int] = Query(None, description="环境ID"),
+        case_id: Optional[int] = Query(None, description="用例ID")
 ) -> JSONResponse:
     """
     获取变量列表
@@ -148,11 +145,11 @@ async def list_variables(
 
 @router.get("/variables/{name}", summary="获取变量")
 async def get_variable(
-    name: str = Path(..., description="变量名"),
-    scope: VariableScope = Query(..., description="变量作用域"),
-    project_id: Optional[int] = Query(None, description="项目ID"),
-    environment_id: Optional[int] = Query(None, description="环境ID"),
-    case_id: Optional[int] = Query(None, description="用例ID")
+        name: str = Path(..., description="变量名"),
+        scope: VariableScope = Query(..., description="变量作用域"),
+        project_id: Optional[int] = Query(None, description="项目ID"),
+        environment_id: Optional[int] = Query(None, description="环境ID"),
+        case_id: Optional[int] = Query(None, description="用例ID")
 ) -> JSONResponse:
     """
     获取变量
@@ -172,11 +169,11 @@ async def get_variable(
 
 @router.delete("/variables/{name}", summary="删除变量")
 async def delete_variable(
-    name: str = Path(..., description="变量名"),
-    scope: VariableScope = Query(..., description="变量作用域"),
-    project_id: Optional[int] = Query(None, description="项目ID"),
-    environment_id: Optional[int] = Query(None, description="环境ID"),
-    case_id: Optional[int] = Query(None, description="用例ID")
+        name: str = Path(..., description="变量名"),
+        scope: VariableScope = Query(..., description="变量作用域"),
+        project_id: Optional[int] = Query(None, description="项目ID"),
+        environment_id: Optional[int] = Query(None, description="环境ID"),
+        case_id: Optional[int] = Query(None, description="用例ID")
 ) -> JSONResponse:
     """
     删除变量
@@ -196,11 +193,11 @@ async def delete_variable(
 
 @router.post("/variables/process-template", summary="处理变量模板")
 async def process_template(
-    template: str = Body(..., description="模板字符串"),
-    project_id: Optional[int] = Body(None, description="项目ID"),
-    environment_id: Optional[int] = Body(None, description="环境ID"),
-    case_id: Optional[int] = Body(None, description="用例ID"),
-    temp_variables: Optional[Dict[str, Any]] = Body(None, description="临时变量")
+        template: str = Body(..., description="模板字符串"),
+        project_id: Optional[int] = Body(None, description="项目ID"),
+        environment_id: Optional[int] = Body(None, description="环境ID"),
+        case_id: Optional[int] = Body(None, description="用例ID"),
+        temp_variables: Optional[Dict[str, Any]] = Body(None, description="临时变量")
 ) -> JSONResponse:
     """
     处理变量模板，替换模板中的变量引用
