@@ -3,15 +3,12 @@
 # ruff: noqa: F403, F401, I001, RUF100
 import asyncio
 import os
-import sys
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-sys.path.append('../')
 
 from backend.app import get_app_models
 from backend.common.model import MappedBase

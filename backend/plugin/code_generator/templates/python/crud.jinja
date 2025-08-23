@@ -66,4 +66,4 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 
-{{ instance_name }}_dao: CRUD{{ class_name }} = CRUD{{ class_name }}({{ class_name }})
+{{ table_name }}_dao: CRUD{{ class_name }} = CRUD{{ class_name }}({{ class_name }})

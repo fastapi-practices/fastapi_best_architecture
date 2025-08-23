@@ -3,7 +3,6 @@
 from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
-from pydantic.alias_generators import to_pascal, to_snake
 
 from backend.core.conf import settings
 from backend.plugin.code_generator.model import GenBusiness, GenColumn
@@ -39,13 +38,13 @@ class GenTemplate:
 
         :return:
         """
-        files = []
-
-        # python
-        python_template_path = JINJA2_TEMPLATE_DIR / 'python'
-        files.extend([f'python/{file.name}' for file in python_template_path.iterdir() if file.is_file()])
-
-        return files
+        return [
+            'python/api.jinja',
+            'python/crud.jinja',
+            'python/model.jinja',
+            'python/schema.jinja',
+            'python/service.jinja',
+        ]
 
     @staticmethod
     def get_code_gen_paths(business: GenBusiness) -> list[str]:
@@ -73,8 +72,7 @@ class GenTemplate:
         :param business: 代码生成业务对象
         :return:
         """
-        target_files = self.get_code_gen_paths(business)
-        code_gen_path_mapping = dict(zip(self.get_template_files(), target_files))
+        code_gen_path_mapping = dict(zip(self.get_template_files(), self.get_code_gen_paths(business)))
         return code_gen_path_mapping[tpl_path]
 
     @staticmethod
@@ -88,12 +86,11 @@ class GenTemplate:
         """
         return {
             'app_name': business.app_name,
-            'table_name': to_snake(business.table_name),
+            'table_name': business.table_name,
             'doc_comment': business.doc_comment,
             'table_comment': business.table_comment,
-            'class_name': to_pascal(business.class_name),
-            'instance_name': to_snake(business.class_name),
-            'schema_name': to_pascal(business.schema_name),
+            'class_name': business.class_name,
+            'schema_name': business.schema_name,
             'default_datetime_column': business.default_datetime_column,
             'permission': str(business.table_name.replace('_', ':')),
             'database_type': settings.DATABASE_TYPE,
