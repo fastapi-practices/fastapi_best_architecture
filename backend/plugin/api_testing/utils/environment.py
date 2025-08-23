@@ -60,10 +60,10 @@ class EnvironmentModel(BaseModel):
 
 class VariableManager:
     """变量管理器"""
-    
+
     # Redis键前缀
     REDIS_KEY_PREFIX = "api_testing:variable:"
-    
+
     @classmethod
     async def set_variable(cls, variable: VariableModel) -> bool:
         """
@@ -75,26 +75,26 @@ class VariableManager:
         try:
             # 构建Redis键
             key = cls._build_variable_key(variable)
-            
+
             # 加密敏感数据
             if variable.is_encrypted:
                 variable.value = cls._encrypt_value(variable.value)
-            
+
             # 存储变量
             await redis_client.set(key, variable.model_dump_json())
             return True
         except Exception as e:
             log.error(f"设置变量失败: {e}")
             return False
-    
+
     @classmethod
     async def get_variable(
-        cls, 
-        name: str, 
-        scope: VariableScope,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None
+            cls,
+            name: str,
+            scope: VariableScope,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None
     ) -> Optional[VariableModel]:
         """
         获取变量
@@ -109,38 +109,38 @@ class VariableManager:
         try:
             # 构建Redis键
             key = cls._build_variable_key_by_params(
-                name=name, 
-                scope=scope, 
+                name=name,
+                scope=scope,
                 project_id=project_id,
                 environment_id=environment_id,
                 case_id=case_id
             )
-            
+
             # 获取变量
             data = await redis_client.get(key)
             if not data:
                 return None
-                
+
             # 解析变量
             variable = VariableModel.model_validate_json(data)
-            
+
             # 解密敏感数据
             if variable.is_encrypted:
                 variable.value = cls._decrypt_value(variable.value)
-                
+
             return variable
         except Exception as e:
             log.error(f"获取变量失败: {e}")
             return None
-    
+
     @classmethod
     async def delete_variable(
-        cls, 
-        name: str, 
-        scope: VariableScope,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None
+            cls,
+            name: str,
+            scope: VariableScope,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None
     ) -> bool:
         """
         删除变量
@@ -155,27 +155,27 @@ class VariableManager:
         try:
             # 构建Redis键
             key = cls._build_variable_key_by_params(
-                name=name, 
-                scope=scope, 
+                name=name,
+                scope=scope,
                 project_id=project_id,
                 environment_id=environment_id,
                 case_id=case_id
             )
-            
+
             # 删除变量
             await redis_client.delete(key)
             return True
         except Exception as e:
             log.error(f"删除变量失败: {e}")
             return False
-    
+
     @classmethod
     async def list_variables(
-        cls, 
-        scope: VariableScope,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None
+            cls,
+            scope: VariableScope,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None
     ) -> List[VariableModel]:
         """
         获取变量列表
@@ -189,35 +189,35 @@ class VariableManager:
         try:
             # 构建Redis键模式
             pattern = cls._build_variable_key_pattern(scope, project_id, environment_id, case_id)
-            
+
             # 获取所有匹配的键
             keys = await redis_client.keys(pattern)
-            
+
             variables = []
             for key in keys:
                 data = await redis_client.get(key)
                 if data:
                     variable = VariableModel.model_validate_json(data)
-                    
+
                     # 解密敏感数据
                     if variable.is_encrypted:
                         variable.value = cls._decrypt_value(variable.value)
-                        
+
                     variables.append(variable)
-            
+
             return variables
         except Exception as e:
             log.error(f"获取变量列表失败: {e}")
             return []
-    
+
     @classmethod
     async def process_template(
-        cls,
-        template: str,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None,
-        temp_variables: Optional[Dict[str, Any]] = None
+            cls,
+            template: str,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None,
+            temp_variables: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         处理变量模板
@@ -232,44 +232,44 @@ class VariableManager:
         """
         if not template:
             return template
-            
+
         # 临时变量字典
         temp_vars = temp_variables or {}
-        
+
         # 查找所有变量引用
         pattern = r'\{\{(.*?)\}\}'
         matches = re.findall(pattern, template)
-        
+
         # 如果没有变量引用，直接返回原始模板
         if not matches:
             return template
-        
+
         # 处理每个变量引用
         result = template
         for match in matches:
             var_name = match.strip()
             value = await cls._get_variable_value(
-                var_name, 
-                project_id, 
-                environment_id, 
-                case_id, 
+                var_name,
+                project_id,
+                environment_id,
+                case_id,
                 temp_vars
             )
-            
+
             if value is not None:
                 # 替换变量引用
                 result = result.replace(f"{{{{{var_name}}}}}", str(value))
-        
+
         return result
-    
+
     @classmethod
     async def process_template_dict(
-        cls,
-        template_dict: Dict[str, Any],
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None,
-        temp_variables: Optional[Dict[str, Any]] = None
+            cls,
+            template_dict: Dict[str, Any],
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None,
+            temp_variables: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         处理变量模板字典
@@ -284,50 +284,50 @@ class VariableManager:
         """
         if not template_dict:
             return template_dict
-            
+
         result = {}
         for key, value in template_dict.items():
             if isinstance(value, str):
                 # 处理字符串值
                 result[key] = await cls.process_template(
-                    value, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
+                    value,
+                    project_id,
+                    environment_id,
+                    case_id,
                     temp_variables
                 )
             elif isinstance(value, dict):
                 # 递归处理嵌套字典
                 result[key] = await cls.process_template_dict(
-                    value, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
+                    value,
+                    project_id,
+                    environment_id,
+                    case_id,
                     temp_variables
                 )
             elif isinstance(value, list):
                 # 递归处理列表
                 result[key] = await cls.process_template_list(
-                    value, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
+                    value,
+                    project_id,
+                    environment_id,
+                    case_id,
                     temp_variables
                 )
             else:
                 # 其他类型值直接复制
                 result[key] = value
-                
+
         return result
-    
+
     @classmethod
     async def process_template_list(
-        cls,
-        template_list: List[Any],
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None,
-        temp_variables: Optional[Dict[str, Any]] = None
+            cls,
+            template_list: List[Any],
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None,
+            temp_variables: Optional[Dict[str, Any]] = None
     ) -> List[Any]:
         """
         处理变量模板列表
@@ -342,50 +342,56 @@ class VariableManager:
         """
         if not template_list:
             return template_list
-            
+
         result = []
         for item in template_list:
             if isinstance(item, str):
                 # 处理字符串值
-                result.append(await cls.process_template(
-                    item, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
-                    temp_variables
-                ))
+                result.append(
+                    await cls.process_template(
+                        item,
+                        project_id,
+                        environment_id,
+                        case_id,
+                        temp_variables
+                    )
+                )
             elif isinstance(item, dict):
                 # 递归处理嵌套字典
-                result.append(await cls.process_template_dict(
-                    item, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
-                    temp_variables
-                ))
+                result.append(
+                    await cls.process_template_dict(
+                        item,
+                        project_id,
+                        environment_id,
+                        case_id,
+                        temp_variables
+                    )
+                )
             elif isinstance(item, list):
                 # 递归处理嵌套列表
-                result.append(await cls.process_template_list(
-                    item, 
-                    project_id, 
-                    environment_id, 
-                    case_id, 
-                    temp_variables
-                ))
+                result.append(
+                    await cls.process_template_list(
+                        item,
+                        project_id,
+                        environment_id,
+                        case_id,
+                        temp_variables
+                    )
+                )
             else:
                 # 其他类型值直接复制
                 result.append(item)
-                
+
         return result
-    
+
     @classmethod
     async def _get_variable_value(
-        cls,
-        name: str,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None,
-        temp_variables: Dict[str, Any] = None
+            cls,
+            name: str,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None,
+            temp_variables: Dict[str, Any] = None
     ) -> Any:
         """
         按优先级获取变量值
@@ -401,33 +407,33 @@ class VariableManager:
         # 检查临时变量
         if temp_variables and name in temp_variables:
             return temp_variables[name]
-        
+
         # 检查用例变量
         if case_id:
             case_var = await cls.get_variable(name, VariableScope.CASE, case_id=case_id)
             if case_var:
                 return case_var.value
-        
+
         # 检查环境变量
         if environment_id:
             env_var = await cls.get_variable(name, VariableScope.ENVIRONMENT, environment_id=environment_id)
             if env_var:
                 return env_var.value
-        
+
         # 检查项目变量
         if project_id:
             proj_var = await cls.get_variable(name, VariableScope.PROJECT, project_id=project_id)
             if proj_var:
                 return proj_var.value
-        
+
         # 检查全局变量
         global_var = await cls.get_variable(name, VariableScope.GLOBAL)
         if global_var:
             return global_var.value
-            
+
         # 未找到变量
         return None
-    
+
     @staticmethod
     def _build_variable_key(variable: VariableModel) -> str:
         """
@@ -437,7 +443,7 @@ class VariableManager:
         :return: Redis键
         """
         prefix = VariableManager.REDIS_KEY_PREFIX
-        
+
         if variable.scope == VariableScope.GLOBAL:
             return f"{prefix}global:{variable.name}"
         elif variable.scope == VariableScope.PROJECT:
@@ -448,14 +454,14 @@ class VariableManager:
             return f"{prefix}case:{variable.case_id}:{variable.name}"
         else:
             raise ValueError(f"不支持的变量作用域: {variable.scope}")
-    
+
     @staticmethod
     def _build_variable_key_by_params(
-        name: str, 
-        scope: VariableScope, 
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None
+            name: str,
+            scope: VariableScope,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None
     ) -> str:
         """
         根据参数构建变量Redis键
@@ -468,7 +474,7 @@ class VariableManager:
         :return: Redis键
         """
         prefix = VariableManager.REDIS_KEY_PREFIX
-        
+
         if scope == VariableScope.GLOBAL:
             return f"{prefix}global:{name}"
         elif scope == VariableScope.PROJECT:
@@ -485,13 +491,13 @@ class VariableManager:
             return f"{prefix}case:{case_id}:{name}"
         else:
             raise ValueError(f"不支持的变量作用域: {scope}")
-    
+
     @staticmethod
     def _build_variable_key_pattern(
-        scope: VariableScope,
-        project_id: Optional[int] = None,
-        environment_id: Optional[int] = None,
-        case_id: Optional[int] = None
+            scope: VariableScope,
+            project_id: Optional[int] = None,
+            environment_id: Optional[int] = None,
+            case_id: Optional[int] = None
     ) -> str:
         """
         构建变量Redis键匹配模式
@@ -503,7 +509,7 @@ class VariableManager:
         :return: Redis键匹配模式
         """
         prefix = VariableManager.REDIS_KEY_PREFIX
-        
+
         if scope == VariableScope.GLOBAL:
             return f"{prefix}global:*"
         elif scope == VariableScope.PROJECT:
@@ -520,7 +526,7 @@ class VariableManager:
             return f"{prefix}case:{case_id}:*"
         else:
             raise ValueError(f"不支持的变量作用域: {scope}")
-    
+
     @staticmethod
     def _encrypt_value(value: Any) -> str:
         """
@@ -538,7 +544,7 @@ class VariableManager:
             import base64
             json_str = json.dumps(value)
             return f"encrypted:{base64.b64encode(json_str.encode()).decode()}"
-    
+
     @staticmethod
     def _decrypt_value(value: str) -> Any:
         """
@@ -550,11 +556,11 @@ class VariableManager:
         # 这里仅作示例，实际应使用安全的解密算法
         if not value.startswith("encrypted:"):
             return value
-            
+
         encrypted_part = value[len("encrypted:"):]
         import base64
         decoded = base64.b64decode(encrypted_part).decode()
-        
+
         try:
             # 尝试解析为JSON
             return json.loads(decoded)
@@ -565,10 +571,10 @@ class VariableManager:
 
 class EnvironmentManager:
     """环境管理器"""
-    
+
     # Redis键前缀
     REDIS_KEY_PREFIX = "api_testing:environment:"
-    
+
     @classmethod
     async def create_environment(cls, environment: EnvironmentModel) -> bool:
         """
@@ -580,19 +586,19 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = cls._build_environment_key(environment)
-            
+
             # 存储环境信息
             await redis_client.set(key, environment.model_dump_json())
-            
+
             # 如果设为默认环境，更新项目默认环境
             if environment.is_default:
                 await cls.set_default_environment(environment.project_id, environment.id)
-                
+
             return True
         except Exception as e:
             log.error(f"创建环境失败: {e}")
             return False
-    
+
     @classmethod
     async def get_environment(cls, environment_id: int) -> Optional[EnvironmentModel]:
         """
@@ -604,18 +610,18 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}{environment_id}"
-            
+
             # 获取环境信息
             data = await redis_client.get(key)
             if not data:
                 return None
-                
+
             # 解析环境信息
             return EnvironmentModel.model_validate_json(data)
         except Exception as e:
             log.error(f"获取环境失败: {e}")
             return None
-    
+
     @classmethod
     async def update_environment(cls, environment: EnvironmentModel) -> bool:
         """
@@ -627,24 +633,24 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = cls._build_environment_key(environment)
-            
+
             # 检查环境是否存在
             exists = await redis_client.exists(key)
             if not exists:
                 return False
-                
+
             # 存储环境信息
             await redis_client.set(key, environment.model_dump_json())
-            
+
             # 如果设为默认环境，更新项目默认环境
             if environment.is_default:
                 await cls.set_default_environment(environment.project_id, environment.id)
-                
+
             return True
         except Exception as e:
             log.error(f"更新环境失败: {e}")
             return False
-    
+
     @classmethod
     async def delete_environment(cls, environment_id: int) -> bool:
         """
@@ -658,22 +664,22 @@ class EnvironmentManager:
             environment = await cls.get_environment(environment_id)
             if not environment:
                 return False
-                
+
             # 构建Redis键
             key = cls._build_environment_key(environment)
-            
+
             # 删除环境信息
             await redis_client.delete(key)
-            
+
             # 如果是默认环境，清除项目默认环境
             if environment.is_default:
                 await cls.clear_default_environment(environment.project_id)
-                
+
             return True
         except Exception as e:
             log.error(f"删除环境失败: {e}")
             return False
-    
+
     @classmethod
     async def list_environments(cls, project_id: int) -> List[EnvironmentModel]:
         """
@@ -685,10 +691,10 @@ class EnvironmentManager:
         try:
             # 构建Redis键模式
             pattern = f"{cls.REDIS_KEY_PREFIX}*"
-            
+
             # 获取所有匹配的键
             keys = await redis_client.keys(pattern)
-            
+
             environments = []
             for key in keys:
                 data = await redis_client.get(key)
@@ -696,12 +702,12 @@ class EnvironmentManager:
                     env = EnvironmentModel.model_validate_json(data)
                     if env.project_id == project_id:
                         environments.append(env)
-            
+
             return environments
         except Exception as e:
             log.error(f"获取环境列表失败: {e}")
             return []
-    
+
     @classmethod
     async def get_default_environment(cls, project_id: int) -> Optional[EnvironmentModel]:
         """
@@ -713,18 +719,18 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}default:{project_id}"
-            
             # 获取默认环境ID
             environment_id = await redis_client.get(key)
+            print("--->", environment_id)
             if not environment_id:
                 return None
-                
+
             # 获取环境信息
             return await cls.get_environment(int(environment_id))
         except Exception as e:
             log.error(f"获取默认环境失败: {e}")
             return None
-    
+
     @classmethod
     async def set_default_environment(cls, project_id: int, environment_id: int) -> bool:
         """
@@ -737,18 +743,18 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}default:{project_id}"
-            
+
             # 设置默认环境ID
             await redis_client.set(key, str(environment_id))
-            
+
             # 更新环境is_default标志
             await cls._update_environments_default_flag(project_id, environment_id)
-            
+
             return True
         except Exception as e:
             log.error(f"设置默认环境失败: {e}")
             return False
-    
+
     @classmethod
     async def clear_default_environment(cls, project_id: int) -> bool:
         """
@@ -760,14 +766,14 @@ class EnvironmentManager:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}default:{project_id}"
-            
+
             # 删除默认环境记录
             await redis_client.delete(key)
             return True
         except Exception as e:
             log.error(f"清除默认环境失败: {e}")
             return False
-    
+
     @classmethod
     async def _update_environments_default_flag(cls, project_id: int, default_environment_id: int) -> None:
         """
@@ -777,7 +783,7 @@ class EnvironmentManager:
         :param default_environment_id: 默认环境ID
         """
         environments = await cls.list_environments(project_id)
-        
+
         for env in environments:
             if env.id != default_environment_id and env.is_default:
                 # 清除其他环境的默认标志
@@ -787,7 +793,7 @@ class EnvironmentManager:
                 # 设置指定环境为默认
                 env.is_default = True
                 await cls.update_environment(env)
-    
+
     @staticmethod
     def _build_environment_key(environment: EnvironmentModel) -> str:
         """
