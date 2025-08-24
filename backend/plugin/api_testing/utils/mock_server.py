@@ -4,18 +4,16 @@
 Mock服务工具
 提供接口Mock功能，类似APIFox的Mock服务
 """
+import asyncio
 import json
 import re
 import time
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union, Callable
-
-import fastapi
+from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, Request, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from starlette.middleware.cors import CORSMiddleware
-
 from backend.common.log import log
 from backend.database.redis import redis_client
 from backend.plugin.api_testing.utils.environment import VariableManager
@@ -146,13 +144,13 @@ class MockProject(BaseModel):
 
 class MockServer:
     """Mock服务"""
-    
+
     # Redis键前缀
     REDIS_KEY_PREFIX = "api_testing:mock:"
-    
+
     # 应用实例
     app = FastAPI(title="API Testing Mock Server")
-    
+
     # 启用CORS
     app.add_middleware(
         CORSMiddleware,
@@ -161,7 +159,7 @@ class MockServer:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     @classmethod
     async def create_project(cls, project: MockProject) -> bool:
         """
@@ -173,14 +171,14 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_project_key(project.id)
-            
+
             # 存储项目配置
             await redis_client.set(key, project.model_dump_json())
             return True
         except Exception as e:
             log.error(f"创建Mock项目失败: {e}")
             return False
-    
+
     @classmethod
     async def get_project(cls, project_id: int) -> Optional[MockProject]:
         """
@@ -192,18 +190,18 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_project_key(project_id)
-            
+
             # 获取项目配置
             data = await redis_client.get(key)
             if not data:
                 return None
-                
+
             # 解析项目配置
             return MockProject.model_validate_json(data)
         except Exception as e:
             log.error(f"获取Mock项目失败: {e}")
             return None
-    
+
     @classmethod
     async def update_project(cls, project: MockProject) -> bool:
         """
@@ -215,19 +213,19 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_project_key(project.id)
-            
+
             # 检查项目是否存在
             exists = await redis_client.exists(key)
             if not exists:
                 return False
-                
+
             # 更新项目配置
             await redis_client.set(key, project.model_dump_json())
             return True
         except Exception as e:
             log.error(f"更新Mock项目失败: {e}")
             return False
-    
+
     @classmethod
     async def delete_project(cls, project_id: int) -> bool:
         """
@@ -239,21 +237,21 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_project_key(project_id)
-            
+
             # 删除项目配置
             await redis_client.delete(key)
-            
+
             # 删除项目下的所有规则
             rule_pattern = cls._build_rule_key_pattern(project_id)
             rule_keys = await redis_client.keys(rule_pattern)
             if rule_keys:
                 await redis_client.delete(*rule_keys)
-                
+
             return True
         except Exception as e:
             log.error(f"删除Mock项目失败: {e}")
             return False
-    
+
     @classmethod
     async def list_projects(cls) -> List[MockProject]:
         """
@@ -264,21 +262,21 @@ class MockServer:
         try:
             # 构建Redis键模式
             pattern = f"{cls.REDIS_KEY_PREFIX}project:*"
-            
+
             # 获取所有项目键
             keys = await redis_client.keys(pattern)
-            
+
             projects = []
             for key in keys:
                 data = await redis_client.get(key)
                 if data:
                     projects.append(MockProject.model_validate_json(data))
-                    
+
             return projects
         except Exception as e:
             log.error(f"获取Mock项目列表失败: {e}")
             return []
-    
+
     @classmethod
     async def create_rule(cls, rule: MockRule) -> bool:
         """
@@ -290,19 +288,19 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_rule_key(rule)
-            
+
             # 存储规则配置
             await redis_client.set(key, rule.model_dump_json())
             return True
         except Exception as e:
             log.error(f"创建Mock规则失败: {e}")
             return False
-    
+
     @classmethod
     async def get_rule(cls, rule_id: str, project_id: int) -> Optional[MockRule]:
         """
         获取Mock规则
-        
+
         :param rule_id: 规则ID
         :param project_id: 项目ID
         :return: 规则配置
@@ -310,18 +308,16 @@ class MockServer:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}rule:{project_id}:{rule_id}"
-            
             # 获取规则配置
             data = await redis_client.get(key)
             if not data:
                 return None
-                
             # 解析规则配置
             return MockRule.model_validate_json(data)
         except Exception as e:
             log.error(f"获取Mock规则失败: {e}")
             return None
-    
+
     @classmethod
     async def update_rule(cls, rule: MockRule) -> bool:
         """
@@ -333,12 +329,12 @@ class MockServer:
         try:
             # 构建Redis键
             key = cls._build_rule_key(rule)
-            
+
             # 检查规则是否存在
             exists = await redis_client.exists(key)
             if not exists:
                 return False
-                
+
             # 更新规则配置
             rule.updated_at = datetime.now()
             await redis_client.set(key, rule.model_dump_json())
@@ -346,7 +342,7 @@ class MockServer:
         except Exception as e:
             log.error(f"更新Mock规则失败: {e}")
             return False
-    
+
     @classmethod
     async def delete_rule(cls, rule_id: str, project_id: int) -> bool:
         """
@@ -359,40 +355,64 @@ class MockServer:
         try:
             # 构建Redis键
             key = f"{cls.REDIS_KEY_PREFIX}rule:{project_id}:{rule_id}"
-            
+
             # 删除规则配置
             await redis_client.delete(key)
             return True
         except Exception as e:
             log.error(f"删除Mock规则失败: {e}")
             return False
-    
+
     @classmethod
     async def list_rules(cls, project_id: int) -> List[MockRule]:
         """
         获取项目下的所有Mock规则
-        
+
         :param project_id: 项目ID
         :return: 规则配置列表
         """
         try:
-            # 构建Redis键模式
             pattern = cls._build_rule_key_pattern(project_id)
-            
-            # 获取所有规则键
             keys = await redis_client.keys(pattern)
-            
             rules = []
+
             for key in keys:
                 data = await redis_client.get(key)
                 if data:
-                    rules.append(MockRule.model_validate_json(data))
-                    
+                    try:
+                        # 添加数据验证和错误处理
+                        rule_data = json.loads(data) if isinstance(data, str) else data
+
+                        # 检查数据格式，修复不符合要求的字段
+                        if 'conditions' in rule_data:
+                            if isinstance(rule_data['conditions'], list):
+                                # 如果conditions包含非对象元素，过滤或转换
+                                rule_data['conditions'] = [
+                                    cond for cond in rule_data['conditions']
+                                    if isinstance(cond, dict)
+                                ]
+
+                        if 'responses' in rule_data:
+                            if isinstance(rule_data['responses'], list):
+                                # 如果responses包含非对象元素，过滤或转换
+                                rule_data['responses'] = [
+                                    resp for resp in rule_data['responses']
+                                    if isinstance(resp, dict)
+                                ]
+
+                        rules.append(MockRule.model_validate(rule_data))
+                    except ValidationError as ve:
+                        log.warning(f"规则数据格式错误，跳过: {key}, 错误: {ve}")
+                        continue
+                    except Exception as parse_error:
+                        log.warning(f"解析规则数据失败，跳过: {key}, 错误: {parse_error}")
+                        continue
+
             return rules
         except Exception as e:
             log.error(f"获取Mock规则列表失败: {e}")
             return []
-    
+
     @classmethod
     async def process_mock_request(cls, request: Request, project_id: int) -> Optional[Response]:
         """
@@ -406,27 +426,27 @@ class MockServer:
             # 获取请求路径和方法
             path = request.url.path
             method = request.method
-            
+
             # 获取项目配置
             project = await cls.get_project(project_id)
             if not project or not project.enabled:
                 return None
-                
+
             # 移除基础路径前缀
             base_path = project.base_path.rstrip('/')
             if path.startswith(base_path):
                 path = path[len(base_path):]
                 if not path.startswith('/'):
                     path = '/' + path
-            
+
             # 获取项目下的所有规则
             rules = await cls.list_rules(project_id)
             if not rules:
                 return None
-                
+
             # 过滤出已启用的规则
             rules = [rule for rule in rules if rule.enabled]
-            
+
             # 查找匹配的规则
             matched_rule = None
             for rule in rules:
@@ -435,18 +455,18 @@ class MockServer:
                     if await cls._check_conditions(rule.conditions, request):
                         matched_rule = rule
                         break
-            
+
             if not matched_rule:
                 return None
-                
+
             # 选择响应
             response_config = await cls._select_response(matched_rule, request)
             if not response_config:
                 return None
-                
+
             # 应用延迟
             await cls._apply_delay(response_config.delay)
-            
+
             # 执行脚本
             if response_config.script.type != MockScriptType.NONE and response_config.script.content:
                 context = {
@@ -456,22 +476,23 @@ class MockServer:
                 }
                 await cls._execute_script(response_config.script.content, context)
                 response_config.content = context["response_content"]
-            
+
             # 处理变量替换
             processed_content = await VariableManager.process_template(response_config.content)
-            
+
             # 构建响应
             response = await cls._build_response(response_config, processed_content)
             return response
         except Exception as e:
             log.error(f"处理Mock请求失败: {e}")
             return None
-    
+
     @classmethod
     def register_mock_routes(cls):
         """
         注册Mock路由
         """
+
         # 动态路由，接收所有请求
         @cls.app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
         async def mock_route(request: Request, path: str):
@@ -483,7 +504,7 @@ class MockServer:
                     media_type="application/json",
                     status_code=400
                 )
-                
+
             try:
                 project_id = int(project_id_str)
             except ValueError:
@@ -492,7 +513,7 @@ class MockServer:
                     media_type="application/json",
                     status_code=400
                 )
-            
+
             # 处理Mock请求
             response = await cls.process_mock_request(request, project_id)
             if not response:
@@ -501,9 +522,9 @@ class MockServer:
                     media_type="application/json",
                     status_code=404
                 )
-                
+
             return response
-    
+
     @staticmethod
     def _build_project_key(project_id: int) -> str:
         """
@@ -513,7 +534,7 @@ class MockServer:
         :return: Redis键
         """
         return f"{MockServer.REDIS_KEY_PREFIX}project:{project_id}"
-    
+
     @staticmethod
     def _build_rule_key(rule: MockRule) -> str:
         """
@@ -523,7 +544,7 @@ class MockServer:
         :return: Redis键
         """
         return f"{MockServer.REDIS_KEY_PREFIX}rule:{rule.project_id}:{rule.id}"
-    
+
     @staticmethod
     def _build_rule_key_pattern(project_id: int) -> str:
         """
@@ -533,7 +554,7 @@ class MockServer:
         :return: Redis键模式
         """
         return f"{MockServer.REDIS_KEY_PREFIX}rule:{project_id}:*"
-    
+
     @staticmethod
     def _match_url(rule_url: str, request_url: str) -> bool:
         """
@@ -545,16 +566,16 @@ class MockServer:
         """
         # 将规则URL转换为正则表达式模式
         pattern = rule_url.replace('/', '\/')
-        
+
         # 替换路径参数，例如 /users/:id -> /users/([^\/]+)
         pattern = re.sub(r':(\w+)', r'([^\/]+)', pattern)
-        
+
         # 添加开始和结束标记
         pattern = f'^{pattern}$'
-        
+
         # 检查是否匹配
         return bool(re.match(pattern, request_url))
-    
+
     @staticmethod
     async def _check_conditions(conditions: List[MockCondition], request: Request) -> bool:
         """
@@ -566,18 +587,18 @@ class MockServer:
         """
         # 过滤出已启用的条件
         conditions = [condition for condition in conditions if condition.enabled]
-        
+
         # 如果没有条件，则默认匹配
         if not conditions:
             return True
-            
+
         # 检查所有条件
         for condition in conditions:
             if not await MockServer._check_single_condition(condition, request):
                 return False
-                
+
         return True
-    
+
     @staticmethod
     async def _check_single_condition(condition: MockCondition, request: Request) -> bool:
         """
@@ -609,7 +630,11 @@ class MockServer:
                 if condition.operator in [MockConditionOperator.EXISTS, MockConditionOperator.NOT_EXISTS]:
                     return MockServer._apply_operator(condition.operator, condition.key.lower() in headers, None)
                 elif condition.key.lower() in headers:
-                    return MockServer._apply_operator(condition.operator, headers[condition.key.lower()], condition.value)
+                    return MockServer._apply_operator(
+                        condition.operator,
+                        headers[condition.key.lower()],
+                        condition.value
+                    )
                 else:
                     return False
             elif condition.type == MockConditionType.BODY:
@@ -660,7 +685,7 @@ class MockServer:
         except Exception as e:
             log.error(f"检查条件失败: {e}")
             return False
-    
+
     @staticmethod
     def _apply_operator(operator: MockConditionOperator, actual_value: Any, expected_value: Any) -> bool:
         """
@@ -690,11 +715,17 @@ class MockServer:
             else:
                 return True
         elif operator == MockConditionOperator.STARTS_WITH:
-            return isinstance(actual_value, str) and isinstance(expected_value, str) and actual_value.startswith(expected_value)
+            return isinstance(actual_value, str) and isinstance(expected_value, str) and actual_value.startswith(
+                expected_value
+            )
         elif operator == MockConditionOperator.ENDS_WITH:
-            return isinstance(actual_value, str) and isinstance(expected_value, str) and actual_value.endswith(expected_value)
+            return isinstance(actual_value, str) and isinstance(expected_value, str) and actual_value.endswith(
+                expected_value
+            )
         elif operator == MockConditionOperator.MATCHES:
-            return isinstance(actual_value, str) and isinstance(expected_value, str) and bool(re.match(expected_value, actual_value))
+            return isinstance(actual_value, str) and isinstance(expected_value, str) and bool(
+                re.match(expected_value, actual_value)
+            )
         elif operator == MockConditionOperator.EXISTS:
             return bool(actual_value)
         elif operator == MockConditionOperator.NOT_EXISTS:
@@ -721,7 +752,7 @@ class MockServer:
                 return False
         else:
             return False
-    
+
     @staticmethod
     async def _select_response(rule: MockRule, request: Request) -> Optional[MockResponse]:
         """
@@ -735,24 +766,24 @@ class MockServer:
         responses = [response for response in rule.responses if response.enabled]
         if not responses:
             return None
-            
+
         # 如果只有一个响应，则直接返回
         if len(responses) == 1:
             return responses[0]
-            
+
         # 如果有默认响应，且默认响应已启用，则返回默认响应
         if rule.default_response_id:
             for response in responses:
                 if response.id == rule.default_response_id:
                     return response
-        
+
         # 如果有多个响应，则根据权重随机选择
         total_weight = sum(response.weight for response in responses)
         if total_weight <= 0:
             # 如果总权重小于等于0，则均匀随机选择
             import random
             return random.choice(responses)
-            
+
         # 根据权重随机选择
         import random
         r = random.uniform(0, total_weight)
@@ -761,10 +792,10 @@ class MockServer:
             cumulative_weight += response.weight
             if r <= cumulative_weight:
                 return response
-                
+
         # 如果随机选择失败，则返回第一个响应
         return responses[0]
-    
+
     @staticmethod
     async def _apply_delay(delay_config: MockDelayConfig) -> None:
         """
@@ -774,14 +805,14 @@ class MockServer:
         """
         if delay_config.type == MockDelayType.NONE:
             return
-            
+
         if delay_config.type == MockDelayType.FIXED and delay_config.fixed_time:
             await asyncio.sleep(delay_config.fixed_time / 1000)
         elif delay_config.type == MockDelayType.RANDOM and delay_config.min_time and delay_config.max_time:
             import random
             delay = random.uniform(delay_config.min_time, delay_config.max_time)
             await asyncio.sleep(delay / 1000)
-    
+
     @staticmethod
     async def _execute_script(script: str, context: Dict[str, Any]) -> None:
         """
@@ -800,12 +831,12 @@ class MockServer:
                 "context": context,
                 "log": log
             }
-            
+
             # 执行脚本
             exec(script, safe_globals)
         except Exception as e:
             log.error(f"执行Mock脚本失败: {e}")
-    
+
     @staticmethod
     async def _build_response(response_config: MockResponse, content: str) -> Response:
         """
@@ -825,13 +856,13 @@ class MockServer:
             content_type = "text/html"
         elif response_config.response_type == MockResponseType.BINARY:
             content_type = "application/octet-stream"
-            
+
         # 构建响应头
         headers = {}
         for header in response_config.headers:
             if header.enabled:
                 headers[header.name] = header.value
-                
+
         # 构建响应
         response = Response(
             content=content,
@@ -839,10 +870,9 @@ class MockServer:
             media_type=content_type,
             headers=headers
         )
-        
+
         return response
 
 
 # 注册Mock路由
-import asyncio  # 这里导入是为了避免_apply_delay中的异步睡眠函数未定义
 MockServer.register_mock_routes()

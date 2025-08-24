@@ -3,16 +3,9 @@
 """
 Mock服务API
 """
-from typing import List, Optional
-
-from fastapi import APIRouter, Body, Path, Query
-from fastapi.responses import JSONResponse
-
+from fastapi import APIRouter, Path, Query
 from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
-from backend.plugin.api_testing.utils.mock_server import (
-    MockProject, MockRule, MockResponse, MockCondition,
-    MockServer
-)
+from backend.plugin.api_testing.utils.mock_server import (MockProject, MockRule, MockServer)
 
 router = APIRouter()
 
@@ -168,4 +161,4 @@ async def get_mock_server_info() -> ResponseModel | ResponseSchemaModel:
         "docs_url": "/docs",
         "redoc_url": "/redoc"
     }
-    return response_base.success(data=info, msg="获取Mock服务信息成功")
+    return response_base.success(data=info)
