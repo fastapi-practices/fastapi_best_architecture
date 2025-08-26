@@ -34,7 +34,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
     url = f'http://{host}:{port}'
     docs_url = url + settings.FASTAPI_DOCS_URL
     redoc_url = url + settings.FASTAPI_REDOC_URL
-    openapi_url = url + settings.FASTAPI_OPENAPI_URL
+    openapi_url = url + (settings.FASTAPI_OPENAPI_URL or '')
 
     panel_content = Text()
     panel_content.append(f'📝 Swagger 文档: {docs_url}\n', style='blue')
