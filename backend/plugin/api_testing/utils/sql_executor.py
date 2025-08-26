@@ -70,15 +70,15 @@ class SQLExecutor:
         
         :return: 数据库配置
         """
-        db_type = DatabaseType.MYSQL if settings.DB_ENGINE == "mysql" else DatabaseType.POSTGRESQL
+        db_type = DatabaseType.MYSQL if settings.DATABASE_TYPE == "mysql" else DatabaseType.POSTGRESQL
         
         return DBConfig(
             type=db_type,
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            username=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            database=settings.DB_DATABASE
+            host=settings.DATABASE_HOST,
+            port=settings.DATABASE_PORT,
+            username=settings.DATABASE_USER,
+            password=settings.DATABASE_PASSWORD,
+            database=settings.DATABASE_SCHEMA
         )
     
     @staticmethod
