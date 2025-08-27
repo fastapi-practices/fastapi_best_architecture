@@ -25,7 +25,7 @@ class SchemaBase(BaseModel):
         use_enum_values=True,
         json_encoders={
             datetime: lambda x: timezone.to_str(timezone.from_datetime(x))
-            if x.tzinfo is not None
+            if x.tzinfo is not None and x.tzinfo != timezone.tz_info
             else timezone.to_str(x)
         },
     )
