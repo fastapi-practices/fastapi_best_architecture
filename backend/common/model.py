@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import BigInteger, DateTime
+from sqlalchemy import BigInteger, DateTime, TypeDecorator
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
 
@@ -51,14 +51,37 @@ class UserMixin(MappedAsDataclass):
     updated_by: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
 
 
+class TimeZone(TypeDecorator[datetime]):
+    """时区感知 DateTime"""
+
+    impl = DateTime(timezone=True)
+    cache_ok = True
+
+    @property
+    def python_type(self) -> type[datetime]:
+        return datetime
+
+    def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
+        if value is not None:
+            if value.tzinfo != timezone.tz_info:
+                value = timezone.from_datetime(value)
+        return value
+
+    def process_result_value(self, value: datetime | None, dialect) -> datetime | None:
+        if value is not None:
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=timezone.tz_info)
+        return value
+
+
 class DateTimeMixin(MappedAsDataclass):
     """日期时间 Mixin 数据类"""
 
     created_time: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), init=False, default_factory=timezone.now, sort_order=999, comment='创建时间'
+        TimeZone, init=False, default_factory=timezone.now, sort_order=999, comment='创建时间'
     )
     updated_time: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), init=False, onupdate=timezone.now, sort_order=999, comment='更新时间'
+        TimeZone, init=False, onupdate=timezone.now, sort_order=999, comment='更新时间'
     )
 
 

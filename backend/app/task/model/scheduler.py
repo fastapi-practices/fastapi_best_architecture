@@ -7,7 +7,6 @@ from datetime import datetime
 from sqlalchemy import (
     JSON,
     Boolean,
-    DateTime,
     String,
     event,
 )
@@ -16,7 +15,7 @@ from sqlalchemy.dialects.postgresql import INTEGER, TEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.exception import errors
-from backend.common.model import Base, id_key
+from backend.common.model import Base, TimeZone, id_key
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
@@ -35,8 +34,8 @@ class TaskScheduler(Base):
     queue: Mapped[str | None] = mapped_column(String(255), comment='CELERY_TASK_QUEUES 中定义的队列')
     exchange: Mapped[str | None] = mapped_column(String(255), comment='低级别 AMQP 路由的交换机')
     routing_key: Mapped[str | None] = mapped_column(String(255), comment='低级别 AMQP 路由的路由密钥')
-    start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment='任务开始触发的时间')
-    expire_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), comment='任务不再触发的截止时间')
+    start_time: Mapped[datetime | None] = mapped_column(TimeZone, comment='任务开始触发的时间')
+    expire_time: Mapped[datetime | None] = mapped_column(TimeZone, comment='任务不再触发的截止时间')
     expire_seconds: Mapped[int | None] = mapped_column(comment='任务不再触发的秒数时间差')
     type: Mapped[int] = mapped_column(comment='调度类型（0间隔 1定时）')
     interval_every: Mapped[int | None] = mapped_column(comment='任务再次运行前的间隔周期数')
@@ -49,9 +48,7 @@ class TaskScheduler(Base):
         Boolean().with_variant(INTEGER, 'postgresql'), default=True, comment='是否启用任务'
     )
     total_run_count: Mapped[int] = mapped_column(default=0, comment='任务触发的总次数')
-    last_run_time: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), default=None, comment='任务最后触发的时间'
-    )
+    last_run_time: Mapped[datetime | None] = mapped_column(TimeZone, default=None, comment='任务最后触发的时间')
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )
