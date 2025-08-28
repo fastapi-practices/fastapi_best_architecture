@@ -19,7 +19,7 @@ class UserSocial(Base):
     __tablename__ = 'sys_user_social'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    sid: Mapped[str] = mapped_column(String(20), comment='第三方用户 ID')
+    sid: Mapped[str] = mapped_column(String(255), comment='第三方用户 ID')
     source: Mapped[str] = mapped_column(String(20), comment='第三方用户来源')
 
     # 用户社交信息一对多
