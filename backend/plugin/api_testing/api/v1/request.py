@@ -12,7 +12,7 @@ from backend.common.response.response_schema import response_base, ResponseModel
 router = APIRouter()
 
 
-@router.post("/send", response_model=Dict[str, Any], summary="发送API请求")
+@router.post("/send", response_model=ResponseModel, summary="发送API请求")
 async def send_api_request(request_data: ApiRequestSchema) -> ResponseModel | ResponseSchemaModel:
     """
     发送API请求接口

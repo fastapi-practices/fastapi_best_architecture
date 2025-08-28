@@ -132,6 +132,7 @@ class HttpClient:
                 status_code=0,
                 elapsed_time=elapsed_time,
                 headers={},
+                cookies={},
                 content="",
                 text="",
                 error=error
