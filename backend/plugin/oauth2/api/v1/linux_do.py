@@ -12,16 +12,12 @@ from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
 
-_linux_do_client = LinuxDoOAuth20(
-    settings.OAUTH2_LINUX_DO_CLIENT_ID,
-    settings.OAUTH2_LINUX_DO_CLIENT_SECRET,
-)
-_linux_do_oauth2 = FastAPIOAuth20(_linux_do_client, redirect_route_name='linux_do_oauth2_callback')
+linux_do_client = LinuxDoOAuth20(settings.OAUTH2_LINUX_DO_CLIENT_ID, settings.OAUTH2_LINUX_DO_CLIENT_SECRET)
 
 
 @router.get('', summary='获取 LinuxDo 授权链接')
 async def get_linux_do_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
-    auth_url = await _linux_do_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
+    auth_url = await linux_do_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
     return response_base.success(data=auth_url)
 
 
@@ -35,11 +31,11 @@ async def linux_do_oauth2_callback(
     request: Request,
     response: Response,
     background_tasks: BackgroundTasks,
-    oauth2: FastAPIOAuth20 = Depends(_linux_do_oauth2),
+    oauth2: FastAPIOAuth20 = Depends(FastAPIOAuth20(linux_do_client, redirect_route_name='linux_do_oauth2_callback')),
 ):
     token, _state = oauth2
     access_token = token['access_token']
-    user = await _linux_do_client.get_userinfo(access_token)
+    user = await linux_do_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
         request=request,
         response=response,
