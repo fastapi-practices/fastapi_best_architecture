@@ -16,6 +16,7 @@ from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.common.queue import batch_dequeue
+from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
@@ -44,7 +45,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             args = await self.get_request_args(request)
 
             # 执行请求
-            elapsed = 0.0
             code = 200
             msg = 'Success'
             status = StatusType.enable
@@ -57,8 +57,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     '__request_validation_exception__',
                     '__request_assertion_error__',
                     '__request_custom_exception__',
-                    '__request_all_unknown_exception__',
-                    '__request_cors_500_exception__',
                 ]:
                     exception = getattr(request.state, state, None)
                     if exception:
@@ -67,11 +65,12 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         log.error(f'请求异常: {msg}')
                         break
             except Exception as e:
-                log.error(f'请求异常: {str(e)}')
-                code = getattr(e, 'code', code)  # 兼容 SQLAlchemy 异常用法
-                msg = getattr(e, 'msg', msg)
+                elapsed = (time.perf_counter() - request.state.perf_time) * 1000
+                code = getattr(e, 'code', StandardResponseCode.HTTP_500)  # 兼容 SQLAlchemy 异常用法
+                msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
                 error = e
+                log.error(f'请求异常: {str(e)}')
 
             # 此信息只能在请求后获取
             _route = request.scope.get('route')
