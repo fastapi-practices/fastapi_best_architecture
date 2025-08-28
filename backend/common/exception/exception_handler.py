@@ -4,7 +4,6 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
-from starlette.middleware.cors import CORSMiddleware
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
 from backend.common.exception.errors import BaseExceptionMixin
@@ -193,66 +192,8 @@ def register_exception(app: FastAPI):
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_500)
             content = res.model_dump()
-        request.state.__request_all_unknown_exception__ = content
         content.update(trace_id=get_request_trace_id(request))
         return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
             content=content,
         )
-
-    if settings.MIDDLEWARE_CORS:
-
-        @app.exception_handler(StandardResponseCode.HTTP_500)
-        async def cors_custom_code_500_exception_handler(request, exc):
-            """
-            跨域自定义 500 异常处理
-
-            `Related issue <https://github.com/encode/starlette/issues/1175>`_
-
-            `Solution <https://github.com/fastapi/fastapi/discussions/7847#discussioncomment-5144709>`_
-
-            :param request: FastAPI 请求对象
-            :param exc: 自定义异常
-            :return:
-            """
-            if isinstance(exc, BaseExceptionMixin):
-                content = {
-                    'code': exc.code,
-                    'msg': exc.msg,
-                    'data': exc.data,
-                }
-            else:
-                if settings.ENVIRONMENT == 'dev':
-                    content = {
-                        'code': StandardResponseCode.HTTP_500,
-                        'msg': str(exc),
-                        'data': None,
-                    }
-                else:
-                    res = response_base.fail(res=CustomResponseCode.HTTP_500)
-                    content = res.model_dump()
-            request.state.__request_cors_500_exception__ = content
-            content.update(trace_id=get_request_trace_id(request))
-            response = MsgSpecJSONResponse(
-                status_code=exc.code if isinstance(exc, BaseExceptionMixin) else StandardResponseCode.HTTP_500,
-                content=content,
-                background=exc.background if isinstance(exc, BaseExceptionMixin) else None,
-            )
-            origin = request.headers.get('origin')
-            if origin:
-                cors = CORSMiddleware(
-                    app=app,
-                    allow_origins=settings.CORS_ALLOWED_ORIGINS,
-                    allow_credentials=True,
-                    allow_methods=['*'],
-                    allow_headers=['*'],
-                    expose_headers=settings.CORS_EXPOSE_HEADERS,
-                )
-                response.headers.update(cors.simple_headers)
-                has_cookie = 'cookie' in request.headers
-                if cors.allow_all_origins and has_cookie:
-                    response.headers['Access-Control-Allow-Origin'] = origin
-                elif not cors.allow_all_origins and cors.is_allowed_origin(origin=origin):
-                    response.headers['Access-Control-Allow-Origin'] = origin
-                    response.headers.add_vary_header('Origin')
-            return response
