@@ -3,19 +3,13 @@
 """
 数据驱动测试API
 """
-from typing import Dict, List, Optional, Any, Coroutine
-
-from fastapi import APIRouter, Body, Path, Query, UploadFile, File, Form
-from fastapi.responses import JSONResponse
 import pandas as pd
 import json
 import os
-import tempfile
-
+from fastapi import APIRouter, Path, UploadFile, File, Form
 from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 from backend.plugin.api_testing.utils.data_driven import (
-    DataDriverManager, DataDrivenConfig, DataSourceConfig,
-    DataSourceType, DatabaseType, TestCaseParameter, TestIteration
+    DataDriverManager, DataDrivenConfig, DataSourceConfig, DataSourceType
 )
 
 router = APIRouter()

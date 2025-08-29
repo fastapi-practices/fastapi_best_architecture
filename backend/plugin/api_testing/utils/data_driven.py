@@ -9,9 +9,7 @@ import json
 import os
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
-
 from pydantic import BaseModel, Field
-
 from backend.common.log import log
 from backend.core.path_conf import PLUGIN_DIR
 

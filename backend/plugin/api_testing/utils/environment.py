@@ -9,9 +9,7 @@ import os
 import re
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Union, Tuple
-
 from pydantic import BaseModel, Field
-
 from backend.common.log import log
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client

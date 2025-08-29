@@ -3,15 +3,12 @@
 """
 环境和变量管理API
 """
-from typing import Dict, List, Optional, Any
-
+from typing import Dict, Optional, Any
 from fastapi import APIRouter, Body, Path, Query
-from fastapi.responses import JSONResponse
 
 from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 from backend.plugin.api_testing.utils.environment import (
-    EnvironmentManager, EnvironmentModel, VariableManager, VariableModel,
-    VariableScope, EnvironmentType
+    EnvironmentManager, EnvironmentModel, VariableManager, VariableModel, VariableScope
 )
 
 router = APIRouter()

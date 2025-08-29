@@ -4,12 +4,10 @@
 历史记录辅助工具
 提供快速记录和分析接口历史的辅助函数
 """
+import httpx
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
-
-import httpx
-
+from typing import Any, Dict, List, Optional
 from backend.plugin.api_testing.utils.history import HistoryManager, RequestHistoryItem
 
 

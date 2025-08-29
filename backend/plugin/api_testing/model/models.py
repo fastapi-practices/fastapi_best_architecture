@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Dict, List, Optional, Any
-
+from typing import List
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, JSON, ForeignKey
-from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm import relationship, Mapped
 from backend.common.enums import StatusType
-from backend.database.db_mysql import Base
+from backend.common.model import Base
 
 
 class ApiProject(Base):
@@ -25,7 +23,7 @@ class ApiProject(Base):
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
-    test_cases = relationship("ApiTestCase", back_populates="project")
+    test_cases: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="project")
 
 
 class ApiTestCase(Base):
@@ -43,9 +41,9 @@ class ApiTestCase(Base):
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
-    project = relationship("ApiProject", back_populates="test_cases")
-    steps = relationship("ApiTestStep", back_populates="test_case")
-    reports = relationship("ApiTestReport", back_populates="test_case")
+    project: Mapped[List["ApiProject"]] = relationship("ApiProject", back_populates="test_cases")
+    steps: Mapped[List["ApiTestStep"]] = relationship("ApiTestStep", back_populates="test_case")
+    reports: Mapped[List["ApiTestReport"]] = relationship("ApiTestReport", back_populates="test_case")
 
 
 class ApiTestStep(Base):
@@ -74,7 +72,7 @@ class ApiTestStep(Base):
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
-    test_case = relationship("ApiTestCase", back_populates="steps")
+    test_case: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="steps")
 
 
 class ApiTestReport(Base):
@@ -95,4 +93,4 @@ class ApiTestReport(Base):
     create_time = Column(DateTime, default=datetime.now, comment='创建时间')
 
     # 关联关系
-    test_case = relationship("ApiTestCase", back_populates="reports")
+    test_case: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="reports")

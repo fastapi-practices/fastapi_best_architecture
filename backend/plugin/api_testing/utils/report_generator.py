@@ -4,17 +4,14 @@
 测试报告生成工具
 支持生成HTML和JSON格式的测试报告
 """
+import jinja2
 import json
 import os
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
-
-import jinja2
 from pydantic import BaseModel
-
 from backend.core.path_conf import PLUGIN_DIR
-from backend.plugin.api_testing.utils.http_client import RequestResult
 
 
 class ReportFormat(str, Enum):

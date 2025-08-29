@@ -4,12 +4,10 @@
 SQL执行工具模块
 提供数据库查询和执行功能
 """
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-
 import pymysql
+from enum import Enum
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
-
 from backend.common.log import log
 from backend.core.conf import settings
 

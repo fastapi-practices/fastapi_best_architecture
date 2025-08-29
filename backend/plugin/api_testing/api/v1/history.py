@@ -5,9 +5,8 @@
 提供接口请求历史记录的API
 """
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Coroutine
+from typing import Any, List, Optional
 from fastapi import APIRouter, Body, Query
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 from backend.plugin.api_testing.utils.history import HistoryManager, RequestHistoryItem
