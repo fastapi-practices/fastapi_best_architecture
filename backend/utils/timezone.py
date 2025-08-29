@@ -12,8 +12,6 @@ class TimeZone:
     def __init__(self) -> None:
         """初始化时区转换器"""
         self.tz_info = zoneinfo.ZoneInfo(settings.DATETIME_TIMEZONE)
-        # TODO 这里对实行夏令时地区会有问题，是否采用动态计算？
-        self.utcoffset = datetime.now(tz=self.tz_info).utcoffset()
 
     def now(self) -> datetime:
         """获取当前时区时间"""

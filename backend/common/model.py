@@ -63,9 +63,7 @@ class TimeZone(TypeDecorator[datetime]):
 
     def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
         if value is not None:
-            # TODO这里没有考虑夏令时的问题,有些地区的夏令时会导致offset偏移改变
-            # timezone.utcoffset 是首次加载初始化，在采用夏令时地区会有问题
-            if value.utcoffset() != timezone.utcoffset:
+            if value.utcoffset() != datetime.now(tz=timezone.tz_info).utcoffset():
                 value = timezone.from_datetime(value)
         return value
 
