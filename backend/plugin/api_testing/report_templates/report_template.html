@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.name }} - 接口自动化测试报告</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .report-header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+        }
+        .report-title {
+            margin: 0;
+            color: #333;
+        }
+        .report-meta {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .meta-item {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 10px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .summary {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+        }
+        .summary-title {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #333;
+        }
+        .summary-data {
+            display: flex;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+        .summary-item {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+        }
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .success-value { color: #28a745; }
+        .fail-value { color: #dc3545; }
+        .summary-label {
+            color: #666;
+        }
+        .steps {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .steps-title {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #333;
+        }
+        .step-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .step-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+        }
+        .step-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #28a745;
+        }
+        .status-fail {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        .step-content {
+            display: none;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .step-section {
+            margin-bottom: 15px;
+        }
+        .step-section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        .request-url {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .code-block {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .badge {
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .badge-success {
+            background-color: #d4edda;
+            color: #28a745;
+        }
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <h1 class="report-title">{{ report.name }}</h1>
+        <div class="report-meta">
+            <div class="meta-item">
+                <div class="meta-label">项目名称:</div>
+                <div>{{ report.project_name }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">测试用例:</div>
+                <div>{{ report.test_case_name }}</div>
+            </div>
+            {% if report.environment %}
+            <div class="meta-item">
+                <div class="meta-label">测试环境:</div>
+                <div>{{ report.environment }}</div>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <div class="meta-label">开始时间:</div>
+                <div>{% if report.start_time %}{{ report.start_time.strftime('%Y-%m-%d %H:%M:%S') if report.start_time.__class__.__name__ == 'datetime' else report.start_time }}{% else %}-{% endif %}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">结束时间:</div>
+                <div>{% if report.end_time %}{{ report.end_time.strftime('%Y-%m-%d %H:%M:%S') if report.end_time.__class__.__name__ == 'datetime' else report.end_time }}{% else %}-{% endif %}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">总耗时:</div>
+                <div>{{ (report.duration / 1000)|round(2) }} 秒</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary">
+        <h2 class="summary-title">测试摘要</h2>
+        <div class="summary-data">
+            <div class="summary-item">
+                <div class="summary-value">{{ report.total_steps }}</div>
+                <div class="summary-label">总步骤</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value success-value">{{ report.success_steps }}</div>
+                <div class="summary-label">成功</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value fail-value">{{ report.fail_steps }}</div>
+                <div class="summary-label">失败</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value {% if report.success %}success-value{% else %}fail-value{% endif %}">
+                    {% if report.total_steps > 0 %}{{ ((report.success_steps / report.total_steps) * 100)|round(0)|int }}%{% else %}0%{% endif %}
+                </div>
+                <div class="summary-label">通过率</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="steps">
+        <h2 class="steps-title">测试步骤详情</h2>
+        {% for step in report.steps %}
+        <div class="step-item">
+            <div class="step-header" onclick="toggleStepContent('step-{{ loop.index }}')">
+                <h3 class="step-name">{{ step.order }}. {{ step.name }}</h3>
+                <span class="step-status {% if step.success %}status-success{% else %}status-fail{% endif %}">
+                    {% if step.success %}成功{% else %}失败{% endif %}
+                </span>
+            </div>
+            <div class="step-content" id="step-{{ loop.index }}">
+                <div class="step-section">
+                    <div class="step-section-title">请求信息</div>
+                    <div class="request-url">{{ step.method }} {{ step.url }}</div>
+
+                    {% if step.request_data %}
+                        {% if step.request_data.headers is defined and step.request_data.headers and step.request_data.headers|length > 0 %}
+                        <h4>请求头</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.headers.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+
+                        {% if step.request_data.params is defined and step.request_data.params and step.request_data.params|length > 0 %}
+                        <h4>查询参数</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.params.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+
+                        {% if step.request_data.json_data is defined and step.request_data.json_data %}
+                        <h4>请求体 (JSON)</h4>
+                        <div class="code-block">{{ step.request_data.json_data | tojson(indent=2) }}</div>
+                        {% elif step.request_data.data is defined and step.request_data.data and step.request_data.data|length > 0 %}
+                        <h4>请求体 (表单)</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.request_data.data.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% elif step.request_data|length > 0 %}
+                        <h4>请求数据</h4>
+                        <div class="code-block">{{ step.request_data | tojson(indent=2) }}</div>
+                        {% endif %}
+                    {% else %}
+                        <p>无请求数据</p>
+                    {% endif %}
+                </div>
+                
+                <div class="step-section">
+                    <div class="step-section-title">响应信息</div>
+                    {% if step.response %}
+                        {% if step.response.status_code is defined or step.response.elapsed_time is defined %}
+                        <table>
+                            {% if step.response.status_code is defined %}
+                            <tr>
+                                <td>状态码</td>
+                                <td>{{ step.response.status_code }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if step.response.elapsed_time is defined %}
+                            <tr>
+                                <td>响应时间</td>
+                                <td>{{ step.response.elapsed_time|round(2) }} 毫秒</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                        {% endif %}
+
+                        {% if step.response.headers is defined and step.response.headers and step.response.headers|length > 0 %}
+                        <h4>响应头</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in step.response.headers.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+
+                        {% if step.response.json_data is defined and step.response.json_data %}
+                        <h4>响应体 (JSON)</h4>
+                        <div class="code-block">{{ step.response.json_data | tojson(indent=2) }}</div>
+                        {% elif step.response.text is defined and step.response.text %}
+                        <h4>响应体</h4>
+                        <div class="code-block">{{ step.response.text }}</div>
+                        {% elif step.response|length > 0 %}
+                        <h4>响应数据</h4>
+                        <div class="code-block">{{ step.response | tojson(indent=2) }}</div>
+                        {% endif %}
+                    {% else %}
+                        <h4>响应数据</h4>
+                        <div class="code-block">无响应数据</div>
+                    {% endif %}
+                </div>
+                
+                {% if step.assertions %}
+                <div class="step-section">
+                    <div class="step-section-title">断言结果</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>断言数据</th>
+                                <th>结果</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assertion in step.assertions %}
+                            <tr>
+                                <td>
+                                    {% if assertion.assertion is defined %}
+                                        <!-- 标准AssertionResult格式 -->
+                                        <strong>类型:</strong> {{ assertion.assertion.type }}<br>
+                                        {% if assertion.assertion.path %}<strong>路径:</strong> {{ assertion.assertion.path }}<br>{% endif %}
+                                        {% if assertion.assertion.expected is not none %}<strong>期望值:</strong> {{ assertion.assertion.expected }}<br>{% endif %}
+                                        {% if assertion.actual is not none %}<strong>实际值:</strong> {{ assertion.actual }}{% endif %}
+                                    {% else %}
+                                        <!-- 原始字典格式 -->
+                                        {% for key, value in assertion.items() %}
+                                        <strong>{{ key }}:</strong> {{ value }}<br>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assertion.success is defined %}
+                                        <span class="badge {% if assertion.success %}badge-success{% else %}badge-danger{% endif %}">
+                                            {% if assertion.success %}通过{% else %}失败{% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">未知</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                
+                {% if step.sql_results %}
+                <div class="step-section">
+                    <div class="step-section-title">SQL执行结果</div>
+                    {% for sql_result in step.sql_results %}
+                    <div style="margin-bottom: 20px;">
+                        {% if sql_result.name is defined %}
+                            <!-- 标准SQL结果格式 -->
+                            <h4>{{ sql_result.name }}</h4>
+                            {% if sql_result.query %}<div class="code-block">{{ sql_result.query }}</div>{% endif %}
+
+                            <p>
+                                状态:
+                                <span class="badge {% if sql_result.success %}badge-success{% else %}badge-danger{% endif %}">
+                                    {% if sql_result.success %}成功{% else %}失败{% endif %}
+                                </span>
+                            </p>
+
+                            {% if sql_result.error %}
+                            <p>错误信息: {{ sql_result.error }}</p>
+                            {% endif %}
+
+                            {% if sql_result.affected_rows is not none %}
+                            <p>影响行数: {{ sql_result.affected_rows }}</p>
+                            {% endif %}
+
+                            {% if sql_result.data is defined and sql_result.data %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {% for key in sql_result.data[0].keys() %}
+                                        <th>{{ key }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in sql_result.data %}
+                                    <tr>
+                                        {% for value in row.values() %}
+                                        <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+
+                            {% if sql_result.extracted_variables is defined and sql_result.extracted_variables %}
+                            <h5>提取的变量</h5>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>变量名</th>
+                                        <th>值</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in sql_result.extracted_variables.items() %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        {% else %}
+                            <!-- 原始字典格式 -->
+                            <h4>SQL结果</h4>
+                            <div class="code-block">{{ sql_result | tojson(indent=2) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if step.variables %}
+                <div class="step-section">
+                    <div class="step-section-title">提取的变量</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>变量名</th>
+                                <th>值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in step.variables.items() %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="footer">
+        <p>生成时间: {{ current_time }} | API自动化测试报告</p>
+    </div>
+
+    <script>
+        function toggleStepContent(stepId) {
+            var content = document.getElementById(stepId);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

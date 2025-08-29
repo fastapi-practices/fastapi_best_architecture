@@ -3,20 +3,19 @@
 """
 测试报告API
 """
-from typing import Any, Dict
 from fastapi import APIRouter, Body
 from fastapi.responses import HTMLResponse
-from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
+from backend.common.response.response_schema import response_base, ResponseModel
 from backend.plugin.api_testing.utils.report_generator import ReportFormat, TestReport, report_generator
 
 router = APIRouter()
 
 
-@router.post("/generate", response_model=Dict[str, Any], summary="生成测试报告")
+@router.post("/generate", summary="生成测试报告")
 async def generate_report(
         report_data: TestReport = Body(...),
         format: ReportFormat = Body(ReportFormat.HTML)
-) -> ResponseModel | ResponseSchemaModel:
+) -> ResponseModel:
     """
     生成测试报告接口
     

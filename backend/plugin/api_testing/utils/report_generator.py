@@ -83,22 +83,26 @@ class ReportGenerator:
     def _generate_html_report(self, report_data: TestReport) -> str:
         """
         生成HTML格式的测试报告
-        
+
         :param report_data: 报告数据
         :return: HTML报告内容
         """
         try:
+            # 预处理数据，确保日期时间字段正确
+            processed_data = self._preprocess_report_data(report_data)
+
             template = self.env.get_template('report_template.html')
             return template.render(
-                report=report_data,
+                report=processed_data,
                 current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
         except jinja2.exceptions.TemplateNotFound:
             # 如果模板不存在，先创建默认模板
             self._create_default_html_template()
             template = self.env.get_template('report_template.html')
+            processed_data = self._preprocess_report_data(report_data)
             return template.render(
-                report=report_data,
+                report=processed_data,
                 current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )
     
@@ -122,6 +126,60 @@ class ReportGenerator:
         
         # 转换为JSON字符串
         return json.dumps(report_dict, ensure_ascii=False, indent=2)
+
+    def _preprocess_report_data(self, report_data: TestReport) -> TestReport:
+        """
+        预处理报告数据，确保日期时间字段正确
+
+        :param report_data: 原始报告数据
+        :return: 处理后的报告数据
+        """
+        # 如果是字典格式的数据，先转换为对象
+        if isinstance(report_data, dict):
+            # 处理日期时间字符串
+            if isinstance(report_data.get('start_time'), str):
+                try:
+                    report_data['start_time'] = datetime.fromisoformat(report_data['start_time'].replace('Z', '+00:00'))
+                except ValueError:
+                    # 如果解析失败，尝试其他格式
+                    try:
+                        report_data['start_time'] = datetime.strptime(report_data['start_time'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        report_data['start_time'] = datetime.now()
+
+            if isinstance(report_data.get('end_time'), str):
+                try:
+                    report_data['end_time'] = datetime.fromisoformat(report_data['end_time'].replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        report_data['end_time'] = datetime.strptime(report_data['end_time'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        report_data['end_time'] = datetime.now()
+
+            # 处理步骤中的日期时间
+            for step in report_data.get('steps', []):
+                if isinstance(step.get('start_time'), str):
+                    try:
+                        step['start_time'] = datetime.fromisoformat(step['start_time'].replace('Z', '+00:00'))
+                    except ValueError:
+                        try:
+                            step['start_time'] = datetime.strptime(step['start_time'], '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            step['start_time'] = datetime.now()
+
+                if isinstance(step.get('end_time'), str):
+                    try:
+                        step['end_time'] = datetime.fromisoformat(step['end_time'].replace('Z', '+00:00'))
+                    except ValueError:
+                        try:
+                            step['end_time'] = datetime.strptime(step['end_time'], '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            step['end_time'] = datetime.now()
+
+            # 重新创建TestReport对象
+            report_data = TestReport(**report_data)
+
+        return report_data
     
     def _create_default_html_template(self) -> None:
         """创建默认HTML报告模板"""
