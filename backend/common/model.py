@@ -63,7 +63,8 @@ class TimeZone(TypeDecorator[datetime]):
 
     def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
         if value is not None:
-            if value.tzinfo != timezone.tz_info:
+            # TODO 处理夏令时偏移
+            if value.utcoffset() != timezone.now().utcoffset():
                 value = timezone.from_datetime(value)
         return value
 
