@@ -3,10 +3,8 @@
 """
 请求相关模型
 """
-from typing import Any, Dict, List, Optional, Union
-
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
-
 from backend.plugin.api_testing.utils.http_client import RequestOptions
 
 

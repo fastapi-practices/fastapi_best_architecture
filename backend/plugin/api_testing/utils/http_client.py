@@ -4,12 +4,9 @@
 接口请求客户端
 基于httpx实现HTTP请求功能
 """
-import json
 import time
-from typing import Any, Dict, List, Optional, Union
-
 import httpx
-from fastapi import HTTPException
+from typing import Any, Dict, Optional
 from pydantic import BaseModel
 
 
@@ -39,7 +36,7 @@ class RequestResult(BaseModel):
 
 class HttpClient:
     """HTTP客户端"""
-    
+
     def __init__(self, options: RequestOptions = None):
         """
         初始化HTTP客户端
@@ -47,19 +44,19 @@ class HttpClient:
         :param options: 请求选项
         """
         self.options = options or RequestOptions()
-        
+
     async def request(
-        self,
-        method: str,
-        url: str,
-        params: Dict[str, Any] = None,
-        headers: Dict[str, str] = None,
-        cookies: Dict[str, str] = None,
-        data: Dict[str, Any] = None,
-        json_data: Dict[str, Any] = None,
-        files: Dict[str, Any] = None,
-        auth: tuple = None,
-        options: RequestOptions = None
+            self,
+            method: str,
+            url: str,
+            params: Dict[str, Any] = None,
+            headers: Dict[str, str] = None,
+            cookies: Dict[str, str] = None,
+            data: Dict[str, Any] = None,
+            json_data: Dict[str, Any] = None,
+            files: Dict[str, Any] = None,
+            auth: tuple = None,
+            options: RequestOptions = None
     ) -> RequestResult:
         """
         发送HTTP请求
@@ -77,7 +74,7 @@ class HttpClient:
         :return: 请求结果
         """
         opts = options or self.options
-        
+
         # 准备客户端参数
         client_kwargs = {
             "timeout": opts.timeout,
@@ -85,7 +82,7 @@ class HttpClient:
             "follow_redirects": opts.follow_redirects,
             "max_redirects": opts.max_redirects
         }
-        
+
         # 准备请求参数
         request_kwargs = {
             "method": method,
@@ -98,15 +95,15 @@ class HttpClient:
             "files": files,
             "auth": auth
         }
-        
+
         # 过滤None值
         request_kwargs = {k: v for k, v in request_kwargs.items() if v is not None}
-        
+
         start_time = time.time()
         error = None
         response = None
         retry_count = 0
-        
+
         # 支持请求重试
         while retry_count <= opts.retry_count:
             try:
@@ -121,9 +118,9 @@ class HttpClient:
                     time.sleep(opts.retry_interval)
                 else:
                     break
-        
+
         elapsed_time = (time.time() - start_time) * 1000  # 转换为毫秒
-        
+
         if response is None:
             # 请求失败，返回错误信息
             return RequestResult(
@@ -137,7 +134,7 @@ class HttpClient:
                 text="",
                 error=error
             )
-        
+
         # 尝试解析JSON
         json_result = None
         try:
@@ -145,7 +142,7 @@ class HttpClient:
                 json_result = response.json()
         except Exception:
             pass
-            
+
         # 构建结果
         result = RequestResult(
             url=str(response.url),
@@ -158,7 +155,7 @@ class HttpClient:
             text=response.text,
             json_data=json_result
         )
-        
+
         return result
 
 
@@ -167,16 +164,16 @@ default_client = HttpClient()
 
 
 async def send_request(
-    method: str,
-    url: str,
-    params: Dict[str, Any] = None,
-    headers: Dict[str, str] = None,
-    cookies: Dict[str, str] = None,
-    data: Dict[str, Any] = None,
-    json_data: Dict[str, Any] = None,
-    files: Dict[str, Any] = None,
-    auth: tuple = None,
-    options: RequestOptions = None
+        method: str,
+        url: str,
+        params: Dict[str, Any] = None,
+        headers: Dict[str, str] = None,
+        cookies: Dict[str, str] = None,
+        data: Dict[str, Any] = None,
+        json_data: Dict[str, Any] = None,
+        files: Dict[str, Any] = None,
+        auth: tuple = None,
+        options: RequestOptions = None
 ) -> RequestResult:
     """
     使用默认客户端发送请求的辅助函数

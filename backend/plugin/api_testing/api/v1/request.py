@@ -3,7 +3,6 @@
 """
 接口请求API
 """
-from typing import Any, Dict
 from fastapi import APIRouter
 from backend.plugin.api_testing.schema.request import ApiRequestSchema, ApiResponseSchema
 from backend.plugin.api_testing.utils.http_client import send_request
@@ -27,7 +26,7 @@ async def send_api_request(request_data: ApiRequestSchema) -> ResponseModel | Re
             try:
                 with open(file_path, "rb") as file:
                     files[field_name] = (file_path.split("/")[-1], file.read())
-            except Exception as error:
+            except Exception:
                 return response_base.fail()
 
     # 处理认证信息
@@ -64,6 +63,5 @@ async def send_api_request(request_data: ApiRequestSchema) -> ResponseModel | Re
         )
 
         return response_base.success(data=response_data.model_dump())
-    except Exception as error:
-        # self._handle_exception(error)
+    except Exception:
         return response_base.fail()
