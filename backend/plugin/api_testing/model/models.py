@@ -41,7 +41,7 @@ class ApiTestCase(Base):
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
-    project: Mapped[List["ApiProject"]] = relationship("ApiProject", back_populates="test_cases")
+    project: Mapped["ApiProject"] = relationship("ApiProject", back_populates="test_cases")
     steps: Mapped[List["ApiTestStep"]] = relationship("ApiTestStep", back_populates="test_case")
     reports: Mapped[List["ApiTestReport"]] = relationship("ApiTestReport", back_populates="test_case")
 
@@ -72,7 +72,7 @@ class ApiTestStep(Base):
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
-    test_case: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="steps")
+    test_case: Mapped["ApiTestCase"] = relationship("ApiTestCase", back_populates="steps")
 
 
 class ApiTestReport(Base):
@@ -93,4 +93,4 @@ class ApiTestReport(Base):
     create_time = Column(DateTime, default=datetime.now, comment='创建时间')
 
     # 关联关系
-    test_case: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="reports")
+    test_case: Mapped["ApiTestCase"] = relationship("ApiTestCase", back_populates="reports")

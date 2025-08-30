@@ -23,48 +23,74 @@
 
 ## API接口
 
-### 请求接口
+### 数据管理接口
 
+#### 项目管理接口
+- **POST** `/v1/api_testing/projects`: 创建API项目
+- **GET** `/v1/api_testing/projects/{project_id}`: 获取API项目详情
+- **GET** `/v1/api_testing/projects`: 获取API项目列表
+- **PUT** `/v1/api_testing/projects/{project_id}`: 更新API项目
+- **DELETE** `/v1/api_testing/projects/{project_id}`: 删除API项目
+
+#### 测试用例管理接口
+- **POST** `/v1/api_testing/test-cases`: 创建测试用例
+- **GET** `/v1/api_testing/test-cases/{case_id}`: 获取测试用例详情
+- **GET** `/v1/api_testing/test-cases`: 获取测试用例列表
+- **PUT** `/v1/api_testing/test-cases/{case_id}`: 更新测试用例
+- **DELETE** `/v1/api_testing/test-cases/{case_id}`: 删除测试用例
+
+#### 测试步骤管理接口
+- **POST** `/v1/api_testing/test-steps`: 创建测试步骤
+- **GET** `/v1/api_testing/test-steps/{step_id}`: 获取测试步骤详情
+- **GET** `/v1/api_testing/test-steps`: 获取测试步骤列表
+- **PUT** `/v1/api_testing/test-steps/{step_id}`: 更新测试步骤
+- **DELETE** `/v1/api_testing/test-steps/{step_id}`: 删除测试步骤
+- **POST** `/v1/api_testing/test-steps/reorder`: 重新排序测试步骤
+
+#### 测试报告管理接口
+- **POST** `/v1/api_testing/test-reports`: 创建测试报告
+- **GET** `/v1/api_testing/test-reports/{report_id}`: 获取测试报告详情
+- **GET** `/v1/api_testing/test-reports`: 获取测试报告列表
+- **DELETE** `/v1/api_testing/test-reports/{report_id}`: 删除测试报告
+- **GET** `/v1/api_testing/test-reports/statistics`: 获取测试报告统计信息
+- **DELETE** `/v1/api_testing/test-reports/cleanup`: 清理旧的测试报告
+
+### 功能接口
+
+#### 请求接口
 - **POST** `/v1/api_testing/requests/send`: 发送API请求
 
-### 断言接口
-
+#### 断言接口
 - **POST** `/v1/api_testing/assertions/validate`: 执行单个断言验证
 - **POST** `/v1/api_testing/assertions/batch-validate`: 批量执行断言验证
 
-### SQL接口
-
+#### SQL接口
 - **POST** `/v1/api_testing/sql/execute`: 执行SQL查询
 - **POST** `/v1/api_testing/sql/batch-execute`: 批量执行SQL查询
 
-### 报告接口
-
+#### 报告接口
 - **POST** `/v1/api_testing/reports/generate`: 生成测试报告
 - **POST** `/v1/api_testing/reports/preview`: 预览HTML测试报告
 
-### 环境变量接口
-
+#### 环境变量接口
 - **POST** `/v1/api_testing/environments`: 创建环境
 - **GET** `/v1/api_testing/environments/{environment_id}`: 获取环境信息
 - **GET** `/v1/api_testing/environments`: 获取环境列表
 - **POST** `/v1/api_testing/environments/variables`: 创建变量
 - **GET** `/v1/api_testing/environments/variables`: 获取变量列表
 
-### Mock服务接口
-
+#### Mock服务接口
 - **POST** `/v1/api_testing/mocks/projects`: 创建Mock项目
 - **GET** `/v1/api_testing/mocks/projects`: 获取Mock项目列表
 - **POST** `/v1/api_testing/mocks/rules`: 创建Mock规则
 - **GET** `/v1/api_testing/mocks/rules`: 获取Mock规则列表
 
-### 数据驱动接口
-
+#### 数据驱动接口
 - **POST** `/v1/api_testing/data-driven/config`: 创建数据驱动配置
 - **POST** `/v1/api_testing/data-driven/upload/csv`: 上传CSV数据文件
 - **POST** `/v1/api_testing/data-driven/upload/excel`: 上传Excel数据文件
 
-### 历史记录接口
-
+#### 历史记录接口
 - **POST** `/v1/api_testing/history`: 保存请求历史记录
 - **GET** `/v1/api_testing/history/{history_id}`: 获取请求历史记录
 - **GET** `/v1/api_testing/history`: 获取请求历史记录列表
@@ -97,9 +123,173 @@
 | length_greater_than | 长度大于 |
 | length_less_than | 长度小于 |
 
+## 数据表结构
+
+### API项目表 (api_project)
+- `id`: 主键ID
+- `name`: 项目名称
+- `description`: 项目描述
+- `base_url`: 基础URL
+- `headers`: 全局请求头 (JSON)
+- `variables`: 全局变量 (JSON)
+- `status`: 状态 (1启用 0禁用)
+- `create_time`: 创建时间
+- `update_time`: 更新时间
+
+### API测试用例表 (api_test_case)
+- `id`: 主键ID
+- `name`: 用例名称
+- `project_id`: 所属项目ID (外键)
+- `description`: 用例描述
+- `pre_script`: 前置脚本
+- `post_script`: 后置脚本
+- `status`: 状态 (1启用 0禁用)
+- `create_time`: 创建时间
+- `update_time`: 更新时间
+
+### API测试步骤表 (api_test_step)
+- `id`: 主键ID
+- `name`: 步骤名称
+- `test_case_id`: 所属用例ID (外键)
+- `url`: 请求URL
+- `method`: 请求方法
+- `headers`: 请求头 (JSON)
+- `params`: 查询参数 (JSON)
+- `body`: 请求体 (JSON)
+- `files`: 上传文件 (JSON)
+- `auth`: 认证信息 (JSON)
+- `extract`: 提取变量 (JSON)
+- `validate`: 断言列表 (JSON)
+- `sql_queries`: SQL查询列表 (JSON)
+- `timeout`: 超时时间(秒)
+- `retry`: 重试次数
+- `retry_interval`: 重试间隔(秒)
+- `order`: 步骤顺序
+- `status`: 状态 (1启用 0禁用)
+- `create_time`: 创建时间
+- `update_time`: 更新时间
+
+### API测试报告表 (api_test_report)
+- `id`: 主键ID
+- `test_case_id`: 所属用例ID (外键)
+- `name`: 报告名称
+- `success`: 是否成功
+- `total_steps`: 总步骤数
+- `success_steps`: 成功步骤数
+- `fail_steps`: 失败步骤数
+- `start_time`: 开始时间
+- `end_time`: 结束时间
+- `duration`: 执行时长(毫秒)
+- `details`: 报告详情 (JSON)
+- `create_time`: 创建时间
+
 ## 使用示例
 
-### 发送请求
+### 1. 项目管理
+
+#### 创建API项目
+
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/v1/api_testing/projects",
+    json={
+        "name": "用户管理API",
+        "description": "用户管理相关接口测试",
+        "base_url": "https://api.example.com",
+        "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer token123"
+        },
+        "variables": {
+            "timeout": 30,
+            "retry": 3
+        }
+    }
+)
+
+print(response.json())
+```
+
+#### 获取项目列表
+
+```python
+import requests
+
+response = requests.get(
+    "http://localhost:8000/v1/api_testing/projects",
+    params={
+        "skip": 0,
+        "limit": 10
+    }
+)
+
+print(response.json())
+```
+
+### 2. 测试用例管理
+
+#### 创建测试用例
+
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/v1/api_testing/test-cases",
+    json={
+        "name": "用户登录测试",
+        "project_id": 1,
+        "description": "测试用户登录功能",
+        "pre_script": "console.log('开始执行登录测试');",
+        "post_script": "console.log('登录测试完成');"
+    }
+)
+
+print(response.json())
+```
+
+### 3. 测试步骤管理
+
+#### 创建测试步骤
+
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/v1/api_testing/test-steps",
+    json={
+        "name": "发送登录请求",
+        "test_case_id": 1,
+        "url": "/auth/login",
+        "method": "POST",
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": {
+            "username": "testuser",
+            "password": "password123"
+        },
+        "validate": [
+            {
+                "source": "json",
+                "type": "equals",
+                "path": "$.success",
+                "expected": True,
+                "message": "登录成功验证"
+            }
+        ],
+        "extract": {
+            "token": "$.data.token"
+        },
+        "order": 1
+    }
+)
+
+print(response.json())
+```
+
+### 4. 发送API请求
 
 ```python
 import requests
