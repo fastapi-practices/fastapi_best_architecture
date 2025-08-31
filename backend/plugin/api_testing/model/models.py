@@ -19,8 +19,8 @@ class ApiProject(Base):
     headers = Column(JSON, nullable=True, comment='全局请求头')
     variables = Column(JSON, nullable=True, comment='全局变量')
     status = Column(Integer, default=StatusType.enable.value, nullable=False, comment='状态 1启用 0禁用')
-    create_time = Column(DateTime, default=datetime.now, comment='创建时间')
-    update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
+    # created_time = Column(DateTime, default=datetime.utcnow)
+    # updated_time = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # 关联关系
     test_cases: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="project")

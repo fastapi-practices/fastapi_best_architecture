@@ -132,8 +132,8 @@ class ProjectResponse(BaseModel):
     headers: Optional[Dict[str, str]] = None
     variables: Optional[Dict[str, Any]] = None
     status: int
-    create_time: str
-    update_time: str
+    created_time: str
+    updated_time: str
 
 
 # 测试用例相关模型

@@ -17,14 +17,17 @@ class ProjectService:
     async def create_project(project_data: ProjectCreateRequest) -> ApiProject:
         """创建API项目"""
         async with async_db_session() as db:
-            project = ApiProject(
-                name=project_data.name,
-                description=project_data.description,
-                base_url=project_data.base_url,
-                headers=project_data.headers,
-                variables=project_data.variables,
-                status=project_data.status
-            )
+            # 创建空的项目对象，不传递任何参数
+            project = ApiProject(test_cases=[])
+
+            # 设置项目属性
+            project.name = project_data.name
+            project.description = project_data.description
+            project.base_url = project_data.base_url
+            project.headers = project_data.headers
+            project.variables = project_data.variables
+            project.status = project_data.status
+
             db.add(project)
             await db.commit()
             await db.refresh(project)
@@ -66,8 +69,8 @@ class ProjectService:
             if update_data:
                 await db.execute(
                     update(ApiProject)
-                    .where(ApiProject.id == project_id)
-                    .values(**update_data)
+                        .where(ApiProject.id == project_id)
+                        .values(**update_data)
                 )
                 await db.commit()
 

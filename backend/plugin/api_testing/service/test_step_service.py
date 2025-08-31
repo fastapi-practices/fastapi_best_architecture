@@ -4,9 +4,8 @@
 API测试步骤服务层
 """
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
-from backend.database.db_mysql import async_db_session
+from backend.database.db import async_db_session
 from backend.plugin.api_testing.model.models import ApiTestStep
 from backend.plugin.api_testing.schema.request import TestStepCreateRequest, TestStepUpdateRequest
 
@@ -54,10 +53,10 @@ class TestStepService:
         """获取测试步骤列表"""
         async with async_db_session() as db:
             query = select(ApiTestStep).order_by(ApiTestStep.order)
-            
+
             if test_case_id:
                 query = query.where(ApiTestStep.test_case_id == test_case_id)
-            
+
             query = query.offset(skip).limit(limit)
             result = await db.execute(query)
             return result.scalars().all()
@@ -104,8 +103,8 @@ class TestStepService:
             if update_data:
                 await db.execute(
                     update(ApiTestStep)
-                    .where(ApiTestStep.id == step_id)
-                    .values(**update_data)
+                        .where(ApiTestStep.id == step_id)
+                        .values(**update_data)
                 )
                 await db.commit()
 
@@ -139,9 +138,9 @@ class TestStepService:
                 for item in step_orders:
                     await db.execute(
                         update(ApiTestStep)
-                        .where(ApiTestStep.id == item['step_id'])
-                        .where(ApiTestStep.test_case_id == test_case_id)
-                        .values(order=item['order'])
+                            .where(ApiTestStep.id == item['step_id'])
+                            .where(ApiTestStep.test_case_id == test_case_id)
+                            .values(order=item['order'])
                     )
                 await db.commit()
                 return True

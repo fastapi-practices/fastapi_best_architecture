@@ -4,11 +4,10 @@
 API测试用例服务层
 """
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from sqlalchemy.orm import selectinload
-from backend.database.db_mysql import async_db_session
-from backend.plugin.api_testing.model.models import ApiTestCase, ApiProject
+from backend.database.db import async_db_session
+from backend.plugin.api_testing.model.models import ApiTestCase
 from backend.plugin.api_testing.schema.request import TestCaseCreateRequest, TestCaseUpdateRequest
 
 
