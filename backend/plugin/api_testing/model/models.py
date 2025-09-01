@@ -19,8 +19,6 @@ class ApiProject(Base):
     headers = Column(JSON, nullable=True, comment='全局请求头')
     variables = Column(JSON, nullable=True, comment='全局变量')
     status = Column(Integer, default=StatusType.enable.value, nullable=False, comment='状态 1启用 0禁用')
-    # created_time = Column(DateTime, default=datetime.utcnow)
-    # updated_time = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # 关联关系
     test_cases: Mapped[List["ApiTestCase"]] = relationship("ApiTestCase", back_populates="project")
@@ -37,8 +35,6 @@ class ApiTestCase(Base):
     pre_script = Column(Text, nullable=True, comment='前置脚本')
     post_script = Column(Text, nullable=True, comment='后置脚本')
     status = Column(Integer, default=StatusType.enable.value, nullable=False, comment='状态 1启用 0禁用')
-    create_time = Column(DateTime, default=datetime.now, comment='创建时间')
-    update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
     project: Mapped["ApiProject"] = relationship("ApiProject", back_populates="test_cases")
@@ -68,8 +64,6 @@ class ApiTestStep(Base):
     retry_interval = Column(Integer, default=1, nullable=False, comment='重试间隔(秒)')
     order = Column(Integer, nullable=False, comment='步骤顺序')
     status = Column(Integer, default=StatusType.enable.value, nullable=False, comment='状态 1启用 0禁用')
-    create_time = Column(DateTime, default=datetime.now, comment='创建时间')
-    update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     # 关联关系
     test_case: Mapped["ApiTestCase"] = relationship("ApiTestCase", back_populates="steps")
@@ -90,7 +84,6 @@ class ApiTestReport(Base):
     end_time = Column(DateTime, nullable=False, comment='结束时间')
     duration = Column(Integer, nullable=False, comment='执行时长(毫秒)')
     details = Column(JSON, nullable=False, comment='报告详情')
-    create_time = Column(DateTime, default=datetime.now, comment='创建时间')
 
     # 关联关系
     test_case: Mapped["ApiTestCase"] = relationship("ApiTestCase", back_populates="reports")

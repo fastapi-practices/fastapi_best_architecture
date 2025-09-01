@@ -7,23 +7,18 @@ from datetime import datetime
 from fastapi import APIRouter, Path, Query
 from backend.common.response.response_schema import response_base, ResponseModel, ResponseSchemaModel
 from backend.plugin.api_testing.service.project_service import ProjectService
-from backend.plugin.api_testing.schema.request import (
-    ProjectCreateRequest, ProjectUpdateRequest, ProjectResponse
-)
+from backend.plugin.api_testing.schema.request import (ProjectCreateRequest, ProjectUpdateRequest, ProjectResponse)
 
 router = APIRouter()
 
 
-@router.post("/", response_model=ResponseModel, summary="创建 API 项目")
+@router.post("/", response_model=ResponseModel, summary="创建API项目")
 async def create_project(project_data: ProjectCreateRequest) -> ResponseModel | ResponseSchemaModel:
     """
     创建 API 项目
     """
     try:
         project = await ProjectService.create_project(project_data)
-        # 为空值提供默认时间字符串
-        created_time = project.created_time.isoformat() if project.created_time else datetime.now().isoformat()
-        updated_time = project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
 
         project_response = ProjectResponse(
             id=project.id,
@@ -33,8 +28,8 @@ async def create_project(project_data: ProjectCreateRequest) -> ResponseModel | 
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            created_time=created_time,
-            updated_time=updated_time
+            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
+            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:
@@ -59,8 +54,8 @@ async def get_project(project_id: int = Path(..., description="项目ID")) -> Re
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            create_time=project.create_time.isoformat(),
-            update_time=project.update_time.isoformat()
+            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
+            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:
@@ -89,8 +84,8 @@ async def get_projects(
                 headers=project.headers,
                 variables=project.variables,
                 status=project.status,
-                create_time=project.create_time.isoformat(),
-                update_time=project.update_time.isoformat()
+                created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
+                updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
             )
             project_list.append(project_response.model_dump())
 
@@ -127,8 +122,8 @@ async def update_project(
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            create_time=project.create_time.isoformat(),
-            update_time=project.update_time.isoformat()
+            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
+            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:
