@@ -22,8 +22,8 @@ async def create_project(project_data: ProjectCreateRequest) -> ResponseModel | 
     try:
         project = await ProjectService.create_project(project_data)
         # 为空值提供默认时间字符串
-        created_time = project.created_time.isoformat() if project.created_time else datetime.utcnow().isoformat()
-        updated_time = project.updated_time.isoformat() if project.updated_time else datetime.utcnow().isoformat()
+        created_time = project.created_time.isoformat() if project.created_time else datetime.now().isoformat()
+        updated_time = project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
 
         project_response = ProjectResponse(
             id=project.id,
