@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Sequence
 
-from sqlalchemy import Select, update
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -89,9 +89,7 @@ class CRUDConfig(CRUDPlus[Config]):
         :param objs: 批量更新参数配置参数
         :return:
         """
-        params = [obj.model_dump(exclude_unset=True) for obj in objs]
-        await db.execute(update(self.model), params)
-        return len(params)
+        return await self.bulk_update_models(db, objs)
 
     async def delete(self, db: AsyncSession, pks: list[int]) -> int:
         """
