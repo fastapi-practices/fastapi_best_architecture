@@ -6,15 +6,14 @@ from pydantic import ConfigDict, Field
 
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
+from backend.plugin.notice.enums import NoticeType
 
 
 class NoticeSchemaBase(SchemaBase):
     """通知公告基础模型"""
 
     title: str = Field(description='标题')
-    type: int = Field(description='类型（0：通知、1：公告）')
-    author: str = Field(description='作者')
-    source: str = Field(description='信息来源')
+    type: NoticeType = Field(description='类型（0：通知、1：公告）')
     status: StatusType = Field(description='状态（0：隐藏、1：显示）')
     content: str = Field(description='内容')
 
