@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -30,8 +30,13 @@ async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) ->
         DependsPagination,
     ],
 )
-async def get_notices_paged(db: CurrentSession) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
-    notice_select = await notice_service.get_select()
+async def get_notices_paged(
+    db: CurrentSession,
+    title: Annotated[str | None, Query(description='标题')] = None,
+    type: Annotated[int | None, Query(description='类型')] = None,
+    status: Annotated[int | None, Query(description='状态')] = None,
+) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
+    notice_select = await notice_service.get_select(title=title, type=type, status=status)
     page_data = await paging_data(db, notice_select)
     return response_base.success(data=page_data)
 
