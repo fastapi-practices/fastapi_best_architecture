@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
@@ -20,6 +22,15 @@ class CRUDDictType(CRUDPlus[DictType]):
         :return:
         """
         return await self.select_model(db, pk)
+
+    async def get_all(self, db: AsyncSession) -> Sequence[DictType]:
+        """
+        获取所有字典类型
+
+        :param db: 数据库会话
+        :return:
+        """
+        return await self.select_models(db, load_strategies={'datas': 'noload'})
 
     async def get_list(self, *, name: str | None, code: str | None, status: int | None) -> Select:
         """
