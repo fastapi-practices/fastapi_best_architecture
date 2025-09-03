@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 
 from backend.common.exception import errors
@@ -25,6 +27,12 @@ class DictTypeService:
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
             return dict_type
+
+    @staticmethod
+    async def get_all() -> Sequence[DictType]:
+        async with async_db_session() as db:
+            dict_datas = await dict_type_dao.get_all(db)
+            return dict_datas
 
     @staticmethod
     async def get_select(*, name: str | None, code: str | None, status: int | None) -> Select:
