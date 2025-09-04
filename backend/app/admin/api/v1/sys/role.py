@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
+from backend.app.admin.schema.menu import GetMenuTree
 from backend.app.admin.schema.role import (
     CreateRoleParam,
     DeleteRoleParam,
@@ -33,7 +34,7 @@ async def get_all_roles() -> ResponseSchemaModel[list[GetRoleDetail]]:
 @router.get('/{pk}/menus', summary='获取角色菜单树', dependencies=[DependsJwtAuth])
 async def get_role_menu_tree(
     pk: Annotated[int, Path(description='角色 ID')],
-) -> ResponseSchemaModel[list[dict[str, Any] | None]]:
+) -> ResponseSchemaModel[list[GetMenuTree] | None]:
     menu = await role_service.get_menu_tree(pk=pk)
     return response_base.success(data=menu)
 

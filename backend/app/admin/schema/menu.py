@@ -43,3 +43,9 @@ class GetMenuDetail(MenuSchemaBase):
     id: int = Field(description='菜单 ID')
     created_time: datetime = Field(description='创建时间')
     updated_time: datetime | None = Field(None, description='更新时间')
+
+
+class GetMenuTree(GetMenuDetail):
+    """获取菜单树"""
+
+    children: list['GetMenuTree'] | None = Field(None, description='子菜单')
