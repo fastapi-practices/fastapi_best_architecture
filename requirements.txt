@@ -184,6 +184,8 @@ psutil==7.0.0
     # via fastapi-best-architecture
 psycopg==3.2.9
     # via fastapi-best-architecture
+psycopg-binary==3.2.9 ; implementation_name != 'pypy'
+    # via psycopg
 pwdlib==0.2.1
     # via fastapi-best-architecture
 pyasn1==0.6.1
