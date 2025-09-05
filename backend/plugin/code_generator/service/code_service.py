@@ -162,7 +162,7 @@ class GenService:
 
             return [os.path.join(gen_path, *target_file.split('/')) for target_file in target_files]
 
-    async def generate(self, *, pk: int) -> None:
+    async def generate(self, *, pk: int) -> str:
         """
         生成代码文件
 
@@ -216,6 +216,8 @@ class GenService:
                 # 写入代码文件
                 async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
+
+        return gen_path
 
     async def download(self, *, pk: int) -> io.BytesIO:
         """

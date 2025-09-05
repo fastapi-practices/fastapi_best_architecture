@@ -12,6 +12,7 @@ import granian
 from cappa import ValueFrom
 from rich.panel import Panel
 from rich.prompt import IntPrompt
+from rich.table import Table
 from rich.text import Text
 from sqlalchemy import text
 from watchfiles import PythonFilter
@@ -36,7 +37,7 @@ class CustomReloadFilter(PythonFilter):
         super().__init__(extra_extensions=['.json', '.yaml', '.yml'])
 
 
-def run(host: str, port: int, reload: bool, workers: int | None) -> None:
+def run(host: str, port: int, reload: bool, workers: int) -> None:
     url = f'http://{host}:{port}'
     docs_url = url + settings.FASTAPI_DOCS_URL
     redoc_url = url + settings.FASTAPI_REDOC_URL
@@ -59,7 +60,7 @@ def run(host: str, port: int, reload: bool, workers: int | None) -> None:
         port=port,
         reload=not reload,
         reload_filter=CustomReloadFilter,
-        workers=workers or 1,
+        workers=workers,
     ).serve()
 
 
@@ -148,21 +149,41 @@ def get_business() -> int:
     try:
         results = run_await(gen_business_service.get_all)()
 
-        if results:
-            console.print('\n业务详情如下：')
-        else:
+        if not results:
             raise cappa.Exit('[red]暂无可用的代码生成业务！请先通过 import 命令导入！[/]')
 
-        console.print('\n编号\t应用名称\t生成路径')
+        table = Table(show_header=True, header_style='bold magenta')
+        table.add_column('业务编号', style='cyan', no_wrap=True, justify='center')
+        table.add_column('应用名称', style='green', no_wrap=True)
+        table.add_column('生成路径', style='yellow')
+        table.add_column('备注', style='blue')
+
         for result in results:
-            console.print(f'{result.id}\t"{result.app_name}"\t\t"{result.gen_path or "业务应用根路径"}"')
+            table.add_row(
+                str(result.id),
+                result.app_name,
+                result.gen_path or f'应用 {result.app_name} 根路径',
+                result.remark or '',
+            )
             ids.append(result.id)
+
+        console.print(table)
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
-    business = IntPrompt.ask('\n请从中选择一个业务编号', choices=[str(_id) for _id in ids])
+    business = IntPrompt.ask('请从中选择一个业务编号', choices=[str(_id) for _id in ids])
 
     return business
+
+
+def generate(pk: int) -> None:
+    try:
+        gen_path = run_await(gen_service.generate)(pk=pk)
+    except Exception as e:
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+
+    console.print(Text('\n代码已生成完毕', style='bold green'))
+    console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
 
 
 @cappa.command(help='运行 API 服务', default_long=True)
@@ -185,8 +206,8 @@ class Run:
         cappa.Arg(default=False, help='禁用在（代码）文件更改时自动重新加载服务器'),
     ]
     workers: Annotated[
-        int | None,
-        cappa.Arg(default=None, help='使用多个工作进程，必须与 `--no-reload` 同时使用'),
+        int,
+        cappa.Arg(default=1, help='使用多个工作进程，必须与 `--no-reload` 同时使用'),
     ]
 
     def __call__(self):
@@ -296,8 +317,9 @@ class CodeGenerate:
     ]
     subcmd: cappa.Subcommands[Import | None] = None
 
-    async def __call__(self):
-        console.print(self.business)
+    def __call__(self):
+        if self.business:
+            generate(self.business)
 
 
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
