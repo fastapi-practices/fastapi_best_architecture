@@ -37,37 +37,61 @@ async def create_test_report(report_data: TestReportCreateRequest) -> ResponseMo
             created_time=test_report.created_time.isoformat() if test_report.created_time else ""
         )
         return response_base.success(data=report_response.model_dump())
+    except ValueError as e:
+        # 处理业务逻辑错误（如测试用例不存在）
+        return response_base.fail(data=str(e))
     except Exception as e:
+        # 处理其他未预期的错误
         return response_base.fail(data=f"创建测试报告失败: {str(e)}")
 
 
-@router.get("/{report_id}", response_model=ResponseModel, summary="获取测试报告详情")
-async def get_test_report(report_id: int = Path(..., description="报告ID")) -> ResponseModel | ResponseSchemaModel:
+@router.get("/statistics", response_model=ResponseModel, summary="获取测试报告统计信息")
+async def get_report_statistics(
+        test_case_id: Optional[int] = Query(None, description="测试用例ID"),
+        days: int = Query(30, description="统计天数")
+) -> ResponseModel | ResponseSchemaModel:
     """
-    根据ID获取测试报告详情
+    获取测试报告统计信息
     """
     try:
-        test_report = await TestReportService.get_test_report_by_id(report_id)
-        if not test_report:
-            return response_base.fail(data="测试报告不存在")
-
-        report_response = TestReportResponse(
-            id=test_report.id,
-            test_case_id=test_report.test_case_id,
-            name=test_report.name,
-            success=test_report.success,
-            total_steps=test_report.total_steps,
-            success_steps=test_report.success_steps,
-            fail_steps=test_report.fail_steps,
-            start_time=test_report.start_time.isoformat(),
-            end_time=test_report.end_time.isoformat(),
-            duration=test_report.duration,
-            details=test_report.details,
-            created_time=test_report.created_time.isoformat() if test_report.created_time else ""
-        )
-        return response_base.success(data=report_response.model_dump())
+        statistics = await TestReportService.get_report_statistics(test_case_id=test_case_id, days=days)
+        return response_base.success(data=statistics)
     except Exception as e:
-        return response_base.fail(data=f"获取测试报告失败: {str(e)}")
+        return response_base.fail(data=f"获取统计信息失败: {str(e)}")
+
+
+@router.get("/test-cases/available", response_model=ResponseModel, summary="获取可用的测试用例列表")
+async def get_available_test_cases() -> ResponseModel | ResponseSchemaModel:
+    """
+    获取可用的测试用例列表（用于创建报告时选择）
+    """
+    try:
+        test_cases = await TestReportService.get_available_test_cases()
+        return response_base.success(data={
+            "test_cases": test_cases,
+            "total": len(test_cases)
+        })
+    except Exception as e:
+        return response_base.fail(data=f"获取可用测试用例失败: {str(e)}")
+
+
+@router.delete("/cleanup", response_model=ResponseModel, summary="清理旧的测试报告")
+async def cleanup_old_reports(
+        days: int = Query(90, description="保留天数，超过此天数的报告将被删除")
+) -> ResponseModel | ResponseSchemaModel:
+    """
+    清理旧的测试报告
+    """
+    try:
+        deleted_count = await TestReportService.cleanup_old_reports(days=days)
+        return response_base.success(
+            data={
+                "deleted_count": deleted_count,
+                "days": days
+            }
+        )
+    except Exception as e:
+        return response_base.fail(data=f"清理报告失败: {str(e)}")
 
 
 @router.get("/", response_model=ResponseModel, summary="获取测试报告列表")
@@ -140,6 +164,35 @@ async def get_test_reports(
         return response_base.fail(data=f"获取测试报告列表失败: {str(e)}")
 
 
+@router.get("/{report_id}", response_model=ResponseModel, summary="获取测试报告详情")
+async def get_test_report(report_id: int = Path(..., description="报告ID")) -> ResponseModel | ResponseSchemaModel:
+    """
+    根据ID获取测试报告详情
+    """
+    try:
+        test_report = await TestReportService.get_test_report_by_id(report_id)
+        if not test_report:
+            return response_base.fail(data="测试报告不存在")
+
+        report_response = TestReportResponse(
+            id=test_report.id,
+            test_case_id=test_report.test_case_id,
+            name=test_report.name,
+            success=test_report.success,
+            total_steps=test_report.total_steps,
+            success_steps=test_report.success_steps,
+            fail_steps=test_report.fail_steps,
+            start_time=test_report.start_time.isoformat(),
+            end_time=test_report.end_time.isoformat(),
+            duration=test_report.duration,
+            details=test_report.details,
+            created_time=test_report.created_time.isoformat() if test_report.created_time else ""
+        )
+        return response_base.success(data=report_response.model_dump())
+    except Exception as e:
+        return response_base.fail(data=f"获取测试报告失败: {str(e)}")
+
+
 @router.delete("/{report_id}", response_model=ResponseModel, summary="删除测试报告")
 async def delete_test_report(report_id: int = Path(..., description="报告ID")) -> ResponseModel | ResponseSchemaModel:
     """
@@ -153,37 +206,3 @@ async def delete_test_report(report_id: int = Path(..., description="报告ID"))
         return response_base.success(data="测试报告删除成功")
     except Exception as e:
         return response_base.fail(data=f"删除测试报告失败: {str(e)}")
-
-
-@router.get("/statistics", response_model=ResponseModel, summary="获取测试报告统计信息")
-async def get_report_statistics(
-        test_case_id: Optional[int] = Query(None, description="测试用例ID"),
-        days: int = Query(30, description="统计天数")
-) -> ResponseModel | ResponseSchemaModel:
-    """
-    获取测试报告统计信息
-    """
-    try:
-        statistics = await TestReportService.get_report_statistics(test_case_id=test_case_id, days=days)
-        return response_base.success(data=statistics)
-    except Exception as e:
-        return response_base.fail(data=f"获取统计信息失败: {str(e)}")
-
-
-@router.delete("/cleanup", response_model=ResponseModel, summary="清理旧的测试报告")
-async def cleanup_old_reports(
-        days: int = Query(90, description="保留天数，超过此天数的报告将被删除")
-) -> ResponseModel | ResponseSchemaModel:
-    """
-    清理旧的测试报告
-    """
-    try:
-        deleted_count = await TestReportService.cleanup_old_reports(days=days)
-        return response_base.success(
-            data={
-                "deleted_count": deleted_count,
-                "days": days
-            }
-        )
-    except Exception as e:
-        return response_base.fail(data=f"清理报告失败: {str(e)}")

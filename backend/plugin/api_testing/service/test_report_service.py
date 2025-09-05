@@ -7,7 +7,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 from sqlalchemy import select, delete, func
 from backend.database.db import async_db_session
-from backend.plugin.api_testing.model.models import ApiTestReport
+from backend.plugin.api_testing.model.models import ApiTestReport, ApiTestCase, ApiProject
 from backend.plugin.api_testing.schema.request import TestReportCreateRequest
 
 
@@ -18,6 +18,14 @@ class TestReportService:
     async def create_test_report(report_data: TestReportCreateRequest) -> ApiTestReport:
         """创建测试报告"""
         async with async_db_session() as db:
+            # 验证测试用例是否存在
+            test_case_result = await db.execute(
+                select(ApiTestCase).where(ApiTestCase.id == report_data.test_case_id)
+            )
+            test_case = test_case_result.scalar_one_or_none()
+            if not test_case:
+                raise ValueError(f"测试用例ID {report_data.test_case_id} 不存在")
+
             test_report = ApiTestReport(
                 test_case_id=report_data.test_case_id,
                 name=report_data.name,
@@ -170,3 +178,22 @@ class TestReportService:
             )
             await db.commit()
             return result.rowcount
+
+    @staticmethod
+    async def get_available_test_cases() -> List[dict]:
+        """获取可用的测试用例列表（用于创建报告时的参考）"""
+        async with async_db_session() as db:
+            result = await db.execute(
+                select(ApiTestCase.id, ApiTestCase.name, ApiProject.name.label('project_name'))
+                .join(ApiProject, ApiTestCase.project_id == ApiProject.id)
+                .where(ApiTestCase.status == 1)  # 只获取启用的测试用例
+                .order_by(ApiTestCase.id)
+            )
+            test_cases = []
+            for row in result:
+                test_cases.append({
+                    "id": row.id,
+                    "name": row.name,
+                    "project_name": row.project_name
+                })
+            return test_cases
