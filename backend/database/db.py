@@ -22,7 +22,7 @@ def create_database_url(unittest: bool = False) -> URL:
     :return:
     """
     url = URL.create(
-        drivername='mysql+asyncmy' if settings.DATABASE_TYPE == 'mysql' else 'postgresql+asyncpg',
+        drivername='mysql+aiomysql' if settings.DATABASE_TYPE == 'mysql' else 'postgresql+asyncpg',
         username=settings.DATABASE_USER,
         password=settings.DATABASE_PASSWORD,
         host=settings.DATABASE_HOST,

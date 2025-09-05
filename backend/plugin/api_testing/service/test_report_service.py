@@ -53,16 +53,16 @@ class TestReportService:
     ) -> List[ApiTestReport]:
         """获取测试报告列表"""
         async with async_db_session() as db:
-            query = select(ApiTestReport).order_by(ApiTestReport.create_time.desc())
+            query = select(ApiTestReport).order_by(ApiTestReport.created_time.desc())
 
             if test_case_id:
                 query = query.where(ApiTestReport.test_case_id == test_case_id)
 
             if start_date:
-                query = query.where(ApiTestReport.create_time >= start_date)
+                query = query.where(ApiTestReport.created_time >= start_date)
 
             if end_date:
-                query = query.where(ApiTestReport.create_time <= end_date)
+                query = query.where(ApiTestReport.created_time <= end_date)
 
             if success_only is not None:
                 query = query.where(ApiTestReport.success == success_only)
@@ -94,10 +94,10 @@ class TestReportService:
                 query = query.where(ApiTestReport.test_case_id == test_case_id)
 
             if start_date:
-                query = query.where(ApiTestReport.create_time >= start_date)
+                query = query.where(ApiTestReport.created_time >= start_date)
 
             if end_date:
-                query = query.where(ApiTestReport.create_time <= end_date)
+                query = query.where(ApiTestReport.created_time <= end_date)
 
             if success_only is not None:
                 query = query.where(ApiTestReport.success == success_only)
@@ -118,8 +118,8 @@ class TestReportService:
 
             # 基础查询
             base_query = select(ApiTestReport).where(
-                ApiTestReport.create_time >= start_date,
-                ApiTestReport.create_time <= end_date
+                ApiTestReport.created_time >= start_date,
+                ApiTestReport.created_time <= end_date
             )
 
             if test_case_id:
@@ -166,7 +166,7 @@ class TestReportService:
         async with async_db_session() as db:
             cutoff_date = datetime.now() - timedelta(days=days)
             result = await db.execute(
-                delete(ApiTestReport).where(ApiTestReport.create_time < cutoff_date)
+                delete(ApiTestReport).where(ApiTestReport.created_time < cutoff_date)
             )
             await db.commit()
             return result.rowcount

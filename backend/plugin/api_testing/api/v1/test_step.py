@@ -40,12 +40,12 @@ async def create_test_step(step_data: TestStepCreateRequest) -> ResponseModel | 
             retry_interval=test_step.retry_interval,
             order=test_step.order,
             status=test_step.status,
-            create_time=test_step.create_time.isoformat(),
-            update_time=test_step.update_time.isoformat()
+            created_time=test_step.created_time.isoformat() if test_step.created_time else "",
+            updated_time=test_step.updated_time.isoformat() if test_step.updated_time else ""
         )
         return response_base.success(data=step_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"创建测试步骤失败: {str(e)}")
+        return response_base.fail(data=f"创建测试步骤失败: {str(e)}")
 
 
 @router.get("/{step_id}", response_model=ResponseModel, summary="获取测试步骤详情")
@@ -56,7 +56,7 @@ async def get_test_step(step_id: int = Path(..., description="步骤ID")) -> Res
     try:
         test_step = await TestStepService.get_test_step_by_id(step_id)
         if not test_step:
-            return response_base.fail(msg="测试步骤不存在")
+            return response_base.fail(data="测试步骤不存在")
         
         step_response = TestStepResponse(
             id=test_step.id,
@@ -77,12 +77,12 @@ async def get_test_step(step_id: int = Path(..., description="步骤ID")) -> Res
             retry_interval=test_step.retry_interval,
             order=test_step.order,
             status=test_step.status,
-            create_time=test_step.create_time.isoformat(),
-            update_time=test_step.update_time.isoformat()
+            created_time=test_step.created_time.isoformat() if test_step.created_time else "",
+            updated_time=test_step.updated_time.isoformat() if test_step.updated_time else ""
         )
         return response_base.success(data=step_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"获取测试步骤失败: {str(e)}")
+        return response_base.fail(data=f"获取测试步骤失败: {str(e)}")
 
 
 @router.get("/", response_model=ResponseModel, summary="获取测试步骤列表")
@@ -119,8 +119,8 @@ async def get_test_steps(
                 retry_interval=test_step.retry_interval,
                 order=test_step.order,
                 status=test_step.status,
-                create_time=test_step.create_time.isoformat(),
-                update_time=test_step.update_time.isoformat()
+                created_time=test_step.created_time.isoformat() if test_step.created_time else "",
+                updated_time=test_step.updated_time.isoformat() if test_step.updated_time else ""
             )
             step_list.append(step_response.model_dump())
         
@@ -132,7 +132,7 @@ async def get_test_steps(
             "test_case_id": test_case_id
         })
     except Exception as e:
-        return response_base.fail(msg=f"获取测试步骤列表失败: {str(e)}")
+        return response_base.fail(data=f"获取测试步骤列表失败: {str(e)}")
 
 
 @router.put("/{step_id}", response_model=ResponseModel, summary="更新测试步骤")
@@ -146,7 +146,7 @@ async def update_test_step(
     try:
         test_step = await TestStepService.update_test_step(step_id, step_data)
         if not test_step:
-            return response_base.fail(msg="测试步骤不存在")
+            return response_base.fail(data="测试步骤不存在")
         
         step_response = TestStepResponse(
             id=test_step.id,
@@ -167,12 +167,12 @@ async def update_test_step(
             retry_interval=test_step.retry_interval,
             order=test_step.order,
             status=test_step.status,
-            create_time=test_step.create_time.isoformat(),
-            update_time=test_step.update_time.isoformat()
+            created_time=test_step.created_time.isoformat() if test_step.created_time else "",
+            updated_time=test_step.updated_time.isoformat() if test_step.updated_time else ""
         )
         return response_base.success(data=step_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"更新测试步骤失败: {str(e)}")
+        return response_base.fail(data=f"更新测试步骤失败: {str(e)}")
 
 
 @router.delete("/{step_id}", response_model=ResponseModel, summary="删除测试步骤")
@@ -183,11 +183,11 @@ async def delete_test_step(step_id: int = Path(..., description="步骤ID")) -> 
     try:
         success = await TestStepService.delete_test_step(step_id)
         if not success:
-            return response_base.fail(msg="测试步骤不存在或删除失败")
+            return response_base.fail(data="测试步骤不存在或删除失败")
         
-        return response_base.success(msg="测试步骤删除成功")
+        return response_base.success(data="测试步骤删除成功")
     except Exception as e:
-        return response_base.fail(msg=f"删除测试步骤失败: {str(e)}")
+        return response_base.fail(data=f"删除测试步骤失败: {str(e)}")
 
 
 @router.post("/reorder", response_model=ResponseModel, summary="重新排序测试步骤")
@@ -201,8 +201,8 @@ async def reorder_test_steps(
     try:
         success = await TestStepService.reorder_steps(test_case_id, reorder_data.step_orders)
         if not success:
-            return response_base.fail(msg="步骤排序失败")
+            return response_base.fail(data="步骤排序失败")
         
-        return response_base.success(msg="步骤排序成功")
+        return response_base.success(data="步骤排序成功")
     except Exception as e:
-        return response_base.fail(msg=f"步骤排序失败: {str(e)}")
+        return response_base.fail(data=f"步骤排序失败: {str(e)}")

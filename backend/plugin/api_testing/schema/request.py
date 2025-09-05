@@ -54,8 +54,8 @@ class TestCaseResponse(BaseModel):
     pre_script: Optional[str] = None
     post_script: Optional[str] = None
     status: int
-    create_time: str
-    update_time: str
+    created_time: str
+    updated_time: str
 
 
 class TestStepRequest(BaseModel):
@@ -98,8 +98,8 @@ class TestStepResponse(BaseModel):
     retry_interval: int
     order: int
     status: int
-    create_time: str
-    update_time: str
+    created_time: str
+    updated_time: str
 
 
 # API项目相关模型
@@ -226,7 +226,7 @@ class TestReportResponse(BaseModel):
     end_time: str
     duration: int
     details: Dict[str, Any]
-    create_time: str
+    created_time: str
 
 
 # 步骤排序请求

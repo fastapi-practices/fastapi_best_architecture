@@ -47,10 +47,10 @@ class TestCaseService:
         """获取测试用例列表"""
         async with async_db_session() as db:
             query = select(ApiTestCase).options(selectinload(ApiTestCase.steps))
-            
+
             if project_id:
                 query = query.where(ApiTestCase.project_id == project_id)
-            
+
             query = query.offset(skip).limit(limit)
             result = await db.execute(query)
             return result.scalars().all()

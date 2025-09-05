@@ -28,8 +28,8 @@ async def create_project(project_data: ProjectCreateRequest) -> ResponseModel | 
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
-            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
+            created_time=project.created_time.isoformat() if project.created_time else "",
+            updated_time=project.updated_time.isoformat() if project.updated_time else ""
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:
@@ -54,8 +54,8 @@ async def get_project(project_id: int = Path(..., description="项目ID")) -> Re
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
-            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
+            created_time=project.created_time.isoformat() if project.created_time else "",
+            updated_time=project.updated_time.isoformat() if project.updated_time else ""
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:
@@ -84,8 +84,8 @@ async def get_projects(
                 headers=project.headers,
                 variables=project.variables,
                 status=project.status,
-                created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
-                updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
+                created_time=project.created_time.isoformat() if project.created_time else "",
+                updated_time=project.updated_time.isoformat() if project.updated_time else ""
             )
             project_list.append(project_response.model_dump())
 
@@ -122,8 +122,8 @@ async def update_project(
             headers=project.headers,
             variables=project.variables,
             status=project.status,
-            created_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat(),
-            updated_time=project.updated_time.isoformat() if project.updated_time else datetime.now().isoformat()
+            created_time=project.created_time.isoformat() if project.created_time else "",
+            updated_time=project.updated_time.isoformat() if project.updated_time else ""
         )
         return response_base.success(data=project_response.model_dump())
     except Exception as e:

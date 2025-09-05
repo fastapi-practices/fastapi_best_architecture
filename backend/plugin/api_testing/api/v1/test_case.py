@@ -29,12 +29,12 @@ async def create_test_case(case_data: TestCaseCreateRequest) -> ResponseModel | 
             pre_script=test_case.pre_script,
             post_script=test_case.post_script,
             status=test_case.status,
-            create_time=test_case.create_time.isoformat(),
-            update_time=test_case.update_time.isoformat()
+            created_time=test_case.created_time.isoformat() if test_case.created_time else "",
+            updated_time=test_case.updated_time.isoformat() if test_case.updated_time else ""
         )
         return response_base.success(data=case_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"创建测试用例失败: {str(e)}")
+        return response_base.fail(data=f"创建测试用例失败: {str(e)}")
 
 
 @router.get("/{case_id}", response_model=ResponseModel, summary="获取测试用例详情")
@@ -45,7 +45,7 @@ async def get_test_case(case_id: int = Path(..., description="用例ID")) -> Res
     try:
         test_case = await TestCaseService.get_test_case_by_id(case_id)
         if not test_case:
-            return response_base.fail(msg="测试用例不存在")
+            return response_base.fail(data="测试用例不存在")
         
         case_response = TestCaseResponse(
             id=test_case.id,
@@ -55,12 +55,12 @@ async def get_test_case(case_id: int = Path(..., description="用例ID")) -> Res
             pre_script=test_case.pre_script,
             post_script=test_case.post_script,
             status=test_case.status,
-            create_time=test_case.create_time.isoformat(),
-            update_time=test_case.update_time.isoformat()
+            created_time=test_case.created_time.isoformat() if test_case.created_time else "",
+            updated_time=test_case.updated_time.isoformat() if test_case.updated_time else ""
         )
         return response_base.success(data=case_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"获取测试用例失败: {str(e)}")
+        return response_base.fail(data=f"获取测试用例失败: {str(e)}")
 
 
 @router.get("/", response_model=ResponseModel, summary="获取测试用例列表")
@@ -86,8 +86,8 @@ async def get_test_cases(
                 pre_script=test_case.pre_script,
                 post_script=test_case.post_script,
                 status=test_case.status,
-                create_time=test_case.create_time.isoformat(),
-                update_time=test_case.update_time.isoformat()
+                created_time=test_case.created_time.isoformat() if test_case.created_time else "",
+                updated_time=test_case.updated_time.isoformat() if test_case.updated_time else ""
             )
             case_list.append(case_response.model_dump())
         
@@ -99,7 +99,7 @@ async def get_test_cases(
             "project_id": project_id
         })
     except Exception as e:
-        return response_base.fail(msg=f"获取测试用例列表失败: {str(e)}")
+        return response_base.fail(data=f"获取测试用例列表失败: {str(e)}")
 
 
 @router.put("/{case_id}", response_model=ResponseModel, summary="更新测试用例")
@@ -113,7 +113,7 @@ async def update_test_case(
     try:
         test_case = await TestCaseService.update_test_case(case_id, case_data)
         if not test_case:
-            return response_base.fail(msg="测试用例不存在")
+            return response_base.fail(data="测试用例不存在")
         
         case_response = TestCaseResponse(
             id=test_case.id,
@@ -123,12 +123,12 @@ async def update_test_case(
             pre_script=test_case.pre_script,
             post_script=test_case.post_script,
             status=test_case.status,
-            create_time=test_case.create_time.isoformat(),
-            update_time=test_case.update_time.isoformat()
+            created_time=test_case.created_time.isoformat() if test_case.created_time else "",
+            updated_time=test_case.updated_time.isoformat() if test_case.updated_time else ""
         )
         return response_base.success(data=case_response.model_dump())
     except Exception as e:
-        return response_base.fail(msg=f"更新测试用例失败: {str(e)}")
+        return response_base.fail(data=f"更新测试用例失败: {str(e)}")
 
 
 @router.delete("/{case_id}", response_model=ResponseModel, summary="删除测试用例")
@@ -139,8 +139,8 @@ async def delete_test_case(case_id: int = Path(..., description="用例ID")) -> 
     try:
         success = await TestCaseService.delete_test_case(case_id)
         if not success:
-            return response_base.fail(msg="测试用例不存在或删除失败")
+            return response_base.fail(data="测试用例不存在或删除失败")
         
-        return response_base.success(msg="测试用例删除成功")
+        return response_base.success(data="测试用例删除成功")
     except Exception as e:
-        return response_base.fail(msg=f"删除测试用例失败: {str(e)}")
+        return response_base.fail(data=f"删除测试用例失败: {str(e)}")
