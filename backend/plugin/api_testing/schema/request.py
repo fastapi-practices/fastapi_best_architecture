@@ -72,9 +72,9 @@ class TestStepRequest(BaseModel):
     extract: Optional[Dict[str, str]] = Field(None, description="提取变量")
     validations: Optional[List[Dict[str, Any]]] = Field(None, description="断言列表")
     sql_queries: Optional[List[Dict[str, Any]]] = Field(None, description="SQL查询列表")
-    timeout: int = Field(30, description="超时时间(秒)")
-    retry: int = Field(0, description="重试次数")
-    retry_interval: int = Field(1, description="重试间隔(秒)")
+    timeout: int = Field(30, ge=1, le=3600, description="超时时间(秒)，范围1-3600")
+    retry: int = Field(0, ge=0, le=10, description="重试次数，范围0-10")
+    retry_interval: int = Field(1, ge=1, le=300, description="重试间隔(秒)，范围1-300")
     order: int = Field(..., description="步骤顺序")
 
 
@@ -171,9 +171,9 @@ class TestStepCreateRequest(BaseModel):
     extract: Optional[Dict[str, str]] = Field(None, description="提取变量")
     validate: Optional[List[Dict[str, Any]]] = Field(None, description="断言列表")
     sql_queries: Optional[List[Dict[str, Any]]] = Field(None, description="SQL查询列表")
-    timeout: int = Field(30, description="超时时间(秒)")
-    retry: int = Field(0, description="重试次数")
-    retry_interval: int = Field(1, description="重试间隔(秒)")
+    timeout: int = Field(30, ge=1, le=3600, description="超时时间(秒)，范围1-3600")
+    retry: int = Field(0, ge=0, le=10, description="重试次数，范围0-10")
+    retry_interval: int = Field(1, ge=1, le=300, description="重试间隔(秒)，范围1-300")
     order: int = Field(..., description="步骤顺序")
     status: int = Field(1, description="状态 1启用 0禁用")
 
@@ -191,9 +191,9 @@ class TestStepUpdateRequest(BaseModel):
     extract: Optional[Dict[str, str]] = Field(None, description="提取变量")
     validate: Optional[List[Dict[str, Any]]] = Field(None, description="断言列表")
     sql_queries: Optional[List[Dict[str, Any]]] = Field(None, description="SQL查询列表")
-    timeout: Optional[int] = Field(None, description="超时时间(秒)")
-    retry: Optional[int] = Field(None, description="重试次数")
-    retry_interval: Optional[int] = Field(None, description="重试间隔(秒)")
+    timeout: Optional[int] = Field(None, ge=1, le=3600, description="超时时间(秒)，范围1-3600")
+    retry: Optional[int] = Field(None, ge=0, le=10, description="重试次数，范围0-10")
+    retry_interval: Optional[int] = Field(None, ge=1, le=300, description="重试间隔(秒)，范围1-300")
     order: Optional[int] = Field(None, description="步骤顺序")
     status: Optional[int] = Field(None, description="状态 1启用 0禁用")
 

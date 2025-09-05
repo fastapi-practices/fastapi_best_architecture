@@ -44,7 +44,11 @@ async def create_test_step(step_data: TestStepCreateRequest) -> ResponseModel | 
             updated_time=test_step.updated_time.isoformat() if test_step.updated_time else ""
         )
         return response_base.success(data=step_response.model_dump())
+    except ValueError as e:
+        # 处理业务逻辑错误（如测试用例不存在、参数超出范围）
+        return response_base.fail(data=str(e))
     except Exception as e:
+        # 处理其他未预期的错误
         return response_base.fail(data=f"创建测试步骤失败: {str(e)}")
 
 

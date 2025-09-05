@@ -6,7 +6,7 @@ API测试步骤服务层
 from typing import List, Optional
 from sqlalchemy import select, update, delete
 from backend.database.db import async_db_session
-from backend.plugin.api_testing.model.models import ApiTestStep
+from backend.plugin.api_testing.model.models import ApiTestStep, ApiTestCase
 from backend.plugin.api_testing.schema.request import TestStepCreateRequest, TestStepUpdateRequest
 
 
@@ -17,6 +17,14 @@ class TestStepService:
     async def create_test_step(step_data: TestStepCreateRequest) -> ApiTestStep:
         """创建测试步骤"""
         async with async_db_session() as db:
+            # 验证测试用例是否存在
+            test_case_result = await db.execute(
+                select(ApiTestCase).where(ApiTestCase.id == step_data.test_case_id)
+            )
+            test_case = test_case_result.scalar_one_or_none()
+            if not test_case:
+                raise ValueError(f"测试用例ID {step_data.test_case_id} 不存在")
+
             test_step = ApiTestStep(
                 name=step_data.name,
                 test_case_id=step_data.test_case_id,
