@@ -20,14 +20,15 @@ class _TaskRunner:
 
     def close(self):
         """关闭事件循环并清理"""
-        if self.__loop:
-            self.__loop.stop()
+        with self.__lock:
+            if self.__loop:
+                self.__loop.call_soon_threadsafe(self.__loop.stop)
+            if self.__thread and self.__thread.is_alive():
+                self.__thread.join()
             self.__loop = None
-        if self.__thread:
-            self.__thread.join()
             self.__thread = None
-        name = f'TaskRunner-{threading.get_ident()}'
-        _runner_map.pop(name, None)
+            name = f'TaskRunner-{threading.get_ident()}'
+            _runner_map.pop(name, None)
 
     def _target(self):
         """后台线程的目标函数"""
@@ -52,13 +53,14 @@ _runner_map = weakref.WeakValueDictionary()
 
 
 def run_await(coro: Callable[..., Awaitable[T]] | Callable[..., Coroutine[Any, Any, T]]) -> Callable[..., T]:
-    """将协程包装在函数中，该函数将在后台事件循环上运行，直到它执行完为止"""
+    """将协程包装在函数中，直到它执行完为止"""
 
     @wraps(coro)
     def wrapped(*args, **kwargs):
         inner = coro(*args, **kwargs)
         if not asyncio.iscoroutine(inner) and not asyncio.isfuture(inner):
-            raise TypeError(f'Expected coroutine, got {type(inner)}')
+            raise TypeError(f'Expected coroutine or future, got {type(inner)}')
+
         try:
             # 如果事件循环正在运行，则使用任务调用
             asyncio.get_running_loop()
@@ -68,7 +70,11 @@ def run_await(coro: Callable[..., Awaitable[T]] | Callable[..., Coroutine[Any, A
             return _runner_map[name].run(inner)
         except RuntimeError:
             # 如果没有，则创建一个新的事件循环
-            loop = asyncio.get_event_loop()
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
             return loop.run_until_complete(inner)
 
     wrapped.__doc__ = coro.__doc__
