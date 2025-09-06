@@ -9,7 +9,7 @@ from typing import Annotated, Literal
 import cappa
 import granian
 
-from cappa import ValueFrom
+from cappa.output import error_format
 from rich.panel import Panel
 from rich.prompt import IntPrompt
 from rich.table import Table
@@ -17,7 +17,7 @@ from rich.text import Text
 from sqlalchemy import text
 from watchfiles import PythonFilter
 
-from backend import console, get_version
+from backend import __version__
 from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
@@ -27,7 +27,10 @@ from backend.plugin.code_generator.service.business_service import gen_business_
 from backend.plugin.code_generator.service.code_service import gen_service
 from backend.plugin.tools import get_plugin_sql
 from backend.utils._await import run_await
+from backend.utils.console import console
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
+
+output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
 
 
 class CustomReloadFilter(PythonFilter):
@@ -144,9 +147,13 @@ async def import_table(
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
 
-def get_business() -> int:
-    ids = []
+def generate(gen: bool) -> None:
+    if not gen:
+        console.print(output_help)
+        return
+
     try:
+        ids = []
         results = run_await(gen_business_service.get_all)()
 
         if not results:
@@ -159,26 +166,18 @@ def get_business() -> int:
         table.add_column('备注', style='blue')
 
         for result in results:
+            ids.append(result.id)
             table.add_row(
                 str(result.id),
                 result.app_name,
                 result.gen_path or f'应用 {result.app_name} 根路径',
                 result.remark or '',
             )
-            ids.append(result.id)
 
         console.print(table)
-    except Exception as e:
-        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+        business = IntPrompt.ask('请从中选择一个业务编号', choices=[str(_id) for _id in ids])
 
-    business = IntPrompt.ask('请从中选择一个业务编号', choices=[str(_id) for _id in ids])
-
-    return business
-
-
-def generate(pk: int) -> None:
-    try:
-        gen_path = run_await(gen_service.generate)(pk=pk)
+        gen_path = run_await(gen_service.generate)(pk=business)
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
@@ -308,27 +307,22 @@ class Import:
         await import_table(self.app, self.table_schema, self.table_name)
 
 
-@cappa.command(name='gen', help='代码生成，体验完成功能，请自行部署 fba vben 前端工程！', default_long=True)
+@cappa.command(name='codegen', help='代码生成（体验完整功能，请自行部署 fba vben 前端工程）', default_long=True)
 @dataclass
 class CodeGenerate:
-    business: Annotated[
-        int,
-        cappa.Arg(default=ValueFrom(get_business), help='业务编号'),
+    gen: Annotated[
+        bool,
+        cappa.Arg(default=False, show_default=False, help='执行代码生成'),
     ]
     subcmd: cappa.Subcommands[Import | None] = None
 
     def __call__(self):
-        if self.business:
-            generate(self.business)
+        generate(self.gen)
 
 
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
 @dataclass
 class FbaCli:
-    version: Annotated[
-        bool,
-        cappa.Arg(short='-V', default=False, show_default=False, help='打印当前版本号'),
-    ]
     sql: Annotated[
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
@@ -336,12 +330,10 @@ class FbaCli:
     subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
 
     async def __call__(self):
-        if self.version:
-            get_version()
         if self.sql:
             await execute_sql_scripts(self.sql)
 
 
 def main() -> None:
-    output = cappa.Output(error_format='[red]Error[/]: {message}\n\n更多信息，尝试 "[cyan]--help[/]"')
-    asyncio.run(cappa.invoke_async(FbaCli, output=output))
+    output = cappa.Output(error_format=f'{error_format}\n{output_help}')
+    asyncio.run(cappa.invoke_async(FbaCli, version=__version__, output=output))
