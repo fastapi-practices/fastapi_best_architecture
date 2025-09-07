@@ -10,6 +10,8 @@ import cappa
 import granian
 
 from cappa.output import error_format
+from rich import box
+from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.prompt import IntPrompt
 from rich.table import Table
@@ -185,6 +187,41 @@ def generate(gen: bool) -> None:
     console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
 
 
+def simplify():
+    title = Text()
+    title.append('🚀 FastAPI Best Architecture · ', style='turquoise4')
+    title.append('代码精简程序 ✨', style='medium_purple1')
+    content = Text()
+    content.append('精简 fba 当前实现，快速切换至新项目开发模式', style='grey50')
+    content.append('\n\n🟨 安全警告', style='deep_sky_blue1')
+    content.append('\n\n   此操作将永久删除您所选择的内容，且无法恢复！', style='gold1')
+    content.append('\n   请仔细阅读可选清理列表，确认后再继续操作', style='grey50')
+    content.append('\n\n🟥 可选清理列表', style='deep_sky_blue1')
+    content.append('\n\n   1. 应用模块')
+    content.append('\n   admin[monitor、sys/data_rule、sys/data_scope、sys/dept、sys/files、sys/menu、sys/role]', style='grey50')
+    content.append('\n   task', style='grey50')
+    content.append('\n\n   2. 公共模块')
+    content.append('\n   common[security/rbac、i18n]', style='grey50')
+    content.append('\n\n   3. 插件模块')
+    content.append('\n   plugin[code_generator、config、dict、notice]', style='grey50')
+    content.append('\n\n   4. 工具模块')
+    content.append('\n   utils[redis_info、server_info]', style='grey50')
+    content.append('\n\n   4. 部署模块')
+    content.append('\n   deploy', style='grey50')
+    content.append('\n\n🟩 默认保留的模块', style='deep_sky_blue1')
+    content.append('\n\n   1. 应用模块')
+    content.append('\n   admin[auth、log、sys/user、sys/plugin]', style='grey50')
+    content.append('\n\n   2. 公共模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   3. 插件模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   3. 工具模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   3. 其他模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    console.print(Panel(content, box.DOUBLE, title=title, expand=False, padding=(1, 2)))
+
+
 @cappa.command(help='运行 API 服务', default_long=True)
 @dataclass
 class Run:
@@ -327,11 +364,17 @@ class FbaCli:
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
+    simplify: Annotated[
+        bool,
+        cappa.Arg(default=False, help='精简 fba 当前实现，快速切换至新项目开发模式')
+    ]
     subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
 
     async def __call__(self):
         if self.sql:
             await execute_sql_scripts(self.sql)
+        if self.simplify:
+            simplify()
 
 
 def main() -> None:
