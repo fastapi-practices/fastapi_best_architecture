@@ -1,3 +1,47 @@
+<a id="v1.8.1"></a>
+# [v1.8.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.1) - 2025-09-09
+
+## What's Changed
+* Update changelog for v1.8.0 by [@wu-clan](https://github.com/wu-clan) in [#772](https://github.com/fastapi-practices/fastapi_best_architecture/pull/772)
+* Optimize the celery crontab expression validation by [@yanlingsishao](https://github.com/yanlingsishao) in [#773](https://github.com/fastapi-practices/fastapi_best_architecture/pull/773)
+* Add bulk update interface for config plugin by [@wu-clan](https://github.com/wu-clan) in [#774](https://github.com/fastapi-practices/fastapi_best_architecture/pull/774)
+* Optimize email sending config update logic by [@wu-clan](https://github.com/wu-clan) in [#775](https://github.com/fastapi-practices/fastapi_best_architecture/pull/775)
+* Add test data SQL script for config plugin by [@wu-clan](https://github.com/wu-clan) in [#776](https://github.com/fastapi-practices/fastapi_best_architecture/pull/776)
+* Update the env parameter value in env file by [@wu-clan](https://github.com/wu-clan) in [#777](https://github.com/fastapi-practices/fastapi_best_architecture/pull/777)
+* Fix the docker compose env configuration file by [@wu-clan](https://github.com/wu-clan) in [#778](https://github.com/fastapi-practices/fastapi_best_architecture/pull/778)
+* Fix redis client not close after plugin parse by [@wu-clan](https://github.com/wu-clan) in [#780](https://github.com/fastapi-practices/fastapi_best_architecture/pull/780)
+* Fix the celery beat distributed lock timeout by [@wu-clan](https://github.com/wu-clan) in [#779](https://github.com/fastapi-practices/fastapi_best_architecture/pull/779)
+* Fix the plugin model object detection logic by [@wuyao4](https://github.com/wuyao4) in [#782](https://github.com/fastapi-practices/fastapi_best_architecture/pull/782)
+* Update the celery task result table creation logic by [@wu-clan](https://github.com/wu-clan) in [#783](https://github.com/fastapi-practices/fastapi_best_architecture/pull/783)
+* Fix code generation template params and filename by [@wu-clan](https://github.com/wu-clan) in [#784](https://github.com/fastapi-practices/fastapi_best_architecture/pull/784)
+* Fix CLI openapi url in production environment by [@siyue-wang](https://github.com/siyue-wang) in [#785](https://github.com/fastapi-practices/fastapi_best_architecture/pull/785)
+* Update the model datetime column type to custom by [@wu-clan](https://github.com/wu-clan) in [#786](https://github.com/fastapi-practices/fastapi_best_architecture/pull/786)
+* Update the opera log exception message record by [@wu-clan](https://github.com/wu-clan) in [#788](https://github.com/fastapi-practices/fastapi_best_architecture/pull/788)
+* Update the handling of CORS 500 status code by [@wu-clan](https://github.com/wu-clan) in [#789](https://github.com/fastapi-practices/fastapi_best_architecture/pull/789)
+* Add the Google OAuth2 login by [@wu-clan](https://github.com/wu-clan) in [#790](https://github.com/fastapi-practices/fastapi_best_architecture/pull/790)
+* Fix the tzinfo comparison in the timezone type by [@IAseven](https://github.com/IAseven) in [#787](https://github.com/fastapi-practices/fastapi_best_architecture/pull/787)
+* Bump dependencies and pre-commits by [@wu-clan](https://github.com/wu-clan) in [#791](https://github.com/fastapi-practices/fastapi_best_architecture/pull/791)
+* Update the notice model and pagination by [@wu-clan](https://github.com/wu-clan) in [#792](https://github.com/fastapi-practices/fastapi_best_architecture/pull/792)
+* Add the dict type query all interface by [@wu-clan](https://github.com/wu-clan) in [#794](https://github.com/fastapi-practices/fastapi_best_architecture/pull/794)
+* Fix sql script syntax error in config plugin by [@wu-clan](https://github.com/wu-clan) in [#793](https://github.com/fastapi-practices/fastapi_best_architecture/pull/793)
+* Fix the psycopg dependency naming by [@wu-clan](https://github.com/wu-clan) in [#795](https://github.com/fastapi-practices/fastapi_best_architecture/pull/795)
+* Add schema for the tree data by [@wu-clan](https://github.com/wu-clan) in [#796](https://github.com/fastapi-practices/fastapi_best_architecture/pull/796)
+* Add the code generator to the CLI by [@wu-clan](https://github.com/wu-clan) in [#798](https://github.com/fastapi-practices/fastapi_best_architecture/pull/798)
+* Optimize the code generation interaction logic by [@wu-clan](https://github.com/wu-clan) in [#799](https://github.com/fastapi-practices/fastapi_best_architecture/pull/799)
+* Fix console import in main module by [@wu-clan](https://github.com/wu-clan) in [#800](https://github.com/fastapi-practices/fastapi_best_architecture/pull/800)
+* Fix the subprocess check call failed in windows by [@yzbf-lin](https://github.com/yzbf-lin) in [#802](https://github.com/fastapi-practices/fastapi_best_architecture/pull/802)
+* Fix alembic migration file missing import by [@wu-clan](https://github.com/wu-clan) in [#803](https://github.com/fastapi-practices/fastapi_best_architecture/pull/803)
+
+## New Contributors
+* [@yanlingsishao](https://github.com/yanlingsishao) made their first contribution in [#773](https://github.com/fastapi-practices/fastapi_best_architecture/pull/773)
+* [@wuyao4](https://github.com/wuyao4) made their first contribution in [#782](https://github.com/fastapi-practices/fastapi_best_architecture/pull/782)
+* [@siyue-wang](https://github.com/siyue-wang) made their first contribution in [#785](https://github.com/fastapi-practices/fastapi_best_architecture/pull/785)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
+
+[Changes][v1.8.1]
+
+
 <a id="v1.8.0"></a>
 # [v1.8.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.0) - 2025-08-15
 
@@ -758,6 +802,7 @@
 [Changes][v1.0.0]
 
 
+[v1.8.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
