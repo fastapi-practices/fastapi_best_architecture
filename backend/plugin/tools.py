@@ -319,7 +319,9 @@ def install_requirements(plugin: str | None) -> None:
                 pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
                 if settings.PLUGIN_PIP_CHINA:
                     pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-                subprocess.check_call(ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.check_call(
+                    ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True
+                )
                 subprocess.check_call(pip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except subprocess.CalledProcessError as e:
                 raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
