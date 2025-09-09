@@ -17,6 +17,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 from starlette.types import ASGIApp
 
+from backend import __version__
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
@@ -85,7 +86,7 @@ def register_app() -> FastAPI:
 
     app = MyFastAPI(
         title=settings.FASTAPI_TITLE,
-        version=settings.FASTAPI_VERSION,
+        version=__version__,
         description=settings.FASTAPI_DESCRIPTION,
         docs_url=settings.FASTAPI_DOCS_URL,
         redoc_url=settings.FASTAPI_REDOC_URL,
