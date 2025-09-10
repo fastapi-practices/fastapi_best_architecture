@@ -320,7 +320,7 @@ def install_requirements(plugin: str | None) -> None:
                 if settings.PLUGIN_PIP_CHINA:
                     pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
                 subprocess.check_call(
-                    ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True
+                    ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                 )
                 subprocess.check_call(pip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except subprocess.CalledProcessError as e:
