@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import httpx
 
-from asgiref.sync import sync_to_async
 from fastapi import Request
 from ip2loc import XdbSearcher
 from user_agents import parse
@@ -10,7 +9,7 @@ from user_agents import parse
 from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
 from backend.core.conf import settings
-from backend.core.path_conf import IP2REGION_XDB
+from backend.core.path_conf import STATIC_DIR
 from backend.database.redis import redis_client
 
 
@@ -55,7 +54,10 @@ async def get_location_online(ip: str, user_agent: str) -> dict | None:
             return None
 
 
-@sync_to_async
+# 离线 IP 搜索器单例（数据将缓存到内存，缓存大小取决于 IP 数据文件大小）
+__xdb_searcher = XdbSearcher(contentBuff=XdbSearcher.loadContentFromFile(dbfile=STATIC_DIR / 'ip2region_v4.xdb'))
+
+
 def get_location_offline(ip: str) -> dict | None:
     """
     离线获取 IP 地址属地，无法保证准确率，100% 可用
@@ -64,15 +66,12 @@ def get_location_offline(ip: str) -> dict | None:
     :return:
     """
     try:
-        cb = XdbSearcher.loadContentFromFile(dbfile=IP2REGION_XDB)
-        searcher = XdbSearcher(contentBuff=cb)
-        data = searcher.search(ip)
-        searcher.close()
+        data = __xdb_searcher.search(ip)
         data = data.split('|')
         return {
             'country': data[0] if data[0] != '0' else None,
-            'regionName': data[2] if data[2] != '0' else None,
-            'city': data[3] if data[3] != '0' else None,
+            'regionName': data[1] if data[1] != '0' else None,
+            'city': data[2] if data[2] != '0' else None,
         }
     except Exception as e:
         log.error(f'离线获取 IP 地址属地失败，错误信息：{e}')
@@ -97,7 +96,7 @@ async def parse_ip_info(request: Request) -> IpInfo:
     if settings.IP_LOCATION_PARSE == 'online':
         location_info = await get_location_online(ip, request.headers.get('User-Agent'))
     elif settings.IP_LOCATION_PARSE == 'offline':
-        location_info = await get_location_offline(ip)
+        location_info = get_location_offline(ip)
 
     if location_info:
         country = location_info.get('country')
