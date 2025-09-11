@@ -74,7 +74,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
             # 此信息只能在请求后获取
             _route = request.scope.get('route')
-            summary = getattr(_route, 'summary', '')
+            summary = getattr(_route, 'summary') or ''
 
             try:
                 # 此信息来源于 JWT 认证中间件
