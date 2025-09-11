@@ -15,7 +15,7 @@ class OperaLogSchemaBase(SchemaBase):
     trace_id: str = Field(description='追踪 ID')
     username: str | None = Field(None, description='用户名')
     method: str = Field(description='请求方法')
-    title: str | None = Field(None, description='操作标题')
+    title: str = Field(description='操作标题')
     path: str = Field(description='请求路径')
     ip: str = Field(description='IP 地址')
     country: str | None = Field(None, description='国家')
