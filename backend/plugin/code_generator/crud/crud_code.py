@@ -27,6 +27,7 @@ class CRUDGen:
             WHERE table_name NOT LIKE 'sys_gen_%'
             AND table_schema = :table_schema;
             """
+            stmt = text(sql).bindparams(table_schema=table_schema)
         else:
             sql = """
             SELECT c.relname AS table_name, obj_description(c.oid) AS table_comment
@@ -36,7 +37,7 @@ class CRUDGen:
             AND n.nspname = 'public' -- schema 通常是 'public'
             AND c.relname NOT LIKE 'sys_gen_%';
             """
-        stmt = text(sql).bindparams(table_schema=table_schema)
+            stmt = text(sql)
         result = await db.execute(stmt)
         return result.mappings().all()
 
@@ -63,6 +64,7 @@ class CRUDGen:
             LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind = 'r'
             AND n.nspname = 'public' -- schema 通常是 'public'
+            AND c.relname = :table_name
             AND c.relname NOT LIKE 'sys_gen_%';
             """
         stmt = text(sql).bindparams(table_name=table_name)
