@@ -15,14 +15,17 @@ _plugins = get_plugins()
 
 with Progress(
     SpinnerColumn(finished_text=f'[bold green]{_log_prefix}插件准备就绪[/]'),
+    TextColumn('{task.description}'),
     TextColumn('{task.completed}/{task.total}', style='bold green'),
     TimeElapsedColumn(),
     console=console,
 ) as progress:
     task = progress.add_task('安装插件依赖...', total=len(_plugins))
     for plugin in _plugins:
+        progress.update(task, description=f'[bold magenta]安装插件 {plugin} 依赖...[/]')
         install_requirements(plugin)
         progress.advance(task)
+    progress.update(task, description='[bold green]-[/]')
 
 console.print(Text(f'{_log_prefix}启动服务...', style='bold magenta'))
 
