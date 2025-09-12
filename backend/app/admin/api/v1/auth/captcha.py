@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from uuid import uuid4
+
 from fast_captcha import img_captcha
 from fastapi import APIRouter, Depends, Request
 from fastapi_limiter.depends import RateLimiter
@@ -24,11 +26,11 @@ async def get_captcha(request: Request) -> ResponseSchemaModel[GetCaptchaDetail]
     """
     img_type: str = 'base64'
     img, code = await run_in_threadpool(img_captcha, img_byte=img_type)
-    ip = request.state.ip
+    uuid = str(uuid4())
     await redis_client.set(
-        f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ip}',
+        f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{uuid}',
         code,
         ex=settings.CAPTCHA_LOGIN_EXPIRE_SECONDS,
     )
-    data = GetCaptchaDetail(image_type=img_type, image=img)
+    data = GetCaptchaDetail(uuid=uuid, img_type=img_type, image=img)
     return response_base.success(data=data)
