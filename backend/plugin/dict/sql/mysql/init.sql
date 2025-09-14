@@ -35,7 +35,7 @@ values
 (18, 'sys_data_rule_expression', '小于(<)', '4', 'gold', 5, 1, '小于比较表达式', 6, now(), null),
 (19, 'sys_data_rule_expression', '小于等于(<=)', '5', 'orange', 6, 1, '小于等于比较表达式', 6, now(), null),
 (20, 'sys_data_rule_expression', '包含(in)', '6', 'purple', 7, 1, '包含表达式', 6, now(), null),
-(21, 'sys_data_rule_expression', '不包含(not in)', '7', 'magenta', 8, 1, '不包含表达式', 6, now(), null),
+(21, 'sys_data_rule_expression', '不包含(not in)', '7', 'error', 8, 1, '不包含表达式', 6, now(), null),
 (22, 'sys_frontend_config', '否', '0', 'red', 1, 1, '不是前端参数配置', 7, now(), null),
 (23, 'sys_frontend_config', '是', '1', 'green', 2, 1, '是前端参数配置', 7, now(), null),
 (24, 'task_strategy_type', 'Interval（间隔）', '0', 'cyan', 1, 1, '时间间隔策略', 8, now(), null),
