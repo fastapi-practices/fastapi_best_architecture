@@ -32,13 +32,12 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.select_models(db, load_strategies={'datas': 'noload'})
 
-    async def get_list(self, *, name: str | None, code: str | None, status: int | None) -> Select:
+    async def get_list(self, *, name: str | None, code: str | None) -> Select:
         """
         获取字典类型列表
 
         :param name: 字典类型名称
         :param code: 字典类型编码
-        :param status: 字典状态
         :return:
         """
         filters = {}
@@ -47,8 +46,6 @@ class CRUDDictType(CRUDPlus[DictType]):
             filters['name__like'] = f'%{name}%'
         if code is not None:
             filters['code__like'] = f'%{code}%'
-        if status is not None:
-            filters['status'] = status
 
         return await self.select_order('id', 'desc', load_strategies={'datas': 'noload'}, **filters)
 
