@@ -1,7 +1,7 @@
 insert into sys_dict_type (id, name, code, remark, created_time, updated_time)
 values
-(1, '通用状态', 'sys_status', '系统通用状态：启用/停用', now(), null),
-(2, '通用开关', 'sys_choose', '系统通用开关：开启/关闭', now(), null),
+(1, '通用状态', 'sys_status', '系统通用状态：1/0', now(), null),
+(2, '通用开关', 'sys_choose', '系统通用开关：true/false', now(), null),
 (3, '菜单类型', 'sys_menu_type', '系统菜单类型', now(), null),
 (4, '登录状态', 'sys_login_status', '用户登录状态', now(), null),
 (5, '数据规则运算符', 'sys_data_rule_operator', '数据权限规则运算符', now(), null),
