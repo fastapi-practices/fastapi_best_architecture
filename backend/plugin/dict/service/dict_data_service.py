@@ -30,6 +30,20 @@ class DictDataService:
             return dict_data
 
     @staticmethod
+    async def get_by_type_code(*, code: str) -> Sequence[DictData]:
+        """
+        获取字典数据详情
+
+        :param code: 字典类型编码
+        :return:
+        """
+        async with async_db_session() as db:
+            dict_datas = await dict_data_dao.get_by_type_code(db, code)
+            if not dict_datas:
+                raise errors.NotFoundError(msg='字典数据不存在')
+            return dict_datas
+
+    @staticmethod
     async def get_all() -> Sequence[DictData]:
         async with async_db_session() as db:
             dict_datas = await dict_data_dao.get_all(db)

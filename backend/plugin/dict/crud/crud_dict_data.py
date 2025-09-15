@@ -23,6 +23,18 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_model(db, pk, load_strategies={'type': 'noload'})
 
+    async def get_by_type_code(self, db: AsyncSession, type_code: str) -> Sequence[DictData]:
+        """
+        通过字典类型编码获取字典数据
+
+        :param db: 数据库会话
+        :param type_code: 字典类型编码
+        :return:
+        """
+        return await self.select_models_order(
+            db, sort_columns='sort', sort_orders='desc', type_code=type_code, load_strategies={'type': 'noload'}
+        )
+
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:
         """
         获取所有字典数据
