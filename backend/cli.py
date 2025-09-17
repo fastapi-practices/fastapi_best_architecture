@@ -47,13 +47,14 @@ def run(host: str, port: int, reload: bool, workers: int) -> None:
     openapi_url = url + (settings.FASTAPI_OPENAPI_URL or '')
 
     panel_content = Text()
-    panel_content.append(f'📝 Swagger 文档: {docs_url}\n', style='blue')
-    panel_content.append(f'📚 Redoc   文档: {redoc_url}\n', style='yellow')
-    panel_content.append(f'📡 OpenAPI JSON: {openapi_url}\n', style='green')
-    panel_content.append(
-        '🌍 fba 官方文档: https://fastapi-practices.github.io/fastapi_best_architecture_docs/',
-        style='cyan',
-    )
+    panel_content.append(f'当前版本: v{__version__}')
+    panel_content.append(f'\n服务地址: {url}')
+    panel_content.append('\n官方文档: https://fastapi-practices.github.io/fastapi_best_architecture_docs/')
+
+    if settings.ENVIRONMENT == 'dev':
+        panel_content.append(f'\n\n📖 Swagger 文档: {docs_url}', style='yellow')
+        panel_content.append(f'\n📚 Redoc   文档: {redoc_url}', style='blue')
+        panel_content.append(f'\n📡 OpenAPI JSON: {openapi_url}', style='green')
 
     console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
     granian.Granian(
