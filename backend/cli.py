@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
+import os
+import shutil
 import subprocess
 
 from dataclasses import dataclass
@@ -8,9 +10,16 @@ from typing import Annotated, Literal
 
 import cappa
 import granian
+import questionary
 
 from cappa.output import error_format
 from rich.panel import Panel
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.prompt import IntPrompt
 from rich.table import Table
 from rich.text import Text
@@ -21,6 +30,7 @@ from backend import __version__
 from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.common.exception.errors import BaseExceptionMixin
 from backend.core.conf import settings
+from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.business_service import gen_business_service
@@ -186,6 +196,154 @@ def generate(gen: bool) -> None:
     console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
 
 
+async def simplify():
+    title = Text()
+    title.append('🚀 FastAPI Best Architecture · ', style='turquoise4')
+    title.append('代码精简程序 ✨', style='medium_purple1')
+    content = Text()
+    content.append('精简 fba 当前实现，快速切换至新项目开发模式', style='grey50')
+    content.append('\n\n🟨 安全警告', style='deep_sky_blue1')
+    content.append('\n\n   此操作将永久删除清理列表内容，且无法恢复！', style='gold1')
+    content.append('\n   请仔细阅读清理列表，确认后再继续操作', style='grey50')
+    content.append('\n\n🟥 清理列表', style='deep_sky_blue1')
+    content.append('\n\n   1. 应用模块')
+    content.append(
+        '\n   admin[monitor、sys/data_rule、sys/data_scope、sys/dept、sys/files、sys/menu、sys/role]', style='grey50'
+    )
+    content.append('\n   task', style='grey50')
+    content.append('\n\n   2. 公共模块')
+    content.append('\n   common[security/permission、security/rbac]', style='grey50')
+    content.append('\n\n   3. 插件模块')
+    content.append('\n   plugin[code_generator、config、dict、notice]', style='grey50')
+    content.append('\n\n   4. 工具模块')
+    content.append('\n   utils[redis_info、server_info]', style='grey50')
+    content.append('\n\n   4. Git模块')
+    content.append('\n   Git[.github]', style='grey50')
+    content.append('\n\n🟩 默认保留', style='deep_sky_blue1')
+    content.append('\n\n   1. 应用模块')
+    content.append('\n   admin[auth、log、sys/user、sys/plugin]', style='grey50')
+    content.append('\n\n   2. 公共模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   3. 插件模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   4. 工具模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    content.append('\n\n   5. 其他模块')
+    content.append('\n   除清理列表已选择外所有', style='grey50')
+    console.print(Panel(content, title=title, expand=False, padding=(1, 2)))
+
+    go = await questionary.confirm('确认继续吗？', qmark='🟨').ask_async()
+    if not go:
+        return
+
+    ego = await questionary.confirm('真的确认继续吗？', qmark='🟨').ask_async()
+    if not ego:
+        return
+
+    # 定义可选可清理列表
+    del_list = [
+        'admin[monitor、sys/data_rule、sys/data_scope、sys/dept、sys/files、sys/menu、sys/role]',
+        'task',
+        'common[security/permission、security/rbac]',
+        'plugin[code_generator]',
+        'plugin[config]',
+        'plugin[dict]',
+        'plugin[notice]',
+        'utils[redis_info、server_info]',
+        'Git[.github]',
+    ]
+
+    console.print(f'\n🟨 开始清理，共 {len(del_list)} 个模块需要处理...\n')
+
+    def remove_file(paths: list[str]):
+        for path in paths:
+            if os.path.exists(path):
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+
+    def remove_module(value: str):
+        match value:
+            case 'admin[monitor、sys/data_rule、sys/data_scope、sys/dept、sys/files、sys/menu、sys/role]':
+                remove_file([
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'monitor'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'data_rule.py'),
+                    os.path.join(BASE_PATH, 'admin', 'crud', 'crud_data_rule.py'),
+                    os.path.join(BASE_PATH, 'admin', 'model', 'data_rule.py'),
+                    os.path.join(BASE_PATH, 'admin', 'schema', 'data_rule.py'),
+                    os.path.join(BASE_PATH, 'admin', 'service', 'data_rule_service.py'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'data_scope.py'),
+                    os.path.join(BASE_PATH, 'admin', 'crud', 'crud_data_scope.py'),
+                    os.path.join(BASE_PATH, 'admin', 'model', 'data_scope.py'),
+                    os.path.join(BASE_PATH, 'admin', 'schema', 'data_scope.py'),
+                    os.path.join(BASE_PATH, 'admin', 'service', 'data_scope_service.py'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'dept.py'),
+                    os.path.join(BASE_PATH, 'admin', 'crud', 'crud_dept.py'),
+                    os.path.join(BASE_PATH, 'admin', 'model', 'dept.py'),
+                    os.path.join(BASE_PATH, 'admin', 'schema', 'dept.py'),
+                    os.path.join(BASE_PATH, 'admin', 'service', 'dept_service.py'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'files.py'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'menu.py'),
+                    os.path.join(BASE_PATH, 'admin', 'crud', 'crud_menu.py'),
+                    os.path.join(BASE_PATH, 'admin', 'model', 'menu.py'),
+                    os.path.join(BASE_PATH, 'admin', 'schema', 'menu.py'),
+                    os.path.join(BASE_PATH, 'admin', 'service', 'menu_service.py'),
+                    os.path.join(BASE_PATH, 'admin', 'api', 'v1', 'sys', 'role.py'),
+                    os.path.join(BASE_PATH, 'admin', 'crud', 'crud_role.py'),
+                    os.path.join(BASE_PATH, 'admin', 'model', 'role.py'),
+                    os.path.join(BASE_PATH, 'admin', 'schema', 'role.py'),
+                    os.path.join(BASE_PATH, 'admin', 'service', 'role_service.py'),
+                ])
+
+            case 'task':
+                remove_file([os.path.join(BASE_PATH, 'app', 'task')])
+
+            case 'common[security/permission、security/rbac]':
+                remove_file([
+                    os.path.join(BASE_PATH, 'common', 'security', 'permission.py'),
+                    os.path.join(BASE_PATH, 'common', 'security', 'rbac.py'),
+                ])
+
+            case 'plugin[code_generator]':
+                remove_file([os.path.join(BASE_PATH, 'plugin', 'code_generator')])
+
+            case 'plugin[config]':
+                remove_file([os.path.join(BASE_PATH, 'plugin', 'config')])
+
+            case 'plugin[dict]':
+                remove_file([os.path.join(BASE_PATH, 'plugin', 'dict')])
+
+            case 'plugin[notice]':
+                remove_file([os.path.join(BASE_PATH, 'plugin', 'notice')])
+
+            case 'utils[redis_info、server_info]':
+                remove_file([
+                    os.path.join(BASE_PATH, 'utils', 'redis_info.py'),
+                    os.path.join(BASE_PATH, 'utils', 'server_info.py'),
+                ])
+            case 'Git[.github]':
+                remove_file([
+                    os.path.join(BASE_PATH.parent, '.github'),
+                ])
+
+    with Progress(
+        SpinnerColumn(finished_text='🟩 [bold cyan]清理完成[/]'),
+        TextColumn('{task.completed}/{task.total}', style='bold green'),
+        TimeElapsedColumn(),
+        console=console,
+    ) as progress:
+        task = progress.add_task('[cyan]正在清理模块...', total=len(del_list))
+
+        for v in del_list:
+            remove_module(v)
+            await asyncio.sleep(0.5)
+            progress.advance(task)
+
+    console.print('\n✨  项目已准备就绪！🚀', style='bold green')
+    console.print('\n🟨 当前并未实现全局清理，仍需自行清理', style='bold yellow')
+
+
 @cappa.command(help='运行 API 服务', default_long=True)
 @dataclass
 class Run:
@@ -328,11 +486,14 @@ class FbaCli:
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
+    simplify: Annotated[bool, cappa.Arg(default=False, help='精简 fba 当前实现，快速切换至新项目开发模式')]
     subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
 
     async def __call__(self):
         if self.sql:
             await execute_sql_scripts(self.sql)
+        if self.simplify:
+            await simplify()
 
 
 def main() -> None:
