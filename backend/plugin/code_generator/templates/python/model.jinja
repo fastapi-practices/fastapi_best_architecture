@@ -4,7 +4,13 @@
 from datetime import datetime
 
 {% endif %}
+{% if 'Decimal' in models %}
+from decimal import Decimal
+
+{% endif %}
+{% if 'Uuid' or 'UUID' in models %}
 from uuid import UUID
+{% endif %}
 
 import sqlalchemy as sa
 
