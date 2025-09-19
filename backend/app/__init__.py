@@ -24,9 +24,6 @@ def get_app_models() -> list[type]:
         if obj:
             objs.append(obj)
 
-    print(apps)
-    print(objs)
-
     return objs
 
 
