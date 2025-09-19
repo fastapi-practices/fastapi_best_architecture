@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, String
-from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import INTEGER, TEXT
+import sqlalchemy as sa
+
+from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_data_scope, sys_role_menu, sys_user_role
@@ -22,14 +22,12 @@ class Role(Base):
     __tablename__ = 'sys_role'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(20), unique=True, comment='角色名称')
+    name: Mapped[str] = mapped_column(sa.String(20), unique=True, comment='角色名称')
     status: Mapped[int] = mapped_column(default=1, comment='角色状态（0停用 1正常）')
     is_filter_scopes: Mapped[bool] = mapped_column(
-        Boolean().with_variant(INTEGER, 'postgresql'), default=True, comment='过滤数据权限(0否 1是)'
+        sa.INTEGER().with_variant(TINYINT, 'mysql'), default=True, comment='过滤数据权限(0否 1是)'
     )
-    remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
-    )
+    remark: Mapped[str | None] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='备注')
 
     # 角色用户多对多
     users: Mapped[list[User]] = relationship(init=False, secondary=sys_user_role, back_populates='roles')

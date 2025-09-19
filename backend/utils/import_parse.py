@@ -48,6 +48,7 @@ def get_model_object(module_path: str) -> type | None:
     """
     try:
         module = import_module_cached(module_path)
+        print(module)
     except ModuleNotFoundError:
         log.warning(f'模块 {module_path} 中不包含模型对象')
         return None
