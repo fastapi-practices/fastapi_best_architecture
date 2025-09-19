@@ -24,40 +24,40 @@ services:
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
 
-  fba_mysql:
-    image: mysql:8.0.41
-    ports:
-      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
-    container_name: fba_mysql
-    restart: always
-    environment:
-      MYSQL_DATABASE: fba
-      MYSQL_ROOT_PASSWORD: 123456
-      TZ: Asia/Shanghai
-    volumes:
-      - fba_mysql:/var/lib/mysql
-    networks:
-      - fba_network
-    command:
-      --default-authentication-plugin=mysql_native_password
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --lower_case_table_names=1
-
-#  fba_postgres:
-#    image: postgres:16
+#  fba_mysql:
+#    image: mysql:8.0.41
 #    ports:
-#      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
-#    container_name: fba_postgres
+#      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
+#    container_name: fba_mysql
 #    restart: always
 #    environment:
-#      POSTGRES_DB: fba
-#      POSTGRES_PASSWORD: 123456
+#      MYSQL_DATABASE: fba
+#      MYSQL_ROOT_PASSWORD: 123456
 #      TZ: Asia/Shanghai
 #    volumes:
-#      - fba_postgres:/var/lib/postgresql/data
+#      - fba_mysql:/var/lib/mysql
 #    networks:
 #      - fba_network
+#    command:
+#      --default-authentication-plugin=mysql_native_password
+#      --character-set-server=utf8mb4
+#      --collation-server=utf8mb4_general_ci
+#      --lower_case_table_names=1
+
+  fba_postgres:
+    image: postgres:16
+    ports:
+      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
+    container_name: fba_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: fba
+      POSTGRES_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - fba_postgres:/var/lib/postgresql/data
+    networks:
+      - fba_network
 
   fba_redis:
     image: redis

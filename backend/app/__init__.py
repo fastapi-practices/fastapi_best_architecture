@@ -18,12 +18,14 @@ def get_app_models() -> list[type]:
             apps.append(d)
 
     objs = []
-
     for app in apps:
         module_path = f'backend.app.{app}.model'
         obj = get_model_object(module_path)
         if obj:
             objs.append(obj)
+
+    print(apps)
+    print(objs)
 
     return objs
 
