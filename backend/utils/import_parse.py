@@ -39,7 +39,7 @@ def dynamic_import_data_model(module_path: str) -> Type[T]:
         raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
 
 
-def get_model_object(module_path: str) -> type | None:
+def get_model_objects(module_path: str) -> list[type] | None:
     """
     获取模型对象
 
@@ -54,8 +54,10 @@ def get_model_object(module_path: str) -> type | None:
     except Exception as e:
         raise RuntimeError(f'获取模块 {module_path} 模型对象失败：{e}')
 
-    for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj):
-            return obj
+    classes = []
 
-    return None
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and module_path in obj.__module__:
+            classes.append(obj)
+
+    return classes
