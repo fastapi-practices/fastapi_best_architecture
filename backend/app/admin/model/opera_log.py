@@ -26,7 +26,7 @@ class OperaLog(DataClassBase):
     country: Mapped[str | None] = mapped_column(String(50), comment='国家')
     region: Mapped[str | None] = mapped_column(String(50), comment='地区')
     city: Mapped[str | None] = mapped_column(String(50), comment='城市')
-    user_agent: Mapped[str] = mapped_column(String(255), comment='请求头')
+    user_agent: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='请求头')
     os: Mapped[str | None] = mapped_column(String(50), comment='操作系统')
     browser: Mapped[str | None] = mapped_column(String(50), comment='浏览器')
     device: Mapped[str | None] = mapped_column(String(50), comment='设备')
