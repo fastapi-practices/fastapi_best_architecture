@@ -23,7 +23,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
 from backend.utils._await import run_await
-from backend.utils.import_parse import get_model_object, import_module_cached
+from backend.utils.import_parse import get_model_objects, import_module_cached
 
 
 class PluginConfigError(Exception):
@@ -63,9 +63,9 @@ def get_plugin_models() -> list[type]:
 
     for plugin in get_plugins():
         module_path = f'backend.plugin.{plugin}.model'
-        obj = get_model_object(module_path)
+        obj = get_model_objects(module_path)
         if obj:
-            objs.append(obj)
+            objs.extend(obj)
 
     return objs
 
