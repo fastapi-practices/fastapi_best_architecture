@@ -52,7 +52,8 @@ def get_model_objects(module_path: str) -> list[type] | None:
         log.warning(f'模块 {module_path} 中不包含模型对象')
         return None
     except Exception as e:
-        raise RuntimeError(f'获取模块 {module_path} 模型对象失败：{e}')
+        log.error(f'获取模块 {module_path} 模型对象失败：{e}')
+        raise e
 
     classes = []
 
