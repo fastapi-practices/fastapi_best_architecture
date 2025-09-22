@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+{% set DECIMAL_TYPES = ['DECIMAL', 'NUMERIC', 'MONEY', 'NUMMULTIRANGE', 'NUMRANGE'] %}
+{% set MYSQL_TYPES = ['BIT', 'ENUM', 'LONGBLOB', 'LONGTEXT', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'SET',
+'TINYBLOB', 'TINYINT', 'TINYTEXT', 'YEAR'] %}
+{% set POSTGRESQL_TYPES = ['ARRAY', 'BIT', 'BYTEA', 'CIDR', 'CITEXT', 'DATEMULTIRANGE', 'DATERANGE', 'DOMAIN', 'ENUM',
+'HSTORE', 'INET', 'INT4MULTIRANGE', 'INT4RANGE', 'INT8MULTIRANGE', 'INT8RANGE', 'INTERVAL', 'JSONB', 'JSONPATH',
+'MACADDR', 'MACADDR8', 'MONEY', 'NUMMULTIRANGE', 'NUMRANGE', 'OID', 'REGCLASS', 'REGCONFIG', 'TSMULTIRANGE', 'TSQUERY',
+'TSRANGE', 'TSTZMULTIRANGE', 'TSTZRANGE', 'TSVECTOR'] %}
 {% if default_datetime_column %}
 from datetime import datetime
-
 {% endif %}
+{% if model_types|select('in', DECIMAL_TYPES)|first %}
+from decimal import Decimal
+{% endif %}
+{% if 'Uuid' in model_types or 'UUID' in model_types %}
 from uuid import UUID
+{% endif %}
 
 import sqlalchemy as sa
 
@@ -31,14 +42,9 @@ class {{ class_name }}({% if default_datetime_column %}Base{% else %}DataClassBa
     {%- endif %} = mapped_column(
     {%- if model.type in ['NVARCHAR', 'String', 'Unicode', 'VARCHAR'] -%}
         sa.String({{ model.length }})
-    {%- elif database_type == 'mysql' and model.type in ['BIT', 'ENUM', 'LONGBLOB', 'LONGTEXT', 'MEDIUMBLOB',
-    'MEDIUMINT', 'MEDIUMTEXT', 'SET', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'YEAR'] -%}
+    {%- elif database_type == 'mysql' and model.type in MYSQL_TYPES -%}
         mysql.{{ model.type }}()
-    {%- elif database_type == 'postgresql' and model.type in [
-    'ARRAY', 'BIT', 'BYTEA', 'CIDR', 'CITEXT', 'DATEMULTIRANGE', 'DATERANGE', 'DOMAIN', 'ENUM', 'HSTORE', 'INET',
-    'INT4MULTIRANGE', 'INT4RANGE', 'INT8MULTIRANGE', 'INT8RANGE', 'INTERVAL', 'JSONB', 'JSONPATH', 'MACADDR',
-    'MACADDR8', 'MONEY', 'NUMMULTIRANGE', 'NUMRANGE', 'OID', 'REGCLASS', 'REGCONFIG', 'TSMULTIRANGE', 'TSQUERY',
-    'TSRANGE', 'TSTZMULTIRANGE', 'TSTZRANGE', 'TSVECTOR'] -%}
+    {%- elif database_type == 'postgresql' and model.type in POSTGRESQL_TYPES -%}
     {%- else -%}
         sa.{{ model.type }}()
     {%- endif -%}, default=

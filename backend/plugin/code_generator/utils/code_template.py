@@ -95,6 +95,7 @@ class GenTemplate:
             'permission': str(business.table_name.replace('_', ':')),
             'database_type': settings.DATABASE_TYPE,
             'models': models,
+            'model_types': [model.type for model in models],
         }
 
 
