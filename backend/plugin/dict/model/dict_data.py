@@ -24,6 +24,7 @@ class DictData(Base):
     type_code: Mapped[str] = mapped_column(String(32), comment='对应的字典类型编码')
     label: Mapped[str] = mapped_column(String(32), comment='字典标签')
     value: Mapped[str] = mapped_column(String(32), comment='字典值')
+    color: Mapped[str | None] = mapped_column(String(32), default=None, comment='标签颜色')
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
     status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(

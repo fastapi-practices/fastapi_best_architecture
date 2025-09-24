@@ -3,7 +3,7 @@
 import os.path
 
 from backend.core.path_conf import BASE_PATH
-from backend.utils.import_parse import get_model_object
+from backend.utils.import_parse import get_model_objects
 
 
 def get_app_models() -> list[type]:
@@ -21,9 +21,9 @@ def get_app_models() -> list[type]:
 
     for app in apps:
         module_path = f'backend.app.{app}.model'
-        obj = get_model_object(module_path)
+        obj = get_model_objects(module_path)
         if obj:
-            objs.append(obj)
+            objs.extend(obj)
 
     return objs
 

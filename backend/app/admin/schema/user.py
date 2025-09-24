@@ -22,6 +22,7 @@ class AuthSchemaBase(SchemaBase):
 class AuthLoginParam(AuthSchemaBase):
     """用户登录参数"""
 
+    uuid: str = Field(description='验证码 UUID')
     captcha: str = Field(description='验证码')
 
 

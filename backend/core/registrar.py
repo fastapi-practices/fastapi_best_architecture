@@ -13,8 +13,11 @@ from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
+from starlette.types import ASGIApp
 
+from backend import __version__
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
@@ -65,9 +68,25 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 
 def register_app() -> FastAPI:
     """注册 FastAPI 应用"""
-    app = FastAPI(
+
+    class MyFastAPI(FastAPI):
+        if settings.MIDDLEWARE_CORS:
+            # Related issues
+            # https://github.com/fastapi/fastapi/discussions/7847
+            # https://github.com/fastapi/fastapi/discussions/8027
+            def build_middleware_stack(self) -> ASGIApp:
+                return CORSMiddleware(
+                    super().build_middleware_stack(),
+                    allow_origins=settings.CORS_ALLOWED_ORIGINS,
+                    allow_credentials=True,
+                    allow_methods=['*'],
+                    allow_headers=['*'],
+                    expose_headers=settings.CORS_EXPOSE_HEADERS,
+                )
+
+    app = MyFastAPI(
         title=settings.FASTAPI_TITLE,
-        version=settings.FASTAPI_VERSION,
+        version=__version__,
         description=settings.FASTAPI_DESCRIPTION,
         docs_url=settings.FASTAPI_DOCS_URL,
         redoc_url=settings.FASTAPI_REDOC_URL,
@@ -133,19 +152,6 @@ def register_middleware(app: FastAPI) -> None:
 
     # I18n
     app.add_middleware(I18nMiddleware)
-
-    # CORS
-    if settings.MIDDLEWARE_CORS:
-        from fastapi.middleware.cors import CORSMiddleware
-
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=settings.CORS_ALLOWED_ORIGINS,
-            allow_credentials=True,
-            allow_methods=['*'],
-            allow_headers=['*'],
-            expose_headers=settings.CORS_EXPOSE_HEADERS,
-        )
 
     # Access log
     app.add_middleware(AccessMiddleware)

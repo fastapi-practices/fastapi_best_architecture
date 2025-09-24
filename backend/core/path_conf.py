@@ -17,9 +17,6 @@ STATIC_DIR = BASE_PATH / 'static'
 # 上传文件目录
 UPLOAD_DIR = STATIC_DIR / 'upload'
 
-# 离线 IP 数据库路径
-IP2REGION_XDB = STATIC_DIR / 'ip2region.xdb'
-
 # 插件目录
 PLUGIN_DIR = BASE_PATH / 'plugin'
 

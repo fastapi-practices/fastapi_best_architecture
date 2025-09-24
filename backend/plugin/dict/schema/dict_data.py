@@ -14,6 +14,7 @@ class DictDataSchemaBase(SchemaBase):
     type_id: int = Field(description='字典类型 ID')
     label: str = Field(description='字典标签')
     value: str = Field(description='字典值')
+    color: str | None = Field(None, description='标签颜色')
     sort: int = Field(description='排序')
     status: StatusType = Field(description='状态')
     remark: str | None = Field(None, description='备注')

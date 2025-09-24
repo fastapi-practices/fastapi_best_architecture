@@ -21,6 +21,12 @@ from backend.plugin.dict.service.dict_type_service import dict_type_service
 router = APIRouter()
 
 
+@router.get('/all', summary='获取所有字典数据', dependencies=[DependsJwtAuth])
+async def get_all_dict_types() -> ResponseSchemaModel[list[GetDictTypeDetail]]:
+    data = await dict_type_service.get_all()
+    return response_base.success(data=data)
+
+
 @router.get('/{pk}', summary='获取字典类型详情', dependencies=[DependsJwtAuth])
 async def get_dict_type(
     pk: Annotated[int, Path(description='字典类型 ID')],
@@ -41,9 +47,8 @@ async def get_dict_types_paged(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='字典类型名称')] = None,
     code: Annotated[str | None, Query(description='字典类型编码')] = None,
-    status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
-    dict_type_select = await dict_type_service.get_select(name=name, code=code, status=status)
+    dict_type_select = await dict_type_service.get_select(name=name, code=code)
     page_data = await paging_data(db, dict_type_select)
     return response_base.success(data=page_data)
 
