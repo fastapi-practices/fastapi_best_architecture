@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import importlib
+import inspect
 
 from functools import lru_cache
 from typing import Any, Type, TypeVar
@@ -33,6 +34,30 @@ def dynamic_import_data_model(module_path: str) -> Type[T]:
         module_path, class_name = module_path.rsplit('.', 1)
         module = import_module_cached(module_path)
         return getattr(module, class_name)
-    except (ImportError, AttributeError) as e:
+    except Exception as e:
         log.error(f'动态导入数据模型失败：{e}')
         raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
+
+
+def get_model_objects(module_path: str) -> list[type] | None:
+    """
+    获取模型对象
+
+    :param module_path: 模块路径
+    :return:
+    """
+    try:
+        module = import_module_cached(module_path)
+    except ModuleNotFoundError:
+        log.warning(f'模块 {module_path} 中不包含模型对象')
+        return None
+    except Exception as e:
+        raise e
+
+    classes = []
+
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and module_path in obj.__module__:
+            classes.append(obj)
+
+    return classes

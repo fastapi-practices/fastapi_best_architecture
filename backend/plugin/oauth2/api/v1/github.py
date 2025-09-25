@@ -12,13 +12,12 @@ from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
 
-_github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_GITHUB_CLIENT_SECRET)
-_github_oauth2 = FastAPIOAuth20(_github_client, redirect_route_name='github_oauth2_callback')
+github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_GITHUB_CLIENT_SECRET)
 
 
 @router.get('', summary='获取 Github 授权链接')
 async def get_github_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
-    auth_url = await _github_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
+    auth_url = await github_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
     return response_base.success(data=auth_url)
 
 
@@ -32,11 +31,11 @@ async def github_oauth2_callback(
     request: Request,
     response: Response,
     background_tasks: BackgroundTasks,
-    oauth2: FastAPIOAuth20 = Depends(_github_oauth2),
+    oauth2: FastAPIOAuth20 = Depends(FastAPIOAuth20(github_client, redirect_route_name='github_oauth2_callback')),
 ):
     token, _state = oauth2
     access_token = token['access_token']
-    user = await _github_client.get_userinfo(access_token)
+    user = await github_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
         request=request,
         response=response,

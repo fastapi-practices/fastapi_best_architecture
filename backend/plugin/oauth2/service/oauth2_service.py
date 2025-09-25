@@ -54,6 +54,12 @@ class OAuth2Service:
                 username = user.get('login')
                 nickname = user.get('name')
 
+            if social == UserSocialType.google:
+                sid = user.get('id')
+                username = user.get('name')
+                nickname = user.get('given_name')
+                avatar = user.get('picture')
+
             if social == UserSocialType.linux_do:
                 sid = user.get('id')
                 nickname = user.get('name')

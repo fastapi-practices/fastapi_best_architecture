@@ -29,9 +29,9 @@ class NoticeService:
             return notice
 
     @staticmethod
-    async def get_select() -> Select:
+    async def get_select(title: str | None, type: int | None, status: int | None) -> Select:
         """获取通知公告查询对象"""
-        return await notice_dao.get_list()
+        return await notice_dao.get_list(title, type, status)
 
     @staticmethod
     async def get_all() -> Sequence[Notice]:

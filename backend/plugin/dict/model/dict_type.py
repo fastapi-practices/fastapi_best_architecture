@@ -23,7 +23,6 @@ class DictType(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(32), comment='字典类型名称')
     code: Mapped[str] = mapped_column(String(32), unique=True, comment='字典类型编码')
-    status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(
         LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
     )

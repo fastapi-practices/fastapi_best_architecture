@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import DataClassBase, id_key
+from backend.common.model import DataClassBase, TimeZone, id_key
 from backend.utils.timezone import timezone
 
 
@@ -29,7 +29,7 @@ class LoginLog(DataClassBase):
     browser: Mapped[str | None] = mapped_column(String(50), comment='浏览器')
     device: Mapped[str | None] = mapped_column(String(50), comment='设备')
     msg: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='提示消息')
-    login_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), comment='登录时间')
+    login_time: Mapped[datetime] = mapped_column(TimeZone, comment='登录时间')
     created_time: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), init=False, default_factory=timezone.now, comment='创建时间'
+        TimeZone, init=False, default_factory=timezone.now, comment='创建时间'
     )

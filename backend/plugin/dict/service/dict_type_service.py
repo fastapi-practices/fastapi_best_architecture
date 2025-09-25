@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Sequence
+
 from sqlalchemy import Select
 
 from backend.common.exception import errors
@@ -27,16 +29,21 @@ class DictTypeService:
             return dict_type
 
     @staticmethod
-    async def get_select(*, name: str | None, code: str | None, status: int | None) -> Select:
+    async def get_all() -> Sequence[DictType]:
+        async with async_db_session() as db:
+            dict_datas = await dict_type_dao.get_all(db)
+            return dict_datas
+
+    @staticmethod
+    async def get_select(*, name: str | None, code: str | None) -> Select:
         """
         获取字典类型列表查询条件
 
         :param name: 字典类型名称
         :param code: 字典类型编码
-        :param status: 状态
         :return:
         """
-        return await dict_type_dao.get_list(name=name, code=code, status=status)
+        return await dict_type_dao.get_list(name=name, code=code)
 
     @staticmethod
     async def create(*, obj: CreateDictTypeParam) -> None:

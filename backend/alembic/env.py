@@ -3,15 +3,12 @@
 # ruff: noqa: F403, F401, I001, RUF100
 import asyncio
 import os
-import sys
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-sys.path.append('../')
 
 from backend.app import get_app_models
 from backend.common.model import MappedBase
@@ -42,7 +39,9 @@ if alembic_config.config_file_name is not None:
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-alembic_config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False))
+alembic_config.set_main_option(
+    'sqlalchemy.url', SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False).replace('%', '%%')
+)
 
 
 def run_migrations_offline():

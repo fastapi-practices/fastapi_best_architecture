@@ -4,7 +4,6 @@ from datetime import datetime
 
 from pydantic import ConfigDict, Field
 
-from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
@@ -13,7 +12,6 @@ class DictTypeSchemaBase(SchemaBase):
 
     name: str = Field(description='字典名称')
     code: str = Field(description='字典编码')
-    status: StatusType = Field(description='状态')
     remark: str | None = Field(None, description='备注')
 
 

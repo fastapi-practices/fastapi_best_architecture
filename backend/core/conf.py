@@ -25,7 +25,6 @@ class Settings(BaseSettings):
     # FastAPI
     FASTAPI_API_V1_PATH: str = '/api/v1'
     FASTAPI_TITLE: str = 'FastAPI'
-    FASTAPI_VERSION: str = '1.5.0'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
     FASTAPI_DOCS_URL: str = '/docs'
     FASTAPI_REDOC_URL: str = '/redoc'
@@ -223,6 +222,8 @@ class Settings(BaseSettings):
     # .env
     OAUTH2_GITHUB_CLIENT_ID: str
     OAUTH2_GITHUB_CLIENT_SECRET: str
+    OAUTH2_GOOGLE_CLIENT_ID: str
+    OAUTH2_GOOGLE_CLIENT_SECRET: str
     OAUTH2_LINUX_DO_CLIENT_ID: str
     OAUTH2_LINUX_DO_CLIENT_SECRET: str
 
