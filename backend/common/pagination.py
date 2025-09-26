@@ -111,15 +111,16 @@ class PageData(_PageDetails, Generic[SchemaT]):
     items: Sequence[SchemaT]
 
 
-async def paging_data(db: AsyncSession, select: Select) -> dict[str, Any]:
+async def paging_data(db: AsyncSession, select: Select, **kwargs) -> dict[str, Any]:
     """
     基于 SQLAlchemy 创建分页数据
 
     :param db: 数据库会话
     :param select: SQL 查询语句
+    :param kwargs: 更多 fastapi-pagination apaginate 参数
     :return:
     """
-    paginated_data: _CustomPage = await apaginate(db, select)
+    paginated_data: _CustomPage = await apaginate(db, select, **kwargs)
     page_data = paginated_data.model_dump()
     return page_data
 
