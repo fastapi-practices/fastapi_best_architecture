@@ -200,7 +200,7 @@ class CRUDUser(CRUDPlus[User]):
         if username:
             filters['username__like'] = f'%{username}%'
         if phone:
-            filters['phone_like'] = f'%{phone}%'
+            filters['phone__like'] = f'%{phone}%'
         if status is not None:
             filters['status'] = status
 
