@@ -1,3 +1,38 @@
+<a id="v1.8.2"></a>
+# [v1.8.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.2) - 2025-09-26
+
+## What's Changed
+* Update changelog for v1.8.1 by [@wu-clan](https://github.com/wu-clan) in [#804](https://github.com/fastapi-practices/fastapi_best_architecture/pull/804)
+* Update the swagger docs version to dynamic by [@wu-clan](https://github.com/wu-clan) in [#805](https://github.com/fastapi-practices/fastapi_best_architecture/pull/805)
+* Fix the subprocess ensurepip got stuck in Linux by [@byte-voyager](https://github.com/byte-voyager) in [#806](https://github.com/fastapi-practices/fastapi_best_architecture/pull/806)
+* Update the offline location information parse by [@wu-clan](https://github.com/wu-clan) in [#807](https://github.com/fastapi-practices/fastapi_best_architecture/pull/807)
+* Fix pgsql syntax error in code generation by [@byte-voyager](https://github.com/byte-voyager) in [#808](https://github.com/fastapi-practices/fastapi_best_architecture/pull/808)
+* Fix summary default in opera log middleware by [@wu-clan](https://github.com/wu-clan) in [#809](https://github.com/fastapi-practices/fastapi_best_architecture/pull/809)
+* Fix special character password support in alembic by [@MortyZhaoy](https://github.com/MortyZhaoy) in [#811](https://github.com/fastapi-practices/fastapi_best_architecture/pull/811)
+* Update the startup progress information display by [@wu-clan](https://github.com/wu-clan) in [#812](https://github.com/fastapi-practices/fastapi_best_architecture/pull/812)
+* Update the login captcha verify logic by [@wu-clan](https://github.com/wu-clan) in [#815](https://github.com/fastapi-practices/fastapi_best_architecture/pull/815)
+* Fix the summary in opera log middleware by [@wu-clan](https://github.com/wu-clan) in [#816](https://github.com/fastapi-practices/fastapi_best_architecture/pull/816)
+* Update the dict plugin table structure by [@wu-clan](https://github.com/wu-clan) in [#817](https://github.com/fastapi-practices/fastapi_best_architecture/pull/817)
+* Add version number output to the startup CLI by [@wu-clan](https://github.com/wu-clan) in [#820](https://github.com/fastapi-practices/fastapi_best_architecture/pull/820)
+* Update the user agent in opera log model by [@wu-clan](https://github.com/wu-clan) in [#831](https://github.com/fastapi-practices/fastapi_best_architecture/pull/831)
+* Fix code generation template missing Decimal by [@wu-clan](https://github.com/wu-clan) in [#830](https://github.com/fastapi-practices/fastapi_best_architecture/pull/830)
+* Fix the get model object method return logic by [@wu-clan](https://github.com/wu-clan) in [#832](https://github.com/fastapi-practices/fastapi_best_architecture/pull/832)
+* Simplify the code generation CLI parameters by [@wu-clan](https://github.com/wu-clan) in [#837](https://github.com/fastapi-practices/fastapi_best_architecture/pull/837)
+* Add the refresh token to demo mode exclusion by [@wu-clan](https://github.com/wu-clan) in [#834](https://github.com/fastapi-practices/fastapi_best_architecture/pull/834)
+* Add extension parameters to paging data by [@wu-clan](https://github.com/wu-clan) in [#835](https://github.com/fastapi-practices/fastapi_best_architecture/pull/835)
+* Fix the phone filter in the user list by [@wu-clan](https://github.com/wu-clan) in [#838](https://github.com/fastapi-practices/fastapi_best_architecture/pull/838)
+* Update docker and deployment script comments by [@wu-clan](https://github.com/wu-clan) in [#839](https://github.com/fastapi-practices/fastapi_best_architecture/pull/839)
+* Update the version number to 1.8.2 by [@wu-clan](https://github.com/wu-clan) in [#840](https://github.com/fastapi-practices/fastapi_best_architecture/pull/840)
+
+## New Contributors
+* [@byte-voyager](https://github.com/byte-voyager) made their first contribution in [#806](https://github.com/fastapi-practices/fastapi_best_architecture/pull/806)
+* [@MortyZhaoy](https://github.com/MortyZhaoy) made their first contribution in [#811](https://github.com/fastapi-practices/fastapi_best_architecture/pull/811)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
+
+[Changes][v1.8.2]
+
+
 <a id="v1.8.1"></a>
 # [v1.8.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.1) - 2025-09-09
 
@@ -802,6 +837,7 @@
 [Changes][v1.0.0]
 
 
+[v1.8.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
