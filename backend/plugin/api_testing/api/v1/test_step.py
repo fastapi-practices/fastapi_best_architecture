@@ -14,7 +14,7 @@ from backend.plugin.api_testing.schema.request import (
 router = APIRouter()
 
 
-@router.post("/", response_model=ResponseModel, summary="创建测试步骤")
+@router.post("", response_model=ResponseModel, summary="创建测试步骤")
 async def create_test_step(step_data: TestStepCreateRequest) -> ResponseModel | ResponseSchemaModel:
     """
     创建测试步骤
@@ -89,7 +89,7 @@ async def get_test_step(step_id: int = Path(..., description="步骤ID")) -> Res
         return response_base.fail(data=f"获取测试步骤失败: {str(e)}")
 
 
-@router.get("/", response_model=ResponseModel, summary="获取测试步骤列表")
+@router.get("", response_model=ResponseModel, summary="获取测试步骤列表")
 async def get_test_steps(
     test_case_id: Optional[int] = Query(None, description="测试用例ID"),
     skip: int = Query(0, description="跳过数量"),

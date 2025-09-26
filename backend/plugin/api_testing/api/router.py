@@ -20,9 +20,9 @@ v1 = APIRouter(prefix=f'{settings.FASTAPI_API_V1_PATH}/api_testing', tags=['接�
 
 # 数据管理接口
 v1.include_router(project_router, prefix='/projects', tags=['项目管理'])
-v1.include_router(test_case_router, prefix='/test-cases', tags=['测试用例管理'])
-v1.include_router(test_step_router, prefix='/test-steps', tags=['测试步骤管理'])
-v1.include_router(test_report_router, prefix='/test-reports', tags=['测试报告管理'])
+v1.include_router(test_case_router, prefix='/test_cases', tags=['测试用例管理'])
+v1.include_router(test_step_router, prefix='/test_steps', tags=['测试步骤管理'])
+v1.include_router(test_report_router, prefix='/test_reports', tags=['测试报告管理'])
 
 # 功能接口
 v1.include_router(request_router, prefix='/requests', tags=['请求发送'])
@@ -31,5 +31,5 @@ v1.include_router(sql_router, prefix='/sql', tags=['SQL执行'])
 v1.include_router(report_router, prefix='/reports', tags=['报告生成'])
 v1.include_router(environment_router, prefix='/environments', tags=['环境管理'])
 v1.include_router(mock_router, prefix='/mocks', tags=['Mock服务'])
-v1.include_router(data_driven_router, prefix='/data-driven', tags=['数据驱动'])
+v1.include_router(data_driven_router, prefix='/data_driven', tags=['数据驱动'])
 v1.include_router(history_router, prefix='/history', tags=['历史记录'])

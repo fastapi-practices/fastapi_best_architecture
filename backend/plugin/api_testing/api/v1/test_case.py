@@ -14,7 +14,7 @@ from backend.plugin.api_testing.schema.request import (
 router = APIRouter()
 
 
-@router.post("/", response_model=ResponseModel, summary="创建测试用例")
+@router.post("", response_model=ResponseModel, summary="创建测试用例")
 async def create_test_case(case_data: TestCaseCreateRequest) -> ResponseModel | ResponseSchemaModel:
     """
     创建测试用例
@@ -63,7 +63,7 @@ async def get_test_case(case_id: int = Path(..., description="用例ID")) -> Res
         return response_base.fail(data=f"获取测试用例失败: {str(e)}")
 
 
-@router.get("/", response_model=ResponseModel, summary="获取测试用例列表")
+@router.get("", response_model=ResponseModel, summary="获取测试用例列表")
 async def get_test_cases(
     project_id: Optional[int] = Query(None, description="项目ID"),
     skip: int = Query(0, description="跳过数量"),

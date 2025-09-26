@@ -12,7 +12,7 @@ from backend.plugin.api_testing.schema.request import (ProjectCreateRequest, Pro
 router = APIRouter()
 
 
-@router.post("/", response_model=ResponseModel, summary="创建API项目")
+@router.post("", response_model=ResponseModel, summary="创建API项目")
 async def create_project(project_data: ProjectCreateRequest) -> ResponseModel | ResponseSchemaModel:
     """
     创建 API 项目
@@ -62,7 +62,7 @@ async def get_project(project_id: int = Path(..., description="项目ID")) -> Re
         return response_base.fail(data=f"获取项目失败: {str(e)}")
 
 
-@router.get("/", response_model=ResponseModel, summary="获取API项目列表")
+@router.get("", response_model=ResponseModel, summary="获取API项目列表")
 async def get_projects(
         skip: int = Query(0, description="跳过数量"),
         limit: int = Query(100, description="限制数量")
