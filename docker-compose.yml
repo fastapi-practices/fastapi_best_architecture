@@ -1,3 +1,25 @@
+networks:
+  fba_network:
+    name: fba_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.10.10.0/24
+
+volumes:
+  # 如果你是 postgres 用户，应将 fba_mysql 修改为 fba_postgres
+  fba_mysql:
+    name: fba_mysql
+  fba_redis:
+    name: fba_redis
+  fba_static:
+    name: fba_static
+  fba_static_upload:
+    name: fba_static_upload
+  fba_rabbitmq:
+    name: fba_rabbitmq
+
 services:
   fba_server:
     build:
@@ -6,6 +28,7 @@ services:
     image: fba_server:latest
     container_name: fba_server
     restart: always
+    # 如果你是 postgres 用户，应将 fba_mysql 修改为 fba_postgres
     depends_on:
       - fba_mysql
       - fba_redis
@@ -16,6 +39,7 @@ services:
       - fba_static_upload:/fba/backend/static/upload
     networks:
       - fba_network
+    # 如果你是 postgres 用户，应将 fba_mysql:3306 修改为 fba_postgres:5432
     command:
       - bash
       - -c
@@ -44,20 +68,21 @@ services:
       --collation-server=utf8mb4_general_ci
       --lower_case_table_names=1
 
-#  fba_postgres:
-#    image: postgres:16
-#    ports:
-#      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
-#    container_name: fba_postgres
-#    restart: always
-#    environment:
-#      POSTGRES_DB: fba
-#      POSTGRES_PASSWORD: 123456
-#      TZ: Asia/Shanghai
-#    volumes:
-#      - fba_postgres:/var/lib/postgresql/data
-#    networks:
-#      - fba_network
+  #  # 如果你是 postgres 用户，应保留 fba_postgres 容器脚本并删除 fba_mysql 容器脚本
+  #  fba_postgres:
+  #    image: postgres:16
+  #    ports:
+  #      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
+  #    container_name: fba_postgres
+  #    restart: always
+  #    environment:
+  #      POSTGRES_DB: fba
+  #      POSTGRES_PASSWORD: 123456
+  #      TZ: Asia/Shanghai
+  #    volumes:
+  #      - fba_postgres:/var/lib/postgresql/data
+  #    networks:
+  #      - fba_network
 
   fba_redis:
     image: redis
@@ -72,6 +97,9 @@ services:
     networks:
       - fba_network
 
+  # 【后端专用】
+  # 如果使用此容器，意味着你只需部署后端 API 服务，不需要前端
+  # 这与下面的 fba_ui 容器冲突，如果你选择使用 fba_ui 容器，你应该注释或删除 fba_nginx 容器脚本
   fba_nginx:
     image: nginx
     ports:
@@ -87,6 +115,8 @@ services:
     networks:
       - fba_network
 
+#  # 如果服务器内存小于 4GB，CPU 小于四个内核
+#  # 建议通过前端工程单独构建此容器或在本地进行构建
 #  fba_ui:
 #    build:
 #      context: /root/fastapi_best_architecture_ui
@@ -104,9 +134,18 @@ services:
 #      - -g
 #      - daemon off;
 #    volumes:
-#      # - local_ssl_pem_path:/etc/ssl/xxx.pem
-#      # - local_ssl_key_path:/etc/ssl/xxx.key
+#      # nginx https conf
+#      # 通过 docker 进行部署时，需要打开此配置项并确保<挂载到容器内的证书文件路径>配置
+#      # 与 nginx conf 中的 ssl 证书文件路径配置一致，如果你直接将 ssl 证书文件 cp
+#      # 到了 docker 容器内，则无需挂载证书文件，直接将它们注释或删除即可
+#      # local_ssl_pem_path：你在服务器存放 ssl pem 证书文件的路径，自行修改
+#      # local_ssl_key_path: 你在服务器存放 ssl key 证书文件的路径，自行修改
+#      # /etc/ssl/xxx.pem：挂载到容器内 ssl pem 证书文件的路径，自行修改
+#      # /etc/ssl/xxx.key：挂载到容器内 ssl key 证书文件的路径，自行修改
+#      - local_ssl_pem_path:/etc/ssl/xxx.pem
+#      - local_ssl_key_path:/etc/ssl/xxx.key
 #      - fba_static:/www/fba_server/backend/static
+#      - fba_static_upload:/www/fba_server/backend/static/upload
 #    networks:
 #      - fba_network
 
@@ -150,24 +189,3 @@ services:
         wait-for-it -s fba_rabbitmq:5672 -t 300
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
-
-networks:
-  fba_network:
-    name: fba_network
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.10.10.0/24
-
-volumes:
-  fba_mysql:
-    name: fba_mysql
-  fba_redis:
-    name: fba_redis
-  fba_static:
-    name: fba_static
-  fba_static_upload:
-    name: fba_static_upload
-  fba_rabbitmq:
-    name: fba_rabbitmq

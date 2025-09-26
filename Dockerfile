@@ -43,7 +43,7 @@ WORKDIR /fba/backend
 # === FastAPI server image ===
 FROM base_server AS fastapi_server
 
-COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
+COPY deploy/backend/fba_server.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/fastapi_server
 
@@ -54,7 +54,7 @@ CMD ["/usr/local/bin/granian", "main:app", "--interface", "asgi", "--host", "0.0
 # === Celery server image ===
 FROM base_server AS celery
 
-COPY deploy/backend/celery.conf /etc/supervisor/conf.d/
+COPY deploy/backend/fba_celery.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/celery
 
