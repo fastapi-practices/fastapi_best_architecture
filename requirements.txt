@@ -226,7 +226,7 @@ python-jose==3.5.0
     # via fastapi-best-architecture
 python-multipart==0.0.20
     # via fastapi
-python-socketio==5.13.0
+python-socketio==5.14.0
     # via fastapi-best-architecture
 pytz==2025.2
     # via flower
