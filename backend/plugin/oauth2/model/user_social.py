@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model import User
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import User
 
 
 class UserSocial(Base):

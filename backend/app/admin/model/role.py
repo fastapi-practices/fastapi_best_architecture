@@ -1,11 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import INTEGER, TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model import DataScope, Menu, User
 from backend.app.admin.model.m2m import sys_role_data_scope, sys_role_menu, sys_user_role
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import DataScope, Menu, User
 
 
 class Role(Base):

@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model import DataRule, Role
 from backend.app.admin.model.m2m import sys_data_scope_rule, sys_role_data_scope
 from backend.common.model import Base, id_key
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import DataRule, Role
 
 
 class DataScope(Base):

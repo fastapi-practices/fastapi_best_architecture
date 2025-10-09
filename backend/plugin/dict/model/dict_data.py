@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
-from backend.plugin.dict.model import DictType
+
+if TYPE_CHECKING:
+    from backend.plugin.dict.model import DictType
 
 
 class DictData(Base):

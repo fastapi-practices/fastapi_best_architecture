@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import VARBINARY, Boolean, ForeignKey, String
 from sqlalchemy.dialects.postgresql import BYTEA, INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.admin.model import Dept, Role
 from backend.app.admin.model.m2m import sys_user_role
 from backend.common.model import Base, TimeZone, id_key
 from backend.database.db import uuid4_str
 from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import Dept, Role
 
 
 class User(Base):

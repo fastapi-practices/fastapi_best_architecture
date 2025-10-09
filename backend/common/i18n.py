@@ -28,7 +28,7 @@ class I18n:
         lang_files = []
 
         for pattern in patterns:
-            lang_files.extend(glob.glob(pattern))
+            lang_files.extend(glob.glob(str(pattern)))
 
         for lang_file in lang_files:
             with open(lang_file, encoding='utf-8') as f:
