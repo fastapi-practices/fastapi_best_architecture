@@ -136,6 +136,7 @@ class Settings(BaseSettings):
         ('POST', f'{FASTAPI_API_V1_PATH}/auth/login'),
         ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
         ('GET', f'{FASTAPI_API_V1_PATH}/auth/captcha'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/refresh'),
     }
 
     # IP 定位配置

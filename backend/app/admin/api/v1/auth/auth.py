@@ -41,7 +41,7 @@ async def get_codes(request: Request) -> ResponseSchemaModel[list[str]]:
     return response_base.success(data=codes)
 
 
-@router.post('/tokens', summary='刷新 token')
+@router.post('/refresh', summary='刷新 token')
 async def refresh_token(request: Request) -> ResponseSchemaModel[GetNewToken]:
     data = await auth_service.refresh_token(request=request)
     return response_base.success(data=data)

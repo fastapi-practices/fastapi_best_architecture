@@ -148,11 +148,7 @@ async def import_table(
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
 
 
-def generate(gen: bool) -> None:
-    if not gen:
-        console.print(output_help)
-        return
-
+def generate() -> None:
     try:
         ids = []
         results = run_await(gen_business_service.get_all)()
@@ -311,14 +307,10 @@ class Import:
 @cappa.command(name='codegen', help='代码生成（体验完整功能，请自行部署 fba vben 前端工程）', default_long=True)
 @dataclass
 class CodeGenerate:
-    gen: Annotated[
-        bool,
-        cappa.Arg(default=False, show_default=False, help='执行代码生成'),
-    ]
     subcmd: cappa.Subcommands[Import | None] = None
 
     def __call__(self):
-        generate(self.gen)
+        generate()
 
 
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
