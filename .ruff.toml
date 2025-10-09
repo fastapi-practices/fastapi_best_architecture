@@ -167,7 +167,3 @@ relative-imports-order = "closest-to-furthest"
 [lint.per-file-ignores]
 "backend/common/socketio/server.py" = ["ANN001"]
 "backend/common/exception/exception_handler.py" = ["ANN202","RUF029"]
-#"**/api/v1/*.py" = ["TC"]
-#"**/model/*.py" = ["TC003"]
-#"**/model/__init__.py" = ["F401"]
-#"**/tests/*.py" = ["E402"]
