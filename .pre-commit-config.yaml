@@ -7,19 +7,17 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.13.2
+    rev: v0.14.0
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
           # https://github.com/astral-sh/ruff-pre-commit/issues/64
-          - '--config'
-          - 'backend/.ruff.toml'
           - '--fix'
           - '--unsafe-fixes'
       - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.22
+    rev: 0.9.0
     hooks:
       - id: uv-lock
       - id: uv-export
