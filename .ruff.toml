@@ -154,6 +154,9 @@ parametrize-values-type = "list"
 [lint.flake8-quotes]
 inline-quotes = "single"
 
+[lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "sqlalchemy.orm.DeclarativeBase"]
+
 [lint.flake8-unused-arguments]
 ignore-variadic-names = true
 

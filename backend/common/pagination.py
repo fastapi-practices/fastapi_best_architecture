@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
 from math import ceil
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
@@ -8,9 +10,11 @@ from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel, Field
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from typing_extensions import Self
 
 T = TypeVar('T')
 SchemaT = TypeVar('SchemaT')
