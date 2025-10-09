@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from backend.database.db import create_database_url, create_async_engine_and_session
+from backend.database.db import create_async_engine_and_session, create_database_url
 
 TEST_SQLALCHEMY_DATABASE_URL = create_database_url(unittest=True)
 

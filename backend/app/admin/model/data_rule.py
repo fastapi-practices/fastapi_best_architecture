@@ -1,9 +1,9 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.common.model import Base, id_key
 from backend.app.admin.model import DataScope
 from backend.app.admin.model.m2m import sys_data_scope_rule
+from backend.common.model import Base, id_key
 
 
 class DataRule(Base):

@@ -3,12 +3,12 @@ from __future__ import annotations
 from math import ceil
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from fastapi import Query, Depends
-from pydantic import Field, BaseModel
+from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
-from fastapi_pagination.bases import RawParams, AbstractPage, AbstractParams
-from fastapi_pagination.links.bases import create_links
+from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import apaginate
+from fastapi_pagination.links.bases import create_links
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

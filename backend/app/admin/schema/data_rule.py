@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
-from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
+from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.schema import SchemaBase
 
 

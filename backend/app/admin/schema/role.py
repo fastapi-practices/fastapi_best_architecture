@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
+from backend.app.admin.schema.data_scope import GetDataScopeDetail
+from backend.app.admin.schema.menu import GetMenuDetail
 from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
-from backend.app.admin.schema.menu import GetMenuDetail
-from backend.app.admin.schema.data_scope import GetDataScopeDetail
 
 
 class RoleSchemaBase(SchemaBase):

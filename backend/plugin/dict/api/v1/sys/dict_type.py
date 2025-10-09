@@ -1,19 +1,19 @@
 from typing import Annotated
 
-from fastapi import Path, Query, Depends, APIRouter
+from fastapi import APIRouter, Depends, Path, Query
 
-from backend.database.db import CurrentSession
-from backend.common.pagination import PageData, DependsPagination, paging_data
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
 from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession
 from backend.plugin.dict.schema.dict_type import (
-    GetDictTypeDetail,
     CreateDictTypeParam,
     DeleteDictTypeParam,
+    GetDictTypeDetail,
     UpdateDictTypeParam,
 )
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.plugin.dict.service.dict_type_service import dict_type_service
 
 router = APIRouter()

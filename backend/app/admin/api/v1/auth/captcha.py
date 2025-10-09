@@ -1,14 +1,14 @@
 from uuid import uuid4
 
-from fastapi import Depends, Request, APIRouter
 from fast_captcha import img_captcha
-from starlette.concurrency import run_in_threadpool
+from fastapi import APIRouter, Depends, Request
 from fastapi_limiter.depends import RateLimiter
+from starlette.concurrency import run_in_threadpool
 
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 from backend.app.admin.schema.captcha import GetCaptchaDetail
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
+from backend.core.conf import settings
+from backend.database.redis import redis_client
 
 router = APIRouter()
 

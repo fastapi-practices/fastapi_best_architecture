@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.code_generator.model import GenColumn
 from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam

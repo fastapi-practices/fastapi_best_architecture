@@ -1,21 +1,21 @@
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
+from aiosmtplib import SMTP
 from anyio import open_file
 from jinja2 import Template
-from aiosmtplib import SMTP
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
-from backend.core.conf import settings
-from backend.common.log import log
-from backend.database.db import async_engine
 from backend.common.enums import StatusType
-from backend.core.path_conf import PLUGIN_DIR
-from backend.utils.timezone import timezone
 from backend.common.exception import errors
-from backend.utils.serializers import select_list_serialize
+from backend.common.log import log
+from backend.core.conf import settings
+from backend.core.path_conf import PLUGIN_DIR
+from backend.database.db import async_engine
 from backend.plugin.config.crud.crud_config import config_dao
+from backend.utils.serializers import select_list_serialize
+from backend.utils.timezone import timezone
 
 
 async def render_message(subject: str, from_header: str, content: str | dict, template: str | None) -> bytes:

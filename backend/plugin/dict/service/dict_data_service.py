@@ -2,12 +2,12 @@ from collections.abc import Sequence
 
 from sqlalchemy import Select
 
-from backend.database.db import async_db_session
 from backend.common.exception import errors
-from backend.plugin.dict.model import DictData
-from backend.plugin.dict.schema.dict_data import CreateDictDataParam, DeleteDictDataParam, UpdateDictDataParam
+from backend.database.db import async_db_session
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
+from backend.plugin.dict.model import DictData
+from backend.plugin.dict.schema.dict_data import CreateDictDataParam, DeleteDictDataParam, UpdateDictDataParam
 
 
 class DictDataService:

@@ -1,11 +1,11 @@
 from collections.abc import Sequence
 
-from backend.database.db import async_db_session
 from backend.common.exception import errors
+from backend.database.db import async_db_session
+from backend.plugin.code_generator.crud.crud_column import gen_column_dao
 from backend.plugin.code_generator.enums import GenMySQLColumnType
 from backend.plugin.code_generator.model import GenColumn
 from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
-from backend.plugin.code_generator.crud.crud_column import gen_column_dao
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
 

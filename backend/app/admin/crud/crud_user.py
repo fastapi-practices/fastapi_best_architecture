@@ -1,19 +1,19 @@
 import bcrypt
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
 from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.utils.timezone import timezone
 from backend.app.admin.model import Dept, Role, User
-from backend.common.security.jwt import get_hash_password
 from backend.app.admin.schema.user import (
+    AddOAuth2UserParam,
     AddUserParam,
     UpdateUserParam,
-    AddOAuth2UserParam,
 )
+from backend.common.security.jwt import get_hash_password
+from backend.utils.timezone import timezone
 
 
 class CRUDUser(CRUDPlus[User]):

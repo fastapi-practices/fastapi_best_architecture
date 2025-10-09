@@ -1,7 +1,7 @@
 from fastapi import Request
 
-from backend.core.conf import settings
 from backend.common.exception import errors
+from backend.core.conf import settings
 
 
 async def demo_site(request: Request) -> None:  # noqa: RUF029

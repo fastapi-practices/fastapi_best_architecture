@@ -1,32 +1,32 @@
 import asyncio
 import subprocess
 
-from typing import Literal, Annotated
 from dataclasses import dataclass
+from typing import Annotated, Literal
 
 import cappa
 import granian
 
-from rich.text import Text
+from cappa.output import error_format
 from rich.panel import Panel
+from rich.prompt import IntPrompt
 from rich.table import Table
+from rich.text import Text
 from sqlalchemy import text
 from watchfiles import PythonFilter
-from rich.prompt import IntPrompt
-from cappa.output import error_format
 
 from backend import __version__
+from backend.common.enums import DataBaseType, PrimaryKeyType
+from backend.common.exception.errors import BaseExceptionError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.common.enums import DataBaseType, PrimaryKeyType
+from backend.plugin.code_generator.schema.code import ImportParam
+from backend.plugin.code_generator.service.business_service import gen_business_service
+from backend.plugin.code_generator.service.code_service import gen_service
 from backend.plugin.tools import get_plugin_sql
 from backend.utils._await import run_await
 from backend.utils.console import console
-from backend.utils.file_ops import parse_sql_script, install_git_plugin, install_zip_plugin
-from backend.common.exception.errors import BaseExceptionError
-from backend.plugin.code_generator.schema.code import ImportParam
-from backend.plugin.code_generator.service.code_service import gen_service
-from backend.plugin.code_generator.service.business_service import gen_business_service
+from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
 
 output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
 

@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
 from fastapi import Request
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam

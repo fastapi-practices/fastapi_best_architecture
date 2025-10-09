@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 from pydantic.types import JsonValue
 
-from backend.common.schema import SchemaBase
 from backend.app.task.enums import PeriodType, TaskSchedulerType
+from backend.common.schema import SchemaBase
 
 
 class TaskSchedulerSchemeBase(SchemaBase):

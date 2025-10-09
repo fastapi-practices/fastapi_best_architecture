@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
-from backend.common.schema import SchemaBase, CustomEmailStr, CustomPhoneNumber
+from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
 
 if TYPE_CHECKING:
     from datetime import datetime

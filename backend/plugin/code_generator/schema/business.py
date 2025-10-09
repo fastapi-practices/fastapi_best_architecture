@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
 from backend.common.schema import SchemaBase
 

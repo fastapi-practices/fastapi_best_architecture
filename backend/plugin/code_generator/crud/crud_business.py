@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
 from sqlalchemy import Select
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.code_generator.model import GenBusiness
 from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam

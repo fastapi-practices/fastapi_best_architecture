@@ -1,11 +1,11 @@
-from typing import Any, TypeVar
-from decimal import Decimal
 from collections.abc import Sequence
+from decimal import Decimal
+from typing import Any, TypeVar
 
+from fastapi.encoders import decimal_encoder
 from msgspec import json
 from sqlalchemy import Row, RowMapping
 from sqlalchemy.orm import ColumnProperty, SynonymProperty, class_mapper
-from fastapi.encoders import decimal_encoder
 from starlette.responses import JSONResponse
 
 RowData = Row | RowMapping | Any

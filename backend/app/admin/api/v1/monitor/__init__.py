@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from backend.app.admin.api.v1.monitor.redis import router as redis_router
 from backend.app.admin.api.v1.monitor.online import router as token_router
+from backend.app.admin.api.v1.monitor.redis import router as redis_router
 from backend.app.admin.api.v1.monitor.server import router as server_router
 
 router = APIRouter(prefix='/monitors')

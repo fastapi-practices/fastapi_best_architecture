@@ -1,15 +1,15 @@
 from typing import Annotated
 
-from fastapi import Path, Depends, APIRouter
+from fastapi import APIRouter, Depends, Path
 from starlette.concurrency import run_in_threadpool
 
 from backend.app.task import celery_app
-from backend.common.exception import errors
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
 from backend.app.task.schema.control import TaskRegisteredDetail
-from backend.common.security.permission import RequestPermission
+from backend.common.exception import errors
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 
 router = APIRouter()
 

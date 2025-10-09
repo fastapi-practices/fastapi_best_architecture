@@ -1,24 +1,24 @@
-from typing import Any
 from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import Select
 
-from backend.core.conf import settings
-from backend.database.db import async_db_session
-from backend.database.redis import redis_client
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.app.admin.crud.crud_menu import menu_dao
+from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.model import Role
-from backend.common.exception import errors
-from backend.utils.build_tree import get_tree_data
 from backend.app.admin.schema.role import (
     CreateRoleParam,
     DeleteRoleParam,
-    UpdateRoleParam,
     UpdateRoleMenuParam,
+    UpdateRoleParam,
     UpdateRoleScopeParam,
 )
-from backend.app.admin.crud.crud_menu import menu_dao
-from backend.app.admin.crud.crud_role import role_dao
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.common.exception import errors
+from backend.core.conf import settings
+from backend.database.db import async_db_session
+from backend.database.redis import redis_client
+from backend.utils.build_tree import get_tree_data
 
 
 class RoleService:

@@ -1,16 +1,16 @@
 from typing import Any
 
 from fastapi import Request, Response
-from starlette.requests import HTTPConnection
 from fastapi.security.utils import get_authorization_scheme_param
-from starlette.authentication import AuthCredentials, AuthenticationError, AuthenticationBackend
+from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
+from starlette.requests import HTTPConnection
 
-from backend.core.conf import settings
-from backend.common.log import log
-from backend.utils.serializers import MsgSpecJSONResponse
-from backend.common.security.jwt import jwt_authentication
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.exception.errors import TokenError
+from backend.common.log import log
+from backend.common.security.jwt import jwt_authentication
+from backend.core.conf import settings
+from backend.utils.serializers import MsgSpecJSONResponse
 
 
 class _AuthenticationError(AuthenticationError):

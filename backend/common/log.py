@@ -1,11 +1,11 @@
+import inspect
+import logging
 import os
 import re
 import sys
-import inspect
-import logging
 
-from loguru import logger
 from asgi_correlation_id import correlation_id
+from loguru import logger
 
 from backend.core.conf import settings
 from backend.core.path_conf import LOG_DIR

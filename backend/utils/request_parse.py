@@ -1,14 +1,14 @@
 import httpx
 
-from ip2loc import XdbSearcher
 from fastapi import Request
+from ip2loc import XdbSearcher
 from user_agents import parse
 
-from backend.core.conf import settings
+from backend.common.dataclasses import IpInfo, UserAgentInfo
 from backend.common.log import log
+from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR
 from backend.database.redis import redis_client
-from backend.common.dataclasses import IpInfo, UserAgentInfo
 
 
 def get_request_ip(request: Request) -> str:

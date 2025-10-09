@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
-from backend.utils.redis_info import redis_info
-from backend.common.security.jwt import DependsJwtAuth
 from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.utils.redis_info import redis_info
 
 router = APIRouter()
 

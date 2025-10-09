@@ -1,10 +1,10 @@
 from sqlalchemy import Select
 
-from backend.database.db import async_db_session
-from backend.app.task.model import TaskResult
-from backend.common.exception import errors
-from backend.app.task.schema.result import DeleteTaskResultParam
 from backend.app.task.crud.crud_result import task_result_dao
+from backend.app.task.model import TaskResult
+from backend.app.task.schema.result import DeleteTaskResultParam
+from backend.common.exception import errors
+from backend.database.db import async_db_session
 
 
 class TaskResultService:

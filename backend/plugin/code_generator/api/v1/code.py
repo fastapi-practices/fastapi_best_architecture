@@ -1,13 +1,13 @@
 from typing import Annotated
 
-from fastapi import Path, Query, Depends, APIRouter
+from fastapi import APIRouter, Depends, Path, Query
 from fastapi.responses import StreamingResponse
 
-from backend.core.conf import settings
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
-from backend.common.security.permission import RequestPermission
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.core.conf import settings
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.code_service import gen_service
 

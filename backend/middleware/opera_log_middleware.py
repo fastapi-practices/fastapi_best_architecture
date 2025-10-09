@@ -1,23 +1,23 @@
 import time
 
-from typing import Any
 from asyncio import Queue
+from typing import Any
 
-from fastapi import Response
 from asgiref.sync import sync_to_async
-from starlette.requests import Request
+from fastapi import Response
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
-from backend.core.conf import settings
-from backend.common.log import log
-from backend.common.enums import StatusType, OperaLogCipherType
-from backend.common.queue import batch_dequeue
-from backend.utils.encrypt import AESCipher, Md5Cipher, ItsDCipher
-from backend.utils.trace_id import get_request_trace_id
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
-from backend.common.response.response_code import StandardResponseCode
 from backend.app.admin.service.opera_log_service import opera_log_service
+from backend.common.enums import OperaLogCipherType, StatusType
+from backend.common.log import log
+from backend.common.queue import batch_dequeue
+from backend.common.response.response_code import StandardResponseCode
+from backend.core.conf import settings
+from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
+from backend.utils.trace_id import get_request_trace_id
 
 
 class OperaLogMiddleware(BaseHTTPMiddleware):

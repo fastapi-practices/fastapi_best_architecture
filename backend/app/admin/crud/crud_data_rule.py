@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
 from sqlalchemy import Select
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule
 from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam

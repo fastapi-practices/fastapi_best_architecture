@@ -1,5 +1,5 @@
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.oauth2.model import UserSocial
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam

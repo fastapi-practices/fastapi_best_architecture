@@ -1,14 +1,14 @@
 from datetime import datetime
 
-from sqlalchemy import VARBINARY, String, Boolean, ForeignKey
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import VARBINARY, Boolean, ForeignKey, String
 from sqlalchemy.dialects.postgresql import BYTEA, INTEGER
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.database.db import uuid4_str
-from backend.common.model import Base, TimeZone, id_key
-from backend.utils.timezone import timezone
 from backend.app.admin.model import Dept, Role
 from backend.app.admin.model.m2m import sys_user_role
+from backend.common.model import Base, TimeZone, id_key
+from backend.database.db import uuid4_str
+from backend.utils.timezone import timezone
 
 
 class User(Base):

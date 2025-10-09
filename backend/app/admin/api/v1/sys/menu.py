@@ -1,13 +1,13 @@
-from typing import Any, Annotated
+from typing import Annotated, Any
 
-from fastapi import Path, Query, Depends, Request, APIRouter
+from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
-from backend.app.admin.schema.menu import GetMenuTree, GetMenuDetail, CreateMenuParam, UpdateMenuParam
-from backend.common.security.permission import RequestPermission
+from backend.app.admin.schema.menu import CreateMenuParam, GetMenuDetail, GetMenuTree, UpdateMenuParam
 from backend.app.admin.service.menu_service import menu_service
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
 
 router = APIRouter()
 

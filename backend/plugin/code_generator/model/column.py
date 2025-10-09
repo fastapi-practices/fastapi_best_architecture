@@ -1,7 +1,7 @@
-from sqlalchemy import String, BigInteger, ForeignKey
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import DataClassBase, id_key
 from backend.plugin.code_generator.model import GenBusiness

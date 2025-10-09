@@ -2,16 +2,16 @@ import json
 
 from typing import Annotated
 
-from fastapi import Path, Query, Depends, Request, APIRouter
+from fastapi import APIRouter, Depends, Path, Query, Request
 
-from backend.core.conf import settings
-from backend.common.enums import StatusType
-from backend.database.redis import redis_client
-from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
-from backend.common.security.rbac import DependsRBAC
 from backend.app.admin.schema.token import GetTokenDetail
-from backend.common.security.permission import RequestPermission
+from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.core.conf import settings
+from backend.database.redis import redis_client
 
 router = APIRouter()
 

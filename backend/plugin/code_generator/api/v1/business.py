@@ -1,21 +1,21 @@
 from typing import Annotated
 
-from fastapi import Path, Query, Depends, APIRouter
+from fastapi import APIRouter, Depends, Path, Query
 
-from backend.database.db import CurrentSession
-from backend.common.pagination import PageData, DependsPagination, paging_data
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
-from backend.common.security.permission import RequestPermission
+from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.plugin.code_generator.schema.column import GetGenColumnDetail
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession
 from backend.plugin.code_generator.schema.business import (
-    GetGenBusinessDetail,
     CreateGenBusinessParam,
+    GetGenBusinessDetail,
     UpdateGenBusinessParam,
 )
-from backend.plugin.code_generator.service.column_service import gen_column_service
+from backend.plugin.code_generator.schema.column import GetGenColumnDetail
 from backend.plugin.code_generator.service.business_service import gen_business_service
+from backend.plugin.code_generator.service.column_service import gen_column_service
 
 router = APIRouter()
 

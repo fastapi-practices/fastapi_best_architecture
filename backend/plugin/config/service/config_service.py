@@ -2,15 +2,15 @@ from collections.abc import Sequence
 
 from sqlalchemy import Select
 
-from backend.database.db import async_db_session
 from backend.common.exception import errors
+from backend.database.db import async_db_session
+from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import (
     CreateConfigParam,
     UpdateConfigParam,
     UpdateConfigsParam,
 )
-from backend.plugin.config.crud.crud_config import config_dao
 
 
 class ConfigService:

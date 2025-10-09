@@ -1,7 +1,7 @@
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import TEXT, INTEGER
+from sqlalchemy.dialects.postgresql import INTEGER, TEXT
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import Base, id_key
 

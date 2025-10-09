@@ -1,6 +1,6 @@
 from sqlalchemy import TEXT, String
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import Base, id_key
 

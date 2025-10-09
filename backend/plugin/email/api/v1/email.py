@@ -2,14 +2,14 @@ import random
 
 from typing import Annotated
 
-from fastapi import Body, Request, APIRouter
+from fastapi import APIRouter, Body, Request
 
+from backend.common.response.response_schema import ResponseModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
 from backend.database.db import CurrentSession
 from backend.database.redis import redis_client
-from backend.common.security.jwt import DependsJwtAuth
 from backend.plugin.email.utils.send import send_email
-from backend.common.response.response_schema import ResponseModel, response_base
 
 router = APIRouter()
 

@@ -1,14 +1,14 @@
 from collections.abc import Sequence
 
 from sqlalchemy import Select, select
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Menu, Role, DataScope
+from backend.app.admin.model import DataScope, Menu, Role
 from backend.app.admin.schema.role import (
     CreateRoleParam,
-    UpdateRoleParam,
     UpdateRoleMenuParam,
+    UpdateRoleParam,
     UpdateRoleScopeParam,
 )
 

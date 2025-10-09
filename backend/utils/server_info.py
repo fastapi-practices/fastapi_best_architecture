@@ -1,9 +1,10 @@
 import os
-import sys
-import socket
 import platform
+import socket
+import sys
 
-from datetime import datetime, timezone as tz, timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as tz
 
 import psutil
 

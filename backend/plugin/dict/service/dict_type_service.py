@@ -2,11 +2,11 @@ from collections.abc import Sequence
 
 from sqlalchemy import Select
 
-from backend.database.db import async_db_session
 from backend.common.exception import errors
+from backend.database.db import async_db_session
+from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
-from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 
 
 class DictTypeService:

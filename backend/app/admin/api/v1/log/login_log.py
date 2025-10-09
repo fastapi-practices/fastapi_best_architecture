@@ -1,15 +1,15 @@
 from typing import Annotated
 
-from fastapi import Query, Depends, APIRouter
+from fastapi import APIRouter, Depends, Query
 
-from backend.database.db import CurrentSession
-from backend.common.pagination import PageData, DependsPagination, paging_data
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.rbac import DependsRBAC
-from backend.app.admin.schema.login_log import GetLoginLogDetail, DeleteLoginLogParam
-from backend.common.security.permission import RequestPermission
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.app.admin.schema.login_log import DeleteLoginLogParam, GetLoginLogDetail
 from backend.app.admin.service.login_log_service import login_log_service
+from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.permission import RequestPermission
+from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession
 
 router = APIRouter()
 

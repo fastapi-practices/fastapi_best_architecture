@@ -1,6 +1,6 @@
 import io
-import os
 import json
+import os
 import shutil
 import zipfile
 
@@ -10,14 +10,14 @@ import anyio
 
 from fastapi import UploadFile
 
-from backend.core.conf import settings
 from backend.common.enums import PluginType, StatusType
-from backend.plugin.tools import uninstall_requirements_async
+from backend.common.exception import errors
+from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
+from backend.plugin.tools import uninstall_requirements_async
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin
 from backend.utils.timezone import timezone
-from backend.common.exception import errors
 
 
 class PluginService:

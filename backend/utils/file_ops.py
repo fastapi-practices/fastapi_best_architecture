@@ -10,15 +10,15 @@ from dulwich import porcelain
 from fastapi import UploadFile
 from sqlparse import split
 
-from backend.core.conf import settings
-from backend.common.log import log
 from backend.common.enums import FileType
-from backend.plugin.tools import install_requirements_async
+from backend.common.exception import errors
+from backend.common.log import log
+from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR, UPLOAD_DIR
 from backend.database.redis import redis_client
-from backend.utils.timezone import timezone
+from backend.plugin.tools import install_requirements_async
 from backend.utils.re_verify import is_git_url
-from backend.common.exception import errors
+from backend.utils.timezone import timezone
 
 
 def build_filename(file: UploadFile) -> str:

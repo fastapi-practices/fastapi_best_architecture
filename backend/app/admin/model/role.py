@@ -1,11 +1,11 @@
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import TEXT, INTEGER
+from sqlalchemy.dialects.postgresql import INTEGER, TEXT
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.app.admin.model import DataScope, Menu, User
+from backend.app.admin.model.m2m import sys_role_data_scope, sys_role_menu, sys_user_role
 from backend.common.model import Base, id_key
-from backend.app.admin.model import Menu, User, DataScope
-from backend.app.admin.model.m2m import sys_role_menu, sys_user_role, sys_role_data_scope
 
 
 class Role(Base):

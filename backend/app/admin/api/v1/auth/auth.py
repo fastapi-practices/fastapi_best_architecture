@@ -1,15 +1,15 @@
 from typing import Annotated
 
-from fastapi import Depends, Request, Response, APIRouter
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import HTTPBasicCredentials
-from starlette.background import BackgroundTasks
 from fastapi_limiter.depends import RateLimiter
+from starlette.background import BackgroundTasks
 
-from backend.common.security.jwt import DependsJwtAuth
+from backend.app.admin.schema.token import GetLoginToken, GetNewToken, GetSwaggerToken
 from backend.app.admin.schema.user import AuthLoginParam
-from backend.app.admin.schema.token import GetNewToken, GetLoginToken, GetSwaggerToken
 from backend.app.admin.service.auth_service import auth_service
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.common.security.jwt import DependsJwtAuth
 
 router = APIRouter()
 

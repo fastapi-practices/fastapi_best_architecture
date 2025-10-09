@@ -2,18 +2,18 @@ from collections.abc import Sequence
 
 from sqlalchemy import Select
 
-from backend.core.conf import settings
-from backend.database.db import async_db_session
-from backend.database.redis import redis_client
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
 from backend.app.admin.model import DataScope
-from backend.common.exception import errors
 from backend.app.admin.schema.data_scope import (
     CreateDataScopeParam,
     DeleteDataScopeParam,
     UpdateDataScopeParam,
     UpdateDataScopeRuleParam,
 )
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.common.exception import errors
+from backend.core.conf import settings
+from backend.database.db import async_db_session
+from backend.database.redis import redis_client
 
 
 class DataScopeService:

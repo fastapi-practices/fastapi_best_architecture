@@ -4,19 +4,19 @@ from datetime import datetime
 
 from sqlalchemy import (
     JSON,
-    String,
     Boolean,
+    String,
     event,
 )
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import TEXT, INTEGER
+from sqlalchemy.dialects.postgresql import INTEGER, TEXT
+from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.core.conf import settings
+from backend.common.exception import errors
 from backend.common.model import Base, TimeZone, id_key
+from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
-from backend.common.exception import errors
 
 
 class TaskScheduler(Base):

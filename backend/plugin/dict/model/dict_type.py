@@ -1,7 +1,7 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.common.model import Base, id_key
 from backend.plugin.dict.model import DictData

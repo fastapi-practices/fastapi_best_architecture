@@ -1,11 +1,11 @@
-import atexit
 import asyncio
-import weakref
+import atexit
 import threading
+import weakref
 
-from typing import Any, TypeVar
+from collections.abc import Awaitable, Callable, Coroutine
 from functools import wraps
-from collections.abc import Callable, Awaitable, Coroutine
+from typing import Any, TypeVar
 
 T = TypeVar('T')
 

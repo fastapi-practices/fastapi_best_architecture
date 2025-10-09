@@ -1,13 +1,13 @@
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from pydantic import Field, HttpUrl, ConfigDict, model_validator
+from pydantic import ConfigDict, Field, HttpUrl, model_validator
 from typing_extensions import Self
 
-from backend.common.enums import StatusType
-from backend.common.schema import SchemaBase, CustomEmailStr, CustomPhoneNumber
 from backend.app.admin.schema.dept import GetDeptDetail
 from backend.app.admin.schema.role import GetRoleWithRelationDetail
+from backend.common.enums import StatusType
+from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
 
 
 class AuthSchemaBase(SchemaBase):

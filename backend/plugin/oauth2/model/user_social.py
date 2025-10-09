@@ -1,8 +1,8 @@
-from sqlalchemy import String, BigInteger, ForeignKey
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.common.model import Base, id_key
 from backend.app.admin.model import User
+from backend.common.model import Base, id_key
 
 
 class UserSocial(Base):

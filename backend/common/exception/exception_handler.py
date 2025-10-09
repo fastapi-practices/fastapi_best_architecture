@@ -1,16 +1,16 @@
 from fastapi import FastAPI, Request
-from pydantic import ValidationError
 from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
-from backend.core.conf import settings
-from backend.common.i18n import t, i18n
-from backend.utils.trace_id import get_request_trace_id
-from backend.utils.serializers import MsgSpecJSONResponse
 from backend.common.exception.errors import BaseExceptionError
+from backend.common.i18n import i18n, t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
+from backend.core.conf import settings
+from backend.utils.serializers import MsgSpecJSONResponse
+from backend.utils.trace_id import get_request_trace_id
 
 
 def _get_exception_code(status_code: int) -> int:

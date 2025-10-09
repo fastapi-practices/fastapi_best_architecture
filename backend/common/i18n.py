@@ -1,8 +1,8 @@
 import glob
 import json
 
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import yaml
 

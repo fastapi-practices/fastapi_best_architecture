@@ -1,11 +1,11 @@
 from datetime import datetime
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import TimeZone, DataClassBase, id_key
+from backend.common.model import DataClassBase, TimeZone, id_key
 from backend.utils.timezone import timezone
 
 

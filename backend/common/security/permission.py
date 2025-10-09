@@ -1,12 +1,12 @@
 from fastapi import Request
-from sqlalchemy import ColumnElement, or_, and_
+from sqlalchemy import ColumnElement, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.conf import settings
-from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
-from backend.common.exception import errors
-from backend.utils.import_parse import dynamic_import_data_model
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
+from backend.common.exception import errors
+from backend.core.conf import settings
+from backend.utils.import_parse import dynamic_import_data_model
 
 
 class RequestPermission:

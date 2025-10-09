@@ -3,9 +3,9 @@ import os
 import celery
 import celery_aio_pool
 
+from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
-from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 
 
 def find_task_packages() -> list[str]:

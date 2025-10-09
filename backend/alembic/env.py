@@ -1,5 +1,5 @@
-import os
 import asyncio
+import os
 
 from logging.config import fileConfig
 
@@ -9,9 +9,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from backend.app import get_app_models
+from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
-from backend.common.model import MappedBase
 from backend.plugin.tools import get_plugin_models
 
 # import models

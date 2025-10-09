@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, BigInteger, ForeignKey
+from sqlalchemy import BigInteger, Column, ForeignKey, Table
 
 from backend.common.model import MappedBase
 

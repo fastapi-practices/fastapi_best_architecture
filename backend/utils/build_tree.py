@@ -1,7 +1,7 @@
 import operator
 
-from typing import Any
 from collections.abc import Sequence
+from typing import Any
 
 from backend.common.enums import BuildTreeType
 from backend.utils.serializers import RowData, select_list_serialize

@@ -1,9 +1,9 @@
 import socketio
 
-from backend.core.conf import settings
 from backend.common.log import log
-from backend.database.redis import redis_client
 from backend.common.security.jwt import jwt_authentication
+from backend.core.conf import settings
+from backend.database.redis import redis_client
 
 # 创建 Socket.IO 服务器实例
 sio = socketio.AsyncServer(

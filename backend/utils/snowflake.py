@@ -2,9 +2,9 @@ import time
 
 from dataclasses import dataclass
 
-from backend.core.conf import settings
-from backend.common.exception import errors
 from backend.common.dataclasses import SnowflakeInfo
+from backend.common.exception import errors
+from backend.core.conf import settings
 
 
 @dataclass(frozen=True)

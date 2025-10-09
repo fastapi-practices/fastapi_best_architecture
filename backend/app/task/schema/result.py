@@ -1,7 +1,7 @@
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from pydantic import Field, ConfigDict, field_serializer
+from pydantic import ConfigDict, Field, field_serializer
 
 from backend.app.task import celery_app
 from backend.common.schema import SchemaBase

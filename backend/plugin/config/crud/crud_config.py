@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
 from sqlalchemy import Select
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigParam

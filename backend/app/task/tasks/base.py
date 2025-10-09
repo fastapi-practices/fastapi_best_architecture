@@ -5,8 +5,8 @@ from typing import Any
 from celery import Task
 from sqlalchemy.exc import SQLAlchemyError
 
-from backend.core.conf import settings
 from backend.common.socketio.actions import task_notification
+from backend.core.conf import settings
 
 
 class TaskBase(Task):

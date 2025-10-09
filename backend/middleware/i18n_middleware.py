@@ -1,5 +1,5 @@
-from functools import lru_cache
 from collections.abc import Callable
+from functools import lru_cache
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware

@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
 from sqlalchemy import Select
-from sqlalchemy_crud_plus import CRUDPlus
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.notice.model import Notice
 from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam

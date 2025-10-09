@@ -141,27 +141,28 @@ ignore = [
     "TRY301"
 ]
 
+[lint.per-file-ignores]
+"backend/common/socketio/server.py" = ["ANN001"]
+"backend/common/exception/exception_handler.py" = ["ANN202","RUF029"]
+
 [lint.flake8-pytest-style]
-mark-parentheses = false
 parametrize-names-type = "list"
 parametrize-values-row-type = "list"
-parametrize-values-type = "tuple"
+parametrize-values-type = "list"
+
+[lint.flake8-quotes]
+inline-quotes = "single"
 
 [lint.flake8-unused-arguments]
 ignore-variadic-names = true
 
 [lint.isort]
-combine-as-imports = true
-length-sort = true
-length-sort-straight = true
-split-on-trailing-comma = true
+case-sensitive = true
 lines-between-types = 1
 order-by-type = true
-relative-imports-order = "closest-to-furthest"
 
-[lint.per-file-ignores]
-"backend/common/socketio/server.py" = ["ANN001"]
-"backend/common/exception/exception_handler.py" = ["ANN202","RUF029"]
+[lint.pylint]
+allow-dunder-method-names = ["__tablename__", "__table_args__"]
 
 [format]
 docstring-code-format = true

@@ -1,7 +1,7 @@
-from typing import Annotated
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import Field, EmailStr, BaseModel, ConfigDict, validate_email
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
 from backend.utils.timezone import timezone
 

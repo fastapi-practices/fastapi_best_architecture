@@ -2,14 +2,14 @@ from typing import Any
 
 from fastapi import Request
 
+from backend.app.admin.crud.crud_menu import menu_dao
+from backend.app.admin.model import Menu
+from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
+from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
-from backend.app.admin.model import Menu
-from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
-from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
-from backend.app.admin.crud.crud_menu import menu_dao
 
 
 class MenuService:
