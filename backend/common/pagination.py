@@ -9,6 +9,7 @@ from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel, Field
+from typing_extensions import Self
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -65,7 +66,7 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
         items: list,
         params: _CustomPageParams,
         total: int = 0,
-    ) -> _CustomPage[T]:
+    ) -> Self:
         page = params.page
         size = params.size
         total_pages = ceil(total / size)
@@ -82,7 +83,7 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
             page=page,
             size=size,
             total_pages=total_pages,
-            links=links,  # type: ignore
+            links=links,
         )
 
 
