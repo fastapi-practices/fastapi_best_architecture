@@ -1,25 +1,32 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any
+from __future__ import annotations
 
-from fastapi import Request, Response
+from typing import TYPE_CHECKING, Any
+
 from fastapi.security.utils import get_authorization_scheme_param
-from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
-from starlette.requests import HTTPConnection
+from starlette.authentication import AuthCredentials, AuthenticationError, AuthenticationBackend
 
-from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
-from backend.common.exception.errors import TokenError
-from backend.common.log import log
-from backend.common.security.jwt import jwt_authentication
 from backend.core.conf import settings
+from backend.common.log import log
 from backend.utils.serializers import MsgSpecJSONResponse
+from backend.common.security.jwt import jwt_authentication
+from backend.common.exception.errors import TokenError
+
+if TYPE_CHECKING:
+    from fastapi import Request, Response
+    from starlette.requests import HTTPConnection
+
+    from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 
 
 class _AuthenticationError(AuthenticationError):
     """重写内部认证错误类"""
 
     def __init__(
-        self, *, code: int | None = None, msg: str | None = None, headers: dict[str, Any] | None = None
+        self,
+        *,
+        code: int | None = None,
+        msg: str | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> None:
         """
         初始化认证错误

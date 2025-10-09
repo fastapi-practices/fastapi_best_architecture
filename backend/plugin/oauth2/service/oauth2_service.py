@@ -1,23 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from fast_captcha import text_captcha
-from fastapi import BackgroundTasks, Request, Response
 
-from backend.app.admin.crud.crud_user import user_dao
-from backend.app.admin.schema.token import GetLoginToken
-from backend.app.admin.schema.user import AddOAuth2UserParam
-from backend.app.admin.service.login_log_service import login_log_service
-from backend.common.enums import LoginLogStatusType, UserSocialType
-from backend.common.i18n import t
-from backend.common.security import jwt
 from backend.core.conf import settings
+from backend.common.i18n import t
 from backend.database.db import async_db_session
+from backend.common.enums import UserSocialType, LoginLogStatusType
 from backend.database.redis import redis_client
-from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
-from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.utils.timezone import timezone
+from backend.common.security import jwt
+from backend.app.admin.schema.user import AddOAuth2UserParam
+from backend.app.admin.schema.token import GetLoginToken
+from backend.app.admin.crud.crud_user import user_dao
+from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
+from backend.app.admin.service.login_log_service import login_log_service
+from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
+
+if TYPE_CHECKING:
+    from fastapi import Request, Response, BackgroundTasks
 
 
 class OAuth2Service:
@@ -98,7 +100,7 @@ class OAuth2Service:
             # 创建 token
             access_token = await jwt.create_access_token(
                 sys_user.id,
-                sys_user.is_multi_login,
+                multi_login=sys_user.is_multi_login,
                 # extra info
                 username=sys_user.username,
                 nickname=sys_user.nickname or f'#{text_captcha(5)}',
@@ -109,19 +111,21 @@ class OAuth2Service:
                 device=request.state.device,
             )
             refresh_token = await jwt.create_refresh_token(
-                access_token.session_uuid, sys_user.id, sys_user.is_multi_login
+                access_token.session_uuid,
+                sys_user.id,
+                multi_login=sys_user.is_multi_login,
             )
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
-            login_log = dict(
-                db=db,
-                request=request,
-                user_uuid=sys_user.uuid,
-                username=sys_user.username,
-                login_time=timezone.now(),
-                status=LoginLogStatusType.success.value,
-                msg=t('success.login.oauth2_success'),
-            )
+            login_log = {
+                'db': db,
+                'request': request,
+                'user_uuid': sys_user.uuid,
+                'username': sys_user.username,
+                'login_time': timezone.now(),
+                'status': LoginLogStatusType.success.value,
+                'msg': t('success.login.oauth2_success'),
+            }
             background_tasks.add_task(login_log_service.create, **login_log)
             await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             response.set_cookie(

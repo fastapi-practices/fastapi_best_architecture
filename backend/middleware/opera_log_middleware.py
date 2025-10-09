@@ -1,25 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import time
 
+from typing import TYPE_CHECKING, Any
 from asyncio import Queue
-from typing import Any
 
 from asgiref.sync import sync_to_async
-from fastapi import Response
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
 
-from backend.app.admin.schema.opera_log import CreateOperaLogParam
-from backend.app.admin.service.opera_log_service import opera_log_service
-from backend.common.enums import OperaLogCipherType, StatusType
-from backend.common.log import log
-from backend.common.queue import batch_dequeue
-from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
-from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
+from backend.common.log import log
+from backend.common.enums import StatusType, OperaLogCipherType
+from backend.common.queue import batch_dequeue
+from backend.utils.encrypt import AESCipher, Md5Cipher, ItsDCipher
 from backend.utils.trace_id import get_request_trace_id
+from backend.app.admin.schema.opera_log import CreateOperaLogParam
+from backend.common.response.response_code import StandardResponseCode
+from backend.app.admin.service.opera_log_service import opera_log_service
+
+if TYPE_CHECKING:
+    from fastapi import Response
+    from starlette.requests import Request
 
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
@@ -70,11 +72,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
                 error = e
-                log.error(f'请求异常: {str(e)}')
+                log.error(f'请求异常: {e!s}')
 
             # 此信息只能在请求后获取
-            _route = request.scope.get('route')
-            summary = getattr(_route, 'summary') or '' if _route else ''
+            route = request.scope.get('route')
+            summary = route.summary or '' if route else ''
 
             try:
                 # 此信息来源于 JWT 认证中间件
@@ -157,16 +159,13 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         form_data = await request.form()
         if len(form_data) > 0:
             for k, v in form_data.items():
-                if isinstance(v, UploadFile):
-                    form_data = {k: v.filename}
-                else:
-                    form_data = {k: v}
+                form_data = {k: v.filename} if isinstance(v, UploadFile) else {k: v}
             if 'multipart/form-data' not in content_type:
                 args['x-www-form-urlencoded'] = await self.desensitization(form_data)
             else:
                 args['form-data'] = await self.desensitization(form_data)
 
-        return None if not args else args
+        return args if args else None
 
     @staticmethod
     @sync_to_async

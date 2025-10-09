@@ -1,14 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from backend.common.exception import errors
+from typing import TYPE_CHECKING
+
 from backend.database.db import async_db_session
-from backend.plugin.code_generator.crud.crud_column import gen_column_dao
+from backend.common.exception import errors
 from backend.plugin.code_generator.enums import GenMySQLColumnType
-from backend.plugin.code_generator.model import GenColumn
-from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
+from backend.plugin.code_generator.crud.crud_column import gen_column_dao
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from backend.plugin.code_generator.model import GenColumn
+    from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
 
 
 class GenColumnService:

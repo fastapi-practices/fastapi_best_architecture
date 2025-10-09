@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.task.model import TaskScheduler
-from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
 
 
 class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
@@ -86,7 +91,7 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         TaskScheduler.no_changes = False
         return 1
 
-    async def set_status(self, db: AsyncSession, pk: int, status: bool) -> int:
+    async def set_status(self, db: AsyncSession, pk: int, *, status: bool) -> int:
         """
         设置任务调度状态
 
@@ -96,7 +101,7 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         :return:
         """
         task_scheduler = await self.get(db, pk)
-        setattr(task_scheduler, 'enabled', status)
+        task_scheduler.enabled = status
         TaskScheduler.no_changes = False
         return 1
 

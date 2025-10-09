@@ -1,15 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Generator
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pytest
 
 from starlette.testclient import TestClient
 
-from backend.app.admin.tests.utils.db import override_get_db
+from backend.main import app
 from backend.core.conf import settings
 from backend.database.db import get_db
-from backend.main import app
+from backend.app.admin.tests.utils.db import override_get_db
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 # 重载数据库
 app.dependency_overrides[get_db] = override_get_db

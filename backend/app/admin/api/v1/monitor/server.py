@@ -1,11 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter
 from starlette.concurrency import run_in_threadpool
 
-from backend.common.response.response_schema import ResponseModel, response_base
-from backend.common.security.jwt import DependsJwtAuth
 from backend.utils.server_info import server_info
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from backend.common.response.response_schema import ResponseModel
 
 router = APIRouter()
 

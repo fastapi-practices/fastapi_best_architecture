@@ -1,17 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import random
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
-from fastapi import APIRouter, Body, Request
+from fastapi import Body, APIRouter
 
-from backend.common.response.response_schema import response_base
-from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
-from backend.database.db import CurrentSession
 from backend.database.redis import redis_client
+from backend.common.security.jwt import DependsJwtAuth
 from backend.plugin.email.utils.send import send_email
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from fastapi import Request
+
+    from backend.database.db import CurrentSession
+    from backend.common.response.response_schema import ResponseModel
 
 router = APIRouter()
 
@@ -21,7 +26,7 @@ async def send_email_captcha(
     request: Request,
     db: CurrentSession,
     recipients: Annotated[str | list[str], Body(embed=True, description='邮件接收者')],
-):
+) -> ResponseModel:
     code = ''.join([str(random.randint(1, 9)) for _ in range(6)])
     ip = request.state.ip
     await redis_client.set(

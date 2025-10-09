@@ -1,16 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import relationship, mapped_column
 
+from backend.common.model import Base
 from backend.app.admin.model.m2m import sys_data_scope_rule
-from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
+
+    from backend.common.model import id_key
     from backend.app.admin.model import DataScope
 
 
@@ -25,7 +26,7 @@ class DataRule(Base):
     column: Mapped[str] = mapped_column(String(20), comment='模型字段名')
     operator: Mapped[int] = mapped_column(comment='运算符（0：and、1：or）')
     expression: Mapped[int] = mapped_column(
-        comment='表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）'
+        comment='表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）',
     )
     value: Mapped[str] = mapped_column(String(255), comment='规则值')
 

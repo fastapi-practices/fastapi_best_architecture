@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.notice.model import Notice
-from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.plugin.notice.schema.notice import CreateNoticeParam, UpdateNoticeParam
 
 
 class CRUDNotice(CRUDPlus[Notice]):

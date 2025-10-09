@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field
+from typing import TYPE_CHECKING
+
+from pydantic import Field, ConfigDict
 
 from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class GenBusinessSchemaBase(SchemaBase):

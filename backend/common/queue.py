@@ -1,8 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import asyncio
 
-from asyncio import Queue
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from asyncio import Queue
 
 
 async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
@@ -16,7 +19,7 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
     """
     items = []
 
-    async def collector():
+    async def collector() -> None:
         while len(items) < max_items:
             item = await queue.get()
             items.append(item)

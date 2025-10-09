@@ -1,21 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.app.admin.crud.crud_data_rule import data_rule_dao
-from backend.app.admin.model import DataRule
-from backend.app.admin.schema.data_rule import (
-    CreateDataRuleParam,
-    DeleteDataRuleParam,
-    GetDataRuleColumnDetail,
-    UpdateDataRuleParam,
-)
-from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
+from backend.common.exception import errors
 from backend.utils.import_parse import dynamic_import_data_model
+from backend.app.admin.schema.data_rule import (
+    GetDataRuleColumnDetail,
+)
+from backend.app.admin.crud.crud_data_rule import data_rule_dao
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.app.admin.model import DataRule
+    from backend.app.admin.schema.data_rule import (
+        CreateDataRuleParam,
+        DeleteDataRuleParam,
+        UpdateDataRuleParam,
+    )
 
 
 class DataRuleService:
@@ -103,9 +109,8 @@ class DataRuleService:
             data_rule = await data_rule_dao.get(db, pk)
             if not data_rule:
                 raise errors.NotFoundError(msg='数据规则不存在')
-            if data_rule.name != obj.name:
-                if await data_rule_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='数据规则已存在')
+            if data_rule.name != obj.name and await data_rule_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='数据规则已存在')
             count = await data_rule_dao.update(db, pk, obj)
             return count
 

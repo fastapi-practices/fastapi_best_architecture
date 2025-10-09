@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import hashlib
 import os
+import hashlib
 
 from typing import Any
 
-from cryptography.hazmat.backends.openssl import backend
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from itsdangerous import URLSafeSerializer
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.backends.openssl import backend
+from cryptography.hazmat.primitives.ciphers import Cipher, modes, algorithms
 
 from backend.common.log import log
 

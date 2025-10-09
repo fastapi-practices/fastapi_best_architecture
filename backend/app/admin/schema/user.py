@@ -1,15 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
-from typing import Any
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field, HttpUrl, model_validator
+from typing import TYPE_CHECKING, Any
+
+from pydantic import Field, ConfigDict, model_validator
 from typing_extensions import Self
 
-from backend.app.admin.schema.dept import GetDeptDetail
-from backend.app.admin.schema.role import GetRoleWithRelationDetail
-from backend.common.enums import StatusType
-from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
+from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from pydantic import HttpUrl
+
+    from backend.common.enums import StatusType
+    from backend.common.schema import CustomEmailStr, CustomPhoneNumber
+    from backend.app.admin.schema.dept import GetDeptDetail
+    from backend.app.admin.schema.role import GetRoleWithRelationDetail
 
 
 class AuthSchemaBase(SchemaBase):

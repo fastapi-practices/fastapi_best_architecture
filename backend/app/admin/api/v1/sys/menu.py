@@ -1,15 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated, Any
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from typing import TYPE_CHECKING, Any, Annotated
 
-from backend.app.admin.schema.menu import CreateMenuParam, GetMenuDetail, GetMenuTree, UpdateMenuParam
-from backend.app.admin.service.menu_service import menu_service
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.common.security.permission import RequestPermission
+from backend.app.admin.service.menu_service import menu_service
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from fastapi import Request
+
+    from backend.app.admin.schema.menu import GetMenuTree, GetMenuDetail, CreateMenuParam, UpdateMenuParam
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

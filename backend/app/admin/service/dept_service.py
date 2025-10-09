@@ -1,17 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any
+from __future__ import annotations
 
-from fastapi import Request
+from typing import TYPE_CHECKING, Any
 
-from backend.app.admin.crud.crud_dept import dept_dao
-from backend.app.admin.model import Dept
-from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
-from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data
+from backend.app.admin.crud.crud_dept import dept_dao
+
+if TYPE_CHECKING:
+    from fastapi import Request
+
+    from backend.app.admin.model import Dept
+    from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 
 
 class DeptService:
@@ -33,7 +35,12 @@ class DeptService:
 
     @staticmethod
     async def get_tree(
-        *, request: Request, name: str | None, leader: str | None, phone: str | None, status: int | None
+        *,
+        request: Request,
+        name: str | None,
+        leader: str | None,
+        phone: str | None,
+        status: int | None,
     ) -> list[dict[str, Any]]:
         """
         获取部门树形结构
@@ -81,9 +88,8 @@ class DeptService:
             dept = await dept_dao.get(db, pk)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
-            if dept.name != obj.name:
-                if await dept_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='部门名称已存在')
+            if dept.name != obj.name and await dept_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='部门名称已存在')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:

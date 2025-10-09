@@ -1,13 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field
+from typing import TYPE_CHECKING
 
-from backend.app.admin.schema.data_scope import GetDataScopeDetail
-from backend.app.admin.schema.menu import GetMenuDetail
-from backend.common.enums import StatusType
+from pydantic import Field, ConfigDict
+
 from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from backend.common.enums import StatusType
+    from backend.app.admin.schema.menu import GetMenuDetail
+    from backend.app.admin.schema.data_scope import GetDataScopeDetail
 
 
 class RoleSchemaBase(SchemaBase):

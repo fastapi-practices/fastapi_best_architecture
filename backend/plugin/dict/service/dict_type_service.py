@@ -1,21 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.common.exception import errors
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
-from backend.plugin.dict.model import DictType
-from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.plugin.dict.model import DictType
+    from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
 
 
 class DictTypeService:
     """字典类型服务类"""
 
     @staticmethod
-    async def get(*, pk) -> DictType:
+    async def get(*, pk: int) -> DictType:
         """
         获取字典类型详情
 
@@ -72,9 +76,8 @@ class DictTypeService:
             dict_type = await dict_type_dao.get(db, pk)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
-            if dict_type.code != obj.code:
-                if await dict_type_dao.get_by_code(db, obj.code):
-                    raise errors.ConflictError(msg='字典类型已存在')
+            if dict_type.code != obj.code and await dict_type_dao.get_by_code(db, obj.code):
+                raise errors.ConflictError(msg='字典类型已存在')
             count = await dict_type_dao.update(db, pk, obj)
             return count
 

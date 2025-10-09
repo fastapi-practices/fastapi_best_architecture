@@ -1,13 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from decimal import Decimal
-from typing import Any, Sequence, TypeVar
+from __future__ import annotations
 
-from fastapi.encoders import decimal_encoder
+from typing import TYPE_CHECKING, Any, TypeVar
+from decimal import Decimal
+
 from msgspec import json
 from sqlalchemy import Row, RowMapping
 from sqlalchemy.orm import ColumnProperty, SynonymProperty, class_mapper
+from fastapi.encoders import decimal_encoder
 from starlette.responses import JSONResponse
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 RowData = Row | RowMapping | Any
 
@@ -40,7 +43,7 @@ def select_list_serialize(row: Sequence[R]) -> list[dict[str, Any]]:
     return [select_columns_serialize(item) for item in row]
 
 
-def select_as_dict(row: R, use_alias: bool = False) -> dict[str, Any]:
+def select_as_dict(row: R, *, use_alias: bool = False) -> dict[str, Any]:
     """
     将 SQLAlchemy 查询结果转换为字典，可以包含关联数据
 

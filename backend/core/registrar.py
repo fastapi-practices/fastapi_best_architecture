@@ -1,39 +1,43 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
+from typing import TYPE_CHECKING
 from asyncio import create_task
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import socketio
 
-from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
-from starlette.middleware.authentication import AuthenticationMiddleware
-from starlette.middleware.cors import CORSMiddleware
+from asgi_correlation_id import CorrelationIdMiddleware
 from starlette.staticfiles import StaticFiles
-from starlette.types import ASGIApp
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend import __version__
-from backend.common.exception.exception_handler import register_exception
-from backend.common.log import set_custom_logfile, setup_logging
 from backend.core.conf import settings
-from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
+from backend.common.log import setup_logging, set_custom_logfile
 from backend.database.db import create_tables
+from backend.plugin.tools import build_final_router
+from backend.utils.openapi import simplify_operation_ids
+from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.redis import redis_client
-from backend.middleware.access_middleware import AccessMiddleware
+from backend.utils.demo_site import demo_site
+from backend.utils.serializers import MsgSpecJSONResponse
+from backend.utils.health_check import http_limit_callback, ensure_unique_route_names
 from backend.middleware.i18n_middleware import I18nMiddleware
+from backend.middleware.state_middleware import StateMiddleware
+from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
-from backend.middleware.state_middleware import StateMiddleware
-from backend.plugin.tools import build_final_router
-from backend.utils.demo_site import demo_site
-from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
-from backend.utils.openapi import simplify_operation_ids
-from backend.utils.serializers import MsgSpecJSONResponse
+from backend.common.exception.exception_handler import register_exception
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
+    from starlette.types import ASGIApp
 
 
 @asynccontextmanager

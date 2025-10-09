@@ -1,12 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import time
 
-from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from typing import TYPE_CHECKING
+
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.common.log import log
 from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from fastapi import Request, Response
+    from starlette.middleware.base import RequestResponseEndpoint
 
 
 class AccessMiddleware(BaseHTTPMiddleware):
@@ -40,7 +45,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
 
             log.info(
                 f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
-                f'{path} | {elapsed:.3f}ms'
+                f'{path} | {elapsed:.3f}ms',
             )
 
         return response

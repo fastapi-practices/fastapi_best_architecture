@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os
 
 import uvicorn
@@ -15,13 +13,10 @@ if __name__ == '__main__':
     # 如果你正在通过 python 命令启动此文件，请遵循以下事宜：
     # 1. 按照官方文档通过 uv 安装依赖
     # 2. 命令行空间位于 backend 目录下
-    try:
-        uvicorn.run(
-            app='backend.main:app',
-            host='127.0.0.1',
-            port=8000,
-            reload=True,
-            reload_excludes=[os.path.abspath('../.venv')],
-        )
-    except Exception as e:
-        raise e
+    uvicorn.run(
+        app='backend.main:app',
+        host='127.0.0.1',
+        port=8000,
+        reload=True,
+        reload_excludes=[os.path.abspath('../.venv')],
+    )

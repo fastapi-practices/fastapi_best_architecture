@@ -1,12 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
-from typing import Any
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field, field_serializer
+from typing import TYPE_CHECKING, Any
+
+from pydantic import Field, ConfigDict, field_serializer
 
 from backend.app.task import celery_app
 from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class TaskResultSchemaBase(SchemaBase):
@@ -39,5 +41,5 @@ class GetTaskResultDetail(TaskResultSchemaBase):
     id: int = Field(description='任务结果 ID')
 
     @field_serializer('args', 'kwargs', when_used='unless-none')
-    def serialize_params(self, value: bytes | None, _info) -> Any:
+    def serialize_params(self, value: bytes | None) -> Any:
         return celery_app.backend.decode(value)

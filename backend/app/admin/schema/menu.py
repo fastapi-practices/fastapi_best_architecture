@@ -1,11 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field
+from typing import TYPE_CHECKING
 
-from backend.common.enums import MenuType, StatusType
+from pydantic import Field, ConfigDict
+
 from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from backend.common.enums import MenuType, StatusType
 
 
 class MenuSchemaBase(SchemaBase):
@@ -48,4 +52,4 @@ class GetMenuDetail(MenuSchemaBase):
 class GetMenuTree(GetMenuDetail):
     """获取菜单树"""
 
-    children: list['GetMenuTree'] | None = Field(None, description='子菜单')
+    children: list[GetMenuTree] | None = Field(None, description='子菜单')

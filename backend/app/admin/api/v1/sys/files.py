@@ -1,14 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from typing import TYPE_CHECKING, Annotated
 
-from backend.common.dataclasses import UploadUrl
-from backend.common.response.response_schema import ResponseSchemaModel, response_base
-from backend.common.security.permission import RequestPermission
-from backend.common.security.rbac import DependsRBAC
+from fastapi import File, Depends, APIRouter
+
 from backend.utils.file_ops import upload_file, upload_file_verify
+from backend.common.security.rbac import DependsRBAC
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from fastapi import UploadFile
+
+    from backend.common.dataclasses import UploadUrl
+    from backend.common.response.response_schema import ResponseSchemaModel
 
 router = APIRouter()
 

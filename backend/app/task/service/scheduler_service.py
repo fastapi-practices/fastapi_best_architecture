@@ -1,27 +1,32 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import json
 
-from typing import Sequence
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Select
 from starlette.concurrency import run_in_threadpool
 
-from backend.app.task.celery import celery_app
-from backend.app.task.crud.crud_scheduler import task_scheduler_dao
-from backend.app.task.enums import TaskSchedulerType
-from backend.app.task.model import TaskScheduler
-from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
-from backend.app.task.utils.tzcrontab import crontab_verify
-from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.app.task.enums import TaskSchedulerType
+from backend.app.task.celery import celery_app
+from backend.common.exception import errors
+from backend.app.task.utils.tzcrontab import crontab_verify
+from backend.app.task.crud.crud_scheduler import task_scheduler_dao
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.app.task.model import TaskScheduler
+    from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
 
 
 class TaskSchedulerService:
     """任务调度服务类"""
 
     @staticmethod
-    async def get(*, pk) -> TaskScheduler | None:
+    async def get(*, pk: int) -> TaskScheduler | None:
         """
         获取任务调度详情
 
@@ -81,9 +86,8 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
-            if task_scheduler.name != obj.name:
-                if await task_scheduler_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='任务调度已存在')
+            if task_scheduler.name != obj.name and await task_scheduler_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='任务调度已存在')
             if task_scheduler.type == TaskSchedulerType.CRONTAB:
                 crontab_verify(obj.crontab)
             count = await task_scheduler_dao.update(db, pk, obj)
@@ -101,11 +105,11 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
-            count = await task_scheduler_dao.set_status(db, pk, not task_scheduler.enabled)
+            count = await task_scheduler_dao.set_status(db, pk, status=not task_scheduler.enabled)
             return count
 
     @staticmethod
-    async def delete(*, pk) -> int:
+    async def delete(*, pk: int) -> int:
         """
         删除任务调度
 

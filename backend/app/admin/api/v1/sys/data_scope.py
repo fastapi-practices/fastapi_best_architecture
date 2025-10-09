@@ -1,24 +1,28 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.app.admin.schema.data_scope import (
-    CreateDataScopeParam,
-    DeleteDataScopeParam,
-    GetDataScopeDetail,
-    GetDataScopeWithRelationDetail,
-    UpdateDataScopeParam,
-    UpdateDataScopeRuleParam,
-)
-from backend.app.admin.service.data_scope_service import data_scope_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+from backend.app.admin.service.data_scope_service import data_scope_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.app.admin.schema.data_scope import (
+        GetDataScopeDetail,
+        CreateDataScopeParam,
+        DeleteDataScopeParam,
+        UpdateDataScopeParam,
+        UpdateDataScopeRuleParam,
+        GetDataScopeWithRelationDetail,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -85,7 +89,8 @@ async def create_data_scope(obj: CreateDataScopeParam) -> ResponseModel:
     ],
 )
 async def update_data_scope(
-    pk: Annotated[int, Path(description='数据范围 ID')], obj: UpdateDataScopeParam
+    pk: Annotated[int, Path(description='数据范围 ID')],
+    obj: UpdateDataScopeParam,
 ) -> ResponseModel:
     count = await data_scope_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -102,8 +107,9 @@ async def update_data_scope(
     ],
 )
 async def update_data_scope_rules(
-    pk: Annotated[int, Path(description='数据范围 ID')], rule_ids: UpdateDataScopeRuleParam
-):
+    pk: Annotated[int, Path(description='数据范围 ID')],
+    rule_ids: UpdateDataScopeRuleParam,
+) -> ResponseModel:
     count = await data_scope_service.update_data_scope_rule(pk=pk, rule_ids=rule_ids)
     if count > 0:
         return response_base.success()

@@ -1,17 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any
+from __future__ import annotations
 
-from fastapi import Request
+from typing import TYPE_CHECKING, Any
 
-from backend.app.admin.crud.crud_menu import menu_dao
-from backend.app.admin.model import Menu
-from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
-from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
+from backend.app.admin.crud.crud_menu import menu_dao
+
+if TYPE_CHECKING:
+    from fastapi import Request
+
+    from backend.app.admin.model import Menu
+    from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 
 
 class MenuService:
@@ -98,9 +100,8 @@ class MenuService:
             menu = await menu_dao.get(db, pk)
             if not menu:
                 raise errors.NotFoundError(msg='菜单不存在')
-            if menu.title != obj.title:
-                if await menu_dao.get_by_title(db, obj.title):
-                    raise errors.ConflictError(msg='菜单标题已存在')
+            if menu.title != obj.title and await menu_dao.get_by_title(db, obj.title):
+                raise errors.ConflictError(msg='菜单标题已存在')
             if obj.parent_id:
                 parent_menu = await menu_dao.get(db, obj.parent_id)
                 if not parent_menu:

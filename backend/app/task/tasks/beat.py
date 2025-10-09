@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from celery.schedules import schedule
 
 from backend.app.task.utils.tzcrontab import TzAwareCrontab

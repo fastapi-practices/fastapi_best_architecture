@@ -1,28 +1,32 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import random
 
-from typing import Sequence
+from typing import TYPE_CHECKING
 
-from fastapi import Request
-from sqlalchemy import Select
-
+from backend.core.conf import settings
+from backend.database.db import async_db_session
+from backend.common.enums import UserPermissionType
+from backend.database.redis import redis_client
+from backend.common.exception import errors
+from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.crud.crud_user import user_dao
-from backend.app.admin.model import Role, User
-from backend.app.admin.schema.user import (
-    AddUserParam,
-    ResetPasswordParam,
-    UpdateUserParam,
-)
-from backend.common.enums import UserPermissionType
-from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
-from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
-from backend.core.conf import settings
-from backend.database.db import async_db_session
-from backend.database.redis import redis_client
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from fastapi import Request
+    from sqlalchemy import Select
+
+    from backend.app.admin.model import Role, User
+    from backend.app.admin.schema.user import (
+        AddUserParam,
+        UpdateUserParam,
+        ResetPasswordParam,
+    )
 
 
 class UserService:
@@ -108,9 +112,8 @@ class UserService:
             user = await user_dao.get_with_relation(db, user_id=pk)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            if obj.username != user.username:
-                if await user_dao.get_by_username(db, obj.username):
-                    raise errors.ConflictError(msg='用户名已注册')
+            if obj.username != user.username and await user_dao.get_by_username(db, obj.username):
+                raise errors.ConflictError(msg='用户名已注册')
             for role_id in obj.roles:
                 if not await role_dao.get(db, role_id):
                     raise errors.NotFoundError(msg='角色不存在')
@@ -119,7 +122,7 @@ class UserService:
             return count
 
     @staticmethod
-    async def update_permission(*, request: Request, pk: int, type: UserPermissionType) -> int:
+    async def update_permission(*, request: Request, pk: int, type: UserPermissionType) -> int:  # noqa: C901
         """
         更新用户权限
 
@@ -137,14 +140,14 @@ class UserService:
                         raise errors.NotFoundError(msg='用户不存在')
                     if pk == request.user.id:
                         raise errors.ForbiddenError(msg='禁止修改自身权限')
-                    count = await user_dao.set_super(db, pk, not user.status)
+                    count = await user_dao.set_super(db, pk, is_super=not user.status)
                 case UserPermissionType.staff:
                     user = await user_dao.get(db, pk)
                     if not user:
                         raise errors.NotFoundError(msg='用户不存在')
                     if pk == request.user.id:
                         raise errors.ForbiddenError(msg='禁止修改自身权限')
-                    count = await user_dao.set_staff(db, pk, not user.is_staff)
+                    count = await user_dao.set_staff(db, pk, is_staff=not user.is_staff)
                 case UserPermissionType.status:
                     user = await user_dao.get(db, pk)
                     if not user:
@@ -158,7 +161,7 @@ class UserService:
                         raise errors.NotFoundError(msg='用户不存在')
                     multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
                     new_multi_login = not multi_login
-                    count = await user_dao.set_multi_login(db, pk, new_multi_login)
+                    count = await user_dao.set_multi_login(db, pk, multi_login=new_multi_login)
                     token = get_token(request)
                     token_payload = jwt_decode(token)
                     if pk == user.id:
@@ -166,7 +169,8 @@ class UserService:
                         if not new_multi_login:
                             key_prefix = f'{settings.TOKEN_REDIS_PREFIX}:{user.id}'
                             await redis_client.delete_prefix(
-                                key_prefix, exclude=f'{key_prefix}:{token_payload.session_uuid}'
+                                key_prefix,
+                                exclude=f'{key_prefix}:{token_payload.session_uuid}',
                             )
                     else:
                         # 系统管理员修改他人时，他人 token 全部失效

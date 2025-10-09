@@ -1,20 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import sys
 
-from typing import Annotated, AsyncGenerator
 from uuid import uuid4
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import Depends
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from backend.core.conf import settings
 from backend.common.log import log
 from backend.common.model import MappedBase
-from backend.core.conf import settings
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
+    from sqlalchemy.ext.asyncio import AsyncEngine
 
 
-def create_database_url(unittest: bool = False) -> URL:
+def create_database_url(*, unittest: bool = False) -> URL:
     """
     创建数据库链接
 

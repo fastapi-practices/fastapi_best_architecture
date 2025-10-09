@@ -1,21 +1,24 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import os
-import platform
-import socket
-import sys
+from __future__ import annotations
 
-from datetime import datetime, timedelta
-from datetime import timezone as tz
+import os
+import sys
+import socket
+import platform
+
+from typing import TYPE_CHECKING
+from datetime import datetime, timezone as tz
 
 import psutil
 
 from backend.utils.timezone import timezone
 
+if TYPE_CHECKING:
+    from datetime import timedelta
+
 
 class ServerInfo:
     @staticmethod
-    def format_bytes(size: int | float) -> str:
+    def format_bytes(size: float) -> str:
         """
         格式化字节大小
 
@@ -112,7 +115,7 @@ class ServerInfo:
                 s.settimeout(0.5)
                 s.connect(('8.8.8.8', 80))
                 ip = s.getsockname()[0]
-        except (socket.gaierror, socket.timeout, OSError):
+        except (TimeoutError, socket.gaierror, OSError):
             pass
 
         return {
@@ -127,8 +130,8 @@ class ServerInfo:
         """获取磁盘信息"""
         disk_info = []
         for partition in psutil.disk_partitions(all=False):
-            try:
-                usage = psutil.disk_usage(partition.mountpoint)
+            usage = psutil.disk_usage(partition.mountpoint)
+            if usage:
                 disk_info.append({
                     'dir': partition.mountpoint,
                     'type': partition.fstype,
@@ -138,8 +141,6 @@ class ServerInfo:
                     'used': ServerInfo.format_bytes(usage.used),
                     'usage': f'{usage.percent:.2f}%',
                 })
-            except (PermissionError, psutil.AccessDenied):
-                continue
         return disk_info
 
     @staticmethod

@@ -1,14 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.common.exception import errors
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
-from backend.plugin.code_generator.model import GenBusiness
-from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.plugin.code_generator.model import GenBusiness
+    from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
 
 
 class GenBusinessService:

@@ -1,26 +1,30 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.app.admin.schema.menu import GetMenuTree
-from backend.app.admin.schema.role import (
-    CreateRoleParam,
-    DeleteRoleParam,
-    GetRoleDetail,
-    GetRoleWithRelationDetail,
-    UpdateRoleMenuParam,
-    UpdateRoleParam,
-    UpdateRoleScopeParam,
-)
-from backend.app.admin.service.role_service import role_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.common.security.permission import RequestPermission
+from backend.app.admin.service.role_service import role_service
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.app.admin.schema.menu import GetMenuTree
+    from backend.app.admin.schema.role import (
+        GetRoleDetail,
+        CreateRoleParam,
+        DeleteRoleParam,
+        UpdateRoleParam,
+        UpdateRoleMenuParam,
+        UpdateRoleScopeParam,
+        GetRoleWithRelationDetail,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -106,7 +110,8 @@ async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: Up
     ],
 )
 async def update_role_menus(
-    pk: Annotated[int, Path(description='角色 ID')], menu_ids: UpdateRoleMenuParam
+    pk: Annotated[int, Path(description='角色 ID')],
+    menu_ids: UpdateRoleMenuParam,
 ) -> ResponseModel:
     count = await role_service.update_role_menu(pk=pk, menu_ids=menu_ids)
     if count > 0:
@@ -123,7 +128,8 @@ async def update_role_menus(
     ],
 )
 async def update_role_scopes(
-    pk: Annotated[int, Path(description='角色 ID')], scope_ids: UpdateRoleScopeParam
+    pk: Annotated[int, Path(description='角色 ID')],
+    scope_ids: UpdateRoleScopeParam,
 ) -> ResponseModel:
     count = await role_service.update_role_scope(pk=pk, scope_ids=scope_ids)
     if count > 0:

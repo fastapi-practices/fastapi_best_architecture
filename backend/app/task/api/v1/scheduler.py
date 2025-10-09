@@ -1,17 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, GetTaskSchedulerDetail, UpdateTaskSchedulerParam
-from backend.app.task.service.scheduler_service import task_scheduler_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+from backend.app.task.service.scheduler_service import task_scheduler_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.app.task.schema.scheduler import (
+        GetTaskSchedulerDetail,
+        CreateTaskSchedulerParam,
+        UpdateTaskSchedulerParam,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -40,7 +48,7 @@ async def get_task_scheduler(
 )
 async def get_task_scheduler_paged(
     db: CurrentSession,
-    name: Annotated[int, Path(description='任务调度名称')] = None,
+    name: Annotated[int | None, Path(description='任务调度名称')] = None,
     type: Annotated[int | None, Query(description='任务调度类型')] = None,
 ) -> ResponseSchemaModel[PageData[GetTaskSchedulerDetail]]:
     task_scheduler_select = await task_scheduler_service.get_select(name=name, type=type)
@@ -70,7 +78,8 @@ async def create_task_scheduler(obj: CreateTaskSchedulerParam) -> ResponseModel:
     ],
 )
 async def update_task_scheduler(
-    pk: Annotated[int, Path(description='任务调度 ID')], obj: UpdateTaskSchedulerParam
+    pk: Annotated[int, Path(description='任务调度 ID')],
+    obj: UpdateTaskSchedulerParam,
 ) -> ResponseModel:
     count = await task_scheduler_service.update(pk=pk, obj=obj)
     if count > 0:

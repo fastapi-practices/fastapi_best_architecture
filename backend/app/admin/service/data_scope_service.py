@@ -1,21 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
-from backend.app.admin.model import DataScope
-from backend.app.admin.schema.data_scope import (
-    CreateDataScopeParam,
-    DeleteDataScopeParam,
-    UpdateDataScopeParam,
-    UpdateDataScopeRuleParam,
-)
-from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.common.exception import errors
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.app.admin.model import DataScope
+    from backend.app.admin.schema.data_scope import (
+        CreateDataScopeParam,
+        DeleteDataScopeParam,
+        UpdateDataScopeParam,
+        UpdateDataScopeRuleParam,
+    )
 
 
 class DataScopeService:
@@ -94,9 +98,8 @@ class DataScopeService:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
-            if data_scope.name != obj.name:
-                if await data_scope_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='数据范围已存在')
+            if data_scope.name != obj.name and await data_scope_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='数据范围已存在')
             count = await data_scope_dao.update(db, pk, obj)
             for role in await data_scope.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:

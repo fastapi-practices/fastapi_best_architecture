@@ -1,22 +1,26 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
-from backend.plugin.dict.schema.dict_data import (
-    CreateDictDataParam,
-    DeleteDictDataParam,
-    GetDictDataDetail,
-    UpdateDictDataParam,
-)
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
 from backend.plugin.dict.service.dict_data_service import dict_data_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.plugin.dict.schema.dict_data import (
+        GetDictDataDetail,
+        CreateDictDataParam,
+        DeleteDictDataParam,
+        UpdateDictDataParam,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -60,7 +64,11 @@ async def get_dict_datas_paged(
     type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
     dict_data_select = await dict_data_service.get_select(
-        type_code=type_code, label=label, value=value, status=status, type_id=type_id
+        type_code=type_code,
+        label=label,
+        value=value,
+        status=status,
+        type_id=type_id,
     )
     page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
@@ -88,7 +96,8 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     ],
 )
 async def update_dict_data(
-    pk: Annotated[int, Path(description='字典数据 ID')], obj: UpdateDictDataParam
+    pk: Annotated[int, Path(description='字典数据 ID')],
+    obj: UpdateDictDataParam,
 ) -> ResponseModel:
     count = await dict_data_service.update(pk=pk, obj=obj)
     if count > 0:

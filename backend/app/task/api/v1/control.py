@@ -1,17 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path
+from typing import TYPE_CHECKING, Annotated
+
+from fastapi import Path, Depends, APIRouter
 from starlette.concurrency import run_in_threadpool
 
 from backend.app.task import celery_app
-from backend.app.task.schema.control import TaskRegisteredDetail
 from backend.common.exception import errors
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from backend.app.task.schema.control import TaskRegisteredDetail
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -24,7 +27,7 @@ async def get_task_registered() -> ResponseSchemaModel[list[TaskRegisteredDetail
         raise errors.ServerError(msg='Celery Worker 暂不可用，请稍后重试')
     task_registered = []
     celery_app_tasks = celery_app.tasks
-    for _, tasks in registered.items():
+    for tasks in registered.values():
         for task in tasks:
             task_ins = celery_app_tasks.get(task)
             if task_ins:

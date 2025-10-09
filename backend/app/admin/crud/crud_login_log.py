@@ -1,12 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from sqlalchemy import Select
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import delete as sa_delete
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import LoginLog
-from backend.app.admin.schema.login_log import CreateLoginLogParam
+
+if TYPE_CHECKING:
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.app.admin.schema.login_log import CreateLoginLogParam
 
 
 class CRUDLoginLog(CRUDPlus[LoginLog]):

@@ -1,10 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from sqlalchemy.ext.asyncio import AsyncSession
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.oauth2.model import UserSocial
-from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 
 
 class CRUDUserSocial(CRUDPlus[UserSocial]):

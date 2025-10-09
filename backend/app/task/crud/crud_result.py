@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.task.model import TaskResult
+
+if TYPE_CHECKING:
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDTaskResult(CRUDPlus[TaskResult]):

@@ -1,17 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.app.admin.schema.opera_log import DeleteOperaLogParam, GetOperaLogDetail
-from backend.app.admin.service.opera_log_service import opera_log_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+from backend.app.admin.service.opera_log_service import opera_log_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.app.admin.schema.opera_log import GetOperaLogDetail, DeleteOperaLogParam
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

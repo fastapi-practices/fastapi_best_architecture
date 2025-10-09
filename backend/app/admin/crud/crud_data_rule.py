@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import DataRule
-from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.app.admin.schema.data_rule import CreateDataRuleParam, UpdateDataRuleParam
 
 
 class CRUDDataRule(CRUDPlus[DataRule]):

@@ -1,8 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from fastapi import Request
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from backend.core.conf import settings
+
+if TYPE_CHECKING:
+    from fastapi import Request
 
 
 def get_request_trace_id(request: Request) -> str:

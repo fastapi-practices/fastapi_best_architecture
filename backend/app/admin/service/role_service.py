@@ -1,25 +1,29 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any, Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING, Any
 
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
-from backend.app.admin.crud.crud_menu import menu_dao
-from backend.app.admin.crud.crud_role import role_dao
-from backend.app.admin.model import Role
-from backend.app.admin.schema.role import (
-    CreateRoleParam,
-    DeleteRoleParam,
-    UpdateRoleMenuParam,
-    UpdateRoleParam,
-    UpdateRoleScopeParam,
-)
-from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data
+from backend.app.admin.crud.crud_menu import menu_dao
+from backend.app.admin.crud.crud_role import role_dao
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.app.admin.model import Role
+    from backend.app.admin.schema.role import (
+        CreateRoleParam,
+        DeleteRoleParam,
+        UpdateRoleParam,
+        UpdateRoleMenuParam,
+        UpdateRoleScopeParam,
+    )
 
 
 class RoleService:
@@ -114,9 +118,8 @@ class RoleService:
             role = await role_dao.get(db, pk)
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
-            if role.name != obj.name:
-                if await role_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='角色已存在')
+            if role.name != obj.name and await role_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='角色已存在')
             count = await role_dao.update(db, pk, obj)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

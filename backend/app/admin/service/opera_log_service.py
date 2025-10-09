@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from sqlalchemy import Select
+from __future__ import annotations
 
-from backend.app.admin.crud.crud_opera_log import opera_log_dao
-from backend.app.admin.schema.opera_log import CreateOperaLogParam, DeleteOperaLogParam
+from typing import TYPE_CHECKING
+
 from backend.database.db import async_db_session
+from backend.app.admin.crud.crud_opera_log import opera_log_dao
+
+if TYPE_CHECKING:
+    from sqlalchemy import Select
+
+    from backend.app.admin.schema.opera_log import CreateOperaLogParam, DeleteOperaLogParam
 
 
 class OperaLogService:

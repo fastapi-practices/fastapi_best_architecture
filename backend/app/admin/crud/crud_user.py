@@ -1,21 +1,26 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import bcrypt
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import noload, selectinload
-from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Dept, Role, User
-from backend.app.admin.schema.user import (
-    AddOAuth2UserParam,
-    AddUserParam,
-    UpdateUserParam,
-)
-from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
+from backend.app.admin.model import Dept, Role, User
+from backend.common.security.jwt import get_hash_password
+
+if TYPE_CHECKING:
+    from sqlalchemy.sql import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.app.admin.schema.user import (
+        AddUserParam,
+        UpdateUserParam,
+        AddOAuth2UserParam,
+    )
 
 
 class CRUDUser(CRUDPlus[User]):
@@ -214,7 +219,7 @@ class CRUDUser(CRUDPlus[User]):
             **filters,
         )
 
-    async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
+    async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """
         设置用户超级管理员状态
 
@@ -225,7 +230,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_superuser': is_super})
 
-    async def set_staff(self, db: AsyncSession, user_id: int, is_staff: bool) -> int:
+    async def set_staff(self, db: AsyncSession, user_id: int, *, is_staff: bool) -> int:
         """
         设置用户后台登录状态
 
@@ -247,7 +252,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'status': status})
 
-    async def set_multi_login(self, db: AsyncSession, user_id: int, multi_login: bool) -> int:
+    async def set_multi_login(self, db: AsyncSession, user_id: int, *, multi_login: bool) -> int:
         """
         设置用户多端登录状态
 
@@ -259,7 +264,11 @@ class CRUDUser(CRUDPlus[User]):
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
     async def get_with_relation(
-        self, db: AsyncSession, *, user_id: int | None = None, username: str | None = None
+        self,
+        db: AsyncSession,
+        *,
+        user_id: int | None = None,
+        username: str | None = None,
     ) -> User | None:
         """
         获取用户关联信息

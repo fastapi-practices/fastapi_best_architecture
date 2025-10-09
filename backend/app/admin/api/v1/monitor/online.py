@@ -1,19 +1,24 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import json
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import Path, Query, Depends, APIRouter
 
-from backend.app.admin.schema.token import GetTokenDetail
-from backend.common.enums import StatusType
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
-from backend.common.security.permission import RequestPermission
-from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
+from backend.common.enums import StatusType
 from backend.database.redis import redis_client
+from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
+from backend.common.security.rbac import DependsRBAC
+from backend.app.admin.schema.token import GetTokenDetail
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+
+if TYPE_CHECKING:
+    from fastapi import Request
+
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -37,8 +42,8 @@ async def get_sessions(
                     'browser': extra_info.get('browser', '未知'),
                     'device': extra_info.get('device', '未知'),
                     'last_login_time': extra_info.get('last_login_time', '未知'),
-                }
-            )
+                },
+            ),
         )
 
     for key in token_keys:

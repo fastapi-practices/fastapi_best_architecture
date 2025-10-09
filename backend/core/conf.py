@@ -1,12 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal
 from functools import lru_cache
-from typing import Any, Literal, Pattern
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from backend.core.path_conf import BASE_PATH
+
+if TYPE_CHECKING:
+    from re import Pattern
 
 
 class Settings(BaseSettings):

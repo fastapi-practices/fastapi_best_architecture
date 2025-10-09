@@ -1,11 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Row, RowMapping, text
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
+from sqlalchemy import text
 
 from backend.core.conf import settings
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Row, RowMapping
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDGen:
@@ -52,9 +57,9 @@ class CRUDGen:
         """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
-            SELECT table_name AS table_name, table_comment AS table_comment 
-            FROM information_schema.tables 
-            WHERE table_name NOT LIKE 'sys_gen_%' 
+            SELECT table_name AS table_name, table_comment AS table_comment
+            FROM information_schema.tables
+            WHERE table_name NOT LIKE 'sys_gen_%'
             AND table_name = :table_name;
             """
         else:
@@ -83,16 +88,16 @@ class CRUDGen:
         """
         if settings.DATABASE_TYPE == 'mysql':
             sql = """
-            SELECT column_name AS column_name, 
-            CASE WHEN column_key = 'PRI' THEN 1 ELSE 0 END AS is_pk, 
-            CASE WHEN is_nullable = 'NO' OR column_key = 'PRI' THEN 0 ELSE 1 END AS is_nullable, 
-            ordinal_position AS sort, column_comment AS column_comment, 
-            column_type AS column_type FROM information_schema.columns 
-            WHERE table_schema = :table_schema 
-            AND table_name = :table_name 
-            AND column_name <> 'id' 
-            AND column_name <> 'created_time' 
-            AND column_name <> 'updated_time' 
+            SELECT column_name AS column_name,
+            CASE WHEN column_key = 'PRI' THEN 1 ELSE 0 END AS is_pk,
+            CASE WHEN is_nullable = 'NO' OR column_key = 'PRI' THEN 0 ELSE 1 END AS is_nullable,
+            ordinal_position AS sort, column_comment AS column_comment,
+            column_type AS column_type FROM information_schema.columns
+            WHERE table_schema = :table_schema
+            AND table_name = :table_name
+            AND column_name <> 'id'
+            AND column_name <> 'created_time'
+            AND column_name <> 'updated_time'
             ORDER BY sort;
             """
             stmt = text(sql).bindparams(table_schema=table_schema, table_name=table_name)

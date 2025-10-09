@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from pydantic import Field
 
-from backend.common.enums import UserSocialType
 from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from backend.common.enums import UserSocialType
 
 
 class UserSocialSchemaBase(SchemaBase):

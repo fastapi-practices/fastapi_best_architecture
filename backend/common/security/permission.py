@@ -1,15 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
-from fastapi import Request
-from sqlalchemy import ColumnElement, and_, or_
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
 
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
-from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
-from backend.common.exception import errors
+from sqlalchemy import or_, and_
+
 from backend.core.conf import settings
+from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
+from backend.common.exception import errors
 from backend.utils.import_parse import dynamic_import_data_model
+from backend.app.admin.crud.crud_data_scope import data_scope_dao
+
+if TYPE_CHECKING:
+    from fastapi import Request
+    from sqlalchemy import ColumnElement
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class RequestPermission:
@@ -44,7 +48,7 @@ class RequestPermission:
             request.state.permission = self.value
 
 
-async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:
+async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 

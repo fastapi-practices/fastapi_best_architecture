@@ -1,14 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
-from fastapi_limiter.depends import RateLimiter
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Annotated
+
+from fastapi import Depends, APIRouter
 from fastapi_oauth20 import FastAPIOAuth20, LinuxDoOAuth20
 from starlette.responses import RedirectResponse
+from fastapi_limiter.depends import RateLimiter
 
-from backend.common.enums import UserSocialType
-from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
+from backend.common.enums import UserSocialType
+from backend.common.response.response_schema import response_base
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
+
+if TYPE_CHECKING:
+    from fastapi import Request, Response, BackgroundTasks
+
+    from backend.common.response.response_schema import ResponseSchemaModel
 
 router = APIRouter()
 
@@ -27,11 +34,14 @@ async def get_linux_do_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
     description='LinuxDo 授权后，自动重定向到当前地址并获取用户信息，通过用户信息自动创建系统用户',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
-async def linux_do_oauth2_callback(
+async def linux_do_oauth2_callback(  # noqa: ANN201
     request: Request,
     response: Response,
     background_tasks: BackgroundTasks,
-    oauth2: FastAPIOAuth20 = Depends(FastAPIOAuth20(linux_do_client, redirect_route_name='linux_do_oauth2_callback')),
+    oauth2: Annotated[
+        FastAPIOAuth20,
+        Depends(FastAPIOAuth20(linux_do_client, redirect_route_name='linux_do_oauth2_callback')),
+    ],
 ):
     token, _state = oauth2
     access_token = token['access_token']
@@ -44,5 +54,5 @@ async def linux_do_oauth2_callback(
         social=UserSocialType.linux_do,
     )
     return RedirectResponse(
-        url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}'
+        url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}',
     )

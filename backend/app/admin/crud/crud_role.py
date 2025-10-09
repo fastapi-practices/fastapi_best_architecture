@@ -1,18 +1,24 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
+from sqlalchemy import select
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import DataScope, Menu, Role
-from backend.app.admin.schema.role import (
-    CreateRoleParam,
-    UpdateRoleMenuParam,
-    UpdateRoleParam,
-    UpdateRoleScopeParam,
-)
+from backend.app.admin.model import Menu, Role, DataScope
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.app.admin.schema.role import (
+        CreateRoleParam,
+        UpdateRoleParam,
+        UpdateRoleMenuParam,
+        UpdateRoleScopeParam,
+    )
 
 
 class CRUDRole(CRUDPlus[Role]):

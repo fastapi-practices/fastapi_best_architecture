@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.text import Text
+from rich.progress import Progress, TextColumn, SpinnerColumn, TimeElapsedColumn
 
-from backend.core.registrar import register_app
 from backend.plugin.tools import get_plugins, install_requirements
 from backend.utils.console import console
+from backend.core.registrar import register_app
 from backend.utils.timezone import timezone
 
 _log_prefix = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | {"INFO": <8} | - | '

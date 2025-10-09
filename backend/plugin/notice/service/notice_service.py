@@ -1,14 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.common.exception import errors
 from backend.plugin.notice.crud.crud_notice import notice_dao
-from backend.plugin.notice.model import Notice
-from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.plugin.notice.model import Notice
+    from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
 
 
 class NoticeService:

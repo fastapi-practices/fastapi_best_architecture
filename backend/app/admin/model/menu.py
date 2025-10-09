@@ -1,18 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy import String, BigInteger, ForeignKey
+from sqlalchemy.orm import relationship, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.common.model import Base
 from backend.app.admin.model.m2m import sys_role_menu
-from backend.common.model import Base, id_key
 
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
+
+    from backend.common.model import id_key
     from backend.app.admin.model import Role
 
 
@@ -34,18 +35,26 @@ class Menu(Base):
     display: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
     cache: Mapped[int] = mapped_column(default=1, comment='是否缓存（0否 1是）')
     link: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='外链地址'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='外链地址',
     )
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='备注',
     )
 
     # 父级菜单一对多
     parent_id: Mapped[int | None] = mapped_column(
-        BigInteger, ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
+        BigInteger,
+        ForeignKey('sys_menu.id', ondelete='SET NULL'),
+        default=None,
+        index=True,
+        comment='父菜单ID',
     )
-    parent: Mapped[Optional['Menu']] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[Optional[list['Menu']]] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Menu | None] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[list[Menu] | None] = relationship(init=False, back_populates='parent')
 
     # 菜单角色多对多
     roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')

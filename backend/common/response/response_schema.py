@@ -1,12 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any, Generic, TypeVar
+from __future__ import annotations
 
-from fastapi import Response
-from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from backend.common.response.response_code import CustomResponse, CustomResponseCode
+from pydantic import Field, BaseModel
+
 from backend.utils.serializers import MsgSpecJSONResponse
+from backend.common.response.response_code import CustomResponseCode
+
+if TYPE_CHECKING:
+    from fastapi import Response
+
+    from backend.common.response.response_code import CustomResponse
 
 SchemaT = TypeVar('SchemaT')
 

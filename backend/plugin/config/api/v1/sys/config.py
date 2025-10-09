@@ -1,22 +1,26 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Body, Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
-from backend.plugin.config.schema.config import (
-    CreateConfigParam,
-    GetConfigDetail,
-    UpdateConfigParam,
-    UpdateConfigsParam,
-)
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
 from backend.plugin.config.service.config_service import config_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.plugin.config.schema.config import (
+        GetConfigDetail,
+        CreateConfigParam,
+        UpdateConfigParam,
+        UpdateConfigsParam,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

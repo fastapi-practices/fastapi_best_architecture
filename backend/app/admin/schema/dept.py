@@ -1,11 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
 
-from pydantic import ConfigDict, Field
+from typing import TYPE_CHECKING
 
-from backend.common.enums import StatusType
-from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
+from pydantic import Field, ConfigDict
+
+from backend.common.schema import SchemaBase
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from backend.common.enums import StatusType
+    from backend.common.schema import CustomEmailStr, CustomPhoneNumber
 
 
 class DeptSchemaBase(SchemaBase):
@@ -42,4 +47,4 @@ class GetDeptDetail(DeptSchemaBase):
 class GetDeptTree(GetDeptDetail):
     """获取部门树"""
 
-    children: list['GetDeptTree'] | None = Field(None, description='子菜单')
+    children: list[GetDeptTree] | None = Field(None, description='子菜单')

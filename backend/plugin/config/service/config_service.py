@@ -1,17 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
-from sqlalchemy import Select
+from typing import TYPE_CHECKING
 
-from backend.common.exception import errors
 from backend.database.db import async_db_session
+from backend.common.exception import errors
 from backend.plugin.config.crud.crud_config import config_dao
-from backend.plugin.config.model import Config
-from backend.plugin.config.schema.config import (
-    CreateConfigParam,
-    UpdateConfigParam,
-    UpdateConfigsParam,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+
+    from backend.plugin.config.model import Config
+    from backend.plugin.config.schema.config import (
+        CreateConfigParam,
+        UpdateConfigParam,
+        UpdateConfigsParam,
+    )
 
 
 class ConfigService:
@@ -32,7 +37,7 @@ class ConfigService:
             return config
 
     @staticmethod
-    async def get_all(*, type: str | None):
+    async def get_all(*, type: str | None) -> Sequence[Config | None]:
         """
         获取所有参数配置
 
@@ -96,7 +101,7 @@ class ConfigService:
         :return:
         """
         async with async_db_session.begin() as db:
-            for batch in range(0, len(objs), 1000):
+            for _batch in range(0, len(objs), 1000):
                 for obj in objs:
                     config = await config_dao.get(db, obj.id)
                     if not config:

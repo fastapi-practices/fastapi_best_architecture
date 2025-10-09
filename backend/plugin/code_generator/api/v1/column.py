@@ -1,15 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path
+from typing import TYPE_CHECKING, Annotated
 
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Depends, APIRouter
+
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.schema.column import CreateGenColumnParam, GetGenColumnDetail, UpdateGenColumnParam
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
 from backend.plugin.code_generator.service.column_service import gen_column_service
+
+if TYPE_CHECKING:
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
+    from backend.plugin.code_generator.schema.column import (
+        GetGenColumnDetail,
+        CreateGenColumnParam,
+        UpdateGenColumnParam,
+    )
 
 router = APIRouter()
 

@@ -1,17 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
+
+from fastapi import Path, Query, Depends, APIRouter
 from fastapi.responses import StreamingResponse
 
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
-from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
-from backend.plugin.code_generator.schema.code import ImportParam
+from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.rbac import DependsRBAC
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
 from backend.plugin.code_generator.service.code_service import gen_service
+
+if TYPE_CHECKING:
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
+    from backend.plugin.code_generator.schema.code import ImportParam
 
 router = APIRouter()
 
@@ -64,7 +67,7 @@ async def generate_code(pk: Annotated[int, Path(description='业务 ID')]) -> Re
 
 
 @router.get('/{pk}', summary='下载代码', dependencies=[DependsJwtAuth])
-async def download_code(pk: Annotated[int, Path(description='业务 ID')]):
+async def download_code(pk: Annotated[int, Path(description='业务 ID')]):  # noqa: ANN201
     bio = await gen_service.download(pk=pk)
     return StreamingResponse(
         bio,

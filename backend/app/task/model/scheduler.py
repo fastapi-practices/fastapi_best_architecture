@@ -1,24 +1,31 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import asyncio
 
-from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     JSON,
-    Boolean,
     String,
+    Boolean,
     event,
 )
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
-from sqlalchemy.dialects.postgresql import INTEGER, TEXT
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import TEXT, INTEGER
 
-from backend.common.exception import errors
-from backend.common.model import Base, TimeZone, id_key
 from backend.core.conf import settings
+from backend.common.model import Base, TimeZone
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
+from backend.common.exception import errors
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from sqlalchemy.orm import Mapped
+
+    from backend.common.model import id_key
 
 
 class TaskScheduler(Base):
@@ -42,36 +49,42 @@ class TaskScheduler(Base):
     interval_period: Mapped[str | None] = mapped_column(String(255), comment='任务运行之间的周期类型')
     crontab: Mapped[str | None] = mapped_column(String(50), default='* * * * *', comment='任务运行的 Crontab 计划')
     one_off: Mapped[bool] = mapped_column(
-        Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='是否仅运行一次'
+        Boolean().with_variant(INTEGER, 'postgresql'),
+        default=False,
+        comment='是否仅运行一次',
     )
     enabled: Mapped[bool] = mapped_column(
-        Boolean().with_variant(INTEGER, 'postgresql'), default=True, comment='是否启用任务'
+        Boolean().with_variant(INTEGER, 'postgresql'),
+        default=True,
+        comment='是否启用任务',
     )
     total_run_count: Mapped[int] = mapped_column(default=0, comment='任务触发的总次数')
     last_run_time: Mapped[datetime | None] = mapped_column(TimeZone, default=None, comment='任务最后触发的时间')
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='备注',
     )
 
     no_changes: bool = False
 
     @staticmethod
-    def before_insert_or_update(mapper, connection, target):
+    def before_insert_or_update(mapper, connection, target) -> None:  # noqa: ANN001
         if target.expire_seconds is not None and target.expire_time:
             raise errors.ConflictError(msg='expires 和 expire_seconds 只能设置一个')
 
     @classmethod
-    def changed(cls, mapper, connection, target):
+    def changed(cls, mapper, connection, target) -> None:  # noqa: ANN001
         if not target.no_changes:
             cls.update_changed(mapper, connection, target)
 
     @classmethod
-    async def update_changed_async(cls):
+    async def update_changed_async(cls) -> None:
         now = timezone.now()
         await redis_client.set(f'{settings.CELERY_REDIS_PREFIX}:last_update', timezone.to_str(now))
 
     @classmethod
-    def update_changed(cls, mapper, connection, target):
+    def update_changed(cls, mapper, connection, target) -> None:  # noqa: ANN001
         asyncio.create_task(cls.update_changed_async())
 
 

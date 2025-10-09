@@ -1,18 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from celery import schedules
 from celery.schedules import ParseException, crontab
 
-from backend.common.exception import errors
 from backend.utils.timezone import timezone
+from backend.common.exception import errors
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class TzAwareCrontab(schedules.crontab):
     """时区感知 Crontab"""
 
-    def __init__(self, minute='*', hour='*', day_of_week='*', day_of_month='*', month_of_year='*', app=None):
+    def __init__(self, minute='*', hour='*', day_of_week='*', day_of_month='*', month_of_year='*', app=None) -> None:  # noqa: ANN001
         super().__init__(
             minute=minute,
             hour=hour,

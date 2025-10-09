@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.dict.model import DictType
-from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
 
 class CRUDDictType(CRUDPlus[DictType]):

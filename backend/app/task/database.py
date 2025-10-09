@@ -1,13 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from celery import states
-from celery.backends.base import BaseBackend
-from celery.backends.database import retry, session_cleanup
 from celery.exceptions import ImproperlyConfigured
 from celery.utils.time import maybe_timedelta
+from celery.backends.base import BaseBackend
+from celery.backends.database import retry, session_cleanup
 
-from backend.app.task.model.result import Task, TaskExtended, TaskSet
 from backend.app.task.session import SessionManager
+from backend.app.task.model.result import Task, TaskSet, TaskExtended
+
+if TYPE_CHECKING:
+    from sqlalchemy import PickleType
+    from sqlalchemy.orm import Session
 
 """
 重写 from celery.backends.database 内部 DatabaseBackend 类，此类实现与模型配合不佳，导致 fba 创建表和 alembic 迁移困难
@@ -24,7 +30,7 @@ class DatabaseBackend(BaseBackend):
     task_cls = Task
     taskset_cls = TaskSet
 
-    def __init__(self, dburi=None, engine_options=None, url=None, **kwargs):
+    def __init__(self, dburi=None, engine_options=None, url=None, **kwargs) -> None:  # noqa: ANN001
         # The `url` argument was added later and is used by
         # the app to set backend by url (celery.app.backends.by_url)
         super().__init__(expires_type=maybe_timedelta, url=url, **kwargs)
@@ -44,7 +50,7 @@ class DatabaseBackend(BaseBackend):
 
         if not self.url:
             raise ImproperlyConfigured(
-                'Missing connection string! Do you have the database_url setting set to a real value?'
+                'Missing connection string! Do you have the database_url setting set to a real value?',
             )
 
         self.session_manager = SessionManager()
@@ -54,24 +60,26 @@ class DatabaseBackend(BaseBackend):
             self._create_tables()
 
     @property
-    def extended_result(self):
+    def extended_result(self):  # noqa: ANN201
         return self.app.conf.find_value_for_key('extended', 'result')
 
-    def _create_tables(self):
+    def _create_tables(self) -> None:
         """Create the task and taskset tables."""
-        self.ResultSession()
+        self.result_session()
 
-    def ResultSession(self, session_manager=None):
+    def result_session(self, session_manager=None) -> Session:  # noqa: ANN001
         if session_manager is None:
             session_manager = self.session_manager
         return session_manager.session_factory(
-            dburi=self.url, short_lived_sessions=self.short_lived_sessions, **self.engine_options
+            dburi=self.url,
+            short_lived_sessions=self.short_lived_sessions,
+            **self.engine_options,
         )
 
     @retry
-    def _store_result(self, task_id, result, state, traceback=None, request=None, **kwargs):
+    def _store_result(self, task_id, result, state, traceback=None, request=None, **kwargs) -> None:  # noqa: ANN001
         """Store return value and state of an executed task."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             task = list(session.query(self.task_cls).filter(self.task_cls.task_id == task_id))
             task = task and task[0]
@@ -84,9 +92,14 @@ class DatabaseBackend(BaseBackend):
             self._update_result(task, result, state, traceback=traceback, request=request)
             session.commit()
 
-    def _update_result(self, task, result, state, traceback=None, request=None):
+    def _update_result(self, task, result, state, traceback=None, request=None) -> None:  # noqa: ANN001
         meta = self._get_result_meta(
-            result=result, state=state, traceback=traceback, request=request, format_date=False, encode=True
+            result=result,
+            state=state,
+            traceback=traceback,
+            request=request,
+            format_date=False,
+            encode=True,
         )
 
         # Exclude the primary key id and task_id columns
@@ -101,9 +114,9 @@ class DatabaseBackend(BaseBackend):
             setattr(task, column, value)
 
     @retry
-    def _get_task_meta_for(self, task_id):
+    def _get_task_meta_for(self, task_id: str):  # noqa: ANN202
         """Get task meta-data for a task by id."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             task = list(session.query(self.task_cls).filter(self.task_cls.task_id == task_id))
             task = task and task[0]
@@ -119,9 +132,9 @@ class DatabaseBackend(BaseBackend):
             return self.meta_from_decoded(data)
 
     @retry
-    def _save_group(self, group_id, result):
+    def _save_group(self, group_id: str, result: PickleType):  # noqa: ANN202
         """Store the result of an executed group."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             group = self.taskset_cls(group_id, result)
             session.add(group)
@@ -130,34 +143,34 @@ class DatabaseBackend(BaseBackend):
             return result
 
     @retry
-    def _restore_group(self, group_id):
+    def _restore_group(self, group_id: str) -> dict | None:
         """Get meta-data for group by id."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             group = session.query(self.taskset_cls).filter(self.taskset_cls.taskset_id == group_id).first()
             if group:
                 return group.to_dict()
 
     @retry
-    def _delete_group(self, group_id):
+    def _delete_group(self, group_id: str) -> None:
         """Delete meta-data for group by id."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             session.query(self.taskset_cls).filter(self.taskset_cls.taskset_id == group_id).delete()
             session.flush()
             session.commit()
 
     @retry
-    def _forget(self, task_id):
+    def _forget(self, task_id: str) -> None:
         """Forget about result."""
-        session = self.ResultSession()
+        session = self.result_session()
         with session_cleanup(session):
             session.query(self.task_cls).filter(self.task_cls.task_id == task_id).delete()
             session.commit()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Delete expired meta-data."""
-        session = self.ResultSession()
+        session = self.result_session()
         expires = self.expires
         now = self.app.now()
         with session_cleanup(session):
@@ -165,7 +178,7 @@ class DatabaseBackend(BaseBackend):
             session.query(self.taskset_cls).filter(self.taskset_cls.date_done < (now - expires)).delete()
             session.commit()
 
-    def __reduce__(self, args=(), kwargs=None):
-        kwargs = {} if not kwargs else kwargs
+    def __reduce__(self, args=(), kwargs=None):  # noqa: ANN001, ANN204
+        kwargs = kwargs if kwargs else {}
         kwargs.update({'dburi': self.url, 'expires': self.expires, 'engine_options': self.engine_options})
         return super().__reduce__(args, kwargs)

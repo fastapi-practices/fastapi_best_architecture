@@ -1,12 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any, Sequence
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from backend.common.enums import BuildTreeType
-from backend.utils.serializers import RowData, select_list_serialize
+from backend.utils.serializers import select_list_serialize
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from backend.utils.serializers import RowData
 
 
-def get_tree_nodes(row: Sequence[RowData], is_sort: bool, sort_key: str) -> list[dict[str, Any]]:
+def get_tree_nodes(row: Sequence[RowData], *, is_sort: bool, sort_key: str) -> list[dict[str, Any]]:
     """
     获取所有树形结构节点
 
@@ -85,7 +90,7 @@ def get_tree_data(
     :param sort_key: 基于此键对结果进行进行排序
     :return:
     """
-    nodes = get_tree_nodes(row, is_sort, sort_key)
+    nodes = get_tree_nodes(row, is_sort=is_sort, sort_key=sort_key)
     match build_type:
         case BuildTreeType.traversal:
             tree = traversal_to_tree(nodes)
@@ -96,7 +101,9 @@ def get_tree_data(
     return tree
 
 
-def get_vben5_tree_data(row: Sequence[RowData], is_sort: bool = True, sort_key: str = 'sort') -> list[dict[str, Any]]:
+def get_vben5_tree_data(
+    row: Sequence[RowData], *, is_sort: bool = True, sort_key: str = 'sort'
+) -> list[dict[str, Any]]:
     """
     获取 vben5 菜单树形结构数据
 
@@ -120,7 +127,7 @@ def get_vben5_tree_data(row: Sequence[RowData], is_sort: bool = True, sort_key: 
                 'menuVisibleWithForbidden': not bool(node['status']),
             },
         }
-        for node in get_tree_nodes(row, is_sort, sort_key)
+        for node in get_tree_nodes(row, is_sort=is_sort, sort_key=sort_key)
     ]
 
     return traversal_to_tree(vben5_nodes)

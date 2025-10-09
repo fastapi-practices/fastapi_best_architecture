@@ -1,17 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
+from sqlalchemy.orm import relationship, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.common.model import Base, id_key
+from backend.common.model import Base
 
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
+
+    from backend.common.model import id_key
     from backend.plugin.dict.model import DictData
 
 
@@ -24,7 +25,9 @@ class DictType(Base):
     name: Mapped[str] = mapped_column(String(32), comment='字典类型名称')
     code: Mapped[str] = mapped_column(String(32), unique=True, comment='字典类型编码')
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='备注',
     )
 
     # 字典类型一对多

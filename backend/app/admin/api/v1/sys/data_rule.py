@@ -1,23 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Annotated
+from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query
+from typing import TYPE_CHECKING, Annotated
 
-from backend.app.admin.schema.data_rule import (
-    CreateDataRuleParam,
-    DeleteDataRuleParam,
-    GetDataRuleColumnDetail,
-    GetDataRuleDetail,
-    UpdateDataRuleParam,
-)
-from backend.app.admin.service.data_rule_service import data_rule_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
-from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from fastapi import Path, Query, Depends, APIRouter
+
+from backend.common.pagination import DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.common.security.permission import RequestPermission
+from backend.common.response.response_schema import response_base
+from backend.app.admin.service.data_rule_service import data_rule_service
+
+if TYPE_CHECKING:
+    from backend.database.db import CurrentSession
+    from backend.common.pagination import PageData
+    from backend.app.admin.schema.data_rule import (
+        GetDataRuleDetail,
+        CreateDataRuleParam,
+        DeleteDataRuleParam,
+        UpdateDataRuleParam,
+        GetDataRuleColumnDetail,
+    )
+    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 
@@ -59,7 +63,8 @@ async def get_data_rule(
     ],
 )
 async def get_data_rules_paged(
-    db: CurrentSession, name: Annotated[str | None, Query(description='规则名称')] = None
+    db: CurrentSession,
+    name: Annotated[str | None, Query(description='规则名称')] = None,
 ) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
     data_rule_select = await data_rule_service.get_select(name=name)
     page_data = await paging_data(db, data_rule_select)
@@ -88,7 +93,8 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
     ],
 )
 async def update_data_rule(
-    pk: Annotated[int, Path(description='数据规则 ID')], obj: UpdateDataRuleParam
+    pk: Annotated[int, Path(description='数据规则 ID')],
+    obj: UpdateDataRuleParam,
 ) -> ResponseModel:
     count = await data_rule_service.update(pk=pk, obj=obj)
     if count > 0:

@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from __future__ import annotations
 
-from sqlalchemy import Select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING
+
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.plugin.dict.model import DictData
-from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy import Select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 
 
 class CRUDDictData(CRUDPlus[DictData]):
@@ -32,7 +37,11 @@ class CRUDDictData(CRUDPlus[DictData]):
         :return:
         """
         return await self.select_models_order(
-            db, sort_columns='sort', sort_orders='desc', type_code=type_code, load_strategies={'type': 'noload'}
+            db,
+            sort_columns='sort',
+            sort_orders='desc',
+            type_code=type_code,
+            load_strategies={'type': 'noload'},
         )
 
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:
@@ -45,7 +54,12 @@ class CRUDDictData(CRUDPlus[DictData]):
         return await self.select_models(db, load_strategies={'type': 'noload'})
 
     async def get_list(
-        self, type_code: str | None, label: str | None, value: str | None, status: int | None, type_id: int | None
+        self,
+        type_code: str | None,
+        label: str | None,
+        value: str | None,
+        status: int | None,
+        type_id: int | None,
     ) -> Select:
         """
         获取字典数据列表

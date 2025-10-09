@@ -1,12 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from fastapi import Request
+from __future__ import annotations
 
-from backend.common.exception import errors
+from typing import TYPE_CHECKING
+
 from backend.core.conf import settings
+from backend.common.exception import errors
+
+if TYPE_CHECKING:
+    from fastapi import Request
 
 
-async def demo_site(request: Request) -> None:
+async def demo_site(request: Request) -> None:  # noqa: RUF029
     """
     演示站点
 

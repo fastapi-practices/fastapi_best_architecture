@@ -1,16 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import httpx
 
-from fastapi import Request
 from ip2loc import XdbSearcher
 from user_agents import parse
 
-from backend.common.dataclasses import IpInfo, UserAgentInfo
-from backend.common.log import log
 from backend.core.conf import settings
+from backend.common.log import log
 from backend.core.path_conf import STATIC_DIR
 from backend.database.redis import redis_client
+from backend.common.dataclasses import IpInfo, UserAgentInfo
+
+if TYPE_CHECKING:
+    from fastapi import Request
 
 
 def get_request_ip(request: Request) -> str:
@@ -118,8 +122,8 @@ def parse_user_agent_info(request: Request) -> UserAgentInfo:
     :return:
     """
     user_agent = request.headers.get('User-Agent')
-    _user_agent = parse(user_agent)
-    os = _user_agent.get_os()
-    browser = _user_agent.get_browser()
-    device = _user_agent.get_device()
+    user_agent_ = parse(user_agent)
+    os = user_agent_.get_os()
+    browser = user_agent_.get_browser()
+    device = user_agent_.get_device()
     return UserAgentInfo(user_agent=user_agent, device=device, os=os, browser=browser)

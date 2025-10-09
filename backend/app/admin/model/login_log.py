@@ -1,14 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
-from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import DataClassBase, TimeZone, id_key
+from backend.common.model import TimeZone, DataClassBase
 from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from sqlalchemy.orm import Mapped
+
+    from backend.common.model import id_key
 
 
 class LoginLog(DataClassBase):
@@ -31,5 +38,8 @@ class LoginLog(DataClassBase):
     msg: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='提示消息')
     login_time: Mapped[datetime] = mapped_column(TimeZone, comment='登录时间')
     created_time: Mapped[datetime] = mapped_column(
-        TimeZone, init=False, default_factory=timezone.now, comment='创建时间'
+        TimeZone,
+        init=False,
+        default_factory=timezone.now,
+        comment='创建时间',
     )

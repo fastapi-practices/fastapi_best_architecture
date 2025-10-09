@@ -1,12 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import dataclasses
 
-from datetime import datetime
+from typing import TYPE_CHECKING
 
-from fastapi import Response
+if TYPE_CHECKING:
+    from datetime import datetime
 
-from backend.common.enums import StatusType
+    from fastapi import Response
+
+    from backend.common.enums import StatusType
 
 
 @dataclasses.dataclass
