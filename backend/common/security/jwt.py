@@ -1,35 +1,29 @@
-from __future__ import annotations
-
 import json
 
 from uuid import uuid4
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from datetime import timedelta
 
 from jose import JWTError, ExpiredSignatureError, jwt
 from pwdlib import PasswordHash
-from fastapi import Depends, HTTPException
+from fastapi import Depends, Request, HTTPException
 from pydantic_core import from_json
 from fastapi.security import HTTPBearer
+from fastapi.security.http import HTTPAuthorizationCredentials
 from pwdlib.hashers.bcrypt import BcryptHasher
 from fastapi.security.utils import get_authorization_scheme_param
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
+from backend.app.admin.model import User
 from backend.common.exception import errors
 from backend.utils.serializers import select_as_dict
 from backend.common.dataclasses import NewToken, AccessToken, RefreshToken, TokenPayload
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.exception.errors import TokenError
-
-if TYPE_CHECKING:
-    from fastapi import Request
-    from fastapi.security.http import HTTPAuthorizationCredentials
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.model import User
 
 
 class CustomHTTPBearer(HTTPBearer):

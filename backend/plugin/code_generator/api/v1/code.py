@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import Path, Query, Depends, APIRouter
 from fastapi.responses import StreamingResponse
@@ -9,12 +7,9 @@ from backend.core.conf import settings
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
 from backend.common.security.permission import RequestPermission
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.code_service import gen_service
-
-if TYPE_CHECKING:
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
-    from backend.plugin.code_generator.schema.code import ImportParam
 
 router = APIRouter()
 

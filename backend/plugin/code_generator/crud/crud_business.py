@@ -1,18 +1,11 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
+from sqlalchemy import Select
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.plugin.code_generator.model import GenBusiness
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
+from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
 
 
 class CRUDGenBusiness(CRUDPlus[GenBusiness]):

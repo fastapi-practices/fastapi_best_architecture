@@ -1,19 +1,15 @@
-from __future__ import annotations
+from typing import Any
 
-from typing import TYPE_CHECKING, Any
+from fastapi import Request
 
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.app.admin.model import Dept
 from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data
+from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.app.admin.crud.crud_dept import dept_dao
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.app.admin.model import Dept
-    from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 
 
 class DeptService:

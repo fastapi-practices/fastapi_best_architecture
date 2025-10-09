@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 import time
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from asyncio import Queue
 
+from fastapi import Response
 from asgiref.sync import sync_to_async
+from starlette.requests import Request
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -18,10 +18,6 @@ from backend.utils.trace_id import get_request_trace_id
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.common.response.response_code import StandardResponseCode
 from backend.app.admin.service.opera_log_service import opera_log_service
-
-if TYPE_CHECKING:
-    from fastapi import Response
-    from starlette.requests import Request
 
 
 class OperaLogMiddleware(BaseHTTPMiddleware):
@@ -165,7 +161,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             else:
                 args['form-data'] = await self.desensitization(form_data)
 
-        return args if args else None
+        return args or None
 
     @staticmethod
     @sync_to_async

@@ -1,15 +1,10 @@
-from __future__ import annotations
-
 import dataclasses
 
-from typing import TYPE_CHECKING
+from datetime import datetime
 
-if TYPE_CHECKING:
-    from datetime import datetime
+from fastapi import Response
 
-    from fastapi import Response
-
-    from backend.common.enums import StatusType
+from backend.common.enums import StatusType
 
 
 @dataclasses.dataclass

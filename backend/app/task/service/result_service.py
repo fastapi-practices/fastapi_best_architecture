@@ -1,16 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from sqlalchemy import Select
 
 from backend.database.db import async_db_session
+from backend.app.task.model import TaskResult
 from backend.common.exception import errors
+from backend.app.task.schema.result import DeleteTaskResultParam
 from backend.app.task.crud.crud_result import task_result_dao
-
-if TYPE_CHECKING:
-    from sqlalchemy import Select
-
-    from backend.app.task.model import TaskResult
-    from backend.app.task.schema.result import DeleteTaskResultParam
 
 
 class TaskResultService:

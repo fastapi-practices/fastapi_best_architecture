@@ -1,26 +1,20 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import Body, Path, Query, Depends, APIRouter
 
-from backend.common.pagination import DependsPagination, paging_data
+from backend.database.db import CurrentSession
+from backend.common.pagination import PageData, DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
 from backend.common.security.permission import RequestPermission
-from backend.common.response.response_schema import response_base
+from backend.plugin.config.schema.config import (
+    GetConfigDetail,
+    CreateConfigParam,
+    UpdateConfigParam,
+    UpdateConfigsParam,
+)
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.plugin.config.service.config_service import config_service
-
-if TYPE_CHECKING:
-    from backend.database.db import CurrentSession
-    from backend.common.pagination import PageData
-    from backend.plugin.config.schema.config import (
-        GetConfigDetail,
-        CreateConfigParam,
-        UpdateConfigParam,
-        UpdateConfigsParam,
-    )
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

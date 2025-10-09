@@ -1,16 +1,13 @@
-from __future__ import annotations
-
 import io
 import os
 import re
 import zipfile
 
-from typing import TYPE_CHECKING
-
 import anyio
 
 from anyio import open_file
 from dulwich import porcelain
+from fastapi import UploadFile
 from sqlparse import split
 
 from backend.core.conf import settings
@@ -22,9 +19,6 @@ from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
 from backend.utils.re_verify import is_git_url
 from backend.common.exception import errors
-
-if TYPE_CHECKING:
-    from fastapi import UploadFile
 
 
 def build_filename(file: UploadFile) -> str:

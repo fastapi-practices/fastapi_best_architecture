@@ -1,16 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from pydantic import Field, ConfigDict
 
+from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from backend.common.enums import StatusType
-    from backend.plugin.notice.enums import NoticeType
+from backend.plugin.notice.enums import NoticeType
 
 
 class NoticeSchemaBase(SchemaBase):

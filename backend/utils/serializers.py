@@ -1,16 +1,12 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 from decimal import Decimal
+from collections.abc import Sequence
 
 from msgspec import json
 from sqlalchemy import Row, RowMapping
 from sqlalchemy.orm import ColumnProperty, SynonymProperty, class_mapper
 from fastapi.encoders import decimal_encoder
 from starlette.responses import JSONResponse
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 RowData = Row | RowMapping | Any
 

@@ -1,17 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
 
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.plugin.code_generator.model import GenColumn
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
+from backend.plugin.code_generator.schema.column import CreateGenColumnParam, UpdateGenColumnParam
 
 
 class CRUDGenColumn(CRUDPlus[GenColumn]):

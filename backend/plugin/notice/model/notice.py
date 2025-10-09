@@ -1,17 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from sqlalchemy import TEXT, String
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 
-from backend.common.model import Base
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
+from backend.common.model import Base, id_key
 
 
 class Notice(Base):

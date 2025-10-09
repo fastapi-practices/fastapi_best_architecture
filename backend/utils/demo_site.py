@@ -1,12 +1,7 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from fastapi import Request
 
 from backend.core.conf import settings
 from backend.common.exception import errors
-
-if TYPE_CHECKING:
-    from fastapi import Request
 
 
 async def demo_site(request: Request) -> None:  # noqa: RUF029

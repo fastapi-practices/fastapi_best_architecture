@@ -1,22 +1,17 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import Path, Depends, APIRouter
 
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
 from backend.common.security.permission import RequestPermission
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
+from backend.plugin.code_generator.schema.column import (
+    GetGenColumnDetail,
+    CreateGenColumnParam,
+    UpdateGenColumnParam,
+)
 from backend.plugin.code_generator.service.column_service import gen_column_service
-
-if TYPE_CHECKING:
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
-    from backend.plugin.code_generator.schema.column import (
-        GetGenColumnDetail,
-        CreateGenColumnParam,
-        UpdateGenColumnParam,
-    )
 
 router = APIRouter()
 

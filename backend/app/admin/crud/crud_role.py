@@ -1,24 +1,16 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import Menu, Role, DataScope
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.role import (
-        CreateRoleParam,
-        UpdateRoleParam,
-        UpdateRoleMenuParam,
-        UpdateRoleScopeParam,
-    )
+from backend.app.admin.schema.role import (
+    CreateRoleParam,
+    UpdateRoleParam,
+    UpdateRoleMenuParam,
+    UpdateRoleScopeParam,
+)
 
 
 class CRUDRole(CRUDPlus[Role]):

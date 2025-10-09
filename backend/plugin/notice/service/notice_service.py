@@ -1,18 +1,12 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
+from sqlalchemy import Select
 
 from backend.database.db import async_db_session
 from backend.common.exception import errors
+from backend.plugin.notice.model import Notice
+from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
 from backend.plugin.notice.crud.crud_notice import notice_dao
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Select
-
-    from backend.plugin.notice.model import Notice
-    from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
 
 
 class NoticeService:

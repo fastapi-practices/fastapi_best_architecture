@@ -1,14 +1,14 @@
-from __future__ import annotations
-
 import io
 import os
 import json
 import shutil
 import zipfile
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import anyio
+
+from fastapi import UploadFile
 
 from backend.core.conf import settings
 from backend.common.enums import PluginType, StatusType
@@ -18,9 +18,6 @@ from backend.database.redis import redis_client
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin
 from backend.utils.timezone import timezone
 from backend.common.exception import errors
-
-if TYPE_CHECKING:
-    from fastapi import UploadFile
 
 
 class PluginService:

@@ -1,14 +1,10 @@
-from __future__ import annotations
+import operator
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from collections.abc import Sequence
 
 from backend.common.enums import BuildTreeType
-from backend.utils.serializers import select_list_serialize
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from backend.utils.serializers import RowData
+from backend.utils.serializers import RowData, select_list_serialize
 
 
 def get_tree_nodes(row: Sequence[RowData], *, is_sort: bool, sort_key: str) -> list[dict[str, Any]]:
@@ -22,7 +18,7 @@ def get_tree_nodes(row: Sequence[RowData], *, is_sort: bool, sort_key: str) -> l
     """
     tree_nodes = select_list_serialize(row)
     if is_sort:
-        tree_nodes.sort(key=lambda x: x[sort_key])
+        tree_nodes.sort(key=operator.itemgetter(sort_key))
     return tree_nodes
 
 
@@ -102,7 +98,10 @@ def get_tree_data(
 
 
 def get_vben5_tree_data(
-    row: Sequence[RowData], *, is_sort: bool = True, sort_key: str = 'sort'
+    row: Sequence[RowData],
+    *,
+    is_sort: bool = True,
+    sort_key: str = 'sort',
 ) -> list[dict[str, Any]]:
     """
     获取 vben5 菜单树形结构数据

@@ -1,19 +1,12 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from sqlalchemy import or_, and_
+from fastapi import Request
+from sqlalchemy import ColumnElement, or_, and_
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
 from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
 from backend.common.exception import errors
 from backend.utils.import_parse import dynamic_import_data_model
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
-
-if TYPE_CHECKING:
-    from fastapi import Request
-    from sqlalchemy import ColumnElement
-    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class RequestPermission:

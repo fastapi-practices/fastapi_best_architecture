@@ -1,10 +1,7 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import httpx
 
 from ip2loc import XdbSearcher
+from fastapi import Request
 from user_agents import parse
 
 from backend.core.conf import settings
@@ -12,9 +9,6 @@ from backend.common.log import log
 from backend.core.path_conf import STATIC_DIR
 from backend.database.redis import redis_client
 from backend.common.dataclasses import IpInfo, UserAgentInfo
-
-if TYPE_CHECKING:
-    from fastapi import Request
 
 
 def get_request_ip(request: Request) -> str:

@@ -1,20 +1,13 @@
-from __future__ import annotations
+from typing import Any, Annotated
 
-from typing import TYPE_CHECKING, Any, Annotated
-
-from fastapi import Path, Query, Depends, APIRouter
+from fastapi import Path, Query, Depends, Request, APIRouter
 
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
+from backend.app.admin.schema.menu import GetMenuTree, GetMenuDetail, CreateMenuParam, UpdateMenuParam
 from backend.common.security.permission import RequestPermission
 from backend.app.admin.service.menu_service import menu_service
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.app.admin.schema.menu import GetMenuTree, GetMenuDetail, CreateMenuParam, UpdateMenuParam
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 
 router = APIRouter()
 

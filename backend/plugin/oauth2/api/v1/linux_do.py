@@ -1,21 +1,14 @@
-from __future__ import annotations
+from typing import Annotated
 
-from typing import TYPE_CHECKING, Annotated
-
-from fastapi import Depends, APIRouter
+from fastapi import Depends, Request, Response, APIRouter, BackgroundTasks
 from fastapi_oauth20 import FastAPIOAuth20, LinuxDoOAuth20
 from starlette.responses import RedirectResponse
 from fastapi_limiter.depends import RateLimiter
 
 from backend.core.conf import settings
 from backend.common.enums import UserSocialType
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response, BackgroundTasks
-
-    from backend.common.response.response_schema import ResponseSchemaModel
 
 router = APIRouter()
 

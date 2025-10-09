@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import asyncio
 import subprocess
 
-from typing import TYPE_CHECKING, Literal, Annotated
+from typing import Literal, Annotated
 from dataclasses import dataclass
 
 import cappa
@@ -20,6 +18,7 @@ from cappa.output import error_format
 from backend import __version__
 from backend.core.conf import settings
 from backend.database.db import async_db_session
+from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.plugin.tools import get_plugin_sql
 from backend.utils._await import run_await
 from backend.utils.console import console
@@ -28,9 +27,6 @@ from backend.common.exception.errors import BaseExceptionError
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.code_service import gen_service
 from backend.plugin.code_generator.service.business_service import gen_business_service
-
-if TYPE_CHECKING:
-    from backend.common.enums import DataBaseType, PrimaryKeyType
 
 output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
 

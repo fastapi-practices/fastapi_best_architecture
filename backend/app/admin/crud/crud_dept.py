@@ -1,19 +1,12 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
+from fastapi import Request
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import Dept
+from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.common.security.permission import filter_data_permission
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from fastapi import Request
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 
 
 class CRUDDept(CRUDPlus[Dept]):

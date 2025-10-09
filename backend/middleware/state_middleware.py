@@ -1,14 +1,7 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response
-    from starlette.middleware.base import RequestResponseEndpoint
 
 
 class StateMiddleware(BaseHTTPMiddleware):

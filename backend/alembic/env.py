@@ -1,22 +1,18 @@
-# ruff: noqa: F403, F401, I001, RUF100
-from __future__ import annotations
-import asyncio
 import os
+import asyncio
+
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import pool
+from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from backend.app import get_app_models
-from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
+from backend.common.model import MappedBase
 from backend.plugin.tools import get_plugin_models
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from sqlalchemy.engine import Connection
 
 # import models
 for cls in get_app_models() + get_plugin_models():

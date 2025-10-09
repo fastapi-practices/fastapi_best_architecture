@@ -1,19 +1,11 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import DataRule, DataScope
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.data_scope import CreateDataScopeParam, UpdateDataScopeParam, UpdateDataScopeRuleParam
+from backend.app.admin.schema.data_scope import CreateDataScopeParam, UpdateDataScopeParam, UpdateDataScopeRuleParam
 
 
 class CRUDDataScope(CRUDPlus[DataScope]):

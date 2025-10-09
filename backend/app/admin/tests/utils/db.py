@@ -1,13 +1,8 @@
-from __future__ import annotations
+from collections.abc import AsyncGenerator
 
-from typing import TYPE_CHECKING
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from backend.database.db import create_database_url, create_async_engine_and_session
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
-
-    from sqlalchemy.ext.asyncio.session import AsyncSession
 
 TEST_SQLALCHEMY_DATABASE_URL = create_database_url(unittest=True)
 

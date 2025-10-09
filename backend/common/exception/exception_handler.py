@@ -1,7 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
+from fastapi import FastAPI, Request
 from pydantic import ValidationError
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
@@ -14,9 +11,6 @@ from backend.utils.serializers import MsgSpecJSONResponse
 from backend.common.exception.errors import BaseExceptionError
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import FastAPI, Request
 
 
 def _get_exception_code(status_code: int) -> int:
@@ -169,7 +163,7 @@ def register_exception(app: FastAPI) -> None:
         content = {
             'code': exc.code,
             'msg': str(exc.msg),
-            'data': exc.data if exc.data else None,
+            'data': exc.data or None,
         }
         request.state.__request_custom_exception__ = content
         content.update(trace_id=get_request_trace_id(request))

@@ -1,17 +1,9 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from sqlalchemy import delete as sa_delete
+from sqlalchemy import Select, delete as sa_delete
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import OperaLog
-
-if TYPE_CHECKING:
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.opera_log import CreateOperaLogParam
+from backend.app.admin.schema.opera_log import CreateOperaLogParam
 
 
 class CRUDOperaLogDao(CRUDPlus[OperaLog]):

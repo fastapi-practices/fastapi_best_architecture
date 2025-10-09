@@ -1,9 +1,6 @@
-from __future__ import annotations
-
 from uuid import uuid4
-from typing import TYPE_CHECKING
 
-from fastapi import Depends, APIRouter
+from fastapi import Depends, Request, APIRouter
 from fast_captcha import img_captcha
 from starlette.concurrency import run_in_threadpool
 from fastapi_limiter.depends import RateLimiter
@@ -11,12 +8,7 @@ from fastapi_limiter.depends import RateLimiter
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.app.admin.schema.captcha import GetCaptchaDetail
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.common.response.response_schema import ResponseSchemaModel
+from backend.common.response.response_schema import ResponseSchemaModel, response_base
 
 router = APIRouter()
 

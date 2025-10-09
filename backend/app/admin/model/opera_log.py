@@ -1,21 +1,12 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from sqlalchemy import String
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import JSON, LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 
-from backend.common.model import TimeZone, DataClassBase
+from backend.common.model import TimeZone, DataClassBase, id_key
 from backend.utils.timezone import timezone
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
 
 
 class OperaLog(DataClassBase):

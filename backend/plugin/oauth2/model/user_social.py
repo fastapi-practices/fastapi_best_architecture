@@ -1,17 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from sqlalchemy import String, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship, mapped_column
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from backend.common.model import Base
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
-    from backend.app.admin.model import User
+from backend.common.model import Base, id_key
+from backend.app.admin.model import User
 
 
 class UserSocial(Base):

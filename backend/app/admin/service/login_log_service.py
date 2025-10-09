@@ -1,20 +1,13 @@
-from __future__ import annotations
+from datetime import datetime
 
-from typing import TYPE_CHECKING
+from fastapi import Request
+from sqlalchemy import Select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.log import log
 from backend.database.db import async_db_session
-from backend.app.admin.schema.login_log import CreateLoginLogParam
+from backend.app.admin.schema.login_log import CreateLoginLogParam, DeleteLoginLogParam
 from backend.app.admin.crud.crud_login_log import login_log_dao
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from fastapi import Request
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.login_log import DeleteLoginLogParam
 
 
 class LoginLogService:

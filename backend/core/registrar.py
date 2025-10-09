@@ -1,15 +1,14 @@
-from __future__ import annotations
-
 import os
 
-from typing import TYPE_CHECKING
 from asyncio import create_task
 from contextlib import asynccontextmanager
+from collections.abc import AsyncGenerator
 
 import socketio
 
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
+from starlette.types import ASGIApp
 from fastapi_pagination import add_pagination
 from asgi_correlation_id import CorrelationIdMiddleware
 from starlette.staticfiles import StaticFiles
@@ -33,11 +32,6 @@ from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.common.exception.exception_handler import register_exception
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
-
-    from starlette.types import ASGIApp
 
 
 @asynccontextmanager

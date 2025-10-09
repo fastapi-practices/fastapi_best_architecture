@@ -1,25 +1,19 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import Path, Query, Depends, APIRouter
 
-from backend.common.pagination import DependsPagination, paging_data
+from backend.database.db import CurrentSession
+from backend.common.pagination import PageData, DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
+from backend.app.task.schema.scheduler import (
+    GetTaskSchedulerDetail,
+    CreateTaskSchedulerParam,
+    UpdateTaskSchedulerParam,
+)
 from backend.common.security.permission import RequestPermission
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.app.task.service.scheduler_service import task_scheduler_service
-
-if TYPE_CHECKING:
-    from backend.database.db import CurrentSession
-    from backend.common.pagination import PageData
-    from backend.app.task.schema.scheduler import (
-        GetTaskSchedulerDetail,
-        CreateTaskSchedulerParam,
-        UpdateTaskSchedulerParam,
-    )
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

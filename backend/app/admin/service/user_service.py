@@ -1,32 +1,26 @@
-from __future__ import annotations
-
 import random
 
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
+
+from fastapi import Request
+from sqlalchemy import Select
 
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.common.enums import UserPermissionType
 from backend.database.redis import redis_client
+from backend.app.admin.model import Role, User
 from backend.common.exception import errors
 from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
+from backend.app.admin.schema.user import (
+    AddUserParam,
+    UpdateUserParam,
+    ResetPasswordParam,
+)
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_role import role_dao
 from backend.app.admin.crud.crud_user import user_dao
 from backend.common.response.response_code import CustomErrorCode
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from fastapi import Request
-    from sqlalchemy import Select
-
-    from backend.app.admin.model import Role, User
-    from backend.app.admin.schema.user import (
-        AddUserParam,
-        UpdateUserParam,
-        ResetPasswordParam,
-    )
 
 
 class UserService:
@@ -87,7 +81,7 @@ class UserService:
             superuser_verify(request)
             if await user_dao.get_by_username(db, obj.username):
                 raise errors.ConflictError(msg='用户名已注册')
-            obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(88888, 99999)}'
+            obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
             if not obj.password:
                 raise errors.RequestError(msg='密码不允许为空')
             if not await dept_dao.get(db, obj.dept_id):

@@ -1,7 +1,7 @@
-from __future__ import annotations
+from typing import Any
 
-from typing import TYPE_CHECKING, Any
-
+from fastapi import Request, Response
+from starlette.requests import HTTPConnection
 from fastapi.security.utils import get_authorization_scheme_param
 from starlette.authentication import AuthCredentials, AuthenticationError, AuthenticationBackend
 
@@ -9,13 +9,8 @@ from backend.core.conf import settings
 from backend.common.log import log
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.common.security.jwt import jwt_authentication
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.exception.errors import TokenError
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response
-    from starlette.requests import HTTPConnection
-
-    from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 
 
 class _AuthenticationError(AuthenticationError):

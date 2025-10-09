@@ -3,17 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship, mapped_column
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 
-from backend.common.model import Base
+from backend.common.model import Base, id_key
 from backend.app.admin.model.m2m import sys_role_menu
 
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
     from backend.app.admin.model import Role
 
 

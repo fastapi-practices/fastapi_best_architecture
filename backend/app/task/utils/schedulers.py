@@ -390,7 +390,7 @@ class DatabaseScheduler(Scheduler):
 
         last, ts = self._last_update, timezone.from_str(last_update)
         try:
-            if ts and ts > (last if last else ts):
+            if ts and ts > (last or ts):
                 return True
         finally:
             self._last_update = now

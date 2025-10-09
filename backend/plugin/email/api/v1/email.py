@@ -1,22 +1,15 @@
-from __future__ import annotations
-
 import random
 
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
-from fastapi import Body, APIRouter
+from fastapi import Body, Request, APIRouter
 
 from backend.core.conf import settings
+from backend.database.db import CurrentSession
 from backend.database.redis import redis_client
 from backend.common.security.jwt import DependsJwtAuth
 from backend.plugin.email.utils.send import send_email
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.database.db import CurrentSession
-    from backend.common.response.response_schema import ResponseModel
+from backend.common.response.response_schema import ResponseModel, response_base
 
 router = APIRouter()
 

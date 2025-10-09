@@ -1,11 +1,5 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
+from fastapi import FastAPI
 from fastapi.routing import APIRoute
-
-if TYPE_CHECKING:
-    from fastapi import FastAPI
 
 
 def simplify_operation_ids(app: FastAPI) -> None:

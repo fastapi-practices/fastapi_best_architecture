@@ -1,15 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from fastapi import APIRouter
 
 from backend.utils.redis_info import redis_info
 from backend.common.security.jwt import DependsJwtAuth
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from backend.common.response.response_schema import ResponseModel
+from backend.common.response.response_schema import ResponseModel, response_base
 
 router = APIRouter()
 

@@ -1,8 +1,7 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from starlette.background import BackgroundTask
+from fastapi import Request, Response
+from fastapi.security import HTTPBasicCredentials
+from starlette.background import BackgroundTask, BackgroundTasks
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
 from backend.common.log import log
@@ -11,6 +10,7 @@ from backend.database.db import uuid4_str, async_db_session
 from backend.common.enums import LoginLogStatusType
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
+from backend.app.admin.model import User
 from backend.common.exception import errors
 from backend.common.security.jwt import (
     get_token,
@@ -20,20 +20,12 @@ from backend.common.security.jwt import (
     create_access_token,
     create_refresh_token,
 )
+from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.schema.token import GetNewToken, GetLoginToken
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.crud.crud_user import user_dao
 from backend.common.response.response_code import CustomErrorCode
 from backend.app.admin.service.login_log_service import login_log_service
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response
-    from fastapi.security import HTTPBasicCredentials
-    from starlette.background import BackgroundTasks
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.model import User
-    from backend.app.admin.schema.user import AuthLoginParam
 
 
 class AuthService:
@@ -123,7 +115,9 @@ class AuthService:
                     device=request.state.device,
                 )
                 refresh_token = await create_refresh_token(
-                    access_token.session_uuid, user.id, multi_login=user.is_multi_login
+                    access_token.session_uuid,
+                    user.id,
+                    multi_login=user.is_multi_login,
                 )
                 response.set_cookie(
                     key=settings.COOKIE_REFRESH_TOKEN_KEY,

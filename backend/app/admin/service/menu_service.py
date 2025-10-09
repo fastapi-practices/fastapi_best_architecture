@@ -1,19 +1,15 @@
-from __future__ import annotations
+from typing import Any
 
-from typing import TYPE_CHECKING, Any
+from fastapi import Request
 
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
+from backend.app.admin.model import Menu
 from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
+from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.app.admin.crud.crud_menu import menu_dao
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.app.admin.model import Menu
-    from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 
 
 class MenuService:
@@ -63,8 +59,7 @@ class MenuService:
                 menu_ids = set()
                 if roles:
                     for role in roles:
-                        for menu in role.menus:
-                            menu_ids.add(menu.id)
+                        menu_ids.update(menu.id for menu in role.menus)
                     menu_data = await menu_dao.get_sidebar(db, list(menu_ids))
             menu_tree = get_vben5_tree_data(menu_data)
             return menu_tree

@@ -1,22 +1,17 @@
-from __future__ import annotations
-
 import time
 import asyncio
 import functools
 
 from math import ceil
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from collections.abc import Callable
 
+from fastapi import FastAPI, Request, Response
 from fastapi.routing import APIRoute
 
 from backend.common.log import log
 from backend.common.exception import errors
 from backend.common.response.response_code import StandardResponseCode
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from fastapi import FastAPI, Request, Response
 
 
 def ensure_unique_route_names(app: FastAPI) -> None:

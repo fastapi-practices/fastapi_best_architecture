@@ -1,23 +1,16 @@
-from __future__ import annotations
+from typing import Any, Annotated
 
-from typing import TYPE_CHECKING, Any, Annotated
-
-from fastapi import File, Path, Depends, APIRouter
+from fastapi import File, Path, Depends, APIRouter, UploadFile
 from fastapi.params import Query
 from starlette.responses import StreamingResponse
 
+from backend.common.enums import PluginType
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
 from backend.common.security.permission import RequestPermission
 from backend.common.response.response_code import CustomResponse
-from backend.common.response.response_schema import response_base
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.app.admin.service.plugin_service import plugin_service
-
-if TYPE_CHECKING:
-    from fastapi import UploadFile
-
-    from backend.common.enums import PluginType
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
 
 router = APIRouter()
 

@@ -1,8 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from fastapi import Depends
+from fastapi import Depends, Request
 
 from backend.core.conf import settings
 from backend.common.log import log
@@ -10,9 +6,6 @@ from backend.common.enums import MethodType, StatusType
 from backend.common.exception import errors
 from backend.utils.import_parse import import_module_cached
 from backend.common.security.jwt import DependsJwtAuth
-
-if TYPE_CHECKING:
-    from fastapi import Request
 
 
 async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  # noqa: C901

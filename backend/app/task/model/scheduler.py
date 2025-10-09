@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import asyncio
 
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from sqlalchemy import (
     JSON,
@@ -10,22 +8,15 @@ from sqlalchemy import (
     Boolean,
     event,
 )
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT, INTEGER
 
 from backend.core.conf import settings
-from backend.common.model import Base, TimeZone
+from backend.common.model import Base, TimeZone, id_key
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
 from backend.common.exception import errors
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
 
 
 class TaskScheduler(Base):

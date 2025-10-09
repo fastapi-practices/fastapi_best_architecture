@@ -1,31 +1,23 @@
-from __future__ import annotations
+from typing import Annotated
 
-from typing import TYPE_CHECKING, Annotated
+from fastapi import Body, Path, Query, Depends, Request, APIRouter
 
-from fastapi import Body, Path, Query, Depends, APIRouter
-
-from backend.common.pagination import DependsPagination, paging_data
+from backend.database.db import CurrentSession
+from backend.common.enums import UserPermissionType
+from backend.common.pagination import PageData, DependsPagination, paging_data
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.rbac import DependsRBAC
+from backend.app.admin.schema.role import GetRoleDetail
+from backend.app.admin.schema.user import (
+    AddUserParam,
+    UpdateUserParam,
+    ResetPasswordParam,
+    GetUserInfoWithRelationDetail,
+    GetCurrentUserInfoWithRelationDetail,
+)
 from backend.common.security.permission import RequestPermission
 from backend.app.admin.service.user_service import user_service
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import Request
-
-    from backend.database.db import CurrentSession
-    from backend.common.enums import UserPermissionType
-    from backend.common.pagination import PageData
-    from backend.app.admin.schema.role import GetRoleDetail
-    from backend.app.admin.schema.user import (
-        AddUserParam,
-        UpdateUserParam,
-        ResetPasswordParam,
-        GetUserInfoWithRelationDetail,
-        GetCurrentUserInfoWithRelationDetail,
-    )
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 
 router = APIRouter()
 

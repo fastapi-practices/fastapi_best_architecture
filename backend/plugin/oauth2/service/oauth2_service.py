@@ -1,7 +1,6 @@
-from __future__ import annotations
+from typing import Any
 
-from typing import TYPE_CHECKING, Any
-
+from fastapi import Request, Response, BackgroundTasks
 from fast_captcha import text_captcha
 
 from backend.core.conf import settings
@@ -17,9 +16,6 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response, BackgroundTasks
 
 
 class OAuth2Service:

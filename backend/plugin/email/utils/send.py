@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -8,6 +5,7 @@ from anyio import open_file
 from jinja2 import Template
 from aiosmtplib import SMTP
 from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 
 from backend.core.conf import settings
 from backend.common.log import log
@@ -18,9 +16,6 @@ from backend.utils.timezone import timezone
 from backend.common.exception import errors
 from backend.utils.serializers import select_list_serialize
 from backend.plugin.config.crud.crud_config import config_dao
-
-if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 
 
 async def render_message(subject: str, from_header: str, content: str | dict, template: str | None) -> bytes:

@@ -1,15 +1,11 @@
-from __future__ import annotations
-
 import atexit
 import asyncio
 import weakref
 import threading
 
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 from functools import wraps
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Awaitable, Coroutine
+from collections.abc import Callable, Awaitable, Coroutine
 
 T = TypeVar('T')
 

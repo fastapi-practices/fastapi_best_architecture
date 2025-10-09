@@ -1,17 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from pydantic import Field, ConfigDict
+from pydantic.types import JsonValue
 
 from backend.common.schema import SchemaBase
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from pydantic.types import JsonValue
-
-    from backend.app.task.enums import PeriodType, TaskSchedulerType
+from backend.app.task.enums import PeriodType, TaskSchedulerType
 
 
 class TaskSchedulerSchemeBase(SchemaBase):

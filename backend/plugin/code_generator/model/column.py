@@ -1,19 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from sqlalchemy import String, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship, mapped_column
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import TEXT
 
-from backend.common.model import DataClassBase
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
-
-    from backend.common.model import id_key
-    from backend.plugin.code_generator.model import GenBusiness
+from backend.common.model import DataClassBase, id_key
+from backend.plugin.code_generator.model import GenBusiness
 
 
 class GenColumn(DataClassBase):

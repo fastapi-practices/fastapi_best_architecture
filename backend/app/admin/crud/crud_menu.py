@@ -1,17 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
 
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import Menu
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
+from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 
 
 class CRUDMenu(CRUDPlus[Menu]):

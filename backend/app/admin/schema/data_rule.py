@@ -1,15 +1,9 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from pydantic import Field, ConfigDict
 
+from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
 from backend.common.schema import SchemaBase
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from backend.common.enums import RoleDataRuleOperatorType, RoleDataRuleExpressionType
 
 
 class DataRuleSchemaBase(SchemaBase):

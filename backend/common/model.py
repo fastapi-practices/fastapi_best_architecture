@@ -1,17 +1,12 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 from datetime import datetime
 
 from sqlalchemy import DateTime, BigInteger, TypeDecorator
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, declared_attr, mapped_column
+from sqlalchemy.orm import Mapped, DeclarativeBase, MappedAsDataclass, declared_attr, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
 from backend.utils.timezone import timezone
 from backend.utils.snowflake import snowflake
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Mapped
 
 # 通用 Mapped 类型主键, 需手动添加，参考以下使用方式
 # MappedBase -> id: Mapped[id_key]

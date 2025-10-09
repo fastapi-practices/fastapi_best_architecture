@@ -1,18 +1,11 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
+from sqlalchemy import Select
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.plugin.config.model import Config
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigParam
+from backend.plugin.config.schema.config import CreateConfigParam, UpdateConfigParam
 
 
 class CRUDConfig(CRUDPlus[Config]):

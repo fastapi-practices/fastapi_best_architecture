@@ -1,15 +1,9 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from fastapi import HTTPException
+from starlette.background import BackgroundTask
 
-from backend.common.response.response_code import StandardResponseCode
-
-if TYPE_CHECKING:
-    from starlette.background import BackgroundTask
-
-    from backend.common.response.response_code import CustomErrorCode
+from backend.common.response.response_code import CustomErrorCode, StandardResponseCode
 
 
 class BaseExceptionError(Exception):

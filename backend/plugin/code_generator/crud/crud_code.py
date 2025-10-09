@@ -1,16 +1,9 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
-from sqlalchemy import text
+from sqlalchemy import Row, RowMapping, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import Row, RowMapping
-    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDGen:

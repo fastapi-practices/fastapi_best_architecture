@@ -1,26 +1,19 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import bcrypt
 
 from sqlalchemy import select
 from sqlalchemy.orm import noload, selectinload
+from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.utils.timezone import timezone
 from backend.app.admin.model import Dept, Role, User
 from backend.common.security.jwt import get_hash_password
-
-if TYPE_CHECKING:
-    from sqlalchemy.sql import Select
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from backend.app.admin.schema.user import (
-        AddUserParam,
-        UpdateUserParam,
-        AddOAuth2UserParam,
-    )
+from backend.app.admin.schema.user import (
+    AddUserParam,
+    UpdateUserParam,
+    AddOAuth2UserParam,
+)
 
 
 class CRUDUser(CRUDPlus[User]):

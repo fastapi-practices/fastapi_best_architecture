@@ -1,19 +1,17 @@
-from __future__ import annotations
-
 import os
 import sys
 import json
 import warnings
 import subprocess
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, distribution
 
 import anyio
 import rtoml
 
-from fastapi import Depends, APIRouter
+from fastapi import Depends, Request, APIRouter
 from starlette.concurrency import run_in_threadpool
 from packaging.requirements import Requirement
 
@@ -25,9 +23,6 @@ from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
 from backend.common.exception import errors
 from backend.utils.import_parse import get_model_objects, import_module_cached
-
-if TYPE_CHECKING:
-    from fastapi import Request
 
 
 class PluginConfigError(Exception):

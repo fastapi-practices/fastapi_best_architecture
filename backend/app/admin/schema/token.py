@@ -1,16 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from pydantic import Field
 
+from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from backend.common.enums import StatusType
-    from backend.app.admin.schema.user import GetUserInfoDetail
+from backend.app.admin.schema.user import GetUserInfoDetail
 
 
 class GetSwaggerToken(SchemaBase):

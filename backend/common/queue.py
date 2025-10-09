@@ -1,11 +1,6 @@
-from __future__ import annotations
-
 import asyncio
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from asyncio import Queue
+from asyncio import Queue
 
 
 async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:

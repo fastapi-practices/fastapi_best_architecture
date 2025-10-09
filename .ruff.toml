@@ -5,11 +5,6 @@ unsafe-fixes = true
 show-fixes = true
 required-version = ">=0.13.0"
 
-[format]
-docstring-code-format = true
-preview = true
-quote-style = "single"
-
 [lint]
 select = [
     "FAST",
@@ -129,6 +124,7 @@ select = [
     "PGH",
     "PLC1901",
     "UP",
+    "FURB",
     "RUF",
     "TRY",
 ]
@@ -144,7 +140,6 @@ ignore = [
     "TRY003",
     "TRY301"
 ]
-future-annotations = true
 
 [lint.flake8-pytest-style]
 mark-parentheses = false
@@ -167,3 +162,8 @@ relative-imports-order = "closest-to-furthest"
 [lint.per-file-ignores]
 "backend/common/socketio/server.py" = ["ANN001"]
 "backend/common/exception/exception_handler.py" = ["ANN202","RUF029"]
+
+[format]
+docstring-code-format = true
+preview = true
+quote-style = "single"

@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING
 
 from pydantic import Field, ConfigDict
 
-from backend.common.schema import SchemaBase
+from backend.common.schema import SchemaBase, CustomEmailStr, CustomPhoneNumber
 
 if TYPE_CHECKING:
     from datetime import datetime
 
     from backend.common.enums import StatusType
-    from backend.common.schema import CustomEmailStr, CustomPhoneNumber
 
 
 class DeptSchemaBase(SchemaBase):

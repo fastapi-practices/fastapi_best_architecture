@@ -1,19 +1,13 @@
-from __future__ import annotations
-
 import os
 import sys
 import socket
 import platform
 
-from typing import TYPE_CHECKING
-from datetime import datetime, timezone as tz
+from datetime import datetime, timezone as tz, timedelta
 
 import psutil
 
 from backend.utils.timezone import timezone
-
-if TYPE_CHECKING:
-    from datetime import timedelta
 
 
 class ServerInfo:

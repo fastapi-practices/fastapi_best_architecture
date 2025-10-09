@@ -1,20 +1,20 @@
-from __future__ import annotations
-
 import io
 import os
 import zipfile
 
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
 
 import anyio
 
 from anyio import open_file
+from sqlalchemy import RowMapping
 from pydantic.alias_generators import to_pascal
 
 from backend.database.db import async_db_session
 from backend.core.path_conf import BASE_PATH
 from backend.common.exception import errors
 from backend.plugin.code_generator.model import GenBusiness
+from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.schema.column import CreateGenColumnParam
 from backend.plugin.code_generator.crud.crud_code import gen_dao
 from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
@@ -23,13 +23,6 @@ from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.utils.code_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 from backend.plugin.code_generator.service.column_service import gen_column_service
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from sqlalchemy import RowMapping
-
-    from backend.plugin.code_generator.schema.code import ImportParam
 
 
 class GenService:

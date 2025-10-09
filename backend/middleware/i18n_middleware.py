@@ -1,16 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
 from functools import lru_cache
+from collections.abc import Callable
 
+from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.common.i18n import i18n
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from fastapi import Request, Response
 
 
 @lru_cache

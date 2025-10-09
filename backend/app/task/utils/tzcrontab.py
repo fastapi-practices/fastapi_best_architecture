@@ -1,15 +1,10 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 from celery import schedules
 from celery.schedules import ParseException, crontab
 
 from backend.utils.timezone import timezone
 from backend.common.exception import errors
-
-if TYPE_CHECKING:
-    from datetime import datetime
 
 
 class TzAwareCrontab(schedules.crontab):

@@ -1,18 +1,10 @@
-from __future__ import annotations
+from collections.abc import Sequence
 
-from typing import TYPE_CHECKING
-
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Template, Environment, FileSystemLoader, select_autoescape
 
 from backend.core.conf import settings
+from backend.plugin.code_generator.model import GenColumn, GenBusiness
 from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from jinja2 import Template
-
-    from backend.plugin.code_generator.model import GenColumn, GenBusiness
 
 
 class GenTemplate:

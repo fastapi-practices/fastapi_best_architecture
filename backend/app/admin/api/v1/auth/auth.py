@@ -1,23 +1,15 @@
-from __future__ import annotations
+from typing import Annotated
 
-from typing import TYPE_CHECKING, Annotated
-
-from fastapi import Depends, APIRouter
+from fastapi import Depends, Request, Response, APIRouter
+from fastapi.security import HTTPBasicCredentials
+from starlette.background import BackgroundTasks
 from fastapi_limiter.depends import RateLimiter
 
 from backend.common.security.jwt import DependsJwtAuth
-from backend.app.admin.schema.token import GetSwaggerToken
+from backend.app.admin.schema.user import AuthLoginParam
+from backend.app.admin.schema.token import GetNewToken, GetLoginToken, GetSwaggerToken
 from backend.app.admin.service.auth_service import auth_service
-from backend.common.response.response_schema import response_base
-
-if TYPE_CHECKING:
-    from fastapi import Request, Response
-    from fastapi.security import HTTPBasicCredentials
-    from starlette.background import BackgroundTasks
-
-    from backend.app.admin.schema.user import AuthLoginParam
-    from backend.app.admin.schema.token import GetNewToken, GetLoginToken
-    from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel
+from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 
 router = APIRouter()
 
