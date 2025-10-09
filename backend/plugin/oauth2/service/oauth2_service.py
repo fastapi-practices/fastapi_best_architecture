@@ -113,16 +113,16 @@ class OAuth2Service:
             )
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
-            login_log = {
-                'db': db,
-                'request': request,
-                'user_uuid': sys_user.uuid,
-                'username': sys_user.username,
-                'login_time': timezone.now(),
-                'status': LoginLogStatusType.success.value,
-                'msg': t('success.login.oauth2_success'),
-            }
-            background_tasks.add_task(login_log_service.create, **login_log)
+            background_tasks.add_task(
+                login_log_service.create,
+                db=db,
+                request=request,
+                user_uuid=sys_user.uuid,
+                username=sys_user.username,
+                login_time=timezone.now(),
+                status=LoginLogStatusType.success.value,
+                msg=t('success.login.oauth2_success'),
+            )
             await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,

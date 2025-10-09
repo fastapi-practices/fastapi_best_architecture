@@ -18,7 +18,7 @@ class GenTemplate:
             keep_trailing_newline=True,
             enable_async=True,
         )
-        self.init_content = '\n# -*- coding: utf-8 -*-\n'
+        self.init_content = ''
 
     def get_template(self, jinja_file: str) -> Template:
         """
