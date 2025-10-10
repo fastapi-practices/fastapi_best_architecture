@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import json
 
 from datetime import timedelta
@@ -40,8 +38,8 @@ class CustomHTTPBearer(HTTPBearer):
             return await super().__call__(request)
         except HTTPException as e:
             if e.status_code == 403:
-                raise TokenError()
-            raise e
+                raise TokenError
+            raise
 
 
 # JWT authorizes dependency injection
@@ -106,11 +104,13 @@ def jwt_decode(token: str) -> TokenPayload:
     except (JWTError, Exception):
         raise errors.TokenError(msg='Token 无效')
     return TokenPayload(
-        id=int(user_id), session_uuid=session_uuid, expire_time=timezone.from_datetime(timezone.to_utc(expire))
+        id=int(user_id),
+        session_uuid=session_uuid,
+        expire_time=timezone.from_datetime(timezone.to_utc(expire)),
     )
 
 
-async def create_access_token(user_id: int, multi_login: bool, **kwargs) -> AccessToken:
+async def create_access_token(user_id: int, *, multi_login: bool, **kwargs) -> AccessToken:
     """
     生成加密 token
 
@@ -147,7 +147,7 @@ async def create_access_token(user_id: int, multi_login: bool, **kwargs) -> Acce
     return AccessToken(access_token=access_token, access_token_expire_time=expire, session_uuid=session_uuid)
 
 
-async def create_refresh_token(session_uuid: str, user_id: int, multi_login: bool) -> RefreshToken:
+async def create_refresh_token(session_uuid: str, user_id: int, *, multi_login: bool) -> RefreshToken:
     """
     生成加密刷新 token，仅用于创建新的 token
 
@@ -175,7 +175,12 @@ async def create_refresh_token(session_uuid: str, user_id: int, multi_login: boo
 
 
 async def create_new_token(
-    refresh_token: str, session_uuid: str, user_id: int, multi_login: bool, **kwargs
+    refresh_token: str,
+    session_uuid: str,
+    user_id: int,
+    *,
+    multi_login: bool,
+    **kwargs,
 ) -> NewToken:
     """
     生成新的 token
@@ -194,8 +199,8 @@ async def create_new_token(
     await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{session_uuid}')
     await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{session_uuid}')
 
-    new_access_token = await create_access_token(user_id, multi_login, **kwargs)
-    new_refresh_token = await create_refresh_token(new_access_token.session_uuid, user_id, multi_login)
+    new_access_token = await create_access_token(user_id, multi_login=multi_login, **kwargs)
+    new_refresh_token = await create_refresh_token(new_access_token.session_uuid, user_id, multi_login=multi_login)
     return NewToken(
         new_access_token=new_access_token.access_token,
         new_access_token_expire_time=new_access_token.access_token_expire_time,
@@ -267,7 +272,7 @@ def superuser_verify(request: Request) -> bool:
     """
     superuser = request.user.is_superuser
     if not superuser or not request.user.is_staff:
-        raise errors.AuthorizationError()
+        raise errors.AuthorizationError
     return superuser
 
 

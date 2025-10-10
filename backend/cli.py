@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import asyncio
 import subprocess
 
@@ -19,7 +17,7 @@ from watchfiles import PythonFilter
 
 from backend import __version__
 from backend.common.enums import DataBaseType, PrimaryKeyType
-from backend.common.exception.errors import BaseExceptionMixin
+from backend.common.exception.errors import BaseExceptionError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.plugin.code_generator.schema.code import ImportParam
@@ -36,11 +34,11 @@ output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
 class CustomReloadFilter(PythonFilter):
     """自定义重载过滤器"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(extra_extensions=['.json', '.yaml', '.yml'])
 
 
-def run(host: str, port: int, reload: bool, workers: int) -> None:
+def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT001
     url = f'http://{host}:{port}'
     docs_url = url + settings.FASTAPI_DOCS_URL
     redoc_url = url + settings.FASTAPI_REDOC_URL
@@ -97,7 +95,11 @@ def run_celery_flower(port: int, basic_auth: str) -> None:
 
 
 async def install_plugin(
-    path: str, repo_url: str, no_sql: bool, db_type: DataBaseType, pk_type: PrimaryKeyType
+    path: str,
+    repo_url: str,
+    no_sql: bool,  # noqa: FBT001
+    db_type: DataBaseType,
+    pk_type: PrimaryKeyType,
 ) -> None:
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
@@ -121,7 +123,7 @@ async def install_plugin(
             await execute_sql_scripts(sql_file)
 
     except Exception as e:
-        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
 async def execute_sql_scripts(sql_scripts: str) -> None:
@@ -145,7 +147,7 @@ async def import_table(
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
         await gen_service.import_business_and_model(obj=obj)
     except Exception as e:
-        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
 def generate() -> None:
@@ -176,7 +178,7 @@ def generate() -> None:
 
         gen_path = run_await(gen_service.generate)(pk=business)
     except Exception as e:
-        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionMixin) else str(e), code=1)
+        raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
     console.print(Text('\n代码已生成完毕', style='bold green'))
     console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
@@ -206,7 +208,7 @@ class Run:
         cappa.Arg(default=1, help='使用多个工作进程，必须与 `--no-reload` 同时使用'),
     ]
 
-    def __call__(self):
+    def __call__(self) -> None:
         run(host=self.host, port=self.port, reload=self.no_reload, workers=self.workers)
 
 
@@ -218,7 +220,7 @@ class Worker:
         cappa.Arg(short='-l', default='info', help='日志输出级别'),
     ]
 
-    def __call__(self):
+    def __call__(self) -> None:
         run_celery_worker(log_level=self.log_level)
 
 
@@ -230,7 +232,7 @@ class Beat:
         cappa.Arg(short='-l', default='info', help='日志输出级别'),
     ]
 
-    def __call__(self):
+    def __call__(self) -> None:
         run_celery_beat(log_level=self.log_level)
 
 
@@ -246,7 +248,7 @@ class Flower:
         cappa.Arg(default='admin:123456', help='页面登录的用户名和密码'),
     ]
 
-    def __call__(self):
+    def __call__(self) -> None:
         run_celery_flower(port=self.port, basic_auth=self.basic_auth)
 
 
@@ -280,7 +282,7 @@ class Add:
         cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
     ]
 
-    async def __call__(self):
+    async def __call__(self) -> None:
         await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
 
 
@@ -300,7 +302,7 @@ class Import:
         cappa.Arg(short='tn', help='数据库表名'),
     ]
 
-    async def __call__(self):
+    async def __call__(self) -> None:
         await import_table(self.app, self.table_schema, self.table_name)
 
 
@@ -309,7 +311,7 @@ class Import:
 class CodeGenerate:
     subcmd: cappa.Subcommands[Import | None] = None
 
-    def __call__(self):
+    def __call__(self) -> None:
         generate()
 
 
@@ -322,7 +324,7 @@ class FbaCli:
     ]
     subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
 
-    async def __call__(self):
+    async def __call__(self) -> None:
         if self.sql:
             await execute_sql_scripts(self.sql)
 

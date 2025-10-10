@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import bcrypt
 
 from sqlalchemy import select
@@ -214,7 +212,7 @@ class CRUDUser(CRUDPlus[User]):
             **filters,
         )
 
-    async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
+    async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """
         设置用户超级管理员状态
 
@@ -225,7 +223,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_superuser': is_super})
 
-    async def set_staff(self, db: AsyncSession, user_id: int, is_staff: bool) -> int:
+    async def set_staff(self, db: AsyncSession, user_id: int, *, is_staff: bool) -> int:
         """
         设置用户后台登录状态
 
@@ -247,7 +245,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'status': status})
 
-    async def set_multi_login(self, db: AsyncSession, user_id: int, multi_login: bool) -> int:
+    async def set_multi_login(self, db: AsyncSession, user_id: int, *, multi_login: bool) -> int:
         """
         设置用户多端登录状态
 
@@ -259,7 +257,11 @@ class CRUDUser(CRUDPlus[User]):
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
     async def get_with_relation(
-        self, db: AsyncSession, *, user_id: int | None = None, username: str | None = None
+        self,
+        db: AsyncSession,
+        *,
+        user_id: int | None = None,
+        username: str | None = None,
     ) -> User | None:
         """
         获取用户关联信息

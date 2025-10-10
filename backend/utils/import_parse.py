@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import importlib
 import inspect
 
 from functools import lru_cache
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
 from backend.common.exception import errors
 from backend.common.log import log
@@ -23,7 +21,7 @@ def import_module_cached(module_path: str) -> Any:
     return importlib.import_module(module_path)
 
 
-def dynamic_import_data_model(module_path: str) -> Type[T]:
+def dynamic_import_data_model(module_path: str) -> type[T]:
     """
     动态导入数据模型
 
@@ -51,12 +49,12 @@ def get_model_objects(module_path: str) -> list[type] | None:
     except ModuleNotFoundError:
         log.warning(f'模块 {module_path} 中不包含模型对象')
         return None
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
     classes = []
 
-    for name, obj in inspect.getmembers(module):
+    for _name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and module_path in obj.__module__:
             classes.append(obj)
 

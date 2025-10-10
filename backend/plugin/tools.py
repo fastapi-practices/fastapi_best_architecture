@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import json
 import os
 import subprocess
@@ -10,6 +8,7 @@ from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, distribution
 from typing import Any
 
+import anyio
 import rtoml
 
 from fastapi import APIRouter, Depends, Request
@@ -45,10 +44,9 @@ def get_plugins() -> list[str]:
 
     # 遍历插件目录
     for item in os.listdir(PLUGIN_DIR):
-        if not os.path.isdir(os.path.join(PLUGIN_DIR, item)) and item == '__pycache__':
+        item_path = PLUGIN_DIR / item
+        if not os.path.isdir(item_path) and item == '__pycache__':
             continue
-
-        item_path = os.path.join(PLUGIN_DIR, item)
 
         # 检查是否为目录且包含 __init__.py 文件
         if os.path.isdir(item_path) and '__init__.py' in os.listdir(item_path):
@@ -80,19 +78,20 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
     :return:
     """
     if db_type == DataBaseType.mysql:
-        mysql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'mysql')
+        mysql_dir = PLUGIN_DIR / plugin / 'sql' / 'mysql'
         if pk_type == PrimaryKeyType.autoincrement:
-            sql_file = os.path.join(mysql_dir, 'init.sql')
+            sql_file = mysql_dir / 'init.sql'
         else:
-            sql_file = os.path.join(mysql_dir, 'init_snowflake.sql')
+            sql_file = mysql_dir / 'init_snowflake.sql'
     else:
-        postgresql_dir = os.path.join(PLUGIN_DIR, plugin, 'sql', 'postgresql')
+        postgresql_dir = PLUGIN_DIR / plugin / 'sql' / 'postgresql'
         if pk_type == PrimaryKeyType.autoincrement:
-            sql_file = os.path.join(postgresql_dir, 'init.sql')
+            sql_file = postgresql_dir / 'init.sql'
         else:
-            sql_file = os.path.join(postgresql_dir, 'init_snowflake.sql')
+            sql_file = postgresql_dir / 'init_snowflake.sql'
 
-    if not os.path.exists(sql_file):
+    path = anyio.Path(sql_file)
+    if not await path.exists():
         return None
 
     return sql_file
@@ -105,11 +104,11 @@ def load_plugin_config(plugin: str) -> dict[str, Any]:
     :param plugin: 插件名称
     :return:
     """
-    toml_path = os.path.join(PLUGIN_DIR, plugin, 'plugin.toml')
+    toml_path = PLUGIN_DIR / plugin / 'plugin.toml'
     if not os.path.exists(toml_path):
         raise PluginInjectError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
 
-    with open(toml_path, 'r', encoding='utf-8') as f:
+    with open(toml_path, encoding='utf-8') as f:
         return rtoml.load(f)
 
 
@@ -126,7 +125,8 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     # 清理未知插件信息
     run_await(current_redis_client.delete_prefix)(
-        settings.PLUGIN_REDIS_PREFIX, exclude=[f'{settings.PLUGIN_REDIS_PREFIX}:{key}' for key in plugins]
+        settings.PLUGIN_REDIS_PREFIX,
+        exclude=[f'{settings.PLUGIN_REDIS_PREFIX}:{key}' for key in plugins],
     )
 
     for plugin in plugins:
@@ -167,7 +167,8 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
         # 缓存最新插件信息
         run_await(current_redis_client.set)(
-            f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(data, ensure_ascii=False)
+            f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}',
+            json.dumps(data, ensure_ascii=False),
         )
 
     # 重置插件变更状态
@@ -187,7 +188,7 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
     :return:
     """
     plugin_name: str = plugin['plugin']['name']
-    plugin_api_path = os.path.join(PLUGIN_DIR, plugin_name, 'api')
+    plugin_api_path = PLUGIN_DIR / plugin_name / 'api'
     if not os.path.exists(plugin_api_path):
         raise PluginConfigError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
 
@@ -226,7 +227,7 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
 
                 if not target_router or not isinstance(target_router, APIRouter):
                     raise PluginInjectError(
-                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
+                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                     )
 
                 # 将插件路由注入到目标路由中
@@ -237,7 +238,7 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
                     dependencies=[Depends(PluginStatusChecker(plugin_name))],
                 )
             except Exception as e:
-                raise PluginInjectError(f'扩展级插件 {plugin_name} 路由注入失败：{str(e)}') from e
+                raise PluginInjectError(f'扩展级插件 {plugin_name} 路由注入失败：{e!s}') from e
 
 
 def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
@@ -260,13 +261,13 @@ def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
             plugin_router = getattr(module, router, None)
             if not plugin_router or not isinstance(plugin_router, APIRouter):
                 raise PluginInjectError(
-                    f'应用级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整'
+                    f'应用级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                 )
 
             # 将插件路由注入到目标路由中
             target_router.include_router(plugin_router, dependencies=[Depends(PluginStatusChecker(plugin_name))])
     except Exception as e:
-        raise PluginInjectError(f'应用级插件 {plugin_name} 路由注入失败：{str(e)}') from e
+        raise PluginInjectError(f'应用级插件 {plugin_name} 路由注入失败：{e!s}') from e
 
 
 def build_final_router() -> APIRouter:
@@ -295,10 +296,10 @@ def install_requirements(plugin: str | None) -> None:
     plugins = [plugin] if plugin else get_plugins()
 
     for plugin in plugins:
-        requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+        requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
         missing_dependencies = False
         if os.path.exists(requirements_file):
-            with open(requirements_file, 'r', encoding='utf-8') as f:
+            with open(requirements_file, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith('#'):
@@ -307,7 +308,7 @@ def install_requirements(plugin: str | None) -> None:
                         req = Requirement(line)
                         dependency = req.name.lower()
                     except Exception as e:
-                        raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {str(e)}') from e
+                        raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {e!s}') from e
                     try:
                         distribution(dependency)
                     except PackageNotFoundError:
@@ -332,7 +333,7 @@ def uninstall_requirements(plugin: str) -> None:
     :param plugin: 插件名称
     :return:
     """
-    requirements_file = os.path.join(PLUGIN_DIR, plugin, 'requirements.txt')
+    requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
     if os.path.exists(requirements_file):
         try:
             pip_uninstall = [sys.executable, '-m', 'pip', 'uninstall', '-r', requirements_file, '-y']

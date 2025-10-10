@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from fastapi import Request
 from sqlalchemy import ColumnElement, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,7 +41,7 @@ class RequestPermission:
             request.state.permission = self.value
 
 
-async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:
+async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 

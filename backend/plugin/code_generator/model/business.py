@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
@@ -31,7 +31,9 @@ class GenBusiness(Base):
     api_version: Mapped[str] = mapped_column(String(20), default='v1', comment='代码生成 api 版本，默认为 v1')
     gen_path: Mapped[str | None] = mapped_column(String(255), default=None, comment='代码生成路径（默认为 app 根路径）')
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='备注',
     )
     # 代码生成业务模型列一对多
-    gen_column: Mapped[list['GenColumn']] = relationship(init=False, back_populates='gen_business')
+    gen_column: Mapped[list[GenColumn]] = relationship(init=False, back_populates='gen_business')

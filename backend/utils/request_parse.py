@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import httpx
 
 from fastapi import Request
@@ -118,8 +116,8 @@ def parse_user_agent_info(request: Request) -> UserAgentInfo:
     :return:
     """
     user_agent = request.headers.get('User-Agent')
-    _user_agent = parse(user_agent)
-    os = _user_agent.get_os()
-    browser = _user_agent.get_browser()
-    device = _user_agent.get_device()
+    user_agent_ = parse(user_agent)
+    os = user_agent_.get_os()
+    browser = user_agent_.get_browser()
+    device = user_agent_.get_device()
     return UserAgentInfo(user_agent=user_agent, device=device, os=os, browser=browser)

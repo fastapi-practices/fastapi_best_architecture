@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -106,7 +104,8 @@ async def update_role(pk: Annotated[int, Path(description='角色 ID')], obj: Up
     ],
 )
 async def update_role_menus(
-    pk: Annotated[int, Path(description='角色 ID')], menu_ids: UpdateRoleMenuParam
+    pk: Annotated[int, Path(description='角色 ID')],
+    menu_ids: UpdateRoleMenuParam,
 ) -> ResponseModel:
     count = await role_service.update_role_menu(pk=pk, menu_ids=menu_ids)
     if count > 0:
@@ -123,7 +122,8 @@ async def update_role_menus(
     ],
 )
 async def update_role_scopes(
-    pk: Annotated[int, Path(description='角色 ID')], scope_ids: UpdateRoleScopeParam
+    pk: Annotated[int, Path(description='角色 ID')],
+    scope_ids: UpdateRoleScopeParam,
 ) -> ResponseModel:
     count = await role_service.update_role_scope(pk=pk, scope_ids=scope_ids)
     if count > 0:

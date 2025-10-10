@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from sqlalchemy import Select
 
 from backend.app.task.crud.crud_result import task_result_dao

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -10,7 +8,12 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession
-from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, GetNoticeDetail, UpdateNoticeParam
+from backend.plugin.notice.schema.notice import (
+    CreateNoticeParam,
+    DeleteNoticeParam,
+    GetNoticeDetail,
+    UpdateNoticeParam,
+)
 from backend.plugin.notice.service.notice_service import notice_service
 
 router = APIRouter()

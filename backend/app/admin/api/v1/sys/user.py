@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Path, Query, Request
@@ -73,7 +71,9 @@ async def create_user(request: Request, obj: AddUserParam) -> ResponseSchemaMode
 
 @router.put('/{pk}', summary='更新用户信息', dependencies=[DependsRBAC])
 async def update_user(
-    request: Request, pk: Annotated[int, Path(description='用户 ID')], obj: UpdateUserParam
+    request: Request,
+    pk: Annotated[int, Path(description='用户 ID')],
+    obj: UpdateUserParam,
 ) -> ResponseModel:
     count = await user_service.update(request=request, pk=pk, obj=obj)
     if count > 0:
@@ -115,7 +115,8 @@ async def reset_user_password(
 
 @router.put('/me/nickname', summary='更新当前用户昵称', dependencies=[DependsJwtAuth])
 async def update_user_nickname(
-    request: Request, nickname: Annotated[str, Body(embed=True, description='用户昵称')]
+    request: Request,
+    nickname: Annotated[str, Body(embed=True, description='用户昵称')],
 ) -> ResponseModel:
     count = await user_service.update_nickname(request=request, nickname=nickname)
     if count > 0:
@@ -125,7 +126,8 @@ async def update_user_nickname(
 
 @router.put('/me/avatar', summary='更新当前用户头像', dependencies=[DependsJwtAuth])
 async def update_user_avatar(
-    request: Request, avatar: Annotated[str, Body(embed=True, description='用户头像地址')]
+    request: Request,
+    avatar: Annotated[str, Body(embed=True, description='用户头像地址')],
 ) -> ResponseModel:
     count = await user_service.update_avatar(request=request, avatar=avatar)
     if count > 0:

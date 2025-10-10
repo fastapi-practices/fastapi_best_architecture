@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,7 +30,11 @@ class CRUDDictData(CRUDPlus[DictData]):
         :return:
         """
         return await self.select_models_order(
-            db, sort_columns='sort', sort_orders='desc', type_code=type_code, load_strategies={'type': 'noload'}
+            db,
+            sort_columns='sort',
+            sort_orders='desc',
+            type_code=type_code,
+            load_strategies={'type': 'noload'},
         )
 
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:
@@ -45,7 +47,12 @@ class CRUDDictData(CRUDPlus[DictData]):
         return await self.select_models(db, load_strategies={'type': 'noload'})
 
     async def get_list(
-        self, type_code: str | None, label: str | None, value: str | None, status: int | None, type_id: int | None
+        self,
+        type_code: str | None,
+        label: str | None,
+        value: str | None,
+        status: int | None,
+        type_id: int | None,
     ) -> Select:
         """
         获取字典数据列表

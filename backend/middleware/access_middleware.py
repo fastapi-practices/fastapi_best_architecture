@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import time
 
 from fastapi import Request, Response
@@ -40,7 +38,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
 
             log.info(
                 f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
-                f'{path} | {elapsed:.3f}ms'
+                f'{path} | {elapsed:.3f}ms',
             )
 
         return response

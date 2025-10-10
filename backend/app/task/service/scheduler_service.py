@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import json
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 from starlette.concurrency import run_in_threadpool
@@ -21,7 +19,7 @@ class TaskSchedulerService:
     """任务调度服务类"""
 
     @staticmethod
-    async def get(*, pk) -> TaskScheduler | None:
+    async def get(*, pk: int) -> TaskScheduler | None:
         """
         获取任务调度详情
 
@@ -81,9 +79,8 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
-            if task_scheduler.name != obj.name:
-                if await task_scheduler_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='任务调度已存在')
+            if task_scheduler.name != obj.name and await task_scheduler_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='任务调度已存在')
             if task_scheduler.type == TaskSchedulerType.CRONTAB:
                 crontab_verify(obj.crontab)
             count = await task_scheduler_dao.update(db, pk, obj)
@@ -101,11 +98,11 @@ class TaskSchedulerService:
             task_scheduler = await task_scheduler_dao.get(db, pk)
             if not task_scheduler:
                 raise errors.NotFoundError(msg='任务调度不存在')
-            count = await task_scheduler_dao.set_status(db, pk, not task_scheduler.enabled)
+            count = await task_scheduler_dao.set_status(db, pk, status=not task_scheduler.enabled)
             return count
 
     @staticmethod
-    async def delete(*, pk) -> int:
+    async def delete(*, pk: int) -> int:
         """
         删除任务调度
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import Request, Response
 from fastapi.security import HTTPBasicCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,9 +47,8 @@ class AuthService:
 
         if user.password is None:
             raise errors.AuthorizationError(msg='用户名或密码有误')
-        else:
-            if not password_verify(password, user.password):
-                raise errors.AuthorizationError(msg='用户名或密码有误')
+        if not password_verify(password, user.password):
+            raise errors.AuthorizationError(msg='用户名或密码有误')
 
         if not user.status:
             raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
@@ -70,14 +67,19 @@ class AuthService:
             await user_dao.update_login_time(db, obj.username)
             access_token = await create_access_token(
                 user.id,
-                user.is_multi_login,
+                multi_login=user.is_multi_login,
                 # extra info
                 swagger=True,
             )
             return access_token.access_token, user
 
     async def login(
-        self, *, request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+        self,
+        *,
+        request: Request,
+        response: Response,
+        obj: AuthLoginParam,
+        background_tasks: BackgroundTasks,
     ) -> GetLoginToken:
         """
         用户登录
@@ -102,7 +104,7 @@ class AuthService:
                 await db.refresh(user)
                 access_token = await create_access_token(
                     user.id,
-                    user.is_multi_login,
+                    multi_login=user.is_multi_login,
                     # extra info
                     username=user.username,
                     nickname=user.nickname,
@@ -112,7 +114,11 @@ class AuthService:
                     browser=request.state.browser,
                     device=request.state.device,
                 )
-                refresh_token = await create_refresh_token(access_token.session_uuid, user.id, user.is_multi_login)
+                refresh_token = await create_refresh_token(
+                    access_token.session_uuid,
+                    user.id,
+                    multi_login=user.is_multi_login,
+                )
                 response.set_cookie(
                     key=settings.COOKIE_REFRESH_TOKEN_KEY,
                     value=refresh_token.refresh_token,
@@ -128,32 +134,28 @@ class AuthService:
                     log.error('登陆错误: 用户密码有误')
                 task = BackgroundTask(
                     login_log_service.create,
-                    **dict(
-                        db=db,
-                        request=request,
-                        user_uuid=user.uuid if user else uuid4_str(),
-                        username=obj.username,
-                        login_time=timezone.now(),
-                        status=LoginLogStatusType.fail.value,
-                        msg=e.msg,
-                    ),
+                    db=db,
+                    request=request,
+                    user_uuid=user.uuid if user else uuid4_str(),
+                    username=obj.username,
+                    login_time=timezone.now(),
+                    status=LoginLogStatusType.fail.value,
+                    msg=e.msg,
                 )
                 raise errors.RequestError(code=e.code, msg=e.msg, background=task)
             except Exception as e:
                 log.error(f'登陆错误: {e}')
-                raise e
+                raise
             else:
                 background_tasks.add_task(
                     login_log_service.create,
-                    **dict(
-                        db=db,
-                        request=request,
-                        user_uuid=user.uuid,
-                        username=obj.username,
-                        login_time=timezone.now(),
-                        status=LoginLogStatusType.success.value,
-                        msg=t('success.login.success'),
-                    ),
+                    db=db,
+                    request=request,
+                    user_uuid=user.uuid,
+                    username=obj.username,
+                    login_time=timezone.now(),
+                    status=LoginLogStatusType.success.value,
+                    msg=t('success.login.success'),
                 )
                 data = GetLoginToken(
                     access_token=access_token.access_token,
@@ -204,16 +206,15 @@ class AuthService:
             user = await user_dao.get(db, token_payload.id)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            elif not user.status:
+            if not user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-            if not user.is_multi_login:
-                if await redis_client.keys(match=f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
-                    raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
+            if not user.is_multi_login and await redis_client.keys(match=f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
+                raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
             new_token = await create_new_token(
                 refresh_token,
                 token_payload.session_uuid,
                 user.id,
-                user.is_multi_login,
+                multi_login=user.is_multi_login,
                 # extra info
                 username=user.username,
                 nickname=user.nickname,

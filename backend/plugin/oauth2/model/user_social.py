@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -24,6 +22,8 @@ class UserSocial(Base):
 
     # 用户社交信息一对多
     user_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey('sys_user.id', ondelete='CASCADE'), comment='用户关联ID'
+        BigInteger,
+        ForeignKey('sys_user.id', ondelete='CASCADE'),
+        comment='用户关联ID',
     )
     user: Mapped[User | None] = relationship(init=False, backref='socials')

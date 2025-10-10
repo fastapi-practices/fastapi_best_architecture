@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import inspect
 import logging
 import os
@@ -21,7 +19,7 @@ class InterceptHandler(logging.Handler):
     参考：https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
     """
 
-    def emit(self, record: logging.LogRecord):
+    def emit(self, record: logging.LogRecord) -> None:
         # 获取对应的 Loguru 级别（如果存在）
         try:
             level = logger.level(record.levelname).name
@@ -37,7 +35,7 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def default_formatter(record):
+def default_formatter(record: logging.LogRecord) -> str:
     """默认日志格式化程序"""
 
     # 重写 sqlalchemy echo 输出
@@ -79,7 +77,7 @@ def setup_logging() -> None:
 
     # correlation_id 过滤器
     # https://github.com/snok/asgi-correlation-id/issues/7
-    def correlation_id_filter(record):
+    def correlation_id_filter(record: logging.LogRecord) -> logging.LogRecord:
         cid = correlation_id.get(settings.TRACE_ID_LOG_DEFAULT_VALUE)
         record['correlation_id'] = cid[: settings.TRACE_ID_LOG_LENGTH]
         return record
@@ -92,8 +90,8 @@ def setup_logging() -> None:
                 'level': settings.LOG_STD_LEVEL,
                 'format': default_formatter,
                 'filter': lambda record: correlation_id_filter(record),
-            }
-        ]
+            },
+        ],
     )
 
 
@@ -103,16 +101,16 @@ def set_custom_logfile() -> None:
         os.mkdir(LOG_DIR)
 
     # 日志文件
-    log_access_file = os.path.join(LOG_DIR, settings.LOG_ACCESS_FILENAME)
-    log_error_file = os.path.join(LOG_DIR, settings.LOG_ERROR_FILENAME)
+    log_access_file = LOG_DIR / settings.LOG_ACCESS_FILENAME
+    log_error_file = LOG_DIR / settings.LOG_ERROR_FILENAME
 
     # 日志压缩回调
-    def compression(filepath):
+    def compression(filepath: str) -> str:
         filename = filepath.split(os.sep)[-1]
         original_filename = filename.split('.')[0]
         if '-' in original_filename:
-            return os.path.join(LOG_DIR, f'{original_filename}.log')
-        return os.path.join(LOG_DIR, f'{original_filename}_{timezone.now().strftime("%Y-%m-%d")}.log')
+            return LOG_DIR / f'{original_filename}.log'
+        return LOG_DIR / f'{original_filename}_{timezone.now().strftime("%Y-%m-%d")}.log'
 
     # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add

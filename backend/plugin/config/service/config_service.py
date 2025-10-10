@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 
@@ -32,7 +31,7 @@ class ConfigService:
             return config
 
     @staticmethod
-    async def get_all(*, type: str | None):
+    async def get_all(*, type: str | None) -> Sequence[Config | None]:
         """
         获取所有参数配置
 
@@ -96,7 +95,7 @@ class ConfigService:
         :return:
         """
         async with async_db_session.begin() as db:
-            for batch in range(0, len(objs), 1000):
+            for _batch in range(0, len(objs), 1000):
                 for obj in objs:
                     config = await config_dao.get(db, obj.id)
                     if not config:

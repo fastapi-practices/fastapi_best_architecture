@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 
@@ -94,9 +92,8 @@ class DataScopeService:
             data_scope = await data_scope_dao.get(db, pk)
             if not data_scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
-            if data_scope.name != obj.name:
-                if await data_scope_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='数据范围已存在')
+            if data_scope.name != obj.name and await data_scope_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='数据范围已存在')
             count = await data_scope_dao.update(db, pk, obj)
             for role in await data_scope.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Any
 
 from fastapi import Request
@@ -33,7 +31,12 @@ class DeptService:
 
     @staticmethod
     async def get_tree(
-        *, request: Request, name: str | None, leader: str | None, phone: str | None, status: int | None
+        *,
+        request: Request,
+        name: str | None,
+        leader: str | None,
+        phone: str | None,
+        status: int | None,
     ) -> list[dict[str, Any]]:
         """
         获取部门树形结构
@@ -81,9 +84,8 @@ class DeptService:
             dept = await dept_dao.get(db, pk)
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
-            if dept.name != obj.name:
-                if await dept_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='部门名称已存在')
+            if dept.name != obj.name and await dept_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='部门名称已存在')
             if obj.parent_id:
                 parent_dept = await dept_dao.get(db, obj.parent_id)
                 if not parent_dept:

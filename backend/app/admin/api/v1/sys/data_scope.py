@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -85,7 +83,8 @@ async def create_data_scope(obj: CreateDataScopeParam) -> ResponseModel:
     ],
 )
 async def update_data_scope(
-    pk: Annotated[int, Path(description='数据范围 ID')], obj: UpdateDataScopeParam
+    pk: Annotated[int, Path(description='数据范围 ID')],
+    obj: UpdateDataScopeParam,
 ) -> ResponseModel:
     count = await data_scope_service.update(pk=pk, obj=obj)
     if count > 0:
@@ -102,8 +101,9 @@ async def update_data_scope(
     ],
 )
 async def update_data_scope_rules(
-    pk: Annotated[int, Path(description='数据范围 ID')], rule_ids: UpdateDataScopeRuleParam
-):
+    pk: Annotated[int, Path(description='数据范围 ID')],
+    rule_ids: UpdateDataScopeRuleParam,
+) -> ResponseModel:
     count = await data_scope_service.update_data_scope_rule(pk=pk, rule_ids=rule_ids)
     if count > 0:
         return response_base.success()

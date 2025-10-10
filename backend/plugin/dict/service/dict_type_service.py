@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 
@@ -15,7 +13,7 @@ class DictTypeService:
     """字典类型服务类"""
 
     @staticmethod
-    async def get(*, pk) -> DictType:
+    async def get(*, pk: int) -> DictType:
         """
         获取字典类型详情
 
@@ -72,9 +70,8 @@ class DictTypeService:
             dict_type = await dict_type_dao.get(db, pk)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')
-            if dict_type.code != obj.code:
-                if await dict_type_dao.get_by_code(db, obj.code):
-                    raise errors.ConflictError(msg='字典类型已存在')
+            if dict_type.code != obj.code and await dict_type_dao.get_by_code(db, obj.code):
+                raise errors.ConflictError(msg='字典类型已存在')
             count = await dict_type_dao.update(db, pk, obj)
             return count
 

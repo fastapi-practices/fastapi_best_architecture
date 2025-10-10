@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
-from backend.common.exception.errors import BaseExceptionMixin
+from backend.common.exception.errors import BaseExceptionError
 from backend.common.i18n import i18n, t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
@@ -28,9 +26,10 @@ def _get_exception_code(status_code: int) -> int:
     """
     try:
         STATUS_PHRASES[status_code]
-        return status_code
     except Exception:
         return StandardResponseCode.HTTP_400
+
+    return status_code
 
 
 async def _validation_exception_handler(request: Request, exc: RequestValidationError | ValidationError):
@@ -78,7 +77,7 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
     return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_422, content=content)
 
 
-def register_exception(app: FastAPI):
+def register_exception(app: FastAPI) -> None:
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
         """
@@ -152,8 +151,8 @@ def register_exception(app: FastAPI):
             content=content,
         )
 
-    @app.exception_handler(BaseExceptionMixin)
-    async def custom_exception_handler(request: Request, exc: BaseExceptionMixin):
+    @app.exception_handler(BaseExceptionError)
+    async def custom_exception_handler(request: Request, exc: BaseExceptionError):
         """
         全局自定义异常处理
 
@@ -164,7 +163,7 @@ def register_exception(app: FastAPI):
         content = {
             'code': exc.code,
             'msg': str(exc.msg),
-            'data': exc.data if exc.data else None,
+            'data': exc.data or None,
         }
         request.state.__request_custom_exception__ = content
         content.update(trace_id=get_request_trace_id(request))

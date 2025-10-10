@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import json
 
 from typing import Annotated
@@ -37,8 +35,8 @@ async def get_sessions(
                     'browser': extra_info.get('browser', '未知'),
                     'device': extra_info.get('device', '未知'),
                     'last_login_time': extra_info.get('last_login_time', '未知'),
-                }
-            )
+                },
+            ),
         )
 
     for key in token_keys:

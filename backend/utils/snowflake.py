@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import time
 
 from dataclasses import dataclass
@@ -45,7 +43,7 @@ class Snowflake:
         cluster_id: int = SnowflakeConfig.DEFAULT_DATACENTER_ID,
         node_id: int = SnowflakeConfig.DEFAULT_WORKER_ID,
         sequence: int = SnowflakeConfig.DEFAULT_SEQUENCE,
-    ):
+    ) -> None:
         """
         初始化雪花算法生成器
 

@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 
@@ -20,7 +18,7 @@ class GenTemplate:
             keep_trailing_newline=True,
             enable_async=True,
         )
-        self.init_content = '#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n'
+        self.init_content = ''
 
     def get_template(self, jinja_file: str) -> Template:
         """

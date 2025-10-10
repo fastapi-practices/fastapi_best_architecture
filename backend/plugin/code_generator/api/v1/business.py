@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -84,7 +82,8 @@ async def create_business(obj: CreateGenBusinessParam) -> ResponseModel:
     ],
 )
 async def update_business(
-    pk: Annotated[int, Path(description='业务 ID')], obj: UpdateGenBusinessParam
+    pk: Annotated[int, Path(description='业务 ID')],
+    obj: UpdateGenBusinessParam,
 ) -> ResponseModel:
     count = await gen_business_service.update(pk=pk, obj=obj)
     if count > 0:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from backend.database.redis import redis_client
 from backend.utils.server_info import server_info
 

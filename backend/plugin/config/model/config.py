@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import INTEGER, TEXT
@@ -19,8 +17,12 @@ class Config(Base):
     key: Mapped[str] = mapped_column(String(50), unique=True, comment='键名')
     value: Mapped[str] = mapped_column(LONGTEXT().with_variant(TEXT, 'postgresql'), comment='键值')
     is_frontend: Mapped[bool] = mapped_column(
-        Boolean().with_variant(INTEGER, 'postgresql'), default=False, comment='是否前端'
+        Boolean().with_variant(INTEGER, 'postgresql'),
+        default=False,
+        comment='是否前端',
     )
     remark: Mapped[str | None] = mapped_column(
-        LONGTEXT().with_variant(TEXT, 'postgresql'), default=None, comment='备注'
+        LONGTEXT().with_variant(TEXT, 'postgresql'),
+        default=None,
+        comment='备注',
     )

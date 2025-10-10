@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -60,7 +58,11 @@ async def get_dict_datas_paged(
     type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
     dict_data_select = await dict_data_service.get_select(
-        type_code=type_code, label=label, value=value, status=status, type_id=type_id
+        type_code=type_code,
+        label=label,
+        value=value,
+        status=status,
+        type_id=type_id,
     )
     page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
@@ -88,7 +90,8 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     ],
 )
 async def update_dict_data(
-    pk: Annotated[int, Path(description='字典数据 ID')], obj: UpdateDictDataParam
+    pk: Annotated[int, Path(description='字典数据 ID')],
+    obj: UpdateDictDataParam,
 ) -> ResponseModel:
     count = await dict_data_service.update(pk=pk, obj=obj)
     if count > 0:

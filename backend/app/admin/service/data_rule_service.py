@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 
@@ -103,9 +101,8 @@ class DataRuleService:
             data_rule = await data_rule_dao.get(db, pk)
             if not data_rule:
                 raise errors.NotFoundError(msg='数据规则不存在')
-            if data_rule.name != obj.name:
-                if await data_rule_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='数据规则已存在')
+            if data_rule.name != obj.name and await data_rule_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='数据规则已存在')
             count = await data_rule_dao.update(db, pk, obj)
             return count
 

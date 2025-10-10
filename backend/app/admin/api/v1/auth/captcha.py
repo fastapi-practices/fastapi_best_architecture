@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from uuid import uuid4
 
 from fast_captcha import img_captcha

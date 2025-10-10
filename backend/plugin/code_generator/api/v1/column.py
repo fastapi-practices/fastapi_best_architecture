@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path
@@ -8,7 +6,11 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.plugin.code_generator.schema.column import CreateGenColumnParam, GetGenColumnDetail, UpdateGenColumnParam
+from backend.plugin.code_generator.schema.column import (
+    CreateGenColumnParam,
+    GetGenColumnDetail,
+    UpdateGenColumnParam,
+)
 from backend.plugin.code_generator.service.column_service import gen_column_service
 
 router = APIRouter()

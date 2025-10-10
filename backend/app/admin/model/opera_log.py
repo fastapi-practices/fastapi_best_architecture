@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 from sqlalchemy import String
@@ -37,5 +35,8 @@ class OperaLog(DataClassBase):
     cost_time: Mapped[float] = mapped_column(insert_default=0.0, comment='请求耗时（ms）')
     opera_time: Mapped[datetime] = mapped_column(TimeZone, comment='操作时间')
     created_time: Mapped[datetime] = mapped_column(
-        TimeZone, init=False, default_factory=timezone.now, comment='创建时间'
+        TimeZone,
+        init=False,
+        default_factory=timezone.now,
+        comment='创建时间',
     )

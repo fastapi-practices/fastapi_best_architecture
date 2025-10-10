@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import Select
 
@@ -114,9 +113,8 @@ class RoleService:
             role = await role_dao.get(db, pk)
             if not role:
                 raise errors.NotFoundError(msg='角色不存在')
-            if role.name != obj.name:
-                if await role_dao.get_by_name(db, obj.name):
-                    raise errors.ConflictError(msg='角色已存在')
+            if role.name != obj.name and await role_dao.get_by_name(db, obj.name):
+                raise errors.ConflictError(msg='角色已存在')
             count = await role_dao.update(db, pk, obj)
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')

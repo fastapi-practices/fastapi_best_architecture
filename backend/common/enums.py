@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from enum import Enum
 from enum import IntEnum as SourceIntEnum
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
 T = TypeVar('T', bound=Enum)
 
@@ -11,17 +9,17 @@ class _EnumBase:
     """枚举基类，提供通用方法"""
 
     @classmethod
-    def get_member_keys(cls: Type[T]) -> list[str]:
+    def get_member_keys(cls) -> list[str]:
         """获取枚举成员名称列表"""
-        return [name for name in cls.__members__.keys()]
+        return list(cls.__members__.keys())
 
     @classmethod
-    def get_member_values(cls: Type[T]) -> list:
+    def get_member_values(cls) -> list:
         """获取枚举成员值列表"""
         return [item.value for item in cls.__members__.values()]
 
     @classmethod
-    def get_member_dict(cls: Type[T]) -> dict[str, Any]:
+    def get_member_dict(cls) -> dict[str, Any]:
         """获取枚举成员字典"""
         return {name: item.value for name, item in cls.__members__.items()}
 
@@ -29,13 +27,9 @@ class _EnumBase:
 class IntEnum(_EnumBase, SourceIntEnum):
     """整型枚举基类"""
 
-    pass
-
 
 class StrEnum(_EnumBase, str, Enum):
     """字符串枚举基类"""
-
-    pass
 
 
 class MenuType(IntEnum):

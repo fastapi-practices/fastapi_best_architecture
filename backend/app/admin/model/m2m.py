@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from sqlalchemy import BigInteger, Column, ForeignKey, Table
 
 from backend.common.model import MappedBase

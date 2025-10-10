@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sys
 
-from typing import Annotated, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Annotated
 from uuid import uuid4
 
 from fastapi import Depends
@@ -14,7 +13,7 @@ from backend.common.model import MappedBase
 from backend.core.conf import settings
 
 
-def create_database_url(unittest: bool = False) -> URL:
+def create_database_url(*, unittest: bool = False) -> URL:
     """
     创建数据库链接
 

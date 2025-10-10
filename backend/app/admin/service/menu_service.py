@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Any
 
 from fastapi import Request
@@ -61,8 +59,7 @@ class MenuService:
                 menu_ids = set()
                 if roles:
                     for role in roles:
-                        for menu in role.menus:
-                            menu_ids.add(menu.id)
+                        menu_ids.update(menu.id for menu in role.menus)
                     menu_data = await menu_dao.get_sidebar(db, list(menu_ids))
             menu_tree = get_vben5_tree_data(menu_data)
             return menu_tree
@@ -98,9 +95,8 @@ class MenuService:
             menu = await menu_dao.get(db, pk)
             if not menu:
                 raise errors.NotFoundError(msg='菜单不存在')
-            if menu.title != obj.title:
-                if await menu_dao.get_by_title(db, obj.title):
-                    raise errors.ConflictError(msg='菜单标题已存在')
+            if menu.title != obj.title and await menu_dao.get_by_title(db, obj.title):
+                raise errors.ConflictError(msg='菜单标题已存在')
             if obj.parent_id:
                 parent_menu = await menu_dao.get(db, obj.parent_id)
                 if not parent_menu:

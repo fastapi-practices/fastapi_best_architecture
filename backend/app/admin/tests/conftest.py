@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 

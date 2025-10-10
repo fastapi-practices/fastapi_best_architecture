@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import time
 
 from asyncio import Queue
@@ -70,11 +68,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
                 error = e
-                log.error(f'请求异常: {str(e)}')
+                log.error(f'请求异常: {e!s}')
 
             # 此信息只能在请求后获取
-            _route = request.scope.get('route')
-            summary = getattr(_route, 'summary') or '' if _route else ''
+            route = request.scope.get('route')
+            summary = route.summary or '' if route else ''
 
             try:
                 # 此信息来源于 JWT 认证中间件
@@ -157,16 +155,13 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         form_data = await request.form()
         if len(form_data) > 0:
             for k, v in form_data.items():
-                if isinstance(v, UploadFile):
-                    form_data = {k: v.filename}
-                else:
-                    form_data = {k: v}
+                form_data = {k: v.filename} if isinstance(v, UploadFile) else {k: v}
             if 'multipart/form-data' not in content_type:
                 args['x-www-form-urlencoded'] = await self.desensitization(form_data)
             else:
                 args['form-data'] = await self.desensitization(form_data)
 
-        return None if not args else args
+        return args or None
 
     @staticmethod
     @sync_to_async

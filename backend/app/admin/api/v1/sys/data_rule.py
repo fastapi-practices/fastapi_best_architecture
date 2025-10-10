@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -59,7 +57,8 @@ async def get_data_rule(
     ],
 )
 async def get_data_rules_paged(
-    db: CurrentSession, name: Annotated[str | None, Query(description='规则名称')] = None
+    db: CurrentSession,
+    name: Annotated[str | None, Query(description='规则名称')] = None,
 ) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
     data_rule_select = await data_rule_service.get_select(name=name)
     page_data = await paging_data(db, data_rule_select)
@@ -88,7 +87,8 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
     ],
 )
 async def update_data_rule(
-    pk: Annotated[int, Path(description='数据规则 ID')], obj: UpdateDataRuleParam
+    pk: Annotated[int, Path(description='数据规则 ID')],
+    obj: UpdateDataRuleParam,
 ) -> ResponseModel:
     count = await data_rule_service.update(pk=pk, obj=obj)
     if count > 0:

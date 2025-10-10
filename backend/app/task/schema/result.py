@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from typing import Any
 
@@ -39,5 +37,5 @@ class GetTaskResultDetail(TaskResultSchemaBase):
     id: int = Field(description='任务结果 ID')
 
     @field_serializer('args', 'kwargs', when_used='unless-none')
-    def serialize_params(self, value: bytes | None, _info) -> Any:
+    def serialize_params(self, value: bytes | None) -> Any:
         return celery_app.backend.decode(value)

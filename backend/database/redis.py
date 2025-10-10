@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sys
 
 from redis.asyncio import Redis
@@ -14,7 +12,7 @@ class RedisCli(Redis):
 
     def __init__(self) -> None:
         """初始化 Redis 客户端"""
-        super(RedisCli, self).__init__(
+        super().__init__(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             password=settings.REDIS_PASSWORD,

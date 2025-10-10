@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import Request
 
 from backend.common.exception import errors
 from backend.core.conf import settings
 
 
-async def demo_site(request: Request) -> None:
+async def demo_site(request: Request) -> None:  # noqa: RUF029
     """
     演示站点
 

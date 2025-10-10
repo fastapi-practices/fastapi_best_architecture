@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from backend.core.conf import settings
 from backend.plugin.code_generator.enums import GenMySQLColumnType, GenPostgreSQLColumnType
 

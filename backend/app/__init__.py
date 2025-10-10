@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os.path
 
 from backend.core.path_conf import BASE_PATH
@@ -8,14 +6,10 @@ from backend.utils.import_parse import get_model_objects
 
 def get_app_models() -> list[type]:
     """获取 app 所有模型类"""
-    app_path = os.path.join(BASE_PATH, 'app')
+    app_path = BASE_PATH / 'app'
     list_dirs = os.listdir(app_path)
 
-    apps = []
-
-    for d in list_dirs:
-        if os.path.isdir(os.path.join(app_path, d)) and d != '__pycache__':
-            apps.append(d)
+    apps = [d for d in list_dirs if os.path.isdir(os.path.join(app_path, d)) and d != '__pycache__']
 
     objs = []
 

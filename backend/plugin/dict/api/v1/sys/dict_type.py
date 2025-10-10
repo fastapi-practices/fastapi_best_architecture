@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -75,7 +73,8 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
     ],
 )
 async def update_dict_type(
-    pk: Annotated[int, Path(description='字典类型 ID')], obj: UpdateDictTypeParam
+    pk: Annotated[int, Path(description='字典类型 ID')],
+    obj: UpdateDictTypeParam,
 ) -> ResponseModel:
     count = await dict_type_service.update(pk=pk, obj=obj)
     if count > 0:

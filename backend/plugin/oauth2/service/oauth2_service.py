@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Any
 
 from fast_captcha import text_captcha
@@ -98,7 +96,7 @@ class OAuth2Service:
             # 创建 token
             access_token = await jwt.create_access_token(
                 sys_user.id,
-                sys_user.is_multi_login,
+                multi_login=sys_user.is_multi_login,
                 # extra info
                 username=sys_user.username,
                 nickname=sys_user.nickname or f'#{text_captcha(5)}',
@@ -109,11 +107,14 @@ class OAuth2Service:
                 device=request.state.device,
             )
             refresh_token = await jwt.create_refresh_token(
-                access_token.session_uuid, sys_user.id, sys_user.is_multi_login
+                access_token.session_uuid,
+                sys_user.id,
+                multi_login=sys_user.is_multi_login,
             )
             await user_dao.update_login_time(db, sys_user.username)
             await db.refresh(sys_user)
-            login_log = dict(
+            background_tasks.add_task(
+                login_log_service.create,
                 db=db,
                 request=request,
                 user_uuid=sys_user.uuid,
@@ -122,7 +123,6 @@ class OAuth2Service:
                 status=LoginLogStatusType.success.value,
                 msg=t('success.login.oauth2_success'),
             )
-            background_tasks.add_task(login_log_service.create, **login_log)
             await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,

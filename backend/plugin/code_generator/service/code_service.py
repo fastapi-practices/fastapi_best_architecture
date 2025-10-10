@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import io
-import os.path
+import os
 import zipfile
 
-from pathlib import Path
-from typing import Sequence
+from collections.abc import Sequence
 
-import aiofiles
+import anyio
 
+from anyio import open_file
 from pydantic.alias_generators import to_pascal
 from sqlalchemy import RowMapping
 
@@ -68,7 +66,7 @@ class GenService:
                     class_name=to_pascal(table_name),
                     schema_name=to_pascal(table_name),
                     filename=table_name,
-                ).model_dump()
+                ).model_dump(),
             )
             db.add(new_business)
             await db.flush()
@@ -175,7 +173,7 @@ class GenService:
                 raise errors.NotFoundError(msg='业务不存在')
 
             tpl_code_map = await self.render_tpl_code(business=business)
-            gen_path = business.gen_path or os.path.join(BASE_PATH, 'app')
+            gen_path = business.gen_path or BASE_PATH / 'app'
 
             for tpl_path, code in tpl_code_map.items():
                 code_filepath = os.path.join(
@@ -184,37 +182,36 @@ class GenService:
                 )
 
                 # 写入 init 文件
-                str_code_filepath = str(code_filepath)
-                code_folder = Path(str_code_filepath).parent
-                code_folder.mkdir(parents=True, exist_ok=True)
+                code_folder = anyio.Path(code_filepath).parent
+                await code_folder.mkdir(parents=True, exist_ok=True)
 
                 init_filepath = code_folder.joinpath('__init__.py')
-                if not os.path.exists(init_filepath):
-                    async with aiofiles.open(init_filepath, 'w', encoding='utf-8') as f:
+                if not await init_filepath.exists():
+                    async with await open_file(init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
 
                 # api __init__.py
-                if 'api' in str_code_filepath:
+                if 'api' in code_filepath:
                     api_init_filepath = code_folder.parent.joinpath('__init__.py')
-                    async with aiofiles.open(api_init_filepath, 'w', encoding='utf-8') as f:
+                    async with await open_file(api_init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
 
                 # app __init__.py
-                if 'service' in str_code_filepath:
+                if 'service' in code_filepath:
                     app_init_filepath = code_folder.parent.joinpath('__init__.py')
-                    async with aiofiles.open(app_init_filepath, 'w', encoding='utf-8') as f:
+                    async with await open_file(app_init_filepath, 'w', encoding='utf-8') as f:
                         await f.write(gen_template.init_content)
 
                 # model init 文件补充
                 if code_folder.name == 'model':
-                    async with aiofiles.open(init_filepath, 'a', encoding='utf-8') as f:
+                    async with await open_file(init_filepath, 'a', encoding='utf-8') as f:
                         await f.write(
                             f'from backend.app.{business.app_name}.model.{business.table_name} '
                             f'import {to_pascal(business.table_name)}\n',
                         )
 
                 # 写入代码文件
-                async with aiofiles.open(code_filepath, 'w', encoding='utf-8') as f:
+                async with await open_file(code_filepath, 'w', encoding='utf-8') as f:
                     await f.write(code)
 
         return gen_path

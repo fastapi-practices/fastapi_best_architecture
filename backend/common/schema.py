@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from typing import Annotated
 
@@ -14,8 +12,8 @@ class CustomEmailStr(EmailStr):
     """自定义邮箱类型"""
 
     @classmethod
-    def _validate(cls, __input_value: str) -> str:
-        return None if __input_value == '' else validate_email(__input_value)[1]
+    def _validate(cls, input_value: str, /) -> str:
+        return None if not input_value else validate_email(input_value)[1]
 
 
 class SchemaBase(BaseModel):
@@ -26,6 +24,6 @@ class SchemaBase(BaseModel):
         json_encoders={
             datetime: lambda x: timezone.to_str(timezone.from_datetime(x))
             if x.tzinfo is not None and x.tzinfo != timezone.tz_info
-            else timezone.to_str(x)
+            else timezone.to_str(x),
         },
     )

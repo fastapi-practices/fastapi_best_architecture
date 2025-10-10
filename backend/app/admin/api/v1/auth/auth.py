@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response
@@ -29,7 +27,10 @@ async def login_swagger(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def login(
-    request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
+    request: Request,
+    response: Response,
+    obj: AuthLoginParam,
+    background_tasks: BackgroundTasks,
 ) -> ResponseSchemaModel[GetLoginToken]:
     data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)

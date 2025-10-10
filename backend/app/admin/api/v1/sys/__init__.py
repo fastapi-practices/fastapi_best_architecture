@@ -1,5 +1,3 @@
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
 from backend.app.admin.api.v1.sys.data_rule import router as data_rule_router

@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# ruff: noqa: F403, F401, I001, RUF100
 import asyncio
 import os
+
 from logging.config import fileConfig
 
 from alembic import context
@@ -40,11 +38,12 @@ target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 alembic_config.set_main_option(
-    'sqlalchemy.url', SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False).replace('%', '%%')
+    'sqlalchemy.url',
+    SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False).replace('%', '%%'),
 )
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -73,7 +72,7 @@ def run_migrations_offline():
 
 def do_run_migrations(connection: Connection) -> None:
     # 当迁移无变化时，不生成迁移记录
-    def process_revision_directives(context, revision, directives):
+    def process_revision_directives(context, revision, directives) -> None:  # noqa: ANN001
         if alembic_config.cmd_opts.autogenerate:
             script = directives[0]
             if script.upgrade_ops.is_empty():

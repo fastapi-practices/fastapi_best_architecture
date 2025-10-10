@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 
@@ -51,7 +49,12 @@ class DictDataService:
 
     @staticmethod
     async def get_select(
-        *, type_code: str | None, label: str | None, value: str | None, status: int | None, type_id: int | None
+        *,
+        type_code: str | None,
+        label: str | None,
+        value: str | None,
+        status: int | None,
+        type_id: int | None,
     ) -> Select:
         """
         获取字典数据列表查询条件
@@ -64,7 +67,11 @@ class DictDataService:
         :return:
         """
         return await dict_data_dao.get_list(
-            type_code=type_code, label=label, value=value, status=status, type_id=type_id
+            type_code=type_code,
+            label=label,
+            value=value,
+            status=status,
+            type_id=type_id,
         )
 
     @staticmethod
@@ -97,9 +104,8 @@ class DictDataService:
             dict_data = await dict_data_dao.get(db, pk)
             if not dict_data:
                 raise errors.NotFoundError(msg='字典数据不存在')
-            if dict_data.label != obj.label:
-                if await dict_data_dao.get_by_label(db, obj.label):
-                    raise errors.ConflictError(msg='字典数据已存在')
+            if dict_data.label != obj.label and await dict_data_dao.get_by_label(db, obj.label):
+                raise errors.ConflictError(msg='字典数据已存在')
             dict_type = await dict_type_dao.get(db, obj.type_id)
             if not dict_type:
                 raise errors.NotFoundError(msg='字典类型不存在')

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -64,7 +62,7 @@ async def generate_code(pk: Annotated[int, Path(description='业务 ID')]) -> Re
 
 
 @router.get('/{pk}', summary='下载代码', dependencies=[DependsJwtAuth])
-async def download_code(pk: Annotated[int, Path(description='业务 ID')]):
+async def download_code(pk: Annotated[int, Path(description='业务 ID')]):  # noqa: ANN201
     bio = await gen_service.download(pk=pk)
     return StreamingResponse(
         bio,
