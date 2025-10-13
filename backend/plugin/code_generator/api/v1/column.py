@@ -6,6 +6,7 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.code_generator.schema.column import (
     CreateGenColumnParam,
     GetGenColumnDetail,
@@ -23,8 +24,10 @@ async def get_column_types() -> ResponseSchemaModel[list[str]]:
 
 
 @router.get('/{pk}', summary='获取代码生成模型列详情', dependencies=[DependsJwtAuth])
-async def get_column(pk: Annotated[int, Path(description='模型列 ID')]) -> ResponseSchemaModel[GetGenColumnDetail]:
-    data = await gen_column_service.get(pk=pk)
+async def get_column(
+    db: CurrentSession, pk: Annotated[int, Path(description='模型列 ID')]
+) -> ResponseSchemaModel[GetGenColumnDetail]:
+    data = await gen_column_service.get(db=db, pk=pk)
     return response_base.success(data=data)
 
 
@@ -36,8 +39,8 @@ async def get_column(pk: Annotated[int, Path(description='模型列 ID')]) -> Re
         DependsRBAC,
     ],
 )
-async def create_column(obj: CreateGenColumnParam) -> ResponseModel:
-    await gen_column_service.create(obj=obj)
+async def create_column(db: CurrentSessionTransaction, obj: CreateGenColumnParam) -> ResponseModel:
+    await gen_column_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -49,8 +52,10 @@ async def create_column(obj: CreateGenColumnParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_column(pk: Annotated[int, Path(description='模型列 ID')], obj: UpdateGenColumnParam) -> ResponseModel:
-    count = await gen_column_service.update(pk=pk, obj=obj)
+async def update_column(
+    db: CurrentSessionTransaction, pk: Annotated[int, Path(description='模型列 ID')], obj: UpdateGenColumnParam
+) -> ResponseModel:
+    count = await gen_column_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -64,8 +69,10 @@ async def update_column(pk: Annotated[int, Path(description='模型列 ID')], ob
         DependsRBAC,
     ],
 )
-async def delete_column(pk: Annotated[int, Path(description='模型列 ID')]) -> ResponseModel:
-    count = await gen_column_service.delete(pk=pk)
+async def delete_column(
+    db: CurrentSessionTransaction, pk: Annotated[int, Path(description='模型列 ID')]
+) -> ResponseModel:
+    count = await gen_column_service.delete(db=db, pk=pk)
     if count > 0:
         return response_base.success()
     return response_base.fail()

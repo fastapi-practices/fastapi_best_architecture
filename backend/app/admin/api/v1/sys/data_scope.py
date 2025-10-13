@@ -16,30 +16,32 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 
 router = APIRouter()
 
 
 @router.get('/all', summary='获取所有数据范围', dependencies=[DependsJwtAuth])
-async def get_all_data_scope() -> ResponseSchemaModel[list[GetDataScopeDetail]]:
-    data = await data_scope_service.get_all()
+async def get_all_data_scope(db: CurrentSession) -> ResponseSchemaModel[list[GetDataScopeDetail]]:
+    data = await data_scope_service.get_all(db=db)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据范围详情', dependencies=[DependsJwtAuth])
 async def get_data_scope(
+    db: CurrentSession,
     pk: Annotated[int, Path(description='数据范围 ID')],
 ) -> ResponseSchemaModel[GetDataScopeDetail]:
-    data = await data_scope_service.get(pk=pk)
+    data = await data_scope_service.get(db=db, pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/rules', summary='获取数据范围所有规则', dependencies=[DependsJwtAuth])
 async def get_data_scope_rules(
+    db: CurrentSession,
     pk: Annotated[int, Path(description='数据范围 ID')],
 ) -> ResponseSchemaModel[GetDataScopeWithRelationDetail]:
-    data = await data_scope_service.get_rules(pk=pk)
+    data = await data_scope_service.get_rules(db=db, pk=pk)
     return response_base.success(data=data)
 
 
@@ -69,8 +71,8 @@ async def get_data_scopes_paged(
         DependsRBAC,
     ],
 )
-async def create_data_scope(obj: CreateDataScopeParam) -> ResponseModel:
-    await data_scope_service.create(obj=obj)
+async def create_data_scope(db: CurrentSessionTransaction, obj: CreateDataScopeParam) -> ResponseModel:
+    await data_scope_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -83,10 +85,11 @@ async def create_data_scope(obj: CreateDataScopeParam) -> ResponseModel:
     ],
 )
 async def update_data_scope(
+    db: CurrentSessionTransaction,
     pk: Annotated[int, Path(description='数据范围 ID')],
     obj: UpdateDataScopeParam,
 ) -> ResponseModel:
-    count = await data_scope_service.update(pk=pk, obj=obj)
+    count = await data_scope_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -101,10 +104,11 @@ async def update_data_scope(
     ],
 )
 async def update_data_scope_rules(
+    db: CurrentSessionTransaction,
     pk: Annotated[int, Path(description='数据范围 ID')],
     rule_ids: UpdateDataScopeRuleParam,
 ) -> ResponseModel:
-    count = await data_scope_service.update_data_scope_rule(pk=pk, rule_ids=rule_ids)
+    count = await data_scope_service.update_data_scope_rule(db=db, pk=pk, rule_ids=rule_ids)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -118,8 +122,8 @@ async def update_data_scope_rules(
         DependsRBAC,
     ],
 )
-async def delete_data_scopes(obj: DeleteDataScopeParam) -> ResponseModel:
-    count = await data_scope_service.delete(obj=obj)
+async def delete_data_scopes(db: CurrentSessionTransaction, obj: DeleteDataScopeParam) -> ResponseModel:
+    count = await data_scope_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

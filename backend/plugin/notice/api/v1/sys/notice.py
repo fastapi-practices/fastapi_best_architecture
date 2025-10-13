@@ -7,7 +7,7 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.notice.schema.notice import (
     CreateNoticeParam,
     DeleteNoticeParam,
@@ -20,8 +20,10 @@ router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
-    notice = await notice_service.get(pk=pk)
+async def get_notice(
+    db: CurrentSession, pk: Annotated[int, Path(description='通知公告 ID')]
+) -> ResponseSchemaModel[GetNoticeDetail]:
+    notice = await notice_service.get(db=db, pk=pk)
     return response_base.success(data=notice)
 
 
@@ -52,8 +54,8 @@ async def get_notices_paged(
         DependsRBAC,
     ],
 )
-async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
-    await notice_service.create(obj=obj)
+async def create_notice(db: CurrentSessionTransaction, obj: CreateNoticeParam) -> ResponseModel:
+    await notice_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -65,8 +67,10 @@ async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam) -> ResponseModel:
-    count = await notice_service.update(pk=pk, obj=obj)
+async def update_notice(
+    db: CurrentSessionTransaction, pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam
+) -> ResponseModel:
+    count = await notice_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -80,8 +84,8 @@ async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')],
         DependsRBAC,
     ],
 )
-async def delete_notices(obj: DeleteNoticeParam) -> ResponseModel:
-    count = await notice_service.delete(obj=obj)
+async def delete_notices(db: CurrentSessionTransaction, obj: DeleteNoticeParam) -> ResponseModel:
+    count = await notice_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

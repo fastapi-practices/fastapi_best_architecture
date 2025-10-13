@@ -9,7 +9,7 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 
 router = APIRouter()
 
@@ -41,8 +41,8 @@ async def get_login_logs_paged(
         DependsRBAC,
     ],
 )
-async def delete_login_logs(obj: DeleteLoginLogParam) -> ResponseModel:
-    count = await login_log_service.delete(obj=obj)
+async def delete_login_logs(db: CurrentSessionTransaction, obj: DeleteLoginLogParam) -> ResponseModel:
+    count = await login_log_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -56,6 +56,6 @@ async def delete_login_logs(obj: DeleteLoginLogParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_all_login_logs() -> ResponseModel:
-    await login_log_service.delete_all()
+async def delete_all_login_logs(db: CurrentSessionTransaction) -> ResponseModel:
+    await login_log_service.delete_all(db=db)
     return response_base.success()

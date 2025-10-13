@@ -18,7 +18,7 @@ class {{ class_name }}Service:
         :param pk: {{ doc_comment }} ID
         :return:
         """
-        async with async_db_session() as db:
+
             {{ table_name }} = await {{ table_name }}_dao.get(db, pk)
             if not {{ table_name }}:
                 raise errors.NotFoundError(msg='{{ doc_comment }}不存在')
@@ -32,7 +32,7 @@ class {{ class_name }}Service:
     @staticmethod
     async def get_all() -> Sequence[{{ class_name }}]:
         """获取所有{{ doc_comment }}"""
-        async with async_db_session() as db:
+
             {{ table_name }}s = await {{ table_name }}_dao.get_all(db)
             return {{ table_name }}s
 
@@ -44,7 +44,7 @@ class {{ class_name }}Service:
         :param obj: 创建{{ doc_comment }}参数
         :return:
         """
-        async with async_db_session.begin() as db:
+
             await {{ table_name }}_dao.create(db, obj)
 
     @staticmethod
@@ -56,7 +56,7 @@ class {{ class_name }}Service:
         :param obj: 更新{{ doc_comment }}参数
         :return:
         """
-        async with async_db_session.begin() as db:
+
             count = await {{ table_name }}_dao.update(db, pk, obj)
             return count
 
@@ -68,7 +68,7 @@ class {{ class_name }}Service:
         :param obj: {{ doc_comment }} ID 列表
         :return:
         """
-        async with async_db_session.begin() as db:
+
             count = await {{ table_name }}_dao.delete(db, obj.pks)
             return count
 

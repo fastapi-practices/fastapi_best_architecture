@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.crud.crud_login_log import login_log_dao
 from backend.app.admin.schema.login_log import CreateLoginLogParam, DeleteLoginLogParam
 from backend.common.log import log
-from backend.database.db import async_db_session
 
 
 class LoginLogService:
@@ -69,22 +68,21 @@ class LoginLogService:
             log.error(f'登录日志创建失败: {e}')
 
     @staticmethod
-    async def delete(*, obj: DeleteLoginLogParam) -> int:
+    async def delete(*, db: AsyncSession, obj: DeleteLoginLogParam) -> int:
         """
         批量删除登录日志
 
+        :param db: 数据库会话
         :param obj: 日志 ID 列表
         :return:
         """
-        async with async_db_session.begin() as db:
-            count = await login_log_dao.delete(db, obj.pks)
-            return count
+        count = await login_log_dao.delete(db, obj.pks)
+        return count
 
     @staticmethod
-    async def delete_all() -> None:
+    async def delete_all(*, db: AsyncSession) -> None:
         """清空所有登录日志"""
-        async with async_db_session.begin() as db:
-            await login_log_dao.delete_all(db)
+        await login_log_dao.delete_all(db)
 
 
 login_log_service: LoginLogService = LoginLogService()
