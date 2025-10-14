@@ -265,7 +265,7 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
 
 def superuser_verify(request: Request) -> bool:
     """
-    验证当前用户权限
+    验证当前用户超级管理员权限
 
     :param request: FastAPI 请求对象
     :return:
@@ -307,3 +307,7 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
         # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
         user = GetUserInfoWithRelationDetail.model_validate(from_json(cache_user, allow_partial=True))
     return user
+
+
+# 超级管理员鉴权依赖注入
+DependsSuperUser = Depends(superuser_verify)
