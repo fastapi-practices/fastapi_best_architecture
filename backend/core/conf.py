@@ -150,7 +150,7 @@ class Settings(BaseSettings):
 
     # 日志
     LOG_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{request_id}</> | <lvl>{message}</>'
     )
 
     # 日志（控制台）
@@ -182,7 +182,7 @@ class Settings(BaseSettings):
         'new_password',
         'confirm_password',
     ]
-    OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 100
+    OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 1
     OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
     # Plugin 配置

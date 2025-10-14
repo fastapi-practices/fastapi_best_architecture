@@ -13,7 +13,6 @@ requires-python = ">=3.10"
 dynamic = ['version']
 dependencies = [
     "alembic>=1.16.5",
-    "asgi-correlation-id>=4.3.4",
     "asgiref>=3.10.0",
     "asyncmy>=0.2.10",
     "asyncpg>=0.30.0",
@@ -50,6 +49,7 @@ dependencies = [
     "sqlalchemy-crud-plus>=1.12.1",
     "sqlalchemy[asyncio]>=2.0.44",
     "sqlparse>=0.5.3",
+    "starlette-context>=0.4.0",
     "user-agents>=2.2.0",
 ]
 

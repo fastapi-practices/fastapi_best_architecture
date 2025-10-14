@@ -12,8 +12,6 @@ anyio==4.11.0
     #   httpx
     #   starlette
     #   watchfiles
-asgi-correlation-id==4.3.4
-    # via fastapi-best-architecture
 asgiref==3.10.0
     # via fastapi-best-architecture
 async-timeout==5.0.1 ; python_full_version < '3.11.3'
@@ -164,7 +162,6 @@ nodeenv==1.9.1
     # via pre-commit
 packaging==25.0
     # via
-    #   asgi-correlation-id
     #   kombu
     #   pytest
 pillow==11.3.0
@@ -270,8 +267,10 @@ sqlparse==0.5.3
     # via fastapi-best-architecture
 starlette==0.48.0
     # via
-    #   asgi-correlation-id
     #   fastapi
+    #   starlette-context
+starlette-context==0.4.0
+    # via fastapi-best-architecture
 termcolor==3.1.0
     # via pytest-sugar
 tomli==2.3.0 ; python_full_version < '3.11'

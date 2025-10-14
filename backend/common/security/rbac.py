@@ -1,4 +1,5 @@
 from fastapi import Depends, Request
+from starlette_context import context
 
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception import errors
@@ -49,7 +50,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  
 
     # RBAC 鉴权
     if settings.RBAC_ROLE_MENU_MODE:
-        path_auth_perm = getattr(request.state, 'permission', None)
+        path_auth_perm = context.get('permission')
 
         # 没有菜单操作权限标识不校验
         if not path_auth_perm:

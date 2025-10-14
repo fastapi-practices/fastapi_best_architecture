@@ -1,5 +1,6 @@
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette_context import context
 
 from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 
@@ -16,16 +17,16 @@ class StateMiddleware(BaseHTTPMiddleware):
         :return:
         """
         ip_info = await parse_ip_info(request)
-        request.state.ip = ip_info.ip
-        request.state.country = ip_info.country
-        request.state.region = ip_info.region
-        request.state.city = ip_info.city
+        context['ip'] = ip_info.ip
+        context['country'] = ip_info.country
+        context['region'] = ip_info.region
+        context['city'] = ip_info.city
 
         ua_info = parse_user_agent_info(request)
-        request.state.user_agent = ua_info.user_agent
-        request.state.os = ua_info.os
-        request.state.browser = ua_info.browser
-        request.state.device = ua_info.device
+        context['user_agent'] = ua_info.user_agent
+        context['os'] = ua_info.os
+        context['browser'] = ua_info.browser
+        context['device'] = ua_info.device
 
         response = await call_next(request)
 

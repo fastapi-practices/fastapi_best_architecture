@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 
 import socketio
 
-from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
@@ -14,10 +13,13 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 from starlette.types import ASGIApp
+from starlette_context.middleware import ContextMiddleware
+from starlette_context.plugins import RequestIdPlugin
 
 from backend import __version__
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
+from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_tables
@@ -154,8 +156,15 @@ def register_middleware(app: FastAPI) -> None:
     # Access log
     app.add_middleware(AccessMiddleware)
 
-    # Trace ID
-    app.add_middleware(CorrelationIdMiddleware, validator=False)
+    # ContextVar
+    app.add_middleware(
+        ContextMiddleware,
+        plugins=[RequestIdPlugin(validate=True)],
+        default_error_response=MsgSpecJSONResponse(
+            content={'code': StandardResponseCode.HTTP_400, 'msg': 'BAD_REQUEST', 'data': None},
+            status_code=StandardResponseCode.HTTP_400,
+        ),
+    )
 
 
 def register_router(app: FastAPI) -> None:
