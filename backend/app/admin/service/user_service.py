@@ -17,7 +17,7 @@ from backend.app.admin.schema.user import (
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
-from backend.common.security.jwt import get_token, jwt_decode, password_verify, superuser_verify
+from backend.common.security.jwt import get_token, jwt_decode, password_verify
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
@@ -69,16 +69,14 @@ class UserService:
         return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
-    async def create(*, request: Request, obj: AddUserParam) -> None:
+    async def create(*, obj: AddUserParam) -> None:
         """
         创建用户
 
-        :param request: FastAPI 请求对象
         :param obj: 用户添加参数
         :return:
         """
         async with async_db_session.begin() as db:
-            superuser_verify(request)
             if await user_dao.get_by_username(db, obj.username):
                 raise errors.ConflictError(msg='用户名已注册')
             obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
@@ -92,17 +90,15 @@ class UserService:
             await user_dao.add(db, obj)
 
     @staticmethod
-    async def update(*, request: Request, pk: int, obj: UpdateUserParam) -> int:
+    async def update(*, pk: int, obj: UpdateUserParam) -> int:
         """
         更新用户信息
 
-        :param request: FastAPI 请求对象
         :param pk: 用户 ID
         :param obj: 用户更新参数
         :return:
         """
         async with async_db_session.begin() as db:
-            superuser_verify(request)
             user = await user_dao.get_with_relation(db, user_id=pk)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -126,7 +122,6 @@ class UserService:
         :return:
         """
         async with async_db_session.begin() as db:
-            superuser_verify(request)
             match type:
                 case UserPermissionType.superuser:
                     user = await user_dao.get(db, pk)
@@ -178,17 +173,15 @@ class UserService:
         return count
 
     @staticmethod
-    async def reset_password(*, request: Request, pk: int, password: str) -> int:
+    async def reset_password(*, pk: int, password: str) -> int:
         """
         重置用户密码
 
-        :param request: FastAPI 请求对象
         :param pk: 用户 ID
         :param password: 新密码
         :return:
         """
         async with async_db_session.begin() as db:
-            superuser_verify(request)
             user = await user_dao.get(db, pk)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
