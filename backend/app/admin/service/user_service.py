@@ -80,7 +80,6 @@ class UserService:
         :return:
         """
 
-
         if await user_dao.get_by_username(db, obj.username):
             raise errors.ConflictError(msg='用户名已注册')
         obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
@@ -94,7 +93,7 @@ class UserService:
         await user_dao.add(db, obj)
 
     @staticmethod
-    async def update(*, db: AsyncSession,  pk: int, obj: UpdateUserParam) -> int:
+    async def update(*, db: AsyncSession, pk: int, obj: UpdateUserParam) -> int:
         """
         更新用户信息
 
@@ -103,7 +102,6 @@ class UserService:
         :param obj: 用户更新参数
         :return:
         """
-
 
         user = await user_dao.get_with_relation(db, user_id=pk)
         if not user:
@@ -128,7 +126,6 @@ class UserService:
         :param type: 权限类型
         :return:
         """
-
 
         match type:
             case UserPermissionType.superuser:
@@ -190,7 +187,6 @@ class UserService:
         :param password: 新密码
         :return:
         """
-
 
         user = await user_dao.get(db, pk)
         if not user:
