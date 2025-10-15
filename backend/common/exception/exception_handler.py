@@ -2,9 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
-from starlette_context import context
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
+from backend.common.context import ctx
 from backend.common.exception.errors import BaseExceptionError
 from backend.common.i18n import i18n, t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
@@ -73,7 +73,7 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
         'msg': msg,
         'data': data,
     }
-    context['__request_validation_exception__'] = content  # 用于在中间件中获取异常信息
+    ctx.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
     content.update(trace_id=get_request_trace_id())
     return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_422, content=content)
 
@@ -97,7 +97,7 @@ def register_exception(app: FastAPI) -> None:
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_400)
             content = res.model_dump()
-        context['__request_http_exception__'] = content
+        ctx.__request_http_exception__ = content
         content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=_get_exception_code(exc.status_code),
@@ -145,7 +145,7 @@ def register_exception(app: FastAPI) -> None:
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_500)
             content = res.model_dump()
-        context['__request_assertion_error__'] = content
+        ctx.__request_assertion_error__ = content
         content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
@@ -166,7 +166,7 @@ def register_exception(app: FastAPI) -> None:
             'msg': str(exc.msg),
             'data': exc.data or None,
         }
-        context['__request_custom_exception__'] = content
+        ctx.__request_custom_exception__ = content
         content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=_get_exception_code(exc.code),

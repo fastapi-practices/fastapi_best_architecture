@@ -8,10 +8,10 @@ from fastapi import Response
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette_context import context
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
+from backend.common.context import ctx
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.common.queue import batch_dequeue
@@ -70,7 +70,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 log.error(f'请求异常: {e!s}')
 
             # 应用内接口流程总耗时（非精准）
-            elapsed = (time.perf_counter() - context.get('perf_time')) * 1000
+            elapsed = (time.perf_counter() - ctx.perf_time) * 1000
 
             # 此信息只能在请求后获取
             route = request.scope.get('route')
@@ -84,7 +84,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
             # 日志记录
             log.debug(f'接口摘要：[{summary}]')
-            log.debug(f'请求地址：[{context.get("ip")}]')
+            log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
 
             # 日志创建
@@ -94,20 +94,20 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 method=method,
                 title=summary,
                 path=path,
-                ip=context.get('ip'),
-                country=context.get('country'),
-                region=context.get('region'),
-                city=context.get('city'),
-                user_agent=context.get('user_agent'),
-                os=context.get('os'),
-                browser=context.get('browser'),
-                device=context.get('device'),
+                ip=ctx.ip,
+                country=ctx.country,
+                region=ctx.region,
+                city=ctx.city,
+                user_agent=ctx.user_agent,
+                os=ctx.os,
+                browser=ctx.browser,
+                device=ctx.device,
                 args=args,
                 status=status,
                 code=str(code),
                 msg=msg,
                 cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
-                opera_time=context.get('start_time'),
+                opera_time=ctx.start_time,
             )
             await self.opera_log_queue.put(opera_log_in)
 

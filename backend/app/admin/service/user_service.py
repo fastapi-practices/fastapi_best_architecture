@@ -4,7 +4,6 @@ from collections.abc import Sequence
 
 from fastapi import Request
 from sqlalchemy import Select
-from starlette_context import context
 
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.crud.crud_role import role_dao
@@ -15,6 +14,7 @@ from backend.app.admin.schema.user import (
     ResetPasswordParam,
     UpdateUserParam,
 )
+from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
@@ -257,12 +257,12 @@ class UserService:
             user = await user_dao.get(db, token_payload.id)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{context.get("ip")}')
+            captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
             if not captcha_code:
                 raise errors.RequestError(msg='验证码已失效，请重新获取')
             if captcha != captcha_code:
                 raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-            await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{context.get("ip")}')
+            await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
             count = await user_dao.update_email(db, token_payload.id, email)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count

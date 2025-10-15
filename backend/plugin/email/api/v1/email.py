@@ -3,8 +3,8 @@ import random
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Request
-from starlette_context import context
 
+from backend.common.context import ctx
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
@@ -22,7 +22,7 @@ async def send_email_captcha(
     recipients: Annotated[str | list[str], Body(embed=True, description='邮件接收者')],
 ) -> ResponseModel:
     code = ''.join([str(random.randint(1, 9)) for _ in range(6)])
-    ip = context.get('ip')
+    ip = ctx.ip
     await redis_client.set(
         f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{ip}',
         code,

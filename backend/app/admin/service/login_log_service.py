@@ -3,10 +3,10 @@ from datetime import datetime
 from fastapi import Request
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette_context import context
 
 from backend.app.admin.crud.crud_login_log import login_log_dao
 from backend.app.admin.schema.login_log import CreateLoginLogParam, DeleteLoginLogParam
+from backend.common.context import ctx
 from backend.common.log import log
 from backend.database.db import async_db_session
 
@@ -54,14 +54,14 @@ class LoginLogService:
                 user_uuid=user_uuid,
                 username=username,
                 status=status,
-                ip=context.get('ip'),
-                country=context.get('country'),
-                region=context.get('region'),
-                city=context.get('city'),
-                user_agent=context.get('user_agent'),
-                browser=context.get('browser'),
-                os=context.get('os'),
-                device=context.get('device'),
+                ip=ctx.ip,
+                country=ctx.country,
+                region=ctx.region,
+                city=ctx.city,
+                user_agent=ctx.user_agent,
+                browser=ctx.browser,
+                os=ctx.os,
+                device=ctx.device,
                 msg=msg,
                 login_time=login_time,
             )
