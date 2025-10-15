@@ -50,6 +50,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             error = None
             try:
                 response = await call_next(request)
+                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
                 for e in [
                     '__request_http_exception__',
                     '__request_validation_exception__',
@@ -63,14 +64,12 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         log.error(f'请求异常: {msg}')
                         break
             except Exception as e:
+                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
                 code = getattr(e, 'code', StandardResponseCode.HTTP_500)  # 兼容 SQLAlchemy 异常用法
                 msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
                 error = e
                 log.error(f'请求异常: {e!s}')
-
-            # 应用内接口流程总耗时（非精准）
-            elapsed = (time.perf_counter() - ctx.perf_time) * 1000
 
             # 此信息只能在请求后获取
             route = request.scope.get('route')
