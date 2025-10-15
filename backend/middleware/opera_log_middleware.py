@@ -50,13 +50,13 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             error = None
             try:
                 response = await call_next(request)
-                for state in [
+                for e in [
                     '__request_http_exception__',
                     '__request_validation_exception__',
                     '__request_assertion_error__',
                     '__request_custom_exception__',
                 ]:
-                    exception = getattr(request.state, state, None)
+                    exception = ctx.get(e)
                     if exception:
                         code = exception.get('code')
                         msg = exception.get('msg')
