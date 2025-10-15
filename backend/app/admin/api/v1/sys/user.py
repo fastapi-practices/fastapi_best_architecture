@@ -14,7 +14,7 @@ from backend.app.admin.service.user_service import user_service
 from backend.common.enums import UserPermissionType
 from backend.common.pagination import DependsPagination, PageData, paging_data
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.jwt import DependsJwtAuth, DependsSuperUser
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession, CurrentSessionTransaction
@@ -65,29 +65,28 @@ async def get_users_paged(
     return response_base.success(data=page_data)
 
 
-@router.post('', summary='创建用户', dependencies=[DependsRBAC])
+@router.post('', summary='创建用户', dependencies=[DependsSuperUser])
 async def create_user(
-    db: CurrentSessionTransaction, request: Request, obj: AddUserParam
+    db: CurrentSessionTransaction, obj: AddUserParam
 ) -> ResponseSchemaModel[GetUserInfoWithRelationDetail]:
-    await user_service.create(db=db, request=request, obj=obj)
+    await user_service.create(db=db, obj=obj)
     data = await user_service.get_userinfo(db=db, username=obj.username)
     return response_base.success(data=data)
 
 
-@router.put('/{pk}', summary='更新用户信息', dependencies=[DependsRBAC])
+@router.put('/{pk}', summary='更新用户信息', dependencies=[DependsSuperUser])
 async def update_user(
     db: CurrentSessionTransaction,
-    request: Request,
     pk: Annotated[int, Path(description='用户 ID')],
     obj: UpdateUserParam,
 ) -> ResponseModel:
-    count = await user_service.update(db=db, request=request, pk=pk, obj=obj)
+    count = await user_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
 
 
-@router.put('/{pk}/permissions', summary='更新用户权限', dependencies=[DependsRBAC])
+@router.put('/{pk}/permissions', summary='更新用户权限', dependencies=[DependsSuperUser])
 async def update_user_permission(
     db: CurrentSessionTransaction,
     request: Request,
@@ -110,14 +109,13 @@ async def update_user_password(
     return response_base.fail()
 
 
-@router.put('/{pk}/password', summary='重置用户密码', dependencies=[DependsRBAC])
+@router.put('/{pk}/password', summary='重置用户密码', dependencies=[DependsSuperUser])
 async def reset_user_password(
     db: CurrentSessionTransaction,
-    request: Request,
     pk: Annotated[int, Path(description='用户 ID')],
     password: Annotated[str, Body(embed=True, description='新密码')],
 ) -> ResponseModel:
-    count = await user_service.reset_password(db=db, request=request, pk=pk, password=password)
+    count = await user_service.reset_password(db=db, pk=pk, password=password)
     if count > 0:
         return response_base.success()
     return response_base.fail()

@@ -1,3 +1,21 @@
+<a id="v1.8.3"></a>
+# [v1.8.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.3) - 2025-10-13
+
+## What's Changed
+* Update changelog for v1.8.2 by [@wu-clan](https://github.com/wu-clan) in [#841](https://github.com/fastapi-practices/fastapi_best_architecture/pull/841)
+* Fix the pgsql script in dict plugin by [@wu-clan](https://github.com/wu-clan) in [#842](https://github.com/fastapi-practices/fastapi_best_architecture/pull/842)
+* Fix SQL script syntax error in config plugin by [@wu-clan](https://github.com/wu-clan) in [#843](https://github.com/fastapi-practices/fastapi_best_architecture/pull/843)
+* Bump dependencies and pre-commits by [@wu-clan](https://github.com/wu-clan) in [#845](https://github.com/fastapi-practices/fastapi_best_architecture/pull/845)
+* Update the ruff rules and format the code by [@wu-clan](https://github.com/wu-clan) in [#846](https://github.com/fastapi-practices/fastapi_best_architecture/pull/846)
+* Bump fastapi and sqlalchemy to support python 3.14 by [@wu-clan](https://github.com/wu-clan) in [#847](https://github.com/fastapi-practices/fastapi_best_architecture/pull/847)
+* Bump sqlalchemy-crud-plus from 0.12.0 to 0.12.1 by [@wu-clan](https://github.com/wu-clan) in [#848](https://github.com/fastapi-practices/fastapi_best_architecture/pull/848)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
+
+[Changes][v1.8.3]
+
+
 <a id="v1.8.2"></a>
 # [v1.8.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.2) - 2025-09-26
 
@@ -837,6 +855,7 @@
 [Changes][v1.0.0]
 
 
+[v1.8.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
 [v1.8.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
