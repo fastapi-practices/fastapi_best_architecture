@@ -6,7 +6,6 @@ import sys
 
 from loguru import logger
 
-from backend.common.context import ctx
 from backend.core.conf import settings
 from backend.core.path_conf import LOG_DIR
 from backend.utils.timezone import timezone
@@ -78,12 +77,8 @@ def setup_logging() -> None:
 
     # request_id 过滤器
     def request_id_filter(record: logging.LogRecord) -> logging.LogRecord:
-        if ctx.exists():
-            rid = get_request_trace_id()
-            record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
-        else:
-            record['request_id'] = settings.TRACE_ID_LOG_DEFAULT_VALUE
-
+        rid = get_request_trace_id()
+        record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
         return record
 
     # 配置 loguru 处理器
