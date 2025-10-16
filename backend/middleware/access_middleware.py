@@ -3,6 +3,7 @@ import time
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
+from backend.common.context import ctx
 from backend.common.log import log
 from backend.utils.timezone import timezone
 
@@ -24,21 +25,19 @@ class AccessMiddleware(BaseHTTPMiddleware):
             log.debug(f'--> 请求开始[{path}]')
 
         perf_time = time.perf_counter()
-        request.state.perf_time = perf_time
+        ctx.perf_time = perf_time
 
         start_time = timezone.now()
-        request.state.start_time = start_time
+        ctx.start_time = start_time
 
         response = await call_next(request)
-
-        elapsed = (time.perf_counter() - perf_time) * 1000
 
         if request.method != 'OPTIONS':
             log.debug('<-- 请求结束')
 
             log.info(
                 f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
-                f'{path} | {elapsed:.3f}ms',
+                f'{path} | {(time.perf_counter() - perf_time) * 1000:.3f}ms',
             )
 
         return response

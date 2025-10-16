@@ -4,12 +4,13 @@ import os
 import re
 import sys
 
-from asgi_correlation_id import correlation_id
 from loguru import logger
 
+from backend.common.context import ctx
 from backend.core.conf import settings
 from backend.core.path_conf import LOG_DIR
 from backend.utils.timezone import timezone
+from backend.utils.trace_id import get_request_trace_id
 
 
 class InterceptHandler(logging.Handler):
@@ -75,11 +76,14 @@ def setup_logging() -> None:
     # 移除 loguru 默认处理器
     logger.remove()
 
-    # correlation_id 过滤器
-    # https://github.com/snok/asgi-correlation-id/issues/7
-    def correlation_id_filter(record: logging.LogRecord) -> logging.LogRecord:
-        cid = correlation_id.get(settings.TRACE_ID_LOG_DEFAULT_VALUE)
-        record['correlation_id'] = cid[: settings.TRACE_ID_LOG_LENGTH]
+    # request_id 过滤器
+    def request_id_filter(record: logging.LogRecord) -> logging.LogRecord:
+        if ctx.exists():
+            rid = get_request_trace_id()
+            record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
+        else:
+            record['request_id'] = settings.TRACE_ID_LOG_DEFAULT_VALUE
+
         return record
 
     # 配置 loguru 处理器
@@ -89,7 +93,7 @@ def setup_logging() -> None:
                 'sink': sys.stdout,
                 'level': settings.LOG_STD_LEVEL,
                 'format': default_formatter,
-                'filter': lambda record: correlation_id_filter(record),
+                'filter': lambda record: request_id_filter(record),
             },
         ],
     )

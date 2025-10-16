@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_login_log import login_log_dao
 from backend.app.admin.schema.login_log import CreateLoginLogParam, DeleteLoginLogParam
+from backend.common.context import ctx
 from backend.common.log import log
 
 
@@ -52,14 +53,14 @@ class LoginLogService:
                 user_uuid=user_uuid,
                 username=username,
                 status=status,
-                ip=request.state.ip,
-                country=request.state.country,
-                region=request.state.region,
-                city=request.state.city,
-                user_agent=request.state.user_agent,
-                browser=request.state.browser,
-                os=request.state.os,
-                device=request.state.device,
+                ip=ctx.ip,
+                country=ctx.country,
+                region=ctx.region,
+                city=ctx.city,
+                user_agent=ctx.user_agent,
+                browser=ctx.browser,
+                os=ctx.os,
+                device=ctx.device,
                 msg=msg,
                 login_time=login_time,
             )
