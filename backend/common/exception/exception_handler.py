@@ -33,11 +33,10 @@ def _get_exception_code(status_code: int) -> int:
     return status_code
 
 
-async def _validation_exception_handler(request: Request, exc: RequestValidationError | ValidationError):
+async def _validation_exception_handler(exc: RequestValidationError | ValidationError):
     """
     数据验证异常处理
 
-    :param request: 请求对象
     :param exc: 验证异常
     :return:
     """
@@ -114,7 +113,7 @@ def register_exception(app: FastAPI) -> None:
         :param exc: 验证异常
         :return:
         """
-        return await _validation_exception_handler(request, exc)
+        return await _validation_exception_handler(exc)
 
     @app.exception_handler(ValidationError)
     async def pydantic_validation_exception_handler(request: Request, exc: ValidationError):
@@ -125,7 +124,7 @@ def register_exception(app: FastAPI) -> None:
         :param exc: 验证异常
         :return:
         """
-        return await _validation_exception_handler(request, exc)
+        return await _validation_exception_handler(exc)
 
     @app.exception_handler(AssertionError)
     async def assertion_error_handler(request: Request, exc: AssertionError):

@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import (
@@ -44,15 +45,17 @@ class ConfigService:
         return await config_dao.get_all(db, type)
 
     @staticmethod
-    async def get_select(*, name: str | None, type: str | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None, type: str | None) -> dict[str, Any]:
         """
-        获取参数配置列表查询条件
+        获取参数配置列表
 
+        :param db: 数据库会话
         :param name: 参数配置名称
         :param type: 参数配置类型
         :return:
         """
-        return await config_dao.get_list(name=name, type=type)
+        config_select = await config_dao.get_select(name=name, type=type)
+        return await paging_data(db, config_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateConfigParam) -> None:

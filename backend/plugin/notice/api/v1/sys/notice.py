@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -35,14 +35,13 @@ async def get_notice(
         DependsPagination,
     ],
 )
-async def get_notices_paged(
+async def get_notices_paginated(
     db: CurrentSession,
     title: Annotated[str | None, Query(description='标题')] = None,
     type: Annotated[int | None, Query(description='类型')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
-    notice_select = await notice_service.get_select(title=title, type=type, status=status)
-    page_data = await paging_data(db, notice_select)
+    page_data = await notice_service.get_list(db=db, title=title, type=type, status=status)
     return response_base.success(data=page_data)
 
 

@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -51,7 +51,7 @@ async def get_dict_data_by_type_code(
         DependsPagination,
     ],
 )
-async def get_dict_datas_paged(
+async def get_dict_datas_paginated(
     db: CurrentSession,
     type_code: Annotated[str | None, Query(description='字典类型编码')] = None,
     label: Annotated[str | None, Query(description='字典数据标签')] = None,
@@ -59,14 +59,14 @@ async def get_dict_datas_paged(
     status: Annotated[int | None, Query(description='状态')] = None,
     type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
-    dict_data_select = await dict_data_service.get_select(
+    page_data = await dict_data_service.get_list(
+        db=db,
         type_code=type_code,
         label=label,
         value=value,
         status=status,
         type_id=type_id,
     )
-    page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
 
 

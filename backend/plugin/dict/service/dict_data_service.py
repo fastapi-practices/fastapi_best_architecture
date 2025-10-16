@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictData
@@ -55,17 +56,19 @@ class DictDataService:
         return dict_datas
 
     @staticmethod
-    async def get_select(
+    async def get_list(
         *,
+        db: AsyncSession,
         type_code: str | None,
         label: str | None,
         value: str | None,
         status: int | None,
         type_id: int | None,
-    ) -> Select:
+    ) -> dict[str, Any]:
         """
-        获取字典数据列表查询条件
+        获取字典数据列表
 
+        :param db: 数据库会话
         :param type_code: 字典类型编码
         :param label: 字典数据标签
         :param value: 字典数据键值
@@ -73,13 +76,14 @@ class DictDataService:
         :param type_id: 字典类型 ID
         :return:
         """
-        return await dict_data_dao.get_list(
+        dict_data_select = await dict_data_dao.get_select(
             type_code=type_code,
             label=label,
             value=value,
             status=status,
             type_id=type_id,
         )
+        return await paging_data(db, dict_data_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateDictDataParam) -> None:

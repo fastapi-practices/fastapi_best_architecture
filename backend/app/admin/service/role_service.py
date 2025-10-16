@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
@@ -16,6 +15,7 @@ from backend.app.admin.schema.role import (
     UpdateRoleScopeParam,
 )
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
@@ -52,15 +52,17 @@ class RoleService:
         return roles
 
     @staticmethod
-    async def get_select(*, name: str | None, status: int | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None, status: int | None) -> dict[str, Any]:
         """
-        获取角色列表查询条件
+        获取角色列表
 
+        :param db: 数据库会话
         :param name: 角色名称
         :param status: 状态
         :return:
         """
-        return await role_dao.get_list(name=name, status=status)
+        role_select = await role_dao.get_select(name=name, status=status)
+        return await paging_data(db, role_select)
 
     @staticmethod
     async def get_menu_tree(*, db: AsyncSession, pk: int) -> list[dict[str, Any] | None]:

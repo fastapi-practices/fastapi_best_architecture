@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -43,12 +43,11 @@ async def get_business(
         DependsPagination,
     ],
 )
-async def get_businesses_paged(
+async def get_businesses_paginated(
     db: CurrentSession,
     table_name: Annotated[str | None, Query(description='代码生成业务表名称')] = None,
 ) -> ResponseSchemaModel[PageData[GetGenBusinessDetail]]:
-    business_select = await gen_business_service.get_select(table_name=table_name)
-    page_data = await paging_data(db, business_select)
+    page_data = await gen_business_service.get_list(db=db, table_name=table_name)
     return response_base.success(data=page_data)
 
 

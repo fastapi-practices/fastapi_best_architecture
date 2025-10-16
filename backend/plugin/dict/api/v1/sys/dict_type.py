@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -42,13 +42,12 @@ async def get_dict_type(
         DependsPagination,
     ],
 )
-async def get_dict_types_paged(
+async def get_dict_types_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='字典类型名称')] = None,
     code: Annotated[str | None, Query(description='字典类型编码')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
-    dict_type_select = await dict_type_service.get_select(name=name, code=code)
-    page_data = await paging_data(db, dict_type_select)
+    page_data = await dict_type_service.get_list(db=db, name=name, code=code)
     return response_base.success(data=page_data)
 
 

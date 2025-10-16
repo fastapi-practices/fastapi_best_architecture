@@ -1,9 +1,9 @@
 import random
 
 from collections.abc import Sequence
+from typing import Any
 
 from fastapi import Request
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_dept import dept_dao
@@ -18,6 +18,7 @@ from backend.app.admin.schema.user import (
 from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import get_token, jwt_decode, password_verify
 from backend.core.conf import settings
@@ -37,7 +38,6 @@ class UserService:
         :param username: 用户名
         :return:
         """
-
         user = await user_dao.get_with_relation(db, user_id=pk, username=username)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
@@ -52,24 +52,25 @@ class UserService:
         :param pk: 用户 ID
         :return:
         """
-
         user = await user_dao.get_with_relation(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         return user.roles
 
     @staticmethod
-    async def get_select(*, dept: int, username: str, phone: str, status: int) -> Select:
+    async def get_list(*, db: AsyncSession, dept: int, username: str, phone: str, status: int) -> dict[str, Any]:
         """
-        获取用户列表查询条件
+        获取用户列表
 
+        :param db: 数据库会话
         :param dept: 部门 ID
         :param username: 用户名
         :param phone: 手机号
         :param status: 状态
         :return:
         """
-        return await user_dao.get_list(dept=dept, username=username, phone=phone, status=status)
+        user_select = await user_dao.get_select(dept=dept, username=username, phone=phone, status=status)
+        return await paging_data(db, user_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: AddUserParam) -> None:
@@ -80,7 +81,6 @@ class UserService:
         :param obj: 用户添加参数
         :return:
         """
-
         if await user_dao.get_by_username(db, obj.username):
             raise errors.ConflictError(msg='用户名已注册')
         obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
@@ -103,7 +103,6 @@ class UserService:
         :param obj: 用户更新参数
         :return:
         """
-
         user = await user_dao.get_with_relation(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
@@ -127,7 +126,6 @@ class UserService:
         :param type: 权限类型
         :return:
         """
-
         match type:
             case UserPermissionType.superuser:
                 user = await user_dao.get(db, pk)
@@ -188,7 +186,6 @@ class UserService:
         :param password: 新密码
         :return:
         """
-
         user = await user_dao.get(db, pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
@@ -212,7 +209,6 @@ class UserService:
         :param nickname: 用户昵称
         :return:
         """
-
         token = get_token(request)
         token_payload = jwt_decode(token)
         user = await user_dao.get(db, token_payload.id)
@@ -232,7 +228,6 @@ class UserService:
         :param avatar: 头像地址
         :return:
         """
-
         token = get_token(request)
         token_payload = jwt_decode(token)
         user = await user_dao.get(db, token_payload.id)
@@ -253,7 +248,6 @@ class UserService:
         :param email: 邮箱
         :return:
         """
-
         token = get_token(request)
         token_payload = jwt_decode(token)
         user = await user_dao.get(db, token_payload.id)
@@ -279,7 +273,6 @@ class UserService:
         :param obj: 密码重置参数
         :return:
         """
-
         token = get_token(request)
         token_payload = jwt_decode(token)
         user = await user_dao.get(db, token_payload.id)
@@ -308,7 +301,6 @@ class UserService:
         :param pk: 用户 ID
         :return:
         """
-
         user = await user_dao.get(db, pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')

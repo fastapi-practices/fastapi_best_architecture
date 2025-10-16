@@ -11,7 +11,7 @@ from backend.app.admin.schema.data_scope import (
     UpdateDataScopeRuleParam,
 )
 from backend.app.admin.service.data_scope_service import data_scope_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -53,13 +53,12 @@ async def get_data_scope_rules(
         DependsPagination,
     ],
 )
-async def get_data_scopes_paged(
+async def get_data_scopes_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='范围名称')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetDataScopeDetail]]:
-    data_scope_select = await data_scope_service.get_select(name=name, status=status)
-    page_data = await paging_data(db, data_scope_select)
+    page_data = await data_scope_service.get_list(db=db, name=name, status=status)
     return response_base.success(data=page_data)
 
 

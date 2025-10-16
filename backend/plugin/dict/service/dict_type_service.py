@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
@@ -39,15 +40,17 @@ class DictTypeService:
         return dict_datas
 
     @staticmethod
-    async def get_select(*, name: str | None, code: str | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None, code: str | None) -> dict[str, Any]:
         """
-        获取字典类型列表查询条件
+        获取字典类型列表
 
+        :param db: 数据库会话
         :param name: 字典类型名称
         :param code: 字典类型编码
         :return:
         """
-        return await dict_type_dao.get_list(name=name, code=code)
+        dict_type_select = await dict_type_dao.get_select(name=name, code=code)
+        return await paging_data(db, dict_type_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateDictTypeParam) -> None:

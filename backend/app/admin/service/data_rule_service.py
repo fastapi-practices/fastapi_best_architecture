@@ -1,6 +1,6 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_rule import data_rule_dao
@@ -12,6 +12,7 @@ from backend.app.admin.schema.data_rule import (
     UpdateDataRuleParam,
 )
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.utils.import_parse import dynamic_import_data_model
 
@@ -59,14 +60,16 @@ class DataRuleService:
         return model_columns
 
     @staticmethod
-    async def get_select(*, name: str | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None) -> dict[str, Any]:
         """
-        获取数据规则列表查询条件
+        获取数据规则列表
 
+        :param db: 数据库会话
         :param name: 规则名称
         :return:
         """
-        return await data_rule_dao.get_list(name=name)
+        data_rule_select = await data_rule_dao.get_select(name=name)
+        return await paging_data(db, data_rule_select)
 
     @staticmethod
     async def get_all(*, db: AsyncSession) -> Sequence[DataRule]:

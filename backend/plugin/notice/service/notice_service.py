@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.notice.crud.crud_notice import notice_dao
 from backend.plugin.notice.model import Notice
 from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, UpdateNoticeParam
@@ -28,9 +29,18 @@ class NoticeService:
         return notice
 
     @staticmethod
-    async def get_select(title: str | None, type: int | None, status: int | None) -> Select:
-        """获取通知公告查询对象"""
-        return await notice_dao.get_list(title, type, status)
+    async def get_list(db: AsyncSession, title: str | None, type: int | None, status: int | None) -> dict[str, Any]:
+        """
+        获取通知公告列表
+
+        :param db: 数据库会话
+        :param title: 通知公告标题
+        :param type: 通知公告类型
+        :param status: 通知公告状态
+        :return:
+        """
+        notice_select = await notice_dao.get_select(title, type, status)
+        return await paging_data(db, notice_select)
 
     @staticmethod
     async def get_all(*, db: AsyncSession) -> Sequence[Notice]:

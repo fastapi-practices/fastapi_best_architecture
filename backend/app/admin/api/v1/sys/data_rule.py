@@ -10,7 +10,7 @@ from backend.app.admin.schema.data_rule import (
     UpdateDataRuleParam,
 )
 from backend.app.admin.service.data_rule_service import data_rule_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -57,12 +57,11 @@ async def get_data_rule(
         DependsPagination,
     ],
 )
-async def get_data_rules_paged(
+async def get_data_rules_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='规则名称')] = None,
 ) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
-    data_rule_select = await data_rule_service.get_select(name=name)
-    page_data = await paging_data(db, data_rule_select)
+    page_data = await data_rule_service.get_list(db=db, name=name)
     return response_base.success(data=page_data)
 
 

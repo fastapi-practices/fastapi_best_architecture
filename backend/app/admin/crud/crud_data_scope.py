@@ -50,9 +50,9 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         """
         return await self.select_models(db)
 
-    async def get_list(self, name: str | None, status: int | None) -> Select:
+    async def get_select(self, name: str | None, status: int | None) -> Select:
         """
-        获取数据范围列表
+        获取数据范围列表查询表达式
 
         :param name: 范围名称
         :param status: 范围状态

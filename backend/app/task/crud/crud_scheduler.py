@@ -31,9 +31,9 @@ class CRUDTaskScheduler(CRUDPlus[TaskScheduler]):
         """
         return await self.select_models(db)
 
-    async def get_list(self, name: str | None, type: int | None) -> Select:
+    async def get_select(self, name: str | None, type: int | None) -> Select:
         """
-        获取任务调度列表
+        获取任务调度列表查询表达式
 
         :param name: 任务调度名称
         :param type: 任务调度类型

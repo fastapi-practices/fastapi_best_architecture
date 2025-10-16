@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.task.schema.result import DeleteTaskResultParam, GetTaskResultDetail
 from backend.app.task.service.result_service import task_result_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -31,13 +31,12 @@ async def get_task_result(
         DependsPagination,
     ],
 )
-async def get_task_results_paged(
+async def get_task_results_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='任务名称')] = None,
     task_id: Annotated[str | None, Query(description='任务 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetTaskResultDetail]]:
-    result_select = await task_result_service.get_select(name=name, task_id=task_id)
-    page_data = await paging_data(db, result_select)
+    page_data = await task_result_service.get_list(db=db, name=name, task_id=task_id)
     return response_base.success(data=page_data)
 
 

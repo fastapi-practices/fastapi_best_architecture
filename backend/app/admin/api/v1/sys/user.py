@@ -12,7 +12,7 @@ from backend.app.admin.schema.user import (
 )
 from backend.app.admin.service.user_service import user_service
 from backend.common.enums import UserPermissionType
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth, DependsSuperUser
 from backend.common.security.permission import RequestPermission
@@ -53,15 +53,14 @@ async def get_user_roles(
         DependsPagination,
     ],
 )
-async def get_users_paged(
+async def get_users_paginated(
     db: CurrentSession,
     dept: Annotated[int | None, Query(description='部门 ID')] = None,
     username: Annotated[str | None, Query(description='用户名')] = None,
     phone: Annotated[str | None, Query(description='手机号')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetUserInfoWithRelationDetail]]:
-    user_select = await user_service.get_select(dept=dept, username=username, phone=phone, status=status)
-    page_data = await paging_data(db, user_select)
+    page_data = await user_service.get_list(db=db, dept=dept, username=username, phone=phone, status=status)
     return response_base.success(data=page_data)
 
 

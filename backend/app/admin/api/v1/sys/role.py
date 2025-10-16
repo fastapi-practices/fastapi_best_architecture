@@ -13,7 +13,7 @@ from backend.app.admin.schema.role import (
     UpdateRoleScopeParam,
 )
 from backend.app.admin.service.role_service import role_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
@@ -62,13 +62,12 @@ async def get_role(
         DependsPagination,
     ],
 )
-async def get_roles_paged(
+async def get_roles_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='角色名称')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetRoleDetail]]:
-    role_select = await role_service.get_select(name=name, status=status)
-    page_data = await paging_data(db, role_select)
+    page_data = await role_service.get_list(db=db, name=name, status=status)
     return response_base.success(data=page_data)
 
 

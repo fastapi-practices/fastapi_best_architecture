@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.model import GenBusiness
 from backend.plugin.code_generator.schema.business import CreateGenBusinessParam, UpdateGenBusinessParam
@@ -39,14 +40,16 @@ class GenBusinessService:
         return await gen_business_dao.get_all(db)
 
     @staticmethod
-    async def get_select(*, table_name: str) -> Select:
+    async def get_list(*, db: AsyncSession, table_name: str) -> dict[str, Any]:
         """
-        获取代码生成业务列表查询条件
+        获取代码生成业务列表
 
+        :param db: 数据库会话
         :param table_name: 业务表名
         :return:
         """
-        return await gen_business_dao.get_list(table_name=table_name)
+        business_select = await gen_business_dao.get_select(table_name=table_name)
+        return await paging_data(db, business_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateGenBusinessParam) -> None:

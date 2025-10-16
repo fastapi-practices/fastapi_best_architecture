@@ -30,9 +30,9 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.select_models(db, load_strategies={'datas': 'noload'})
 
-    async def get_list(self, *, name: str | None, code: str | None) -> Select:
+    async def get_select(self, *, name: str | None, code: str | None) -> Select:
         """
-        获取字典类型列表
+        获取字典类型列表查询表达式
 
         :param name: 字典类型名称
         :param code: 字典类型编码

@@ -1,6 +1,6 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
@@ -12,6 +12,7 @@ from backend.app.admin.schema.data_scope import (
     UpdateDataScopeRuleParam,
 )
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 
@@ -62,15 +63,17 @@ class DataScopeService:
         return data_scope
 
     @staticmethod
-    async def get_select(*, name: str | None, status: int | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None, status: int | None) -> dict[str, Any]:
         """
-        获取数据范围列表查询条件
+        获取数据范围列表
 
+        :param db: 数据库会话
         :param name: 范围名称
         :param status: 范围状态
         :return:
         """
-        return await data_scope_dao.get_list(name, status)
+        data_scope_select = await data_scope_dao.get_select(name, status)
+        return await paging_data(db, data_scope_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateDataScopeParam) -> None:

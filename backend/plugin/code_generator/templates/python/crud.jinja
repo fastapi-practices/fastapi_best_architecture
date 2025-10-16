@@ -19,8 +19,8 @@ class CRUD{{ class_name }}(CRUDPlus[{{ schema_name }}]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self) -> Select:
-        """获取{{ doc_comment }}列表"""
+    async def get_select(self) -> Select:
+        """获取{{ doc_comment }}列表查询表达式"""
         return await self.select_order('id', 'desc')
 
     async def get_all(self, db: AsyncSession) -> Sequence[{{ class_name }}]:

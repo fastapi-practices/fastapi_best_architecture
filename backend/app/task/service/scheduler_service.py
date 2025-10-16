@@ -1,8 +1,8 @@
 import json
 
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
 
@@ -13,6 +13,7 @@ from backend.app.task.model import TaskScheduler
 from backend.app.task.schema.scheduler import CreateTaskSchedulerParam, UpdateTaskSchedulerParam
 from backend.app.task.utils.tzcrontab import crontab_verify
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 
 
 class TaskSchedulerService:
@@ -46,15 +47,17 @@ class TaskSchedulerService:
         return task_schedulers
 
     @staticmethod
-    async def get_select(*, name: str | None, type: int | None) -> Select:
+    async def get_list(*, db: AsyncSession, name: str | None, type: int | None) -> dict[str, Any]:
         """
-        获取任务调度列表查询条件
+        获取任务调度列表
 
+        :param db: 数据库会话
         :param name: 任务调度名称
         :param type: 任务调度类型
         :return:
         """
-        return await task_scheduler_dao.get_list(name=name, type=type)
+        task_scheduler_select = await task_scheduler_dao.get_select(name=name, type=type)
+        return await paging_data(db, task_scheduler_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateTaskSchedulerParam) -> None:
