@@ -30,7 +30,6 @@ async def get_linux_do_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
 )
 async def linux_do_oauth2_callback(  # noqa: ANN201
     db: CurrentSessionTransaction,
-    request: Request,
     response: Response,
     background_tasks: BackgroundTasks,
     oauth2: Annotated[
@@ -43,7 +42,6 @@ async def linux_do_oauth2_callback(  # noqa: ANN201
     user = await linux_do_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
         db=db,
-        request=request,
         response=response,
         background_tasks=background_tasks,
         user=user,

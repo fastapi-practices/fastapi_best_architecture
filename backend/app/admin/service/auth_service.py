@@ -9,6 +9,7 @@ from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import login_log_service
+from backend.common.context import ctx
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
 from backend.common.i18n import t
@@ -77,7 +78,6 @@ class AuthService:
         self,
         *,
         db: AsyncSession,
-        request: Request,
         response: Response,
         obj: AuthLoginParam,
         background_tasks: BackgroundTasks,
@@ -110,10 +110,10 @@ class AuthService:
                 username=user.username,
                 nickname=user.nickname,
                 last_login_time=timezone.to_str(user.last_login_time),
-                ip=request.state.ip,
-                os=request.state.os,
-                browser=request.state.browser,
-                device=request.state.device,
+                ip=ctx.ip,
+                os=ctx.os,
+                browser=ctx.browser,
+                device=ctx.device,
             )
             refresh_token = await create_refresh_token(
                 access_token.session_uuid,
@@ -136,7 +136,6 @@ class AuthService:
             task = BackgroundTask(
                 login_log_service.create,
                 db=db,
-                request=request,
                 user_uuid=user.uuid if user else uuid4_str(),
                 username=obj.username,
                 login_time=timezone.now(),
@@ -151,7 +150,6 @@ class AuthService:
             background_tasks.add_task(
                 login_log_service.create,
                 db=db,
-                request=request,
                 user_uuid=user.uuid,
                 username=obj.username,
                 login_time=timezone.now(),
@@ -221,10 +219,10 @@ class AuthService:
             username=user.username,
             nickname=user.nickname,
             last_login_time=timezone.to_str(user.last_login_time),
-            ip=request.state.ip,
-            os=request.state.os,
-            browser=request.state.browser,
-            device_type=request.state.device,
+            ip=ctx.ip,
+            os=ctx.os,
+            browser=ctx.browser,
+            device_type=ctx.device,
         )
         data = GetNewToken(
             access_token=new_token.new_access_token,

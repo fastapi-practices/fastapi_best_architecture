@@ -30,12 +30,12 @@ async def login_swagger(
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def login(
-    request: Request,
+    db: CurrentSessionTransaction,
     response: Response,
     obj: AuthLoginParam,
     background_tasks: BackgroundTasks,
 ) -> ResponseSchemaModel[GetLoginToken]:
-    data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
+    data = await auth_service.login(db=db, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)
 
 

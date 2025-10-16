@@ -1,13 +1,14 @@
 from typing import Any
 
 from fast_captcha import text_captcha
-from fastapi import BackgroundTasks, Request, Response
+from fastapi import BackgroundTasks, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import AddOAuth2UserParam
 from backend.app.admin.service.login_log_service import login_log_service
+from backend.common.context import ctx
 from backend.common.enums import LoginLogStatusType, UserSocialType
 from backend.common.i18n import t
 from backend.common.security import jwt
@@ -25,7 +26,6 @@ class OAuth2Service:
     async def create_with_login(
         *,
         db: AsyncSession,
-        request: Request,
         response: Response,
         background_tasks: BackgroundTasks,
         user: dict[str, Any],
@@ -35,7 +35,6 @@ class OAuth2Service:
         创建 OAuth2 用户并登录
 
         :param db: 数据库会话
-        :param request: FastAPI 请求对象
         :param response: FastAPI 响应对象
         :param background_tasks: FastAPI 后台任务
         :param user: OAuth2 用户信息
@@ -103,10 +102,10 @@ class OAuth2Service:
             username=sys_user.username,
             nickname=sys_user.nickname or f'#{text_captcha(5)}',
             last_login_time=timezone.to_str(timezone.now()),
-            ip=request.state.ip,
-            os=request.state.os,
-            browser=request.state.browser,
-            device=request.state.device,
+            ip=ctx.ip,
+            os=ctx.os,
+            browser=ctx.browser,
+            device=ctx.device,
         )
         refresh_token = await jwt.create_refresh_token(
             access_token.session_uuid,
@@ -118,14 +117,13 @@ class OAuth2Service:
         background_tasks.add_task(
             login_log_service.create,
             db=db,
-            request=request,
             user_uuid=sys_user.uuid,
             username=sys_user.username,
             login_time=timezone.now(),
             status=LoginLogStatusType.success.value,
             msg=t('success.login.oauth2_success'),
         )
-        await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+        await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ctx.ip}')
         response.set_cookie(
             key=settings.COOKIE_REFRESH_TOKEN_KEY,
             value=refresh_token.refresh_token,

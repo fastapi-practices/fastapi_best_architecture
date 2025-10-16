@@ -17,6 +17,7 @@ from backend.common.log import log
 from backend.common.queue import batch_dequeue
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
+from backend.database.db import async_db_session
 from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
 
@@ -202,7 +203,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 try:
                     if settings.DATABASE_ECHO:
                         log.info('自动执行【操作日志批量创建】任务...')
-                    await opera_log_service.bulk_create(objs=logs)
+                    async with async_db_session.begin() as db:
+                        await opera_log_service.bulk_create(db=db, objs=logs)
                 finally:
                     if not cls.opera_log_queue.empty():
                         cls.opera_log_queue.task_done()
