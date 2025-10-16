@@ -2,12 +2,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.dict.schema.dict_data import (
     CreateDictDataParam,
     DeleteDictDataParam,
@@ -20,24 +20,26 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有字典数据', dependencies=[DependsJwtAuth])
-async def get_all_dict_datas() -> ResponseSchemaModel[list[GetDictDataDetail]]:
-    data = await dict_data_service.get_all()
+async def get_all_dict_datas(db: CurrentSession) -> ResponseSchemaModel[list[GetDictDataDetail]]:
+    data = await dict_data_service.get_all(db=db)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取字典数据详情', dependencies=[DependsJwtAuth])
 async def get_dict_data(
+    db: CurrentSession,
     pk: Annotated[int, Path(description='字典数据 ID')],
 ) -> ResponseSchemaModel[GetDictDataDetail]:
-    data = await dict_data_service.get(pk=pk)
+    data = await dict_data_service.get(db=db, pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/type-codes/{code}', summary='获取字典数据列表', dependencies=[DependsJwtAuth])
 async def get_dict_data_by_type_code(
+    db: CurrentSession,
     code: Annotated[str, Path(description='字典类型编码')],
 ) -> ResponseSchemaModel[list[GetDictDataDetail]]:
-    data = await dict_data_service.get_by_type_code(code=code)
+    data = await dict_data_service.get_by_type_code(db=db, code=code)
     return response_base.success(data=data)
 
 
@@ -49,7 +51,7 @@ async def get_dict_data_by_type_code(
         DependsPagination,
     ],
 )
-async def get_dict_datas_paged(
+async def get_dict_datas_paginated(
     db: CurrentSession,
     type_code: Annotated[str | None, Query(description='字典类型编码')] = None,
     label: Annotated[str | None, Query(description='字典数据标签')] = None,
@@ -57,14 +59,14 @@ async def get_dict_datas_paged(
     status: Annotated[int | None, Query(description='状态')] = None,
     type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
-    dict_data_select = await dict_data_service.get_select(
+    page_data = await dict_data_service.get_list(
+        db=db,
         type_code=type_code,
         label=label,
         value=value,
         status=status,
         type_id=type_id,
     )
-    page_data = await paging_data(db, dict_data_select)
     return response_base.success(data=page_data)
 
 
@@ -76,8 +78,8 @@ async def get_dict_datas_paged(
         DependsRBAC,
     ],
 )
-async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
-    await dict_data_service.create(obj=obj)
+async def create_dict_data(db: CurrentSessionTransaction, obj: CreateDictDataParam) -> ResponseModel:
+    await dict_data_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -90,10 +92,11 @@ async def create_dict_data(obj: CreateDictDataParam) -> ResponseModel:
     ],
 )
 async def update_dict_data(
+    db: CurrentSessionTransaction,
     pk: Annotated[int, Path(description='字典数据 ID')],
     obj: UpdateDictDataParam,
 ) -> ResponseModel:
-    count = await dict_data_service.update(pk=pk, obj=obj)
+    count = await dict_data_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -107,8 +110,8 @@ async def update_dict_data(
         DependsRBAC,
     ],
 )
-async def delete_dict_datas(obj: DeleteDictDataParam) -> ResponseModel:
-    count = await dict_data_service.delete(obj=obj)
+async def delete_dict_datas(db: CurrentSessionTransaction, obj: DeleteDictDataParam) -> ResponseModel:
+    count = await dict_data_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

@@ -2,7 +2,7 @@ import random
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Request
+from fastapi import APIRouter, Body
 
 from backend.common.context import ctx
 from backend.common.response.response_schema import ResponseModel, response_base
@@ -17,7 +17,6 @@ router = APIRouter()
 
 @router.post('/captcha', summary='发送电子邮件验证码', dependencies=[DependsJwtAuth])
 async def send_email_captcha(
-    request: Request,
     db: CurrentSession,
     recipients: Annotated[str | list[str], Body(embed=True, description='邮件接收者')],
 ) -> ResponseModel:

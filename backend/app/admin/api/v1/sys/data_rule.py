@@ -10,12 +10,12 @@ from backend.app.admin.schema.data_rule import (
     UpdateDataRuleParam,
 )
 from backend.app.admin.service.data_rule_service import data_rule_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 
 router = APIRouter()
 
@@ -35,16 +35,17 @@ async def get_data_rule_model_columns(
 
 
 @router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
-async def get_all_data_rules() -> ResponseSchemaModel[list[GetDataRuleDetail]]:
-    data = await data_rule_service.get_all()
+async def get_all_data_rules(db: CurrentSession) -> ResponseSchemaModel[list[GetDataRuleDetail]]:
+    data = await data_rule_service.get_all(db=db)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取数据规则详情', dependencies=[DependsJwtAuth])
 async def get_data_rule(
+    db: CurrentSession,
     pk: Annotated[int, Path(description='数据规则 ID')],
 ) -> ResponseSchemaModel[GetDataRuleDetail]:
-    data = await data_rule_service.get(pk=pk)
+    data = await data_rule_service.get(db=db, pk=pk)
     return response_base.success(data=data)
 
 
@@ -56,12 +57,11 @@ async def get_data_rule(
         DependsPagination,
     ],
 )
-async def get_data_rules_paged(
+async def get_data_rules_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='规则名称')] = None,
 ) -> ResponseSchemaModel[PageData[GetDataRuleDetail]]:
-    data_rule_select = await data_rule_service.get_select(name=name)
-    page_data = await paging_data(db, data_rule_select)
+    page_data = await data_rule_service.get_list(db=db, name=name)
     return response_base.success(data=page_data)
 
 
@@ -73,8 +73,8 @@ async def get_data_rules_paged(
         DependsRBAC,
     ],
 )
-async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
-    await data_rule_service.create(obj=obj)
+async def create_data_rule(db: CurrentSessionTransaction, obj: CreateDataRuleParam) -> ResponseModel:
+    await data_rule_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -87,10 +87,11 @@ async def create_data_rule(obj: CreateDataRuleParam) -> ResponseModel:
     ],
 )
 async def update_data_rule(
+    db: CurrentSessionTransaction,
     pk: Annotated[int, Path(description='数据规则 ID')],
     obj: UpdateDataRuleParam,
 ) -> ResponseModel:
-    count = await data_rule_service.update(pk=pk, obj=obj)
+    count = await data_rule_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -104,8 +105,8 @@ async def update_data_rule(
         DependsRBAC,
     ],
 )
-async def delete_data_rules(obj: DeleteDataRuleParam) -> ResponseModel:
-    count = await data_rule_service.delete(obj=obj)
+async def delete_data_rules(db: CurrentSessionTransaction, obj: DeleteDataRuleParam) -> ResponseModel:
+    count = await data_rule_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

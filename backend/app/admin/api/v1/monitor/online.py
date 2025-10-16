@@ -2,7 +2,7 @@ import json
 
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query, Request
+from fastapi import APIRouter, Path, Query
 
 from backend.app.admin.schema.token import GetTokenDetail
 from backend.common.enums import StatusType
@@ -76,7 +76,6 @@ async def get_sessions(
     dependencies=[DependsSuperUser],
 )
 async def delete_session(
-    request: Request,
     pk: Annotated[int, Path(description='用户 ID')],
     session_uuid: Annotated[str, Query(description='会话 UUID')],
 ) -> ResponseModel:

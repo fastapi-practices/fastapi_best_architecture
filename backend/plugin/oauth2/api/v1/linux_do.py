@@ -8,6 +8,7 @@ from starlette.responses import RedirectResponse
 from backend.common.enums import UserSocialType
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
+from backend.database.db import CurrentSessionTransaction
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
@@ -28,7 +29,7 @@ async def get_linux_do_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
 async def linux_do_oauth2_callback(  # noqa: ANN201
-    request: Request,
+    db: CurrentSessionTransaction,
     response: Response,
     background_tasks: BackgroundTasks,
     oauth2: Annotated[
@@ -40,7 +41,7 @@ async def linux_do_oauth2_callback(  # noqa: ANN201
     access_token = token['access_token']
     user = await linux_do_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
-        request=request,
+        db=db,
         response=response,
         background_tasks=background_tasks,
         user=user,

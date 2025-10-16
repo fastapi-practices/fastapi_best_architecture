@@ -40,9 +40,9 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         """
         return await self.select_models(db)
 
-    async def get_list(self, table_name: str | None) -> Select:
+    async def get_select(self, table_name: str | None) -> Select:
         """
-        获取所有代码生成业务
+        获取所有代码生成业务查询表达式
 
         :param table_name: 业务表名
         :return:

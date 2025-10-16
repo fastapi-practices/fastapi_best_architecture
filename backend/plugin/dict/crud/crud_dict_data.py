@@ -46,7 +46,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         """
         return await self.select_models(db, load_strategies={'type': 'noload'})
 
-    async def get_list(
+    async def get_select(
         self,
         type_code: str | None,
         label: str | None,
@@ -55,7 +55,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         type_id: int | None,
     ) -> Select:
         """
-        获取字典数据列表
+        获取字典数据列表查询表达式
 
         :param type_code: 字典类型编码
         :param label: 字典数据标签
