@@ -85,19 +85,6 @@ wheels = [
 ]
 
 [[package]]
-name = "asgi-correlation-id"
-version = "4.3.4"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "packaging" },
-    { name = "starlette" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/f4/ff/a6538245ac1eaa7733ec6740774e9d5add019e2c63caa29e758c16c0afdd/asgi_correlation_id-4.3.4.tar.gz", hash = "sha256:ea6bc310380373cb9f731dc2e8b2b6fb978a76afe33f7a2384f697b8d6cd811d" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/d9/ab/6936e2663c47a926e0659437b9333ad87d1ff49b1375d239026e0a268eba/asgi_correlation_id-4.3.4-py3-none-any.whl", hash = "sha256:36ce69b06c7d96b4acb89c7556a4c4f01a972463d3d49c675026cbbd08e9a0a2" },
-]
-
-[[package]]
 name = "asgiref"
 version = "3.10.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
@@ -683,7 +670,6 @@ name = "fastapi-best-architecture"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
-    { name = "asgi-correlation-id" },
     { name = "asgiref" },
     { name = "asyncmy" },
     { name = "asyncpg" },
@@ -718,6 +704,7 @@ dependencies = [
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "sqlalchemy-crud-plus" },
     { name = "sqlparse" },
+    { name = "starlette-context" },
     { name = "user-agents" },
 ]
 
@@ -737,7 +724,6 @@ server = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.16.5" },
-    { name = "asgi-correlation-id", specifier = ">=4.3.4" },
     { name = "asgiref", specifier = ">=3.10.0" },
     { name = "asyncmy", specifier = ">=0.2.10" },
     { name = "asyncpg", specifier = ">=0.30.0" },
@@ -772,6 +758,7 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.44" },
     { name = "sqlalchemy-crud-plus", specifier = ">=1.12.1" },
     { name = "sqlparse", specifier = ">=0.5.3" },
+    { name = "starlette-context", specifier = ">=0.4.0" },
     { name = "user-agents", specifier = ">=2.2.0" },
 ]
 
@@ -2584,6 +2571,18 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/a7/a5/d6f429d43394057b67a6b5bbe6eae2f77a6bf7459d961fdb224bf206eee6/starlette-0.48.0.tar.gz", hash = "sha256:7e8cee469a8ab2352911528110ce9088fdc6a37d9876926e73da7ce4aa4c7a46" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/be/72/2db2f49247d0a18b4f1bb9a5a39a0162869acf235f3a96418363947b3d46/starlette-0.48.0-py3-none-any.whl", hash = "sha256:0764ca97b097582558ecb498132ed0c7d942f233f365b86ba37770e026510659" },
+]
+
+[[package]]
+name = "starlette-context"
+version = "0.4.0"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+dependencies = [
+    { name = "starlette" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/50/a2/42e29208fea21d03e6487d3ae4b6f1a5bd21cf762b8b7eef95041e8c08ff/starlette_context-0.4.0.tar.gz", hash = "sha256:3242417c9354c067a4ac5009aff762dc0b322074216f664825d5d127108553be" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/98/ec/90a4479bc3e307f3ff0b56165d70e1b01cf10882872823b27984bda375e2/starlette_context-0.4.0-py3-none-any.whl", hash = "sha256:dbcc11006587f901edd3d0a989a69a628fccf9d00c1ca3c28fab23ab88bd0093" },
 ]
 
 [[package]]

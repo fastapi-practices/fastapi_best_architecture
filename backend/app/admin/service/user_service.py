@@ -14,6 +14,7 @@ from backend.app.admin.schema.user import (
     ResetPasswordParam,
     UpdateUserParam,
 )
+from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
 from backend.common.response.response_code import CustomErrorCode
@@ -249,12 +250,12 @@ class UserService:
             user = await user_dao.get(db, token_payload.id)
             if not user:
                 raise errors.NotFoundError(msg='用户不存在')
-            captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
+            captcha_code = await redis_client.get(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
             if not captcha_code:
                 raise errors.RequestError(msg='验证码已失效，请重新获取')
             if captcha != captcha_code:
                 raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-            await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{request.state.ip}')
+            await redis_client.delete(f'{settings.EMAIL_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
             count = await user_dao.update_email(db, token_payload.id, email)
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
             return count

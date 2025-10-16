@@ -11,6 +11,7 @@ from starlette.requests import Request
 
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
+from backend.common.context import ctx
 from backend.common.enums import OperaLogCipherType, StatusType
 from backend.common.log import log
 from backend.common.queue import batch_dequeue
@@ -49,21 +50,21 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             error = None
             try:
                 response = await call_next(request)
-                elapsed = (time.perf_counter() - request.state.perf_time) * 1000
-                for state in [
+                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
+                for e in [
                     '__request_http_exception__',
                     '__request_validation_exception__',
                     '__request_assertion_error__',
                     '__request_custom_exception__',
                 ]:
-                    exception = getattr(request.state, state, None)
+                    exception = ctx.get(e)
                     if exception:
                         code = exception.get('code')
                         msg = exception.get('msg')
                         log.error(f'请求异常: {msg}')
                         break
             except Exception as e:
-                elapsed = (time.perf_counter() - request.state.perf_time) * 1000
+                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
                 code = getattr(e, 'code', StandardResponseCode.HTTP_500)  # 兼容 SQLAlchemy 异常用法
                 msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
@@ -82,30 +83,30 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
             # 日志记录
             log.debug(f'接口摘要：[{summary}]')
-            log.debug(f'请求地址：[{request.state.ip}]')
+            log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
 
             # 日志创建
             opera_log_in = CreateOperaLogParam(
-                trace_id=get_request_trace_id(request),
+                trace_id=get_request_trace_id(),
                 username=username,
                 method=method,
                 title=summary,
                 path=path,
-                ip=request.state.ip,
-                country=request.state.country,
-                region=request.state.region,
-                city=request.state.city,
-                user_agent=request.state.user_agent,
-                os=request.state.os,
-                browser=request.state.browser,
-                device=request.state.device,
+                ip=ctx.ip,
+                country=ctx.country,
+                region=ctx.region,
+                city=ctx.city,
+                user_agent=ctx.user_agent,
+                os=ctx.os,
+                browser=ctx.browser,
+                device=ctx.device,
                 args=args,
                 status=status,
                 code=str(code),
                 msg=msg,
                 cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
-                opera_time=request.state.start_time,
+                opera_time=ctx.start_time,
             )
             await self.opera_log_queue.put(opera_log_in)
 
