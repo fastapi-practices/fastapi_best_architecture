@@ -37,7 +37,7 @@ async def get_{{ table_name }}(
     ],
 )
 async def get_{{ table_name }}s_paginated(db: CurrentSession) -> ResponseSchemaModel[PageData[Get{{ schema_name }}Detail]]:
-    page_data = = await {{ table_name }}_service.get_list(db=db)
+    page_data = await {{ table_name }}_service.get_list(db=db)
     return response_base.success(data=page_data)
 
 
