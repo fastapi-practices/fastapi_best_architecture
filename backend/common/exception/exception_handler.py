@@ -53,9 +53,7 @@ async def _validation_exception_handler(exc: RequestValidationError | Validation
                     e = error_ctx.get('error')
                     if e:
                         error['msg'] = custom_message.format(**error_ctx)
-                        error['ctx']['error'] = (
-                            e.__str__().replace("'", '"') if isinstance(e, Exception) else None
-                        )
+                        error['ctx']['error'] = e.__str__().replace("'", '"') if isinstance(e, Exception) else None
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
