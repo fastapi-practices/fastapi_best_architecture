@@ -46,16 +46,14 @@ async def _validation_exception_handler(exc: RequestValidationError | Validation
         if i18n.current_language != 'en-US':
             custom_message = t(f'pydantic.{error["type"]}')
             if custom_message:
-                ctx = error.get('ctx')
-                if not ctx:
+                error_ctx = error.get('ctx')
+                if not error_ctx:
                     error['msg'] = custom_message
                 else:
-                    ctx_error = ctx.get('error')
-                    if ctx_error:
-                        error['msg'] = custom_message.format(**ctx)
-                        error['ctx']['error'] = (
-                            ctx_error.__str__().replace("'", '"') if isinstance(ctx_error, Exception) else None
-                        )
+                    e = error_ctx.get('error')
+                    if e:
+                        error['msg'] = custom_message.format(**error_ctx)
+                        error['ctx']['error'] = e.__str__().replace("'", '"') if isinstance(e, Exception) else None
         errors.append(error)
     error = errors[0]
     if error.get('type') == 'json_invalid':
