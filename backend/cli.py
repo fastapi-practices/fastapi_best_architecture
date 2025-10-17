@@ -145,7 +145,8 @@ async def import_table(
 ) -> None:
     try:
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
-        await gen_service.import_business_and_model(obj=obj)
+        async with async_db_session.begin() as db:
+            await gen_service.import_business_and_model(db=db, obj=obj)
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
