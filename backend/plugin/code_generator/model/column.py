@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from typing import TYPE_CHECKING, Union
 
 import sqlalchemy as sa

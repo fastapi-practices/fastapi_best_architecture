@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sqlalchemy as sa
 
 from sqlalchemy.dialects.mysql import LONGTEXT
