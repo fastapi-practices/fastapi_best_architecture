@@ -1,16 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import os.path
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import aiofiles
-
 from aiosmtplib import SMTP
+from anyio import open_file
 from jinja2 import Template
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from backend.common.enums import StatusType
 from backend.common.exception import errors
@@ -39,7 +34,7 @@ async def render_message(subject: str, from_header: str, content: str | dict, te
     message['date'] = timezone.now().strftime('%a, %d %b %Y %H:%M:%S %z')
 
     if template:
-        async with aiofiles.open(os.path.join(PLUGIN_DIR, 'email', 'templates', template), 'r', encoding='utf-8') as f:
+        async with await open_file(PLUGIN_DIR / 'email' / 'templates' / template, encoding='utf-8') as f:
             html = Template(await f.read(), enable_async=True)
         mail_body = MIMEText(await html.render_async(**content), 'html', 'utf-8')
     else:
@@ -56,7 +51,7 @@ async def send_email(
     subject: str,
     content: str | dict,
     template: str | None = None,
-):
+) -> None:
     """
     发送电子邮件
 
@@ -77,7 +72,7 @@ async def send_email(
     # 动态配置
     dynamic_config = None
 
-    def get_config_table(conn):
+    def get_config_table(conn: AsyncConnection) -> bool:
         inspector = inspect(conn)
         return inspector.has_table('sys_config', schema=None)
 
@@ -87,22 +82,22 @@ async def send_email(
             dynamic_config = await config_dao.get_all(db, 'EMAIL')
 
     if dynamic_config:
-        _status_key = 'EMAIL_STATUS'
-        _host_key = 'EMAIL_HOST'
-        _port_key = 'EMAIL_PORT'
-        _ssl_key = 'EMAIL_SSL'
-        _username_key = 'EMAIL_USERNAME'
-        _password_key = 'EMAIL_PASSWORD'
+        status_key = 'EMAIL_STATUS'
+        host_key = 'EMAIL_HOST'
+        port_key = 'EMAIL_PORT'
+        ssl_key = 'EMAIL_SSL'
+        username_key = 'EMAIL_USERNAME'
+        password_key = 'EMAIL_PASSWORD'
 
         configs = {d['key']: d['value'] for d in select_list_serialize(dynamic_config)}
-        if configs.get(_status_key):
+        if configs.get(status_key):
             if len(dynamic_config) < 6:
                 raise errors.NotFoundError(msg='缺少邮件动态配置，请检查系统参数配置-邮件配置')
-            email_host = configs.get(_host_key)
-            email_port = int(configs.get(_port_key, 0))
-            email_ssl = True if configs.get(_ssl_key, '') == str(StatusType.enable.value) else False
-            email_username = configs.get(_username_key)
-            email_password = configs.get(_password_key)
+            email_host = configs.get(host_key)
+            email_port = int(configs.get(port_key, 0))
+            email_ssl = configs.get(ssl_key, '') == str(StatusType.enable.value)
+            email_username = configs.get(username_key)
+            email_password = configs.get(password_key)
 
     try:
         message = await render_message(subject, email_username, content, template)

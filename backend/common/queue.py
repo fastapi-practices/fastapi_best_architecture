@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import asyncio
 
 from asyncio import Queue
@@ -16,7 +14,7 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
     """
     items = []
 
-    async def collector():
+    async def collector() -> None:
         while len(items) < max_items:
             item = await queue.get()
             items.append(item)

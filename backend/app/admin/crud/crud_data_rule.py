@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,9 +21,9 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, name: str | None) -> Select:
+    async def get_select(self, name: str | None) -> Select:
         """
-        获取规则列表
+        获取规则列表查询表达式
 
         :param name: 规则名称
         :return:

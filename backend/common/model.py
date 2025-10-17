@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from typing import Annotated
 
@@ -61,17 +59,15 @@ class TimeZone(TypeDecorator[datetime]):
     def python_type(self) -> type[datetime]:
         return datetime
 
-    def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
-        if value is not None:
+    def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:  # noqa: ANN001
+        if value is not None and value.utcoffset() != timezone.now().utcoffset():
             # TODO 处理夏令时偏移
-            if value.utcoffset() != timezone.now().utcoffset():
-                value = timezone.from_datetime(value)
+            value = timezone.from_datetime(value)
         return value
 
-    def process_result_value(self, value: datetime | None, dialect) -> datetime | None:
-        if value is not None:
-            if value.tzinfo is None:
-                value = value.replace(tzinfo=timezone.tz_info)
+    def process_result_value(self, value: datetime | None, dialect) -> datetime | None:  # noqa: ANN001
+        if value is not None and value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.tz_info)
         return value
 
 
@@ -79,10 +75,18 @@ class DateTimeMixin(MappedAsDataclass):
     """日期时间 Mixin 数据类"""
 
     created_time: Mapped[datetime] = mapped_column(
-        TimeZone, init=False, default_factory=timezone.now, sort_order=999, comment='创建时间'
+        TimeZone,
+        init=False,
+        default_factory=timezone.now,
+        sort_order=999,
+        comment='创建时间',
     )
     updated_time: Mapped[datetime | None] = mapped_column(
-        TimeZone, init=False, onupdate=timezone.now, sort_order=999, comment='更新时间'
+        TimeZone,
+        init=False,
+        onupdate=timezone.now,
+        sort_order=999,
+        comment='更新时间',
     )
 
 
@@ -98,14 +102,14 @@ class MappedBase(AsyncAttrs, DeclarativeBase):
     """
 
     @declared_attr.directive
-    def __tablename__(cls) -> str:
+    def __tablename__(self) -> str:
         """生成表名"""
-        return cls.__name__.lower()
+        return self.__name__.lower()
 
     @declared_attr.directive
-    def __table_args__(cls) -> dict:
+    def __table_args__(self) -> dict:
         """表配置"""
-        return {'comment': cls.__doc__ or ''}
+        return {'comment': self.__doc__ or ''}
 
 
 class DataClassBase(MappedAsDataclass, MappedBase):

@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from backend.common.socketio.server import sio
 
 
-async def task_notification(msg: str):
+async def task_notification(msg: str) -> None:
     """
     任务通知
 

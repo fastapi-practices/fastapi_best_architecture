@@ -1,15 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.dict.schema.dict_type import (
     CreateDictTypeParam,
     DeleteDictTypeParam,
@@ -22,16 +20,17 @@ router = APIRouter()
 
 
 @router.get('/all', summary='获取所有字典数据', dependencies=[DependsJwtAuth])
-async def get_all_dict_types() -> ResponseSchemaModel[list[GetDictTypeDetail]]:
-    data = await dict_type_service.get_all()
+async def get_all_dict_types(db: CurrentSession) -> ResponseSchemaModel[list[GetDictTypeDetail]]:
+    data = await dict_type_service.get_all(db=db)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}', summary='获取字典类型详情', dependencies=[DependsJwtAuth])
 async def get_dict_type(
+    db: CurrentSession,
     pk: Annotated[int, Path(description='字典类型 ID')],
 ) -> ResponseSchemaModel[GetDictTypeDetail]:
-    data = await dict_type_service.get(pk=pk)
+    data = await dict_type_service.get(db=db, pk=pk)
     return response_base.success(data=data)
 
 
@@ -43,13 +42,12 @@ async def get_dict_type(
         DependsPagination,
     ],
 )
-async def get_dict_types_paged(
+async def get_dict_types_paginated(
     db: CurrentSession,
     name: Annotated[str | None, Query(description='字典类型名称')] = None,
     code: Annotated[str | None, Query(description='字典类型编码')] = None,
 ) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
-    dict_type_select = await dict_type_service.get_select(name=name, code=code)
-    page_data = await paging_data(db, dict_type_select)
+    page_data = await dict_type_service.get_list(db=db, name=name, code=code)
     return response_base.success(data=page_data)
 
 
@@ -61,8 +59,8 @@ async def get_dict_types_paged(
         DependsRBAC,
     ],
 )
-async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
-    await dict_type_service.create(obj=obj)
+async def create_dict_type(db: CurrentSessionTransaction, obj: CreateDictTypeParam) -> ResponseModel:
+    await dict_type_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -75,9 +73,11 @@ async def create_dict_type(obj: CreateDictTypeParam) -> ResponseModel:
     ],
 )
 async def update_dict_type(
-    pk: Annotated[int, Path(description='字典类型 ID')], obj: UpdateDictTypeParam
+    db: CurrentSessionTransaction,
+    pk: Annotated[int, Path(description='字典类型 ID')],
+    obj: UpdateDictTypeParam,
 ) -> ResponseModel:
-    count = await dict_type_service.update(pk=pk, obj=obj)
+    count = await dict_type_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -91,8 +91,8 @@ async def update_dict_type(
         DependsRBAC,
     ],
 )
-async def delete_dict_types(obj: DeleteDictTypeParam) -> ResponseModel:
-    count = await dict_type_service.delete(obj=obj)
+async def delete_dict_types(db: CurrentSessionTransaction, obj: DeleteDictTypeParam) -> ResponseModel:
+    count = await dict_type_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

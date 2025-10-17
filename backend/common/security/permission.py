@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from fastapi import Request
 from sqlalchemy import ColumnElement, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
 from backend.core.conf import settings
@@ -41,10 +39,10 @@ class RequestPermission:
             if not isinstance(self.value, str):
                 raise errors.ServerError
             # 附加权限标识到请求状态
-            request.state.permission = self.value
+            ctx.permission = self.value
 
 
-async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:
+async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 

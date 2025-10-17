@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 from celery import schedules
@@ -12,7 +10,7 @@ from backend.utils.timezone import timezone
 class TzAwareCrontab(schedules.crontab):
     """时区感知 Crontab"""
 
-    def __init__(self, minute='*', hour='*', day_of_week='*', day_of_month='*', month_of_year='*', app=None):
+    def __init__(self, minute='*', hour='*', day_of_week='*', day_of_month='*', month_of_year='*', app=None) -> None:  # noqa: ANN001
         super().__init__(
             minute=minute,
             hour=hour,

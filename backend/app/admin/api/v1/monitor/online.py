@@ -1,17 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import json
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, Request
+from fastapi import APIRouter, Path, Query
 
 from backend.app.admin.schema.token import GetTokenDetail
 from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth, jwt_decode, revoke_token, superuser_verify
-from backend.common.security.permission import RequestPermission
-from backend.common.security.rbac import DependsRBAC
+from backend.common.security.jwt import DependsJwtAuth, DependsSuperUser, jwt_decode, revoke_token
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 
@@ -37,8 +33,8 @@ async def get_sessions(
                     'browser': extra_info.get('browser', '未知'),
                     'device': extra_info.get('device', '未知'),
                     'last_login_time': extra_info.get('last_login_time', '未知'),
-                }
-            )
+                },
+            ),
         )
 
     for key in token_keys:
@@ -77,16 +73,11 @@ async def get_sessions(
 @router.delete(
     '/{pk}',
     summary='强制下线',
-    dependencies=[
-        Depends(RequestPermission('sys:session:delete')),
-        DependsRBAC,
-    ],
+    dependencies=[DependsSuperUser],
 )
 async def delete_session(
-    request: Request,
     pk: Annotated[int, Path(description='用户 ID')],
     session_uuid: Annotated[str, Query(description='会话 UUID')],
 ) -> ResponseModel:
-    superuser_verify(request)
     await revoke_token(pk, session_uuid)
     return response_base.success()

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -31,5 +29,8 @@ class LoginLog(DataClassBase):
     msg: Mapped[str] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), comment='提示消息')
     login_time: Mapped[datetime] = mapped_column(TimeZone, comment='登录时间')
     created_time: Mapped[datetime] = mapped_column(
-        TimeZone, init=False, default_factory=timezone.now, comment='创建时间'
+        TimeZone,
+        init=False,
+        default_factory=timezone.now,
+        comment='创建时间',
     )

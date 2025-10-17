@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import asyncio
 import functools
 import time
 
+from collections.abc import Callable
 from math import ceil
-from typing import Any, Callable
+from typing import Any
 
 from fastapi import FastAPI, Request, Response
 from fastapi.routing import APIRoute
@@ -30,7 +29,7 @@ def ensure_unique_route_names(app: FastAPI) -> None:
             temp_routes.add(route.name)
 
 
-async def http_limit_callback(request: Request, response: Response, expire: int) -> None:
+async def http_limit_callback(request: Request, response: Response, expire: int) -> None:  # noqa: RUF029
     """
     请求限制时的默认回调函数
 
@@ -41,11 +40,13 @@ async def http_limit_callback(request: Request, response: Response, expire: int)
     """
     expires = ceil(expire / 1000)
     raise errors.HTTPError(
-        code=StandardResponseCode.HTTP_429, msg='请求过于频繁，请稍后重试', headers={'Retry-After': str(expires)}
+        code=StandardResponseCode.HTTP_429,
+        msg='请求过于频繁，请稍后重试',
+        headers={'Retry-After': str(expires)},
     )
 
 
-def timer(func) -> Callable:
+def timer(func) -> Callable:  # noqa: ANN001
     """函数耗时计时装饰器"""
 
     @functools.wraps(func)
@@ -64,7 +65,7 @@ def timer(func) -> Callable:
         _log_time(func, elapsed_seconds)
         return result
 
-    def _log_time(func, elapsed: float):
+    def _log_time(func, elapsed: float) -> None:  # noqa: ANN001
         # 智能选择单位（秒、毫秒、微秒、纳秒）
         if elapsed >= 1:
             unit, factor = 's', 1

@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import Depends, Request
 
+from backend.common.context import ctx
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception import errors
 from backend.common.log import log
@@ -10,7 +9,7 @@ from backend.core.conf import settings
 from backend.utils.import_parse import import_module_cached
 
 
-async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
+async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  # noqa: C901
     """
     RBAC 权限校验（鉴权顺序很重要，谨慎修改）
 
@@ -46,13 +45,12 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
 
     # 检测后台管理操作权限
     method = request.method
-    if method != MethodType.GET or method != MethodType.OPTIONS:
-        if not request.user.is_staff:
-            raise errors.AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
+    if (method != MethodType.GET or method != MethodType.OPTIONS) and not request.user.is_staff:
+        raise errors.AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
 
     # RBAC 鉴权
     if settings.RBAC_ROLE_MENU_MODE:
-        path_auth_perm = getattr(request.state, 'permission', None)
+        path_auth_perm = ctx.permission
 
         # 没有菜单操作权限标识不校验
         if not path_auth_perm:
@@ -78,7 +76,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:
     else:
         try:
             casbin_rbac = import_module_cached('backend.plugin.casbin_rbac.rbac')
-            casbin_verify = getattr(casbin_rbac, 'casbin_verify')
+            casbin_verify = casbin_rbac.casbin_verify
         except (ImportError, AttributeError) as e:
             log.error(f'正在通过 casbin 执行 RBAC 权限校验，但此插件不存在: {e}')
             raise errors.ServerError(msg='权限校验失败，请联系系统管理员')

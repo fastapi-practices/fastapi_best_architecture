@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Any
 
 from fastapi import Request, Response
@@ -19,7 +17,11 @@ class _AuthenticationError(AuthenticationError):
     """重写内部认证错误类"""
 
     def __init__(
-        self, *, code: int | None = None, msg: str | None = None, headers: dict[str, Any] | None = None
+        self,
+        *,
+        code: int | None = None,
+        msg: str | None = None,
+        headers: dict[str, Any] | None = None,
     ) -> None:
         """
         初始化认证错误

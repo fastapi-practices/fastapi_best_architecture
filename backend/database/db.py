@@ -1,20 +1,24 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sys
 
-from typing import Annotated, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Annotated
 from uuid import uuid4
 
 from fastapi import Depends
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from backend.common.log import log
 from backend.common.model import MappedBase
 from backend.core.conf import settings
 
 
-def create_database_url(unittest: bool = False) -> URL:
+def create_database_url(*, unittest: bool = False) -> URL:
     """
     创建数据库链接
 
@@ -75,6 +79,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+async def get_db_transaction() -> AsyncGenerator[AsyncSession, None]:
+    """获取带有事务的数据库会话"""
+    async with async_db_session.begin() as session:
+        yield session
+
+
 async def create_tables() -> None:
     """创建数据库表"""
     async with async_engine.begin() as coon:
@@ -94,3 +104,4 @@ async_engine, async_db_session = create_async_engine_and_session(SQLALCHEMY_DATA
 
 # Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]
+CurrentSessionTransaction = Annotated[AsyncSession, Depends(get_db_transaction)]

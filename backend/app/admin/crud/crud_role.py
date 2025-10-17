@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,9 +45,9 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_list(self, name: str | None, status: int | None) -> Select:
+    async def get_select(self, name: str | None, status: int | None) -> Select:
         """
-        获取角色列表
+        获取角色列表查询表达式
 
         :param name: 角色名称
         :param status: 角色状态

@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from functools import lru_cache
-from typing import Any, Literal, Pattern
+from re import Pattern
+from typing import Any, Literal
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -136,6 +135,7 @@ class Settings(BaseSettings):
         ('POST', f'{FASTAPI_API_V1_PATH}/auth/login'),
         ('POST', f'{FASTAPI_API_V1_PATH}/auth/logout'),
         ('GET', f'{FASTAPI_API_V1_PATH}/auth/captcha'),
+        ('POST', f'{FASTAPI_API_V1_PATH}/auth/refresh'),
     }
 
     # IP 定位配置
@@ -150,7 +150,7 @@ class Settings(BaseSettings):
 
     # 日志
     LOG_FORMAT: str = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{correlation_id}</> | <lvl>{message}</>'
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</> | <lvl>{level: <8}</> | <cyan>{request_id}</> | <lvl>{message}</>'
     )
 
     # 日志（控制台）

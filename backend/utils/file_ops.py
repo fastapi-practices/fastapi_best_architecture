@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import io
 import os
 import re
 import zipfile
 
-import aiofiles
+import anyio
 
+from anyio import open_file
 from dulwich import porcelain
 from fastapi import UploadFile
 from sqlparse import split
@@ -69,14 +68,14 @@ async def upload_file(file: UploadFile) -> str:
     """
     filename = build_filename(file)
     try:
-        async with aiofiles.open(os.path.join(UPLOAD_DIR, filename), mode='wb') as fb:
+        async with await open_file(UPLOAD_DIR / filename, mode='wb') as fb:
             while True:
                 content = await file.read(settings.UPLOAD_READ_SIZE)
                 if not content:
                     break
                 await fb.write(content)
     except Exception as e:
-        log.error(f'上传文件 {filename} 失败：{str(e)}')
+        log.error(f'上传文件 {filename} 失败：{e!s}')
         raise errors.RequestError(msg='上传文件失败')
     await file.close()
     return filename
@@ -90,7 +89,7 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
     :return:
     """
     if isinstance(file, str):
-        async with aiofiles.open(file, mode='rb') as fb:
+        async with await open_file(file, mode='rb') as fb:
             contents = await fb.read()
     else:
         contents = await file.read()
@@ -117,11 +116,10 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
             if isinstance(file, str)
             else file.filename.split('.')[0].strip(),
         ).group()
-        full_plugin_path = os.path.join(PLUGIN_DIR, plugin_name)
-        if os.path.exists(full_plugin_path):
+        full_plugin_path = anyio.Path(PLUGIN_DIR / plugin_name)
+        if await full_plugin_path.exists():
             raise errors.ConflictError(msg='此插件已安装')
-        else:
-            os.makedirs(full_plugin_path, exist_ok=True)
+        await full_plugin_path.mkdir(parents=True, exist_ok=True)
 
         # 解压（安装）
         members = []
@@ -150,10 +148,11 @@ async def install_git_plugin(repo_url: str) -> str:
     if not match:
         raise errors.RequestError(msg='Git 仓库地址格式非法')
     repo_name = match.group('repo')
-    if os.path.exists(os.path.join(PLUGIN_DIR, repo_name)):
+    path = anyio.Path(PLUGIN_DIR / repo_name)
+    if await path.exists():
         raise errors.ConflictError(msg=f'{repo_name} 插件已安装')
     try:
-        porcelain.clone(repo_url, os.path.join(PLUGIN_DIR, repo_name), checkout=True)
+        porcelain.clone(repo_url, PLUGIN_DIR / repo_name, checkout=True)
     except Exception as e:
         log.error(f'插件安装失败: {e}')
         raise errors.ServerError(msg='插件安装失败，请稍后重试') from e
@@ -171,10 +170,11 @@ async def parse_sql_script(filepath: str) -> list[str]:
     :param filepath: 脚本文件路径
     :return:
     """
-    if not os.path.exists(filepath):
+    path = anyio.Path(filepath)
+    if not await path.exists():
         raise errors.NotFoundError(msg='SQL 脚本文件不存在')
 
-    async with aiofiles.open(filepath, mode='r', encoding='utf-8') as f:
+    async with await open_file(filepath, encoding='utf-8') as f:
         contents = await f.read(1024)
         while additional_contents := await f.read(1024):
             contents += additional_contents

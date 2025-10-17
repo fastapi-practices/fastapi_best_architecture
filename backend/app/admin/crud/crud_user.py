@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import bcrypt
 
 from sqlalchemy import select
@@ -183,9 +181,9 @@ class CRUDUser(CRUDPlus[User]):
         new_pwd = get_hash_password(password, salt)
         return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
 
-    async def get_list(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
+    async def get_select(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
         """
-        获取用户列表
+        获取用户列表查询表达式
 
         :param dept: 部门 ID
         :param username: 用户名
@@ -200,7 +198,7 @@ class CRUDUser(CRUDPlus[User]):
         if username:
             filters['username__like'] = f'%{username}%'
         if phone:
-            filters['phone_like'] = f'%{phone}%'
+            filters['phone__like'] = f'%{phone}%'
         if status is not None:
             filters['status'] = status
 
@@ -214,7 +212,7 @@ class CRUDUser(CRUDPlus[User]):
             **filters,
         )
 
-    async def set_super(self, db: AsyncSession, user_id: int, is_super: bool) -> int:
+    async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """
         设置用户超级管理员状态
 
@@ -225,7 +223,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_superuser': is_super})
 
-    async def set_staff(self, db: AsyncSession, user_id: int, is_staff: bool) -> int:
+    async def set_staff(self, db: AsyncSession, user_id: int, *, is_staff: bool) -> int:
         """
         设置用户后台登录状态
 
@@ -247,7 +245,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'status': status})
 
-    async def set_multi_login(self, db: AsyncSession, user_id: int, multi_login: bool) -> int:
+    async def set_multi_login(self, db: AsyncSession, user_id: int, *, multi_login: bool) -> int:
         """
         设置用户多端登录状态
 
@@ -259,7 +257,11 @@ class CRUDUser(CRUDPlus[User]):
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
     async def get_with_relation(
-        self, db: AsyncSession, *, user_id: int | None = None, username: str | None = None
+        self,
+        db: AsyncSession,
+        *,
+        user_id: int | None = None,
+        username: str | None = None,
     ) -> User | None:
         """
         获取用户关联信息

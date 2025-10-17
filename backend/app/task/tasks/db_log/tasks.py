@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from celery import shared_task
 
 from backend.app.admin.service.login_log_service import login_log_service

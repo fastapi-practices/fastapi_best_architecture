@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
@@ -20,9 +18,9 @@ class CRUDTaskResult(CRUDPlus[TaskResult]):
         """
         return await self.select_model(db, pk)
 
-    async def get_list(self, name: str | None, task_id: str | None) -> Select:
+    async def get_select(self, name: str | None, task_id: str | None) -> Select:
         """
-        获取任务结果列表
+        获取任务结果列表查询表达式
 
         :param name: 任务名称
         :param task_id: 任务 ID

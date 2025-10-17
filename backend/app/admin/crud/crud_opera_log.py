@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from sqlalchemy import Select
 from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,9 +10,9 @@ from backend.app.admin.schema.opera_log import CreateOperaLogParam
 class CRUDOperaLogDao(CRUDPlus[OperaLog]):
     """操作日志数据库操作类"""
 
-    async def get_list(self, username: str | None, status: int | None, ip: str | None) -> Select:
+    async def get_select(self, username: str | None, status: int | None, ip: str | None) -> Select:
         """
-        获取操作日志列表
+        获取操作日志列表查询表达式
 
         :param username: 用户名
         :param status: 操作状态

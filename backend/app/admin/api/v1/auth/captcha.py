@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from uuid import uuid4
 
 from fast_captcha import img_captcha
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
 from starlette.concurrency import run_in_threadpool
 
@@ -20,7 +18,7 @@ router = APIRouter()
     summary='获取登录验证码',
     dependencies=[Depends(RateLimiter(times=5, seconds=10))],
 )
-async def get_captcha(request: Request) -> ResponseSchemaModel[GetCaptchaDetail]:
+async def get_captcha() -> ResponseSchemaModel[GetCaptchaDetail]:
     """
     此接口可能存在性能损耗，尽管是异步接口，但是验证码生成是IO密集型任务，使用线程池尽量减少性能损耗
     """

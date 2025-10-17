@@ -49,7 +49,6 @@ values
 (2049629108253622272, '清空', 'EmptyOperaLog', null, 0, null, 2, null, 'log:opera:clear', 1, 0, 1, '', null, 2049629108249427990, '2025-06-26 20:29:06', null),
 (2049629108253622273, 'page.menu.monitor', 'Monitor', '/monitor', 4, 'mdi:monitor-eye', 0, null, null, 1, 1, 1, '', null, null, '2025-06-26 20:29:06', null),
 (2049629108253622274, 'page.menu.online', 'Online', '/log/online', 1, 'wpf:online', 1, '/monitor/online/index', null, 1, 1, 1, '', null, 2049629108253622273, '2025-06-26 20:29:06', null),
-(2049629108253622275, '下线', 'KickOutOnline', null, 0, null, 2, null, 'sys:session:delete', 1, 0, 1, '', null, 2049629108253622274, '2025-06-26 20:29:06', null),
 (2049629108253622276, 'page.menu.redis', 'Redis', '/monitor/redis', 2, 'devicon:redis', 1, '/monitor/redis/index', null, 1, 1, 1, '', null, 2049629108253622273, '2025-06-26 20:29:06', null),
 (2049629108253622277, 'page.menu.server', 'Server', '/monitor/server', 3, 'mdi:server-outline', 1, '/monitor/server/index', null, 1, 1, 1, '', null, 2049629108253622273, '2025-06-26 20:29:06', null),
 (2049629108253622278, '项目', 'Project', '/fba', 5, 'https://wu-clan.github.io/picx-images-hosting/logo/fba.png', 0, null, null, 1, 1, 1, '', null, null, '2025-06-26 20:29:06', null),

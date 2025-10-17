@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 from uvicorn.protocols.http.h11_impl import STATUS_PHRASES
 
-from backend.common.exception.errors import BaseExceptionMixin
+from backend.common.context import ctx
+from backend.common.exception.errors import BaseExceptionError
 from backend.common.i18n import i18n, t
 from backend.common.response.response_code import CustomResponseCode, StandardResponseCode
 from backend.common.response.response_schema import response_base
@@ -28,16 +27,16 @@ def _get_exception_code(status_code: int) -> int:
     """
     try:
         STATUS_PHRASES[status_code]
-        return status_code
     except Exception:
         return StandardResponseCode.HTTP_400
 
+    return status_code
 
-async def _validation_exception_handler(request: Request, exc: RequestValidationError | ValidationError):
+
+async def _validation_exception_handler(exc: RequestValidationError | ValidationError):
     """
     数据验证异常处理
 
-    :param request: 请求对象
     :param exc: 验证异常
     :return:
     """
@@ -73,12 +72,12 @@ async def _validation_exception_handler(request: Request, exc: RequestValidation
         'msg': msg,
         'data': data,
     }
-    request.state.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
-    content.update(trace_id=get_request_trace_id(request))
+    ctx.__request_validation_exception__ = content  # 用于在中间件中获取异常信息
+    content.update(trace_id=get_request_trace_id())
     return MsgSpecJSONResponse(status_code=StandardResponseCode.HTTP_422, content=content)
 
 
-def register_exception(app: FastAPI):
+def register_exception(app: FastAPI) -> None:
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
         """
@@ -97,8 +96,8 @@ def register_exception(app: FastAPI):
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_400)
             content = res.model_dump()
-        request.state.__request_http_exception__ = content
-        content.update(trace_id=get_request_trace_id(request))
+        ctx.__request_http_exception__ = content
+        content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=_get_exception_code(exc.status_code),
             content=content,
@@ -114,7 +113,7 @@ def register_exception(app: FastAPI):
         :param exc: 验证异常
         :return:
         """
-        return await _validation_exception_handler(request, exc)
+        return await _validation_exception_handler(exc)
 
     @app.exception_handler(ValidationError)
     async def pydantic_validation_exception_handler(request: Request, exc: ValidationError):
@@ -125,7 +124,7 @@ def register_exception(app: FastAPI):
         :param exc: 验证异常
         :return:
         """
-        return await _validation_exception_handler(request, exc)
+        return await _validation_exception_handler(exc)
 
     @app.exception_handler(AssertionError)
     async def assertion_error_handler(request: Request, exc: AssertionError):
@@ -145,15 +144,15 @@ def register_exception(app: FastAPI):
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_500)
             content = res.model_dump()
-        request.state.__request_assertion_error__ = content
-        content.update(trace_id=get_request_trace_id(request))
+        ctx.__request_assertion_error__ = content
+        content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
             content=content,
         )
 
-    @app.exception_handler(BaseExceptionMixin)
-    async def custom_exception_handler(request: Request, exc: BaseExceptionMixin):
+    @app.exception_handler(BaseExceptionError)
+    async def custom_exception_handler(request: Request, exc: BaseExceptionError):
         """
         全局自定义异常处理
 
@@ -164,10 +163,10 @@ def register_exception(app: FastAPI):
         content = {
             'code': exc.code,
             'msg': str(exc.msg),
-            'data': exc.data if exc.data else None,
+            'data': exc.data or None,
         }
-        request.state.__request_custom_exception__ = content
-        content.update(trace_id=get_request_trace_id(request))
+        ctx.__request_custom_exception__ = content
+        content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=_get_exception_code(exc.code),
             content=content,
@@ -192,7 +191,7 @@ def register_exception(app: FastAPI):
         else:
             res = response_base.fail(res=CustomResponseCode.HTTP_500)
             content = res.model_dump()
-        content.update(trace_id=get_request_trace_id(request))
+        content.update(trace_id=get_request_trace_id())
         return MsgSpecJSONResponse(
             status_code=StandardResponseCode.HTTP_500,
             content=content,

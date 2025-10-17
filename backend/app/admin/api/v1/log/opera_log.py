@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
 from backend.app.admin.schema.opera_log import DeleteOperaLogParam, GetOperaLogDetail
 from backend.app.admin.service.opera_log_service import opera_log_service
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 
 router = APIRouter()
 
@@ -24,14 +22,14 @@ router = APIRouter()
         DependsPagination,
     ],
 )
-async def get_opera_logs_paged(
+async def get_opera_logs_paginated(
     db: CurrentSession,
     username: Annotated[str | None, Query(description='用户名')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
     ip: Annotated[str | None, Query(description='IP 地址')] = None,
 ) -> ResponseSchemaModel[PageData[GetOperaLogDetail]]:
-    log_select = await opera_log_service.get_select(username=username, status=status, ip=ip)
-    page_data = await paging_data(db, log_select)
+    page_data = await opera_log_service.get_list(db=db, username=username, status=status, ip=ip)
+
     return response_base.success(data=page_data)
 
 
@@ -43,8 +41,8 @@ async def get_opera_logs_paged(
         DependsRBAC,
     ],
 )
-async def delete_opera_logs(obj: DeleteOperaLogParam) -> ResponseModel:
-    count = await opera_log_service.delete(obj=obj)
+async def delete_opera_logs(db: CurrentSessionTransaction, obj: DeleteOperaLogParam) -> ResponseModel:
+    count = await opera_log_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -58,6 +56,6 @@ async def delete_opera_logs(obj: DeleteOperaLogParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def delete_all_opera_logs() -> ResponseModel:
-    await opera_log_service.delete_all()
+async def delete_all_opera_logs(db: CurrentSessionTransaction) -> ResponseModel:
+    await opera_log_service.delete_all(db=db)
     return response_base.success()

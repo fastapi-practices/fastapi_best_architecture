@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os
 
 import celery
@@ -10,10 +8,10 @@ from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
 
 
-def find_task_packages():
+def find_task_packages() -> list[str]:
     packages = []
-    task_dir = os.path.join(BASE_PATH, 'app', 'task', 'tasks')
-    for root, dirs, files in os.walk(task_dir):
+    task_dir = BASE_PATH / 'app' / 'task' / 'tasks'
+    for root, _dirs, files in os.walk(task_dir):
         if 'tasks.py' in files:
             package = root.replace(str(BASE_PATH.parent) + os.path.sep, '').replace(os.path.sep, '.')
             packages.append(package)

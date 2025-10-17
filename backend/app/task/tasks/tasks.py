@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from time import sleep
 
 from anyio import sleep as asleep
@@ -24,4 +22,5 @@ async def task_demo_async() -> str:
 @celery_app.task(name='task_demo_params')
 async def task_demo_params(hello: str, world: str | None = None) -> str:
     """参数示例任务，模拟传参操作"""
+    await asleep(1)
     return hello + world

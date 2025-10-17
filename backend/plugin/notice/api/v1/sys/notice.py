@@ -1,24 +1,29 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.common.pagination import DependsPagination, PageData, paging_data
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
-from backend.database.db import CurrentSession
-from backend.plugin.notice.schema.notice import CreateNoticeParam, DeleteNoticeParam, GetNoticeDetail, UpdateNoticeParam
+from backend.database.db import CurrentSession, CurrentSessionTransaction
+from backend.plugin.notice.schema.notice import (
+    CreateNoticeParam,
+    DeleteNoticeParam,
+    GetNoticeDetail,
+    UpdateNoticeParam,
+)
 from backend.plugin.notice.service.notice_service import notice_service
 
 router = APIRouter()
 
 
 @router.get('/{pk}', summary='获取通知公告详情', dependencies=[DependsJwtAuth])
-async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) -> ResponseSchemaModel[GetNoticeDetail]:
-    notice = await notice_service.get(pk=pk)
+async def get_notice(
+    db: CurrentSession, pk: Annotated[int, Path(description='通知公告 ID')]
+) -> ResponseSchemaModel[GetNoticeDetail]:
+    notice = await notice_service.get(db=db, pk=pk)
     return response_base.success(data=notice)
 
 
@@ -30,14 +35,13 @@ async def get_notice(pk: Annotated[int, Path(description='通知公告 ID')]) ->
         DependsPagination,
     ],
 )
-async def get_notices_paged(
+async def get_notices_paginated(
     db: CurrentSession,
     title: Annotated[str | None, Query(description='标题')] = None,
     type: Annotated[int | None, Query(description='类型')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[PageData[GetNoticeDetail]]:
-    notice_select = await notice_service.get_select(title=title, type=type, status=status)
-    page_data = await paging_data(db, notice_select)
+    page_data = await notice_service.get_list(db=db, title=title, type=type, status=status)
     return response_base.success(data=page_data)
 
 
@@ -49,8 +53,8 @@ async def get_notices_paged(
         DependsRBAC,
     ],
 )
-async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
-    await notice_service.create(obj=obj)
+async def create_notice(db: CurrentSessionTransaction, obj: CreateNoticeParam) -> ResponseModel:
+    await notice_service.create(db=db, obj=obj)
     return response_base.success()
 
 
@@ -62,8 +66,10 @@ async def create_notice(obj: CreateNoticeParam) -> ResponseModel:
         DependsRBAC,
     ],
 )
-async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam) -> ResponseModel:
-    count = await notice_service.update(pk=pk, obj=obj)
+async def update_notice(
+    db: CurrentSessionTransaction, pk: Annotated[int, Path(description='通知公告 ID')], obj: UpdateNoticeParam
+) -> ResponseModel:
+    count = await notice_service.update(db=db, pk=pk, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -77,8 +83,8 @@ async def update_notice(pk: Annotated[int, Path(description='通知公告 ID')],
         DependsRBAC,
     ],
 )
-async def delete_notices(obj: DeleteNoticeParam) -> ResponseModel:
-    count = await notice_service.delete(obj=obj)
+async def delete_notices(db: CurrentSessionTransaction, obj: DeleteNoticeParam) -> ResponseModel:
+    count = await notice_service.delete(db=db, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

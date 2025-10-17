@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from fastapi import APIRouter
 
 from backend.app.task.api.v1.control import router as task_control_router

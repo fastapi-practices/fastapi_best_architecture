@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -10,6 +8,7 @@ from backend.common.security.jwt import DependsJwtAuth
 from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
+from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.code_service import gen_service
 
@@ -18,9 +17,10 @@ router = APIRouter()
 
 @router.get('/tables', summary='获取数据库表')
 async def get_all_tables(
+    db: CurrentSession,
     table_schema: Annotated[str, Query(description='数据库名')] = 'fba',
 ) -> ResponseSchemaModel[list[dict[str, str | None]]]:
-    data = await gen_service.get_tables(table_schema=table_schema)
+    data = await gen_service.get_tables(db=db, table_schema=table_schema)
     return response_base.success(data=data)
 
 
@@ -32,20 +32,24 @@ async def get_all_tables(
         DependsRBAC,
     ],
 )
-async def import_table(obj: ImportParam) -> ResponseModel:
-    await gen_service.import_business_and_model(obj=obj)
+async def import_table(db: CurrentSessionTransaction, obj: ImportParam) -> ResponseModel:
+    await gen_service.import_business_and_model(db=db, obj=obj)
     return response_base.success()
 
 
 @router.get('/{pk}/previews', summary='代码生成预览', dependencies=[DependsJwtAuth])
-async def preview_code(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseSchemaModel[dict[str, bytes]]:
-    data = await gen_service.preview(pk=pk)
+async def preview_code(
+    db: CurrentSession, pk: Annotated[int, Path(description='业务 ID')]
+) -> ResponseSchemaModel[dict[str, bytes]]:
+    data = await gen_service.preview(db=db, pk=pk)
     return response_base.success(data=data)
 
 
 @router.get('/{pk}/paths', summary='获取代码生成路径', dependencies=[DependsJwtAuth])
-async def get_generate_paths(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseSchemaModel[list[str]]:
-    data = await gen_service.get_generate_path(pk=pk)
+async def get_generate_paths(
+    db: CurrentSession, pk: Annotated[int, Path(description='业务 ID')]
+) -> ResponseSchemaModel[list[str]]:
+    data = await gen_service.get_generate_path(db=db, pk=pk)
     return response_base.success(data=data)
 
 
@@ -58,14 +62,14 @@ async def get_generate_paths(pk: Annotated[int, Path(description='业务 ID')]) 
         DependsRBAC,
     ],
 )
-async def generate_code(pk: Annotated[int, Path(description='业务 ID')]) -> ResponseModel:
-    await gen_service.generate(pk=pk)
+async def generate_code(db: CurrentSession, pk: Annotated[int, Path(description='业务 ID')]) -> ResponseModel:
+    await gen_service.generate(db=db, pk=pk)
     return response_base.success()
 
 
 @router.get('/{pk}', summary='下载代码', dependencies=[DependsJwtAuth])
-async def download_code(pk: Annotated[int, Path(description='业务 ID')]):
-    bio = await gen_service.download(pk=pk)
+async def download_code(db: CurrentSession, pk: Annotated[int, Path(description='业务 ID')]):  # noqa: ANN201
+    bio = await gen_service.download(db=db, pk=pk)
     return StreamingResponse(
         bio,
         media_type='application/x-zip-compressed',
