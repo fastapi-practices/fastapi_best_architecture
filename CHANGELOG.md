@@ -1,3 +1,21 @@
+<a id="v1.9.0"></a>
+# [v1.9.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.9.0) - 2025-10-16
+
+## What's Changed
+* Update changelog for v1.8.3 by [@wu-clan](https://github.com/wu-clan) in [#849](https://github.com/fastapi-practices/fastapi_best_architecture/pull/849)
+* Bump fastapi and pydantic to the latest by [@wu-clan](https://github.com/wu-clan) in [#851](https://github.com/fastapi-practices/fastapi_best_architecture/pull/851)
+* Update superuser verify to dependency injection by [@wu-clan](https://github.com/wu-clan) in [#852](https://github.com/fastapi-practices/fastapi_best_architecture/pull/852)
+* Fix the superuser verify missing auth by [@wu-clan](https://github.com/wu-clan) in [#854](https://github.com/fastapi-practices/fastapi_best_architecture/pull/854)
+* Update request state usage to context variable by [@wu-clan](https://github.com/wu-clan) in [#853](https://github.com/fastapi-practices/fastapi_best_architecture/pull/853)
+* Fix safely of access ctx in exception handlers by [@wu-clan](https://github.com/wu-clan) in [#855](https://github.com/fastapi-practices/fastapi_best_architecture/pull/855)
+* Refactor the service layer db session call method by [@wu-clan](https://github.com/wu-clan) in [#850](https://github.com/fastapi-practices/fastapi_best_architecture/pull/850)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
+
+[Changes][v1.9.0]
+
+
 <a id="v1.8.3"></a>
 # [v1.8.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.8.3) - 2025-10-13
 
@@ -855,6 +873,7 @@
 [Changes][v1.0.0]
 
 
+[v1.9.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
 [v1.8.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
 [v1.8.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
