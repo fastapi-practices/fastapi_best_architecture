@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sqlalchemy as sa
 
 from backend.common.model import MappedBase

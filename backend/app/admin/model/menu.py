@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 
@@ -42,8 +41,8 @@ class Menu(Base):
     parent_id: Mapped[int | None] = mapped_column(
         sa.BigInteger, sa.ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
     )
-    parent: Mapped[Optional['Menu']] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[Optional[list['Menu']]] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Menu | None] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[list[Menu] | None] = relationship(init=False, back_populates='parent')
 
     # 菜单角色多对多
     roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')

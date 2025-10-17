@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 
@@ -35,8 +34,8 @@ class Dept(Base):
     parent_id: Mapped[int | None] = mapped_column(
         sa.BigInteger, sa.ForeignKey('sys_dept.id', ondelete='SET NULL'), default=None, index=True, comment='父部门ID'
     )
-    parent: Mapped[Optional['Dept']] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[Optional[list['Dept']]] = relationship(init=False, back_populates='parent')
+    parent: Mapped[Dept | None] = relationship(init=False, back_populates='children', remote_side=[id])
+    children: Mapped[list[Dept] | None] = relationship(init=False, back_populates='parent')
 
     # 部门用户一对多
     users: Mapped[list[User]] = relationship(init=False, back_populates='dept')
