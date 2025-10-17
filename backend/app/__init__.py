@@ -12,7 +12,6 @@ def get_app_models() -> list[type]:
     apps = [d for d in list_dirs if os.path.isdir(os.path.join(app_path, d)) and d != '__pycache__']
 
     objs = []
-
     for app in apps:
         module_path = f'backend.app.{app}.model'
         obj = get_model_objects(module_path)

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+import sqlalchemy as sa
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_data_scope_rule, sys_role_data_scope
@@ -18,7 +19,7 @@ class DataScope(Base):
     __tablename__ = 'sys_data_scope'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(String(50), unique=True, comment='名称')
+    name: Mapped[str] = mapped_column(sa.String(50), unique=True, comment='名称')
     status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
 
     # 数据范围规则多对多

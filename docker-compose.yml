@@ -48,41 +48,41 @@ services:
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
 
-  fba_mysql:
-    image: mysql:8.0.41
+  fba_postgres:
+    image: postgres:16
     ports:
-      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
-    container_name: fba_mysql
+      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
+    container_name: fba_postgres
     restart: always
     environment:
-      MYSQL_DATABASE: fba
-      MYSQL_ROOT_PASSWORD: 123456
+      POSTGRES_DB: fba
+      POSTGRES_PASSWORD: 123456
       TZ: Asia/Shanghai
     volumes:
-      - fba_mysql:/var/lib/mysql
+      - fba_postgres:/var/lib/postgresql/data
     networks:
       - fba_network
-    command:
-      --default-authentication-plugin=mysql_native_password
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --lower_case_table_names=1
 
-  #  # 如果你是 postgres 用户，应保留 fba_postgres 容器脚本并删除 fba_mysql 容器脚本
-  #  fba_postgres:
-  #    image: postgres:16
-  #    ports:
-  #      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
-  #    container_name: fba_postgres
-  #    restart: always
-  #    environment:
-  #      POSTGRES_DB: fba
-  #      POSTGRES_PASSWORD: 123456
-  #      TZ: Asia/Shanghai
-  #    volumes:
-  #      - fba_postgres:/var/lib/postgresql/data
-  #    networks:
-  #      - fba_network
+#  # 如果你是 mysql 用户，应保留 fba_mysql 容器脚本并删除 fba_postgres 容器脚本
+#  fba_mysql:
+#    image: mysql:8.0.41
+#    ports:
+#      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
+#    container_name: fba_mysql
+#    restart: always
+#    environment:
+#      MYSQL_DATABASE: fba
+#      MYSQL_ROOT_PASSWORD: 123456
+#      TZ: Asia/Shanghai
+#    volumes:
+#      - fba_mysql:/var/lib/mysql
+#    networks:
+#      - fba_network
+#    command:
+#      --default-authentication-plugin=mysql_native_password
+#      --character-set-server=utf8mb4
+#      --collation-server=utf8mb4_general_ci
+#      --lower_case_table_names=1
 
   fba_redis:
     image: redis
