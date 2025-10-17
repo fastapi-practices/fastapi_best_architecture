@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
@@ -34,4 +36,4 @@ class GenBusiness(Base):
     )
     remark: Mapped[str | None] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='备注')
     # 代码生成业务模型列一对多
-    gen_column: Mapped[list['GenColumn']] = relationship(init=False, back_populates='gen_business')
+    gen_column: Mapped[list[GenColumn]] = relationship(init=False, back_populates='gen_business')

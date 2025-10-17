@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 
@@ -33,4 +35,4 @@ class GenColumn(DataClassBase):
     gen_business_id: Mapped[int] = mapped_column(
         sa.BigInteger, sa.ForeignKey('gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
     )
-    gen_business: Mapped[Union['GenBusiness', None]] = relationship(init=False, back_populates='gen_column')
+    gen_business: Mapped[GenBusiness | None] = relationship(init=False, back_populates='gen_column')
