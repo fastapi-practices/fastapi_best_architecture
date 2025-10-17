@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import sqlalchemy as sa
 
 from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_user_role
@@ -27,7 +28,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(sa.String(20), unique=True, index=True, comment='用户名')
     nickname: Mapped[str] = mapped_column(sa.String(20), comment='昵称')
     password: Mapped[str | None] = mapped_column(sa.String(255), comment='密码')
-    salt: Mapped[bytes | None] = mapped_column(sa.VARBINARY(255), comment='加密盐')
+    salt: Mapped[bytes | None] = mapped_column(BYTEA(255).with_variant(sa.VARBINARY, 'mysql'), comment='加密盐')
     email: Mapped[str | None] = mapped_column(sa.String(50), default=None, unique=True, index=True, comment='邮箱')
     phone: Mapped[str | None] = mapped_column(sa.String(11), default=None, comment='手机号')
     avatar: Mapped[str | None] = mapped_column(sa.String(255), default=None, comment='头像')
