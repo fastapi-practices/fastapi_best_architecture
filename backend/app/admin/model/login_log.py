@@ -2,10 +2,9 @@ from datetime import datetime
 
 import sqlalchemy as sa
 
-from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import DataClassBase, TimeZone, id_key
+from backend.common.model import DataClassBase, TimeZone, UniversalText, id_key
 from backend.utils.timezone import timezone
 
 
@@ -26,7 +25,7 @@ class LoginLog(DataClassBase):
     os: Mapped[str | None] = mapped_column(sa.String(50), comment='操作系统')
     browser: Mapped[str | None] = mapped_column(sa.String(50), comment='浏览器')
     device: Mapped[str | None] = mapped_column(sa.String(50), comment='设备')
-    msg: Mapped[str] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), comment='提示消息')
+    msg: Mapped[str] = mapped_column(UniversalText, comment='提示消息')
     login_time: Mapped[datetime] = mapped_column(TimeZone, comment='登录时间')
     created_time: Mapped[datetime] = mapped_column(
         TimeZone,

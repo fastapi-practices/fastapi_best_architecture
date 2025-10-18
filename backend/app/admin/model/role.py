@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 
-from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_data_scope, sys_role_menu, sys_user_role
-from backend.common.model import Base, id_key
+from backend.common.model import Base, UniversalText, id_key
 
 if TYPE_CHECKING:
     from backend.app.admin.model import DataScope, Menu, User
@@ -22,10 +21,8 @@ class Role(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(sa.String(20), unique=True, comment='角色名称')
     status: Mapped[int] = mapped_column(default=1, comment='角色状态（0停用 1正常）')
-    is_filter_scopes: Mapped[bool] = mapped_column(
-        sa.INTEGER().with_variant(TINYINT, 'mysql'), default=True, comment='过滤数据权限(0否 1是)'
-    )
-    remark: Mapped[str | None] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='备注')
+    is_filter_scopes: Mapped[bool] = mapped_column(default=True, comment='过滤数据权限(0否 1是)')
+    remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
 
     # 角色用户多对多
     users: Mapped[list[User]] = relationship(init=False, secondary=sys_user_role, back_populates='roles')

@@ -399,7 +399,7 @@ class DatabaseScheduler(Scheduler):
         """获取所有任务调度"""
         async with async_db_session() as db:
             logger.debug('DatabaseScheduler: Fetching database schedule')
-            stmt = select(TaskScheduler).where(TaskScheduler.enabled == 1)
+            stmt = select(TaskScheduler).where(TaskScheduler.enabled == True)  # noqa: E712
             query = await db.execute(stmt)
             schedulers = query.scalars().all()
             s = {}

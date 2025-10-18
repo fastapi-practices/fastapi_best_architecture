@@ -1,5 +1,5 @@
 insert into sys_dept (id, name, sort, leader, phone, email, status, del_flag, parent_id, created_time, updated_time)
-values (2048601258595581952, '测试', 0, null, null, null, 1, 0, null, now(), null);
+values (2048601258595581952, '测试', 0, null, null, null, 1, false, null, now(), null);
 
 insert into sys_menu (id, title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
 values
@@ -82,7 +82,7 @@ values
 (2049629108257816588, '写入', 'WriteGenCode', null, 0, null, 2, null, 'codegen:local:write', 1, 0, 1, '', null, 2049629108257816580, '2025-06-26 20:29:06', null);
 
 insert into sys_role (id, name, status, is_filter_scopes, remark, created_time, updated_time)
-values (2048601263515500544, '测试', 1, 1, null, now(), null);
+values (2048601263515500544, '测试', 1, true, null, now(), null);
 
 insert into sys_role_menu (id, role_id, menu_id)
 values
@@ -91,10 +91,10 @@ values
 (2048601263708438528, 2048601263515500544, 2049629108245233666),
 (2048601263775547392, 2048601263515500544, 2049629108253622282);
 
-insert into sys_user (id, uuid, username, nickname, password, salt, email, is_superuser, is_staff, status, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
+insert into sys_user (id, uuid, username, nickname, password, salt, email, status, is_superuser, is_staff, is_multi_login, avatar, phone, join_time, last_login_time, dept_id, created_time, updated_time)
 values
-(2048601263834267648, uuid(), 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', unhex('24326224313224387932654E7563583139566A6D5A33745968424C634F'), 'admin@example.com', 1, 1, 1, 1, null, null, now(), now(), 2048601258595581952, now(), null),
-(2049946297615646720, uuid(), 'test', '用户66666', '$2b$12$BMiXsNQAgTx7aNc7kVgnwedXGyUxPEHRnJMFbiikbqHgVoT3y14Za', unhex('24326224313224424D6958734E514167547837614E63376B56676E7765'), 'test@example.com', 0, 0, 1, 0, null, null, now(), now(), 2048601258595581952, now(), null);
+(2048601263834267648, uuid(), 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', unhex('24326224313224387932654E7563583139566A6D5A33745968424C634F'), 'admin@example.com', 1, true, true, true, null, null, now(), now(), 2048601258595581952, now(), null),
+(2049946297615646720, uuid(), 'test', '用户66666', '$2b$12$BMiXsNQAgTx7aNc7kVgnwedXGyUxPEHRnJMFbiikbqHgVoT3y14Za', unhex('24326224313224424D6958734E514167547837614E63376B56676E7765'), 'test@example.com', 1, false, false, false, null, null, now(), now(), 2048601258595581952, now(), null);
 
 insert into sys_user_role (id, user_id, role_id)
 values

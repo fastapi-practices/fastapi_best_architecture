@@ -5,11 +5,10 @@ from datetime import datetime
 import sqlalchemy as sa
 
 from sqlalchemy import event
-from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.exception import errors
-from backend.common.model import Base, TimeZone, id_key
+from backend.common.model import Base, TimeZone, UniversalText, id_key
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.timezone import timezone
@@ -35,15 +34,11 @@ class TaskScheduler(Base):
     interval_every: Mapped[int | None] = mapped_column(comment='任务再次运行前的间隔周期数')
     interval_period: Mapped[str | None] = mapped_column(sa.String(255), comment='任务运行之间的周期类型')
     crontab: Mapped[str | None] = mapped_column(sa.String(50), default='* * * * *', comment='任务运行的 Crontab 计划')
-    one_off: Mapped[bool] = mapped_column(
-        sa.INTEGER().with_variant(TINYINT, 'mysql'), default=False, comment='是否仅运行一次'
-    )
-    enabled: Mapped[bool] = mapped_column(
-        sa.INTEGER().with_variant(TINYINT, 'mysql'), default=True, comment='是否启用任务'
-    )
+    one_off: Mapped[bool] = mapped_column(default=False, comment='是否仅运行一次')
+    enabled: Mapped[bool] = mapped_column(default=True, comment='是否启用任务')
     total_run_count: Mapped[int] = mapped_column(default=0, comment='任务触发的总次数')
     last_run_time: Mapped[datetime | None] = mapped_column(TimeZone, default=None, comment='任务最后触发的时间')
-    remark: Mapped[str | None] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='备注')
+    remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
 
     no_changes: bool = False
 
