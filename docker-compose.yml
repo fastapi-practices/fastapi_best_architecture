@@ -8,7 +8,7 @@ networks:
         - subnet: 172.10.10.0/24
 
 volumes:
-  # 如果你是 postgres 用户，应将 fba_postgres 修改为 fba_mysql
+  # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
   fba_postgres:
     name: fba_postgres
   fba_redis:
