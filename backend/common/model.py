@@ -57,7 +57,7 @@ class UniversalText(TypeDecorator[str]):
 
 
 class TimeZone(TypeDecorator[datetime]):
-    """PostgreSQL、MySQL 兼容性时区感知 sqlalchemy DateTime 类型"""
+    """PostgreSQL、MySQL 兼容性时区感知类型"""
 
     impl = DateTime(timezone=True)
     cache_ok = True
