@@ -8,9 +8,9 @@ networks:
         - subnet: 172.10.10.0/24
 
 volumes:
-  # 如果你是 postgres 用户，应将 fba_mysql 修改为 fba_postgres
-  fba_mysql:
-    name: fba_mysql
+  # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
+  fba_postgres:
+    name: fba_postgres
   fba_redis:
     name: fba_redis
   fba_static:
@@ -28,9 +28,9 @@ services:
     image: fba_server:latest
     container_name: fba_server
     restart: always
-    # 如果你是 postgres 用户，应将 fba_mysql 修改为 fba_postgres
+    # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
     depends_on:
-      - fba_mysql
+      - fba_postgres
       - fba_redis
       - fba_celery
     volumes:
@@ -39,12 +39,12 @@ services:
       - fba_static_upload:/fba/backend/static/upload
     networks:
       - fba_network
-    # 如果你是 postgres 用户，应将 fba_mysql:3306 修改为 fba_postgres:5432
+    # 如果你是 mysql 用户，应将 fba_postgres:5432 修改为 fba_mysql:3306
     command:
       - bash
       - -c
       - |
-        wait-for-it -s fba_mysql:3306 -s fba_redis:6379 -t 300
+        wait-for-it -s fba_postgres:5432 -s fba_redis:6379 -t 300
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
 
