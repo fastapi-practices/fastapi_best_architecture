@@ -1,3 +1,21 @@
+<a id="v1.10.0"></a>
+# [v1.10.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.0) - 2025-10-17
+
+## What's Changed
+* Fix the import table cli command by [@wu-clan](https://github.com/wu-clan) in [#860](https://github.com/fastapi-practices/fastapi_best_architecture/pull/860)
+* Update unique judgment logic for dict data by [@wu-clan](https://github.com/wu-clan) in [#859](https://github.com/fastapi-practices/fastapi_best_architecture/pull/859)
+* Fix the api ninja in code generation by [@wu-clan](https://github.com/wu-clan) in [#858](https://github.com/fastapi-practices/fastapi_best_architecture/pull/858)
+* Fix dict plugin pgsql init script missing by [@wu-clan](https://github.com/wu-clan) in [#857](https://github.com/fastapi-practices/fastapi_best_architecture/pull/857)
+* Update the changelog for v1.9.0 by [@wu-clan](https://github.com/wu-clan) in [#856](https://github.com/fastapi-practices/fastapi_best_architecture/pull/856)
+* Fix ctx in validation exception handler by [@wu-clan](https://github.com/wu-clan) in [#861](https://github.com/fastapi-practices/fastapi_best_architecture/pull/861)
+* Update the primary database to postgresql by [@wu-clan](https://github.com/wu-clan) in [#829](https://github.com/fastapi-practices/fastapi_best_architecture/pull/829)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
+
+[Changes][v1.10.0]
+
+
 <a id="v1.9.0"></a>
 # [v1.9.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.9.0) - 2025-10-16
 
@@ -873,6 +891,7 @@
 [Changes][v1.0.0]
 
 
+[v1.10.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
 [v1.8.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
 [v1.8.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
