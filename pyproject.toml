@@ -12,7 +12,7 @@ license = { text = "MIT" }
 requires-python = ">=3.10"
 dynamic = ['version']
 dependencies = [
-    "alembic>=1.16.5",
+    "alembic>=1.17.0",
     "asgiref>=3.10.0",
     "asyncmy>=0.2.10",
     "asyncpg>=0.30.0",
@@ -22,8 +22,8 @@ dependencies = [
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool>=0.1.0rc8",
-    "cryptography>=46.0.2",
-    "dulwich>=0.24.2",
+    "cryptography>=46.0.3",
+    "dulwich>=0.24.5",
     "fast-captcha>=0.3.2",
     "fastapi-limiter>=0.1.6",
     "fastapi-pagination>=0.14.3",
@@ -39,11 +39,11 @@ dependencies = [
     "psutil>=7.1.0",
     "psycopg[binary]>=3.2.10",
     "pwdlib>=0.2.1",
-    "pydantic>=2.12.1",
+    "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
     "pymysql>=1.1.2",
     "python-jose>=3.5.0",
-    "python-socketio>=5.14.1",
+    "python-socketio>=5.14.2",
     "redis[hiredis]>=6.4.0",
     "rtoml>=0.12.0",
     "sqlalchemy-crud-plus>=1.12.1",

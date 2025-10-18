@@ -69,13 +69,13 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   loguru
     #   pytest
     #   uvicorn
-cryptography==46.0.2
+cryptography==46.0.3
     # via fastapi-best-architecture
 distlib==0.4.0
     # via virtualenv
 dnspython==2.8.0
     # via email-validator
-dulwich==0.24.3
+dulwich==0.24.5
     # via fastapi-best-architecture
 ecdsa==0.19.1
     # via python-jose
@@ -115,7 +115,7 @@ h11==0.16.0
     #   httpcore
     #   uvicorn
     #   wsproto
-hiredis==3.2.1
+hiredis==3.3.0
     # via redis
 httpcore==1.0.9
     # via httpx
@@ -123,7 +123,7 @@ httptools==0.7.1
     # via uvicorn
 httpx==0.28.1
     # via fastapi
-humanize==4.13.0
+humanize==4.14.0
     # via flower
 identify==2.6.15
     # via pre-commit
@@ -164,7 +164,7 @@ packaging==25.0
     # via
     #   kombu
     #   pytest
-pillow==11.3.0
+pillow==12.0.0
     # via fast-captcha
 platformdirs==4.5.0
     # via virtualenv
@@ -189,14 +189,14 @@ pyasn1==0.6.1
     #   rsa
 pycparser==2.23 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
-pydantic==2.12.1
+pydantic==2.12.3
     # via
     #   fastapi
     #   fastapi-best-architecture
     #   fastapi-pagination
     #   pydantic-settings
     #   sqlalchemy-crud-plus
-pydantic-core==2.41.3
+pydantic-core==2.41.4
     # via pydantic
 pydantic-settings==2.11.0
     # via fastapi-best-architecture
@@ -221,7 +221,7 @@ python-jose==3.5.0
     # via fastapi-best-architecture
 python-multipart==0.0.20
     # via fastapi
-python-socketio==5.14.1
+python-socketio==5.14.2
     # via fastapi-best-architecture
 pytz==2025.2
     # via flower
@@ -325,7 +325,7 @@ uvicorn==0.37.0
     # via
     #   fastapi
     #   fastapi-cli
-uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
+uvloop==0.22.1 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
     # via uvicorn
 vine==5.1.0
     # via
@@ -334,7 +334,7 @@ vine==5.1.0
     #   kombu
 virtualenv==20.35.3
     # via pre-commit
-watchfiles==1.1.0
+watchfiles==1.1.1
     # via uvicorn
 wcwidth==0.2.14
     # via prompt-toolkit
