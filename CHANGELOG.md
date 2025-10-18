@@ -1,3 +1,23 @@
+<a id="v1.10.1"></a>
+# [v1.10.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.1) - 2025-10-18
+
+## What's Changed
+* Update the changelog for v1.10.0 by [@wu-clan](https://github.com/wu-clan) in [#864](https://github.com/fastapi-practices/fastapi_best_architecture/pull/864)
+* Fix tasks related to deleting db logs by [@wu-clan](https://github.com/wu-clan) in [#863](https://github.com/fastapi-practices/fastapi_best_architecture/pull/863)
+* Fix the volume in the docker compose script by [@wu-clan](https://github.com/wu-clan) in [#865](https://github.com/fastapi-practices/fastapi_best_architecture/pull/865)
+* Update the release changelog workflow by [@wu-clan](https://github.com/wu-clan) in [#867](https://github.com/fastapi-practices/fastapi_best_architecture/pull/867)
+* Bump dependencies to the latest version by [@wu-clan](https://github.com/wu-clan) in [#868](https://github.com/fastapi-practices/fastapi_best_architecture/pull/868)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.10.1]
+
+
 <a id="v1.10.0"></a>
 # [v1.10.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.0) - 2025-10-17
 
@@ -12,6 +32,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.10.0]
 
@@ -31,6 +55,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.9.0]
 
 
@@ -48,6 +76,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.8.3]
 
@@ -83,6 +115,12 @@
 * [@MortyZhaoy](https://github.com/MortyZhaoy) made their first contribution in [#811](https://github.com/fastapi-practices/fastapi_best_architecture/pull/811)
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.1...v1.8.2
+
+## Contributors
+
+<a href="https://github.com/MortyZhaoy"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FMortyZhaoy.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@MortyZhaoy"></a>
+<a href="https://github.com/byte-voyager"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fbyte-voyager.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@byte-voyager"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.8.2]
 
@@ -128,6 +166,15 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.0...v1.8.1
 
+## Contributors
+
+<a href="https://github.com/IAseven"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FIAseven.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@IAseven"></a>
+<a href="https://github.com/siyue-wang"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fsiyue-wang.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@siyue-wang"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+<a href="https://github.com/wuyao4"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwuyao4.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wuyao4"></a>
+<a href="https://github.com/yanlingsishao"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fyanlingsishao.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@yanlingsishao"></a>
+<a href="https://github.com/yzbf-lin"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fyzbf-lin.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@yzbf-lin"></a>
+
 [Changes][v1.8.1]
 
 
@@ -172,6 +219,12 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.7.0...v1.8.0
 
+## Contributors
+
+<a href="https://github.com/IAseven"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FIAseven.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@IAseven"></a>
+<a href="https://github.com/downdawn"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdowndawn.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@downdawn"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.8.0]
 
 
@@ -207,6 +260,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.6.0...v1.7.0
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.7.0]
 
 
@@ -229,6 +286,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.2...v1.6.0
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.6.0]
 
@@ -256,6 +317,11 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.1...v1.5.2
 
+## Contributors
+
+<a href="https://github.com/downdawn"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdowndawn.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@downdawn"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.5.2]
 
 
@@ -271,6 +337,11 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.5.0...v1.5.1
+
+## Contributors
+
+<a href="https://github.com/downdawn"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdowndawn.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@downdawn"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.5.1]
 
@@ -295,6 +366,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.3...v1.5.0
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.5.0]
 
 
@@ -315,6 +390,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.2...v1.4.3
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.4.3]
 
@@ -337,6 +416,11 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.1...v1.4.2
 
+## Contributors
+
+<a href="https://github.com/huyuwei1996"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fhuyuwei1996.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@huyuwei1996"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.4.2]
 
 
@@ -353,6 +437,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.4.0...v1.4.1
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.4.1]
 
@@ -375,6 +463,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.3.0...v1.4.0
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.4.0]
 
 
@@ -391,6 +483,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.2.0...v1.3.0
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.3.0]
 
@@ -409,6 +505,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.2...v1.2.0
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.2.0]
 
 
@@ -426,6 +526,10 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.1...v1.1.2
 
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.1.2]
 
 
@@ -439,6 +543,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.1.0...v1.1.1
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.1.1]
 
@@ -458,6 +566,11 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.5...v1.1.0
+
+## Contributors
+
+<a href="https://github.com/huyuwei1996"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fhuyuwei1996.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@huyuwei1996"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.1.0]
 
@@ -482,6 +595,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.4...v1.0.5
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.0.5]
 
@@ -511,6 +628,12 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.3...v1.0.4
 
+## Contributors
+
+<a href="https://github.com/PoetryL"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FPoetryL.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@PoetryL"></a>
+<a href="https://github.com/ThankCat"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FThankCat.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@ThankCat"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.0.4]
 
 
@@ -529,6 +652,11 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.2...v1.0.3
 
+## Contributors
+
+<a href="https://github.com/huyuwei1996"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fhuyuwei1996.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@huyuwei1996"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
 [Changes][v1.0.3]
 
 
@@ -543,6 +671,10 @@
 
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.1...v1.0.2
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.0.2]
 
@@ -562,6 +694,11 @@
 * [@huyuwei1996](https://github.com/huyuwei1996) made their first contribution in [#525](https://github.com/fastapi-practices/fastapi_best_architecture/pull/525)
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.0.0...v1.0.1
+
+## Contributors
+
+<a href="https://github.com/huyuwei1996"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fhuyuwei1996.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@huyuwei1996"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
 
 [Changes][v1.0.1]
 
@@ -888,9 +1025,21 @@
 
 **Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/commits/v1.0.0
 
+## Contributors
+
+<a href="https://github.com/Meepoljdx"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FMeepoljdx.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@Meepoljdx"></a>
+<a href="https://github.com/dependabot"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdependabot.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@dependabot"></a>
+<a href="https://github.com/dividduang"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdividduang.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@dividduang"></a>
+<a href="https://github.com/downdawn"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdowndawn.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@downdawn"></a>
+<a href="https://github.com/obrua"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fobrua.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@obrua"></a>
+<a href="https://github.com/qhp13654398483"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fqhp13654398483.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@qhp13654398483"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+<a href="https://github.com/yshan2028"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fyshan2028.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@yshan2028"></a>
+
 [Changes][v1.0.0]
 
 
+[v1.10.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
 [v1.10.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
 [v1.8.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
