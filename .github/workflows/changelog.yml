@@ -18,4 +18,6 @@ jobs:
         with:
           file: CHANGELOG.md
           pull_request: true
+          commit_summary_template: 'Update the changelog for %s'
+          args: -c
           github_token: ${{ secrets.GH_TOKEN }}
