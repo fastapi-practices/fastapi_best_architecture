@@ -1,3 +1,17 @@
+<a id="v1.10.1"></a>
+# [v1.10.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.1) - 2025-10-18
+
+## What's Changed
+* Update the changelog for v1.10.0 by [@wu-clan](https://github.com/wu-clan) in [#864](https://github.com/fastapi-practices/fastapi_best_architecture/pull/864)
+* Fix tasks related to deleting db logs by [@wu-clan](https://github.com/wu-clan) in [#863](https://github.com/fastapi-practices/fastapi_best_architecture/pull/863)
+* Fix the volume in the docker compose script by [@wu-clan](https://github.com/wu-clan) in [#865](https://github.com/fastapi-practices/fastapi_best_architecture/pull/865)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
+
+[Changes][v1.10.1]
+
+
 <a id="v1.10.0"></a>
 # [v1.10.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.0) - 2025-10-17
 
@@ -891,6 +905,7 @@
 [Changes][v1.0.0]
 
 
+[v1.10.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
 [v1.10.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.3...v1.9.0
 [v1.8.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.8.2...v1.8.3
