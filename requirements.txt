@@ -132,7 +132,7 @@ idna==3.11
     #   anyio
     #   email-validator
     #   httpx
-iniconfig==2.1.0
+iniconfig==2.3.0
     # via pytest
 ip2loc==1.0.0
     # via fastapi-best-architecture
@@ -177,9 +177,9 @@ prompt-toolkit==3.0.52
     # via click-repl
 psutil==7.1.0
     # via fastapi-best-architecture
-psycopg==3.2.10
+psycopg==3.2.11
     # via fastapi-best-architecture
-psycopg-binary==3.2.10 ; implementation_name != 'pypy'
+psycopg-binary==3.2.11 ; implementation_name != 'pypy'
     # via psycopg
 pwdlib==0.2.1
     # via fastapi-best-architecture
@@ -242,7 +242,7 @@ rich-toolkit==0.15.1
     # via fastapi-cli
 rsa==4.9.1
     # via python-jose
-rtoml==0.12.0
+rtoml==0.13.0
     # via fastapi-best-architecture
 setuptools==80.9.0
     # via zope-event
@@ -321,7 +321,7 @@ urllib3==2.5.0
     # via dulwich
 user-agents==2.2.0
     # via fastapi-best-architecture
-uvicorn==0.37.0
+uvicorn==0.38.0
     # via
     #   fastapi
     #   fastapi-cli
