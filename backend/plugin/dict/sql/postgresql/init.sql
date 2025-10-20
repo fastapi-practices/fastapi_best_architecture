@@ -52,6 +52,5 @@ values
 (35, 'sys_plugin_type', '压缩包', '0', 'gold', 1, 1, '插件类型-压缩包', 12, now(), null),
 (36, 'sys_plugin_type', 'GIT', '1', 'processing', 2, 1, '插件类型-GIT', 12, now(), null);
 
--- reset auto-increment values for each table based on max id
 select setval(pg_get_serial_sequence('sys_dict_type', 'id'),coalesce(max(id), 0) + 1, true) from sys_dict_type;
 select setval(pg_get_serial_sequence('sys_dict_data', 'id'),coalesce(max(id), 0) + 1, true) from sys_dict_data;

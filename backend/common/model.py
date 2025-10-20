@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import BigInteger, DateTime, TypeDecorator
+from sqlalchemy import BigInteger, DateTime, Text, TypeDecorator
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
 
+from backend.core.conf import settings
 from backend.utils.snowflake import snowflake
 from backend.utils.timezone import timezone
 
@@ -41,16 +43,21 @@ snowflake_id_key = Annotated[
 ]
 
 
-# Mixin: 一种面向对象编程概念, 使结构变得更加清晰, `Wiki <https://en.wikipedia.org/wiki/Mixin/>`__
-class UserMixin(MappedAsDataclass):
-    """用户 Mixin 数据类"""
+class UniversalText(TypeDecorator[str]):
+    """PostgreSQL、MySQL 兼容性（长）文本类型"""
 
-    created_by: Mapped[int] = mapped_column(sort_order=998, comment='创建者')
-    updated_by: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
+    impl = LONGTEXT if settings.DATABASE_TYPE == 'mysql' else Text
+    cache_ok = True
+
+    def process_bind_param(self, value: str | None, dialect) -> str | None:  # noqa: ANN001
+        return value
+
+    def process_result_value(self, value: str | None, dialect) -> str | None:  # noqa: ANN001
+        return value
 
 
 class TimeZone(TypeDecorator[datetime]):
-    """时区感知 DateTime"""
+    """PostgreSQL、MySQL 兼容性时区感知类型"""
 
     impl = DateTime(timezone=True)
     cache_ok = True
@@ -69,6 +76,14 @@ class TimeZone(TypeDecorator[datetime]):
         if value is not None and value.tzinfo is None:
             value = value.replace(tzinfo=timezone.tz_info)
         return value
+
+
+# Mixin: 一种面向对象编程概念, 使结构变得更加清晰, `Wiki <https://en.wikipedia.org/wiki/Mixin/>`__
+class UserMixin(MappedAsDataclass):
+    """用户 Mixin 数据类"""
+
+    created_by: Mapped[int] = mapped_column(sort_order=998, comment='创建者')
+    updated_by: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
 
 
 class DateTimeMixin(MappedAsDataclass):

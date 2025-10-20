@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 
-from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.m2m import sys_role_menu
-from backend.common.model import Base, id_key
+from backend.common.model import Base, UniversalText, id_key
 
 if TYPE_CHECKING:
     from backend.app.admin.model import Role
@@ -31,10 +30,8 @@ class Menu(Base):
     status: Mapped[int] = mapped_column(default=1, comment='菜单状态（0停用 1正常）')
     display: Mapped[int] = mapped_column(default=1, comment='是否显示（0否 1是）')
     cache: Mapped[int] = mapped_column(default=1, comment='是否缓存（0否 1是）')
-    link: Mapped[str | None] = mapped_column(
-        sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='外链地址'
-    )
-    remark: Mapped[str | None] = mapped_column(sa.TEXT().with_variant(LONGTEXT, 'mysql'), default=None, comment='备注')
+    link: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='外链地址')
+    remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
 
     # 父级菜单一对多
     parent_id: Mapped[int | None] = mapped_column(
