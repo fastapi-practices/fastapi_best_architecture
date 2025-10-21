@@ -75,7 +75,7 @@ distlib==0.4.0
     # via virtualenv
 dnspython==2.8.0
     # via email-validator
-dulwich==0.24.5
+dulwich==0.24.6
     # via fastapi-best-architecture
 ecdsa==0.19.1
     # via python-jose
@@ -87,7 +87,7 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11'
     #   pytest
 fast-captcha==0.3.2
     # via fastapi-best-architecture
-fastapi==0.119.0
+fastapi==0.119.1
     # via
     #   fastapi-best-architecture
     #   fastapi-limiter
@@ -175,7 +175,7 @@ prometheus-client==0.23.1
     # via flower
 prompt-toolkit==3.0.52
     # via click-repl
-psutil==7.1.0
+psutil==7.1.1
     # via fastapi-best-architecture
 psycopg==3.2.11
     # via fastapi-best-architecture
