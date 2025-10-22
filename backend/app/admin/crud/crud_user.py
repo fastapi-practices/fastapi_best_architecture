@@ -87,7 +87,7 @@ class CRUDUser(CRUDPlus[User]):
         :param obj: 注册用户参数
         :return:
         """
-        obj.avatar = str(obj.avatar)
+        obj.avatar = str(obj.avatar)  # noqa: fix pgsql compatibility
         dict_obj = obj.model_dump()
         dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
@@ -110,7 +110,7 @@ class CRUDUser(CRUDPlus[User]):
         role_ids = obj.roles
         del obj.roles
 
-        obj.avatar = str(obj.avatar)
+        obj.avatar = str(obj.avatar)  # noqa: fix pgsql compatibility
         count = await self.update_model(db, input_user.id, obj)
 
         stmt = select(Role).where(Role.id.in_(role_ids))
