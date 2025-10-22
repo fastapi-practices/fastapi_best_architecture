@@ -27,7 +27,7 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(sa.String(20), comment='昵称')
     password: Mapped[str | None] = mapped_column(sa.String(255), comment='密码')
     salt: Mapped[bytes | None] = mapped_column(sa.LargeBinary(255), comment='加密盐')
-    email: Mapped[str | None] = mapped_column(sa.String(50), default=None, unique=True, index=True, comment='邮箱')
+    email: Mapped[str | None] = mapped_column(sa.String(255), default=None, unique=True, index=True, comment='邮箱')
     phone: Mapped[str | None] = mapped_column(sa.String(11), default=None, comment='手机号')
     avatar: Mapped[str | None] = mapped_column(sa.String(255), default=None, comment='头像')
     status: Mapped[int] = mapped_column(default=1, index=True, comment='用户账号状态(0停用 1正常)')
