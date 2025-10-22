@@ -26,6 +26,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: fba_server:latest
+    ports:
+      - "8001:8001"
     container_name: fba_server
     restart: always
     # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
