@@ -18,7 +18,9 @@ google_client = GoogleOAuth20(settings.OAUTH2_GOOGLE_CLIENT_ID, settings.OAUTH2_
 
 @router.get('', summary='获取 google 授权链接')
 async def get_google_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
-    auth_url = await google_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
+    auth_url = await google_client.get_authorization_url(
+        redirect_uri=f'{settings.OAUTH2_BACKEND_BASE_URL}{request.url.path}/callback'
+    )
     return response_base.success(data=auth_url)
 
 
