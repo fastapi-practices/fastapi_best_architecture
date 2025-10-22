@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
@@ -27,3 +27,9 @@ class SchemaBase(BaseModel):
             else timezone.to_str(x),
         },
     )
+
+
+def ser_string(value: Any) -> str | None:
+    if value:
+        return str(value)
+    return value
