@@ -20,7 +20,7 @@ class Task(MappedBase):
 
     id = sa.Column(sa.Integer, sa.Sequence('task_id_sequence'), primary_key=True, autoincrement=True)
     task_id = sa.Column(sa.String(155), unique=True)
-    status = sa.Column(sa.String(50), default=states.PENDING)
+    status = sa.Column(sa.String(64), default=states.PENDING)
     result = sa.Column(PickleType, nullable=True)
     date_done = sa.Column(
         sa.DateTime,
