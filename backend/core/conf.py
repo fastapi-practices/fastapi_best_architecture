@@ -228,7 +228,7 @@ class Settings(BaseSettings):
     OAUTH2_LINUX_DO_CLIENT_SECRET: str
 
     # 基础配置
-    OAUTH2_BACKEND_URL: str = 'http://127.0.0.1:8000'
+    OAUTH2_BACKEND_BASE_URL: str = 'http://127.0.0.1:8000'
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
     ##################################################
