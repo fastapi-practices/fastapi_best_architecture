@@ -1,13 +1,13 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Annotated
 
-from pydantic import ConfigDict, Field, HttpUrl, model_validator
+from pydantic import ConfigDict, Field, HttpUrl, model_validator, PlainSerializer
 from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptDetail
 from backend.app.admin.schema.role import GetRoleWithRelationDetail
 from backend.common.enums import StatusType
-from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase
+from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase, ser_string
 
 
 class AuthSchemaBase(SchemaBase):
@@ -40,7 +40,7 @@ class AddOAuth2UserParam(AuthSchemaBase):
     password: str | None = Field(None, description='密码')
     nickname: str | None = Field(None, description='昵称')
     email: CustomEmailStr | None = Field(None, description='邮箱')
-    avatar: HttpUrl | None = Field(None, description='头像地址')
+    avatar: Annotated[HttpUrl, PlainSerializer(ser_string)] | None = Field(None, description='头像地址')
 
 
 class ResetPasswordParam(SchemaBase):
@@ -57,7 +57,7 @@ class UserInfoSchemaBase(SchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     username: str = Field(description='用户名')
     nickname: str = Field(description='昵称')
-    avatar: HttpUrl | None = Field(None, description='头像地址')
+    avatar: Annotated[HttpUrl, PlainSerializer(ser_string)] | None = Field(None, description='头像地址')
     email: CustomEmailStr | None = Field(None, description='邮箱')
     phone: CustomPhoneNumber | None = Field(None, description='手机号')
 
