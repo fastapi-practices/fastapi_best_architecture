@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Any, Annotated
+from typing import Annotated, Any
 
-from pydantic import ConfigDict, Field, HttpUrl, model_validator, PlainSerializer
+from pydantic import ConfigDict, Field, HttpUrl, PlainSerializer, model_validator
 from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptDetail
