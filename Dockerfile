@@ -1,5 +1,5 @@
-# Select the image to build based on SERVER_TYPE, defaulting to fastapi_server, or docker-compose build args
-ARG SERVER_TYPE=fastapi_server
+# Select the image to build based on SERVER_TYPE, defaulting to fba_server, or docker-compose build args
+ARG SERVER_TYPE=fba_server
 
 # === Python environment from uv ===
 FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
@@ -41,22 +41,22 @@ COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
 WORKDIR /fba/backend
 
 # === FastAPI server image ===
-FROM base_server AS fastapi_server
+FROM base_server AS fba_server
 
 COPY deploy/backend/fba_server.conf /etc/supervisor/conf.d/
 
-RUN mkdir -p /var/log/fastapi_server
+RUN mkdir -p /var/log/fba
 
 EXPOSE 8001
 
 CMD ["/usr/local/bin/granian", "main:app", "--interface", "asgi", "--host", "0.0.0.0", "--port","8000"]
 
 # === Celery server image ===
-FROM base_server AS celery
+FROM base_server AS fba_celery
 
 COPY deploy/backend/fba_celery.conf /etc/supervisor/conf.d/
 
-RUN mkdir -p /var/log/celery
+RUN mkdir -p /var/log/fba
 
 RUN chmod +x celery-start.sh
 
