@@ -18,7 +18,9 @@ linux_do_client = LinuxDoOAuth20(settings.OAUTH2_LINUX_DO_CLIENT_ID, settings.OA
 
 @router.get('', summary='获取 LinuxDo 授权链接')
 async def get_linux_do_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
-    auth_url = await linux_do_client.get_authorization_url(redirect_uri=f'{request.url}/callback')
+    auth_url = await linux_do_client.get_authorization_url(
+        redirect_uri=f'{settings.OAUTH2_BACKEND_URL}{request.url.path}/callback'
+    )
     return response_base.success(data=auth_url)
 
 
