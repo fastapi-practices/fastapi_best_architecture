@@ -172,7 +172,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - SERVER_TYPE=celery
+        - SERVER_TYPE=fba_celery
     image: fba_celery:latest
     ports:
       - "8555:8555"
