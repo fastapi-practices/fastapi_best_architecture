@@ -15,7 +15,7 @@ class LoginLog(DataClassBase):
 
     id: Mapped[id_key] = mapped_column(init=False)
     user_uuid: Mapped[str] = mapped_column(sa.String(64), comment='用户UUID')
-    username: Mapped[str] = mapped_column(sa.String(32), comment='用户名')
+    username: Mapped[str] = mapped_column(sa.String(64), comment='用户名')
     status: Mapped[int] = mapped_column(insert_default=0, comment='登录状态(0失败 1成功)')
     ip: Mapped[str] = mapped_column(sa.String(64), comment='登录IP地址')
     country: Mapped[str | None] = mapped_column(sa.String(64), comment='国家')
