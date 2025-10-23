@@ -18,10 +18,10 @@ class GenColumn(DataClassBase):
     __tablename__ = 'gen_column'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    name: Mapped[str] = mapped_column(sa.String(50), comment='列名称')
-    comment: Mapped[str | None] = mapped_column(sa.String(255), default=None, comment='列描述')
-    type: Mapped[str] = mapped_column(sa.String(20), default='String', comment='SQLA 模型列类型')
-    pd_type: Mapped[str] = mapped_column(sa.String(20), default='str', comment='列类型对应的 pydantic 类型')
+    name: Mapped[str] = mapped_column(sa.String(64), comment='列名称')
+    comment: Mapped[str | None] = mapped_column(sa.String(256), default=None, comment='列描述')
+    type: Mapped[str] = mapped_column(sa.String(32), default='String', comment='SQLA 模型列类型')
+    pd_type: Mapped[str] = mapped_column(sa.String(32), default='str', comment='列类型对应的 pydantic 类型')
     default: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='列默认值')
     sort: Mapped[int | None] = mapped_column(default=1, comment='列排序')
     length: Mapped[int] = mapped_column(default=0, comment='列长度')
