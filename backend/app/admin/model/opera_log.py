@@ -15,7 +15,7 @@ class OperaLog(DataClassBase):
 
     id: Mapped[id_key] = mapped_column(init=False)
     trace_id: Mapped[str] = mapped_column(sa.String(32), comment='请求跟踪 ID')
-    username: Mapped[str | None] = mapped_column(sa.String(32), comment='用户名')
+    username: Mapped[str | None] = mapped_column(sa.String(64), comment='用户名')
     method: Mapped[str] = mapped_column(sa.String(32), comment='请求类型')
     title: Mapped[str] = mapped_column(sa.String(256), comment='操作模块')
     path: Mapped[str] = mapped_column(sa.String(512), comment='请求路径')
