@@ -60,7 +60,7 @@ async def get_report_statistics(
         return response_base.fail(data=f"获取统计信息失败: {str(e)}")
 
 
-@router.get("/test-cases/available", response_model=ResponseModel, summary="获取可用的测试用例列表")
+@router.get("/test_cases/available", response_model=ResponseModel, summary="获取可用的测试用例列表")
 async def get_available_test_cases() -> ResponseModel | ResponseSchemaModel:
     """
     获取可用的测试用例列表（用于创建报告时选择）
