@@ -189,6 +189,8 @@ class Settings(BaseSettings):
     # Plugin 配置
     PLUGIN_PIP_CHINA: bool = True
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
+    PLUGIN_PIP_MAX_RETRY: int = 3
+    PLUGIN_PIP_INSTALL_TIMEOUT: int = 300
     PLUGIN_REDIS_PREFIX: str = 'fba:plugin'
 
     # I18n 配置
