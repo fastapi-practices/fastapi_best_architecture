@@ -89,7 +89,7 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11'
     #   pytest
 fast-captcha==0.3.2
     # via fastapi-best-architecture
-fastapi==0.120.1
+fastapi==0.120.2
     # via
     #   fastapi-best-architecture
     #   fastapi-limiter
