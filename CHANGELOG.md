@@ -1,3 +1,33 @@
+<a id="v1.10.3"></a>
+# [v1.10.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.3) - 2025-10-30
+
+## What's Changed
+* Update changelog for v1.10.2 by [@wu-clan](https://github.com/wu-clan) in [#873](https://github.com/fastapi-practices/fastapi_best_architecture/pull/873)
+* Fix docker default database env variables by [@wu-clan](https://github.com/wu-clan) in [#874](https://github.com/fastapi-practices/fastapi_best_architecture/pull/874)
+* Add port for fba sever in docker compose by [@wu-clan](https://github.com/wu-clan) in [#875](https://github.com/fastapi-practices/fastapi_best_architecture/pull/875)
+* Update the container naming in docker scripts by [@wu-clan](https://github.com/wu-clan) in [#876](https://github.com/fastapi-practices/fastapi_best_architecture/pull/876)
+* Fix the httpurl type compatibility with postgresql by [@wu-clan](https://github.com/wu-clan) in [#877](https://github.com/fastapi-practices/fastapi_best_architecture/pull/877)
+* Update the default length of user email column by [@wu-clan](https://github.com/wu-clan) in [#878](https://github.com/fastapi-practices/fastapi_best_architecture/pull/878)
+* Update the serializer of httpurl type by [@wu-clan](https://github.com/wu-clan) in [#879](https://github.com/fastapi-practices/fastapi_best_architecture/pull/879)
+* Fix the OAuth2 link acquisition in HTTPS by [@wu-clan](https://github.com/wu-clan) in [#881](https://github.com/fastapi-practices/fastapi_best_architecture/pull/881)
+* Add Google OAuth2 callback to opera log exclusion by [@wu-clan](https://github.com/wu-clan) in [#882](https://github.com/fastapi-practices/fastapi_best_architecture/pull/882)
+* Update the length style of the model columns by [@wu-clan](https://github.com/wu-clan) in [#883](https://github.com/fastapi-practices/fastapi_best_architecture/pull/883)
+* Bump dependencies to the latest version by [@wu-clan](https://github.com/wu-clan) in [#890](https://github.com/fastapi-practices/fastapi_best_architecture/pull/890)
+* Fix import in code generation api template by [@wu-clan](https://github.com/wu-clan) in [#891](https://github.com/fastapi-practices/fastapi_best_architecture/pull/891)
+* Fix celery compatibility with psycopg version by [@wu-clan](https://github.com/wu-clan) in [#892](https://github.com/fastapi-practices/fastapi_best_architecture/pull/892)
+* Fix the venv pip availability in Linux by [@wu-clan](https://github.com/wu-clan) in [#893](https://github.com/fastapi-practices/fastapi_best_architecture/pull/893)
+* Add the celery rabbitmq vhost config by [@wu-clan](https://github.com/wu-clan) in [#894](https://github.com/fastapi-practices/fastapi_best_architecture/pull/894)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.2...v1.10.3
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.10.3]
+
+
 <a id="v1.10.2"></a>
 # [v1.10.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.2) - 2025-10-21
 
@@ -1058,6 +1088,7 @@
 [Changes][v1.0.0]
 
 
+[v1.10.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.2...v1.10.3
 [v1.10.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.1...v1.10.2
 [v1.10.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
 [v1.10.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.9.0...v1.10.0
