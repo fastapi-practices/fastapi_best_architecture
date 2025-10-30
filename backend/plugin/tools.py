@@ -286,7 +286,62 @@ def build_final_router() -> APIRouter:
     return main_router
 
 
-def install_requirements(plugin: str | None) -> None:
+def _ensure_pip_available() -> bool:
+    """确保 pip 在虚拟环境中可用"""
+    try:
+        result = subprocess.run([sys.executable, '-m', 'pip', '--version'], capture_output=True, text=True)
+        if result.returncode == 0:
+            return True
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
+        pass
+
+    # 尝试使用 ensurepip
+    try:
+        subprocess.check_call(
+            [sys.executable, '-m', 'ensurepip', '--default-pip'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        result = subprocess.run([sys.executable, '-m', 'pip', '--version'], capture_output=True, text=True)
+        if result.returncode == 0:
+            return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
+        pass
+
+    # 尝试下载并安装
+    try:
+        import os
+        import tempfile
+
+        import httpx
+
+        try:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+                with httpx.Client(timeout=3) as client:
+                    get_pip_url = 'https://bootstrap.pypa.io/get-pip.py'
+                    response = client.get(get_pip_url)
+                    response.raise_for_status()
+                    f.write(response.text)
+                    temp_file = f.name
+        except Exception:  # noqa: ignore
+            return False
+
+        try:
+            subprocess.check_call([sys.executable, temp_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            result = subprocess.run([sys.executable, '-m', 'pip', '--version'], capture_output=True, text=True)
+            return result.returncode == 0
+        finally:
+            try:
+                os.unlink(temp_file)
+            except OSError:
+                pass
+    except Exception:  # noqa: ignore
+        pass
+
+    return False
+
+
+def install_requirements(plugin: str | None) -> None:  # noqa: C901
     """
     安装插件依赖
 
@@ -316,12 +371,30 @@ def install_requirements(plugin: str | None) -> None:
 
         if missing_dependencies:
             try:
-                ensurepip_install = [sys.executable, '-m', 'ensurepip', '--upgrade']
+                if not _ensure_pip_available():
+                    raise PluginInstallError(f'pip 安装失败，无法继续安装插件 {plugin} 依赖')
+
                 pip_install = [sys.executable, '-m', 'pip', 'install', '-r', requirements_file]
                 if settings.PLUGIN_PIP_CHINA:
                     pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-                subprocess.check_call(ensurepip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                subprocess.check_call(pip_install, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+                max_retries = settings.PLUGIN_PIP_MAX_RETRY
+                for attempt in range(max_retries):
+                    try:
+                        subprocess.check_call(
+                            pip_install,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
+                        break
+                    except subprocess.TimeoutExpired:
+                        if attempt == max_retries - 1:
+                            raise PluginInstallError(f'插件 {plugin} 依赖安装超时')
+                        continue
+                    except subprocess.CalledProcessError as e:
+                        if attempt == max_retries - 1:
+                            raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
+                        continue
             except subprocess.CalledProcessError as e:
                 raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
 
