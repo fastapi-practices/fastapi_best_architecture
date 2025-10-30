@@ -179,9 +179,9 @@ prompt-toolkit==3.0.52
     # via click-repl
 psutil==7.1.2
     # via fastapi-best-architecture
-psycopg==3.2.12
+psycopg==3.2.10
     # via fastapi-best-architecture
-psycopg-binary==3.2.12 ; implementation_name != 'pypy'
+psycopg-binary==3.2.10 ; implementation_name != 'pypy'
     # via psycopg
 pwdlib==0.3.0
     # via fastapi-best-architecture

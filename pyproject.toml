@@ -37,7 +37,8 @@ dependencies = [
     "loguru>=0.7.3",
     "msgspec>=0.19.0",
     "psutil>=7.1.2",
-    "psycopg[binary]>=3.2.12",
+    # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
+    "psycopg[binary]==3.2.10",
     "pwdlib>=0.2.1",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
