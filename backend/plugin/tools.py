@@ -385,7 +385,6 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
                             pip_install,
                             stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL,
-                            timeout=settings.PLUGIN_PIP_INSTALL_TIMEOUT,
                         )
                         break
                     except subprocess.TimeoutExpired:
