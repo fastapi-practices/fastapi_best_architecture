@@ -231,7 +231,9 @@ class Settings(BaseSettings):
     OAUTH2_LINUX_DO_CLIENT_SECRET: str
 
     # 基础配置
-    OAUTH2_BACKEND_BASE_URL: str = 'http://127.0.0.1:8000'
+    OAUTH2_GITHUB_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/github/callback'
+    OAUTH2_GOOGLE_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/google/callback'
+    OAUTH2_LINUX_DO_REDIRECT_URI: str = 'http://127.0.0.1:8000/api/v1/oauth2/linux-do/callback'
     OAUTH2_FRONTEND_REDIRECT_URI: str = 'http://localhost:5173/oauth2/callback'
 
     ##################################################

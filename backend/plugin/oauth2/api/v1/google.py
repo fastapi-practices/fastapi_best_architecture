@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, GoogleOAuth20
 from starlette.responses import RedirectResponse
@@ -17,10 +17,8 @@ google_client = GoogleOAuth20(settings.OAUTH2_GOOGLE_CLIENT_ID, settings.OAUTH2_
 
 
 @router.get('', summary='获取 google 授权链接')
-async def get_google_oauth2_url(request: Request) -> ResponseSchemaModel[str]:
-    auth_url = await google_client.get_authorization_url(
-        redirect_uri=f'{settings.OAUTH2_BACKEND_BASE_URL}{request.url.path}/callback'
-    )
+async def get_google_oauth2_url() -> ResponseSchemaModel[str]:
+    auth_url = await google_client.get_authorization_url(redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI)
     return response_base.success(data=auth_url)
 
 
@@ -36,11 +34,11 @@ async def google_oauth2_callback(  # noqa: ANN201
     background_tasks: BackgroundTasks,
     oauth2: Annotated[
         FastAPIOAuth20,
-        Depends(FastAPIOAuth20(google_client, redirect_route_name='google_oauth2_callback')),
+        Depends(FastAPIOAuth20(google_client, redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI)),
     ],
 ):
-    token, _state = oauth2
-    access_token = token['access_token']
+    token_data, _state = oauth2
+    access_token = token_data['access_token']
     user = await google_client.get_userinfo(access_token)
     data = await oauth2_service.create_with_login(
         db=db,
