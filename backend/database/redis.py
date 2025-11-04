@@ -66,7 +66,7 @@ class RedisCli(Redis):
         获取指定前缀的所有 key
 
         :param prefix: 要搜索的键前缀
-        :param count: 每次扫描批次的数量，值越大扫描速度越快，但可能占用更多服务器资源
+        :param count: 每次扫描批次的数量，值越大扫描速度越快，但会占用更多服务器资源
         :return:
         """
         return [key async for key in self.scan_iter(match=f'{prefix}*', count=count)]
