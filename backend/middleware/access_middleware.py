@@ -32,12 +32,4 @@ class AccessMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
-        if request.method != 'OPTIONS':
-            log.debug('<-- 请求结束')
-
-            log.info(
-                f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
-                f'{path} | {(time.perf_counter() - perf_time) * 1000:.3f}ms',
-            )
-
         return response

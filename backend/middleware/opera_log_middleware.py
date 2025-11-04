@@ -51,7 +51,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             error = None
             try:
                 response = await call_next(request)
-                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
+                elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
                 for e in [
                     '__request_http_exception__',
                     '__request_validation_exception__',
@@ -65,7 +65,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         log.error(f'请求异常: {msg}')
                         break
             except Exception as e:
-                elapsed = (time.perf_counter() - ctx.perf_time) * 1000
+                elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
                 code = getattr(e, 'code', StandardResponseCode.HTTP_500)  # 兼容 SQLAlchemy 异常用法
                 msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
                 status = StatusType.disable
@@ -86,6 +86,12 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             log.debug(f'接口摘要：[{summary}]')
             log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
+            log.info(
+                f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
+                f'{path} | {elapsed:.3f}ms',
+            )
+            if request.method != 'OPTIONS':
+                log.debug('<-- 请求结束')
 
             # 日志创建
             opera_log_in = CreateOperaLogParam(
