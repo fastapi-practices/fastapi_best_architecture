@@ -208,7 +208,7 @@ class AuthService:
             raise errors.NotFoundError(msg='用户不存在')
         if not user.status:
             raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-        if not user.is_multi_login and await redis_client.keys(match=f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
+        if not user.is_multi_login and await redis_client.get_prefix(f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
             raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
         new_token = await create_new_token(
             refresh_token,
