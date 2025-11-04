@@ -83,8 +83,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 username = None
 
             # 日志记录
-            if request.method != 'OPTIONS':
-                log.debug('<-- 请求结束')
             log.debug(f'接口摘要：[{summary}]')
             log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
@@ -92,6 +90,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 f'{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | '
                 f'{path} | {elapsed:.3f}ms',
             )
+            if request.method != 'OPTIONS':
+                log.debug('<-- 请求结束')
 
             # 日志创建
             opera_log_in = CreateOperaLogParam(
