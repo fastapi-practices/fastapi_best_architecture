@@ -1,15 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import Base, UniversalText, id_key
-
-if TYPE_CHECKING:
-    from backend.plugin.code_generator.model import GenColumn
 
 
 class GenBusiness(Base):
@@ -34,5 +27,3 @@ class GenBusiness(Base):
         sa.String(256), default=None, comment='代码生成路径（默认为 app 根路径）'
     )
     remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
-    # 代码生成业务模型列一对多
-    gen_column: Mapped[list[GenColumn]] = relationship(init=False, back_populates='gen_business')

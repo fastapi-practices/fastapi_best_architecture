@@ -1,16 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.admin.model.m2m import sys_role_menu
 from backend.common.model import Base, UniversalText, id_key
-
-if TYPE_CHECKING:
-    from backend.app.admin.model import Role
 
 
 class Menu(Base):
@@ -33,12 +25,5 @@ class Menu(Base):
     link: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='外链地址')
     remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
 
-    # 父级菜单一对多
-    parent_id: Mapped[int | None] = mapped_column(
-        sa.BigInteger, sa.ForeignKey('sys_menu.id', ondelete='SET NULL'), default=None, index=True, comment='父菜单ID'
-    )
-    parent: Mapped[Menu | None] = relationship(init=False, back_populates='children', remote_side=[id])
-    children: Mapped[list[Menu] | None] = relationship(init=False, back_populates='parent')
-
-    # 菜单角色多对多
-    roles: Mapped[list[Role]] = relationship(init=False, secondary=sys_role_menu, back_populates='menus')
+    # 父级菜单
+    parent_id: Mapped[int | None] = mapped_column(sa.BigInteger, default=None, index=True, comment='父菜单ID')

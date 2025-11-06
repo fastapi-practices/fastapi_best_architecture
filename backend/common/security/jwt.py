@@ -22,7 +22,6 @@ from backend.common.exception.errors import TokenError
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
-from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 
 
@@ -246,7 +245,7 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
     """
     from backend.app.admin.crud.crud_user import user_dao
 
-    user = await user_dao.get_with_relation(db, user_id=pk)
+    user = await user_dao.get_joins(db, user_id=pk)
     if not user:
         raise errors.TokenError(msg='Token 无效')
     if not user.status:
@@ -297,7 +296,7 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
     if not cache_user:
         async with async_db_session() as db:
             current_user = await get_current_user(db, user_id)
-            user = GetUserInfoWithRelationDetail(**select_as_dict(current_user))
+            user = GetUserInfoWithRelationDetail.model_validate(current_user)
             await redis_client.setex(
                 f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
                 settings.TOKEN_EXPIRE_SECONDS,

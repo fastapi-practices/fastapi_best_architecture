@@ -1,15 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import DataClassBase, UniversalText, id_key
-
-if TYPE_CHECKING:
-    from backend.plugin.code_generator.model import GenBusiness
 
 
 class GenColumn(DataClassBase):
@@ -28,8 +21,5 @@ class GenColumn(DataClassBase):
     is_pk: Mapped[bool] = mapped_column(default=False, comment='是否主键')
     is_nullable: Mapped[bool] = mapped_column(default=False, comment='是否可为空')
 
-    # 代码生成业务模型列一对多
-    gen_business_id: Mapped[int] = mapped_column(
-        sa.BigInteger, sa.ForeignKey('gen_business.id', ondelete='CASCADE'), default=0, comment='代码生成业务ID'
-    )
-    gen_business: Mapped[GenBusiness | None] = relationship(init=False, back_populates='gen_column')
+    # 逻辑外键
+    gen_business_id: Mapped[int] = mapped_column(sa.BigInteger, default=0, comment='代码生成业务ID')

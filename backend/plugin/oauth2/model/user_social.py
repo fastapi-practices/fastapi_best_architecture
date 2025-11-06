@@ -1,15 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import Base, id_key
-
-if TYPE_CHECKING:
-    from backend.app.admin.model import User
 
 
 class UserSocial(Base):
@@ -21,8 +14,5 @@ class UserSocial(Base):
     sid: Mapped[str] = mapped_column(sa.String(256), comment='第三方用户 ID')
     source: Mapped[str] = mapped_column(sa.String(32), comment='第三方用户来源')
 
-    # 用户社交信息一对多
-    user_id: Mapped[int] = mapped_column(
-        sa.BigInteger, sa.ForeignKey('sys_user.id', ondelete='CASCADE'), comment='用户关联ID'
-    )
-    user: Mapped[User | None] = relationship(init=False, backref='socials')
+    # 逻辑外键
+    user_id: Mapped[int] = mapped_column(sa.BigInteger, comment='用户关联ID')
