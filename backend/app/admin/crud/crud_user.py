@@ -81,6 +81,8 @@ class CRUDUser(CRUDPlus[User]):
         roles = await db.execute(stmt)
         new_user.roles = roles.scalars().all()
 
+        db.add(new_user)
+
     async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
         """
         通过 OAuth2 添加用户
@@ -116,7 +118,6 @@ class CRUDUser(CRUDPlus[User]):
         stmt = select(Role).where(Role.id.in_(role_ids))
         roles = await db.execute(stmt)
         input_user.roles = roles.scalars().all()
-
         return count
 
     async def update_nickname(self, db: AsyncSession, user_id: int, nickname: str) -> int:
