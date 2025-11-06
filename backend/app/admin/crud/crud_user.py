@@ -2,8 +2,9 @@ from typing import Any
 
 import bcrypt
 
-from sqlalchemy import delete, insert, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import noload, selectinload
 from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -76,13 +77,9 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
 
-        db.add(new_user)
-        await db.flush()  # 获取用户ID
-
-        # 添加用户角色关联（逻辑外键）
-        if obj.roles:
-            for role_id in obj.roles:
-                await db.execute(insert(user_role).values(user_id=new_user.id, role_id=role_id))
+        stmt = select(Role).where(Role.id.in_(obj.roles))
+        roles = await db.execute(stmt)
+        new_user.roles = roles.scalars().all()
 
     async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
         """
@@ -96,15 +93,11 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
 
-        db.add(new_user)
-        await db.flush()  # 获取用户ID
-
-        # 绑定第一个角色（逻辑外键）
-        stmt = select(Role).limit(1)
+        stmt = select(Role)
         role = await db.execute(stmt)
-        first_role = role.scalars().first()
-        if first_role:
-            await db.execute(insert(user_role).values(user_id=new_user.id, role_id=first_role.id))
+        new_user.roles = [role.scalars().first()]  # 默认绑定第一个角色
+
+        db.add(new_user)
 
     async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
         """
@@ -120,13 +113,9 @@ class CRUDUser(CRUDPlus[User]):
 
         count = await self.update_model(db, input_user.id, obj)
 
-        # 删除原有用户角色关联
-        await db.execute(delete(user_role).where(user_role.c.user_id == input_user.id))
-
-        # 添加新的用户角色关联（逻辑外键）
-        if role_ids:
-            for role_id in role_ids:
-                await db.execute(insert(user_role).values(user_id=input_user.id, role_id=role_id))
+        stmt = select(Role).where(Role.id.in_(role_ids))
+        roles = await db.execute(stmt)
+        input_user.roles = roles.scalars().all()
 
         return count
 
@@ -220,6 +209,10 @@ class CRUDUser(CRUDPlus[User]):
         return await self.select_order(
             'id',
             'desc',
+            load_options=[
+                selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
+                selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.scopes)),
+            ],
             **filters,
         )
 
@@ -280,7 +273,7 @@ class CRUDUser(CRUDPlus[User]):
         :param db: 数据库会话
         :param user_id: 用户 ID
         :param username: 用户名
-        :return: 包含用户信息及关联部门、角色等数据的对象，支持访问 .status、.dept、.roles 等属性
+        :return:
         """
         filters = {}
 
