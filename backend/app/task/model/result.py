@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
-
 import sqlalchemy as sa
 
 from celery import states
 from sqlalchemy.types import PickleType
 
-from backend.common.model import MappedBase
+from backend.common.model import MappedBase, TimeZone
+from backend.utils.timezone import timezone
 
 """
 重写 celery.backends.database.models 内部所有模型，适配 fba 创建表和 alembic 迁移
@@ -23,9 +22,9 @@ class Task(MappedBase):
     status = sa.Column(sa.String(64), default=states.PENDING)
     result = sa.Column(PickleType, nullable=True)
     date_done = sa.Column(
-        sa.DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        TimeZone,
+        default=timezone.now,
+        onupdate=timezone.now,
         nullable=True,
     )
     traceback = sa.Column(sa.Text, nullable=True)
@@ -87,7 +86,7 @@ class TaskSet(MappedBase):
     id = sa.Column(sa.Integer, sa.Sequence('taskset_id_sequence'), autoincrement=True, primary_key=True)
     taskset_id = sa.Column(sa.String(155), unique=True)
     result = sa.Column(PickleType, nullable=True)
-    date_done = sa.Column(sa.DateTime, default=datetime.now(timezone.utc), nullable=True)
+    date_done = sa.Column(TimeZone, default=timezone.now, nullable=True)
 
     def __init__(self, taskset_id, result) -> None:  # noqa: ANN001
         self.taskset_id = taskset_id
