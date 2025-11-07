@@ -37,7 +37,7 @@ class UserService:
         :param username: 用户名
         :return:
         """
-        user = await user_dao.get_joins(db, user_id=pk, username=username)
+        user = await user_dao.get_join(db, user_id=pk, username=username)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         return user
@@ -51,7 +51,7 @@ class UserService:
         :param pk: 用户 ID
         :return:
         """
-        user = await user_dao.get_joins(db, user_id=pk)
+        user = await user_dao.get_join(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         return user.roles
@@ -101,7 +101,7 @@ class UserService:
         :param obj: 用户更新参数
         :return:
         """
-        user = await user_dao.get_joins(db, user_id=pk)
+        user = await user_dao.get_join(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         if obj.username != user.username and await user_dao.get_by_username(db, obj.username):

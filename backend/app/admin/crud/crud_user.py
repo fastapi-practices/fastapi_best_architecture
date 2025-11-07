@@ -282,7 +282,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
-    async def get_joins(
+    async def get_join(
         self,
         db: AsyncSession,
         *,

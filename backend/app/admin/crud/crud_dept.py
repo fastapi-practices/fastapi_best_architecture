@@ -99,7 +99,7 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         return await self.delete_model_by_column(db, id=dept_id, logical_deletion=True, deleted_flag_column='del_flag')
 
-    async def get_with_relation(self, db: AsyncSession, dept_id: int) -> Any | None:
+    async def get_join(self, db: AsyncSession, dept_id: int) -> Any | None:
         """
         获取部门及关联数据
 

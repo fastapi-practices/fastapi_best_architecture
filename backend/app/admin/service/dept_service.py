@@ -107,7 +107,7 @@ class DeptService:
         :param pk: 部门 ID
         :return:
         """
-        dept = await dept_dao.get_with_relation(db, pk)
+        dept = await dept_dao.get_join(db, pk)
         if not dept:
             raise errors.NotFoundError(msg='部门不存在')
         if dept.users:
