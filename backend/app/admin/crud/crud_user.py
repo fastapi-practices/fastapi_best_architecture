@@ -2,7 +2,7 @@ from typing import Any
 
 import bcrypt
 
-from sqlalchemy import select
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -11,6 +11,7 @@ from backend.app.admin.model.m2m import data_scope_rule, role_data_scope, role_m
 from backend.app.admin.schema.user import (
     AddOAuth2UserParam,
     AddUserParam,
+    AddUserRoleParam,
     UpdateUserParam,
 )
 from backend.common.pagination import paging_data
@@ -72,15 +73,20 @@ class CRUDUser(CRUDPlus[User]):
         """
         salt = bcrypt.gensalt()
         obj.password = get_hash_password(obj.password, salt)
+
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
-
-        stmt = select(Role).where(Role.id.in_(obj.roles))
-        roles = await db.execute(stmt)
-        new_user.roles = roles.scalars().all()
-
         db.add(new_user)
+        await db.flush()
+
+        role_stmt = select(Role).where(Role.id.in_(obj.roles))
+        result = await db.execute(role_stmt)
+        roles = result.scalars().all()
+
+        user_role_data = [AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump() for role in roles]
+        user_role_stmt = insert(user_role)
+        await db.execute(user_role_stmt, user_role_data)
 
     async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
         """
@@ -93,12 +99,15 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj = obj.model_dump()
         dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
-
-        stmt = select(Role)
-        role = await db.execute(stmt)
-        new_user.roles = [role.scalars().first()]  # 默认绑定第一个角色
-
         db.add(new_user)
+        await db.flush()
+
+        role_stmt = select(Role)
+        result = await db.execute(role_stmt)
+        role = result.scalars().first()  # 默认绑定第一个角色
+
+        user_role_stmt = insert(user_role).values(AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump())
+        await db.execute(user_role_stmt)
 
     async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
         """
@@ -114,9 +123,14 @@ class CRUDUser(CRUDPlus[User]):
 
         count = await self.update_model(db, input_user.id, obj)
 
-        stmt = select(Role).where(Role.id.in_(role_ids))
-        roles = await db.execute(stmt)
-        input_user.roles = roles.scalars().all()
+        role_stmt = select(Role).where(Role.id.in_(role_ids))
+        result = await db.execute(role_stmt)
+        roles = result.scalars().all()
+
+        user_role_data = [AddUserRoleParam(user_id=input_user.id, role_id=role.id).model_dump() for role in roles]
+        user_role_stmt = insert(user_role)
+        await db.execute(user_role_stmt, user_role_data)
+
         return count
 
     async def update_nickname(self, db: AsyncSession, user_id: int, nickname: str) -> int:
