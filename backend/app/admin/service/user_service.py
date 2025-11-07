@@ -18,7 +18,6 @@ from backend.app.admin.schema.user import (
 from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
-from backend.common.pagination import paging_data
 from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import get_token, jwt_decode, password_verify
 from backend.core.conf import settings
@@ -69,8 +68,7 @@ class UserService:
         :param status: 状态
         :return:
         """
-        user_select = await user_dao.get_select(dept=dept, username=username, phone=phone, status=status)
-        return await paging_data(db, user_select)
+        return await user_dao.get_paginated(db=db, dept=dept, username=username, phone=phone, status=status)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: AddUserParam) -> None:

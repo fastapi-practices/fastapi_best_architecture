@@ -4,8 +4,6 @@ import bcrypt
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import noload, selectinload
-from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
 from backend.app.admin.model import DataRule, DataScope, Dept, Menu, Role, User
@@ -15,6 +13,7 @@ from backend.app.admin.schema.user import (
     AddUserParam,
     UpdateUserParam,
 )
+from backend.common.pagination import paging_data
 from backend.common.security.jwt import get_hash_password
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
@@ -186,10 +185,13 @@ class CRUDUser(CRUDPlus[User]):
         new_pwd = get_hash_password(password, salt)
         return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
 
-    async def get_select(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
+    async def get_paginated(
+        self, db: AsyncSession, dept: int | None, username: str | None, phone: str | None, status: int | None
+    ) -> dict[str, Any]:
         """
-        获取用户列表查询表达式
+        获取用户分页
 
+        :param db: 数据库会话
         :param dept: 部门 ID
         :param username: 用户名
         :param phone: 电话号码
@@ -207,15 +209,20 @@ class CRUDUser(CRUDPlus[User]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_order(
+        user_select = await self.select_order(
             'id',
             'desc',
-            load_options=[
-                selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
-                selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.scopes)),
+            join_conditions=[
+                JoinConfig(model=Dept, join_on=Dept.id == self.model.dept_id, fill_result=True),
+                JoinConfig(model=user_role, join_on=user_role.c.user_id == self.model.id),
+                JoinConfig(model=Role, join_on=Role.id == user_role.c.role_id, fill_result=True),
             ],
             **filters,
         )
+
+        data = await paging_data(db, user_select)
+        data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
+        return data
 
     async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """

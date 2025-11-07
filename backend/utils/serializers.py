@@ -18,6 +18,15 @@ RowData = Row | RowMapping | Any
 R = TypeVar('R', bound=RowData)
 
 
+class MsgSpecJSONResponse(JSONResponse):
+    """
+    使用高性能的 msgspec 库将数据序列化为 JSON 的响应类
+    """
+
+    def render(self, content: Any) -> bytes:
+        return json.encode(content)
+
+
 def select_columns_serialize(row: R) -> dict[str, Any]:
     """
     序列化 SQLAlchemy 查询表的列，不包含关联列
@@ -79,7 +88,8 @@ def select_as_dict(row: R, *, use_alias: bool = False) -> dict[str, Any]:
 def select_join_serialize(  # noqa: C901
     row: R | Sequence[R],
     relationships: list[str] | None = None,
-    return_as_dict: bool = False,  # noqa: FBT001, FBT002
+    *,
+    return_as_dict: bool = False,
 ) -> dict[str, Any] | list[dict[str, Any]] | tuple[Any, ...] | list[tuple[Any, ...]] | None:
     """
     将 SQLAlchemy 连接查询结果序列化为支持属性访问的 namedtuple，支持虚拟关系嵌套
@@ -92,7 +102,7 @@ def select_join_serialize(  # noqa: C901
     - 输出：Result(name='Alice', dept=Dept(...))
 
     :param row: SQLAlchemy 查询结果
-    :param relationships: 虚拟关系 (source_model_class-type-target_model_class, type: o2m/m2o/o2o/m2m)
+    :param relationships: 表之间的虚拟关系 (source_model_class-type-target_model_class, type: o2m/m2o/o2o/m2m)
     :param return_as_dict: False 返回 namedtuple，True 返回 dict
     :return:
     """
@@ -329,12 +339,3 @@ def select_join_serialize(  # noqa: C901
             result_list.append(nest_data)
 
     return result_list[0] if len(result_list) == 1 else result_list
-
-
-class MsgSpecJSONResponse(JSONResponse):
-    """
-    使用高性能的 msgspec 库将数据序列化为 JSON 的响应类
-    """
-
-    def render(self, content: Any) -> bytes:
-        return json.encode(content)
