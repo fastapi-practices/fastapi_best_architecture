@@ -2,7 +2,7 @@ from typing import Any
 
 import bcrypt
 
-from sqlalchemy import insert, select, delete
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -16,6 +16,7 @@ from backend.app.admin.schema.user import (
 )
 from backend.common.pagination import paging_data
 from backend.common.security.jwt import get_hash_password
+from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
 
@@ -176,6 +177,9 @@ class CRUDUser(CRUDPlus[User]):
         """
         user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
         await db.execute(user_role_stmt)
+
+        await user_social_dao.delete_by_user_id(db, user_id)
+
         return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:

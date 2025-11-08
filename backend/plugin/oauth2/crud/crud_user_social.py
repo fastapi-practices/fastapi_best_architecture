@@ -8,23 +8,23 @@ from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 class CRUDUserSocial(CRUDPlus[UserSocial]):
     """用户社交账号数据库操作类"""
 
-    async def check_binding(self, db: AsyncSession, pk: int, source: str) -> UserSocial | None:
+    async def check_binding(self, db: AsyncSession, user_id: int, source: str) -> UserSocial | None:
         """
         检查系统用户社交账号绑定
 
         :param db: 数据库会话
-        :param pk: 用户 ID
+        :param user_id: 用户 ID
         :param source: 社交账号类型
         :return:
         """
-        return await self.select_model_by_column(db, user_id=pk, source=source)
+        return await self.select_model_by_column(db, user_id=user_id, source=source)
 
     async def get_by_sid(self, db: AsyncSession, sid: str, source: str) -> UserSocial | None:
         """
-        通过 UUID 获取社交用户
+        通过 sid 获取社交用户
 
         :param db: 数据库会话
-        :param sid: 第三方 UUID
+        :param sid: 第三方用户唯一编码
         :param source: 社交账号类型
         :return:
         """
@@ -40,15 +40,26 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         """
         await self.create_model(db, obj)
 
-    async def delete(self, db: AsyncSession, social_id: int) -> int:
+    async def delete(self, db: AsyncSession, user_id: int, source: str) -> int:
         """
         删除用户社交账号绑定
 
         :param db: 数据库会话
-        :param social_id: 社交账号绑定 ID
+        :param user_id: 用户 ID
+        :param source: 社交账号类型
         :return:
         """
-        return await self.delete_model(db, social_id)
+        return await self.delete_model_by_column(db, user_id=user_id, source=source)
+
+    async def delete_by_user_id(self, db: AsyncSession, user_id: int) -> int:
+        """
+        通过用户 ID 删除用户社交
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :return:
+        """
+        return await self.delete_model_by_column(db, user_id=user_id)
 
 
 user_social_dao: CRUDUserSocial = CRUDUserSocial(UserSocial)

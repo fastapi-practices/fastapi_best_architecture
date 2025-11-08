@@ -5,10 +5,10 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, LinuxDoOAuth20
 from starlette.responses import RedirectResponse
 
-from backend.common.enums import UserSocialType
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
 from backend.database.db import CurrentSessionTransaction
+from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
