@@ -92,17 +92,25 @@ def select_join_serialize(  # noqa: C901
     return_as_dict: bool = False,
 ) -> dict[str, Any] | list[dict[str, Any]] | tuple[Any, ...] | list[tuple[Any, ...]] | None:
     """
-    将 SQLAlchemy 连接查询结果序列化为支持属性访问的 namedtuple，支持虚拟关系嵌套
+    将 SQLAlchemy 连接查询结果序列化为字典或支持属性访问的 namedtuple
 
-    扁平序列化：relationships=None
+    扁平序列化：``relationships=None``
+        | 将所有查询结果平铺到同一层级，不进行嵌套处理
+        输出：Result(name='Alice', dept=Dept(...))
 
-    嵌套序列化：
-    - row = select(User, Dept).join(...).all()
-    - relationships = ['User-m2o-Dept']
-    - 输出：Result(name='Alice', dept=Dept(...))
+    嵌套序列化：``relationships=['User-m2o-Dept', 'User-m2m-Role', 'Role-m2m-Menu']``
+        | 根据指定的关系类型将数据嵌套组织，支持层级结构
+        | row = select(User, Dept, Role).join(...).all()
+        输出：Result(name='Alice', dept=Dept(...), roles=[Role(..., menus=[Menu(...)])])
 
     :param row: SQLAlchemy 查询结果
     :param relationships: 表之间的虚拟关系 (source_model_class-type-target_model_class, type: o2m/m2o/o2o/m2m)
+
+        - o2m (一对多): 目标模型类名会自动添加's'变为复数形式 (如: dept->depts)
+        - m2o (多对一): 目标模型类名保持单数形式 (如: user->user)
+        - o2o (一对一): 目标模型类名保持单数形式 (如: profile->profile)
+        - m2m (多对多): 目标模型类名会自动添加's'变为复数形式 (如: role->roles)
+
     :param return_as_dict: False 返回 namedtuple，True 返回 dict
     :return:
     """
