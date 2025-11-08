@@ -6,7 +6,7 @@ from sqlalchemy.orm import noload, selectinload
 from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Dept, Role, User
+from backend.app.admin.model import DataScope, Dept, Role, User
 from backend.app.admin.schema.user import (
     AddOAuth2UserParam,
     AddUserParam,
@@ -281,7 +281,12 @@ class CRUDUser(CRUDPlus[User]):
 
         return await self.select_model_by_column(
             db,
-            load_options=[selectinload(self.model.roles).options(selectinload(Role.menus), selectinload(Role.scopes))],
+            load_options=[
+                selectinload(self.model.roles).options(
+                    selectinload(Role.menus),
+                    selectinload(Role.scopes).options(selectinload(DataScope.rules)),
+                )
+            ],
             load_strategies=['dept'],
             **filters,
         )
