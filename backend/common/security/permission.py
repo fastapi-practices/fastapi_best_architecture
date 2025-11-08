@@ -1,8 +1,7 @@
 from fastapi import Request
 from sqlalchemy import ColumnElement, and_, or_
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
@@ -42,50 +41,39 @@ class RequestPermission:
             ctx.permission = self.value
 
 
-async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:  # noqa: C901
+def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 
     使用场景：
         - 控制用户能看到哪些数据
 
-    :param db: 数据库会话
-    :param request: FastAPI 请求对象
+    :param request_user: 请求用户
     :return:
     """
     # 是否过滤数据权限
-    if request.user.is_superuser:
+    if request_user.is_superuser:
         return or_(1 == 1)
 
-    for role in request.user.roles:
+    for role in request_user.roles:
         if not role.is_filter_scopes:
             return or_(1 == 1)
 
-    # 获取数据范围
-    data_scope_ids = set()
-    for role in request.user.roles:
+    # 获取数据规则
+    data_rules = set()
+    for role in request_user.roles:
         for scope in role.scopes:
             if scope.status:
-                data_scope_ids.add(scope.id)
+                data_rules.update(scope.rules)
 
     # 无规则用户不做过滤
-    if not list(data_scope_ids):
+    if not list(data_rules):
         return or_(1 == 1)
-
-    # 获取数据范围规则
-    unique_data_rules = {}
-    for data_scope_id in list(data_scope_ids):
-        data_scope_with_relation = await data_scope_dao.get_with_relation(db, data_scope_id)
-        for rule in data_scope_with_relation.rules:
-            unique_data_rules[rule.id] = rule
-
-    # 转换为列表
-    data_rule_list = list(unique_data_rules.values())
 
     where_and_list = []
     where_or_list = []
 
-    for data_rule in data_rule_list:
+    for data_rule in list(data_rules):
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:

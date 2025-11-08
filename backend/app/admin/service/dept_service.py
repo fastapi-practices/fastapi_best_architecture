@@ -1,11 +1,11 @@
 from typing import Any
 
-from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.redis import redis_client
@@ -34,7 +34,7 @@ class DeptService:
     async def get_tree(
         *,
         db: AsyncSession,
-        request: Request,
+        request_user: GetUserInfoWithRelationDetail,
         name: str | None,
         leader: str | None,
         phone: str | None,
@@ -44,7 +44,7 @@ class DeptService:
         获取部门树形结构
 
         :param db: 数据库会话
-        :param request: FastAPI 请求对象
+        :param request_user: 请求用户
         :param name: 部门名称
         :param leader: 部门负责人
         :param phone: 联系电话
@@ -52,7 +52,7 @@ class DeptService:
         :return:
         """
 
-        dept_select = await dept_dao.get_all(request, db, name, leader, phone, status)
+        dept_select = await dept_dao.get_all(db, request_user, name, leader, phone, status)
         tree_data = get_tree_data(dept_select)
         return tree_data
 

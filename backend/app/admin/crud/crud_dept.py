@@ -1,12 +1,12 @@
 from collections.abc import Sequence
 from typing import Any
 
-from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
 from backend.app.admin.model import Dept, User
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.security.permission import filter_data_permission
 from backend.utils.serializers import select_join_serialize
 
@@ -36,8 +36,8 @@ class CRUDDept(CRUDPlus[Dept]):
 
     async def get_all(
         self,
-        request: Request,
         db: AsyncSession,
+        request_user: GetUserInfoWithRelationDetail,
         name: str | None,
         leader: str | None,
         phone: str | None,
@@ -46,8 +46,8 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         获取所有部门
 
-        :param request: FastAPI 请求对象
         :param db: 数据库会话
+        :param request_user: 请求用户
         :param name: 部门名称
         :param leader: 负责人
         :param phone: 联系电话
@@ -65,7 +65,7 @@ class CRUDDept(CRUDPlus[Dept]):
         if status is not None:
             filters['status'] = status
 
-        data_filter = await filter_data_permission(db, request)
+        data_filter = filter_data_permission(request_user)
         return await self.select_models_order(db, 'sort', 'desc', data_filter, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
