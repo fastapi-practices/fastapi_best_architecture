@@ -111,6 +111,11 @@ values
 (1, '部门名称等于测试', '部门', 'name', 1, 0, '测试', now(), null),
 (2, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', now(), null);
 
+insert into sys_role_data_scope (id, role_id, data_scope_id)
+values
+(1, 1, 1),
+(2, 1, 2);
+
 insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
 values
 (1, 1, 1),

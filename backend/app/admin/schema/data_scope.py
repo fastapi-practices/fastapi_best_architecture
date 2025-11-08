@@ -47,4 +47,4 @@ class GetDataScopeDetail(DataScopeBase):
 class GetDataScopeWithRelationDetail(GetDataScopeDetail):
     """数据范围关联详情"""
 
-    rules: list[GetDataRuleDetail] = Field([], description='数据规则列表')
+    rules: list[GetDataRuleDetail | None] = Field([], description='数据规则列表')
