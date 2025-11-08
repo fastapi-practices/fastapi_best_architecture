@@ -3,6 +3,7 @@ from sqlalchemy import ColumnElement, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
+from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
@@ -42,7 +43,7 @@ class RequestPermission:
             ctx.permission = self.value
 
 
-async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnElement[bool]:  # noqa: C901
+async def filter_data_permission(db: AsyncSession, request_user: GetUserInfoWithRelationDetail) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 
@@ -50,20 +51,20 @@ async def filter_data_permission(db: AsyncSession, request: Request) -> ColumnEl
         - 控制用户能看到哪些数据
 
     :param db: 数据库会话
-    :param request: FastAPI 请求对象
+    :param request_user: 请求用户
     :return:
     """
     # 是否过滤数据权限
-    if request.user.is_superuser:
+    if request_user.is_superuser:
         return or_(1 == 1)
 
-    for role in request.user.roles:
+    for role in request_user.roles:
         if not role.is_filter_scopes:
             return or_(1 == 1)
 
     # 获取数据范围
     data_scope_ids = set()
-    for role in request.user.roles:
+    for role in request_user.roles:
         for scope in role.scopes:
             if scope.status:
                 data_scope_ids.add(scope.id)

@@ -102,7 +102,9 @@ async def update_user_permission(
 async def update_user_password(
     db: CurrentSessionTransaction, request: Request, obj: ResetPasswordParam
 ) -> ResponseModel:
-    count = await user_service.update_password(db=db, request=request, obj=obj)
+    count = await user_service.update_password(
+        db=db, user_id=request.user.id, hash_password=request.user.password, obj=obj
+    )
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -126,7 +128,7 @@ async def update_user_nickname(
     request: Request,
     nickname: Annotated[str, Body(embed=True, description='用户昵称')],
 ) -> ResponseModel:
-    count = await user_service.update_nickname(db=db, request=request, nickname=nickname)
+    count = await user_service.update_nickname(db=db, user_id=request.user.id, nickname=nickname)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -138,7 +140,7 @@ async def update_user_avatar(
     request: Request,
     avatar: Annotated[str, Body(embed=True, description='用户头像地址')],
 ) -> ResponseModel:
-    count = await user_service.update_avatar(db=db, request=request, avatar=avatar)
+    count = await user_service.update_avatar(db=db, user_id=request.user.id, avatar=avatar)
     if count > 0:
         return response_base.success()
     return response_base.fail()
@@ -151,7 +153,7 @@ async def update_user_email(
     captcha: Annotated[str, Body(embed=True, description='邮箱验证码')],
     email: Annotated[str, Body(embed=True, description='用户邮箱')],
 ) -> ResponseModel:
-    count = await user_service.update_email(db=db, request=request, captcha=captcha, email=email)
+    count = await user_service.update_email(db=db, user_id=request.user.id, captcha=captcha, email=email)
     if count > 0:
         return response_base.success()
     return response_base.fail()
