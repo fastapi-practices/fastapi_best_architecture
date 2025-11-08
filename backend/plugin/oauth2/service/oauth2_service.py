@@ -9,12 +9,13 @@ from backend.app.admin.schema.token import GetLoginToken
 from backend.app.admin.schema.user import AddOAuth2UserParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.context import ctx
-from backend.common.enums import LoginLogStatusType, UserSocialType
+from backend.common.enums import LoginLogStatusType
 from backend.common.i18n import t
 from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
+from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.utils.timezone import timezone
 

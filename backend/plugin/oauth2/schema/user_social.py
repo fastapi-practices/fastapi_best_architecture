@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from backend.common.enums import UserSocialType
 from backend.common.schema import SchemaBase
+from backend.plugin.oauth2.enums import UserSocialType
 
 
 class UserSocialSchemaBase(SchemaBase):

@@ -103,14 +103,6 @@ class StatusType(IntEnum):
     enable = 1
 
 
-class UserSocialType(StrEnum):
-    """用户社交类型"""
-
-    github = 'GitHub'
-    google = 'Google'
-    linux_do = 'LinuxDo'
-
-
 class FileType(StrEnum):
     """文件类型"""
 
