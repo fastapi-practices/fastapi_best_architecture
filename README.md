@@ -23,8 +23,6 @@ English | [简体中文](./README.zh-CN.md)
 
 </div>
 
-[![][image-star]][https://github.com/fastapi-practices/fastapi_best_architecture/stargazers]
-
 ## Pseudo 3-tier architecture
 
 The mvc architecture is a common design pattern in python web, but the 3-tier architecture is even more fascinating

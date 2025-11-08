@@ -2,7 +2,7 @@ from typing import Any
 
 import bcrypt
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -174,6 +174,8 @@ class CRUDUser(CRUDPlus[User]):
         :param user_id: 用户 ID
         :return:
         """
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
+        await db.execute(user_role_stmt)
         return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:

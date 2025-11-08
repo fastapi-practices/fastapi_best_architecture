@@ -23,8 +23,6 @@
 
 </div>
 
-[![][image-star]][https://github.com/fastapi-practices/fastapi_best_architecture/stargazers]
-
 ## 伪三层架构
 
 mvc 架构作为常规设计模式，在 python web 中也很常见，但是三层架构更令人着迷
