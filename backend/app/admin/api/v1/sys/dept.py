@@ -30,7 +30,9 @@ async def get_dept_tree(
     phone: Annotated[str | None, Query(description='联系电话')] = None,
     status: Annotated[int | None, Query(description='状态')] = None,
 ) -> ResponseSchemaModel[list[GetDeptTree]]:
-    dept = await dept_service.get_tree(db=db, request=request, name=name, leader=leader, phone=phone, status=status)
+    dept = await dept_service.get_tree(
+        db=db, request_user=request.user, name=name, leader=leader, phone=phone, status=status
+    )
     return response_base.success(data=dept)
 
 
