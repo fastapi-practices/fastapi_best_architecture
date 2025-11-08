@@ -23,7 +23,7 @@ English | [简体中文](./README.zh-CN.md)
 
 </div>
 
-![star](https://github.com/fastapi-practices/fastapi_best_architecture/stargazers)
+[![][image-star]][https://github.com/fastapi-practices/fastapi_best_architecture/stargazers]
 
 ## Pseudo 3-tier architecture
 

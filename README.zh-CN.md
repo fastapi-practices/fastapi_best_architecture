@@ -23,7 +23,7 @@
 
 </div>
 
-![star](https://github.com/fastapi-practices/fastapi_best_architecture/stargazers)
+[![][image-star]][https://github.com/fastapi-practices/fastapi_best_architecture/stargazers]
 
 ## 伪三层架构
 
