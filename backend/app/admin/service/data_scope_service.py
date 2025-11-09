@@ -105,6 +105,7 @@ class DataScopeService:
         if data_scope.name != obj.name and await data_scope_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据范围已存在')
         count = await data_scope_dao.update(db, pk, obj)
+        # TODO: 重构缓存清理
         for role in await data_scope.awaitable_attrs.roles:
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
@@ -132,6 +133,7 @@ class DataScopeService:
         :return:
         """
         count = await data_scope_dao.delete(db, obj.pks)
+        # TODO: 重构缓存清理
         for pk in obj.pks:
             data_rule = await data_scope_dao.get(db, pk)
             if data_rule:

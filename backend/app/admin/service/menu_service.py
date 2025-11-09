@@ -112,6 +112,7 @@ class MenuService:
         if obj.parent_id == menu.id:
             raise errors.ForbiddenError(msg='禁止关联自身为父级')
         count = await menu_dao.update(db, pk, obj)
+        # TODO: 重构缓存清理
         for role in await menu.awaitable_attrs.roles:
             for user in await role.awaitable_attrs.users:
                 await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
@@ -132,6 +133,7 @@ class MenuService:
             raise errors.ConflictError(msg='菜单下存在子菜单，无法删除')
         menu = await menu_dao.get(db, pk)
         count = await menu_dao.delete(db, pk)
+        # TODO: 重构缓存清理
         if menu:
             for role in await menu.awaitable_attrs.roles:
                 for user in await role.awaitable_attrs.users:

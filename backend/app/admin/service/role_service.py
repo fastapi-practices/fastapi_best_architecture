@@ -15,7 +15,6 @@ from backend.app.admin.schema.role import (
     UpdateRoleScopeParam,
 )
 from backend.common.exception import errors
-from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
@@ -61,8 +60,7 @@ class RoleService:
         :param status: 状态
         :return:
         """
-        role_select = await role_dao.get_select(name=name, status=status)
-        return await paging_data(db, role_select)
+        return await role_dao.get_paginated(db=db, name=name, status=status)
 
     @staticmethod
     async def get_menu_tree(*, db: AsyncSession, pk: int) -> list[dict[str, Any] | None]:
@@ -128,6 +126,7 @@ class RoleService:
         if role.name != obj.name and await role_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='角色已存在')
         count = await role_dao.update(db, pk, obj)
+        # TODO: 重构缓存清理
         for user in await role.awaitable_attrs.users:
             await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
@@ -151,6 +150,7 @@ class RoleService:
             if not menu:
                 raise errors.NotFoundError(msg='菜单不存在')
         count = await role_dao.update_menus(db, pk, menu_ids)
+        # TODO: 重构缓存清理
         for user in await role.awaitable_attrs.users:
             await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
@@ -174,6 +174,7 @@ class RoleService:
             if not scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
         count = await role_dao.update_scopes(db, pk, scope_ids)
+        # TODO: 重构缓存清理
         for user in await role.awaitable_attrs.users:
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
@@ -189,6 +190,7 @@ class RoleService:
         """
 
         count = await role_dao.delete(db, obj.pks)
+        # TODO: 重构缓存清理
         for pk in obj.pks:
             role = await role_dao.get(db, pk)
             if role:

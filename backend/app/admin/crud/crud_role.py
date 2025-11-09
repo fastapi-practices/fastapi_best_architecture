@@ -1,16 +1,22 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import Select, select
+from sqlalchemy import delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
 from backend.app.admin.model import DataScope, Menu, Role
+from backend.app.admin.model.m2m import role_data_scope, role_menu
 from backend.app.admin.schema.role import (
+    CreateRoleMenuParam,
     CreateRoleParam,
+    CreateRoleScopeParam,
     UpdateRoleMenuParam,
     UpdateRoleParam,
     UpdateRoleScopeParam,
 )
+from backend.common.pagination import paging_data
+from backend.utils.serializers import select_join_serialize
 
 
 class CRUDRole(CRUDPlus[Role]):
@@ -26,7 +32,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_model(db, role_id)
 
-    async def get_with_relation(self, db: AsyncSession, role_id: int) -> Role | None:
+    async def get_with_relation(self, db: AsyncSession, role_id: int) -> Any:
         """
         获取角色及关联数据
 
@@ -34,7 +40,18 @@ class CRUDRole(CRUDPlus[Role]):
         :param role_id: 角色 ID
         :return:
         """
-        return await self.select_model(db, role_id, load_strategies=['menus', 'scopes'])
+        result = await self.select_models(
+            db,
+            id=role_id,
+            join_conditions=[
+                JoinConfig(model=role_menu, join_on=role_menu.c.role_id == self.model.id),
+                JoinConfig(model=Menu, join_on=Menu.id == role_menu.c.menu_id, fill_result=True),
+                JoinConfig(model=role_data_scope, join_on=role_data_scope.c.role_id == self.model.id),
+                JoinConfig(model=DataScope, join_on=DataScope.id == role_data_scope.c.data_scope_id, fill_result=True),
+            ],
+        )
+
+        return select_join_serialize(result, relationships=['Role-m2m-Menu', 'Role-m2m-DataScope'])
 
     async def get_all(self, db: AsyncSession) -> Sequence[Role]:
         """
@@ -45,10 +62,11 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_select(self, name: str | None, status: int | None) -> Select:
+    async def get_paginated(self, db: AsyncSession, name: str | None, status: int | None) -> dict[str, Any]:
         """
-        获取角色列表查询表达式
+        获取角色分页
 
+        :param db: 数据库会话
         :param name: 角色名称
         :param status: 角色状态
         :return:
@@ -61,15 +79,11 @@ class CRUDRole(CRUDPlus[Role]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_order(
+        role_select = await self.select_order(
             'id',
-            load_strategies={
-                'users': 'noload',
-                'menus': 'noload',
-                'scopes': 'noload',
-            },
             **filters,
         )
+        return await paging_data(db, role_select)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:
         """
@@ -102,7 +116,8 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.update_model(db, role_id, obj)
 
-    async def update_menus(self, db: AsyncSession, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:
+    @staticmethod
+    async def update_menus(db: AsyncSession, role_id: int, menu_ids: UpdateRoleMenuParam) -> int:
         """
         更新角色菜单
 
@@ -111,13 +126,19 @@ class CRUDRole(CRUDPlus[Role]):
         :param menu_ids: 菜单 ID 列表
         :return:
         """
-        current_role = await self.get_with_relation(db, role_id)
-        stmt = select(Menu).where(Menu.id.in_(menu_ids.menus))
-        menus = await db.execute(stmt)
-        current_role.menus = menus.scalars().all()
-        return len(current_role.menus)
+        role_menu_stmt = delete(role_menu).where(role_menu.c.role_id == role_id)
+        await db.execute(role_menu_stmt)
 
-    async def update_scopes(self, db: AsyncSession, role_id: int, scope_ids: UpdateRoleScopeParam) -> int:
+        role_menu_data = [
+            CreateRoleMenuParam(role_id=role_id, menu_id=menu_id).model_dump() for menu_id in menu_ids.menus
+        ]
+        role_menu_stmt = insert(role_menu)
+        await db.execute(role_menu_stmt, role_menu_data)
+
+        return len(menu_ids.menus)
+
+    @staticmethod
+    async def update_scopes(db: AsyncSession, role_id: int, scope_ids: UpdateRoleScopeParam) -> int:
         """
         更新角色数据范围
 
@@ -126,11 +147,16 @@ class CRUDRole(CRUDPlus[Role]):
         :param scope_ids: 权限范围 ID 列表
         :return:
         """
-        current_role = await self.get_with_relation(db, role_id)
-        stmt = select(DataScope).where(DataScope.id.in_(scope_ids.scopes))
-        scopes = await db.execute(stmt)
-        current_role.scopes = scopes.scalars().all()
-        return len(current_role.scopes)
+        role_scope_stmt = delete(role_data_scope).where(role_data_scope.c.role_id == role_id)
+        await db.execute(role_scope_stmt)
+
+        role_scope_data = [
+            CreateRoleScopeParam(role_id=role_id, data_scope_id=scope_id).model_dump() for scope_id in scope_ids.scopes
+        ]
+        role_scope_stmt = insert(role_data_scope)
+        await db.execute(role_scope_stmt, role_scope_data)
+
+        return len(scope_ids.scopes)
 
     async def delete(self, db: AsyncSession, role_ids: list[int]) -> int:
         """
