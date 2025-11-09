@@ -15,6 +15,7 @@ from backend.app.admin.schema.role import (
     UpdateRoleScopeParam,
 )
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
@@ -60,7 +61,8 @@ class RoleService:
         :param status: 状态
         :return:
         """
-        return await role_dao.get_paginated(db=db, name=name, status=status)
+        role_select = await role_dao.get_select(name=name, status=status)
+        return await paging_data(db, role_select)
 
     @staticmethod
     async def get_menu_tree(*, db: AsyncSession, pk: int) -> list[dict[str, Any] | None]:

@@ -4,6 +4,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, DeleteDictTypeParam, UpdateDictTypeParam
@@ -48,7 +49,8 @@ class DictTypeService:
         :param code: 字典类型编码
         :return:
         """
-        return await dict_type_dao.get_paginated(db=db, name=name, code=code)
+        dict_type_select = await dict_type_dao.get_select(name=name, code=code)
+        return await paging_data(db, dict_type_select)
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateDictTypeParam) -> None:

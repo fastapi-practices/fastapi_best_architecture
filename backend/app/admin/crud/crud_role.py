@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import delete, insert
+from sqlalchemy import Select, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -15,7 +15,6 @@ from backend.app.admin.schema.role import (
     UpdateRoleParam,
     UpdateRoleScopeParam,
 )
-from backend.common.pagination import paging_data
 from backend.utils.serializers import select_join_serialize
 
 
@@ -62,11 +61,10 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
-    async def get_paginated(self, db: AsyncSession, name: str | None, status: int | None) -> dict[str, Any]:
+    async def get_select(self, name: str | None, status: int | None) -> Select:
         """
-        获取角色分页
+        获取角色列表查询表达式
 
-        :param db: 数据库会话
         :param name: 角色名称
         :param status: 角色状态
         :return:
@@ -79,11 +77,10 @@ class CRUDRole(CRUDPlus[Role]):
         if status is not None:
             filters['status'] = status
 
-        role_select = await self.select_order(
+        return await self.select_order(
             'id',
-            **filters,
+            **filters
         )
-        return await paging_data(db, role_select)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:
         """

@@ -2,7 +2,7 @@ from typing import Any
 
 import bcrypt
 
-from sqlalchemy import delete, insert, select
+from sqlalchemy import Select, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -14,7 +14,6 @@ from backend.app.admin.schema.user import (
     AddUserRoleParam,
     UpdateUserParam,
 )
-from backend.common.pagination import paging_data
 from backend.common.security.jwt import get_hash_password
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.utils.serializers import select_join_serialize
@@ -205,13 +204,10 @@ class CRUDUser(CRUDPlus[User]):
         new_pwd = get_hash_password(password, salt)
         return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
 
-    async def get_paginated(
-        self, db: AsyncSession, dept: int | None, username: str | None, phone: str | None, status: int | None
-    ) -> dict[str, Any]:
+    async def get_select(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
         """
-        获取用户分页
+        获取用户列表查询表达式
 
-        :param db: 数据库会话
         :param dept: 部门 ID
         :param username: 用户名
         :param phone: 电话号码
@@ -229,7 +225,7 @@ class CRUDUser(CRUDPlus[User]):
         if status is not None:
             filters['status'] = status
 
-        user_select = await self.select_order(
+        return await self.select_order(
             'id',
             'desc',
             join_conditions=[
@@ -239,10 +235,6 @@ class CRUDUser(CRUDPlus[User]):
             ],
             **filters,
         )
-
-        data = await paging_data(db, user_select)
-        data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
-        return data
 
     async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """

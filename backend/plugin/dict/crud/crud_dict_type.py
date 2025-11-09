@@ -1,10 +1,9 @@
 from collections.abc import Sequence
-from typing import Any
 
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.common.pagination import paging_data
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
@@ -32,11 +31,10 @@ class CRUDDictType(CRUDPlus[DictType]):
         """
         return await self.select_models(db)
 
-    async def get_paginated(self, db: AsyncSession, name: str | None, code: str | None) -> dict[str, Any]:
+    async def get_select(self, name: str | None, code: str | None) -> Select:
         """
-        获取用户分页
+        获取字典类型列表查询表达式
 
-        :param db: 数据库会话
         :param name: 字典类型名称
         :param code: 字典类型编码
         :return:
@@ -48,8 +46,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         if code is not None:
             filters['code__like'] = f'%{code}%'
 
-        dict_type_select = await self.select_order('id', 'desc', **filters)
-        return await paging_data(db, dict_type_select)
+        return await self.select_order('id', 'desc', **filters)
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """
