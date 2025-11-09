@@ -77,10 +77,7 @@ class CRUDRole(CRUDPlus[Role]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_order(
-            'id',
-            **filters
-        )
+        return await self.select_order('id', **filters)
 
     async def get_by_name(self, db: AsyncSession, name: str) -> Role | None:
         """
