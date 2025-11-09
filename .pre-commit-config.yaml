@@ -3,6 +3,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
+      - id: check-json
       - id: check-yaml
       - id: check-toml
 
