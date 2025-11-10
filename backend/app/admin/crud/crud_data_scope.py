@@ -56,7 +56,7 @@ class CRUDDataScope(CRUDPlus[DataScope]):
             ],
         )
 
-        return select_join_serialize(result, relationships=['DataScope-m2m-DataRule'])
+        return select_join_serialize(result, relationships=['DataScope-m2m-DataRule:rules'])
 
     async def get_all(self, db: AsyncSession) -> Sequence[DataScope]:
         """

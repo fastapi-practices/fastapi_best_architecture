@@ -4,7 +4,6 @@ from collections import defaultdict, namedtuple
 from collections.abc import Sequence
 from decimal import Decimal
 from functools import lru_cache
-from itertools import starmap
 from typing import Any, TypeVar
 
 from fastapi.encoders import decimal_encoder
@@ -98,24 +97,30 @@ def select_join_serialize(  # noqa: C901
         | 将所有查询结果平铺到同一层级，不进行嵌套处理
         输出：Result(name='Alice', dept=Dept(...))
 
-    嵌套序列化：``relationships=['User-m2o-Dept', 'User-m2m-Role', 'Role-m2m-Menu']``
+    嵌套序列化：``relationships=['User-m2o-Dept', 'User-m2m-Role:permissions', 'Role-m2m-Menu']``
         | 根据指定的关系类型将数据嵌套组织，支持层级结构
         | row = select(User, Dept, Role).join(...).all()
-        输出：Result(name='Alice', dept=Dept(...), roles=[Role(..., menus=[Menu(...)])])
+        输出：Result(name='Alice', dept=Dept(...), permissions=[Role(..., menus=[Menu(...)])])
 
     :param row: SQLAlchemy 查询结果
-    :param relationships: 表之间的虚拟关系 (source_model_class-type-target_model_class, type: o2m/m2o/o2o/m2m)
+    :param relationships: 表之间的虚拟关系
+
+         source_model_class-type-target_model_class[:custom_name], type: o2m/m2o/o2o/m2m
 
         - o2m (一对多): 目标模型类名会自动添加's'变为复数形式 (如: dept->depts)
         - m2o (多对一): 目标模型类名保持单数形式 (如: user->user)
         - o2o (一对一): 目标模型类名保持单数形式 (如: profile->profile)
         - m2m (多对多): 目标模型类名会自动添加's'变为复数形式 (如: role->roles)
+        - 自定义名称: 可以通过在关系字符串末尾添加 ':custom_name' 来指定自定义的目标字段名
+          例如: 'User-m2m-Role:permissions' 会将角色数据放在 'permissions' 字段而不是默认的 'roles'
 
     :param return_as_dict: False 返回 namedtuple，True 返回 dict
     :return:
     """
 
-    def get_relation_key(target_: str, rel_type_: str) -> str:
+    def get_relation_key(target_: str, rel_type_: str, custom_name_: str | None = None) -> str:
+        if custom_name_:
+            return custom_name_
         return target_ if rel_type_ in ['o2o', 'm2o'] else target_ + 's'
 
     if not row:
@@ -155,8 +160,16 @@ def select_join_serialize(  # noqa: C901
     if has_relationships:
         relation_graph = defaultdict(dict)
         reverse_relation = {}
+        custom_names = {}
         for rel_str in relationships:
-            parts = rel_str.split('-')
+            if ':' in rel_str:
+                rel_part, custom_name = rel_str.split(':', 1)
+                custom_name = custom_name.strip()
+            else:
+                rel_part = rel_str
+                custom_name = None
+
+            parts = rel_part.split('-')
             if len(parts) != 3:
                 continue
             source, rel_type, target = (
@@ -168,6 +181,8 @@ def select_join_serialize(  # noqa: C901
                 continue
             relation_graph[source][target] = rel_type
             reverse_relation[target] = source
+            if custom_name:
+                custom_names[source, target] = custom_name
 
     for i, row in enumerate(rows_list):
         if hasattr(row, '__getitem__'):
@@ -223,9 +238,12 @@ def select_join_serialize(  # noqa: C901
     sub_types = {}
     sub_full_fields = {}
     for sub_obj_name, sub_columns in sub_objs.items():
-        child_rel_keys = (
-            sorted(starmap(get_relation_key, relation_graph[sub_obj_name].items())) if has_relationships else []
-        )
+        child_rel_keys = []
+        if has_relationships:
+            for target, rel_type in relation_graph[sub_obj_name].items():
+                custom_name = custom_names.get((sub_obj_name, target))
+                child_rel_keys.append(get_relation_key(target, rel_type, custom_name))
+            child_rel_keys = sorted(child_rel_keys)
         full_columns = sub_columns + child_rel_keys
         sub_full_fields[sub_obj_name] = full_columns
         if not return_as_dict and full_columns:
@@ -246,9 +264,11 @@ def select_join_serialize(  # noqa: C901
         # 预计算主结果字段
         result_fields = main_columns.copy()
         if not return_as_dict:
-            top_keys = [
-                get_relation_key(top_layer, relation_graph[main_obj_name][top_layer]) for top_layer in top_level_subs
-            ]
+            top_keys = []
+            for top_layer in top_level_subs:
+                rel_type = relation_graph[main_obj_name][top_layer]
+                custom_name = custom_names.get((main_obj_name, top_layer))
+                top_keys.append(get_relation_key(top_layer, rel_type, custom_name))
             result_fields.extend(top_keys)
             result_type = namedtuple('Result', result_fields) if result_fields else None  # noqa: PYI024
 
@@ -279,7 +299,8 @@ def select_join_serialize(  # noqa: C901
                     if child_parent_id is None:
                         continue
                     child_instances = build_nested(child_name_, child_parent_id, main_id_)
-                    child_key = get_relation_key(child_name_, rel_type_)
+                    custom_name_ = custom_names.get((layer_name, child_name_))
+                    child_key = get_relation_key(child_name_, rel_type_, custom_name_)
                     if rel_type_ in ['m2o', 'o2o']:
                         nest_dict[child_key] = child_instances[0] if child_instances else None
                     else:
@@ -300,7 +321,8 @@ def select_join_serialize(  # noqa: C901
         if has_relationships:
             for top_layer in top_level_subs:
                 rel_type = relation_graph[main_obj_name][top_layer]
-                top_key = get_relation_key(top_layer, rel_type)
+                custom_name = custom_names.get((main_obj_name, top_layer))
+                top_key = get_relation_key(top_layer, rel_type, custom_name)
                 top_instances = build_nested(top_layer, main_id, main_id)
                 if rel_type in ['m2o', 'o2o']:
                     nest_data[top_key] = top_instances[0] if top_instances else None

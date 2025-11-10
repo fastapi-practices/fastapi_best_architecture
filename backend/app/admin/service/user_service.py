@@ -72,7 +72,8 @@ class UserService:
         """
         user_select = await user_dao.get_select(dept=dept, username=username, phone=phone, status=status)
         data = await paging_data(db, user_select)
-        data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
+        if data['items']:
+            data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
         return data
 
     @staticmethod
@@ -111,6 +112,8 @@ class UserService:
             raise errors.NotFoundError(msg='用户不存在')
         if obj.username != user.username and await user_dao.get_by_username(db, obj.username):
             raise errors.ConflictError(msg='用户名已注册')
+        if obj.dept_id and obj.dept_id != user.dept_id and not await dept_dao.get(db, dept_id=obj.dept_id):
+            raise errors.NotFoundError(msg='部门不存在')
         for role_id in obj.roles:
             if not await role_dao.get(db, role_id):
                 raise errors.NotFoundError(msg='角色不存在')

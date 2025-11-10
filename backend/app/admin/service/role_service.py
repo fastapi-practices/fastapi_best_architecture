@@ -73,10 +73,11 @@ class RoleService:
         :return:
         """
 
-        role = await role_dao.get_join(db, pk)
+        role = await role_dao.get(db, pk)
         if not role:
             raise errors.NotFoundError(msg='角色不存在')
-        menu_tree = get_tree_data(role.menus) if role.menus else []
+        menus = await role_dao.get_menus(db, pk)
+        menu_tree = get_tree_data(menus) if menus else []
         return menu_tree
 
     @staticmethod

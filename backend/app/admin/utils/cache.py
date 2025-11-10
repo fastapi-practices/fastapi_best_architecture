@@ -19,8 +19,8 @@ class UserCacheManager:
         :param user_ids: 用户 ID 列表
         :return:
         """
-        for user_id in user_ids:
-            await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
+        if user_ids:
+            await redis_client.delete(*[f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}' for user_id in user_ids])
 
     async def clear_by_role_id(self, db: AsyncSession, role_ids: list[int]) -> None:
         """

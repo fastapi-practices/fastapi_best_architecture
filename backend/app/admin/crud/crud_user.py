@@ -324,8 +324,8 @@ class CRUDUser(CRUDPlus[User]):
                 'User-m2o-Dept',
                 'User-m2m-Role',
                 'Role-m2m-Menu',
-                'Role-m2m-DataScope',
-                'DataScope-m2m-DataRule',
+                'Role-m2m-DataScope:scopes',
+                'DataScope-m2m-DataRule:rules',
             ],
         )
 

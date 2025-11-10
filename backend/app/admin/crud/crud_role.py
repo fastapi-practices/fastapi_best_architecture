@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, delete, insert
+from sqlalchemy import Select, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
@@ -31,6 +31,19 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_model(db, role_id)
 
+    @staticmethod
+    async def get_menus(db: AsyncSession, role_id: int) -> Sequence[Menu] | None:
+        """
+        获取角色菜单
+
+        :param db: 数据库会话
+        :param role_id: 角色 ID
+        :return:
+        """
+        menu_stmt = select(Menu).join(role_menu, Menu.id == role_menu.c.menu_id).where(role_menu.c.role_id == role_id)
+        result = await db.execute(menu_stmt)
+        return result.scalars().all()
+
     async def get_join(self, db: AsyncSession, role_id: int) -> Any:
         """
         获取角色及关联数据
@@ -50,7 +63,7 @@ class CRUDRole(CRUDPlus[Role]):
             ],
         )
 
-        return select_join_serialize(result, relationships=['Role-m2m-Menu', 'Role-m2m-DataScope'])
+        return select_join_serialize(result, relationships=['Role-m2m-Menu', 'Role-m2m-DataScope:scopes'])
 
     async def get_all(self, db: AsyncSession) -> Sequence[Role]:
         """
