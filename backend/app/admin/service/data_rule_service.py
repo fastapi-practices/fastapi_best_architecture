@@ -11,6 +11,7 @@ from backend.app.admin.schema.data_rule import (
     GetDataRuleColumnDetail,
     UpdateDataRuleParam,
 )
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.core.conf import settings
@@ -113,7 +114,7 @@ class DataRuleService:
         if data_rule.name != obj.name and await data_rule_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据规则已存在')
         count = await data_rule_dao.update(db, pk, obj)
-        # TODO: 重构缓存清理
+        await user_cache_manager.clear_by_data_rule_id(db, [pk])
         return count
 
     @staticmethod
@@ -126,7 +127,7 @@ class DataRuleService:
         :return:
         """
         count = await data_rule_dao.delete(db, obj.pks)
-        # TODO: 重构缓存清理
+        await user_cache_manager.clear_by_data_rule_id(db, obj.pks)
         return count
 
 

@@ -6,9 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.model import Menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
 
 
@@ -112,10 +111,7 @@ class MenuService:
         if obj.parent_id == menu.id:
             raise errors.ForbiddenError(msg='禁止关联自身为父级')
         count = await menu_dao.update(db, pk, obj)
-        # TODO: 重构缓存清理
-        for role in await menu.awaitable_attrs.roles:
-            for user in await role.awaitable_attrs.users:
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_menu_id(db, [pk])
         return count
 
     @staticmethod
@@ -131,13 +127,9 @@ class MenuService:
         children = await menu_dao.get_children(db, pk)
         if children:
             raise errors.ConflictError(msg='菜单下存在子菜单，无法删除')
-        menu = await menu_dao.get(db, pk)
         count = await menu_dao.delete(db, pk)
-        # TODO: 重构缓存清理
-        if menu:
-            for role in await menu.awaitable_attrs.roles:
-                for user in await role.awaitable_attrs.users:
-                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        if count:
+            await user_cache_manager.clear_by_menu_id(db, [pk])
         return count
 
 

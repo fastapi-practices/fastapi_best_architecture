@@ -11,10 +11,9 @@ from backend.app.admin.schema.data_scope import (
     UpdateDataScopeParam,
     UpdateDataScopeRuleParam,
 )
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 
 
 class DataScopeService:
@@ -105,10 +104,7 @@ class DataScopeService:
         if data_scope.name != obj.name and await data_scope_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据范围已存在')
         count = await data_scope_dao.update(db, pk, obj)
-        # TODO: 重构缓存清理
-        for role in await data_scope.awaitable_attrs.roles:
-            for user in await role.awaitable_attrs.users:
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
 
     @staticmethod
@@ -116,12 +112,13 @@ class DataScopeService:
         """
         更新数据范围规则
 
+        :param db: 数据库会话
         :param pk: 范围 ID
         :param rule_ids: 规则 ID 列表
         :return:
         """
         count = await data_scope_dao.update_rules(db, pk, rule_ids)
-        # TODO: 重构缓存清理
+        await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
 
     @staticmethod
@@ -134,13 +131,7 @@ class DataScopeService:
         :return:
         """
         count = await data_scope_dao.delete(db, obj.pks)
-        # TODO: 重构缓存清理
-        for pk in obj.pks:
-            data_rule = await data_scope_dao.get(db, pk)
-            if data_rule:
-                for role in await data_rule.awaitable_attrs.roles:
-                    for user in await role.awaitable_attrs.users:
-                        await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_scope_id(db, obj.pks)
         return count
 
 

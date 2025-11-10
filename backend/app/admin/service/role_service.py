@@ -14,10 +14,9 @@ from backend.app.admin.schema.role import (
     UpdateRoleParam,
     UpdateRoleScopeParam,
 )
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
 
 
@@ -128,9 +127,8 @@ class RoleService:
         if role.name != obj.name and await role_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='角色已存在')
         count = await role_dao.update(db, pk, obj)
-        # TODO: 重构缓存清理
-        for user in await role.awaitable_attrs.users:
-            await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        # 清理该角色所有用户的缓存
+        await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
     @staticmethod
@@ -152,9 +150,8 @@ class RoleService:
             if not menu:
                 raise errors.NotFoundError(msg='菜单不存在')
         count = await role_dao.update_menus(db, pk, menu_ids)
-        # TODO: 重构缓存清理
-        for user in await role.awaitable_attrs.users:
-            await redis_client.delete_prefix(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        # 清理该角色所有用户的缓存
+        await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
     @staticmethod
@@ -176,9 +173,8 @@ class RoleService:
             if not scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
         count = await role_dao.update_scopes(db, pk, scope_ids)
-        # TODO: 重构缓存清理
-        for user in await role.awaitable_attrs.users:
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        # 清理该角色所有用户的缓存
+        await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
     @staticmethod
@@ -192,12 +188,8 @@ class RoleService:
         """
 
         count = await role_dao.delete(db, obj.pks)
-        # TODO: 重构缓存清理
-        for pk in obj.pks:
-            role = await role_dao.get(db, pk)
-            if role:
-                for user in await role.awaitable_attrs.users:
-                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        # 清理这些角色所有用户的缓存
+        await user_cache_manager.clear_by_role_id(db, obj.pks)
         return count
 
 
