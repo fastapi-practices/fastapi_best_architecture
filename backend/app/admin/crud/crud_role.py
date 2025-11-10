@@ -31,7 +31,7 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_model(db, role_id)
 
-    async def get_with_relation(self, db: AsyncSession, role_id: int) -> Any:
+    async def get_join(self, db: AsyncSession, role_id: int) -> Any:
         """
         获取角色及关联数据
 

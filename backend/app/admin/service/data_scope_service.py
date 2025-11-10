@@ -57,7 +57,7 @@ class DataScopeService:
         :return:
         """
 
-        data_scope = await data_scope_dao.get_with_relation(db, pk)
+        data_scope = await data_scope_dao.get_join(db, pk)
         if not data_scope:
             raise errors.NotFoundError(msg='数据范围不存在')
         return data_scope

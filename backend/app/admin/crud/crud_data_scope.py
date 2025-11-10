@@ -39,7 +39,7 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         """
         return await self.select_model_by_column(db, name=name)
 
-    async def get_with_relation(self, db: AsyncSession, pk: int) -> Any:
+    async def get_join(self, db: AsyncSession, pk: int) -> Any:
         """
         获取数据范围关联数据
 
@@ -56,7 +56,7 @@ class CRUDDataScope(CRUDPlus[DataScope]):
             ],
         )
 
-        return await select_join_serialize(result, relationships=['DataScope-m2m-DataRule'])
+        return select_join_serialize(result, relationships=['DataScope-m2m-DataRule'])
 
     async def get_all(self, db: AsyncSession) -> Sequence[DataScope]:
         """

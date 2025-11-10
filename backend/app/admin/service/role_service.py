@@ -34,7 +34,7 @@ class RoleService:
         :return:
         """
 
-        role = await role_dao.get_with_relation(db, pk)
+        role = await role_dao.get_join(db, pk)
         if not role:
             raise errors.NotFoundError(msg='角色不存在')
         return role
@@ -74,7 +74,7 @@ class RoleService:
         :return:
         """
 
-        role = await role_dao.get_with_relation(db, pk)
+        role = await role_dao.get_join(db, pk)
         if not role:
             raise errors.NotFoundError(msg='角色不存在')
         menu_tree = get_tree_data(role.menus) if role.menus else []
@@ -90,7 +90,7 @@ class RoleService:
         :return:
         """
 
-        role = await role_dao.get_with_relation(db, pk)
+        role = await role_dao.get_join(db, pk)
         if not role:
             raise errors.NotFoundError(msg='角色不存在')
         scope_ids = [scope.id for scope in role.scopes]
