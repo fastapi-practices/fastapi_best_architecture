@@ -142,14 +142,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             raise PluginConfigError(f'插件 {plugin} 配置文件缺少必要字段: {", ".join(missing_fields)}')
 
         if data.get('api'):
-            # TODO: 删除过时的 include 配置
-            include = data.get('app', {}).get('include')
-            if include:
-                warnings.warn(
-                    f'插件 {plugin} 配置 app.include 即将在未来版本中弃用，请尽快更新配置为 app.extend, 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/plugin/dev.html#%E6%8F%92%E4%BB%B6%E9%85%8D%E7%BD%AE',
-                    FutureWarning,
-                )
-            if not include and not data.get('app', {}).get('extend'):
+            if not data.get('app', {}).get('extend'):
                 raise PluginConfigError(f'扩展级插件 {plugin} 配置文件缺少 app.extend 配置')
             extend_plugins.append(data)
         else:
@@ -219,8 +212,7 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
 
                 # 获取目标 app 路由
                 relative_path = os.path.relpath(root, plugin_api_path)
-                # TODO: 删除过时的 include 配置
-                app_name = plugin.get('app', {}).get('include') or plugin.get('app', {}).get('extend')
+                app_name = plugin.get('app', {}).get('extend')
                 target_module_path = f'backend.app.{app_name}.api.{relative_path.replace(os.sep, ".")}'
                 target_module = import_module_cached(target_module_path)
                 target_router = getattr(target_module, 'router', None)
