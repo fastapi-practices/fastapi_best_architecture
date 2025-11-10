@@ -113,6 +113,7 @@ class DataRuleService:
         if data_rule.name != obj.name and await data_rule_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据规则已存在')
         count = await data_rule_dao.update(db, pk, obj)
+        # TODO: 重构缓存清理
         return count
 
     @staticmethod
@@ -125,6 +126,7 @@ class DataRuleService:
         :return:
         """
         count = await data_rule_dao.delete(db, obj.pks)
+        # TODO: 重构缓存清理
         return count
 
 

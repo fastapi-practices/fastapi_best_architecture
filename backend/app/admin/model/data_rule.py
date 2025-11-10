@@ -12,7 +12,7 @@ class DataRule(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(sa.String(512), unique=True, comment='名称')
-    model: Mapped[str] = mapped_column(sa.String(64), comment='SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名')
+    model: Mapped[str] = mapped_column(sa.String(64), comment='模型名称')
     column: Mapped[str] = mapped_column(sa.String(32), comment='模型字段名')
     operator: Mapped[int] = mapped_column(comment='运算符（0：and、1：or）')
     expression: Mapped[int] = mapped_column(
