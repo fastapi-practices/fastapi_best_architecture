@@ -128,7 +128,6 @@ class RoleService:
         if role.name != obj.name and await role_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='角色已存在')
         count = await role_dao.update(db, pk, obj)
-        # 清理该角色所有用户的缓存
         await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
@@ -151,7 +150,6 @@ class RoleService:
             if not menu:
                 raise errors.NotFoundError(msg='菜单不存在')
         count = await role_dao.update_menus(db, pk, menu_ids)
-        # 清理该角色所有用户的缓存
         await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
@@ -174,7 +172,6 @@ class RoleService:
             if not scope:
                 raise errors.NotFoundError(msg='数据范围不存在')
         count = await role_dao.update_scopes(db, pk, scope_ids)
-        # 清理该角色所有用户的缓存
         await user_cache_manager.clear_by_role_id(db, [pk])
         return count
 
@@ -189,7 +186,6 @@ class RoleService:
         """
 
         count = await role_dao.delete(db, obj.pks)
-        # 清理这些角色所有用户的缓存
         await user_cache_manager.clear_by_role_id(db, obj.pks)
         return count
 
