@@ -54,7 +54,7 @@ class MenuService:
         :param request: FastAPI 请求对象
         :return:
         """
-
+        menu_data = None
         if request.user.is_superuser:
             menu_data = await menu_dao.get_sidebar(db, None)
         else:
@@ -64,8 +64,11 @@ class MenuService:
                 for role in roles:
                     menu_ids.update(menu.id for menu in role.menus)
                 menu_data = await menu_dao.get_sidebar(db, list(menu_ids))
-        menu_tree = get_vben5_tree_data(menu_data)
-        return menu_tree
+
+        if menu_data:
+            return get_vben5_tree_data(menu_data)
+
+        return []
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: CreateMenuParam) -> None:
