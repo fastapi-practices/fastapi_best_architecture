@@ -77,7 +77,7 @@ def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> Colum
         # 验证规则模型
         rule_model = data_rule.model
         if rule_model not in settings.DATA_PERMISSION_MODELS:
-            raise errors.NotFoundError(msg='数据规则模型不存在')
+            raise errors.NotFoundError(msg='数据规则可用模型不存在')
         model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
 
         # 验证规则列
@@ -86,7 +86,7 @@ def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> Colum
         ]
         column = data_rule.column
         if column not in model_columns:
-            raise errors.NotFoundError(msg='数据规则模型列不存在')
+            raise errors.NotFoundError(msg='数据规则模可用型列不存在')
 
         # 构建过滤条件
         column_obj = getattr(model_ins, column)
