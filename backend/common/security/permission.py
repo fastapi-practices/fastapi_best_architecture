@@ -86,7 +86,7 @@ def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> Colum
         ]
         column = data_rule.column
         if column not in model_columns:
-            raise errors.NotFoundError(msg='数据规则模可用型列不存在')
+            raise errors.NotFoundError(msg='数据规则可用模型列不存在')
 
         # 构建过滤条件
         column_obj = getattr(model_ins, column)
