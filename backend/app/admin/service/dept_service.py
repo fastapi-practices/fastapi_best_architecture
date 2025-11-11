@@ -68,7 +68,7 @@ class DeptService:
         dept = await dept_dao.get_by_name(db, obj.name)
         if dept:
             raise errors.ConflictError(msg='部门名称已存在')
-        if obj.parent_id:
+        if obj.parent_id is not None:
             parent_dept = await dept_dao.get(db, obj.parent_id)
             if not parent_dept:
                 raise errors.NotFoundError(msg='父级部门不存在')
@@ -108,6 +108,8 @@ class DeptService:
         :return:
         """
         dept = await dept_dao.get_with_relation(db, pk)
+        if not dept:
+            raise errors.NotFoundError(msg='部门不存在')
         if dept.users:
             raise errors.ConflictError(msg='部门下存在用户，无法删除')
         children = await dept_dao.get_children(db, pk)
