@@ -94,7 +94,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         """
         return await self.delete_model(db, menu_id)
 
-    async def get_children(self, db: AsyncSession, menu_id: int) -> list[Menu | None]:
+    async def get_children(self, db: AsyncSession, menu_id: int) -> Sequence[Menu | None]:
         """
         获取子菜单列表
 
@@ -102,8 +102,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         :param menu_id: 菜单 ID
         :return:
         """
-        menu = await self.select_model(db, menu_id, load_strategies=['children'])
-        return menu.children
+        return await self.select_models(db, parent_id=menu_id)
 
 
 menu_dao: CRUDMenu = CRUDMenu(Menu)

@@ -115,7 +115,7 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id: 部门 ID
         :return:
         """
-        return await self.select_models(db, parent_id=dept_id, del_flag=0)
+        return await self.select_models(db, parent_id=dept_id, del_flag=False)
 
 
 dept_dao: CRUDDept = CRUDDept(Dept)
