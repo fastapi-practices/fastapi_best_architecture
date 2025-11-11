@@ -1,9 +1,6 @@
-import operator
-
 from collections import defaultdict, namedtuple
 from collections.abc import Sequence
 from decimal import Decimal
-from functools import lru_cache
 from typing import Any, TypeVar
 
 from fastapi.encoders import decimal_encoder
@@ -12,7 +9,7 @@ from sqlalchemy import Row, RowMapping
 from sqlalchemy.orm import ColumnProperty, SynonymProperty, class_mapper
 from starlette.responses import JSONResponse
 
-RowData = Row | RowMapping | Any
+RowData = Row[Any] | RowMapping | Any
 
 R = TypeVar('R', bound=RowData)
 
@@ -34,16 +31,11 @@ def select_columns_serialize(row: R) -> dict[str, Any]:
     :return:
     """
     result = {}
-
-    if not row:
-        return result
-
     for column in row.__table__.columns.keys():
         value = getattr(row, column)
         if isinstance(value, Decimal):
             value = decimal_encoder(value)
         result[column] = value
-
     return result
 
 
@@ -65,16 +57,12 @@ def select_as_dict(row: R, *, use_alias: bool = False) -> dict[str, Any]:
     :param use_alias: 是否使用别名作为列名
     :return:
     """
-    result = {}
-
-    if not row:
-        return result
-
     if not use_alias:
         result = row.__dict__
         if '_sa_instance_state' in result:
             del result['_sa_instance_state']
     else:
+        result = {}
         mapper = class_mapper(row.__class__)  # type: ignore
         for prop in mapper.iterate_properties:
             if isinstance(prop, (ColumnProperty, SynonymProperty)):
@@ -118,254 +106,271 @@ def select_join_serialize(  # noqa: C901
     :return:
     """
 
-    def get_relation_key(target_: str, rel_type_: str, custom_name_: str | None = None) -> str:
-        if custom_name_:
-            return custom_name_
-        return target_ if rel_type_ in ['o2o', 'm2o'] else target_ + 's'
+    def get_relation_key(model_name: str, rel_type: str, custom_field: str | None = None) -> str:
+        """获取关系键名"""
+        return custom_field or (model_name if rel_type in ('o2o', 'm2o') else f'{model_name}s')
+
+    def parse_relationships(relationship_list: list[str]) -> tuple[dict, dict, dict]:
+        """解析关系定义"""
+        if not relationship_list:
+            return {}, {}, {}
+
+        parsed_relation_graph = defaultdict(dict)
+        parsed_reverse_relation = {}
+        parsed_custom_names = {}
+
+        for rel_str in relationship_list:
+            parts = rel_str.split(':', 1)
+            rel_part = parts[0].strip()
+            field_custom_name = parts[1].strip() if len(parts) > 1 else None
+
+            rel_info = rel_part.split('-')
+            if len(rel_info) != 3:
+                continue
+
+            source_model, rel_type, target_model = (info.lower() for info in rel_info)
+            if rel_type not in ('o2m', 'm2o', 'o2o', 'm2m'):
+                continue
+
+            parsed_relation_graph[source_model][target_model] = rel_type
+            parsed_reverse_relation[target_model] = source_model
+            if field_custom_name:
+                parsed_custom_names[source_model, target_model] = field_custom_name
+
+        return parsed_relation_graph, parsed_reverse_relation, parsed_custom_names
+
+    def get_model_columns(model_obj: Any) -> list[str]:
+        """获取模型列名"""
+        mapper = class_mapper(type(model_obj))
+        return [
+            prop.key
+            for prop in mapper.iterate_properties
+            if isinstance(prop, (ColumnProperty, SynonymProperty)) and hasattr(model_obj, prop.key)
+        ]
+
+    def get_unique_objects(objs: list[Any], key_attr: str = 'id') -> list[Any]:
+        """根据键属性去重对象列表"""
+        seen = set()
+        unique = []
+        for item in objs:
+            item_id = getattr(item, key_attr, None)
+            if item_id is not None and item_id not in seen:
+                seen.add(item_id)
+                unique.append(item)
+        return unique
 
     if not row:
         return None
 
-    is_single = not isinstance(row, list)
-    rows_list = [row] if is_single else row
-
+    rows_list = [row] if not isinstance(row, list) else row
     if not rows_list:
         return None
 
-    # 获取主结构，取第一行第一列，类似于 scalar()
+    # 获取主对象信息
     first_row = rows_list[0]
-    main_obj = first_row[0] if hasattr(first_row, '__getitem__') and len(first_row) > 0 else first_row
-
+    main_obj = first_row[0] if hasattr(first_row, '__getitem__') and first_row else first_row
     if main_obj is None:
         return None
 
-    main_cls = type(main_obj)
-    main_obj_name = main_cls.__name__.lower()
-    main_mapper = class_mapper(main_cls)
-    main_columns = [
-        prop.key
-        for prop in main_mapper.iterate_properties
-        if isinstance(prop, (ColumnProperty, SynonymProperty)) and hasattr(main_obj, prop.key)
-    ]
+    main_obj_name = type(main_obj).__name__.lower()
+    main_columns = get_model_columns(main_obj)
 
-    # 单一遍历收集所有必要信息
-    sub_objs = {}
+    # 解析关系
+    relation_graph, reverse_relation, custom_names = parse_relationships(relationships or [])
+    has_relationships = bool(relation_graph)
+
+    # 预处理所有模型类型和列信息
+    model_info = {}
     cls_idxs = {}
-    main_ids = set()
-    flat_grouped = defaultdict(lambda: defaultdict(list))
-    all_layer_instances = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    sub_obj_names = set()
-    has_relationships = bool(relationships)
 
-    if has_relationships:
-        relation_graph = defaultdict(dict)
-        reverse_relation = {}
-        custom_names = {}
-        for rel_str in relationships:
-            if ':' in rel_str:
-                rel_part, custom_name = rel_str.split(':', 1)
-                custom_name = custom_name.strip()
-            else:
-                rel_part = rel_str
-                custom_name = None
-
-            parts = rel_part.split('-')
-            if len(parts) != 3:
+    for preprocess_row in rows_list:
+        preprocess_row_items = preprocess_row if hasattr(preprocess_row, '__getitem__') else (preprocess_row,)
+        for idx, row_obj in enumerate(preprocess_row_items):
+            if row_obj is None:
                 continue
-            source, rel_type, target = (
-                parts[0].lower(),
-                parts[1].lower(),
-                parts[2].lower(),
-            )
-            if rel_type not in ['o2m', 'm2o', 'o2o', 'm2m']:
-                continue
-            relation_graph[source][target] = rel_type
-            reverse_relation[target] = source
-            if custom_name:
-                custom_names[source, target] = custom_name
+            obj_class_name = type(row_obj).__name__.lower()
+            if obj_class_name not in model_info:
+                model_info[obj_class_name] = get_model_columns(row_obj)
+            if obj_class_name not in cls_idxs:
+                cls_idxs[obj_class_name] = idx
 
-    for i, row in enumerate(rows_list):
-        if hasattr(row, '__getitem__'):
-            row_items = row
-        else:
-            row_items = (row,)
-            if row is None:
-                continue
+    # 数据收集和分组
+    main_data = {}
+    grouped_data = defaultdict(lambda: defaultdict(list))
 
-        main = row_items[0]
-        if main is None:
+    for data_row in rows_list:
+        data_row_items = data_row if hasattr(data_row, '__getitem__') else (data_row,)
+        if not data_row_items or data_row_items[0] is None:
             continue
 
-        main_id = getattr(main, 'id', None) or id(main)
-        main_ids.add(main_id)
-        flat_grouped[main_id]['main'] = main  # 只在第一次设置 main
-        if i == 0:
-            cls_idxs[main_obj_name] = 0
+        main_obj = data_row_items[0]
+        main_id = getattr(main_obj, 'id', None) or id(main_obj)
 
-        for j, obj in enumerate(row_items[1:], 1):
-            if obj is None:
+        if main_id not in main_data:
+            main_data[main_id] = main_obj
+
+        # 收集子对象
+        for child_obj in data_row_items[1:]:
+            if child_obj is None:
                 continue
-            cls_name = type(obj).__name__.lower()
-            if cls_name not in sub_obj_names:
-                sub_obj_names.add(cls_name)
-                sub_mapper = class_mapper(type(obj))
-                sub_objs[cls_name] = [
-                    prop.key
-                    for prop in sub_mapper.iterate_properties
-                    if isinstance(prop, (ColumnProperty, SynonymProperty))
-                ]
-            if i == 0:
-                cls_idxs[cls_name] = j
-            flat_grouped[main_id][cls_name].append(obj)
+            child_class_name = type(child_obj).__name__.lower()
+            grouped_data[main_id][child_class_name].append(child_obj)
 
-            if has_relationships and cls_name in reverse_relation:
-                parent_layer = reverse_relation[cls_name]
-                parent_idx = cls_idxs.get(parent_layer, 0)
-                parent_obj = row_items[parent_idx]
-                if parent_obj is None:
-                    continue
-                parent_id = getattr(parent_obj, 'id', None)
-                if parent_id is None:
-                    continue
-                all_layer_instances[main_id][cls_name][parent_id].append(obj)
-
-    if not main_ids:
+    if not main_data:
         return None
 
-    group_keys = dict.fromkeys(sub_obj_names, 'id')
+    # 预生成 namedtuple 类型
+    namedtuple_cache = {}
+    if not return_as_dict:
+        for cls_name, columns in model_info.items():
+            if columns:
+                # 为嵌套关系预计算完整字段列表
+                full_columns = columns.copy()
+                if has_relationships:
+                    for target_class, relation_type in relation_graph.get(cls_name, {}).items():
+                        field_name = custom_names.get((cls_name, target_class))
+                        rel_key = get_relation_key(target_class, relation_type, field_name)
+                        full_columns.append(rel_key)
+                    full_columns = sorted(set(full_columns))  # 去重并排序
 
-    # 子类型预计算
-    sub_types = {}
-    sub_full_fields = {}
-    for sub_obj_name, sub_columns in sub_objs.items():
-        child_rel_keys = []
-        if has_relationships:
-            for target, rel_type in relation_graph[sub_obj_name].items():
-                custom_name = custom_names.get((sub_obj_name, target))
-                child_rel_keys.append(get_relation_key(target, rel_type, custom_name))
-            child_rel_keys = sorted(child_rel_keys)
-        full_columns = sub_columns + child_rel_keys
-        sub_full_fields[sub_obj_name] = full_columns
-        if not return_as_dict and full_columns:
-            if child_rel_keys:
-                sub_types[sub_obj_name] = namedtuple(sub_obj_name.capitalize(), full_columns)  # noqa: PYI024
+                namedtuple_cache[cls_name] = namedtuple(cls_name.capitalize(), full_columns or columns)  # noqa: PYI024
+
+    def build_flat_result(build_main_id: int, build_main_obj: Any) -> dict[str, Any]:  # noqa: C901
+        """构建扁平化结果"""
+        flat_result = {col: getattr(build_main_obj, col, None) for col in main_columns}
+
+        for class_name in sorted(grouped_data[build_main_id]):
+            if class_name == main_obj_name:
+                continue
+
+            flat_objs = get_unique_objects(grouped_data[build_main_id][class_name])
+            cls_columns = model_info.get(class_name, [])
+
+            if not flat_objs:
+                flat_result[class_name] = []
+            elif len(flat_objs) == 1:
+                obj_data = {col: getattr(flat_objs[0], col, None) for col in cls_columns}
+                # 确保 namedtuple 所需的所有字段都存在
+                if not return_as_dict and class_name in namedtuple_cache:
+                    nt_fields = getattr(namedtuple_cache[class_name], '_fields', [])
+                    for field in nt_fields:
+                        if field not in obj_data:
+                            obj_data[field] = None
+                flat_result[class_name] = obj_data if return_as_dict else namedtuple_cache[class_name](**obj_data)
             else:
-                sub_types[sub_obj_name] = namedtuple(sub_obj_name.capitalize(), sub_columns)  # noqa: PYI024
+                if return_as_dict:
+                    flat_result[class_name] = [
+                        {col: getattr(flat_obj, col, None) for col in cls_columns} for flat_obj in flat_objs
+                    ]
+                else:
+                    nested_result_list = []
+                    for nested_obj in flat_objs:
+                        obj_data = {col: getattr(nested_obj, col, None) for col in cls_columns}
+                        # 确保 namedtuple 所需的所有字段都存在
+                        if class_name in namedtuple_cache:
+                            nt_fields = getattr(namedtuple_cache[class_name], '_fields', [])
+                            for field in nt_fields:
+                                if field not in obj_data:
+                                    obj_data[field] = None
+                        nested_result_list.append(namedtuple_cache[class_name](**obj_data))
+                    flat_result[class_name] = nested_result_list
 
-    if has_relationships:
-        # 顶级收集
-        top_level_subs = sorted(relation_graph[main_obj_name].keys())
-        for main_id in main_ids:
-            for layer in top_level_subs:
-                if layer in cls_idxs:
-                    for obj in flat_grouped[main_id].get(layer, []):
-                        all_layer_instances[main_id][layer][main_id].append(obj)
+        return flat_result
 
-        # 预计算主结果字段
-        result_fields = main_columns.copy()
-        if not return_as_dict:
-            top_keys = []
-            for top_layer in top_level_subs:
-                rel_type = relation_graph[main_obj_name][top_layer]
-                custom_name = custom_names.get((main_obj_name, top_layer))
-                top_keys.append(get_relation_key(top_layer, rel_type, custom_name))
-            result_fields.extend(top_keys)
-            result_type = namedtuple('Result', result_fields) if result_fields else None  # noqa: PYI024
+    def build_nested_result(nested_main_id: int, nested_main_obj: Any) -> dict[str, Any]:  # noqa: C901
+        """构建嵌套化结果"""
+        nested_result = {col: getattr(nested_main_obj, col, None) for col in main_columns}
 
-        # 递归构建
-        @lru_cache(maxsize=128)
-        def build_nested(layer_name: str, parent_id_: int, main_id_: int) -> list:
-            objs_list = all_layer_instances[main_id_][layer_name].get(parent_id_, [])
-            layer_key = group_keys.get(layer_name, 'id')
+        # 构建关系层级数据结构
+        hierarchy = defaultdict(lambda: defaultdict(list))
+        for iter_row in rows_list:
+            iter_row_items = iter_row if hasattr(iter_row, '__getitem__') else (iter_row,)
+            if not iter_row_items or iter_row_items[0] is None:
+                continue
 
-            node_map_ = {}
-            for obj_ in objs_list:
-                layer_id = getattr(obj_, layer_key, None)
-                if layer_id is not None and layer_id not in node_map_:
-                    node_map_[layer_id] = obj_
+            iter_main_id = getattr(iter_row_items[0], 'id', None) or id(iter_row_items[0])
+            if iter_main_id != nested_main_id:
+                continue
 
-            instances = []
-            sub_columns_ = sub_objs.get(layer_name, [])
-            child_rels = sorted(relation_graph[layer_name].items(), key=operator.itemgetter(0))
-            sub_full_fields.get(layer_name, [])
+            for _i, related_obj in enumerate(iter_row_items[1:], 1):
+                if related_obj is None:
+                    continue
+                related_class_name = type(related_obj).__name__.lower()
 
-            nt_type = sub_types.get(layer_name) if not return_as_dict else None
+                if related_class_name in reverse_relation:
+                    parent_cls = reverse_relation[related_class_name]
+                    parent_idx = cls_idxs.get(parent_cls, 0)
+                    if parent_idx < len(iter_row_items):
+                        parent_obj = iter_row_items[parent_idx]
+                        if parent_obj is not None:
+                            parent_obj_id = getattr(parent_obj, 'id', None)
+                            if parent_obj_id is not None:
+                                hierarchy[related_class_name][parent_obj_id].append(related_obj)
 
-            for obj_ in node_map_.values():
-                nest_dict = {col: getattr(obj_, col, None) for col in sub_columns_}
+        def build_recursive(current_cls_name: str, current_parent_id: int) -> list:
+            """递归构建嵌套数据"""
+            recursive_objs = get_unique_objects(hierarchy[current_cls_name].get(current_parent_id, []))
+            if not recursive_objs:
+                return []
 
-                for child_name_, rel_type_ in child_rels:
-                    child_parent_id = getattr(obj_, group_keys.get(layer_name, 'id'), None)
+            recursive_result = []
+            for nested_obj in recursive_objs:
+                # 基础数据
+                obj_data = {col: getattr(nested_obj, col, None) for col in model_info[current_cls_name]}
+
+                # 处理子关系
+                for child_cls, child_rel_type in relation_graph.get(current_cls_name, {}).items():
+                    child_parent_id = getattr(nested_obj, 'id', None)
                     if child_parent_id is None:
                         continue
-                    child_instances = build_nested(child_name_, child_parent_id, main_id_)
-                    custom_name_ = custom_names.get((layer_name, child_name_))
-                    child_key = get_relation_key(child_name_, rel_type_, custom_name_)
-                    if rel_type_ in ['m2o', 'o2o']:
-                        nest_dict[child_key] = child_instances[0] if child_instances else None
+
+                    child_list = build_recursive(child_cls, child_parent_id)
+                    child_key = get_relation_key(
+                        child_cls, child_rel_type, custom_names.get((current_cls_name, child_cls))
+                    )
+
+                    if child_rel_type in ('m2o', 'o2o'):
+                        obj_data[child_key] = child_list[0] if child_list else None
                     else:
-                        nest_dict[child_key] = child_instances
+                        obj_data[child_key] = child_list
 
-                if return_as_dict:
-                    instances.append(nest_dict)
-                else:
-                    instances.append(nt_type(**nest_dict))
-            return instances
+                if not return_as_dict and current_cls_name in namedtuple_cache:
+                    nt_fields = getattr(namedtuple_cache[current_cls_name], '_fields', [])
+                    for field in nt_fields:
+                        if field not in obj_data:
+                            obj_data[field] = None
 
-    # 构建结果 list
-    result_list = []
-    sorted_main_ids = sorted(main_ids)  # 排序以保持确定性
-    for main_id in sorted_main_ids:
-        main = flat_grouped[main_id]['main']
-        nest_data = {col: getattr(main, col, None) for col in main_columns}
+                recursive_result.append(obj_data if return_as_dict else namedtuple_cache[current_cls_name](**obj_data))
+
+            return recursive_result
+
+        # 构建顶级关系
+        for top_cls_name, top_rel_type in relation_graph.get(main_obj_name, {}).items():
+            instances = build_recursive(top_cls_name, nested_main_id)
+            key = get_relation_key(top_cls_name, top_rel_type, custom_names.get((main_obj_name, top_cls_name)))
+
+            if top_rel_type in ('m2o', 'o2o'):
+                nested_result[key] = instances[0] if instances else None
+            else:
+                nested_result[key] = instances
+
+        return nested_result
+
+    # 构建最终结果
+    final_result_list = []
+    for current_main_id in sorted(main_data.keys()):
+        current_main_obj = main_data[current_main_id]
+
         if has_relationships:
-            for top_layer in top_level_subs:
-                rel_type = relation_graph[main_obj_name][top_layer]
-                custom_name = custom_names.get((main_obj_name, top_layer))
-                top_key = get_relation_key(top_layer, rel_type, custom_name)
-                top_instances = build_nested(top_layer, main_id, main_id)
-                if rel_type in ['m2o', 'o2o']:
-                    nest_data[top_key] = top_instances[0] if top_instances else None
-                else:
-                    nest_data[top_key] = top_instances
+            final_result_data = build_nested_result(current_main_id, current_main_obj)
         else:
-            for sub_obj in sorted(sub_obj_names):
-                subs = flat_grouped[main_id].get(sub_obj, [])
-                sub_columns = sub_objs.get(sub_obj, [])
-                group_key = group_keys.get(sub_obj, 'id')
-                node_map = {}
-                for obj in subs:
-                    obj_id = getattr(obj, group_key, None)
-                    if obj_id is not None and obj_id not in node_map:
-                        node_map[obj_id] = obj
-                unique_objs = list(node_map.values())
-                if not unique_objs:
-                    nest_data[sub_obj] = []
-                elif len(unique_objs) == 1:
-                    if return_as_dict:
-                        nest_data[sub_obj] = {col: getattr(unique_objs[0], col, None) for col in sub_columns}
-                    else:
-                        nt_type = sub_types.get(sub_obj)
-                        nest_data[sub_obj] = nt_type(**{col: getattr(unique_objs[0], col, None) for col in sub_columns})
-                else:
-                    if return_as_dict:
-                        nest_data[sub_obj] = [
-                            {col: getattr(obj, col, None) for col in sub_columns} for obj in unique_objs
-                        ]
-                    else:
-                        nt_type = sub_types.get(sub_obj)
-                        nest_data[sub_obj] = [
-                            nt_type(**{col: getattr(obj, col, None) for col in sub_columns}) for obj in unique_objs
-                        ]
+            final_result_data = build_flat_result(current_main_id, current_main_obj)
 
         if not return_as_dict:
-            if has_relationships:
-                result_list.append(result_type(**nest_data))
-            else:
-                result_fields = main_columns + sorted(sub_obj_names)
-                result_type = namedtuple('Result', result_fields)  # noqa: PYI024
-                result_list.append(result_type(**nest_data))
+            all_fields = list(final_result_data.keys())
+            result_type = namedtuple('Result', all_fields)  # noqa: PYI024
+            final_result_list.append(result_type(**final_result_data))
         else:
-            result_list.append(nest_data)
+            final_result_list.append(final_result_data)
 
-    return result_list[0] if len(result_list) == 1 else result_list
+    return final_result_list[0] if len(final_result_list) == 1 else final_result_list
