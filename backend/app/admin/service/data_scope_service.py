@@ -115,11 +115,17 @@ class DataScopeService:
         """
         更新数据范围规则
 
+        :param db: 数据库会话
         :param pk: 范围 ID
         :param rule_ids: 规则 ID 列表
         :return:
         """
         count = await data_scope_dao.update_rules(db, pk, rule_ids)
+        data_rule = await data_scope_dao.get(db, pk)
+        if data_rule:
+            for role in await data_rule.awaitable_attrs.roles:
+                for user in await role.awaitable_attrs.users:
+                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
 
     @staticmethod
