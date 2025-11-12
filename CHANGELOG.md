@@ -1,3 +1,36 @@
+<a id="v1.10.4"></a>
+# [v1.10.4](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.4) - 2025-11-12
+
+## What's Changed
+* Update changelog for v1.10.3 by [@wu-clan](https://github.com/wu-clan) in [#895](https://github.com/fastapi-practices/fastapi_best_architecture/pull/895)
+* Bump fastapi oauth2 from 0.0.1 to 0.0.2 by [@wu-clan](https://github.com/wu-clan) in [#896](https://github.com/fastapi-practices/fastapi_best_architecture/pull/896)
+* Update the interface timing accuracy in log by [@wu-clan](https://github.com/wu-clan) in [#897](https://github.com/fastapi-practices/fastapi_best_architecture/pull/897)
+* Optimize redis batch get and delete operations by [@wu-clan](https://github.com/wu-clan) in [#899](https://github.com/fastapi-practices/fastapi_best_architecture/pull/899)
+* Update the time column type in the task by [@wu-clan](https://github.com/wu-clan) in [#900](https://github.com/fastapi-practices/fastapi_best_architecture/pull/900)
+* Add the user social independent enum file by [@wu-clan](https://github.com/wu-clan) in [#902](https://github.com/fastapi-practices/fastapi_best_architecture/pull/902)
+* Optimize the request params of the service layer by [@wu-clan](https://github.com/wu-clan) in [#903](https://github.com/fastapi-practices/fastapi_best_architecture/pull/903)
+* Optimize the data permission condition build by [@wu-clan](https://github.com/wu-clan) in [#904](https://github.com/fastapi-practices/fastapi_best_architecture/pull/904)
+* Fix response status codes in the request logs by [@wu-clan](https://github.com/wu-clan) in [#905](https://github.com/fastapi-practices/fastapi_best_architecture/pull/905)
+* Add dept validation to user updates by [@wu-clan](https://github.com/wu-clan) in [#906](https://github.com/fastapi-practices/fastapi_best_architecture/pull/906)
+* Update the version number to 1.10.4 by [@wu-clan](https://github.com/wu-clan) in [#907](https://github.com/fastapi-practices/fastapi_best_architecture/pull/907)
+* Fix typo in the data permission prompt by [@wu-clan](https://github.com/wu-clan) in [#909](https://github.com/fastapi-practices/fastapi_best_architecture/pull/909)
+* Fix user cache cleanup when operating data rules by [@wu-clan](https://github.com/wu-clan) in [#910](https://github.com/fastapi-practices/fastapi_best_architecture/pull/910)
+* Fix create and delete department validations by [@wu-clan](https://github.com/wu-clan) in [#911](https://github.com/fastapi-practices/fastapi_best_architecture/pull/911)
+* Fix the user menu sidebar parsing by [@wu-clan](https://github.com/wu-clan) in [#912](https://github.com/fastapi-practices/fastapi_best_architecture/pull/912)
+* Add user social unbinding account interface by [@wu-clan](https://github.com/wu-clan) in [#913](https://github.com/fastapi-practices/fastapi_best_architecture/pull/913)
+* Fix user cache cleanup when updating data scope by [@wu-clan](https://github.com/wu-clan) in [#915](https://github.com/fastapi-practices/fastapi_best_architecture/pull/915)
+* Fix dept and menu table subqueries by [@wu-clan](https://github.com/wu-clan) in [#914](https://github.com/fastapi-practices/fastapi_best_architecture/pull/914)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.3...v1.10.4
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.10.4]
+
+
 <a id="v1.10.3"></a>
 # [v1.10.3](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.3) - 2025-10-30
 
@@ -1088,6 +1121,7 @@
 [Changes][v1.0.0]
 
 
+[v1.10.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.3...v1.10.4
 [v1.10.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.2...v1.10.3
 [v1.10.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.1...v1.10.2
 [v1.10.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.0...v1.10.1
