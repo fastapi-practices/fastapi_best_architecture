@@ -1,3 +1,20 @@
+<a id="v1.11.0"></a>
+# [v1.11.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.0) - 2025-11-12
+
+## What's Changed
+* Update changelog for v1.10.4 by [@wu-clan](https://github.com/wu-clan) in [#916](https://github.com/fastapi-practices/fastapi_best_architecture/pull/916)
+* Refactor foreign keys and relationships to pure logic by [@wu-clan](https://github.com/wu-clan) in [#901](https://github.com/fastapi-practices/fastapi_best_architecture/pull/901)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.4...v1.11.0
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.11.0]
+
+
 <a id="v1.10.4"></a>
 # [v1.10.4](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.10.4) - 2025-11-12
 
@@ -1121,6 +1138,7 @@
 [Changes][v1.0.0]
 
 
+[v1.11.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.4...v1.11.0
 [v1.10.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.3...v1.10.4
 [v1.10.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.2...v1.10.3
 [v1.10.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.1...v1.10.2
