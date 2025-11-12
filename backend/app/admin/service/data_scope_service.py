@@ -11,10 +11,9 @@ from backend.app.admin.schema.data_scope import (
     UpdateDataScopeParam,
     UpdateDataScopeRuleParam,
 )
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 
 
 class DataScopeService:
@@ -57,7 +56,7 @@ class DataScopeService:
         :return:
         """
 
-        data_scope = await data_scope_dao.get_with_relation(db, pk)
+        data_scope = await data_scope_dao.get_join(db, pk)
         if not data_scope:
             raise errors.NotFoundError(msg='数据范围不存在')
         return data_scope
@@ -105,9 +104,7 @@ class DataScopeService:
         if data_scope.name != obj.name and await data_scope_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据范围已存在')
         count = await data_scope_dao.update(db, pk, obj)
-        for role in await data_scope.awaitable_attrs.roles:
-            for user in await role.awaitable_attrs.users:
-                await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
 
     @staticmethod
@@ -121,11 +118,7 @@ class DataScopeService:
         :return:
         """
         count = await data_scope_dao.update_rules(db, pk, rule_ids)
-        data_rule = await data_scope_dao.get(db, pk)
-        if data_rule:
-            for role in await data_rule.awaitable_attrs.roles:
-                for user in await role.awaitable_attrs.users:
-                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
 
     @staticmethod
@@ -138,12 +131,7 @@ class DataScopeService:
         :return:
         """
         count = await data_scope_dao.delete(db, obj.pks)
-        for pk in obj.pks:
-            data_rule = await data_scope_dao.get(db, pk)
-            if data_rule:
-                for role in await data_rule.awaitable_attrs.roles:
-                    for user in await role.awaitable_attrs.users:
-                        await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_scope_id(db, obj.pks)
         return count
 
 

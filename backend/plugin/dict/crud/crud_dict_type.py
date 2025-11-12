@@ -4,6 +4,7 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
+from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.model import DictType
 from backend.plugin.dict.schema.dict_type import CreateDictTypeParam, UpdateDictTypeParam
 
@@ -28,9 +29,9 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param db: 数据库会话
         :return:
         """
-        return await self.select_models(db, load_strategies={'datas': 'noload'})
+        return await self.select_models(db)
 
-    async def get_select(self, *, name: str | None, code: str | None) -> Select:
+    async def get_select(self, name: str | None, code: str | None) -> Select:
         """
         获取字典类型列表查询表达式
 
@@ -45,7 +46,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         if code is not None:
             filters['code__like'] = f'%{code}%'
 
-        return await self.select_order('id', 'desc', load_strategies={'datas': 'noload'}, **filters)
+        return await self.select_order('id', 'desc', **filters)
 
     async def get_by_code(self, db: AsyncSession, code: str) -> DictType | None:
         """
@@ -86,6 +87,7 @@ class CRUDDictType(CRUDPlus[DictType]):
         :param pks: 字典类型 ID 列表
         :return:
         """
+        await dict_data_dao.delete_by_type_id(db, pks)
         return await self.delete_model_by_column(db, allow_multiple=True, id__in=pks)
 
 

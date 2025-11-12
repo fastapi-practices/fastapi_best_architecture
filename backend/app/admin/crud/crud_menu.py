@@ -1,9 +1,11 @@
 from collections.abc import Sequence
 
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Menu
+from backend.app.admin.model.m2m import role_menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 
 
@@ -92,6 +94,9 @@ class CRUDMenu(CRUDPlus[Menu]):
         :param menu_id: 菜单 ID
         :return:
         """
+        role_menu_stmt = delete(role_menu).where(role_menu.c.menu_id == menu_id)
+        await db.execute(role_menu_stmt)
+
         return await self.delete_model(db, menu_id)
 
     async def get_children(self, db: AsyncSession, menu_id: int) -> Sequence[Menu | None]:

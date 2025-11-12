@@ -31,10 +31,24 @@ class DeleteRoleParam(SchemaBase):
     pks: list[int] = Field(description='角色 ID 列表')
 
 
+class CreateRoleMenuParam(SchemaBase):
+    """创建角色菜单参数"""
+
+    role_id: int = Field(description='角色 ID')
+    menu_id: int = Field(description='菜单 ID')
+
+
 class UpdateRoleMenuParam(SchemaBase):
     """更新角色菜单参数"""
 
     menus: list[int] = Field(description='菜单 ID 列表')
+
+
+class CreateRoleScopeParam(SchemaBase):
+    """创建角色数据范围参数"""
+
+    role_id: int = Field(description='角色 ID')
+    data_scope_id: int = Field(description='数据范围 ID')
 
 
 class UpdateRoleScopeParam(SchemaBase):

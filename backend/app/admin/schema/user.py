@@ -34,6 +34,13 @@ class AddUserParam(AuthSchemaBase):
     roles: list[int] = Field(description='角色 ID 列表')
 
 
+class AddUserRoleParam(SchemaBase):
+    """添加用户角色"""
+
+    user_id: int = Field(description='用户 ID')
+    role_id: int = Field(description='角色 ID')
+
+
 class AddOAuth2UserParam(AuthSchemaBase):
     """添加 OAuth2 用户参数"""
 

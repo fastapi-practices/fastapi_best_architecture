@@ -51,5 +51,15 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         """
         return await self.delete_model_by_column(db, user_id=user_id, source=source)
 
+    async def delete_by_user_id(self, db: AsyncSession, user_id: int) -> int:
+        """
+        通过用户 ID 删除用户社交
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :return:
+        """
+        return await self.delete_model_by_column(db, user_id=user_id)
+
 
 user_social_dao: CRUDUserSocial = CRUDUserSocial(UserSocial)

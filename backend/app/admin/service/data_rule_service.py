@@ -11,10 +11,10 @@ from backend.app.admin.schema.data_rule import (
     GetDataRuleColumnDetail,
     UpdateDataRuleParam,
 )
+from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.core.conf import settings
-from backend.database.redis import redis_client
 from backend.utils.import_parse import dynamic_import_data_model
 
 
@@ -114,10 +114,7 @@ class DataRuleService:
         if data_rule.name != obj.name and await data_rule_dao.get_by_name(db, obj.name):
             raise errors.ConflictError(msg='数据规则已存在')
         count = await data_rule_dao.update(db, pk, obj)
-        for data_scope in await data_rule.awaitable_attrs.scopes:
-            for role in await data_scope.awaitable_attrs.roles:
-                for user in await role.awaitable_attrs.users:
-                    await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_rule_id(db, [pk])
         return count
 
     @staticmethod
@@ -130,13 +127,7 @@ class DataRuleService:
         :return:
         """
         count = await data_rule_dao.delete(db, obj.pks)
-        for pk in obj.pks:
-            data_rule = await data_rule_dao.get(db, pk)
-            if data_rule:
-                for data_scope in await data_rule.awaitable_attrs.scopes:
-                    for role in await data_scope.awaitable_attrs.roles:
-                        for user in await role.awaitable_attrs.users:
-                            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
+        await user_cache_manager.clear_by_data_rule_id(db, obj.pks)
         return count
 
 

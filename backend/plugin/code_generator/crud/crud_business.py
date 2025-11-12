@@ -52,7 +52,7 @@ class CRUDGenBusiness(CRUDPlus[GenBusiness]):
         if table_name is not None:
             filters['table_name__like'] = f'%{table_name}%'
 
-        return await self.select_order('id', 'desc', load_strategies={'gen_column': 'noload'}, **filters)
+        return await self.select_order('id', 'desc', **filters)
 
     async def create(self, db: AsyncSession, obj: CreateGenBusinessParam) -> None:
         """

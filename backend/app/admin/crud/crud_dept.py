@@ -1,12 +1,14 @@
 from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
-from backend.app.admin.model import Dept
+from backend.app.admin.model import Dept, User
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.security.permission import filter_data_permission
+from backend.utils.serializers import select_join_serialize
 
 
 class CRUDDept(CRUDPlus[Dept]):
@@ -63,8 +65,8 @@ class CRUDDept(CRUDPlus[Dept]):
         if status is not None:
             filters['status'] = status
 
-        data_filtered = filter_data_permission(request_user)
-        return await self.select_models_order(db, 'sort', 'desc', data_filtered, **filters)
+        data_filter = filter_data_permission(request_user)
+        return await self.select_models_order(db, 'sort', 'desc', data_filter, **filters)
 
     async def create(self, db: AsyncSession, obj: CreateDeptParam) -> None:
         """
@@ -97,7 +99,7 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         return await self.delete_model_by_column(db, id=dept_id, logical_deletion=True, deleted_flag_column='del_flag')
 
-    async def get_with_relation(self, db: AsyncSession, dept_id: int) -> Dept | None:
+    async def get_join(self, db: AsyncSession, dept_id: int) -> Any | None:
         """
         获取部门及关联数据
 
@@ -105,7 +107,12 @@ class CRUDDept(CRUDPlus[Dept]):
         :param dept_id: 部门 ID
         :return:
         """
-        return await self.select_model(db, dept_id, load_strategies=['users'])
+        result = await self.select_model(
+            db,
+            dept_id,
+            join_conditions=[JoinConfig(model=User, join_on=User.dept_id == self.model.id, fill_result=True)],
+        )
+        return select_join_serialize(result, relationships=['Dept-o2m-User'])
 
     async def get_children(self, db: AsyncSession, dept_id: int) -> Sequence[Dept | None]:
         """

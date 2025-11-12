@@ -1,16 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.admin.model.m2m import sys_data_scope_rule
 from backend.common.model import Base, id_key
-
-if TYPE_CHECKING:
-    from backend.app.admin.model import DataScope
 
 
 class DataRule(Base):
@@ -20,13 +12,10 @@ class DataRule(Base):
 
     id: Mapped[id_key] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(sa.String(512), unique=True, comment='名称')
-    model: Mapped[str] = mapped_column(sa.String(64), comment='SQLA 模型名，对应 DATA_PERMISSION_MODELS 键名')
+    model: Mapped[str] = mapped_column(sa.String(64), comment='模型名称')
     column: Mapped[str] = mapped_column(sa.String(32), comment='模型字段名')
     operator: Mapped[int] = mapped_column(comment='运算符（0：and、1：or）')
     expression: Mapped[int] = mapped_column(
         comment='表达式（0：==、1：!=、2：>、3：>=、4：<、5：<=、6：in、7：not_in）',
     )
     value: Mapped[str] = mapped_column(sa.String(256), comment='规则值')
-
-    # 数据范围规则多对多
-    scopes: Mapped[list[DataScope]] = relationship(init=False, secondary=sys_data_scope_rule, back_populates='rules')

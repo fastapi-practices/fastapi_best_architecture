@@ -7,3 +7,4 @@ venv/
 .python-version
 .ruff_cache/
 .pytest_cache/
+.claude/

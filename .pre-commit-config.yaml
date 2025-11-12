@@ -1,8 +1,12 @@
+default_language_version:
+    python: '>= 3.10'
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
+      - id: check-json
       - id: check-yaml
       - id: check-toml
 

@@ -1,18 +1,22 @@
+from typing import Any
+
 import bcrypt
 
-from sqlalchemy import select
+from sqlalchemy import Select, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import noload, selectinload
-from sqlalchemy.sql import Select
-from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
-from backend.app.admin.model import DataScope, Dept, Role, User
+from backend.app.admin.model import DataRule, DataScope, Dept, Menu, Role, User
+from backend.app.admin.model.m2m import data_scope_rule, role_data_scope, role_menu, user_role
 from backend.app.admin.schema.user import (
     AddOAuth2UserParam,
     AddUserParam,
+    AddUserRoleParam,
     UpdateUserParam,
 )
 from backend.common.security.jwt import get_hash_password
+from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
+from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
 
 
@@ -69,15 +73,20 @@ class CRUDUser(CRUDPlus[User]):
         """
         salt = bcrypt.gensalt()
         obj.password = get_hash_password(obj.password, salt)
+
         dict_obj = obj.model_dump(exclude={'roles'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
-
-        stmt = select(Role).where(Role.id.in_(obj.roles))
-        roles = await db.execute(stmt)
-        new_user.roles = roles.scalars().all()
-
         db.add(new_user)
+        await db.flush()
+
+        role_stmt = select(Role).where(Role.id.in_(obj.roles))
+        result = await db.execute(role_stmt)
+        roles = result.scalars().all()
+
+        user_role_data = [AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump() for role in roles]
+        user_role_stmt = insert(user_role)
+        await db.execute(user_role_stmt, user_role_data)
 
     async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
         """
@@ -90,12 +99,15 @@ class CRUDUser(CRUDPlus[User]):
         dict_obj = obj.model_dump()
         dict_obj.update({'is_staff': True, 'salt': None})
         new_user = self.model(**dict_obj)
-
-        stmt = select(Role)
-        role = await db.execute(stmt)
-        new_user.roles = [role.scalars().first()]  # 默认绑定第一个角色
-
         db.add(new_user)
+        await db.flush()
+
+        role_stmt = select(Role)
+        result = await db.execute(role_stmt)
+        role = result.scalars().first()  # 默认绑定第一个角色
+
+        user_role_stmt = insert(user_role).values(AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump())
+        await db.execute(user_role_stmt)
 
     async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
         """
@@ -111,9 +123,17 @@ class CRUDUser(CRUDPlus[User]):
 
         count = await self.update_model(db, input_user.id, obj)
 
-        stmt = select(Role).where(Role.id.in_(role_ids))
-        roles = await db.execute(stmt)
-        input_user.roles = roles.scalars().all()
+        role_stmt = select(Role).where(Role.id.in_(role_ids))
+        result = await db.execute(role_stmt)
+        roles = result.scalars().all()
+
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == input_user.id)
+        await db.execute(user_role_stmt)
+
+        user_role_data = [AddUserRoleParam(user_id=input_user.id, role_id=role.id).model_dump() for role in roles]
+        user_role_stmt = insert(user_role)
+        await db.execute(user_role_stmt, user_role_data)
+
         return count
 
     async def update_nickname(self, db: AsyncSession, user_id: int, nickname: str) -> int:
@@ -157,6 +177,11 @@ class CRUDUser(CRUDPlus[User]):
         :param user_id: 用户 ID
         :return:
         """
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
+        await db.execute(user_role_stmt)
+
+        await user_social_dao.delete_by_user_id(db, user_id)
+
         return await self.delete_model(db, user_id)
 
     async def check_email(self, db: AsyncSession, email: str) -> User | None:
@@ -206,9 +231,10 @@ class CRUDUser(CRUDPlus[User]):
         return await self.select_order(
             'id',
             'desc',
-            load_options=[
-                selectinload(self.model.dept).options(noload(Dept.parent), noload(Dept.children), noload(Dept.users)),
-                selectinload(self.model.roles).options(noload(Role.users), noload(Role.menus), noload(Role.scopes)),
+            join_conditions=[
+                JoinConfig(model=Dept, join_on=Dept.id == self.model.dept_id, fill_result=True),
+                JoinConfig(model=user_role, join_on=user_role.c.user_id == self.model.id),
+                JoinConfig(model=Role, join_on=Role.id == user_role.c.role_id, fill_result=True),
             ],
             **filters,
         )
@@ -257,13 +283,13 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
-    async def get_with_relation(
+    async def get_join(
         self,
         db: AsyncSession,
         *,
         user_id: int | None = None,
         username: str | None = None,
-    ) -> User | None:
+    ) -> Any | None:
         """
         获取用户关联信息
 
@@ -279,16 +305,31 @@ class CRUDUser(CRUDPlus[User]):
         if username:
             filters['username'] = username
 
-        return await self.select_model_by_column(
+        result = await self.select_models(
             db,
-            load_options=[
-                selectinload(self.model.roles).options(
-                    selectinload(Role.menus),
-                    selectinload(Role.scopes).options(selectinload(DataScope.rules)),
-                )
+            join_conditions=[
+                JoinConfig(model=Dept, join_on=Dept.id == self.model.dept_id, fill_result=True),
+                JoinConfig(model=user_role, join_on=user_role.c.user_id == self.model.id),
+                JoinConfig(model=Role, join_on=Role.id == user_role.c.role_id, fill_result=True),
+                JoinConfig(model=role_menu, join_on=role_menu.c.role_id == Role.id),
+                JoinConfig(model=Menu, join_on=Menu.id == role_menu.c.menu_id, fill_result=True),
+                JoinConfig(model=role_data_scope, join_on=role_data_scope.c.role_id == Role.id),
+                JoinConfig(model=DataScope, join_on=DataScope.id == role_data_scope.c.data_scope_id, fill_result=True),
+                JoinConfig(model=data_scope_rule, join_on=data_scope_rule.c.data_scope_id == DataScope.id),
+                JoinConfig(model=DataRule, join_on=DataRule.id == data_scope_rule.c.data_rule_id, fill_result=True),
             ],
-            load_strategies=['dept'],
             **filters,
+        )
+
+        return select_join_serialize(
+            result,
+            relationships=[
+                'User-m2o-Dept',
+                'User-m2m-Role',
+                'Role-m2m-Menu',
+                'Role-m2m-DataScope:scopes',
+                'DataScope-m2m-DataRule:rules',
+            ],
         )
 
 

@@ -23,6 +23,7 @@ from backend.common.response.response_code import CustomErrorCode
 from backend.common.security.jwt import get_token, jwt_decode, password_verify
 from backend.core.conf import settings
 from backend.database.redis import redis_client
+from backend.utils.serializers import select_join_serialize
 
 
 class UserService:
@@ -38,7 +39,7 @@ class UserService:
         :param username: 用户名
         :return:
         """
-        user = await user_dao.get_with_relation(db, user_id=pk, username=username)
+        user = await user_dao.get_join(db, user_id=pk, username=username)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         return user
@@ -52,7 +53,7 @@ class UserService:
         :param pk: 用户 ID
         :return:
         """
-        user = await user_dao.get_with_relation(db, user_id=pk)
+        user = await user_dao.get_join(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         return user.roles
@@ -70,7 +71,10 @@ class UserService:
         :return:
         """
         user_select = await user_dao.get_select(dept=dept, username=username, phone=phone, status=status)
-        return await paging_data(db, user_select)
+        data = await paging_data(db, user_select)
+        if data['items']:
+            data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
+        return data
 
     @staticmethod
     async def create(*, db: AsyncSession, obj: AddUserParam) -> None:
@@ -103,7 +107,7 @@ class UserService:
         :param obj: 用户更新参数
         :return:
         """
-        user = await user_dao.get_with_relation(db, user_id=pk)
+        user = await user_dao.get_join(db, user_id=pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         if obj.username != user.username and await user_dao.get_by_username(db, obj.username):

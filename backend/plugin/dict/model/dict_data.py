@@ -1,15 +1,8 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import sqlalchemy as sa
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.common.model import Base, UniversalText, id_key
-
-if TYPE_CHECKING:
-    from backend.plugin.dict.model import DictType
 
 
 class DictData(Base):
@@ -26,8 +19,5 @@ class DictData(Base):
     status: Mapped[int] = mapped_column(default=1, comment='状态（0停用 1正常）')
     remark: Mapped[str | None] = mapped_column(UniversalText, default=None, comment='备注')
 
-    # 字典类型一对多
-    type_id: Mapped[int] = mapped_column(
-        sa.ForeignKey('sys_dict_type.id', ondelete='CASCADE'), default=0, comment='字典类型关联ID'
-    )
-    type: Mapped[DictType] = relationship(init=False, back_populates='datas')
+    # 逻辑外键
+    type_id: Mapped[int] = mapped_column(sa.BigInteger, default=0, comment='字典类型关联ID')
