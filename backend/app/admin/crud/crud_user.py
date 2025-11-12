@@ -127,6 +127,9 @@ class CRUDUser(CRUDPlus[User]):
         result = await db.execute(role_stmt)
         roles = result.scalars().all()
 
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == input_user.id)
+        await db.execute(user_role_stmt)
+
         user_role_data = [AddUserRoleParam(user_id=input_user.id, role_id=role.id).model_dump() for role in roles]
         user_role_stmt = insert(user_role)
         await db.execute(user_role_stmt, user_role_data)
