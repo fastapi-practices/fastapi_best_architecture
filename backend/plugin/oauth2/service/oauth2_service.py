@@ -1,3 +1,5 @@
+import json
+
 from typing import Any
 
 from fast_captcha import text_captcha
@@ -10,6 +12,7 @@ from backend.app.admin.schema.user import AddOAuth2UserParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.common.context import ctx
 from backend.common.enums import LoginLogStatusType
+from backend.common.exception import errors
 from backend.common.i18n import t
 from backend.common.security import jwt
 from backend.core.conf import settings
@@ -17,6 +20,7 @@ from backend.database.redis import redis_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
+from backend.plugin.oauth2.service.user_social_service import user_social_service
 from backend.utils.timezone import timezone
 
 
@@ -24,47 +28,33 @@ class OAuth2Service:
     """OAuth2 认证服务类"""
 
     @staticmethod
-    async def create_with_login(
+    async def login(
         *,
         db: AsyncSession,
         response: Response,
         background_tasks: BackgroundTasks,
-        user: dict[str, Any],
-        social: UserSocialType,
-    ) -> GetLoginToken | None:
+        sid: str,
+        source: UserSocialType,
+        username: str | None = None,
+        nickname: str | None = None,
+        email: str | None = None,
+        avatar: str | None = None,
+    ) -> GetLoginToken:
         """
-        创建 OAuth2 用户并登录
+        OAuth2 用户登录
 
         :param db: 数据库会话
         :param response: FastAPI 响应对象
         :param background_tasks: FastAPI 后台任务
-        :param user: OAuth2 用户信息
-        :param social: 社交平台类型
+        :param sid: 社交账号唯一编码
+        :param source: 社交平台
+        :param username: 用户名
+        :param nickname: 昵称
+        :param email: 邮箱
+        :param avatar: 头像地址
         :return:
         """
-
-        sid = user.get('uuid')
-        username = user.get('username')
-        nickname = user.get('nickname')
-        email = user.get('email')
-        avatar = user.get('avatar_url')
-
-        if social == UserSocialType.github:
-            sid = user.get('id')
-            username = user.get('login')
-            nickname = user.get('name')
-
-        if social == UserSocialType.google:
-            sid = user.get('id')
-            username = user.get('name')
-            nickname = user.get('given_name')
-            avatar = user.get('picture')
-
-        if social == UserSocialType.linux_do:
-            sid = user.get('id')
-            nickname = user.get('name')
-
-        user_social = await user_social_dao.get_by_sid(db, str(sid), str(social.value))
+        user_social = await user_social_dao.get_by_sid(db, sid, source.value)
         if user_social:
             sys_user = await user_dao.get(db, user_social.user_id)
             # 更新用户头像
@@ -74,7 +64,7 @@ class OAuth2Service:
             sys_user = None
             # 检测系统用户是否已存在
             if email:
-                sys_user = await user_dao.check_email(db, email)  # 通过邮箱验证绑定保证邮箱真实性
+                sys_user = await user_dao.check_email(db, email)
 
             # 创建系统用户
             if not sys_user:
@@ -92,7 +82,7 @@ class OAuth2Service:
                 sys_user = await user_dao.get_by_username(db, username)
 
             # 绑定社交账号
-            new_user_social = CreateUserSocialParam(sid=str(sid), source=social.value, user_id=sys_user.id)
+            new_user_social = CreateUserSocialParam(sid=sid, source=source.value, user_id=sys_user.id)
             await user_social_dao.create(db, new_user_social)
 
         # 创建 token
@@ -139,6 +129,77 @@ class OAuth2Service:
             user=sys_user,  # type: ignore
         )
         return data
+
+    async def login_or_binding(
+        self,
+        *,
+        db: AsyncSession,
+        response: Response,
+        background_tasks: BackgroundTasks,
+        user: dict[str, Any],
+        social: UserSocialType,
+        state: str | None = None,
+    ) -> GetLoginToken | None:
+        """
+        OAuth2 登录或绑定
+
+        :param db: 数据库会话
+        :param response: FastAPI 响应对象
+        :param background_tasks: FastAPI 后台任务
+        :param user: OAuth2 用户信息
+        :param social: 社交平台类型
+        :param state: OAuth2 state 参数
+        :return:
+        """
+
+        sid = user.get('uuid')
+        username = user.get('username')
+        nickname = user.get('nickname')
+        email = user.get('email')
+        avatar = user.get('avatar_url')
+
+        match social:
+            case UserSocialType.github:
+                sid = user.get('id')
+                username = user.get('login')
+                nickname = user.get('name')
+            case UserSocialType.google:
+                sid = user.get('id')
+                username = user.get('name')
+                nickname = user.get('given_name')
+                avatar = user.get('picture')
+            case UserSocialType.linux_do:
+                sid = user.get('id')
+                nickname = user.get('name')
+            case _:
+                raise errors.ForbiddenError(msg=f'暂不支持 {social} OAuth2 登录')
+
+        state = json.loads(state)
+
+        # 绑定流程
+        if state and state.get('type') == 'binding':
+            user_id = state.get('user_id')
+            if user_id:
+                await user_social_service.binding_with_oauth2(
+                    db=db,
+                    user_id=user_id,
+                    sid=str(sid),
+                    source=social,
+                )
+                return None
+
+        # 登录流程
+        return await self.login(
+            db=db,
+            response=response,
+            background_tasks=background_tasks,
+            sid=str(sid),
+            source=social,
+            username=username,
+            nickname=nickname,
+            email=email,
+            avatar=avatar,
+        )
 
 
 oauth2_service: OAuth2Service = OAuth2Service()

@@ -37,16 +37,23 @@ async def google_oauth2_callback(  # noqa: ANN201
         Depends(FastAPIOAuth20(google_client, redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI)),
     ],
 ):
-    token_data, _state = oauth2
+    token_data, state = oauth2
     access_token = token_data['access_token']
     user = await google_client.get_userinfo(access_token)
-    data = await oauth2_service.create_with_login(
+    data = await oauth2_service.login_or_binding(
         db=db,
         response=response,
         background_tasks=background_tasks,
         user=user,
         social=UserSocialType.google,
+        state=state,
     )
+
+    # 绑定流程
+    if data is None:
+        return RedirectResponse(url=settings.OAUTH2_FRONTEND_BINDING_REDIRECT_URI)
+
+    # 登录流程
     return RedirectResponse(
-        url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}',
+        url=f'{settings.OAUTH2_FRONTEND_LOGIN_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}',
     )
