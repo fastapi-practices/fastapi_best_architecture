@@ -1,4 +1,6 @@
 import json
+import uuid
+from datetime import datetime
 
 from collections.abc import Sequence
 
@@ -6,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
 from backend.core.conf import settings
+from backend.database.redis import redis_client
 from backend.plugin.oauth2.api.v1.github import github_client
 from backend.plugin.oauth2.api.v1.google import google_client
 from backend.plugin.oauth2.api.v1.linux_do import linux_do_client
@@ -70,23 +73,32 @@ class UserSocialService:
 
     @staticmethod
     async def get_binding_auth_url(*, user_id: int, source: UserSocialType) -> str:
-        state = json.dumps({'type': 'binding', 'user_id': user_id})
+        state_token = str(uuid.uuid4())
+        state_data = {
+            'type': 'binding',
+            'user_id': user_id
+        }
+        await redis_client.setex(
+            f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state_token}',
+            settings.OAUTH2_STATE_EXPIRE_SECONDS,
+            json.dumps(state_data)
+        )
 
         match source:
             case UserSocialType.github:
                 auth_url = await github_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI,
-                    state=state,
+                    state=state_token,
                 )
             case UserSocialType.google:
                 auth_url = await google_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI,
-                    state=state,
+                    state=state_token,
                 )
             case UserSocialType.linux_do:
                 auth_url = await linux_do_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI,
-                    state=state,
+                    state=state_token,
                 )
             case _:
                 raise errors.ForbiddenError(msg=f'暂不支持 {source} 绑定')
