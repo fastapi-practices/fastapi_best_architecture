@@ -8,9 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.redis import redis_client
-from backend.plugin.oauth2.api.v1.github import github_client
-from backend.plugin.oauth2.api.v1.google import google_client
-from backend.plugin.oauth2.api.v1.linux_do import linux_do_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.model import UserSocial
@@ -82,16 +79,22 @@ class UserSocialService:
 
         match source:
             case UserSocialType.github:
+                from backend.plugin.oauth2.api.v1.github import github_client
+
                 auth_url = await github_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI,
                     state=state,
                 )
             case UserSocialType.google:
+                from backend.plugin.oauth2.api.v1.google import google_client
+
                 auth_url = await google_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI,
                     state=state,
                 )
             case UserSocialType.linux_do:
+                from backend.plugin.oauth2.api.v1.linux_do import linux_do_client
+
                 auth_url = await linux_do_client.get_authorization_url(
                     redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI,
                     state=state,
