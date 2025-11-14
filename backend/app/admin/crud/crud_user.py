@@ -6,8 +6,18 @@ from sqlalchemy import Select, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
-from backend.app.admin.model import DataRule, DataScope, Dept, Menu, Role, User
-from backend.app.admin.model.m2m import data_scope_rule, role_data_scope, role_menu, user_role
+from backend.app.admin.model import (
+    DataRule,
+    DataScope,
+    Dept,
+    Menu,
+    Role,
+    User,
+    data_scope_rule,
+    role_data_scope,
+    role_menu,
+    user_role,
+)
 from backend.app.admin.schema.user import (
     AddOAuth2UserParam,
     AddUserParam,
