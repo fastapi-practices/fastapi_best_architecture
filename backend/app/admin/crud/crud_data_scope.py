@@ -5,8 +5,7 @@ from sqlalchemy import Select, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
-from backend.app.admin.model import DataRule, DataScope
-from backend.app.admin.model.m2m import data_scope_rule
+from backend.app.admin.model import DataRule, DataScope, data_scope_rule
 from backend.app.admin.schema.data_scope import (
     CreateDataScopeParam,
     CreateDataScopeRuleParam,
