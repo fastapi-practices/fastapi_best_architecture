@@ -1,3 +1,6 @@
+import json
+import uuid
+
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
@@ -8,6 +11,7 @@ from starlette.responses import RedirectResponse
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
 from backend.database.db import CurrentSessionTransaction
+from backend.database.redis import redis_client
 from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
@@ -18,7 +22,15 @@ github_client = GitHubOAuth20(settings.OAUTH2_GITHUB_CLIENT_ID, settings.OAUTH2_
 
 @router.get('', summary='获取 Github 授权链接')
 async def get_github_oauth2_url() -> ResponseSchemaModel[str]:
-    auth_url = await github_client.get_authorization_url(redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI)
+    state = str(uuid.uuid4())
+
+    await redis_client.setex(
+        f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
+        settings.OAUTH2_STATE_EXPIRE_SECONDS,
+        json.dumps({'type': 'login'}),
+    )
+
+    auth_url = await github_client.get_authorization_url(redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI, state=state)
     return response_base.success(data=auth_url)
 
 

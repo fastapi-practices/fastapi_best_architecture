@@ -174,15 +174,18 @@ class OAuth2Service:
             case _:
                 raise errors.ForbiddenError(msg=f'暂不支持 {social} OAuth2 登录')
 
-        state_info = None
-        if state:
-            state_data = await redis_client.get(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
-            if state_data:
-                state_info = json.loads(state_data)
-                await redis_client.delete(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
+        if not state:
+            raise errors.ForbiddenError(msg='OAuth2 状态信息缺失')
+
+        state_data = await redis_client.get(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
+        if not state_data:
+            raise errors.ForbiddenError(msg='OAuth2 状态信息无效或缺失')
+
+        state_info = json.loads(state_data)
+        await redis_client.delete(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
 
         # 绑定流程
-        if state_info and state_info.get('type') == 'binding':
+        if state_info.get('type') == 'binding':
             user_id = state_info.get('user_id')
             if not user_id:
                 raise errors.ForbiddenError(msg='非法操作，OAuth2 状态信息无效')
@@ -195,6 +198,9 @@ class OAuth2Service:
             return None
 
         # 登录流程
+        if state_info.get('type') != 'login':
+            raise errors.ForbiddenError(msg='OAuth2 状态信息无效')
+
         return await self.login(
             db=db,
             response=response,
