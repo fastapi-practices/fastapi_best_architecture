@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -24,11 +26,21 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         通过 sid 获取社交用户
 
         :param db: 数据库会话
-        :param sid: 第三方用户唯一编码
+        :param sid: 社交账号唯一编码
         :param source: 社交账号类型
         :return:
         """
         return await self.select_model_by_column(db, sid=sid, source=source)
+
+    async def get_by_user_id(self, db: AsyncSession, user_id: int) -> Sequence[UserSocial]:
+        """
+        通过用户 ID 获取所有社交账号绑定
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :return:
+        """
+        return await self.select_models(db, user_id=user_id)
 
     async def create(self, db: AsyncSession, obj: CreateUserSocialParam) -> None:
         """

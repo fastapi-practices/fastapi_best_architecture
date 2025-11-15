@@ -1,3 +1,6 @@
+import json
+import uuid
+
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
@@ -8,7 +11,8 @@ from starlette.responses import RedirectResponse
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
 from backend.database.db import CurrentSessionTransaction
-from backend.plugin.oauth2.enums import UserSocialType
+from backend.database.redis import redis_client
+from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
@@ -18,7 +22,17 @@ linux_do_client = LinuxDoOAuth20(settings.OAUTH2_LINUX_DO_CLIENT_ID, settings.OA
 
 @router.get('', summary='获取 LinuxDo 授权链接')
 async def get_linux_do_oauth2_url() -> ResponseSchemaModel[str]:
-    auth_url = await linux_do_client.get_authorization_url(redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI)
+    state = str(uuid.uuid4())
+
+    await redis_client.setex(
+        f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
+        settings.OAUTH2_STATE_EXPIRE_SECONDS,
+        json.dumps({'type': UserSocialAuthType.login.value}),
+    )
+
+    auth_url = await linux_do_client.get_authorization_url(
+        redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI, state=state
+    )
     return response_base.success(data=auth_url)
 
 
@@ -37,16 +51,23 @@ async def linux_do_oauth2_callback(  # noqa: ANN201
         Depends(FastAPIOAuth20(linux_do_client, redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI)),
     ],
 ):
-    token_data, _state = oauth2
+    token_data, state = oauth2
     access_token = token_data['access_token']
     user = await linux_do_client.get_userinfo(access_token)
-    data = await oauth2_service.create_with_login(
+    data = await oauth2_service.login_or_binding(
         db=db,
         response=response,
         background_tasks=background_tasks,
         user=user,
         social=UserSocialType.linux_do,
+        state=state,
     )
+
+    # 绑定流程
+    if data is None:
+        return RedirectResponse(url=settings.OAUTH2_FRONTEND_BINDING_REDIRECT_URI)
+
+    # 登录流程
     return RedirectResponse(
-        url=f'{settings.OAUTH2_FRONTEND_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}',
+        url=f'{settings.OAUTH2_FRONTEND_LOGIN_REDIRECT_URI}?access_token={data.access_token}&session_uuid={data.session_uuid}',
     )
