@@ -18,7 +18,7 @@ from backend.common.security import jwt
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
-from backend.plugin.oauth2.enums import UserSocialType
+from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.plugin.oauth2.service.user_social_service import user_social_service
 from backend.utils.timezone import timezone
@@ -185,7 +185,7 @@ class OAuth2Service:
         await redis_client.delete(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
 
         # 绑定流程
-        if state_info.get('type') == 'binding':
+        if state_info.get('type') == UserSocialAuthType.binding.value:
             user_id = state_info.get('user_id')
             if not user_id:
                 raise errors.ForbiddenError(msg='非法操作，OAuth2 状态信息无效')
@@ -198,7 +198,7 @@ class OAuth2Service:
             return None
 
         # 登录流程
-        if state_info.get('type') != 'login':
+        if state_info.get('type') != UserSocialAuthType.login.value:
             raise errors.ForbiddenError(msg='OAuth2 状态信息无效')
 
         return await self.login(

@@ -12,7 +12,7 @@ from backend.common.response.response_schema import ResponseSchemaModel, respons
 from backend.core.conf import settings
 from backend.database.db import CurrentSessionTransaction
 from backend.database.redis import redis_client
-from backend.plugin.oauth2.enums import UserSocialType
+from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 
 router = APIRouter()
@@ -27,7 +27,7 @@ async def get_github_oauth2_url() -> ResponseSchemaModel[str]:
     await redis_client.setex(
         f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
         settings.OAUTH2_STATE_EXPIRE_SECONDS,
-        json.dumps({'type': 'login'}),
+        json.dumps({'type': UserSocialAuthType.login.value}),
     )
 
     auth_url = await github_client.get_authorization_url(redirect_uri=settings.OAUTH2_GITHUB_REDIRECT_URI, state=state)

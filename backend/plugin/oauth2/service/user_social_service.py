@@ -7,7 +7,7 @@ from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
-from backend.plugin.oauth2.enums import UserSocialType
+from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 
 
@@ -72,7 +72,7 @@ class UserSocialService:
         await redis_client.setex(
             f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
             settings.OAUTH2_STATE_EXPIRE_SECONDS,
-            json.dumps({'type': 'binding', 'user_id': user_id}),
+            json.dumps({'type': UserSocialAuthType.binding.value, 'user_id': user_id}),
         )
 
         match source:
