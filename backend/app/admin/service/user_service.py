@@ -73,7 +73,9 @@ class UserService:
         user_select = await user_dao.get_select(dept=dept, username=username, phone=phone, status=status)
         data = await paging_data(db, user_select)
         if data['items']:
-            data['items'] = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
+            serialized_items = select_join_serialize(data['items'], relationships=['User-m2o-Dept', 'User-m2m-Role'])
+            # 确保返回的是列表，即使只有一个元素
+            data['items'] = [serialized_items] if not isinstance(serialized_items, list) else serialized_items
         return data
 
     @staticmethod
