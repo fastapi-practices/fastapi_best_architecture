@@ -4,21 +4,20 @@ from backend.common.response.response_schema import ResponseModel, ResponseSchem
 from backend.common.security.jwt import DependsJwtAuth
 from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.oauth2.enums import UserSocialType
-from backend.plugin.oauth2.schema.user_social import GetUserSocialDetail
 from backend.plugin.oauth2.service.user_social_service import user_social_service
 
 router = APIRouter()
 
 
 @router.get('/me/bindings', summary='获取用户已绑定的社交账号', dependencies=[DependsJwtAuth])
-async def get_user_bindings(db: CurrentSession, request: Request) -> ResponseSchemaModel[GetUserSocialDetail]:
+async def get_user_bindings(db: CurrentSession, request: Request) -> ResponseSchemaModel[list[str]]:
     bindings = await user_social_service.get_bindings(db=db, user_id=request.user.id)
     return response_base.success(data=bindings)
 
 
-@router.get('/me/binding/{source}', summary='获取绑定授权链接', dependencies=[DependsJwtAuth])
+@router.get('/me/binding', summary='获取绑定授权链接', dependencies=[DependsJwtAuth])
 async def get_binding_auth_url(request: Request, source: UserSocialType) -> ResponseSchemaModel[str]:
-    binding_url = user_social_service.get_binding_auth_url(user_id=request.user.id, source=source)
+    binding_url = await user_social_service.get_binding_auth_url(user_id=request.user.id, source=source)
     return response_base.success(data=binding_url)
 
 

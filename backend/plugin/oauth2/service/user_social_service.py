@@ -1,8 +1,6 @@
 import json
 import uuid
 
-from collections.abc import Sequence
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
@@ -10,13 +8,12 @@ from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.plugin.oauth2.enums import UserSocialType
-from backend.plugin.oauth2.model import UserSocial
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 
 
 class UserSocialService:
     @staticmethod
-    async def get_bindings(*, db: AsyncSession, user_id: int) -> Sequence[UserSocial]:
+    async def get_bindings(*, db: AsyncSession, user_id: int) -> list[str]:
         """
         获取用户已绑定的社交账号
 
@@ -24,7 +21,8 @@ class UserSocialService:
         :param user_id: 用户 ID
         :return: 绑定列表，每个元素包含 sid、source 等信息
         """
-        return await user_social_dao.get_by_user_id(db, user_id)
+        bindings = await user_social_dao.get_by_user_id(db, user_id)
+        return [binding.source for binding in bindings]
 
     @staticmethod
     async def binding_with_oauth2(
