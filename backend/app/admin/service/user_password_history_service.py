@@ -1,3 +1,5 @@
+import math
+
 from datetime import datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,7 +34,7 @@ class UserPasswordHistoryService:
             locked_until = timezone.from_str(locked_until_str)
             now = timezone.now()
             if locked_until > now:
-                remaining_minutes = int((locked_until - now).total_seconds() / 60)
+                remaining_minutes = math.ceil((locked_until - now).total_seconds() / 60)
                 raise errors.AuthorizationError(msg=f'账号已被锁定，请在 {remaining_minutes} 分钟后重试')
 
             await redis_client.delete(f'{settings.USER_LOCK_REDIS_PREFIX}:{user_id}')

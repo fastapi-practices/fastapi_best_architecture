@@ -32,7 +32,7 @@ class User(Base):
         TimeZone, init=False, onupdate=timezone.now, comment='上次登录时间'
     )
     last_password_changed_time: Mapped[datetime | None] = mapped_column(
-        TimeZone, init=False, default=None, comment='上次密码变更时间'
+        TimeZone, init=False, default_factory=timezone.now, comment='上次密码变更时间'
     )
 
     # 逻辑外键
