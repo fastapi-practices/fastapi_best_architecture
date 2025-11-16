@@ -1,3 +1,26 @@
+<a id="v1.11.1"></a>
+# [v1.11.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.1) - 2025-11-16
+
+## What's Changed
+* Update changelog for v1.11.0 by [@wu-clan](https://github.com/wu-clan) in [#917](https://github.com/fastapi-practices/fastapi_best_architecture/pull/917)
+* Fix missing table in alembic migration by [@wu-clan](https://github.com/wu-clan) in [#920](https://github.com/fastapi-practices/fastapi_best_architecture/pull/920)
+* Add user social binding and unbinding by [@wu-clan](https://github.com/wu-clan) in [#919](https://github.com/fastapi-practices/fastapi_best_architecture/pull/919)
+* Fix the user list query serialization by [@linrong](https://github.com/linrong) in [#921](https://github.com/fastapi-practices/fastapi_best_architecture/pull/921)
+* Update user and login security configs by [@wu-clan](https://github.com/wu-clan) in [#922](https://github.com/fastapi-practices/fastapi_best_architecture/pull/922)
+
+## New Contributors
+* [@linrong](https://github.com/linrong) made their first contribution in [#921](https://github.com/fastapi-practices/fastapi_best_architecture/pull/921)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.0...v1.11.1
+
+## Contributors
+
+<a href="https://github.com/linrong"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Flinrong.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@linrong"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.11.1]
+
+
 <a id="v1.11.0"></a>
 # [v1.11.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.0) - 2025-11-12
 
@@ -1138,6 +1161,7 @@
 [Changes][v1.0.0]
 
 
+[v1.11.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.0...v1.11.1
 [v1.11.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.4...v1.11.0
 [v1.10.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.3...v1.10.4
 [v1.10.3]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.2...v1.10.3
