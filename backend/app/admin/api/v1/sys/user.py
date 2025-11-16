@@ -102,9 +102,7 @@ async def update_user_permission(
 async def update_user_password(
     db: CurrentSessionTransaction, request: Request, obj: ResetPasswordParam
 ) -> ResponseModel:
-    count = await user_service.update_password(
-        db=db, user_id=request.user.id, hash_password=request.user.password, obj=obj
-    )
+    count = await user_service.update_password(db=db, user_id=request.user.id, obj=obj)
     if count > 0:
         return response_base.success()
     return response_base.fail()

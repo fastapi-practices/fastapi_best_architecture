@@ -265,17 +265,18 @@ class UserService:
         return count
 
     @staticmethod
-    async def update_password(*, db: AsyncSession, user_id: int, hash_password: str, obj: ResetPasswordParam) -> int:
+    async def update_password(*, db: AsyncSession, user_id: int, obj: ResetPasswordParam) -> int:
         """
         更新当前用户密码
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param hash_password: 哈希密码
         :param obj: 密码重置参数
         :return:
         """
-        if hash_password and not password_verify(obj.old_password, hash_password):
+        user = await user_dao.get(db, user_id)
+
+        if user.password and not password_verify(obj.old_password, user.password):
             raise errors.RequestError(msg='原密码错误')
 
         if obj.new_password != obj.confirm_password:
@@ -284,7 +285,6 @@ class UserService:
         await validate_new_password(db, user_id, obj.new_password)
         count = await user_dao.reset_password(db, user_id, obj.new_password)
 
-        user = await user_dao.get(db, user_id)
         history_obj = CreateUserPasswordHistoryParam(user_id=user.id, password=user.password)
         await password_security_service.save_password_history(db, history_obj)
         await user_dao.update_password_changed_time(db, user.id)
