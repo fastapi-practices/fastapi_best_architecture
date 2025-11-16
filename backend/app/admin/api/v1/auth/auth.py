@@ -20,7 +20,7 @@ async def login_swagger(
     db: CurrentSessionTransaction, obj: Annotated[HTTPBasicCredentials, Depends()]
 ) -> GetSwaggerToken:
     token, user = await auth_service.swagger_login(db=db, obj=obj)
-    return GetSwaggerToken(access_token=token, user=user)
+    return GetSwaggerToken(access_token=token, user=user)  # type: ignore
 
 
 @router.post(

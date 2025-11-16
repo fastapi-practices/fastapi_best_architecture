@@ -29,7 +29,10 @@ class User(Base):
     is_multi_login: Mapped[bool] = mapped_column(default=False, comment='是否重复登陆(0否 1是)')
     join_time: Mapped[datetime] = mapped_column(TimeZone, init=False, default_factory=timezone.now, comment='注册时间')
     last_login_time: Mapped[datetime | None] = mapped_column(
-        TimeZone, init=False, onupdate=timezone.now, comment='上次登录'
+        TimeZone, init=False, onupdate=timezone.now, comment='上次登录时间'
+    )
+    last_password_changed_time: Mapped[datetime | None] = mapped_column(
+        TimeZone, init=False, default_factory=timezone.now, comment='上次密码变更时间'
     )
 
     # 逻辑外键

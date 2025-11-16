@@ -86,20 +86,20 @@ class OAuth2Service:
             await user_social_dao.create(db, new_user_social)
 
         # 创建 token
-        access_token = await jwt.create_access_token(
+        access_token_data = await jwt.create_access_token(
             sys_user.id,
             multi_login=sys_user.is_multi_login,
             # extra info
             username=sys_user.username,
-            nickname=sys_user.nickname or f'#{text_captcha(5)}',
+            nickname=sys_user.nickname,
             last_login_time=timezone.to_str(timezone.now()),
             ip=ctx.ip,
             os=ctx.os,
             browser=ctx.browser,
             device=ctx.device,
         )
-        refresh_token = await jwt.create_refresh_token(
-            access_token.session_uuid,
+        refresh_token_data = await jwt.create_refresh_token(
+            access_token_data.session_uuid,
             sys_user.id,
             multi_login=sys_user.is_multi_login,
         )
@@ -114,18 +114,18 @@ class OAuth2Service:
             status=LoginLogStatusType.success.value,
             msg=t('success.login.oauth2_success'),
         )
-        await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ctx.ip}')
+        await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
         response.set_cookie(
             key=settings.COOKIE_REFRESH_TOKEN_KEY,
-            value=refresh_token.refresh_token,
+            value=refresh_token_data.refresh_token,
             max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-            expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
+            expires=timezone.to_utc(refresh_token_data.refresh_token_expire_time),
             httponly=True,
         )
         data = GetLoginToken(
-            access_token=access_token.access_token,
-            access_token_expire_time=access_token.access_token_expire_time,
-            session_uuid=access_token.session_uuid,
+            access_token=access_token_data.access_token,
+            access_token_expire_time=access_token_data.access_token_expire_time,
+            session_uuid=access_token_data.session_uuid,
             user=sys_user,  # type: ignore
         )
         return data

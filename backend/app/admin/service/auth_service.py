@@ -9,6 +9,8 @@ from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import login_log_service
+from backend.app.admin.service.user_password_history_service import password_security_service
+from backend.app.admin.utils.password_security import password_verify
 from backend.common.context import ctx
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -21,11 +23,11 @@ from backend.common.security.jwt import (
     create_refresh_token,
     get_token,
     jwt_decode,
-    password_verify,
 )
 from backend.core.conf import settings
 from backend.database.db import uuid4_str
 from backend.database.redis import redis_client
+from backend.utils.dynamic_config import load_login_config
 from backend.utils.timezone import timezone
 
 
@@ -33,7 +35,7 @@ class AuthService:
     """认证服务类"""
 
     @staticmethod
-    async def user_verify(db: AsyncSession, username: str, password: str) -> User:
+    async def user_verify(db: AsyncSession, username: str, password: str) -> tuple[User, int | None]:
         """
         验证用户名和密码
 
@@ -46,15 +48,19 @@ class AuthService:
         if not user:
             raise errors.NotFoundError(msg='用户名或密码有误')
 
-        if user.password is None:
-            raise errors.AuthorizationError(msg='用户名或密码有误')
-        if not password_verify(password, user.password):
+        await password_security_service.check_status(user.id, user.status)
+
+        if user.password is None or not password_verify(password, user.password):
+            await password_security_service.handle_login_failure(db, user.id)
             raise errors.AuthorizationError(msg='用户名或密码有误')
 
-        if not user.status:
-            raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
+        days_remaining = await password_security_service.check_password_expiry_status(
+            db, user.last_password_changed_time
+        )
 
-        return user
+        await password_security_service.handle_login_success(user.id)
+
+        return user, days_remaining
 
     async def swagger_login(self, *, db: AsyncSession, obj: HTTPBasicCredentials) -> tuple[str, User]:
         """
@@ -64,15 +70,15 @@ class AuthService:
         :param obj: 登录凭证
         :return:
         """
-        user = await self.user_verify(db, obj.username, obj.password)
+        user, _ = await self.user_verify(db, obj.username, obj.password)
         await user_dao.update_login_time(db, obj.username)
-        access_token = await create_access_token(
+        access_token_data = await create_access_token(
             user.id,
             multi_login=user.is_multi_login,
             # extra info
             swagger=True,
         )
-        return access_token.access_token, user
+        return access_token_data.access_token, user
 
     async def login(
         self,
@@ -86,7 +92,6 @@ class AuthService:
         用户登录
 
         :param db: 数据库会话
-        :param request: 请求对象
         :param response: 响应对象
         :param obj: 登录参数
         :param background_tasks: 后台任务
@@ -94,16 +99,22 @@ class AuthService:
         """
         user = None
         try:
-            user = await self.user_verify(db, obj.username, obj.password)
-            captcha_code = await redis_client.get(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{obj.uuid}')
-            if not captcha_code:
-                raise errors.RequestError(msg=t('error.captcha.expired'))
-            if captcha_code.lower() != obj.captcha.lower():
-                raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-            await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{obj.uuid}')
+            user, days_remaining = await self.user_verify(db, obj.username, obj.password)
+
+            await load_login_config(db)
+            if settings.LOGIN_CAPTCHA_ENABLED:
+                if not obj.captcha_uuid or not obj.captcha:
+                    raise errors.RequestError(msg=t('error.captcha.invalid'))
+                captcha_code = await redis_client.get(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.captcha_uuid}')
+                if not captcha_code:
+                    raise errors.RequestError(msg=t('error.captcha.expired'))
+                if captcha_code.lower() != obj.captcha.lower():
+                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+                await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.captcha_uuid}')
+
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
-            access_token = await create_access_token(
+            access_token_data = await create_access_token(
                 user.id,
                 multi_login=user.is_multi_login,
                 # extra info
@@ -115,16 +126,16 @@ class AuthService:
                 browser=ctx.browser,
                 device=ctx.device,
             )
-            refresh_token = await create_refresh_token(
-                access_token.session_uuid,
+            refresh_token_data = await create_refresh_token(
+                access_token_data.session_uuid,
                 user.id,
                 multi_login=user.is_multi_login,
             )
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                value=refresh_token.refresh_token,
+                value=refresh_token_data.refresh_token,
                 max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
+                expires=timezone.to_utc(refresh_token_data.refresh_token_expire_time),
                 httponly=True,
             )
         except errors.NotFoundError as e:
@@ -157,9 +168,10 @@ class AuthService:
                 msg=t('success.login.success'),
             )
             data = GetLoginToken(
-                access_token=access_token.access_token,
-                access_token_expire_time=access_token.access_token_expire_time,
-                session_uuid=access_token.session_uuid,
+                access_token=access_token_data.access_token,
+                access_token_expire_time=access_token_data.access_token_expire_time,
+                session_uuid=access_token_data.session_uuid,
+                password_expire_days_remaining=days_remaining,
                 user=user,  # type: ignore
             )
             return data

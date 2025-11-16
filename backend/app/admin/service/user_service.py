@@ -15,12 +15,15 @@ from backend.app.admin.schema.user import (
     ResetPasswordParam,
     UpdateUserParam,
 )
+from backend.app.admin.schema.user_password_history import CreateUserPasswordHistoryParam
+from backend.app.admin.service.user_password_history_service import password_security_service
+from backend.app.admin.utils.password_security import password_verify, validate_new_password
 from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.common.response.response_code import CustomErrorCode
-from backend.common.security.jwt import get_token, jwt_decode, password_verify
+from backend.common.security.jwt import get_token, jwt_decode
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.serializers import select_join_serialize
@@ -119,7 +122,7 @@ class UserService:
         for role_id in obj.roles:
             if not await role_dao.get(db, role_id):
                 raise errors.NotFoundError(msg='角色不存在')
-        count = await user_dao.update(db, user, obj)
+        count = await user_dao.update(db, user.id, obj)
         await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
 
@@ -197,7 +200,14 @@ class UserService:
         user = await user_dao.get(db, pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
+
+        await validate_new_password(db, user.id, password)
         count = await user_dao.reset_password(db, user.id, password)
+
+        history_obj = CreateUserPasswordHistoryParam(user_id=user.id, password=user.password)
+        await password_security_service.save_password_history(db, history_obj)
+        await user_dao.update_password_changed_time(db, user.id)
+
         key_prefix = [
             f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
             f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
@@ -257,21 +267,30 @@ class UserService:
         return count
 
     @staticmethod
-    async def update_password(*, db: AsyncSession, user_id: int, hash_password: str, obj: ResetPasswordParam) -> int:
+    async def update_password(*, db: AsyncSession, user_id: int, obj: ResetPasswordParam) -> int:
         """
         更新当前用户密码
 
         :param db: 数据库会话
         :param user_id: 用户 ID
-        :param hash_password: 哈希密码
         :param obj: 密码重置参数
         :return:
         """
-        if not password_verify(obj.old_password, hash_password):
+        user = await user_dao.get(db, user_id)
+
+        if user.password and not password_verify(obj.old_password, user.password):
             raise errors.RequestError(msg='原密码错误')
+
         if obj.new_password != obj.confirm_password:
-            raise errors.RequestError(msg='密码输入不一致')
+            raise errors.RequestError(msg='两次密码输入不一致')
+
+        await validate_new_password(db, user_id, obj.new_password)
         count = await user_dao.reset_password(db, user_id, obj.new_password)
+
+        history_obj = CreateUserPasswordHistoryParam(user_id=user.id, password=user.password)
+        await password_security_service.save_password_history(db, history_obj)
+        await user_dao.update_password_changed_time(db, user.id)
+
         key_prefix = [
             f'{settings.TOKEN_REDIS_PREFIX}:{user_id}',
             f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}',

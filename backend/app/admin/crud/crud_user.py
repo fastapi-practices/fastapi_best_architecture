@@ -24,7 +24,7 @@ from backend.app.admin.schema.user import (
     AddUserRoleParam,
     UpdateUserParam,
 )
-from backend.common.security.jwt import get_hash_password
+from backend.app.admin.utils.password_security import get_hash_password
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
@@ -63,15 +63,47 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.select_model_by_column(db, nickname=nickname)
 
-    async def update_login_time(self, db: AsyncSession, username: str) -> int:
+    async def check_email(self, db: AsyncSession, email: str) -> User | None:
         """
-        更新用户最后登录时间
+        检查邮箱是否已被绑定
 
         :param db: 数据库会话
-        :param username: 用户名
+        :param email: 电子邮箱
         :return:
         """
-        return await self.update_model_by_column(db, {'last_login_time': timezone.now()}, username=username)
+        return await self.select_model_by_column(db, email=email)
+
+    async def get_select(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
+        """
+        获取用户列表查询表达式
+
+        :param dept: 部门 ID
+        :param username: 用户名
+        :param phone: 电话号码
+        :param status: 用户状态
+        :return:
+        """
+        filters = {}
+
+        if dept:
+            filters['dept_id'] = dept
+        if username:
+            filters['username__like'] = f'%{username}%'
+        if phone:
+            filters['phone__like'] = f'%{phone}%'
+        if status is not None:
+            filters['status'] = status
+
+        return await self.select_order(
+            'id',
+            'desc',
+            join_conditions=[
+                JoinConfig(model=Dept, join_on=Dept.id == self.model.dept_id, fill_result=True),
+                JoinConfig(model=user_role, join_on=user_role.c.user_id == self.model.id),
+                JoinConfig(model=Role, join_on=Role.id == user_role.c.role_id, fill_result=True),
+            ],
+            **filters,
+        )
 
     async def add(self, db: AsyncSession, obj: AddUserParam) -> None:
         """
@@ -119,32 +151,52 @@ class CRUDUser(CRUDPlus[User]):
         user_role_stmt = insert(user_role).values(AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump())
         await db.execute(user_role_stmt)
 
-    async def update(self, db: AsyncSession, input_user: User, obj: UpdateUserParam) -> int:
+    async def update(self, db: AsyncSession, user_id: int, obj: UpdateUserParam) -> int:
         """
         更新用户信息
 
         :param db: 数据库会话
-        :param input_user: 用户 ID
+        :param user_id: 用户 ID
         :param obj: 更新用户参数
         :return:
         """
         role_ids = obj.roles
         del obj.roles
 
-        count = await self.update_model(db, input_user.id, obj)
+        count = await self.update_model(db, user_id, obj)
 
         role_stmt = select(Role).where(Role.id.in_(role_ids))
         result = await db.execute(role_stmt)
         roles = result.scalars().all()
 
-        user_role_stmt = delete(user_role).where(user_role.c.user_id == input_user.id)
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
         await db.execute(user_role_stmt)
 
-        user_role_data = [AddUserRoleParam(user_id=input_user.id, role_id=role.id).model_dump() for role in roles]
+        user_role_data = [AddUserRoleParam(user_id=user_id, role_id=role.id).model_dump() for role in roles]
         user_role_stmt = insert(user_role)
         await db.execute(user_role_stmt, user_role_data)
 
         return count
+
+    async def update_login_time(self, db: AsyncSession, username: str) -> int:
+        """
+        更新用户上次登录时间
+
+        :param db: 数据库会话
+        :param username: 用户名
+        :return:
+        """
+        return await self.update_model_by_column(db, {'last_login_time': timezone.now()}, username=username)
+
+    async def update_password_changed_time(self, db: AsyncSession, user_id: int) -> int:
+        """
+        更新用户上次密码变更时间
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :return:
+        """
+        return await self.update_model(db, user_id, {'last_password_changed_time': timezone.now()})
 
     async def update_nickname(self, db: AsyncSession, user_id: int, nickname: str) -> int:
         """
@@ -179,31 +231,6 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'email': email})
 
-    async def delete(self, db: AsyncSession, user_id: int) -> int:
-        """
-        删除用户
-
-        :param db: 数据库会话
-        :param user_id: 用户 ID
-        :return:
-        """
-        user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
-        await db.execute(user_role_stmt)
-
-        await user_social_dao.delete_by_user_id(db, user_id)
-
-        return await self.delete_model(db, user_id)
-
-    async def check_email(self, db: AsyncSession, email: str) -> User | None:
-        """
-        检查邮箱是否已被绑定
-
-        :param db: 数据库会话
-        :param email: 电子邮箱
-        :return:
-        """
-        return await self.select_model_by_column(db, email=email)
-
     async def reset_password(self, db: AsyncSession, pk: int, password: str) -> int:
         """
         重置用户密码
@@ -215,39 +242,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         salt = bcrypt.gensalt()
         new_pwd = get_hash_password(password, salt)
-        return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt})
-
-    async def get_select(self, dept: int | None, username: str | None, phone: str | None, status: int | None) -> Select:
-        """
-        获取用户列表查询表达式
-
-        :param dept: 部门 ID
-        :param username: 用户名
-        :param phone: 电话号码
-        :param status: 用户状态
-        :return:
-        """
-        filters = {}
-
-        if dept:
-            filters['dept_id'] = dept
-        if username:
-            filters['username__like'] = f'%{username}%'
-        if phone:
-            filters['phone__like'] = f'%{phone}%'
-        if status is not None:
-            filters['status'] = status
-
-        return await self.select_order(
-            'id',
-            'desc',
-            join_conditions=[
-                JoinConfig(model=Dept, join_on=Dept.id == self.model.dept_id, fill_result=True),
-                JoinConfig(model=user_role, join_on=user_role.c.user_id == self.model.id),
-                JoinConfig(model=Role, join_on=Role.id == user_role.c.role_id, fill_result=True),
-            ],
-            **filters,
-        )
+        return await self.update_model(db, pk, {'password': new_pwd, 'salt': salt}, flush=True)
 
     async def set_super(self, db: AsyncSession, user_id: int, *, is_super: bool) -> int:
         """
@@ -292,6 +287,21 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
+
+    async def delete(self, db: AsyncSession, user_id: int) -> int:
+        """
+        删除用户
+
+        :param db: 数据库会话
+        :param user_id: 用户 ID
+        :return:
+        """
+        user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
+        await db.execute(user_role_stmt)
+
+        await user_social_dao.delete_by_user_id(db, user_id)
+
+        return await self.delete_model(db, user_id)
 
     async def get_join(
         self,

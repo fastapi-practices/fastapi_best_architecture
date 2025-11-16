@@ -2,6 +2,7 @@
   "error": {
     "captcha": {
       "error": "Captcha error",
+      "invalid": "Captcha is invalid, please try again",
       "expired": "Captcha has expired, please try again"
     },
     "language_not_found": "Current language pack is not initialized or does not exist"
