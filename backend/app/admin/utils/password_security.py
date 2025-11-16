@@ -1,11 +1,36 @@
+from pwdlib import PasswordHash
+from pwdlib.hashers.bcrypt import BcryptHasher
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_user_password_history import user_password_history_dao
 from backend.common.exception import errors
-from backend.common.security.jwt import password_verify
 from backend.core.conf import settings
 from backend.utils.dynamic_config import load_user_security_config
 from backend.utils.re_verify import is_has_letter, is_has_number, is_has_special_char
+
+password_hash = PasswordHash((BcryptHasher(),))
+
+
+def get_hash_password(password: str, salt: bytes | None) -> str:
+    """
+    使用哈希算法加密密码
+
+    :param password: 密码
+    :param salt: 盐值
+    :return:
+    """
+    return password_hash.hash(password, salt=salt)
+
+
+def password_verify(plain_password: str, hashed_password: str) -> bool:
+    """
+    密码验证
+
+    :param plain_password: 待验证的密码
+    :param hashed_password: 哈希密码
+    :return:
+    """
+    return password_hash.verify(plain_password, hashed_password)
 
 
 async def validate_new_password(db: AsyncSession, user_id: int, new_password: str) -> None:

@@ -10,6 +10,7 @@ from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.login_log_service import login_log_service
 from backend.app.admin.service.user_password_history_service import password_security_service
+from backend.app.admin.utils.password_security import password_verify
 from backend.common.context import ctx
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -22,7 +23,6 @@ from backend.common.security.jwt import (
     create_refresh_token,
     get_token,
     jwt_decode,
-    password_verify,
 )
 from backend.core.conf import settings
 from backend.database.db import uuid4_str
@@ -35,7 +35,7 @@ class AuthService:
     """认证服务类"""
 
     @staticmethod
-    async def user_verify(db: AsyncSession, username: str, password: str) -> tuple[User, int]:
+    async def user_verify(db: AsyncSession, username: str, password: str) -> tuple[User, int | None]:
         """
         验证用户名和密码
 
@@ -72,13 +72,13 @@ class AuthService:
         """
         user, _ = await self.user_verify(db, obj.username, obj.password)
         await user_dao.update_login_time(db, obj.username)
-        token_data = await create_access_token(
+        access_token_data = await create_access_token(
             user.id,
             multi_login=user.is_multi_login,
             # extra info
             swagger=True,
         )
-        return token_data.access_token, user
+        return access_token_data.access_token, user
 
     async def login(
         self,
@@ -111,7 +111,7 @@ class AuthService:
             user, days_remaining = await self.user_verify(db, obj.username, obj.password)
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
-            access_token = await create_access_token(
+            access_token_data = await create_access_token(
                 user.id,
                 multi_login=user.is_multi_login,
                 # extra info
@@ -123,16 +123,16 @@ class AuthService:
                 browser=ctx.browser,
                 device=ctx.device,
             )
-            refresh_token = await create_refresh_token(
-                access_token.session_uuid,
+            refresh_token_data = await create_refresh_token(
+                access_token_data.session_uuid,
                 user.id,
                 multi_login=user.is_multi_login,
             )
             response.set_cookie(
                 key=settings.COOKIE_REFRESH_TOKEN_KEY,
-                value=refresh_token.refresh_token,
+                value=refresh_token_data.refresh_token,
                 max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
-                expires=timezone.to_utc(refresh_token.refresh_token_expire_time),
+                expires=timezone.to_utc(refresh_token_data.refresh_token_expire_time),
                 httponly=True,
             )
         except errors.NotFoundError as e:
@@ -165,9 +165,9 @@ class AuthService:
                 msg=t('success.login.success'),
             )
             data = GetLoginToken(
-                access_token=access_token.access_token,
-                access_token_expire_time=access_token.access_token_expire_time,
-                session_uuid=access_token.session_uuid,
+                access_token=access_token_data.access_token,
+                access_token_expire_time=access_token_data.access_token_expire_time,
+                session_uuid=access_token_data.session_uuid,
                 password_expire_days_remaining=days_remaining,
                 user=user,  # type: ignore
             )

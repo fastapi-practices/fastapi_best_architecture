@@ -17,13 +17,13 @@ from backend.app.admin.schema.user import (
 )
 from backend.app.admin.schema.user_password_history import CreateUserPasswordHistoryParam
 from backend.app.admin.service.user_password_history_service import password_security_service
-from backend.app.admin.utils.password_security import validate_new_password
+from backend.app.admin.utils.password_security import password_verify, validate_new_password
 from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.common.response.response_code import CustomErrorCode
-from backend.common.security.jwt import get_token, jwt_decode, password_verify
+from backend.common.security.jwt import get_token, jwt_decode
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 from backend.utils.serializers import select_join_serialize

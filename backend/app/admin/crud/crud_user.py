@@ -24,7 +24,7 @@ from backend.app.admin.schema.user import (
     AddUserRoleParam,
     UpdateUserParam,
 )
-from backend.common.security.jwt import get_hash_password
+from backend.app.admin.utils.password_security import get_hash_password
 from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
