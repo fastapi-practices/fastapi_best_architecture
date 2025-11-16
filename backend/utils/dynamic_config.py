@@ -49,7 +49,7 @@ async def load_user_security_config(db: AsyncSession) -> None:  # noqa: C901
         password_require_special_char_key = 'USER_PASSWORD_REQUIRE_SPECIAL_CHAR'
 
         configs = {dc['key']: dc['value'] for dc in select_list_serialize(dynamic_config)}
-        if configs.get(security_config_status_key):
+        if int(configs.get(security_config_status_key)):
             if lock_threshold_key in configs:
                 settings.USER_LOCK_THRESHOLD = int(configs[lock_threshold_key])
             if lock_seconds_key in configs:
@@ -65,7 +65,7 @@ async def load_user_security_config(db: AsyncSession) -> None:  # noqa: C901
             if password_max_length_key in configs:
                 settings.USER_PASSWORD_MAX_LENGTH = int(configs[password_max_length_key])
             if password_require_special_char_key in configs:
-                settings.USER_PASSWORD_REQUIRE_SPECIAL_CHAR = bool(configs[password_require_special_char_key])
+                settings.USER_PASSWORD_REQUIRE_SPECIAL_CHAR = configs[password_require_special_char_key] == 'true'
 
 
 async def load_login_config(db: AsyncSession) -> None:
@@ -90,8 +90,8 @@ async def load_login_config(db: AsyncSession) -> None:
         login_captcha_enabled_key = 'LOGIN_CAPTCHA_ENABLED'
 
         configs = {dc['key']: dc['value'] for dc in select_list_serialize(dynamic_config)}
-        if configs.get(login_config_status_key) and login_captcha_enabled_key in configs:
-            settings.LOGIN_CAPTCHA_ENABLED = bool(configs[login_captcha_enabled_key])
+        if int(configs.get(login_config_status_key)) and login_captcha_enabled_key in configs:
+            settings.LOGIN_CAPTCHA_ENABLED = configs[login_captcha_enabled_key] == 'true'
 
 
 async def load_email_config(db: AsyncSession) -> None:
@@ -120,12 +120,12 @@ async def load_email_config(db: AsyncSession) -> None:
         password_key = 'EMAIL_PASSWORD'
 
         configs = {dc['key']: dc['value'] for dc in select_list_serialize(dynamic_config)}
-        if configs.get(email_config_status_key):
+        if int(configs.get(email_config_status_key)):
             settings.EMAIL_HOST = str(configs[host_key])
         if configs.get(port_key):
             settings.EMAIL_PORT = int(configs[port_key])
         if configs.get(ssl_key):
-            settings.EMAIL_SSL = bool(configs[ssl_key])
+            settings.EMAIL_SSL = configs[ssl_key] == 'true'
         if configs.get(username_key):
             settings.EMAIL_USERNAME = str(configs[username_key])
         if configs.get(password_key):
