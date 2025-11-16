@@ -15,6 +15,9 @@ from backend.app.admin.schema.user import (
     ResetPasswordParam,
     UpdateUserParam,
 )
+from backend.app.admin.schema.user_password_history import CreateUserPasswordHistoryParam
+from backend.app.admin.service.user_password_history_service import password_security_service
+from backend.app.admin.utils.password_security import validate_new_password
 from backend.common.context import ctx
 from backend.common.enums import UserPermissionType
 from backend.common.exception import errors
@@ -117,7 +120,7 @@ class UserService:
         for role_id in obj.roles:
             if not await role_dao.get(db, role_id):
                 raise errors.NotFoundError(msg='角色不存在')
-        count = await user_dao.update(db, user, obj)
+        count = await user_dao.update(db, user.id, obj)
         await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
 
@@ -195,7 +198,14 @@ class UserService:
         user = await user_dao.get(db, pk)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
+
+        await validate_new_password(db, user.id, password)
         count = await user_dao.reset_password(db, user.id, password)
+
+        history_obj = CreateUserPasswordHistoryParam(user_id=user.id, password=user.password)
+        await password_security_service.save_password_history(db, history_obj)
+        await user_dao.update_password_changed_time(db, user.id)
+
         key_prefix = [
             f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
             f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
@@ -265,11 +275,20 @@ class UserService:
         :param obj: 密码重置参数
         :return:
         """
-        if not password_verify(obj.old_password, hash_password):
+        if hash_password and not password_verify(obj.old_password, hash_password):
             raise errors.RequestError(msg='原密码错误')
+
         if obj.new_password != obj.confirm_password:
-            raise errors.RequestError(msg='密码输入不一致')
+            raise errors.RequestError(msg='两次密码输入不一致')
+
+        await validate_new_password(db, user_id, obj.new_password)
         count = await user_dao.reset_password(db, user_id, obj.new_password)
+
+        user = await user_dao.get(db, user_id)
+        history_obj = CreateUserPasswordHistoryParam(user_id=user.id, password=user.password)
+        await password_security_service.save_password_history(db, history_obj)
+        await user_dao.update_password_changed_time(db, user.id)
+
         key_prefix = [
             f'{settings.TOKEN_REDIS_PREFIX}:{user_id}',
             f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}',

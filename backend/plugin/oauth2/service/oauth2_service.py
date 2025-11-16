@@ -91,7 +91,7 @@ class OAuth2Service:
             multi_login=sys_user.is_multi_login,
             # extra info
             username=sys_user.username,
-            nickname=sys_user.nickname or f'#{text_captcha(5)}',
+            nickname=sys_user.nickname,
             last_login_time=timezone.to_str(timezone.now()),
             ip=ctx.ip,
             os=ctx.os,
@@ -114,7 +114,7 @@ class OAuth2Service:
             status=LoginLogStatusType.success.value,
             msg=t('success.login.oauth2_success'),
         )
-        await redis_client.delete(f'{settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{ctx.ip}')
+        await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
         response.set_cookie(
             key=settings.COOKIE_REFRESH_TOKEN_KEY,
             value=refresh_token.refresh_token,
