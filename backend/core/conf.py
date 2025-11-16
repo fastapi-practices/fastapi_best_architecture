@@ -72,10 +72,10 @@ class Settings(BaseSettings):
 
     # 用户安全
     USER_LOCK_REDIS_PREFIX: str = 'fba:user:lock'
-    USER_LOCK_THRESHOLD: int = 5  # 密码错误锁定阈值，0 表示禁用锁定
+    USER_LOCK_THRESHOLD: int = 5  # 用户密码错误锁定阈值，0 表示禁用锁定
     USER_LOCK_SECONDS: int = 60 * 5  # 5 分钟
-    USER_PASSWORD_EXPIRY_DAYS: int = 365  # 密码有效期，0表示永不过期
-    USER_PASSWORD_REMINDER_DAYS: int = 7  # 密码到期提醒，0表示不提醒
+    USER_PASSWORD_EXPIRY_DAYS: int = 365  # 用户密码有效期，0 表示永不过期
+    USER_PASSWORD_REMINDER_DAYS: int = 7  # 用户密码到期提醒，0 表示不提醒
     USER_PASSWORD_HISTORY_CHECK_COUNT: int = 3
     USER_PASSWORD_MIN_LENGTH: int = 6
     USER_PASSWORD_MAX_LENGTH: int = 32
