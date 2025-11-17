@@ -108,8 +108,8 @@ values
 
 insert into sys_data_rule (id, name, model, "column", operator, expression, "value", created_time, updated_time)
 values
-(2048601269932785664, '部门名称等于测试', '部门', 'name', 1, 0, '测试', now(), null),
-(2048601269999894528, '父部门 ID 等于 1', '部门', 'parent_id', 0, 0, '1', now(), null);
+(2048601269932785664, '部门名称等于测试', 'Dept', 'name', 1, 0, '测试', now(), null),
+(2048601269999894528, '父部门 ID 等于 1', 'Dept', 'parent_id', 0, 0, '1', now(), null);
 
 insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
 values
