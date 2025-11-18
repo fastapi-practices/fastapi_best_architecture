@@ -52,6 +52,15 @@ class Settings(BaseSettings):
     # Redis
     REDIS_TIMEOUT: int = 5
 
+    # .env Snowflake
+    SNOWFLAKE_CLUSTER_ID: int | None = None
+    SNOWFLAKE_NODE_ID: int | None = None
+
+    # Snowflake
+    SNOWFLAKE_REDIS_PREFIX: str = 'fba:snowflake'
+    SNOWFLAKE_HEARTBEAT_INTERVAL: int = 30  # 心跳间隔（秒）
+    SNOWFLAKE_NODE_TTL: int = 60  # 节点存活时间（秒）
+
     # .env Token
     TOKEN_SECRET_KEY: str  # 密钥 secrets.token_urlsafe(32)
 
