@@ -103,14 +103,14 @@ class AuthService:
 
             await load_login_config(db)
             if settings.LOGIN_CAPTCHA_ENABLED:
-                if not obj.captcha_uuid or not obj.captcha:
+                if not obj.uuid or not obj.captcha:
                     raise errors.RequestError(msg=t('error.captcha.invalid'))
-                captcha_code = await redis_client.get(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.captcha_uuid}')
+                captcha_code = await redis_client.get(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.uuid}')
                 if not captcha_code:
                     raise errors.RequestError(msg=t('error.captcha.expired'))
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-                await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.captcha_uuid}')
+                await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.uuid}')
 
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
