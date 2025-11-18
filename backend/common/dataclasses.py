@@ -70,6 +70,6 @@ class UploadUrl:
 class SnowflakeInfo:
     timestamp: int
     datetime: str
-    cluster_id: int
-    node_id: int
+    datacenter_id: int
+    worker_id: int
     sequence: int

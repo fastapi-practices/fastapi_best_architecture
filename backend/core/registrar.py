@@ -59,7 +59,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     )
 
     # 初始化 snowflake 节点
-    await snowflake.initialize()
+    await snowflake.init()
 
     # 创建操作日志任务
     create_task(OperaLogMiddleware.consumer())
