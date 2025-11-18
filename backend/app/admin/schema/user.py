@@ -20,7 +20,7 @@ class AuthSchemaBase(SchemaBase):
 class AuthLoginParam(AuthSchemaBase):
     """用户登录参数"""
 
-    captcha_uuid: str | None = Field(None, description='验证码 UUID')
+    uuid: str | None = Field(None, description='验证码 UUID')
     captcha: str | None = Field(None, description='验证码')
 
 
