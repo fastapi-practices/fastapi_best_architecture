@@ -128,9 +128,6 @@ class Snowflake:
             return
 
         with self._lock:
-            if self._initialized:
-                return
-
             # 环境变量固定分配
             if settings.SNOWFLAKE_DATACENTER_ID is not None and settings.SNOWFLAKE_WORKER_ID is not None:
                 self.datacenter_id = settings.SNOWFLAKE_DATACENTER_ID
@@ -138,6 +135,11 @@ class Snowflake:
                 log.debug(
                     f'雪花算法使用环境变量固定节点：datacenter_id={self.datacenter_id}, worker_id={self.worker_id}'
                 )
+            elif (settings.SNOWFLAKE_DATACENTER_ID is not None and settings.SNOWFLAKE_WORKER_ID is None) or (
+                settings.SNOWFLAKE_DATACENTER_ID is None and settings.SNOWFLAKE_WORKER_ID is not None
+            ):
+                log.error('雪花算法 datacenter_id 和 worker_id 配置错误，只允许同时非 None 或同时为 None')
+                raise errors.ServerError(msg='雪花算法配置失败，请联系系统管理员')
             else:
                 # Redis 动态分配
                 self._node_manager = SnowflakeNodeManager()
@@ -150,9 +152,11 @@ class Snowflake:
 
             # 严格校验范围
             if not (0 <= self.datacenter_id <= SnowflakeConfig.MAX_DATACENTER_ID):
-                raise errors.RequestError(msg=f'雪花算法 datacenter_id 必须在 0~{SnowflakeConfig.MAX_DATACENTER_ID}')
+                log.error(f'雪花算法 datacenter_id 配置失败，必须在 0~{SnowflakeConfig.MAX_DATACENTER_ID} 之间')
+                raise errors.ServerError(msg='雪花算法数据中心配置失败，请联系系统管理员')
             if not (0 <= self.worker_id <= SnowflakeConfig.MAX_WORKER_ID):
-                raise errors.RequestError(msg=f'雪花算法 worker_id 必须在 0~{SnowflakeConfig.MAX_WORKER_ID}')
+                log.error(f'雪花算法 worker_id 配置失败，必须在 0~{SnowflakeConfig.MAX_WORKER_ID} 之间')
+                raise errors.ServerError(msg='雪花算法工作机器配置失败，请联系系统管理员')
 
             self._initialized = True
 
@@ -188,7 +192,7 @@ class Snowflake:
                     log.warning(f'检测到时钟回拨 {back_ms} ms，等待恢复...')
                     timestamp = self._till_next_ms(self.last_timestamp)
                 else:
-                    raise errors.ServerError(msg=f'时钟回拨超过 {back_ms} ms，雪花 ID 生成失败，请立即联系系统管理员')
+                    raise errors.ServerError(msg=f'雪花 ID 生成失败，时钟回拨超过 {back_ms} ms，请立即联系系统管理员')
 
             # 同毫秒内序列号递增
             if timestamp == self.last_timestamp:
