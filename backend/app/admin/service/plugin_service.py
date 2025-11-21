@@ -48,6 +48,8 @@ class PluginService:
         :param repo_url: git 仓库地址
         :return:
         """
+        if settings.ENVIRONMENT != 'dev':
+            raise errors.RequestError(msg='禁止在非开发环境下安装插件')
         if type == PluginType.zip:
             if not file:
                 raise errors.RequestError(msg='ZIP 压缩包不能为空')
@@ -64,6 +66,8 @@ class PluginService:
         :param plugin: 插件名称
         :return:
         """
+        if settings.ENVIRONMENT != 'dev':
+            raise errors.RequestError(msg='禁止在非开发环境下卸载插件')
         plugin_dir = anyio.Path(PLUGIN_DIR / plugin)
         if not await plugin_dir.exists():
             raise errors.NotFoundError(msg='插件不存在')
