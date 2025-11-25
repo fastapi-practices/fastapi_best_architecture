@@ -1,23 +1,24 @@
-from functools import lru_cache
-
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
 from backend.database.db import async_engine
 from backend.utils.serializers import select_list_serialize
 
+_sys_config_table_exists: bool | None = None
 
-@lru_cache
-def get_sys_config_table(conn: AsyncConnection) -> bool:
+
+async def check_sys_config_table_exists() -> bool:
     """
-    获取参数配置表
+    检查 sys_config 表是否存在
 
-    :param conn: 数据库连接
     :return:
     """
-    inspector = inspect(conn)
-    return inspector.has_table('sys_config', schema=None)
+    global _sys_config_table_exists
+    if _sys_config_table_exists is None:
+        async with async_engine.begin() as conn:
+            _sys_config_table_exists = await conn.run_sync(lambda c: inspect(c).has_table('sys_config', schema=None))
+    return _sys_config_table_exists
 
 
 async def load_user_security_config(db: AsyncSession) -> None:  # noqa: C901
@@ -27,15 +28,13 @@ async def load_user_security_config(db: AsyncSession) -> None:  # noqa: C901
     :param db: 数据库会话
     :return:
     """
-    dynamic_config = None
+    if not await check_sys_config_table_exists():
+        return
 
-    async with async_engine.begin() as conn:
-        exists = await conn.run_sync(get_sys_config_table)
-        if exists:
-            from backend.plugin.config.crud.crud_config import config_dao
-            from backend.plugin.config.enums import ConfigType
+    from backend.plugin.config.crud.crud_config import config_dao
+    from backend.plugin.config.enums import ConfigType
 
-            dynamic_config = await config_dao.get_all(db, ConfigType.user_security)
+    dynamic_config = await config_dao.get_all(db, ConfigType.user_security)
 
     if dynamic_config:
         security_config_status_key = 'USER_SECURITY_CONFIG_STATUS'
@@ -75,15 +74,13 @@ async def load_login_config(db: AsyncSession) -> None:
     :param db: 数据库会话
     :return:
     """
-    dynamic_config = None
+    if not await check_sys_config_table_exists():
+        return
 
-    async with async_engine.begin() as conn:
-        exists = await conn.run_sync(get_sys_config_table)
-        if exists:
-            from backend.plugin.config.crud.crud_config import config_dao
-            from backend.plugin.config.enums import ConfigType
+    from backend.plugin.config.crud.crud_config import config_dao
+    from backend.plugin.config.enums import ConfigType
 
-            dynamic_config = await config_dao.get_all(db, ConfigType.login)
+    dynamic_config = await config_dao.get_all(db, ConfigType.login)
 
     if dynamic_config:
         login_config_status_key = 'LOGIN_CONFIG_STATUS'
@@ -101,15 +98,13 @@ async def load_email_config(db: AsyncSession) -> None:
     :param db: 数据库会话
     :return:
     """
-    dynamic_config = None
+    if not await check_sys_config_table_exists():
+        return
 
-    async with async_engine.begin() as conn:
-        exists = await conn.run_sync(get_sys_config_table)
-        if exists:
-            from backend.plugin.config.crud.crud_config import config_dao
-            from backend.plugin.config.enums import ConfigType
+    from backend.plugin.config.crud.crud_config import config_dao
+    from backend.plugin.config.enums import ConfigType
 
-            dynamic_config = await config_dao.get_all(db, ConfigType.email)
+    dynamic_config = await config_dao.get_all(db, ConfigType.email)
 
     if dynamic_config:
         email_config_status_key = 'EMAIL_CONFIG_STATUS'

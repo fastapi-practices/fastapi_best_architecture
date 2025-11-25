@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from functools import lru_cache
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -7,7 +6,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from backend.common.i18n import i18n
 
 
-@lru_cache
 def get_current_language(request: Request) -> str | None:
     """
     获取当前请求的语言偏好
