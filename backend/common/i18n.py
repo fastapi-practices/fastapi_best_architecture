@@ -16,6 +16,7 @@ class I18n:
     def __init__(self) -> None:
         self.locales: dict[str, dict[str, Any]] = {}
         self.current_language: str = settings.I18N_DEFAULT_LANGUAGE
+        self.load_locales()
 
     def load_locales(self) -> None:
         """加载语言文本"""
