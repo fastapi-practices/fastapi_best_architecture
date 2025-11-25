@@ -20,6 +20,7 @@ English | [简体中文](./README.zh-CN.md)
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white)](https://discord.com/invite/yNN3wTbVAC)
 ![Discord](https://img.shields.io/discord/1185035164577972344)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fastapi-practices/fastapi_best_architecture)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffastapi-practices%2Ffastapi_best_architecture.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffastapi-practices%2Ffastapi_best_architecture?ref=badge_shield)
 
 </div>
 
@@ -76,3 +77,6 @@ This project is licensed by the terms of
 the [MIT](https://github.com/fastapi-practices/fastapi_best_architecture/blob/master/LICENSE) license
 
 [![Stargazers over time](https://starchart.cc/fastapi-practices/fastapi_best_architecture.svg?variant=adaptive)](https://starchart.cc/fastapi-practices/fastapi_best_architecture)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffastapi-practices%2Ffastapi_best_architecture.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffastapi-practices%2Ffastapi_best_architecture?ref=badge_large)
