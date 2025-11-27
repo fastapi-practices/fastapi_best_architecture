@@ -37,7 +37,7 @@ async def import_table(db: CurrentSessionTransaction, obj: ImportParam) -> Respo
     return response_base.success()
 
 
-@router.get('/{pk}/previews', summary='代码生成预览', dependencies=[DependsJwtAuth])
+@router.get('/{pk}/preview', summary='代码生成预览', dependencies=[DependsJwtAuth])
 async def preview_code(
     db: CurrentSession, pk: Annotated[int, Path(description='业务 ID')]
 ) -> ResponseSchemaModel[dict[str, bytes]]:
@@ -54,7 +54,7 @@ async def get_generate_paths(
 
 
 @router.post(
-    '/{pk}/generation',
+    '/{pk}',
     summary='代码生成',
     description='文件磁盘写入，请谨慎操作',
     dependencies=[
