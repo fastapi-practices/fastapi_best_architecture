@@ -5,7 +5,7 @@ from backend.plugin.code_generator.api.v1.business import router as business_rou
 from backend.plugin.code_generator.api.v1.code import router as gen_router
 from backend.plugin.code_generator.api.v1.column import router as column_router
 
-v1 = APIRouter(prefix=f'{settings.FASTAPI_API_V1_PATH}/generates', tags=['代码生成'])
+v1 = APIRouter(prefix=f'{settings.FASTAPI_API_V1_PATH}/code-generation', tags=['代码生成'])
 
 v1.include_router(business_router, prefix='/businesses')
 v1.include_router(column_router, prefix='/columns')
