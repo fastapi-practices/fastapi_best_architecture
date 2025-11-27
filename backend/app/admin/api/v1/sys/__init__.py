@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from backend.app.admin.api.v1.sys.data_rule import router as data_rule_router
 from backend.app.admin.api.v1.sys.data_scope import router as data_scope_router
 from backend.app.admin.api.v1.sys.dept import router as dept_router
-from backend.app.admin.api.v1.sys.files import router as file_router
+from backend.app.admin.api.v1.sys.file import router as file_router
 from backend.app.admin.api.v1.sys.menu import router as menu_router
 from backend.app.admin.api.v1.sys.plugin import router as plugin_router
 from backend.app.admin.api.v1.sys.role import router as role_router
