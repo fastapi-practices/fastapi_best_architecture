@@ -117,7 +117,7 @@ async def delete_task_scheduler(
 
 
 @router.post(
-    '/{pk}/exec',
+    '/{pk}/execute',
     summary='执行任务',
     dependencies=[
         Depends(RequestPermission('sys:task:exec')),
