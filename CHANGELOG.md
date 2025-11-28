@@ -1,3 +1,33 @@
+<a id="v1.11.2"></a>
+# [v1.11.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.2) - 2025-11-28
+
+## What's Changed
+* Update changelog for v1.11.1 by [@wu-clan](https://github.com/wu-clan) in [#923](https://github.com/fastapi-practices/fastapi_best_architecture/pull/923)
+* Fix typos in data rule sql scripts by [@wu-clan](https://github.com/wu-clan) in [#926](https://github.com/fastapi-practices/fastapi_best_architecture/pull/926)
+* Restore captcha uuid naming in the login params by [@wu-clan](https://github.com/wu-clan) in [#928](https://github.com/fastapi-practices/fastapi_best_architecture/pull/928)
+* Add distributed deployment support for snowflake ID by [@downdawn](https://github.com/downdawn) in [#927](https://github.com/fastapi-practices/fastapi_best_architecture/pull/927)
+* Add env reqs for plugin install and uninstall by [@wu-clan](https://github.com/wu-clan) in [#929](https://github.com/fastapi-practices/fastapi_best_architecture/pull/929)
+* Optimize the use of some LRU caches by [@wu-clan](https://github.com/wu-clan) in [#932](https://github.com/fastapi-practices/fastapi_best_architecture/pull/932)
+* Update the i18n language file init location by [@wu-clan](https://github.com/wu-clan) in [#934](https://github.com/fastapi-practices/fastapi_best_architecture/pull/934)
+* Fix get column types in code generation by [@wu-clan](https://github.com/wu-clan) in [#935](https://github.com/fastapi-practices/fastapi_best_architecture/pull/935)
+* Bump dependencies and pre-commits by [@wu-clan](https://github.com/wu-clan) in [#936](https://github.com/fastapi-practices/fastapi_best_architecture/pull/936)
+* Update the files interface filename to file by [@wu-clan](https://github.com/wu-clan) in [#937](https://github.com/fastapi-practices/fastapi_best_architecture/pull/937)
+* Update task application interface definitions by [@wu-clan](https://github.com/wu-clan) in [#938](https://github.com/fastapi-practices/fastapi_best_architecture/pull/938)
+* Update code generation interface definitions by [@wu-clan](https://github.com/wu-clan) in [#939](https://github.com/fastapi-practices/fastapi_best_architecture/pull/939)
+* Update the fba run CLI command output by [@wu-clan](https://github.com/wu-clan) in [#941](https://github.com/fastapi-practices/fastapi_best_architecture/pull/941)
+* Update the version number to 1.11.2 by [@wu-clan](https://github.com/wu-clan) in [#940](https://github.com/fastapi-practices/fastapi_best_architecture/pull/940)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.1...v1.11.2
+
+## Contributors
+
+<a href="https://github.com/downdawn"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fdowndawn.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@downdawn"></a>
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.11.2]
+
+
 <a id="v1.11.1"></a>
 # [v1.11.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.1) - 2025-11-16
 
@@ -1161,6 +1191,7 @@
 [Changes][v1.0.0]
 
 
+[v1.11.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.1...v1.11.2
 [v1.11.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.0...v1.11.1
 [v1.11.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.4...v1.11.0
 [v1.10.4]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.3...v1.10.4
