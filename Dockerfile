@@ -22,7 +22,7 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 # Install dependencies with cache
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-default-groups --group server
+    ulimit -n 65535 && uv sync --frozen --no-default-groups --group server
 
 # === Runtime base server image ===
 FROM python:3.10-slim AS base_server
