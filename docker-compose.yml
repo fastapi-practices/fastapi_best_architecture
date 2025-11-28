@@ -173,6 +173,8 @@ services:
       args:
         - SERVER_TYPE=fba_celery_worker
     image: fba_celery_worker:latest
+    # 如果你需要分布式部署 Worker，则必须移除此 container_name 配置
+    container_name: fba_celery_worker
     restart: always
     depends_on:
       - fba_rabbitmq
