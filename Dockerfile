@@ -49,7 +49,7 @@ RUN mkdir -p /var/log/fba
 
 EXPOSE 8001
 
-CMD ["/usr/local/bin/granian", "main:app", "--interface", "asgi", "--host", "0.0.0.0", "--port","8000"]
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
 # === Celery Worker image ===
 FROM base_server AS fba_celery_worker
