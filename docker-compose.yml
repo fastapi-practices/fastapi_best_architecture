@@ -34,7 +34,6 @@ services:
     depends_on:
       - fba_postgres
       - fba_redis
-      - fba_celery
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
       - fba_static:/fba/backend/app/static
@@ -167,19 +166,66 @@ services:
     networks:
       - fba_network
 
-  fba_celery:
+  fba_celery_worker:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - SERVER_TYPE=fba_celery
-    image: fba_celery:latest
-    ports:
-      - "8555:8555"
-    container_name: fba_celery
+        - SERVER_TYPE=fba_celery_worker
+    image: fba_celery_worker:latest
     restart: always
     depends_on:
       - fba_rabbitmq
+    volumes:
+      - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+    networks:
+      - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s fba_rabbitmq:5672 -t 300
+        supervisord -c /etc/supervisor/supervisord.conf
+        supervisorctl restart
+
+  fba_celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVER_TYPE=fba_celery_beat
+    image: fba_celery_beat:latest
+    container_name: fba_celery_beat
+    restart: always
+    depends_on:
+      - fba_rabbitmq
+      - fba_celery_worker
+    volumes:
+      - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+    networks:
+      - fba_network
+    command:
+      - bash
+      - -c
+      - |
+        wait-for-it -s fba_rabbitmq:5672 -t 300
+        supervisord -c /etc/supervisor/supervisord.conf
+        supervisorctl restart
+
+  fba_celery_flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVER_TYPE=fba_celery_flower
+    image: fba_celery_flower:latest
+    ports:
+      - "8555:8555"
+    container_name: fba_celery_flower
+    restart: always
+    depends_on:
+      - fba_rabbitmq
+      - fba_celery_worker
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
     networks:
