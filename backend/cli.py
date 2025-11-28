@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+import sys
 
 from dataclasses import dataclass
 from typing import Annotated, Literal
@@ -23,7 +24,7 @@ from backend.database.db import async_db_session
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.business_service import gen_business_service
 from backend.plugin.code_generator.service.code_service import gen_service
-from backend.plugin.tools import get_plugin_sql
+from backend.plugin.tools import get_plugin_sql, get_plugins
 from backend.utils._await import run_await
 from backend.utils.console import console
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
@@ -45,16 +46,32 @@ def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT0
     openapi_url = url + (settings.FASTAPI_OPENAPI_URL or '')
 
     panel_content = Text()
-    panel_content.append(f'当前版本: v{__version__}')
-    panel_content.append(f'\n服务地址: {url}')
-    panel_content.append('\n官方文档: https://fastapi-practices.github.io/fastapi_best_architecture_docs/')
+    panel_content.append('Python 版本：', style='bold cyan')
+    panel_content.append(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}', style='white')
+
+    panel_content.append('\nAPI 请求地址: ', style='bold cyan')
+    panel_content.append(f'{url}{settings.FASTAPI_API_V1_PATH}', style='blue')
+
+    panel_content.append('\n\n环境模式：', style='bold green')
+    env_style = 'yellow' if settings.ENVIRONMENT == 'dev' else 'green'
+    panel_content.append(f'{settings.ENVIRONMENT.upper()}', style=env_style)
+
+    plugins = get_plugins()
+    panel_content.append('\n已安装插件：', style='bold green')
+    if plugins:
+        panel_content.append(f'{", ".join(plugins)}', style='yellow')
+    else:
+        panel_content.append('无', style='white')
 
     if settings.ENVIRONMENT == 'dev':
-        panel_content.append(f'\n\n📖 Swagger 文档: {docs_url}', style='yellow')
-        panel_content.append(f'\n📚 Redoc   文档: {redoc_url}', style='blue')
-        panel_content.append(f'\n📡 OpenAPI JSON: {openapi_url}', style='green')
+        panel_content.append(f'\n\n📖 Swagger 文档: {docs_url}', style='bold magenta')
+        panel_content.append(f'\n📚 Redoc   文档: {redoc_url}', style='bold magenta')
+        panel_content.append(f'\n📡 OpenAPI JSON: {openapi_url}', style='bold magenta')
 
-    console.print(Panel(panel_content, title='fba 服务信息', border_style='purple', padding=(1, 2)))
+    panel_content.append('\n🌐 架构官方文档: ', style='bold magenta')
+    panel_content.append('https://fastapi-practices.github.io/fastapi_best_architecture_docs/')
+
+    console.print(Panel(panel_content, title=f'fba v{__version__}', border_style='purple', padding=(1, 2)))
     granian.Granian(
         target='backend.main:app',
         interface='asgi',
@@ -276,7 +293,7 @@ class Add:
     ]
     db_type: Annotated[
         DataBaseType,
-        cappa.Arg(default='mysql', help='执行插件 SQL 脚本的数据库类型'),
+        cappa.Arg(default='postgresql', help='执行插件 SQL 脚本的数据库类型'),
     ]
     pk_type: Annotated[
         PrimaryKeyType,
