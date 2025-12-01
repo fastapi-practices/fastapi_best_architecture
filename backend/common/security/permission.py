@@ -1,7 +1,8 @@
-from fastapi import Request
+from typing import Annotated
+
+from fastapi import Depends, Request
 from sqlalchemy import ColumnElement, and_, or_
 
-from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
 from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
@@ -41,27 +42,27 @@ class RequestPermission:
             ctx.permission = self.value
 
 
-def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> ColumnElement[bool]:  # noqa: C901
+def filter_data_permission(request: Request) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 
     使用场景：
         - 控制用户能看到哪些数据
 
-    :param request_user: 请求用户
+    :param request: FastAPI 请求对象
     :return:
     """
     # 是否过滤数据权限
-    if request_user.is_superuser:
+    if request.user.is_superuser:
         return or_(1 == 1)
 
-    for role in request_user.roles:
+    for role in request.user.roles:
         if not role.is_filter_scopes:
             return or_(1 == 1)
 
     # 获取数据规则
     data_rules = set()
-    for role in request_user.roles:
+    for role in request.user.roles:
         for scope in role.scopes:
             if scope.status:
                 data_rules.update(scope.rules)
@@ -128,3 +129,7 @@ def filter_data_permission(request_user: GetUserInfoWithRelationDetail) -> Colum
         where_list.append(or_(*where_or_list))
 
     return or_(*where_list) if where_list else or_(1 == 1)
+
+
+# Data Permission Annotated
+DataPermissionFilter = Annotated[ColumnElement[bool], Depends(filter_data_permission)]
