@@ -7,7 +7,7 @@ from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
 from backend.core.conf import settings
-from backend.utils.import_parse import dynamic_import_data_model
+from backend.utils.import_parse import get_all_models
 
 
 class RequestPermission:
@@ -40,6 +40,11 @@ class RequestPermission:
                 raise errors.ServerError
             # 附加权限标识到请求状态
             ctx.permission = self.value
+
+
+def get_data_permission_models() -> dict[str, type]:
+    """获取所有可用于数据权限的模型"""
+    return {model.__name__: model for model in get_all_models()}
 
 
 def filter_data_permission(request: Request) -> ColumnElement[bool]:  # noqa: C901
@@ -77,9 +82,10 @@ def filter_data_permission(request: Request) -> ColumnElement[bool]:  # noqa: C9
     for data_rule in list(data_rules):
         # 验证规则模型
         rule_model = data_rule.model
-        if rule_model not in settings.DATA_PERMISSION_MODELS:
+        available_models = get_data_permission_models()
+        if rule_model not in available_models:
             raise errors.NotFoundError(msg='数据规则可用模型不存在')
-        model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[rule_model])
+        model_ins = available_models[rule_model]
 
         # 验证规则列
         model_columns = [

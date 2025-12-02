@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import os.path
 
 from functools import lru_cache
 from typing import Any, TypeVar
@@ -59,3 +60,30 @@ def get_model_objects(module_path: str) -> list[type] | None:
             classes.append(obj)
 
     return classes
+
+
+def get_app_models() -> list[type]:
+    """获取 app 所有模型类"""
+    from backend.core.path_conf import BASE_PATH
+
+    app_path = BASE_PATH / 'app'
+    list_dirs = os.listdir(app_path)
+
+    apps = [d for d in list_dirs if os.path.isdir(os.path.join(app_path, d)) and d != '__pycache__']
+
+    objs = []
+    for app in apps:
+        module_path = f'backend.app.{app}.model'
+        model_objs = get_model_objects(module_path)
+        if model_objs:
+            objs.extend(model_objs)
+
+    return objs
+
+
+@lru_cache
+def get_all_models() -> list[type]:
+    """获取所有模型类（app + plugin）"""
+    from backend.plugin.tools import get_plugin_models
+
+    return get_app_models() + get_plugin_models()

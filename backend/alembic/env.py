@@ -8,14 +8,13 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from backend.app import get_app_models
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
-from backend.plugin.tools import get_plugin_models
+from backend.utils.import_parse import get_all_models
 
-# import models
-for cls in get_app_models() + get_plugin_models():
+# import all models
+for cls in get_all_models():
     class_name = cls.__name__
     if class_name not in globals():
         globals()[class_name] = cls
