@@ -5,6 +5,8 @@ import os.path
 from functools import lru_cache
 from typing import Any, TypeVar
 
+import sqlalchemy as sa
+
 from backend.common.exception import errors
 from backend.common.log import log
 
@@ -55,7 +57,9 @@ def get_model_objects(module_path: str) -> list[object] | None:
     classes = []
 
     for _name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and module_path in obj.__module__:
+        if (inspect.isclass(obj) and module_path in obj.__module__) or (
+            isinstance(obj, sa.Table) and obj.metadata is not None
+        ):
             classes.append(obj)
 
     return classes

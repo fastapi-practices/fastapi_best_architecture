@@ -11,13 +11,6 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
-from backend.utils.import_parse import get_all_models
-
-# import all models
-for cls in get_all_models():
-    class_name = cls.__name__
-    if class_name not in globals():
-        globals()[class_name] = cls
 
 if not os.path.exists(path_conf.ALEMBIC_VERSION_DIR):
     os.makedirs(path_conf.ALEMBIC_VERSION_DIR)
