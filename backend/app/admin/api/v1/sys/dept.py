@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
+from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptDetail, GetDeptTree, UpdateDeptParam
 from backend.app.admin.service.dept_service import dept_service
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -24,7 +25,7 @@ async def get_dept(
 @router.get('', summary='获取部门树', dependencies=[DependsJwtAuth])
 async def get_dept_tree(
     db: CurrentSession,
-    data_filter: DataPermissionFilter,
+    data_filter: DataPermissionFilter(Dept),
     name: Annotated[str | None, Query(description='部门名称')] = None,
     leader: Annotated[str | None, Query(description='部门负责人')] = None,
     phone: Annotated[str | None, Query(description='联系电话')] = None,

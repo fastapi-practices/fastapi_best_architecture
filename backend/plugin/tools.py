@@ -55,7 +55,7 @@ def get_plugins() -> list[str]:
     return plugin_packages
 
 
-def get_plugin_models() -> list[type]:
+def get_plugin_models() -> list[object]:
     """获取插件所有模型类"""
     objs = []
 

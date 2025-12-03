@@ -38,7 +38,7 @@ def dynamic_import_data_model(module_path: str) -> type[T]:
         raise errors.ServerError(msg='数据模型列动态解析失败，请联系系统超级管理员')
 
 
-def get_model_objects(module_path: str) -> list[type] | None:
+def get_model_objects(module_path: str) -> list[object] | None:
     """
     获取模型对象
 
@@ -62,7 +62,7 @@ def get_model_objects(module_path: str) -> list[type] | None:
     return classes
 
 
-def get_app_models() -> list[type]:
+def get_app_models() -> list[object]:
     """获取 app 所有模型类"""
     from backend.core.path_conf import BASE_PATH
 
@@ -82,8 +82,8 @@ def get_app_models() -> list[type]:
 
 
 @lru_cache
-def get_all_models() -> list[type]:
-    """获取所有模型类（app + plugin）"""
+def get_all_models() -> list[object]:
+    """获取所有模型类"""
     from backend.plugin.tools import get_plugin_models
 
     return get_app_models() + get_plugin_models()
