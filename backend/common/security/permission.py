@@ -1,7 +1,6 @@
-from functools import partial
-from typing import Annotated
+from typing import Any
 
-from fastapi import Depends, Request
+from fastapi import Request
 from sqlalchemy import ColumnElement, and_, or_
 
 from backend.common.context import ctx
@@ -97,25 +96,34 @@ def filter_data_permission(request: Request, *models: object) -> ColumnElement[b
 
         # 构建过滤条件
         column_obj = getattr(target_model, rule_column)
+        column_type = target_model.__table__.columns[rule_column].type.python_type
+
+        def cast_value(value: Any) -> Any:
+            """类型转换"""
+            try:
+                return column_type(value) if column_type is not str else value
+            except (ValueError, TypeError):
+                return value
+
         condition = None
         match data_rule.expression:
             case RoleDataRuleExpressionType.eq:
-                condition = column_obj == data_rule.value
+                condition = column_obj == cast_value(data_rule.value)
             case RoleDataRuleExpressionType.ne:
-                condition = column_obj != data_rule.value
+                condition = column_obj != cast_value(data_rule.value)
             case RoleDataRuleExpressionType.gt:
-                condition = column_obj > data_rule.value
+                condition = column_obj > cast_value(data_rule.value)
             case RoleDataRuleExpressionType.ge:
-                condition = column_obj >= data_rule.value
+                condition = column_obj >= cast_value(data_rule.value)
             case RoleDataRuleExpressionType.lt:
-                condition = column_obj < data_rule.value
+                condition = column_obj < cast_value(data_rule.value)
             case RoleDataRuleExpressionType.le:
-                condition = column_obj <= data_rule.value
+                condition = column_obj <= cast_value(data_rule.value)
             case RoleDataRuleExpressionType.in_:
-                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
                 condition = column_obj.in_(values)
             case RoleDataRuleExpressionType.not_in:
-                values = data_rule.value.split(',') if isinstance(data_rule.value, str) else data_rule.value
+                values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
                 condition = column_obj.not_in(values)
 
         # 根据运算符添加到对应列表
@@ -136,11 +144,22 @@ def filter_data_permission(request: Request, *models: object) -> ColumnElement[b
     return or_(*where_list) if where_list else or_(1 == 1)
 
 
-def DataPermissionFilter(*models: object) -> type[ColumnElement[bool]]:  # noqa: N802
-    """
-    指定模型的数据权限过滤器
+# 此函数是为了简化调用方式，但目前无法正常工作: https://github.com/fastapi/fastapi/discussions/14438
+# def DataPermissionFilter(*models: object) -> type[ColumnElement[bool]]:
+#     """
+#     指定模型的数据权限过滤器
+#
+#     :param models: 模型类（可选，支持多个）
+#     :return:
+#     """
+#     return Annotated[ColumnElement[bool], Depends(partial(filter_data_permission, *models))]
 
-    :param models: 模型类（可选，支持多个）
-    :return:
-    """
-    return Annotated[ColumnElement[bool], Depends(partial(filter_data_permission, *models))]
+
+class DataPermissionFilter:
+    """指定模型的数据权限过滤器"""
+
+    def __init__(self, *models: object) -> None:
+        self.models = models
+
+    async def __call__(self, request: Request) -> ColumnElement[bool]:
+        return filter_data_permission(request, *self.models)

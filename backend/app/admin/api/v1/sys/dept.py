@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
+from sqlalchemy import ColumnElement
 
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, GetDeptDetail, GetDeptTree, UpdateDeptParam
@@ -25,7 +26,7 @@ async def get_dept(
 @router.get('', summary='获取部门树', dependencies=[DependsJwtAuth])
 async def get_dept_tree(
     db: CurrentSession,
-    data_filter: DataPermissionFilter(Dept),
+    data_filter: Annotated[ColumnElement[bool], Depends(DataPermissionFilter(Dept))],
     name: Annotated[str | None, Query(description='部门名称')] = None,
     leader: Annotated[str | None, Query(description='部门负责人')] = None,
     phone: Annotated[str | None, Query(description='联系电话')] = None,
