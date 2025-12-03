@@ -1,7 +1,9 @@
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import ColumnElement, and_, or_
+from sqlalchemy import Alias, ColumnElement, Table, and_, or_
+from sqlalchemy.orm.util import AliasedClass
+from sqlalchemy_crud_plus.types import Model
 
 from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
@@ -44,10 +46,12 @@ class RequestPermission:
 
 def get_data_permission_models() -> dict[str, object]:
     """获取所有可用于数据权限的模型"""
-    return {model.__name__: model for model in get_all_models()}
+    return {getattr(model, '__name__', str(model)): model for model in get_all_models()}
 
 
-def filter_data_permission(request: Request, *models: object) -> ColumnElement[bool]:  # noqa: C901
+def filter_data_permission(  # noqa: C901
+    request: Request, *models: type[Model] | AliasedClass | Alias | Table
+) -> ColumnElement[bool]:
     """
     过滤数据权限，控制用户可见数据范围
 
@@ -78,25 +82,30 @@ def filter_data_permission(request: Request, *models: object) -> ColumnElement[b
         return or_(1 == 1)
 
     # 获取目标模型
-    model_map = {model.__name__: model for model in models} if models else get_data_permission_models()
+    model_map = (
+        {getattr(model, '__name__', str(model)): model for model in models} if models else get_data_permission_models()
+    )
 
     where_and_list = []
     where_or_list = []
 
     for data_rule in data_rules:
         target_model = model_map.get(data_rule.model)
-        if not target_model:
+        if target_model is None:
             continue
 
+        table = target_model if isinstance(target_model, Table) else target_model.__table__
         rule_column = data_rule.column
-        if rule_column not in target_model.__table__.columns.keys():
+        if rule_column not in table.columns.keys():
             continue
         if rule_column in settings.DATA_PERMISSION_COLUMN_EXCLUDE:
             continue
 
         # 构建过滤条件
-        column_obj = getattr(target_model, rule_column)
-        column_type = target_model.__table__.columns[rule_column].type.python_type
+        column_obj = (
+            getattr(target_model, rule_column) if not isinstance(target_model, Table) else table.columns[rule_column]
+        )
+        column_type = table.columns[rule_column].type.python_type
 
         def cast_value(value: Any) -> Any:
             """类型转换"""
@@ -145,7 +154,7 @@ def filter_data_permission(request: Request, *models: object) -> ColumnElement[b
 
 
 # 此函数是为了简化调用方式，但目前无法正常工作: https://github.com/fastapi/fastapi/discussions/14438
-# def DataPermissionFilter(*models: object) -> type[ColumnElement[bool]]:
+# def DataPermissionFilter(*models: type[Model] | AliasedClass | Alias | Table) -> type[ColumnElement[bool]]:
 #     """
 #     指定模型的数据权限过滤器
 #
@@ -158,7 +167,7 @@ def filter_data_permission(request: Request, *models: object) -> ColumnElement[b
 class DataPermissionFilter:
     """指定模型的数据权限过滤器"""
 
-    def __init__(self, *models: object) -> None:
+    def __init__(self, *models: type[Model] | AliasedClass | Alias | Table) -> None:
         self.models = models
 
     async def __call__(self, request: Request) -> ColumnElement[bool]:
