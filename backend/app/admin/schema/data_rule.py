@@ -45,4 +45,4 @@ class GetDataRuleColumnDetail(SchemaBase):
     """数据规则可用模型字段详情"""
 
     key: str = Field(description='字段名')
-    comment: str = Field(description='字段评论')
+    comment: str | None = Field(description='字段评论')

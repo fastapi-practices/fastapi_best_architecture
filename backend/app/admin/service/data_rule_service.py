@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+from sqlalchemy import Table
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_data_rule import data_rule_dao
@@ -14,8 +15,8 @@ from backend.app.admin.schema.data_rule import (
 from backend.app.admin.utils.cache import user_cache_manager
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
+from backend.common.security.permission import get_data_permission_models
 from backend.core.conf import settings
-from backend.utils.import_parse import dynamic_import_data_model
 
 
 class DataRuleService:
@@ -39,7 +40,8 @@ class DataRuleService:
     @staticmethod
     async def get_models() -> list[str]:
         """获取所有数据规则可用模型"""
-        return list(settings.DATA_PERMISSION_MODELS.keys())
+        model_exclude = ['DataScope', 'DataRule', 'sys_role_data_scope', 'sys_data_scope_rule']
+        return [m for m in list(get_data_permission_models().keys()) if m not in model_exclude]
 
     @staticmethod
     async def get_columns(model: str) -> list[GetDataRuleColumnDetail]:
@@ -49,13 +51,15 @@ class DataRuleService:
         :param model: 模型名称
         :return:
         """
-        if model not in settings.DATA_PERMISSION_MODELS:
+        available_models = get_data_permission_models()
+        if model not in available_models:
             raise errors.NotFoundError(msg='数据规则可用模型不存在')
-        model_ins = dynamic_import_data_model(settings.DATA_PERMISSION_MODELS[model])
+        model_ins = available_models[model]
 
+        table = model_ins if isinstance(model_ins, Table) else model_ins.__table__
         model_columns = [
             GetDataRuleColumnDetail(key=column.key, comment=column.comment)
-            for column in model_ins.__table__.columns
+            for column in table.columns
             if column.key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
         return model_columns

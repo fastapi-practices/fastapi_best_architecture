@@ -111,9 +111,6 @@ class Settings(BaseSettings):
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 7 天
 
     # 数据权限
-    DATA_PERMISSION_MODELS: dict[str, str] = {  # 允许进行数据过滤的 SQLA 模型，它必须以模块字符串的方式定义
-        'Dept': 'backend.app.admin.model.Dept',
-    }
     DATA_PERMISSION_COLUMN_EXCLUDE: list[str] = [  # 排除允许进行数据过滤的 SQLA 模型列
         'id',
         'sort',

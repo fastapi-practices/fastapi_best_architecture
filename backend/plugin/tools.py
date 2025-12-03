@@ -55,15 +55,15 @@ def get_plugins() -> list[str]:
     return plugin_packages
 
 
-def get_plugin_models() -> list[type]:
+def get_plugin_models() -> list[object]:
     """获取插件所有模型类"""
     objs = []
 
     for plugin in get_plugins():
         module_path = f'backend.plugin.{plugin}.model'
-        obj = get_model_objects(module_path)
-        if obj:
-            objs.extend(obj)
+        model_objs = get_model_objects(module_path)
+        if model_objs:
+            objs.extend(model_objs)
 
     return objs
 

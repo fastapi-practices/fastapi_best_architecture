@@ -18,7 +18,7 @@ dependencies = [
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
     "cappa>=0.30.4",
-    "celery>=5.5.3",
+    "celery>=5.6.0",
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool>=0.1.0rc8",
@@ -27,7 +27,7 @@ dependencies = [
     "fast-captcha>=0.3.2",
     "fastapi-limiter>=0.1.6",
     "fastapi-pagination>=0.15.0",
-    "fastapi[standard-no-fastapi-cloud-cli]>=0.122.0",
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.123.5",
     "flower>=2.0.1",
     "gevent>=25.9.1",
     "granian>=2.6.0",
@@ -40,7 +40,7 @@ dependencies = [
     # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
     "psycopg[binary]==3.2.10",
     "pwdlib>=0.3.0",
-    "pydantic>=2.12.4",
+    "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
     "pymysql>=1.1.2",
     "python-jose>=3.5.0",
@@ -49,7 +49,7 @@ dependencies = [
     "rtoml>=0.13.0",
     "sqlalchemy-crud-plus>=1.13.1",
     "sqlalchemy[asyncio]>=2.0.44",
-    "sqlparse>=0.5.3",
+    "sqlparse>=0.5.4",
     "starlette-context>=0.4.0",
     "user-agents>=2.2.0",
 ]
@@ -60,7 +60,7 @@ dev = [
     "pytest-sugar>=1.1.1",
 ]
 lint = [
-    "prek>=0.2.18",
+    "prek>=0.2.19",
 ]
 server = [
     "aio-pika>=9.5.8",

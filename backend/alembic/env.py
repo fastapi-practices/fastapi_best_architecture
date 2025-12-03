@@ -8,17 +8,9 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from backend.app import get_app_models
 from backend.common.model import MappedBase
 from backend.core import path_conf
 from backend.database.db import SQLALCHEMY_DATABASE_URL
-from backend.plugin.tools import get_plugin_models
-
-# import models
-for cls in get_app_models() + get_plugin_models():
-    class_name = cls.__name__
-    if class_name not in globals():
-        globals()[class_name] = cls
 
 if not os.path.exists(path_conf.ALEMBIC_VERSION_DIR):
     os.makedirs(path_conf.ALEMBIC_VERSION_DIR)
