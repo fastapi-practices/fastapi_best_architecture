@@ -48,7 +48,7 @@ def get_data_permission_models() -> dict[str, object]:
     return {model.__name__: model for model in get_all_models()}
 
 
-def filter_data_permission(request: Request, model: object) -> ColumnElement[bool]:  # noqa: C901
+def filter_data_permission(request: Request, *models: object) -> ColumnElement[bool]:  # noqa: C901
     """
     过滤数据权限，控制用户可见数据范围
 
@@ -56,7 +56,7 @@ def filter_data_permission(request: Request, model: object) -> ColumnElement[boo
         - 控制用户能看到哪些数据
 
     :param request: FastAPI 请求对象
-    :param model: 需要应用数据权限的模型类
+    :param models: 需要应用数据权限的模型类
     :return:
     """
     # 超级管理员不过滤
@@ -78,23 +78,25 @@ def filter_data_permission(request: Request, model: object) -> ColumnElement[boo
     if not data_rules:
         return or_(1 == 1)
 
+    # 获取目标模型
+    model_map = {model.__name__: model for model in models} if models else get_data_permission_models()
+
     where_and_list = []
     where_or_list = []
-    current_model_name = model.__name__
 
     for data_rule in data_rules:
-        # 只处理匹配当前模型的规则
-        if data_rule.model != current_model_name:
+        target_model = model_map.get(data_rule.model)
+        if not target_model:
             continue
 
         rule_column = data_rule.column
-        if rule_column not in model.__table__.columns.keys():
+        if rule_column not in target_model.__table__.columns.keys():
             continue
         if rule_column in settings.DATA_PERMISSION_COLUMN_EXCLUDE:
             continue
 
         # 构建过滤条件
-        column_obj = getattr(model, rule_column)
+        column_obj = getattr(target_model, rule_column)
         condition = None
         match data_rule.expression:
             case RoleDataRuleExpressionType.eq:
@@ -134,11 +136,11 @@ def filter_data_permission(request: Request, model: object) -> ColumnElement[boo
     return or_(*where_list) if where_list else or_(1 == 1)
 
 
-def DataPermissionFilter(model: object) -> type[ColumnElement[bool]]:  # noqa: N802
+def DataPermissionFilter(*models: object) -> type[ColumnElement[bool]]:  # noqa: N802
     """
     指定模型的数据权限过滤器
 
-    :param model: 模型类
+    :param models: 模型类（可选，支持多个）
     :return:
     """
-    return Annotated[ColumnElement[bool], Depends(partial(filter_data_permission, model=model))]
+    return Annotated[ColumnElement[bool], Depends(partial(filter_data_permission, *models))]
