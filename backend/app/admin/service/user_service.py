@@ -144,7 +144,7 @@ class UserService:
                     raise errors.NotFoundError(msg='用户不存在')
                 if pk == request.user.id:
                     raise errors.ForbiddenError(msg='禁止修改自身权限')
-                count = await user_dao.set_super(db, pk, is_super=not user.status)
+                count = await user_dao.set_super(db, pk, is_super=not user.is_superuser)
             case UserPermissionType.staff:
                 user = await user_dao.get(db, pk)
                 if not user:
