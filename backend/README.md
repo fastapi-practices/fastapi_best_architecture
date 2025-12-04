@@ -74,8 +74,6 @@
 
 - `pre_start.sh`: Perform automatic database migration
 
-- `celery-start.sh`: For celery docker script, implementation is not recommended
-
 - `scripts/format.sh`: Perform ruff format check
 
 - `scripts/lint.sh`: Perform prek formatting
