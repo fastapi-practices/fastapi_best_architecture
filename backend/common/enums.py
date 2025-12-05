@@ -136,5 +136,5 @@ class DataBaseType(StrEnum):
 class PrimaryKeyType(StrEnum):
     """主键类型"""
 
-    autoincrement = 'autoincrement'
+    auto = 'auto'
     snowflake = 'snowflake'

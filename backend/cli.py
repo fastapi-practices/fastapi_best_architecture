@@ -297,7 +297,7 @@ class Add:
     ]
     pk_type: Annotated[
         PrimaryKeyType,
-        cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
+        cappa.Arg(default='auto', help='执行插件 SQL 脚本数据库主键类型'),
     ]
 
     async def __call__(self) -> None:
