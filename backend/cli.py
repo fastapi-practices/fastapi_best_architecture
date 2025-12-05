@@ -5,12 +5,13 @@ import sys
 from dataclasses import dataclass
 from typing import Annotated, Literal
 
+import anyio
 import cappa
 import granian
 
 from cappa.output import error_format
 from rich.panel import Panel
-from rich.prompt import IntPrompt
+from rich.prompt import IntPrompt, Prompt
 from rich.table import Table
 from rich.text import Text
 from sqlalchemy import text
@@ -20,7 +21,8 @@ from backend import __version__
 from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.common.exception.errors import BaseExceptionError
 from backend.core.conf import settings
-from backend.database.db import async_db_session
+from backend.core.path_conf import BASE_PATH
+from backend.database.db import async_db_session, create_tables, drop_tables
 from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.service.business_service import gen_business_service
 from backend.plugin.code_generator.service.code_service import gen_service
@@ -37,6 +39,46 @@ class CustomReloadFilter(PythonFilter):
 
     def __init__(self) -> None:
         super().__init__(extra_extensions=['.json', '.yaml', '.yml'])
+
+
+async def init() -> None:
+    panel_content = Text()
+    panel_content.append('【数据库配置】', style='bold green')
+    panel_content.append('\n\n  • 类型: ')
+    panel_content.append(f'{settings.DATABASE_TYPE}', style='yellow')
+    panel_content.append('\n  • 数据库：')
+    panel_content.append(f'{settings.DATABASE_SCHEMA}', style='yellow')
+    plugins = get_plugins()
+    panel_content.append('\n\n【已安装插件】', style='bold green')
+    panel_content.append('\n\n  • ')
+    if plugins:
+        panel_content.append(f'{", ".join(plugins)}', style='yellow')
+    else:
+        panel_content.append('无', style='dim')
+
+    console.print(Panel(panel_content, title=f'fba v{__version__} 初始化', border_style='cyan', padding=(1, 2)))
+    ok = Prompt.ask(
+        '\n即将[red]重建数据库表[/red]并[red]执行所有 SQL 脚本[/red]，确认继续吗？', choices=['y', 'n'], default='n'
+    )
+
+    if ok.lower() == 'y':
+        console.print(Text('开始初始化...', style='white'))
+        try:
+            console.print('丢弃数据库表', style='white')
+            await drop_tables()
+            console.print('创建数据库表', style='white')
+            await create_tables()
+            console.print('执行 SQL 脚本', style='white')
+            sql_scripts = await get_sql_scripts()
+            for sql_script in sql_scripts:
+                console.print(f'正在执行：{sql_script}', style='white')
+                await execute_sql_scripts(sql_script)
+            console.print(Text('初始化成功', style='green'))
+            console.print('\n快试试 [bold cyan]fba run[/bold cyan] 启动服务吧~')
+        except Exception as e:
+            raise cappa.Exit(f'初始化失败：{e}', code=1)
+    else:
+        console.print(Text('已取消初始化', style='yellow'))
 
 
 def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT001
@@ -141,6 +183,35 @@ async def install_plugin(
 
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
+
+
+async def get_sql_scripts() -> list[str]:
+    sql_scripts = []
+
+    if DataBaseType.mysql == settings.DATABASE_TYPE:
+        db_dir = BASE_PATH / 'sql' / 'mysql'
+    else:
+        db_dir = BASE_PATH / 'sql' / 'postgresql'
+
+    use_snowflake = settings.SNOWFLAKE_DATACENTER_ID is not None and settings.SNOWFLAKE_WORKER_ID is not None
+    pk_type = PrimaryKeyType.snowflake if use_snowflake else PrimaryKeyType.autoincrement
+
+    if pk_type == PrimaryKeyType.autoincrement:
+        main_sql_file = db_dir / 'init_test_data.sql'
+    else:
+        main_sql_file = db_dir / 'init_snowflake_test_data.sql'
+
+    main_sql_path = anyio.Path(main_sql_file)
+    if await main_sql_path.exists():
+        sql_scripts.append(str(main_sql_file))
+
+    plugins = get_plugins()
+    for plugin in plugins:
+        plugin_sql = await get_plugin_sql(plugin, settings.DATABASE_TYPE, pk_type)
+        if plugin_sql:
+            sql_scripts.append(str(plugin_sql))
+
+    return sql_scripts
 
 
 async def execute_sql_scripts(sql_scripts: str) -> None:
@@ -336,6 +407,7 @@ class CodeGenerate:
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
 @dataclass
 class FbaCli:
+    init: Annotated[bool, cappa.Arg(help='初始化 fba 项目')]
     sql: Annotated[
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
@@ -343,6 +415,8 @@ class FbaCli:
     subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
 
     async def __call__(self) -> None:
+        if self.init:
+            await init()
         if self.sql:
             await execute_sql_scripts(self.sql)
 

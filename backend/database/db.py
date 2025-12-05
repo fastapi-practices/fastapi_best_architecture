@@ -91,6 +91,12 @@ async def create_tables() -> None:
         await coon.run_sync(MappedBase.metadata.create_all)
 
 
+async def drop_tables() -> None:
+    """丢弃数据库表"""
+    async with async_engine.connect() as conn:
+        await conn.run_sync(MappedBase.metadata.drop_all)
+
+
 def uuid4_str() -> str:
     """数据库引擎 UUID 类型兼容性解决方案"""
     return str(uuid4())
