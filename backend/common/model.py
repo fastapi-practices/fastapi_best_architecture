@@ -6,6 +6,7 @@ from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
 
+from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.core.conf import settings
 from backend.utils.snowflake import snowflake
 from backend.utils.timezone import timezone
@@ -23,15 +24,11 @@ id_key = Annotated[
         autoincrement=True,
         sort_order=-999,
         comment='主键 ID',
-    ),
-]
-
-
-# 雪花算法 Mapped 类型主键，使用方法与 id_key 相同
-# 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html
-snowflake_id_key = Annotated[
-    int,
-    mapped_column(
+    )
+    if PrimaryKeyType.autoincrement == settings.DATABASE_PK_MODE
+    # 雪花算法 Mapped 类型主键
+    # 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html
+    else mapped_column(
         BigInteger,
         primary_key=True,
         unique=True,
@@ -46,7 +43,7 @@ snowflake_id_key = Annotated[
 class UniversalText(TypeDecorator[str]):
     """PostgreSQL、MySQL 兼容性（长）文本类型"""
 
-    impl = LONGTEXT if settings.DATABASE_TYPE == 'mysql' else Text
+    impl = LONGTEXT if DataBaseType.mysql == settings.DATABASE_TYPE else Text
     cache_ok = True
 
     def process_bind_param(self, value: str | None, dialect) -> str | None:  # noqa: ANN001

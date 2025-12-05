@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from sqlalchemy import Row, RowMapping, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.common.enums import DataBaseType
 from backend.core.conf import settings
 
 
@@ -18,7 +19,7 @@ class CRUDGen:
         :param table_schema: 数据库 schema 名称
         :return:
         """
-        if settings.DATABASE_TYPE == 'mysql':
+        if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
             SELECT table_name AS table_name, table_comment AS table_comment
             FROM information_schema.tables
@@ -48,7 +49,7 @@ class CRUDGen:
         :param table_name: 表名
         :return:
         """
-        if settings.DATABASE_TYPE == 'mysql':
+        if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
             SELECT table_name AS table_name, table_comment AS table_comment
             FROM information_schema.tables
@@ -79,7 +80,7 @@ class CRUDGen:
         :param table_name: 表名
         :return:
         """
-        if settings.DATABASE_TYPE == 'mysql':
+        if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
             SELECT column_name AS column_name,
             CASE WHEN column_key = 'PRI' THEN 1 ELSE 0 END AS is_pk,

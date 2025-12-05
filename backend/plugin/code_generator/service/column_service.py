@@ -2,6 +2,7 @@ from collections.abc import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.common.enums import DataBaseType
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.plugin.code_generator.crud.crud_column import gen_column_dao
@@ -32,7 +33,7 @@ class GenColumnService:
     @staticmethod
     async def get_types() -> list[str]:
         """获取所有列类型"""
-        if settings.DATABASE_TYPE == 'mysql':
+        if DataBaseType.mysql == settings.DATABASE_TYPE:
             types = GenMySQLColumnType.get_member_keys()
         else:
             types = GenPostgreSQLColumnType.get_member_keys()
