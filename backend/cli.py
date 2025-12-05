@@ -185,19 +185,16 @@ async def install_plugin(
 
 async def get_sql_scripts() -> list[str]:
     sql_scripts = []
-
-    if DataBaseType.mysql == settings.DATABASE_TYPE:
-        db_dir = BASE_PATH / 'sql' / 'mysql'
-    else:
-        db_dir = BASE_PATH / 'sql' / 'postgresql'
-
-    use_snowflake = settings.SNOWFLAKE_DATACENTER_ID is not None and settings.SNOWFLAKE_WORKER_ID is not None
-    pk_type = PrimaryKeyType.snowflake if use_snowflake else PrimaryKeyType.autoincrement
-
-    if pk_type == PrimaryKeyType.autoincrement:
-        main_sql_file = db_dir / 'init_test_data.sql'
-    else:
-        main_sql_file = db_dir / 'init_snowflake_test_data.sql'
+    db_dir = (
+        BASE_PATH / 'sql' / 'mysql'
+        if DataBaseType.mysql == settings.DATABASE_TYPE
+        else BASE_PATH / 'sql' / 'postgresql'
+    )
+    main_sql_file = (
+        db_dir / 'init_test_data.sql'
+        if PrimaryKeyType.autoincrement == settings.DATABASE_PK_MODE
+        else db_dir / 'init_snowflake_test_data.sql'
+    )
 
     main_sql_path = anyio.Path(main_sql_file)
     if await main_sql_path.exists():
@@ -205,7 +202,7 @@ async def get_sql_scripts() -> list[str]:
 
     plugins = get_plugins()
     for plugin in plugins:
-        plugin_sql = await get_plugin_sql(plugin, settings.DATABASE_TYPE, pk_type)
+        plugin_sql = await get_plugin_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
         if plugin_sql:
             sql_scripts.append(str(plugin_sql))
 
