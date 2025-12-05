@@ -25,7 +25,7 @@ id_key = Annotated[
         sort_order=-999,
         comment='主键 ID',
     )
-    if PrimaryKeyType.auto == settings.DATABASE_PK_MODE
+    if PrimaryKeyType.autoincrement == settings.DATABASE_PK_MODE
     # 雪花算法 Mapped 类型主键
     # 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html
     else mapped_column(
