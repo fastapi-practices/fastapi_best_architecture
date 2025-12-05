@@ -23,13 +23,11 @@ from backend.common.exception.errors import BaseExceptionError
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session, create_tables, drop_tables
-from backend.plugin.code_generator.schema.code import ImportParam
-from backend.plugin.code_generator.service.business_service import gen_business_service
-from backend.plugin.code_generator.service.code_service import gen_service
 from backend.plugin.tools import get_plugin_sql, get_plugins
 from backend.utils._await import run_await
 from backend.utils.console import console
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
+from backend.utils.import_parse import import_module_cached
 
 output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
 
@@ -231,6 +229,9 @@ async def import_table(
     table_schema: str,
     table_name: str,
 ) -> None:
+    from backend.plugin.code_generator.schema.code import ImportParam
+    from backend.plugin.code_generator.service.code_service import gen_service
+
     try:
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
         async with async_db_session.begin() as db:
@@ -240,6 +241,9 @@ async def import_table(
 
 
 def generate() -> None:
+    from backend.plugin.code_generator.service.business_service import gen_business_service
+    from backend.plugin.code_generator.service.code_service import gen_service
+
     try:
         ids = []
         results = run_await(gen_business_service.get_all)()
@@ -391,14 +395,26 @@ class Import:
         cappa.Arg(short='tn', help='数据库表名'),
     ]
 
+    def __post_init__(self) -> None:
+        try:
+            import_module_cached('backend.plugin.code_generator')
+        except ImportError:
+            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
+
     async def __call__(self) -> None:
         await import_table(self.app, self.table_schema, self.table_name)
 
 
 @cappa.command(name='codegen', help='代码生成（体验完整功能，请自行部署 fba vben 前端工程）', default_long=True)
 @dataclass
-class CodeGenerate:
+class CodeGenerator:
     subcmd: cappa.Subcommands[Import | None] = None
+
+    def __post_init__(self) -> None:
+        try:
+            import_module_cached('backend.plugin.code_generator')
+        except ImportError:
+            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
 
     def __call__(self) -> None:
         generate()
@@ -412,7 +428,7 @@ class FbaCli:
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
-    subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerate | None] = None
+    subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerator | None] = None
 
     async def __call__(self) -> None:
         if self.init:
