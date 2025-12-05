@@ -94,7 +94,7 @@ async def create_tables() -> None:
 
 async def drop_tables() -> None:
     """丢弃数据库表"""
-    async with async_engine.connect() as conn:
+    async with async_engine.begin() as conn:
         await conn.run_sync(MappedBase.metadata.drop_all)
 
 

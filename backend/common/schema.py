@@ -3,6 +3,7 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, validate_email
 
+from backend.common.enums import PrimaryKeyType
 from backend.core.conf import settings
 from backend.utils.timezone import timezone
 
@@ -29,7 +30,7 @@ class SchemaBase(BaseModel):
         },
     )
 
-    if settings.DATABASE_PK_MODE:
+    if PrimaryKeyType.snowflake == settings.DATABASE_PK_MODE:
         from pydantic import field_serializer
 
         # 详情：https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9

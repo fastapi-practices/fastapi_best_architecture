@@ -23,6 +23,7 @@ from backend.common.exception.errors import BaseExceptionError
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session, create_tables, drop_tables
+from backend.database.redis import redis_client
 from backend.plugin.tools import get_plugin_sql, get_plugins
 from backend.utils._await import run_await
 from backend.utils.console import console
@@ -46,6 +47,18 @@ async def init() -> None:
     panel_content.append(f'{settings.DATABASE_TYPE}', style='yellow')
     panel_content.append('\n  • 数据库：')
     panel_content.append(f'{settings.DATABASE_SCHEMA}', style='yellow')
+    panel_content.append('\n  • 主键模式：')
+    panel_content.append(
+        f'{settings.DATABASE_PK_MODE}',
+        style='yellow',
+    )
+    pk_details = panel_content.from_markup(
+        '[link=https://fastapi-practices.github.io/fastapi_best_architecture_docs/backend/reference/pk.html]（了解详情）[/]'
+    )
+    panel_content.append(pk_details)
+    panel_content.append('\n\n【Redis 配置】', style='bold green')
+    panel_content.append('\n\n  • 数据库：')
+    panel_content.append(f'{settings.REDIS_DATABASE}', style='yellow')
     plugins = get_plugins()
     panel_content.append('\n\n【已安装插件】', style='bold green')
     panel_content.append('\n\n  • ')
@@ -56,27 +69,32 @@ async def init() -> None:
 
     console.print(Panel(panel_content, title=f'fba v{__version__} 初始化', border_style='cyan', padding=(1, 2)))
     ok = Prompt.ask(
-        '\n即将[red]重建数据库表[/red]并[red]执行所有 SQL 脚本[/red]，确认继续吗？', choices=['y', 'n'], default='n'
+        '即将[red]重建数据库表[/red]并[red]执行所有 SQL 脚本[/red]，确认继续吗？', choices=['y', 'n'], default='n'
     )
 
     if ok.lower() == 'y':
-        console.print(Text('开始初始化...', style='white'))
+        console.print('开始初始化...', style='white')
         try:
             console.print('丢弃数据库表', style='white')
             await drop_tables()
+            console.print('丢弃 Redis 缓存', style='white')
+            await redis_client.delete_prefix(settings.JWT_USER_REDIS_PREFIX)
+            await redis_client.delete_prefix(settings.TOKEN_EXTRA_INFO_REDIS_PREFIX)
+            await redis_client.delete_prefix(settings.TOKEN_REDIS_PREFIX)
+            await redis_client.delete_prefix(settings.TOKEN_REFRESH_REDIS_PREFIX)
             console.print('创建数据库表', style='white')
             await create_tables()
             console.print('执行 SQL 脚本', style='white')
             sql_scripts = await get_sql_scripts()
             for sql_script in sql_scripts:
                 console.print(f'正在执行：{sql_script}', style='white')
-                await execute_sql_scripts(sql_script)
-            console.print(Text('初始化成功', style='green'))
+                await execute_sql_scripts(sql_script, is_init=True)
+            console.print('初始化成功', style='green')
             console.print('\n快试试 [bold cyan]fba run[/bold cyan] 启动服务吧~')
         except Exception as e:
             raise cappa.Exit(f'初始化失败：{e}', code=1)
     else:
-        console.print(Text('已取消初始化', style='yellow'))
+        console.print('已取消初始化', style='yellow')
 
 
 def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT001
@@ -164,7 +182,7 @@ async def install_plugin(
         raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
 
     plugin_name = None
-    console.print(Text('开始安装插件...', style='bold cyan'))
+    console.print('开始安装插件...', style='bold cyan')
 
     try:
         if path:
@@ -172,11 +190,11 @@ async def install_plugin(
         if repo_url:
             plugin_name = await install_git_plugin(repo_url=repo_url)
 
-        console.print(Text(f'插件 {plugin_name} 安装成功', style='bold green'))
+        console.print(f'插件 {plugin_name} 安装成功', style='bold green')
 
         sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
         if sql_file and not no_sql:
-            console.print(Text('开始自动执行插件 SQL 脚本...', style='bold cyan'))
+            console.print('开始自动执行插件 SQL 脚本...', style='bold cyan')
             await execute_sql_scripts(sql_file)
 
     except Exception as e:
@@ -209,7 +227,7 @@ async def get_sql_scripts() -> list[str]:
     return sql_scripts
 
 
-async def execute_sql_scripts(sql_scripts: str) -> None:
+async def execute_sql_scripts(sql_scripts: str, *, is_init: bool = False) -> None:
     async with async_db_session.begin() as db:
         try:
             stmts = await parse_sql_script(sql_scripts)
@@ -218,7 +236,8 @@ async def execute_sql_scripts(sql_scripts: str) -> None:
         except Exception as e:
             raise cappa.Exit(f'SQL 脚本执行失败：{e}', code=1)
 
-    console.print(Text('SQL 脚本已执行完成', style='bold green'))
+    if not is_init:
+        console.print('SQL 脚本已执行完成', style='bold green')
 
 
 async def import_table(
@@ -270,7 +289,7 @@ def generate() -> None:
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
-    console.print(Text('\n代码已生成完毕', style='bold green'))
+    console.print('\n代码已生成完毕', style='bold green')
     console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
 
 
@@ -420,7 +439,7 @@ class CodeGenerator:
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
 @dataclass
 class FbaCli:
-    init: Annotated[bool, cappa.Arg(help='初始化 fba 项目')]
+    init: Annotated[bool, cappa.Arg(default=False, show_default=False, help='初始化 fba 项目')]
     sql: Annotated[
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
