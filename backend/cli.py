@@ -293,6 +293,13 @@ def generate() -> None:
     console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
 
 
+@cappa.command(help='初始化 fba 项目', default_long=True)
+@dataclass
+class Init:
+    async def __call__(self) -> None:
+        await init()
+
+
 @cappa.command(help='运行 API 服务', default_long=True)
 @dataclass
 class Run:
@@ -439,16 +446,13 @@ class CodeGenerator:
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
 @dataclass
 class FbaCli:
-    init: Annotated[bool, cappa.Arg(default=False, show_default=False, help='初始化 fba 项目')]
     sql: Annotated[
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
-    subcmd: cappa.Subcommands[Run | Celery | Add | CodeGenerator | None] = None
+    subcmd: cappa.Subcommands[Init | Run | Celery | Add | CodeGenerator | None] = None
 
     async def __call__(self) -> None:
-        if self.init:
-            await init()
         if self.sql:
             await execute_sql_scripts(self.sql)
 
