@@ -25,7 +25,6 @@ from backend.core.path_conf import BASE_PATH
 from backend.database.db import async_db_session, create_tables, drop_tables
 from backend.database.redis import redis_client
 from backend.plugin.tools import get_plugin_sql, get_plugins
-from backend.utils._await import run_await
 from backend.utils.console import console
 from backend.utils.file_ops import install_git_plugin, install_zip_plugin, parse_sql_script
 from backend.utils.import_parse import import_module_cached
@@ -252,17 +251,20 @@ async def import_table(
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
         async with async_db_session.begin() as db:
             await gen_service.import_business_and_model(db=db, obj=obj)
+        console.log('代码生成业务和模型列导入成功', style='bold green')
+        console.log('\n快试试 [bold cyan]fba codegen[/bold cyan] 生成代码吧~')
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
-def generate() -> None:
+async def generate() -> None:
     from backend.plugin.code_generator.service.business_service import gen_business_service
     from backend.plugin.code_generator.service.code_service import gen_service
 
     try:
         ids = []
-        results = run_await(gen_business_service.get_all)()
+        async with async_db_session() as db:
+            results = await gen_business_service.get_all(db=db)
 
         if not results:
             raise cappa.Exit('[red]暂无可用的代码生成业务！请先通过 import 命令导入！[/]')
@@ -285,12 +287,13 @@ def generate() -> None:
         console.print(table)
         business = IntPrompt.ask('请从中选择一个业务编号', choices=[str(_id) for _id in ids])
 
-        gen_path = run_await(gen_service.generate)(pk=business)
+        async with async_db_session.begin() as db:
+            gen_path = await gen_service.generate(db=db, pk=business)
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
-    console.print('\n代码已生成完毕', style='bold green')
-    console.print(Text('\n详情请查看：'), Text(gen_path, style='bold magenta'))
+    console.print('\n代码已生成完成', style='bold green')
+    console.print(Text('\n详情请查看：'), Text(str(gen_path), style='bold magenta'))
 
 
 @cappa.command(help='初始化 fba 项目', default_long=True)
@@ -439,8 +442,8 @@ class CodeGenerator:
         except ImportError:
             raise cappa.Exit('代码生成插件不存在，请先安装此插件')
 
-    def __call__(self) -> None:
-        generate()
+    async def __call__(self) -> None:
+        await generate()
 
 
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
