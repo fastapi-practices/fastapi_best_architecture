@@ -1,0 +1,68 @@
+// 接收 OTLP 数据（Traces/Logs/Metrics）
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces  = [otelcol.processor.batch.traces.input]
+    logs    = [otelcol.processor.batch.logs.input]
+    metrics = [otelcol.processor.batch.metrics.input]
+  }
+}
+
+// 批量处理器（优化网络请求）
+otelcol.processor.batch "traces" {
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+otelcol.processor.batch "logs" {
+  output {
+    logs = [otelcol.exporter.loki.default.input]  // OTLP logs → Loki 格式转换
+  }
+}
+
+otelcol.processor.batch "metrics" {
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]  // OTLP metrics → Prometheus 格式转换
+  }
+}
+
+// Traces 转发到 Tempo（修复：insecure 移到 tls 块）
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "http://tempo:4317"
+    tls {
+      insecure = true  // 修复：放在 tls 块里！生产环境配 TLS
+    }
+  }
+}
+
+// Logs 桥接：OTLP → Loki 格式（无 client 块，已正确）
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.local.receiver]
+}
+
+// Logs 写入 Loki（endpoint 已正确）
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// Metrics 桥接：OTLP → Prometheus 格式（已正确）
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.prom.receiver]
+}
+
+// Metrics 写入 Prometheus（已正确）
+prometheus.remote_write "prom" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}

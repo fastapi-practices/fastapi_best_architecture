@@ -5,6 +5,9 @@ import re
 import sys
 
 from loguru import logger
+from opentelemetry import trace
+from opentelemetry.sdk._logs import LoggingHandler
+from opentelemetry.trace import format_span_id, format_trace_id
 
 from backend.core.conf import settings
 from backend.core.path_conf import LOG_DIR
@@ -31,6 +34,16 @@ class InterceptHandler(logging.Handler):
         while frame and (depth == 0 or frame.f_code.co_filename == logging.__file__):
             frame = frame.f_back
             depth += 1
+
+        if settings.GRAFANA_METRICS:
+            logging.getLogger().addHandler(LoggingHandler())
+            current_span = trace.get_current_span()
+            if current_span:
+                span_ctx = current_span.get_span_context()
+                if span_ctx.is_valid:
+                    record.trace_id = format_trace_id(span_ctx.trace_id)
+                    record.span_id = format_span_id(span_ctx.span_id)
+                    record.trace_flags = span_ctx.trace_flags
 
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 

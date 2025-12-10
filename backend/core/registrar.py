@@ -9,6 +9,7 @@ import socketio
 from fastapi import Depends, FastAPI
 from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
+from prometheus_client import make_asgi_app
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
@@ -33,6 +34,7 @@ from backend.plugin.tools import build_final_router
 from backend.utils.demo_site import demo_site
 from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
 from backend.utils.openapi import simplify_operation_ids
+from backend.utils.otel import init_otel
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.snowflake import snowflake
 
@@ -110,6 +112,9 @@ def register_app() -> FastAPI:
     register_router(app)
     register_page(app)
     register_exception(app)
+
+    if settings.GRAFANA_METRICS:
+        register_metrics(app)
 
     return app
 
@@ -218,3 +223,16 @@ def register_socket_app(app: FastAPI) -> None:
         socketio_path='/ws/socket.io',
     )
     app.mount('/ws', socket_app)
+
+
+def register_metrics(app: FastAPI) -> None:
+    """
+    注册指标
+
+    :param app: FastAPI 应用实例
+    :return:
+    """
+    init_otel(app)
+
+    metrics_app = make_asgi_app()
+    app.mount('/metrics', metrics_app)

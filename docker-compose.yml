@@ -239,3 +239,80 @@ services:
         wait-for-it -s fba_rabbitmq:5672 -t 300
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
+
+  loki:
+    image: grafana/loki
+    restart: always
+    ports:
+      - "3100:3100"
+    container_name: fba_loki
+    networks:
+      - fba_network
+    command: -config.file=/etc/loki/local-config.yaml
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    container_name: fba_prometheus
+    depends_on:
+      - loki
+    volumes:
+      - ./deploy/backend/fba_prometheus.yaml:/workspace/fba_prometheus.yaml
+    networks:
+      - fba_network
+    command:
+      - --config.file=/workspace/fba_prometheus.yaml
+      - --enable-feature=exemplar-storage
+
+  alloy:
+    image: grafana/alloy
+    restart: always
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "12345:12345" # Alloy UI
+    container_name: fba_alloy
+    depends_on:
+      - loki
+    volumes:
+      - ./deploy/backend/fba_alloy_config.alloy:/etc/alloy/config.alloy
+    networks:
+      - fba_network
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+
+  tempo:
+    image: grafana/tempo:latest
+    restart: always
+    ports:
+      - "3200:3200"
+    expose:
+      - "4317"
+      - "4318"
+    container_name: fba_tempo
+    volumes:
+      - ./deploy/backend/fba_tempo.yaml:/etc/tempo/tempo.yaml
+    networks:
+      - fba_network
+    command:
+      - -config.file=/etc/tempo/tempo.yaml
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    container_name: fba_grafana
+    depends_on:
+      - loki
+      - prometheus
+    volumes:
+      - ./deploy/backend/fba_grafana.json:/etc/grafana/dashboards/fba_grafana.json
+      - ./deploy/backend/fba_grafana_dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./deploy/backend/fba_grafana_datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    networks:
+      - fba_network
