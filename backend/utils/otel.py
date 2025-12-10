@@ -34,13 +34,13 @@ def init_otel(app: FastAPI) -> None:
     tracer_provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(tracer_provider)
 
-    span_exporter = OTLPSpanExporter(endpoint='http://alloy:4317', insecure=True)
+    span_exporter = OTLPSpanExporter(endpoint='http://fba_alloy:4317', insecure=True)
     tracer_provider.add_span_processor(BatchSpanProcessor(span_exporter))
 
     logger_provider = LoggerProvider(resource=resource)
     set_logger_provider(logger_provider)
 
-    log_exporter = OTLPLogExporter(endpoint='http://alloy:4317', insecure=True)
+    log_exporter = OTLPLogExporter(endpoint='http://fba_alloy:4317', insecure=True)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
     LoggingInstrumentor().instrument(set_logging_format=True)

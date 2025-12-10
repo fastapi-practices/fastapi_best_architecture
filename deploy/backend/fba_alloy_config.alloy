@@ -1,68 +1,76 @@
-// 接收 OTLP 数据（Traces/Logs/Metrics）
+// 接收
 otelcol.receiver.otlp "default" {
   grpc {
     endpoint = "0.0.0.0:4317"
   }
+
   http {
     endpoint = "0.0.0.0:4318"
   }
 
   output {
-    traces  = [otelcol.processor.batch.traces.input]
-    logs    = [otelcol.processor.batch.logs.input]
-    metrics = [otelcol.processor.batch.metrics.input]
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
   }
 }
 
-// 批量处理器（优化网络请求）
-otelcol.processor.batch "traces" {
+// 处理
+otelcol.processor.batch "default" {
   output {
-    traces = [otelcol.exporter.otlp.tempo.input]
+    metrics = [otelcol.exporter.prometheus.default.input]
+    logs    = [otelcol.exporter.loki.default.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
   }
 }
 
-otelcol.processor.batch "logs" {
-  output {
-    logs = [otelcol.exporter.loki.default.input]  // OTLP logs → Loki 格式转换
+// Loki
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.loki_server.receiver]
+}
+
+loki.write "loki_server" {
+  endpoint {
+    url = "http://fba_loki:3100/loki/api/v1/push"
   }
 }
 
-otelcol.processor.batch "metrics" {
-  output {
-    metrics = [otelcol.exporter.prometheus.default.input]  // OTLP metrics → Prometheus 格式转换
+// Prometheus
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.prom_server.receiver]
+}
+
+prometheus.remote_write "prom_server" {
+  endpoint {
+    url = "http://fba_prometheus:9090/api/v1/push"
   }
 }
 
-// Traces 转发到 Tempo（修复：insecure 移到 tls 块）
+prometheus.scrape "prometheus" {
+	targets = [{
+		__address__ = "fba_prometheus:9090",
+	}]
+	forward_to      = [prometheus.remote_write.prom_server.receiver]
+	job_name        = "fba_prometheus"
+	scrape_interval = "15s"
+}
+
+prometheus.scrape "fba_server" {
+	targets = [{
+		__address__ = "fba_server:8001",
+	}]
+	forward_to      = [prometheus.remote_write.prom_server.receiver]
+	job_name        = "fba_server"
+	scrape_interval = "5s"
+}
+
+// Tempo
 otelcol.exporter.otlp "tempo" {
   client {
-    endpoint = "http://tempo:4317"
+    endpoint = "http://fba_tempo:4317"
     tls {
-      insecure = true  // 修复：放在 tls 块里！生产环境配 TLS
+        insecure             = true
+        insecure_skip_verify = true
     }
-  }
-}
-
-// Logs 桥接：OTLP → Loki 格式（无 client 块，已正确）
-otelcol.exporter.loki "default" {
-  forward_to = [loki.write.local.receiver]
-}
-
-// Logs 写入 Loki（endpoint 已正确）
-loki.write "local" {
-  endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
-  }
-}
-
-// Metrics 桥接：OTLP → Prometheus 格式（已正确）
-otelcol.exporter.prometheus "default" {
-  forward_to = [prometheus.remote_write.prom.receiver]
-}
-
-// Metrics 写入 Prometheus（已正确）
-prometheus.remote_write "prom" {
-  endpoint {
-    url = "http://prometheus:9090/api/v1/write"
   }
 }

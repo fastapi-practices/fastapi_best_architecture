@@ -89,7 +89,7 @@
         }
       ],
       "timeFrom": "24h",
-      "title": "总请求",
+      "title": "请求统计",
       "transformations": [
         {
           "id": "seriesToRows",
@@ -271,7 +271,7 @@
           "refId": "A"
         }
       ],
-      "title": "请求平均时长",
+      "title": "请求平均耗时",
       "type": "bargauge"
     },
     {
@@ -342,7 +342,7 @@
         }
       ],
       "timeFrom": "24h",
-      "title": "异常总计",
+      "title": "异常统计",
       "type": "stat"
     },
     {
@@ -440,7 +440,7 @@
           "refId": "A"
         }
       ],
-      "title": "2xx 请求的百分比",
+      "title": "2xx 请求百分比",
       "type": "timeseries"
     },
     {
@@ -538,7 +538,7 @@
           "refId": "A"
         }
       ],
-      "title": "5xx 请求的百分比",
+      "title": "5xx 请求百分比",
       "type": "timeseries"
     },
     {
@@ -635,7 +635,7 @@
           "refId": "A"
         }
       ],
-      "title": "PR 99 请求期限",
+      "title": "99% 请求耗时",
       "type": "timeseries"
     },
     {
@@ -731,7 +731,7 @@
           "refId": "A"
         }
       ],
-      "title": "请求进行中",
+      "title": "请求中",
       "type": "timeseries"
     },
     {
@@ -1022,8 +1022,8 @@
     "list": [
       {
         "current": {
-          "text": "app-a",
-          "value": "app-a"
+          "text": "fba",
+          "value": "fba"
         },
         "datasource": {
           "type": "prometheus",
@@ -1049,7 +1049,7 @@
         },
         "description": "带关键词的查询",
         "label": "日志查询",
-        "name": "log 关键词",
+        "name": "日志关键词",
         "options": [
           {
             "selected": true,
@@ -1067,7 +1067,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "Asia/Shanghai",
   "title": "FastAPI Best Architecture",
   "uid": "fba",
   "version": 1

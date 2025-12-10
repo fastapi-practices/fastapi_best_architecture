@@ -30,6 +30,8 @@ services:
       - "8001:8001"
     container_name: fba_server
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
     depends_on:
       - fba_postgres
@@ -176,6 +178,8 @@ services:
     # 如果你需要分布式部署 Worker，则必须移除此 container_name 配置
     container_name: fba_celery_worker
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - fba_rabbitmq
     volumes:
@@ -199,6 +203,8 @@ services:
     image: fba_celery_beat:latest
     container_name: fba_celery_beat
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - fba_rabbitmq
       - fba_celery_worker
@@ -225,6 +231,8 @@ services:
       - "8555:8555"
     container_name: fba_celery_flower
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - fba_rabbitmq
       - fba_celery_worker
@@ -240,7 +248,7 @@ services:
         supervisord -c /etc/supervisor/supervisord.conf
         supervisorctl restart
 
-  loki:
+  fba_loki:
     image: grafana/loki
     restart: always
     ports:
@@ -250,32 +258,32 @@ services:
       - fba_network
     command: -config.file=/etc/loki/local-config.yaml
 
-  prometheus:
+  fba_prometheus:
     image: prom/prometheus
     restart: always
     ports:
       - "9090:9090"
     container_name: fba_prometheus
     depends_on:
-      - loki
+      - fba_loki
     volumes:
-      - ./deploy/backend/fba_prometheus.yaml:/workspace/fba_prometheus.yaml
+      - ./deploy/backend/fba_prometheus.yml:/workspace/fba_prometheus.yml
     networks:
       - fba_network
     command:
-      - --config.file=/workspace/fba_prometheus.yaml
+      - --config.file=/workspace/fba_prometheus.yml
       - --enable-feature=exemplar-storage
 
-  alloy:
+  fba_alloy:
     image: grafana/alloy
     restart: always
     ports:
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP
-      - "12345:12345" # Alloy UI
+      - "4317:4317"
+      - "4318:4318"
+      - "12345:12345"
     container_name: fba_alloy
     depends_on:
-      - loki
+      - fba_loki
     volumes:
       - ./deploy/backend/fba_alloy_config.alloy:/etc/alloy/config.alloy
     networks:
@@ -285,34 +293,36 @@ services:
       - /etc/alloy/config.alloy
       - --server.http.listen-addr=0.0.0.0:12345
 
-  tempo:
+  fba_tempo:
     image: grafana/tempo:latest
     restart: always
     ports:
       - "3200:3200"
     expose:
       - "4317"
-      - "4318"
     container_name: fba_tempo
+    depends_on:
+      - fba_loki
     volumes:
-      - ./deploy/backend/fba_tempo.yaml:/etc/tempo/tempo.yaml
+      - ./deploy/backend/fba_tempo.yml:/etc/tempo/tempo.yml
     networks:
       - fba_network
     command:
-      - -config.file=/etc/tempo/tempo.yaml
+      - -config.file=/etc/tempo/tempo.yml
+      - -auth.enabled=false
 
-  grafana:
+  fba_grafana:
     image: grafana/grafana
     restart: always
     ports:
       - "3000:3000"
     container_name: fba_grafana
     depends_on:
-      - loki
-      - prometheus
+      - fba_loki
+      - fba_prometheus
     volumes:
       - ./deploy/backend/fba_grafana.json:/etc/grafana/dashboards/fba_grafana.json
-      - ./deploy/backend/fba_grafana_dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
-      - ./deploy/backend/fba_grafana_datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./deploy/backend/fba_grafana_dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./deploy/backend/fba_grafana_datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     networks:
       - fba_network

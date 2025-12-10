@@ -1,5 +1,4 @@
-server:
-  http_listen_port: 3200
+target: all
 
 distributor:
   receivers:
@@ -12,4 +11,4 @@ storage:
   trace:
     backend: local
     local:
-      path: /tmp/tempo/traces
+      path: /tmp/tempo
