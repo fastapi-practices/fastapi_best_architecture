@@ -963,7 +963,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by(type) (rate({compose_service=~\"app-.*\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] - <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
+          "expr": "sum by(type) (rate({container=\"fba_server\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
           "legendFormat": "{{type}}",
           "refId": "A"
         }
@@ -1005,7 +1005,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{compose_service=~\"app-.*\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] - <msg>` | line_format \"{{.compose_service}}\\t{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
+          "expr": "{container=\"fba_server\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
           "hide": false,
           "refId": "A"
         }
@@ -1032,7 +1032,7 @@
         "definition": "label_values(fba_app_info{}, app_name)",
         "includeAll": false,
         "label": "应用名称",
-        "name": "应用名称",
+        "name": "app_name",
         "options": [],
         "query": {
           "query": "label_values(fba_app_info{}, app_name)",
@@ -1049,7 +1049,7 @@
         },
         "description": "带关键词的查询",
         "label": "日志查询",
-        "name": "日志关键词",
+        "name": "log_keyword",
         "options": [
           {
             "selected": true,

@@ -9,8 +9,8 @@ otelcol.receiver.otlp "default" {
   }
 
   output {
-    metrics = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]
+    metrics = [otelcol.processor.batch.default.input]
     traces  = [otelcol.processor.batch.default.input]
   }
 }
@@ -18,8 +18,8 @@ otelcol.receiver.otlp "default" {
 // 处理
 otelcol.processor.batch "default" {
   output {
-    metrics = [otelcol.exporter.prometheus.default.input]
     logs    = [otelcol.exporter.loki.default.input]
+    metrics = [otelcol.exporter.prometheus.default.input]
     traces  = [otelcol.exporter.otlp.tempo.input]
   }
 }
@@ -42,7 +42,7 @@ otelcol.exporter.prometheus "default" {
 
 prometheus.remote_write "prom_server" {
   endpoint {
-    url = "http://fba_prometheus:9090/api/v1/push"
+    url = "http://fba_prometheus:9090/api/v1/write"
   }
 }
 
@@ -62,6 +62,7 @@ prometheus.scrape "fba_server" {
 	forward_to      = [prometheus.remote_write.prom_server.receiver]
 	job_name        = "fba_server"
 	scrape_interval = "5s"
+	scrape_timeout  = "5s"
 }
 
 // Tempo
