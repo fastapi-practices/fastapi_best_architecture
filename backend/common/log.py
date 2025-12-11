@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sys
+from typing import Any
 
 from loguru import logger
 
@@ -35,7 +36,7 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def default_formatter(record: logging.LogRecord) -> str:
+def default_formatter(record: logging.LogRecord) -> dict[str, Any]:
     """默认日志格式化程序"""
 
     # 重写 sqlalchemy echo 输出
