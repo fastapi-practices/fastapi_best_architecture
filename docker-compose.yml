@@ -325,6 +325,7 @@ services:
       - fba_loki
       - fba_prometheus
     volumes:
+      - ./deploy/backend/metrics/fba_grafana.ini:/etc/grafana/grafana.ini
       - ./deploy/backend/metrics/fba_grafana.json:/etc/grafana/dashboards/fba_grafana.json
       - ./deploy/backend/metrics/fba_grafana_dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
       - ./deploy/backend/metrics/fba_grafana_datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml

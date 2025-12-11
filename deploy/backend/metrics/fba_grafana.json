@@ -963,7 +963,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by(type) (rate({container=\"fba_server\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
+          "expr": "sum by(type) (rate({service_name=~\"fba_*\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
           "legendFormat": "{{type}}",
           "refId": "A"
         }
@@ -1005,7 +1005,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{container=\"fba_server\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
+          "expr": "{service_name=~\"fba_*\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
           "hide": false,
           "refId": "A"
         }
