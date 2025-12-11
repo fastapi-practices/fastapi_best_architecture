@@ -222,7 +222,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -265,7 +265,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\"} / fba_request_cost_time_count{app_name=\"$app_name\"}",
+          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\"} / fba_request_cost_time_count{app_name=\"$app_name\"} * 1000",
           "interval": "",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
@@ -597,7 +597,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -963,7 +963,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by(type) (rate({container=\"fba_server\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
+          "expr": "sum by(type) (rate({container=\"fba_server\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
           "legendFormat": "{{type}}",
           "refId": "A"
         }
@@ -1005,7 +1005,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{container=\"fba_server\"} | pattern `<date> <time> <type> <logger> <code> [<_>=<trace_id> <_>=<span_id> <_>=<service_name>] | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
+          "expr": "{container=\"fba_server\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
           "hide": false,
           "refId": "A"
         }

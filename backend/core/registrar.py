@@ -13,7 +13,6 @@ from prometheus_client import make_asgi_app
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from starlette.types import ASGIApp
 from starlette_context.middleware import ContextMiddleware
 from starlette_context.plugins import RequestIdPlugin
 
@@ -37,6 +36,7 @@ from backend.utils.openapi import simplify_operation_ids
 from backend.utils.otel import init_otel
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.snowflake import snowflake
+from backend.utils.trace_id import OtelTraceIdPlugin
 
 
 @asynccontextmanager
@@ -78,22 +78,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 def register_app() -> FastAPI:
     """注册 FastAPI 应用"""
 
-    class MyFastAPI(FastAPI):
-        if settings.MIDDLEWARE_CORS:
-            # Related issues
-            # https://github.com/fastapi/fastapi/discussions/7847
-            # https://github.com/fastapi/fastapi/discussions/8027
-            def build_middleware_stack(self) -> ASGIApp:
-                return CORSMiddleware(
-                    super().build_middleware_stack(),
-                    allow_origins=settings.CORS_ALLOWED_ORIGINS,
-                    allow_credentials=True,
-                    allow_methods=['*'],
-                    allow_headers=['*'],
-                    expose_headers=settings.CORS_EXPOSE_HEADERS,
-                )
-
-    app = MyFastAPI(
+    app = FastAPI(
         title=settings.FASTAPI_TITLE,
         version=__version__,
         description=settings.FASTAPI_DESCRIPTION,
@@ -169,14 +154,26 @@ def register_middleware(app: FastAPI) -> None:
     app.add_middleware(AccessMiddleware)
 
     # ContextVar
+    plugins = [OtelTraceIdPlugin()] if settings.GRAFANA_METRICS else [RequestIdPlugin(validate=True)]
     app.add_middleware(
         ContextMiddleware,
-        plugins=[RequestIdPlugin(validate=True)],
+        plugins=plugins,
         default_error_response=MsgSpecJSONResponse(
             content={'code': StandardResponseCode.HTTP_400, 'msg': 'BAD_REQUEST', 'data': None},
             status_code=StandardResponseCode.HTTP_400,
         ),
     )
+
+    # CORS (should be last, so it's first to process requests)
+    if settings.MIDDLEWARE_CORS:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.CORS_ALLOWED_ORIGINS,
+            allow_credentials=True,
+            allow_methods=['*'],
+            allow_headers=['*'],
+            expose_headers=settings.CORS_EXPOSE_HEADERS,
+        )
 
 
 def register_router(app: FastAPI) -> None:

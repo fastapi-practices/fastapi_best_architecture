@@ -43,5 +43,5 @@ def init_otel(app: FastAPI) -> None:
     log_exporter = OTLPLogExporter(endpoint='http://fba_alloy:4317', insecure=True)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
-    LoggingInstrumentor().instrument(set_logging_format=True)
+    LoggingInstrumentor().instrument(set_logging_format=False)
     FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
