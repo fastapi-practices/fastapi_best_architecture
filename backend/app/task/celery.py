@@ -3,9 +3,6 @@ import os
 import celery
 import celery_aio_pool
 
-from celery.signals import worker_process_init
-from opentelemetry.instrumentation.celery import CeleryInstrumentor
-
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.common.enums import DataBaseType
 from backend.core.conf import settings
@@ -66,13 +63,6 @@ def init_celery() -> celery.Celery:
     app.autodiscover_tasks(packages)
 
     return app
-
-
-if settings.GRAFANA_METRICS:
-
-    @worker_process_init.connect(weak=False)
-    def init_celery_tracing(*args, **kwargs) -> None:
-        CeleryInstrumentor().instrument()
 
 
 # 创建 Celery 实例

@@ -65,6 +65,16 @@ prometheus.scrape "fba_server" {
 	scrape_timeout  = "5s"
 }
 
+prometheus.scrape "fba_celery_exporter" {
+	targets = [{
+		__address__ = "fba_celery_exporter:9808",
+	}]
+	forward_to      = [prometheus.remote_write.prom_server.receiver]
+	job_name        = "fba_celery_exporter"
+	scrape_interval = "5s"
+	scrape_timeout  = "5s"
+}
+
 // Tempo
 otelcol.exporter.otlp "tempo" {
   client {

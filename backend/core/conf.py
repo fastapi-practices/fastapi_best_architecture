@@ -217,6 +217,7 @@ class Settings(BaseSettings):
 
     # Grafana
     GRAFANA_METRICS: bool = True
+    GRAFANA_OTLP_EXPORTER_ENDPOINT: str = 'http://fba_alloy:4317'
 
     ##################################################
     # [ App ] task

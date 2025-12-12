@@ -80,7 +80,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_total{app_name=\"fba\", path!=\"/metrics\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -162,7 +162,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"}",
+          "expr": "fba_request_total{app_name=\"fba\", path!=\"/metrics\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "{{method}} {{path}}",
@@ -265,7 +265,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\"} / fba_request_cost_time_count{app_name=\"$app_name\"}",
+          "expr": "fba_request_cost_time_sum{app_name=\"fba\"} / fba_request_cost_time_count{app_name=\"fba\"}",
           "interval": "",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
@@ -333,7 +333,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(fba_exception_total{app_name=\"$app_name\"})",
+          "expr": "sum(fba_exception_total{app_name=\"fba\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -434,7 +434,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "sum by(path) (fba_response_total{app_name=\"$app_name\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -532,7 +532,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "sum by(path) (fba_response_total{app_name=\"$app_name\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -629,7 +629,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "histogram_quantile(.99,sum(rate(fba_request_cost_time_bucket{app_name=\"$app_name\", path!=\"/metrics\"}[1m])) by(path, le))",
+          "expr": "histogram_quantile(.99,sum(rate(fba_request_cost_time_bucket{app_name=\"fba\", path!=\"/metrics\"}[1m])) by(path, le))",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -725,7 +725,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "fba_request_in_progress{app_name=\"$app_name\", path!=\"/metrics\"}",
+          "expr": "fba_request_in_progress{app_name=\"fba\", path!=\"/metrics\"}",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -822,7 +822,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "rate(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"}[1m])",
+          "expr": "rate(fba_request_total{app_name=\"fba\", path!=\"/metrics\"}[1m])",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -1052,28 +1052,6 @@
     "list": [
       {
         "current": {
-          "text": "fba",
-          "value": "fba"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(fba_app_info{}, app_name)",
-        "includeAll": false,
-        "label": "应用名称",
-        "name": "app_name",
-        "options": [],
-        "query": {
-          "query": "label_values(fba_app_info{}, app_name)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "type": "query"
-      },
-      {
-        "current": {
           "text": "",
           "value": ""
         },
@@ -1097,7 +1075,6 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "Asia/Shanghai",
   "title": "FastAPI Best Architecture",
   "uid": "fba",
   "version": 1
