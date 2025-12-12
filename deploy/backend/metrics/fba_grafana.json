@@ -265,7 +265,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\"} / fba_request_cost_time_count{app_name=\"$app_name\"} * 1000",
+          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\"} / fba_request_cost_time_count{app_name=\"$app_name\"}",
           "interval": "",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
@@ -822,7 +822,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "rate(fba_request_total{app_name=\"$app_name\"}[1m])",
+          "expr": "rate(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"}[1m])",
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -922,6 +922,36 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "WARNING"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEBUG"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "CRITICAL"
             },
             "properties": [
@@ -963,8 +993,8 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by(type) (rate({service_name=~\"fba_*\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
-          "legendFormat": "{{type}}",
+          "expr": "sum by(level) (rate({service_name=~\"fba.*\"} | json | level != \"\" |= \"$log_keyword\" [1m]))",
+          "legendFormat": "{{level}}",
           "refId": "A"
         }
       ],
@@ -1005,7 +1035,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{service_name=~\"fba_*\"} | pattern `<date> <time> | <type> | <trace_id> | <msg>` | line_format \"{{.type}}\\t trace_id={{.trace_id}}\\t {{.msg}}\" |= \"$log_keyword\"",
+          "expr": "{service_name=~\"fba.*\"} | json | line_format \"{{.body}}\" |= \"$log_keyword\"",
           "hide": false,
           "refId": "A"
         }
