@@ -1,6 +1,4 @@
-# https://grafana.com/docs/grafana/latest/datasources/
 apiVersion: 1
-
 datasources:
   - name: Loki
     uid: loki
@@ -10,9 +8,11 @@ datasources:
     jsonData:
       derivedFields:
         - datasourceUid: tempo
-          matcherRegex: (?:trace_id)=(\w+)
+          matcherRegex: (?:trace_id|traceid)["\s:=]+([a-f0-9]{32})
+          matcherType: regex
           name: TraceID
           url: $${__value.raw}
+          urlDisplayLabel: 查看 Trace
 
   - name: Prometheus
     uid: prometheus

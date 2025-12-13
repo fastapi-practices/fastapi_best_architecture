@@ -28,7 +28,7 @@
       "keepTime": true,
       "tags": [
         "fastapi",
-        "fba"
+        "fba_server"
       ],
       "targetBlank": true,
       "title": "FastAPI 监控",
@@ -60,11 +60,11 @@
             {
               "options": {
                 "0": {
-                  "color": "red",
+                  "color": "#e74c3c",
                   "text": "离线"
                 },
                 "1": {
-                  "color": "green",
+                  "color": "#27ae60",
                   "text": "在线"
                 }
               },
@@ -75,11 +75,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "#C0392B",
                 "value": null
               },
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": 1
               }
             ]
@@ -135,7 +135,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
+            "fixedColor": "#27AE60",
             "mode": "fixed"
           },
           "mappings": [],
@@ -143,7 +143,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#27AE60",
                 "value": null
               }
             ]
@@ -199,7 +199,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
+            "fixedColor": "#D68910",
             "mode": "fixed"
           },
           "mappings": [],
@@ -207,7 +207,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#D68910",
                 "value": null
               }
             ]
@@ -263,7 +263,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
+            "fixedColor": "#52BE80",
             "mode": "fixed"
           },
           "decimals": 2,
@@ -274,7 +274,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#52BE80",
                 "value": null
               }
             ]
@@ -337,15 +337,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27ae60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#f39c12",
                 "value": 50
               },
               {
-                "color": "red",
+                "color": "#e74c3c",
                 "value": 100
               }
             ]
@@ -484,7 +484,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#3498db",
                 "value": null
               }
             ]
@@ -1050,7 +1050,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#27ae60",
                   "mode": "fixed"
                 }
               }
@@ -1065,7 +1065,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "#e74c3c",
                   "mode": "fixed"
                 }
               }
@@ -1080,7 +1080,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#f39c12",
                   "mode": "fixed"
                 }
               }
@@ -1102,7 +1102,7 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1228,7 +1228,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "purple",
+                  "fixedColor": "#9b59b6",
                   "mode": "fixed"
                 }
               }
@@ -1243,7 +1243,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "yellow",
+                  "fixedColor": "#f39c12",
                   "mode": "fixed"
                 }
               }
@@ -1265,7 +1265,7 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1434,7 +1434,7 @@
       "options": {
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "values": [
             "value",
@@ -1502,7 +1502,7 @@
       "options": {
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "values": [
             "value",
@@ -1599,15 +1599,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27ae60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#f39c12",
                 "value": 50
               },
               {
-                "color": "red",
+                "color": "#e74c3c",
                 "value": 100
               }
             ]
@@ -1631,7 +1631,7 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1729,7 +1729,7 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1837,7 +1837,7 @@
             "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1947,7 +1947,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#27ae60",
                   "mode": "fixed"
                 }
               }
@@ -1962,7 +1962,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "#e74c3c",
                   "mode": "fixed"
                 }
               }
@@ -1984,7 +1984,7 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -2024,8 +2024,7 @@
   "schemaVersion": 41,
   "tags": [
     "celery",
-    "fba",
-    "tasks"
+    "fba_celery"
   ],
   "templating": {
     "list": []
@@ -2034,30 +2033,7 @@
     "from": "now-1h",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d"
-    ]
-  },
-  "timezone": "browser",
   "title": "FastAPI Best Architecture Celery",
-  "uid": "fba-celery",
+  "uid": "fba_celery",
   "version": 1
 }

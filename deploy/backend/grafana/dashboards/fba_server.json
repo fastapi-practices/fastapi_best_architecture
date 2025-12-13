@@ -63,15 +63,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#27AE60",
                 "value": null
               },
               {
-                "color": "green",
+                "color": "#1E8449",
                 "value": 100
               },
               {
-                "color": "yellow",
+                "color": "#186A3B",
                 "value": 10000
               }
             ]
@@ -111,7 +111,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_total{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -138,15 +138,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#1E8449",
                 "value": 50
               },
               {
-                "color": "red",
+                "color": "#186A3B",
                 "value": 100
               }
             ]
@@ -186,7 +186,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(fba_request_total{app_name=\"fba\", path!=\"/metrics\"}[5m]))",
+          "expr": "sum(rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m]))",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -214,15 +214,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "#C0392B",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#D68910",
                 "value": 0.9
               },
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": 0.95
               }
             ]
@@ -262,7 +262,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_response_total{app_name=\"fba\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum(fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -287,15 +287,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#D68910",
                 "value": 10
               },
               {
-                "color": "red",
+                "color": "#C0392B",
                 "value": 50
               }
             ]
@@ -335,7 +335,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_exception_total{app_name=\"fba\"}) or vector(0)",
+          "expr": "sum(fba_exception_total{app_name=\"fba_server\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -362,15 +362,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#D68910",
                 "value": 100
               },
               {
-                "color": "red",
+                "color": "#C0392B",
                 "value": 500
               }
             ]
@@ -410,7 +410,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_cost_time_sum{app_name=\"fba\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "",
           "refId": "A"
         }
@@ -434,15 +434,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#27AE60",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#D68910",
                 "value": 10
               },
               {
-                "color": "red",
+                "color": "#C0392B",
                 "value": 50
               }
             ]
@@ -482,7 +482,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_in_progress{app_name=\"fba\", path!=\"/metrics\"}) or vector(0)",
+          "expr": "sum(fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -562,7 +562,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 0,
         "y": 6
@@ -575,8 +575,9 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "placement": "bottom",
+          "showLegend": true,
+          "width": 300
         },
         "tooltip": {
           "hideZeros": true,
@@ -592,7 +593,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(fba_request_total{app_name=\"fba\", path!=\"/metrics\"}[5m])",
+          "expr": "rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m])",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -659,7 +660,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 12,
         "y": 6
@@ -672,8 +673,9 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "placement": "bottom",
+          "showLegend": true,
+          "width": 300
         },
         "tooltip": {
           "hideZeros": true,
@@ -689,7 +691,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_in_progress{app_name=\"fba\", path!=\"/metrics\"}",
+          "expr": "fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -703,7 +705,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 16
       },
       "id": 102,
       "title": "⏱️ 响应时间",
@@ -746,7 +748,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 15
+        "y": 17
       },
       "id": 20,
       "options": {
@@ -781,7 +783,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_cost_time_sum{app_name=\"fba\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"fba\", path!=\"/metrics\"}",
+          "expr": "fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"}",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -859,7 +861,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 15
+        "y": 17
       },
       "id": 21,
       "options": {
@@ -886,7 +888,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"fba\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -964,7 +966,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 15
+        "y": 17
       },
       "id": 22,
       "options": {
@@ -991,7 +993,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"fba\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1005,7 +1007,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 25
       },
       "id": 103,
       "title": "✅ 响应状态",
@@ -1083,7 +1085,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 24
+        "y": 26
       },
       "id": 30,
       "options": {
@@ -1110,7 +1112,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1190,7 +1192,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 24
+        "y": 26
       },
       "id": 31,
       "options": {
@@ -1217,7 +1219,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1251,13 +1253,13 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 24
+        "y": 26
       },
       "id": 32,
       "options": {
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "values": [
             "value",
@@ -1285,7 +1287,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_request_total{app_name=\"fba\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1299,7 +1301,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 34
       },
       "id": 104,
       "title": "🔍 链路追踪",
@@ -1310,7 +1312,7 @@
         "type": "tempo",
         "uid": "tempo"
       },
-      "description": "FastAPI 服务的分布式追踪数据，可以查看请求的完整调用链路和耗时分布。如果无数据，请确认 OpenTelemetry 已正确配置并有请求产生",
+      "description": "FastAPI 服务的分布式追踪数据，可以查看请求的完整调用链路和耗时分布。",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -1319,7 +1321,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 35
       },
       "id": 40,
       "options": {},
@@ -1331,7 +1333,7 @@
             "uid": "tempo"
           },
           "queryType": "traceql",
-          "query": "{}",
+          "query": "{ .service.name = \"fba_server\" && .http.method exists() && .http.target !~ \".*/metrics.*\" }",
           "limit": 30,
           "refId": "A"
         }
@@ -1345,7 +1347,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 45
       },
       "id": 105,
       "title": "📝 应用日志",
@@ -1416,7 +1418,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "#85C1E9",
                   "mode": "fixed"
                 }
               }
@@ -1431,7 +1433,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#52BE80",
                   "mode": "fixed"
                 }
               }
@@ -1446,7 +1448,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "yellow",
+                  "fixedColor": "#F39C12",
                   "mode": "fixed"
                 }
               }
@@ -1461,7 +1463,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "#E74C3C",
                   "mode": "fixed"
                 }
               }
@@ -1476,7 +1478,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "purple",
+                  "fixedColor": "#8E44AD",
                   "mode": "fixed"
                 }
               }
@@ -1488,7 +1490,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 44
+        "y": 46
       },
       "id": 50,
       "options": {
@@ -1514,7 +1516,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by(level) (rate({service_name=~\"fba.*\"} | json | level != \"\" |= \"$log_keyword\" [1m]))",
+          "expr": "(rate({service_name=\"fba_server\"} |= \"$log_keyword\" [1m]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
@@ -1536,7 +1538,7 @@
         "h": 12,
         "w": 16,
         "x": 8,
-        "y": 44
+        "y": 46
       },
       "id": 51,
       "options": {
@@ -1558,7 +1560,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=~\"fba.*\"} | json | line_format \"{{.body}}\" |= \"$log_keyword\"",
+          "expr": "{service_name=\"fba_server\"} | json | line_format \"{{.body}}\" |= \"$log_keyword\"",
           "refId": "A"
         }
       ],
@@ -1579,7 +1581,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 52
+        "y": 54
       },
       "id": 52,
       "options": {
@@ -1601,7 +1603,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=~\"fba.*\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\"",
+          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\"",
           "refId": "A"
         }
       ],
@@ -1614,8 +1616,7 @@
   "schemaVersion": 41,
   "tags": [
     "fastapi",
-    "fba",
-    "api"
+    "fba_server"
   ],
   "templating": {
     "list": [
@@ -1643,30 +1644,7 @@
     "from": "now-15m",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d"
-    ]
-  },
-  "timezone": "browser",
   "title": "FastAPI Best Architecture",
-  "uid": "fba",
+  "uid": "fba_server",
   "version": 1
 }

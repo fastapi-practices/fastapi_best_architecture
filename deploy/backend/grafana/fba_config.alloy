@@ -78,7 +78,7 @@ prometheus.scrape "fba_celery_exporter" {
 // Tempo
 otelcol.exporter.otlp "tempo" {
   client {
-    endpoint = "http://fba_tempo:4317"
+    endpoint = "fba_tempo:4317"
     tls {
         insecure             = true
         insecure_skip_verify = true

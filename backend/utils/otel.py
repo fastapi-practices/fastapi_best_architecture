@@ -27,7 +27,7 @@ def init_otel(app: FastAPI) -> None:
 
     resource = Resource(
         attributes={
-            'service.name': settings.FASTAPI_TITLE,
+            'service.name': 'fba_server',
             'service.version': __version__,
             'deployment.environment': settings.ENVIRONMENT,
         },
@@ -36,13 +36,13 @@ def init_otel(app: FastAPI) -> None:
     tracer_provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(tracer_provider)
 
-    span_exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_EXPORTER_ENDPOINT, insecure=True)
+    span_exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
     tracer_provider.add_span_processor(BatchSpanProcessor(span_exporter))
 
     logger_provider = LoggerProvider(resource=resource)
     set_logger_provider(logger_provider)
 
-    log_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_EXPORTER_ENDPOINT, insecure=True)
+    log_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
     LoggingInstrumentor().instrument(set_logging_format=True)
