@@ -3,9 +3,8 @@ apiVersion: 1
 providers:
   - name: 'fba'
     orgId: 1
-    folder: ''
     type: 'file'
     disableDeletion: true
-    editable: true
+    editable: false
     options:
       path: '/etc/grafana/dashboards'

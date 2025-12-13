@@ -37,7 +37,6 @@ dependencies = [
     "loguru>=0.7.3",
     "msgspec>=0.20.0",
     "opentelemetry-exporter-otlp-proto-grpc>=1.39.0",
-    "opentelemetry-instrumentation-celery>=0.60b0",
     "opentelemetry-instrumentation-fastapi>=0.60b0",
     "opentelemetry-instrumentation-logging>=0.60b0",
     "opentelemetry-sdk>=1.39.0",

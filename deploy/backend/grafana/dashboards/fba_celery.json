@@ -15,11 +15,26 @@
       }
     ]
   },
+  "description": "Celery 分布式任务队列监控仪表盘 - 实时监控 Worker 状态、任务执行情况、队列长度和性能指标",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [
+        "fastapi",
+        "fba"
+      ],
+      "targetBlank": true,
+      "title": "FastAPI 监控",
+      "type": "dashboards"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -30,7 +45,7 @@
         "y": 0
       },
       "id": 100,
-      "title": "Worker 概览",
+      "title": "🖥️ Worker 概览",
       "type": "row"
     },
     {
@@ -38,6 +53,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "显示每个 Celery Worker 的运行状态。绿色表示在线，红色表示离线",
       "fieldConfig": {
         "defaults": {
           "mappings": [
@@ -59,7 +75,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "green",
@@ -79,7 +96,7 @@
       },
       "id": 1,
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
@@ -100,12 +117,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "editorMode": "code",
           "expr": "celery_worker_up{job=\"fba_celery_exporter\"}",
           "legendFormat": "{{hostname}}",
           "refId": "A"
         }
       ],
-      "title": "Worker 启动状态",
+      "title": "Worker 状态",
       "type": "stat"
     },
     {
@@ -113,25 +131,20 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "当前在线的 Worker 数量",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "fixedColor": "blue",
+            "mode": "fixed"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "green",
-                "value": 2
+                "color": "blue",
+                "value": null
               }
             ]
           },
@@ -147,8 +160,8 @@
       },
       "id": 2,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -168,12 +181,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "count(celery_worker_up{job=\"fba_celery_exporter\"} == 1)",
+          "editorMode": "code",
+          "expr": "count(celery_worker_up{job=\"fba_celery_exporter\"} == 1) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "活动 Worker 数量",
+      "title": "在线 Worker",
       "type": "stat"
     },
     {
@@ -181,21 +195,20 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "当前正在执行的任务数量",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "fixedColor": "blue",
+            "mode": "fixed"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue"
-              },
-              {
-                "color": "green",
-                "value": 1
+                "color": "blue",
+                "value": null
               }
             ]
           },
@@ -211,8 +224,8 @@
       },
       "id": 3,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -232,12 +245,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_worker_tasks_active{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_worker_tasks_active{job=\"fba_celery_exporter\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "活动任务数量",
+      "title": "执行中任务",
       "type": "stat"
     },
     {
@@ -245,17 +259,94 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "任务成功率 = 成功任务数 / (成功 + 失败)",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto"
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"}) / (sum(celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"}) + sum(celery_task_failed_total{job=\"fba_celery_exporter\", name!=\"None\"}) + 0.001)",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "任务成功率",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "各队列中等待处理的任务数量",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
               }
             ]
           },
@@ -265,15 +356,15 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 12,
+        "w": 4,
+        "x": 16,
         "y": 1
       },
-      "id": 4,
+      "id": 5,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background_solid",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -292,6 +383,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "editorMode": "code",
           "expr": "celery_queue_length{job=\"fba_celery_exporter\"}",
           "legendFormat": "{{queue_name}}",
           "refId": "A"
@@ -305,6 +397,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "各 Worker 当前处理的任务数量分布",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -323,18 +416,18 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 18,
+        "w": 4,
+        "x": 20,
         "y": 1
       },
-      "id": 5,
+      "id": 6,
       "options": {
         "legend": {
           "displayMode": "list",
           "placement": "right",
           "showLegend": true
         },
-        "pieType": "pie",
+        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -354,12 +447,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "celery_worker_tasks_active{job=\"fba_celery_exporter\"}",
+          "editorMode": "code",
+          "expr": "celery_worker_tasks_active{job=\"fba_celery_exporter\"} >= 0",
           "legendFormat": "{{hostname}}",
           "refId": "A"
         }
       ],
-      "title": "Worker 任务分布",
+      "title": "Worker 负载分布",
       "type": "piechart"
     },
     {
@@ -371,7 +465,7 @@
         "y": 5
       },
       "id": 101,
-      "title": "任务统计",
+      "title": "📊 任务统计",
       "type": "row"
     },
     {
@@ -379,6 +473,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "已发送到队列的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -389,7 +484,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "blue",
+                "value": null
               }
             ]
           },
@@ -398,15 +494,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 0,
         "y": 6
       },
       "id": 10,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -426,12 +522,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_sent_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_sent_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "已发送任务",
+      "title": "已发送",
       "type": "stat"
     },
     {
@@ -439,6 +536,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "Worker 已接收的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -449,7 +547,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue"
+                "color": "super-light-blue",
+                "value": null
               }
             ]
           },
@@ -458,15 +557,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 3,
         "y": 6
       },
       "id": 11,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -486,12 +585,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_received_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_received_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "已接收任务",
+      "title": "已接收",
       "type": "stat"
     },
     {
@@ -499,6 +599,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "已开始执行的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -509,7 +610,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "yellow"
+                "color": "light-blue",
+                "value": null
               }
             ]
           },
@@ -518,15 +620,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 6,
         "y": 6
       },
       "id": 12,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -546,12 +648,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_started_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_started_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "开始任务",
+      "title": "已开始",
       "type": "stat"
     },
     {
@@ -559,6 +662,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "执行成功的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -569,7 +673,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -578,15 +683,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 9,
         "y": 6
       },
       "id": 13,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -606,12 +711,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_succeeded_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "成功任务",
+      "title": "成功",
       "type": "stat"
     },
     {
@@ -619,6 +725,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "执行失败的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -629,7 +736,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               }
             ]
           },
@@ -638,15 +746,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 12,
         "y": 6
       },
       "id": 14,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -666,12 +774,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_failed_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_failed_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "失败任务",
+      "title": "失败",
       "type": "stat"
     },
     {
@@ -679,6 +788,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "重试的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -689,7 +799,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "orange"
+                "color": "orange",
+                "value": null
               }
             ]
           },
@@ -698,15 +809,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 15,
         "y": 6
       },
       "id": 15,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -726,12 +837,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_retried_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_retried_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "重试任务",
+      "title": "重试",
       "type": "stat"
     },
     {
@@ -739,6 +851,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "被撤销的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -749,7 +862,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "purple"
+                "color": "purple",
+                "value": null
               }
             ]
           },
@@ -758,15 +872,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 18,
         "y": 6
       },
       "id": 16,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -786,12 +900,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_revoked_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_revoked_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "撤销任务",
+      "title": "撤销",
       "type": "stat"
     },
     {
@@ -799,6 +914,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "被拒绝的任务总数（累计值）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -809,7 +925,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "dark-red"
+                "color": "dark-red",
+                "value": null
               }
             ]
           },
@@ -818,15 +935,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 21,
         "y": 6
       },
       "id": 17,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background_solid",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
@@ -846,12 +963,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(celery_task_rejected_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum(celery_task_rejected_total{job=\"fba_celery_exporter\", name!=\"None\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "被拒绝任务",
+      "title": "拒绝",
       "type": "stat"
     },
     {
@@ -860,10 +978,10 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 9
       },
       "id": 102,
-      "title": "任务趋势",
+      "title": "📈 任务趋势",
       "type": "row"
     },
     {
@@ -871,6 +989,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "任务执行结果的速率趋势，包括成功、失败和重试",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -880,13 +999,13 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "任务/秒",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -914,32 +1033,80 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "成功.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "失败.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "重试.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 11
+        "y": 10
       },
       "id": 20,
       "options": {
         "legend": {
           "calcs": [
-            "sum"
+            "sum",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
+          "hideZeros": true,
           "mode": "multi",
           "sort": "desc"
         }
@@ -951,7 +1118,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_succeeded_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "成功 - {{name}}",
           "refId": "A"
         },
@@ -960,7 +1128,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_failed_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_failed_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "失败 - {{name}}",
           "refId": "B"
         },
@@ -969,7 +1138,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_retried_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_retried_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "重试 - {{name}}",
           "refId": "C"
         }
@@ -982,6 +1152,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "任务发送、接收和开始执行的速率趋势",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -991,13 +1162,13 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "任务/秒",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -1025,32 +1196,80 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "发送.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "接收.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "开始.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 11
+        "y": 10
       },
       "id": 21,
       "options": {
         "legend": {
           "calcs": [
-            "sum"
+            "sum",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
+          "hideZeros": true,
           "mode": "multi",
           "sort": "desc"
         }
@@ -1062,7 +1281,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_sent_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_sent_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "发送 - {{name}}",
           "refId": "A"
         },
@@ -1071,7 +1291,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_received_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_received_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "接收 - {{name}}",
           "refId": "B"
         },
@@ -1080,12 +1301,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(celery_task_started_total{job=\"fba_celery_exporter\"}[1m])",
+          "editorMode": "code",
+          "expr": "sum by(name) (rate(celery_task_started_total{job=\"fba_celery_exporter\", name!=\"None\"}[5m]))",
           "legendFormat": "开始 - {{name}}",
           "refId": "C"
         }
       ],
-      "title": "任务发送/接收速率",
+      "title": "任务流转速率",
       "type": "timeseries"
     },
     {
@@ -1094,10 +1316,10 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 18
       },
       "id": 103,
-      "title": "任务详情",
+      "title": "⏱️ 任务性能",
       "type": "row"
     },
     {
@@ -1105,25 +1327,27 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "各任务类型的平均执行时间，颜色从绿到红表示执行时间从短到长",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "continuous-GrYlRd"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
-                "value": 10
+                "value": 5
               },
               {
                 "color": "red",
-                "value": 100
+                "value": 30
               }
             ]
           },
@@ -1133,9 +1357,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
-        "y": 20
+        "y": 19
       },
       "id": 30,
       "options": {
@@ -1153,7 +1377,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
@@ -1169,12 +1393,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "celery_task_runtime_seconds_sum{job=\"fba_celery_exporter\"} / celery_task_runtime_seconds_count{job=\"fba_celery_exporter\"}",
+          "editorMode": "code",
+          "expr": "celery_task_runtime_sum{job=\"fba_celery_exporter\", name!=\"None\"} / celery_task_runtime_count{job=\"fba_celery_exporter\", name!=\"None\"}",
           "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
-      "title": "任务平均运行时间",
+      "title": "任务平均执行时间",
       "type": "bargauge"
     },
     {
@@ -1182,6 +1407,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "成功任务按类型的分布情况",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1200,9 +1426,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 20
+        "w": 8,
+        "x": 8,
+        "y": 19
       },
       "id": 31,
       "options": {
@@ -1235,7 +1461,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by(name) (celery_task_succeeded_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum by(name) (celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"})",
           "legendFormat": "{{name}}",
           "refId": "A"
         }
@@ -1248,6 +1475,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "失败任务按类型的分布情况",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1266,9 +1494,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 20
+        "w": 8,
+        "x": 16,
+        "y": 19
       },
       "id": 32,
       "options": {
@@ -1301,7 +1529,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by(name) (celery_task_failed_total{job=\"fba_celery_exporter\"})",
+          "editorMode": "code",
+          "expr": "sum by(name) (celery_task_failed_total{job=\"fba_celery_exporter\", name!=\"None\"})",
           "legendFormat": "{{name}}",
           "refId": "A"
         }
@@ -1315,10 +1544,10 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 28
+        "y": 27
       },
       "id": 104,
-      "title": "队列监控",
+      "title": "📦 队列监控",
       "type": "row"
     },
     {
@@ -1326,6 +1555,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "各队列中等待处理的任务数量趋势",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1335,7 +1565,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "任务数",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1361,7 +1591,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "line+area"
             }
           },
           "mappings": [],
@@ -1369,7 +1599,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1389,14 +1620,15 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 29
+        "y": 28
       },
       "id": 40,
       "options": {
         "legend": {
           "calcs": [
             "last",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -1415,6 +1647,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "editorMode": "code",
           "expr": "celery_queue_length{job=\"fba_celery_exporter\"}",
           "legendFormat": "{{queue_name}}",
           "refId": "A"
@@ -1428,6 +1661,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "各 Worker 当前处理的活动任务数量趋势",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1437,7 +1671,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "任务数",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1471,7 +1705,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1483,14 +1718,15 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 29
+        "y": 28
       },
       "id": 41,
       "options": {
         "legend": {
           "calcs": [
             "last",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -1509,6 +1745,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "editorMode": "code",
           "expr": "celery_worker_tasks_active{job=\"fba_celery_exporter\"}",
           "legendFormat": "{{hostname}}",
           "refId": "A"
@@ -1523,84 +1760,272 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 36
       },
       "id": 105,
-      "title": "Traces",
+      "title": "📊 性能分析",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
+      "description": "各任务类型的执行时间分布（P50/P90/P99）",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "执行时间 (秒)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 37
       },
       "id": 50,
-      "options": {},
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
       "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "queryType": "traceql",
-          "query": "{resource.service.name=\"fba_celery_worker\"}",
-          "limit": 20,
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum by(name, le) (rate(celery_task_runtime_bucket{job=\"fba_celery_exporter\", name!=\"None\"}[5m])))",
+          "legendFormat": "P50 - {{name}}",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum by(name, le) (rate(celery_task_runtime_bucket{job=\"fba_celery_exporter\", name!=\"None\"}[5m])))",
+          "legendFormat": "P90 - {{name}}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(name, le) (rate(celery_task_runtime_bucket{job=\"fba_celery_exporter\", name!=\"None\"}[5m])))",
+          "legendFormat": "P99 - {{name}}",
+          "refId": "C"
         }
       ],
-      "title": "Celery Worker Traces",
-      "type": "traces"
+      "title": "任务执行时间分布 (P50/P90/P99)",
+      "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
+      "description": "每分钟完成的任务数量（吞吐量）",
       "fieldConfig": {
-        "defaults": {},
-        "overrides": []
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "任务/分钟",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "成功.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "失败.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 37
       },
       "id": 51,
-      "options": {},
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
       "pluginVersion": "12.0.0",
       "targets": [
         {
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "queryType": "traceql",
-          "query": "{resource.service.name=\"fba_celery_beat\"}",
-          "limit": 20,
+          "editorMode": "code",
+          "expr": "sum(increase(celery_task_succeeded_total{job=\"fba_celery_exporter\", name!=\"None\"}[1m])) by (name)",
+          "legendFormat": "成功 - {{name}}",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(celery_task_failed_total{job=\"fba_celery_exporter\", name!=\"None\"}[1m])) by (name)",
+          "legendFormat": "失败 - {{name}}",
+          "refId": "B"
         }
       ],
-      "title": "Celery Beat Traces",
-      "type": "traces"
+      "title": "任务吞吐量 (每分钟)",
+      "type": "timeseries"
     }
   ],
   "preload": false,
   "refresh": "5s",
   "schemaVersion": 41,
   "tags": [
-    "celery"
+    "celery",
+    "fba",
+    "tasks"
   ],
   "templating": {
     "list": []
@@ -1609,7 +2034,29 @@
     "from": "now-1h",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d"
+    ]
+  },
+  "timezone": "browser",
   "title": "FastAPI Best Architecture Celery",
   "uid": "fba-celery",
   "version": 1

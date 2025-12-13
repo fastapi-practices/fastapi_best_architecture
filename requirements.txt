@@ -166,7 +166,6 @@ opentelemetry-api==1.39.0
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-instrumentation-logging
     #   opentelemetry-sdk
@@ -178,13 +177,10 @@ opentelemetry-exporter-otlp-proto-grpc==1.39.0
 opentelemetry-instrumentation==0.60b0
     # via
     #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-instrumentation-logging
 opentelemetry-instrumentation-asgi==0.60b0
     # via opentelemetry-instrumentation-fastapi
-opentelemetry-instrumentation-celery==0.60b0
-    # via fastapi-best-architecture
 opentelemetry-instrumentation-fastapi==0.60b0
     # via fastapi-best-architecture
 opentelemetry-instrumentation-logging==0.60b0
@@ -201,7 +197,6 @@ opentelemetry-semantic-conventions==0.60b0
     # via
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-asgi
-    #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-sdk
 opentelemetry-util-http==0.60b0

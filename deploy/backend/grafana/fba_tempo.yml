@@ -1,14 +1,26 @@
+# https://grafana.com/docs/tempo/latest/configuration/
+server:
+  http_listen_port: 3200
+
 distributor:
   receivers:
     otlp:
       protocols:
-        grpc:
-          endpoint: 0.0.0.0:4317
         http:
-          endpoint: 0.0.0.0:4318
+          endpoint: "0.0.0.0:4318"
+        grpc:
+          endpoint: "0.0.0.0:4317"
 
 storage:
   trace:
     backend: local
+    wal:
+      path: /tmp/tempo/wal
     local:
-      path: /tmp/tempo
+      path: /tmp/tempo/blocks
+
+metrics_generator:
+  storage:
+    path: /tmp/tempo/generator/wal
+  traces_storage:
+    path: /tmp/tempo/generator/traces

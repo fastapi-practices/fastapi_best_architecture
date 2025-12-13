@@ -302,12 +302,12 @@ services:
     depends_on:
       - fba_loki
     volumes:
-      - ./deploy/backend/grafana/fba_alloy.alloy:/etc/alloy/config.alloy
+      - ./deploy/backend/grafana/fba_config.alloy:/etc/alloy/fba_config.alloy
     networks:
       - fba_network
     command:
       - run
-      - /etc/alloy/config.alloy
+      - /etc/alloy/fba_config.alloy
       - --server.http.listen-addr=0.0.0.0:12345
 
   fba_tempo:
@@ -322,11 +322,11 @@ services:
     depends_on:
       - fba_loki
     volumes:
-      - ./deploy/backend/grafana/fba_tempo.yml:/etc/tempo/tempo.yml
+      - ./deploy/backend/grafana/fba_tempo.yml:/etc/tempo/fba_tempo.yml
     networks:
       - fba_network
     command:
-      - -config.file=/etc/tempo/tempo.yml
+      - -config.file=/etc/tempo/fba_tempo.yml
       - -auth.enabled=false
 
   fba_grafana:

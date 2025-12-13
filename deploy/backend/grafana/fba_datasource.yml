@@ -1,72 +1,46 @@
+# https://grafana.com/docs/grafana/latest/datasources/
 apiVersion: 1
 
-deleteDatasources:
-  - name: Prometheus
-    orgId: 1
-
 datasources:
-  - uid: loki
-    orgId: 1
-    name: Loki
+  - name: Loki
+    uid: loki
     type: loki
-    typeName: Loki
-    access: proxy
     url: http://fba_loki:3100
-    password: ''
-    user: ''
-    database: ''
-    basicAuth: false
     isDefault: false
     jsonData:
       derivedFields:
         - datasourceUid: tempo
           matcherRegex: (?:trace_id)=(\w+)
-          matcherType: regex
           name: TraceID
           url: $${__value.raw}
-    readOnly: false
-    editable: true
-  - uid: prometheus
-    orgId: 1
-    name: Prometheus
+
+  - name: Prometheus
+    uid: prometheus
     type: prometheus
-    typeName: Prometheus
-    access: proxy
     url: http://fba_prometheus:9090
-    password: ''
-    user: ''
-    database: ''
-    basicAuth: false
     isDefault: true
     jsonData:
-      exemplarTraceIdDestinations:
-        - datasourceUid: tempo
-          name: TraceID
       httpMethod: POST
-    readOnly: false
-    editable: true
-  - uid: tempo
-    orgId: 1
-    name: Tempo
+      exemplarTraceIdDestinations:
+        - name: TraceID
+          datasourceUid: tempo
+
+  - name: Tempo
+    uid: tempo
     type: tempo
-    typeName: Tempo
-    access: proxy
     url: http://fba_tempo:3200
-    password: ''
-    user: ''
-    database: ''
-    basicAuth: false
-    isDefault: false
     jsonData:
       nodeGraph:
         enabled: true
       tracesToLogsV2:
-        customQuery: false
         datasourceUid: loki
-        filterBySpanID: false
         filterByTraceID: true
-        tags:
-          - key: service.name
-            value: compose_service
-    readOnly: false
-    editable: true
+        spanStartTimeShift: "-1m"
+        spanEndTimeShift: "1m"
+        tags: ["service.name", "compose_service"]
+      search:
+        hide: false
+      serviceMap:
+        datasourceUid: prometheus
+      lokiSearch:
+        datasourceUid: loki

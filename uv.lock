@@ -705,7 +705,6 @@ dependencies = [
     { name = "loguru" },
     { name = "msgspec" },
     { name = "opentelemetry-exporter-otlp-proto-grpc" },
-    { name = "opentelemetry-instrumentation-celery" },
     { name = "opentelemetry-instrumentation-fastapi" },
     { name = "opentelemetry-instrumentation-logging" },
     { name = "opentelemetry-sdk" },
@@ -765,7 +764,6 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "msgspec", specifier = ">=0.20.0" },
     { name = "opentelemetry-exporter-otlp-proto-grpc", specifier = ">=1.39.0" },
-    { name = "opentelemetry-instrumentation-celery", specifier = ">=0.60b0" },
     { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.60b0" },
     { name = "opentelemetry-instrumentation-logging", specifier = ">=0.60b0" },
     { name = "opentelemetry-sdk", specifier = ">=1.39.0" },
@@ -1783,20 +1781,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/b0/0a/715ea7044708d3c215385fb2a1c6ffe429aacb3cd23a348060aaeda52834/opentelemetry_instrumentation_asgi-0.60b0.tar.gz", hash = "sha256:928731218050089dca69f0fe980b8bfe109f384be8b89802d7337372ddb67b91" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/9b/8c/c6c59127fd996107243ca45669355665a7daff578ddafb86d6d2d3b01428/opentelemetry_instrumentation_asgi-0.60b0-py3-none-any.whl", hash = "sha256:9d76a541269452c718a0384478f3291feb650c5a3f29e578fdc6613ea3729cf3" },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-celery"
-version = "0.60b0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-semantic-conventions" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ac/04/ece5dfd3e9ee18832b138943f69affb73f982ef51d5f466ff0202a655945/opentelemetry_instrumentation_celery-0.60b0.tar.gz", hash = "sha256:e19e23141c0c8529b2aa75f7d6ec50252828fc7d18329d711bf4df2ca94213bb" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/7b/e4/4d310504cdb0a362a9e2813248c219ceebd9e94ce95906c7cf42255e9655/opentelemetry_instrumentation_celery-0.60b0-py3-none-any.whl", hash = "sha256:4909203ee318c9801b7002d92afbc61c593878bd63033dd399b859a9c4310b1d" },
 ]
 
 [[package]]
