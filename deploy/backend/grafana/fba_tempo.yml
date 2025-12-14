@@ -20,7 +20,33 @@ storage:
       path: /tmp/tempo/blocks
 
 metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
   storage:
     path: /tmp/tempo/generator/wal
+    remote_write:
+      - url: http://fba_prometheus:9090/api/v1/write
+        send_exemplars: true
   traces_storage:
     path: /tmp/tempo/generator/traces
+  processor:
+    span_metrics:
+      dimensions:
+        - service.name
+        - http.method
+        - http.target
+        - http.status_code
+    service_graphs:
+      dimensions:
+        - service.name
+    local_blocks:
+      flush_to_storage: true
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - span-metrics
+        - service-graphs
+        - local-blocks

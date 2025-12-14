@@ -45,14 +45,13 @@ def init_otel(app: FastAPI) -> None:
     log_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
-    LoggingInstrumentor().instrument(set_logging_format=True)
-    FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
-
-    # 为 loguru 添加 OpenTelemetry handler
-    otel_handler = LoggingHandler(logger_provider=logger_provider)
+    otel_logging_handler = LoggingHandler(logger_provider=logger_provider)
     logger.add(
-        otel_handler,
+        otel_logging_handler,
         level=settings.LOG_STD_LEVEL,
         format=settings.LOG_FORMAT,
         filter=lambda record: request_id_filter(record),
     )
+
+    LoggingInstrumentor().instrument(set_logging_format=True)
+    FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)

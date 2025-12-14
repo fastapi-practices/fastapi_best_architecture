@@ -111,7 +111,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_total{app_name=\"fba\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -186,7 +186,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m]))",
+          "expr": "sum(rate(fba_request_total{app_name=\"fba\", path!=\"/metrics\"}[5m]))",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -262,7 +262,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum(fba_response_total{app_name=\"fba\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -335,7 +335,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_exception_total{app_name=\"fba_server\"}) or vector(0)",
+          "expr": "sum(fba_exception_total{app_name=\"fba\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -410,7 +410,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_cost_time_sum{app_name=\"fba\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"fba\", path!=\"/metrics\"})",
           "legendFormat": "",
           "refId": "A"
         }
@@ -482,7 +482,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}) or vector(0)",
+          "expr": "sum(fba_request_in_progress{app_name=\"fba\", path!=\"/metrics\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -593,7 +593,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m])",
+          "expr": "rate(fba_request_total{app_name=\"fba\", path!=\"/metrics\"}[5m])",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -691,7 +691,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}",
+          "expr": "fba_request_in_progress{app_name=\"fba\", path!=\"/metrics\"}",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -783,7 +783,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"}",
+          "expr": "fba_request_cost_time_sum{app_name=\"fba\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"fba\", path!=\"/metrics\"}",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -888,7 +888,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"fba\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -993,7 +993,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"fba\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1112,7 +1112,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1219,7 +1219,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1287,7 +1287,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_request_total{app_name=\"fba\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1312,10 +1312,128 @@
         "type": "tempo",
         "uid": "tempo"
       },
-      "description": "FastAPI 服务的分布式追踪数据，可以查看请求的完整调用链路和耗时分布。",
+      "description": "FastAPI 服务的分布式追踪数据，点击 Trace ID 可跳转到 Explore 查看完整调用链",
       "fieldConfig": {
-        "defaults": {},
-        "overrides": []
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Service"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 270
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6E9FFF",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "查看调用链",
+                    "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"queryType\":\"traceql\",\"query\":\"${__value.raw}\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Start time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              },
+              {
+                "id": "displayName",
+                "value": "时间"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "接口"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "displayName",
+                "value": "耗时"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "max",
+                "value": 500
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -1324,7 +1442,38 @@
         "y": 35
       },
       "id": 40,
-      "options": {},
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Start time",
+                "destinationType": "time"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Start time",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
       "pluginVersion": "12.0.0",
       "targets": [
         {
@@ -1333,13 +1482,14 @@
             "uid": "tempo"
           },
           "queryType": "traceql",
-          "query": "{ .service.name = \"fba_server\" && .http.method exists() && .http.target !~ \".*/metrics.*\" }",
-          "limit": 30,
-          "refId": "A"
+          "query": "{span.http.target!=\"/metrics/\" && span.http.target!=\"/metrics\" && span.http.target=~\".*${trace_filter}.*\"}",
+          "limit": 20,
+          "refId": "A",
+          "tableType": "traces"
         }
       ],
       "title": "FastAPI 服务 Traces",
-      "type": "traces"
+      "type": "table"
     },
     {
       "collapsed": false,
@@ -1620,6 +1770,24 @@
   ],
   "templating": {
     "list": [
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "description": "输入接口路径筛选 Traces（如：/api/v1/auth）",
+        "label": "接口筛选",
+        "name": "trace_filter",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
       {
         "current": {
           "text": "",

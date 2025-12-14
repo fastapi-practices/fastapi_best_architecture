@@ -229,7 +229,7 @@ def register_metrics(app: FastAPI) -> None:
     :param app: FastAPI 应用实例
     :return:
     """
-    init_otel(app)
-
     metrics_app = make_asgi_app()
     app.mount('/metrics', metrics_app)
+
+    init_otel(app)

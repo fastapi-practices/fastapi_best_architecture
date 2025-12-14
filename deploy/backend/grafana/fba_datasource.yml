@@ -8,7 +8,7 @@ datasources:
     jsonData:
       derivedFields:
         - datasourceUid: tempo
-          matcherRegex: (?:trace_id|traceid)["\s:=]+([a-f0-9]{32})
+          matcherRegex: '"traceid":"([a-f0-9]{32})"'
           matcherType: regex
           name: TraceID
           url: $${__value.raw}
@@ -37,7 +37,8 @@ datasources:
         filterByTraceID: true
         spanStartTimeShift: "-1m"
         spanEndTimeShift: "1m"
-        tags: ["service.name", "compose_service"]
+        customQuery: true
+        query: '{service_name="fba_server"} | json | traceid="${__span.traceId}"'
       search:
         hide: false
       serviceMap:

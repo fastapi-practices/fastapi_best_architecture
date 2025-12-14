@@ -1,3 +1,13 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'fba_server'
+    static_configs:
+      - targets: ['fba_server:8001']
+    metrics_path: /metrics
+
+  - job_name: 'celery_exporter'
+    static_configs:
+      - targets: ['fba_celery_exporter:9808']
