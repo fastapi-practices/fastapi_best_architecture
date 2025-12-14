@@ -52,7 +52,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "过去24小时内所有 API 端点的总请求数量（不包含 /metrics 端点）",
+      "description": "过去24小时内所有 API 端点的总请求数量",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -63,15 +63,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#27AE60",
+                "color": "#3498DB",
                 "value": null
               },
               {
-                "color": "#1E8449",
-                "value": 100
+                "color": "#2980B9",
+                "value": 1000
               },
               {
-                "color": "#186A3B",
+                "color": "#1F618D",
                 "value": 10000
               }
             ]
@@ -138,15 +138,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#27AE60",
+                "color": "#2ECC71",
                 "value": null
               },
               {
-                "color": "#1E8449",
+                "color": "#27AE60",
                 "value": 50
               },
               {
-                "color": "#186A3B",
+                "color": "#1E8449",
                 "value": 100
               }
             ]
@@ -214,15 +214,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#C0392B",
+                "color": "#E74C3C",
                 "value": null
               },
               {
-                "color": "#D68910",
+                "color": "#F39C12",
                 "value": 0.9
               },
               {
-                "color": "#27AE60",
+                "color": "#2ECC71",
                 "value": 0.95
               }
             ]
@@ -287,15 +287,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#27AE60",
+                "color": "#2ECC71",
                 "value": null
               },
               {
-                "color": "#D68910",
+                "color": "#F39C12",
                 "value": 10
               },
               {
-                "color": "#C0392B",
+                "color": "#E74C3C",
                 "value": 50
               }
             ]
@@ -362,15 +362,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#27AE60",
+                "color": "#2ECC71",
                 "value": null
               },
               {
-                "color": "#D68910",
+                "color": "#F39C12",
                 "value": 100
               },
               {
-                "color": "#C0392B",
+                "color": "#E74C3C",
                 "value": 500
               }
             ]
@@ -1312,7 +1312,7 @@
         "type": "tempo",
         "uid": "tempo"
       },
-      "description": "FastAPI 服务的分布式追踪数据，点击 Trace ID 可跳转到 Explore 查看完整调用链",
+      "description": "FastAPI 服务的分布式追踪数据，点击 Trace ID 可跳转到 Explore 查看完整调用链，支持通过顶部「接口筛选」变量过滤",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1345,7 +1345,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 270
+                "value": 350
               },
               {
                 "id": "custom.cellOptions",
@@ -1508,7 +1508,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "各日志级别的产生速率，用于监控系统健康状态。ERROR 和 CRITICAL 级别的增加需要立即关注",
+      "description": "按级别统计日志产生速率，ERROR/CRITICAL 级别增加需立即关注",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1637,7 +1637,7 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 8,
         "x": 0,
         "y": 46
@@ -1671,7 +1671,7 @@
           "refId": "A"
         }
       ],
-      "title": "日志级别分布",
+      "title": "日志级别统计",
       "type": "timeseries"
     },
     {
@@ -1679,7 +1679,7 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "实时应用日志流，支持关键词搜索。可以通过顶部的日志查询变量过滤特定内容",
+      "description": "实时应用日志流，支持通过顶部「日志搜索」变量过滤",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -1695,12 +1695,12 @@
         "dedupStrategy": "none",
         "enableInfiniteScrolling": true,
         "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
+        "showLabels": false,
+        "showTime": false,
         "sortOrder": "Descending",
-        "wrapLogMessage": true
+        "wrapLogMessage": false
       },
       "pluginVersion": "12.0.0",
       "targets": [
@@ -1714,7 +1714,7 @@
           "refId": "A"
         }
       ],
-      "title": "应用日志流",
+      "title": "实时日志",
       "type": "logs"
     },
     {
@@ -1722,28 +1722,28 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "仅显示 ERROR 和 CRITICAL 级别的日志，便于快速定位问题",
+      "description": "仅显示 ERROR 和 CRITICAL 级别日志，支持通过「日志搜索」变量过滤",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 8,
+        "h": 8,
+        "w": 24,
         "x": 0,
-        "y": 54
+        "y": 58
       },
       "id": 52,
       "options": {
         "dedupStrategy": "none",
         "enableInfiniteScrolling": true,
         "enableLogDetails": true,
-        "prettifyLogMessage": true,
+        "prettifyLogMessage": false,
         "showCommonLabels": false,
         "showLabels": false,
-        "showTime": true,
+        "showTime": false,
         "sortOrder": "Descending",
-        "wrapLogMessage": true
+        "wrapLogMessage": false
       },
       "pluginVersion": "12.0.0",
       "targets": [
@@ -1753,7 +1753,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\"",
+          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$log_keyword\"",
           "refId": "A"
         }
       ],
