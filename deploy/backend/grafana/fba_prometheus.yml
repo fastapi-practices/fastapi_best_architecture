@@ -1,13 +1,45 @@
+# ============================================================================
+# Prometheus 配置文件
+# Prometheus 是云原生监控和告警系统，专注于时序指标数据
+# 官方文档: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+# ============================================================================
+
+# global: 全局配置
 global:
   scrape_interval: 15s
+  # 指标抓取间隔
+
   evaluation_interval: 15s
+  # 规则评估间隔
 
+# scrape_configs: 抓取配置
 scrape_configs:
+  # ==========================================================================
+  # FastAPI 后端服务指标抓取配置
+  # ==========================================================================
   - job_name: 'fba_server'
-    static_configs:
-      - targets: ['fba_server:8001']
-    metrics_path: /metrics
+    # 任务名称
+    # 将作为 job 标签添加到所有抓取的指标上
 
+    static_configs:
+      # 静态目标配置
+
+      - targets: ['fba_server:8001']
+        # 目标地址列表
+
+    metrics_path: /metrics
+    # 指标端点路径
+    # 默认值: /metrics
+    # FastAPI 应用通过此路径暴露 Prometheus 格式的指标
+
+  # ==========================================================================
+  # Celery Exporter 指标抓取配置
+  # 用于监控 Celery 异步任务队列
+  # ==========================================================================
   - job_name: 'celery_exporter'
+    # 任务名称
+    # 标识这是 Celery 相关的指标
+
     static_configs:
       - targets: ['fba_celery_exporter:9808']
+        # Celery Exporter 地址
