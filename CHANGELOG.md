@@ -1,3 +1,35 @@
+<a id="v1.12.0"></a>
+# [v1.12.0](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.12.0) - 2025-12-15
+
+## What's Changed
+* Update changelog for v1.11.2 by [@wu-clan](https://github.com/wu-clan) in [#942](https://github.com/fastapi-practices/fastapi_best_architecture/pull/942)
+* Update celery related docker container independence by [@wu-clan](https://github.com/wu-clan) in [#943](https://github.com/fastapi-practices/fastapi_best_architecture/pull/943)
+* Fix super value in update user permissions by [@wu-clan](https://github.com/wu-clan) in [#948](https://github.com/fastapi-practices/fastapi_best_architecture/pull/948)
+* Optimize data permission logic and usage by [@wu-clan](https://github.com/wu-clan) in [#947](https://github.com/fastapi-practices/fastapi_best_architecture/pull/947)
+* Update pre-commit to prek in pre-commit script by [@wu-clan](https://github.com/wu-clan) in [#949](https://github.com/fastapi-practices/fastapi_best_architecture/pull/949)
+* Optimize the coupling of user social plugin by [@wu-clan](https://github.com/wu-clan) in [#950](https://github.com/fastapi-practices/fastapi_best_architecture/pull/950)
+* Add the database primary key mode config by [@wu-clan](https://github.com/wu-clan) in [#953](https://github.com/fastapi-practices/fastapi_best_architecture/pull/953)
+* Optimize the coupling of code generation CLI by [@wu-clan](https://github.com/wu-clan) in [#951](https://github.com/fastapi-practices/fastapi_best_architecture/pull/951)
+* Add CLI init project database support by [@wu-clan](https://github.com/wu-clan) in [#952](https://github.com/fastapi-practices/fastapi_best_architecture/pull/952)
+* Update the init project database CLI to subcommand by [@wu-clan](https://github.com/wu-clan) in [#954](https://github.com/fastapi-practices/fastapi_best_architecture/pull/954)
+* Fix CLI command for code generation by [@wu-clan](https://github.com/wu-clan) in [#956](https://github.com/fastapi-practices/fastapi_best_architecture/pull/956)
+* Fix the IP address in the request log by [@wuyuemushi](https://github.com/wuyuemushi) in [#959](https://github.com/fastapi-practices/fastapi_best_architecture/pull/959)
+* Add the Grafana observability suite by [@wu-clan](https://github.com/wu-clan) in [#961](https://github.com/fastapi-practices/fastapi_best_architecture/pull/961)
+* Update the version number to 1.12.0 by [@wu-clan](https://github.com/wu-clan) in [#962](https://github.com/fastapi-practices/fastapi_best_architecture/pull/962)
+
+## New Contributors
+* [@wuyuemushi](https://github.com/wuyuemushi) made their first contribution in [#959](https://github.com/fastapi-practices/fastapi_best_architecture/pull/959)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.2...v1.12.0
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+<a href="https://github.com/wuyuemushi"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwuyuemushi.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wuyuemushi"></a>
+
+[Changes][v1.12.0]
+
+
 <a id="v1.11.2"></a>
 # [v1.11.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.11.2) - 2025-11-28
 
@@ -1191,6 +1223,7 @@
 [Changes][v1.0.0]
 
 
+[v1.12.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.2...v1.12.0
 [v1.11.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.1...v1.11.2
 [v1.11.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.0...v1.11.1
 [v1.11.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.10.4...v1.11.0
