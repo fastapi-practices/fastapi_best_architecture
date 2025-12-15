@@ -52,6 +52,8 @@ def init_celery() -> celery.Celery:
         task_track_started=True,
         enable_utc=False,
         timezone=settings.DATETIME_TIMEZONE,
+        worker_send_task_events=True,
+        task_send_sent_event=True,
     )
 
     # 在 Celery 中设置此参数无效

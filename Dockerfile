@@ -36,14 +36,14 @@ COPY --from=builder /fba /fba
 
 COPY --from=builder /usr/local /usr/local
 
-COPY deploy/backend/supervisord.conf /etc/supervisor/supervisord.conf
+COPY deploy/backend/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 
 WORKDIR /fba/backend
 
 # === FastAPI server image ===
 FROM base_server AS fba_server
 
-COPY deploy/backend/fba_server.conf /etc/supervisor/conf.d/
+COPY deploy/backend/supervisor/fba_server.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/fba
 
@@ -54,7 +54,7 @@ CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 # === Celery Worker image ===
 FROM base_server AS fba_celery_worker
 
-COPY deploy/backend/fba_celery_worker.conf /etc/supervisor/conf.d/
+COPY deploy/backend/supervisor/fba_celery_worker.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/fba
 
@@ -63,7 +63,7 @@ CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 # === Celery Beat image ===
 FROM base_server AS fba_celery_beat
 
-COPY deploy/backend/fba_celery_beat.conf /etc/supervisor/conf.d/
+COPY deploy/backend/supervisor/fba_celery_beat.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/fba
 
@@ -72,7 +72,7 @@ CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 # === Celery Flower image ===
 FROM base_server AS fba_celery_flower
 
-COPY deploy/backend/fba_celery_flower.conf /etc/supervisor/conf.d/
+COPY deploy/backend/supervisor/fba_celery_flower.conf /etc/supervisor/conf.d/
 
 RUN mkdir -p /var/log/fba
 

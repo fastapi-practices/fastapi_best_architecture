@@ -47,6 +47,13 @@ def default_formatter(record: logging.LogRecord) -> str:
     return settings.LOG_FORMAT if settings.LOG_FORMAT.endswith('\n') else f'{settings.LOG_FORMAT}\n'
 
 
+def request_id_filter(record: logging.LogRecord) -> logging.LogRecord:
+    """请求 ID 过滤器"""
+    rid = get_request_trace_id()
+    record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
+    return record
+
+
 def setup_logging() -> None:
     """
     设置日志处理器
@@ -74,12 +81,6 @@ def setup_logging() -> None:
 
     # 移除 loguru 默认处理器
     logger.remove()
-
-    # request_id 过滤器
-    def request_id_filter(record: logging.LogRecord) -> logging.LogRecord:
-        rid = get_request_trace_id()
-        record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
-        return record
 
     # 配置 loguru 处理器
     logger.configure(

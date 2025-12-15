@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # FastAPI
     FASTAPI_API_V1_PATH: str = '/api/v1'
-    FASTAPI_TITLE: str = 'FastAPI'
+    FASTAPI_TITLE: str = 'fba'
     FASTAPI_DESCRIPTION: str = 'FastAPI Best Architecture'
     FASTAPI_DOCS_URL: str = '/docs'
     FASTAPI_REDOC_URL: str = '/redoc'
@@ -214,6 +214,11 @@ class Settings(BaseSettings):
 
     # I18n 配置
     I18N_DEFAULT_LANGUAGE: str = 'zh-CN'
+
+    # Grafana
+    GRAFANA_METRICS: bool = False
+    GRAFANA_APP_NAME: str = 'fba_server'
+    GRAFANA_OTLP_GRPC_ENDPOINT: str = 'fba_alloy:4317'
 
     ##################################################
     # [ App ] task
