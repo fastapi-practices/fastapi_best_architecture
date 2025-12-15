@@ -14,4 +14,4 @@ for cls in get_all_models():
             globals()[class_name] = cls
 
 
-__version__ = '1.11.2'
+__version__ = '1.12.0'
