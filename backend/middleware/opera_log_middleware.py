@@ -50,8 +50,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         else:
             method = request.method
             args = await self.get_request_args(request)
-            PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(method=method, path=path, app_name=settings.FASTAPI_TITLE).inc()
-            PROMETHEUS_REQUEST_COUNTER.labels(method=method, path=path, app_name=settings.FASTAPI_TITLE).inc()
+            PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
+                app_name=settings.GRAFANA_APP_NAME, method=method, path=path
+            ).inc()
+            PROMETHEUS_REQUEST_COUNTER.labels(app_name=settings.GRAFANA_APP_NAME, method=method, path=path).inc()
 
             # 执行请求
             code = 200
@@ -73,7 +75,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         msg = exception.get('msg')
                         log.error(f'请求异常: {msg}')
                         PROMETHEUS_EXCEPTION_COUNTER.labels(
-                            method=method, path=path, exception_type=type(e).__name__, app_name=settings.FASTAPI_TITLE
+                            app_name=settings.GRAFANA_APP_NAME,
+                            method=method,
+                            path=path,
+                            exception_type=type(e).__name__,
                         ).inc()
                         break
             except Exception as e:
@@ -84,18 +89,18 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 error = e
                 log.error(f'请求异常: {e!s}')
                 PROMETHEUS_EXCEPTION_COUNTER.labels(
-                    method=method, path=path, exception_type=type(e).__name__, app_name=settings.FASTAPI_TITLE
+                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path, exception_type=type(e).__name__
                 ).inc()
             else:
                 PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM.labels(
-                    method=method, path=path, app_name=settings.FASTAPI_TITLE
+                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path
                 ).observe(elapsed, exemplar={'TraceID': get_request_trace_id()})
             finally:
                 PROMETHEUS_RESPONSE_COUNTER.labels(
-                    method=method, path=path, status_code=code, app_name=settings.FASTAPI_TITLE
+                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path, status_code=code
                 ).inc()
                 PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
-                    method=method, path=path, app_name=settings.FASTAPI_TITLE
+                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path
                 ).dec()
 
             # 此信息只能在请求后获取

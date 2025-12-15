@@ -217,6 +217,7 @@ class Settings(BaseSettings):
 
     # Grafana
     GRAFANA_METRICS: bool = True
+    GRAFANA_APP_NAME: str = 'fba_server'
     GRAFANA_OTLP_GRPC_ENDPOINT: str = 'fba_alloy:4317'
 
     ##################################################
