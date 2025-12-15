@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from loguru import logger
 from opentelemetry import trace
 from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
@@ -13,7 +12,7 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from backend.common.log import request_id_filter
+from backend.common.log import log, request_id_filter
 from backend.core.conf import settings
 from backend.database.db import async_engine
 
@@ -29,7 +28,7 @@ def init_otel(app: FastAPI) -> None:
 
     resource = Resource(
         attributes={
-            'service.name': 'fba_server',
+            'service.name': settings.GRAFANA_APP_NAME,
             'service.version': __version__,
             'deployment.environment': settings.ENVIRONMENT,
         },
@@ -48,7 +47,7 @@ def init_otel(app: FastAPI) -> None:
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
     otel_logging_handler = LoggingHandler(logger_provider=logger_provider)
-    logger.add(
+    log.add(  # type: ignore
         otel_logging_handler,
         level=settings.LOG_STD_LEVEL,
         format=settings.LOG_FORMAT,

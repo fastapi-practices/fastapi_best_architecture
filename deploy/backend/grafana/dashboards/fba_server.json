@@ -1551,7 +1551,7 @@
             "uid": "tempo"
           },
           "queryType": "traceql",
-          "query": "{span.http.method!=\"OPTIONS\" && span.http.target!~\"/metrics.*\" && span.http.target!~\"/ws.*\" && span.http.target=~\".*.*\"}",
+          "query": "{ span.http.method != \"OPTIONS\" && span.http.target !~ \"/metrics.*\" && span.http.target !~ \"/ws.*\" && trace:id =~ \".*${trace_id}.*\" }",
           "limit": 20,
           "refId": "A",
           "tableType": "traces"
@@ -1735,7 +1735,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "(rate({service_name=\"fba_server\"} |= \"$log_keyword\" [1m]))",
+          "expr": "(rate({service_name=\"fba_server\"} |= \"$trace_id\" [1m]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
@@ -1779,7 +1779,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"fba_server\"} | json | line_format \"{{.body}}\" |= \"$log_keyword\"",
+          "expr": "{service_name=\"fba_server\"} | json | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
@@ -1822,7 +1822,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$log_keyword\"",
+          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
@@ -1867,27 +1867,9 @@
           "text": "",
           "value": ""
         },
-        "description": "输入接口路径筛选 Traces（如：/api/v1/auth）",
-        "label": "接口筛选",
-        "name": "trace_filter",
-        "options": [
-          {
-            "selected": true,
-            "text": "",
-            "value": ""
-          }
-        ],
-        "query": "",
-        "type": "textbox"
-      },
-      {
-        "current": {
-          "text": "",
-          "value": ""
-        },
-        "description": "输入关键词过滤日志内容，支持正则表达式",
-        "label": "日志搜索",
-        "name": "log_keyword",
+        "description": "输入 Trace ID 同时搜索 Traces 和日志",
+        "label": "Trace ID",
+        "name": "trace_id",
         "options": [
           {
             "selected": true,
