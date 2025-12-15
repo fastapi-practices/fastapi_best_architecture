@@ -216,7 +216,7 @@ class Settings(BaseSettings):
     I18N_DEFAULT_LANGUAGE: str = 'zh-CN'
 
     # Grafana
-    GRAFANA_METRICS: bool = True
+    GRAFANA_METRICS: bool = False
     GRAFANA_APP_NAME: str = 'fba_server'
     GRAFANA_OTLP_GRPC_ENDPOINT: str = 'fba_alloy:4317'
 
