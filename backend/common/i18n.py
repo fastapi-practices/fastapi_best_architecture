@@ -6,6 +6,9 @@ from typing import Any
 
 import yaml
 
+from starlette_context.errors import ContextDoesNotExistError
+
+from backend.common.context import ctx
 from backend.core.conf import settings
 from backend.core.path_conf import LOCALE_DIR
 
@@ -15,8 +18,20 @@ class I18n:
 
     def __init__(self) -> None:
         self.locales: dict[str, dict[str, Any]] = {}
-        self.current_language: str = settings.I18N_DEFAULT_LANGUAGE
         self.load_locales()
+
+    @property
+    def current_language(self) -> str:
+        """获取当前请求的语言"""
+        try:
+            return ctx.language
+        except (AttributeError, LookupError, ContextDoesNotExistError):
+            return settings.I18N_DEFAULT_LANGUAGE
+
+    @current_language.setter
+    def current_language(self, language: str) -> None:
+        """设置当前请求的语言"""
+        ctx.language = language
 
     def load_locales(self) -> None:
         """加载语言文本"""
