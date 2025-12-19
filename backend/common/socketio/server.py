@@ -1,3 +1,5 @@
+import urllib.parse
+
 import socketio
 
 from backend.common.log import log
@@ -8,7 +10,7 @@ from backend.database.redis import redis_client
 # 创建 Socket.IO 服务器实例
 sio = socketio.AsyncServer(
     client_manager=socketio.AsyncRedisManager(
-        f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DATABASE}',
+        f'redis://:{urllib.parse.quote(settings.REDIS_PASSWORD)}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DATABASE}',
     ),
     async_mode='asgi',
     cors_allowed_origins=settings.CORS_ALLOWED_ORIGINS,
