@@ -29,11 +29,11 @@ def init_celery() -> celery.Celery:
     celery.app.trace.build_tracer = celery_aio_pool.build_async_tracer
     celery.app.trace.reset_worker_optimizations()
 
-    broker_url = f'amqp://{urllib.parse.quote(settings.CELERY_RABBITMQ_USERNAME)}:{urllib.parse.quote(settings.CELERY_RABBITMQ_PASSWORD)}@{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}/{settings.CELERY_RABBITMQ_VHOST}'
+    broker_url = f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{urllib.parse.quote(settings.CELERY_RABBITMQ_PASSWORD)}@{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}/{settings.CELERY_RABBITMQ_VHOST}'
     if settings.CELERY_BROKER == 'redis':
         broker_url = f'redis://:{urllib.parse.quote(settings.REDIS_PASSWORD)}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
 
-    result_backend = f'db+postgresql+psycopg://{urllib.parse.quote(settings.DATABASE_USER)}:{urllib.parse.quote(settings.DATABASE_PASSWORD)}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_SCHEMA}'
+    result_backend = f'db+postgresql+psycopg://{settings.DATABASE_USER}:{urllib.parse.quote(settings.DATABASE_PASSWORD)}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_SCHEMA}'
     if DataBaseType.mysql == settings.DATABASE_TYPE:
         result_backend = result_backend.replace('postgresql+psycopg', 'mysql+pymysql')
 
