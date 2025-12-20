@@ -39,6 +39,7 @@ dependencies = [
     "opentelemetry-exporter-otlp-proto-grpc>=1.39.0",
     "opentelemetry-instrumentation-fastapi>=0.60b0",
     "opentelemetry-instrumentation-logging>=0.60b0",
+    "opentelemetry-instrumentation-redis>=0.60b0",
     "opentelemetry-instrumentation-sqlalchemy>=0.60b0",
     "opentelemetry-sdk>=1.39.0",
     "prometheus-client>=0.23.1",

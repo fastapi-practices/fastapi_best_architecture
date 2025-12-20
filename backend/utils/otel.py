@@ -5,6 +5,7 @@ from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs._internal.export import BatchLogRecordProcessor
@@ -15,6 +16,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from backend.common.log import log, request_id_filter
 from backend.core.conf import settings
 from backend.database.db import async_engine
+from backend.database.redis import redis_client
 
 
 def init_otel(app: FastAPI) -> None:
@@ -56,4 +58,5 @@ def init_otel(app: FastAPI) -> None:
 
     LoggingInstrumentor().instrument(set_logging_format=True)
     SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
+    RedisInstrumentor().instrument_client(redis_client)  # type: ignore
     FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
