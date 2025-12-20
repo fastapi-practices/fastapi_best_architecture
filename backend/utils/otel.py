@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from opentelemetry import trace
-from opentelemetry._logs import set_logger_provider
+from opentelemetry import _logs, metrics, trace
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
@@ -9,6 +9,8 @@ from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs._internal.export import BatchLogRecordProcessor
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -17,6 +19,58 @@ from backend.common.log import log, request_id_filter
 from backend.core.conf import settings
 from backend.database.db import async_engine
 from backend.database.redis import redis_client
+
+
+def _init_tracer(resource: Resource) -> None:
+    """
+    初始化追踪器
+
+    :param resource: 遥测资源
+    :return:
+    """
+    tracer_provider = TracerProvider(resource=resource)
+    span_exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+
+    tracer_provider.add_span_processor(BatchSpanProcessor(span_exporter))
+    trace.set_tracer_provider(tracer_provider)
+
+
+def _init_metrics(resource: Resource) -> None:
+    """
+    初始化指标
+
+    :param resource: 遥测资源
+    :return:
+    """
+    metric_exporter = OTLPMetricExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    meter_provider = MeterProvider(
+        resource=resource,
+        metric_readers=[PeriodicExportingMetricReader(metric_exporter)],
+    )
+
+    metrics.set_meter_provider(meter_provider)
+
+
+def _init_logging(resource: Resource) -> None:
+    """
+    初始化日志
+
+    :param resource: 遥测资源
+    :return:
+    """
+    logger_provider = LoggerProvider(resource=resource)
+    logger_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+
+    logger_provider.add_log_record_processor(BatchLogRecordProcessor(logger_exporter))
+    _logs.set_logger_provider(logger_provider)
+
+    otel_logging_handler = LoggingHandler(logger_provider=logger_provider)
+    log.add(  # type: ignore
+        otel_logging_handler,
+        level=settings.LOG_STD_LEVEL,
+        format=settings.LOG_FORMAT,
+        filter=lambda record: request_id_filter(record),
+    )
 
 
 def init_otel(app: FastAPI) -> None:
@@ -36,27 +90,11 @@ def init_otel(app: FastAPI) -> None:
         },
     )
 
-    tracer_provider = TracerProvider(resource=resource)
-    trace.set_tracer_provider(tracer_provider)
-
-    span_exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
-    tracer_provider.add_span_processor(BatchSpanProcessor(span_exporter))
-
-    logger_provider = LoggerProvider(resource=resource)
-    set_logger_provider(logger_provider)
-
-    log_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
-    logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
-
-    otel_logging_handler = LoggingHandler(logger_provider=logger_provider)
-    log.add(  # type: ignore
-        otel_logging_handler,
-        level=settings.LOG_STD_LEVEL,
-        format=settings.LOG_FORMAT,
-        filter=lambda record: request_id_filter(record),
-    )
+    _init_tracer(resource)
+    # _init_metrics(resource)
+    _init_logging(resource)
 
     LoggingInstrumentor().instrument(set_logging_format=True)
     SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
-    RedisInstrumentor().instrument_client(redis_client)  # type: ignore
-    FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
+    RedisInstrumentor.instrument_client(redis_client)  # type: ignore
+    FastAPIInstrumentor.instrument_app(app)
