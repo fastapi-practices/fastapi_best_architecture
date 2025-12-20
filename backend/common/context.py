@@ -19,6 +19,7 @@ class TypedContextProtocol(Protocol):
     device: str | None
 
     permission: str | None
+    language: str
 
 
 class TypedContext(TypedContextProtocol, _Context):
