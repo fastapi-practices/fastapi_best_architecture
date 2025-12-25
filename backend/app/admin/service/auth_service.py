@@ -146,7 +146,6 @@ class AuthService:
                 log.error('登陆错误: 用户密码有误')
             task = BackgroundTask(
                 login_log_service.create,
-                db=db,
                 user_uuid=user.uuid if user else uuid4_str(),
                 username=obj.username,
                 login_time=timezone.now(),
@@ -160,7 +159,6 @@ class AuthService:
         else:
             background_tasks.add_task(
                 login_log_service.create,
-                db=db,
                 user_uuid=user.uuid,
                 username=obj.username,
                 login_time=timezone.now(),
