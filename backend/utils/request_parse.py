@@ -32,19 +32,16 @@ def get_request_ip(request: Request) -> str:
     return request.client.host
 
 
-async def get_location_online(ip: str, user_agent: str) -> dict | None:
+async def get_location_online(ip: str) -> dict | None:
     """
     在线获取 IP 地址属地，无法保证可用性，准确率较高
 
     :param ip: IP 地址
-    :param user_agent: 用户代理字符串
     :return:
     """
     async with httpx.AsyncClient(timeout=3) as client:
-        ip_api_url = f'http://ip-api.com/json/{ip}?lang=zh-CN'
-        headers = {'User-Agent': user_agent}
         try:
-            response = await client.get(ip_api_url, headers=headers)
+            response = await client.get(f'http://ip-api.com/json/{ip}?lang=zh-CN')
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
@@ -92,7 +89,7 @@ async def parse_ip_info(request: Request) -> IpInfo:
 
     location_info = None
     if settings.IP_LOCATION_PARSE == 'online':
-        location_info = await get_location_online(ip, request.headers.get('User-Agent'))
+        location_info = await get_location_online(ip)
     elif settings.IP_LOCATION_PARSE == 'offline':
         location_info = get_location_offline(ip)
 
@@ -115,9 +112,11 @@ def parse_user_agent_info(request: Request) -> UserAgentInfo:
     :param request: FastAPI 请求对象
     :return:
     """
+    os, browser, device = None, None, None
     user_agent = request.headers.get('User-Agent')
-    user_agent_ = parse(user_agent)
-    os = user_agent_.get_os()
-    browser = user_agent_.get_browser()
-    device = user_agent_.get_device()
+    if user_agent:
+        user_agent_ = parse(user_agent)
+        os = user_agent_.get_os()
+        browser = user_agent_.get_browser()
+        device = user_agent_.get_device()
     return UserAgentInfo(user_agent=user_agent, device=device, os=os, browser=browser)

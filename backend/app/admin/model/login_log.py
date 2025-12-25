@@ -21,7 +21,7 @@ class LoginLog(DataClassBase):
     country: Mapped[str | None] = mapped_column(sa.String(64), comment='国家')
     region: Mapped[str | None] = mapped_column(sa.String(64), comment='地区')
     city: Mapped[str | None] = mapped_column(sa.String(64), comment='城市')
-    user_agent: Mapped[str] = mapped_column(sa.String(256), comment='请求头')
+    user_agent: Mapped[str | None] = mapped_column(sa.String(256), comment='请求头')
     os: Mapped[str | None] = mapped_column(sa.String(64), comment='操作系统')
     browser: Mapped[str | None] = mapped_column(sa.String(64), comment='浏览器')
     device: Mapped[str | None] = mapped_column(sa.String(64), comment='设备')
