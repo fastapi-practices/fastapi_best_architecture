@@ -107,7 +107,6 @@ class OAuth2Service:
         await db.refresh(sys_user)
         background_tasks.add_task(
             login_log_service.create,
-            db=db,
             user_uuid=sys_user.uuid,
             username=sys_user.username,
             login_time=timezone.now(),
