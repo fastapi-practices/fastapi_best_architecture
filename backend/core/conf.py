@@ -183,7 +183,7 @@ class Settings(BaseSettings):
     LOG_ERROR_FILENAME: str = 'fba_error.log'
 
     # .env 操作日志
-    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # 密钥 os.urandom(32), 需使用 bytes.hex() 方法转换为 str
+    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # secrets.token_hex(32)
 
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
