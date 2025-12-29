@@ -11,7 +11,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.14.6
+    rev: v0.14.10
     hooks:
       - id: ruff-check
         args:
@@ -21,7 +21,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.12
+    rev: 0.9.18
     hooks:
       - id: uv-lock
       - id: uv-export
