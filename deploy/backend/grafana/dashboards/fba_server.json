@@ -1735,7 +1735,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "(rate({service_name=\"fba_server\"} |= \"$trace_id\" [1m]))",
+          "expr": "(rate({service_name=\"$app_name\"} |= \"$trace_id\" [1m]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
@@ -1779,7 +1779,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"fba_server\"} | json | line_format \"{{.body}}\" |= \"$trace_id\"",
+          "expr": "{service_name=\"$app_name\"} | json | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
@@ -1822,7 +1822,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"fba_server\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$trace_id\"",
+          "expr": "{service_name=\"$app_name\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
