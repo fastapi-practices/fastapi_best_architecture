@@ -3,7 +3,10 @@ __pycache__/
 .github/
 .idea/
 .vscode/
+.cursor/
 venv/
 .venv/
 .ruff_cache/
 .pytest_cache/
+.claude/
+.serena/
