@@ -1,3 +1,5 @@
+import shutil
+
 from functools import lru_cache
 from re import Pattern
 from typing import Any, Literal
@@ -5,14 +7,14 @@ from typing import Any, Literal
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from backend.core.path_conf import BASE_PATH
+from backend.core.path_conf import ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH
 
 
 class Settings(BaseSettings):
     """全局配置"""
 
     model_config = SettingsConfigDict(
-        env_file=f'{BASE_PATH}/.env',
+        env_file=ENV_FILE_PATH,
         env_file_encoding='utf-8',
         extra='ignore',
         case_sensitive=True,
@@ -296,6 +298,8 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """获取全局配置单例"""
+    if not ENV_FILE_PATH.exists():
+        shutil.copy(ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH)
     return Settings()
 
 
