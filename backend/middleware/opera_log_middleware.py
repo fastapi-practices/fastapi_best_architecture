@@ -12,7 +12,7 @@ from starlette.requests import Request
 from backend.app.admin.schema.opera_log import CreateOperaLogParam
 from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.context import ctx
-from backend.common.enums import OperaLogCipherType, StatusType
+from backend.common.enums import StatusType
 from backend.common.log import log
 from backend.common.prometheus.instruments import (
     PROMETHEUS_EXCEPTION_COUNTER,
@@ -25,7 +25,6 @@ from backend.common.queue import batch_dequeue
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.database.db import async_db_session
-from backend.utils.encrypt import AESCipher, ItsDCipher, Md5Cipher
 from backend.utils.trace_id import get_request_trace_id
 
 
@@ -208,20 +207,9 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         :param args: 需要脱敏的参数字典
         :return:
         """
-        for key, value in args.items():
-            if key in settings.OPERA_LOG_ENCRYPT_KEY_INCLUDE:
-                match settings.OPERA_LOG_ENCRYPT_TYPE:
-                    case OperaLogCipherType.aes:
-                        args[key] = (AESCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(value)).hex()
-                    case OperaLogCipherType.md5:
-                        args[key] = Md5Cipher.encrypt(value)
-                    case OperaLogCipherType.itsdangerous:
-                        args[key] = ItsDCipher(settings.OPERA_LOG_ENCRYPT_SECRET_KEY).encrypt(value)
-                    case OperaLogCipherType.plan:
-                        pass
-                    case _:
-                        args[key] = '******'
-
+        for key in args:
+            if key in settings.OPERA_LOG_REDACT_KEYS:
+                args[key] = '[REDACTED]'
         return args
 
     @classmethod
