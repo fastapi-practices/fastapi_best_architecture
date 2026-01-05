@@ -68,9 +68,8 @@ def setup_env_file() -> bool:
         redis_password = Prompt.ask('Redis 密码（留空表示无密码）', password=True, default='')
         redis_db = Prompt.ask('Redis 数据库编号', default='0')
 
-        console.print('生成 Token 和操作日志密钥...', style='white')
+        console.print('生成 Token 密钥...', style='white')
         token_secret = secrets.token_urlsafe(32)
-        opera_log_secret = secrets.token_hex(32)
 
         console.print('写入 .env 文件...', style='white')
         env_content = env_content.replace("DATABASE_TYPE='postgresql'", f"DATABASE_TYPE='{db_type}'")
@@ -93,10 +92,6 @@ def setup_env_file() -> bool:
         settings.REDIS_DATABASE = redis_db
         env_content = re.sub(r"TOKEN_SECRET_KEY='[^']*'", f"TOKEN_SECRET_KEY='{token_secret}'", env_content)
         settings.TOKEN_SECRET_KEY = token_secret
-        env_content = re.sub(
-            r"OPERA_LOG_ENCRYPT_SECRET_KEY='[^']*'", f"OPERA_LOG_ENCRYPT_SECRET_KEY='{opera_log_secret}'", env_content
-        )
-        settings.OPERA_LOG_ENCRYPT_SECRET_KEY = opera_log_secret
 
         Path(ENV_FILE_PATH).write_text(env_content, encoding='utf-8')
         console.print('.env 文件创建成功', style='green')
