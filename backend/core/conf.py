@@ -184,9 +184,6 @@ class Settings(BaseSettings):
     LOG_ACCESS_FILENAME: str = 'fba_access.log'
     LOG_ERROR_FILENAME: str = 'fba_error.log'
 
-    # .env 操作日志
-    OPERA_LOG_ENCRYPT_SECRET_KEY: str  # secrets.token_hex(32)
-
     # 操作日志
     OPERA_LOG_PATH_EXCLUDE: list[str] = [
         '/favicon.ico',
@@ -198,8 +195,7 @@ class Settings(BaseSettings):
         f'{FASTAPI_API_V1_PATH}/oauth2/google/callback',
         f'{FASTAPI_API_V1_PATH}/oauth2/linux-do/callback',
     ]
-    OPERA_LOG_ENCRYPT_TYPE: int = 1  # 0: AES (性能损耗); 1: md5; 2: ItsDangerous; 3: 不加密, others: 替换为 ******
-    OPERA_LOG_ENCRYPT_KEY_INCLUDE: list[str] = [  # 将加密接口入参参数对应的值
+    OPERA_LOG_REDACT_KEYS: list[str] = [
         'password',
         'old_password',
         'new_password',
