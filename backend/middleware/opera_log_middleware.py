@@ -1,6 +1,6 @@
 import time
 
-from asyncio import Queue, sleep
+from asyncio import Queue
 from typing import Any
 
 from asgiref.sync import sync_to_async
