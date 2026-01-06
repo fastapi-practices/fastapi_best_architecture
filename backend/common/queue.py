@@ -2,6 +2,8 @@ import asyncio
 
 from asyncio import Queue
 
+from backend.common.log import log
+
 
 async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
     """
@@ -23,5 +25,7 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float) -> list:
         await asyncio.wait_for(collector(), timeout=timeout)
     except asyncio.TimeoutError:
         pass
+    except Exception as e:
+        log.error(f'队列批量获取失败: {e}')
 
     return items
