@@ -227,6 +227,8 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         log.info('自动执行【操作日志批量创建】任务...')
                     async with async_db_session.begin() as db:
                         await opera_log_service.bulk_create(db=db, objs=logs)
+                except Exception as e:
+                    log.error(f'操作日志入库失败，丢失 {len(logs)} 条日志: {e}')
                 finally:
-                    if not cls.opera_log_queue.empty():
+                    for _ in range(len(logs)):
                         cls.opera_log_queue.task_done()
