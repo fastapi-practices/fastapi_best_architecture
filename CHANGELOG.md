@@ -1,3 +1,26 @@
+<a id="v1.12.2"></a>
+# [v1.12.2](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.12.2) - 2026-01-07
+
+## What's Changed
+* Update changelog for v1.12.1 by [@wu-clan](https://github.com/wu-clan) in [#983](https://github.com/fastapi-practices/fastapi_best_architecture/pull/983)
+* Fix environment variable file auto init by [@wu-clan](https://github.com/wu-clan) in [#985](https://github.com/fastapi-practices/fastapi_best_architecture/pull/985)
+* Simplify the desensitization of operation log data by [@wu-clan](https://github.com/wu-clan) in [#987](https://github.com/fastapi-practices/fastapi_best_architecture/pull/987)
+* Remove invalid configs of operation log by [@wu-clan](https://github.com/wu-clan) in [#988](https://github.com/fastapi-practices/fastapi_best_architecture/pull/988)
+* Fix operation log queue status management by [@wu-clan](https://github.com/wu-clan) in [#989](https://github.com/fastapi-practices/fastapi_best_architecture/pull/989)
+* Fix SQL scripts error in config plugin by [@wu-clan](https://github.com/wu-clan) in [#991](https://github.com/fastapi-practices/fastapi_best_architecture/pull/991)
+* Fix the key of the refresh token removed by [@wu-clan](https://github.com/wu-clan) in [#993](https://github.com/fastapi-practices/fastapi_best_architecture/pull/993)
+* Remove Linux Do OAuth2 login by [@wu-clan](https://github.com/wu-clan) in [#994](https://github.com/fastapi-practices/fastapi_best_architecture/pull/994)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.12.1...v1.12.2
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.12.2]
+
+
 <a id="v1.12.1"></a>
 # [v1.12.1](https://github.com/fastapi-practices/fastapi_best_architecture/releases/tag/v1.12.1) - 2025-12-31
 
@@ -1253,6 +1276,7 @@
 [Changes][v1.0.0]
 
 
+[v1.12.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.2...v1.12.0
 [v1.11.2]: https://github.com/fastapi-practices/fastapi_best_architecture/compare/v1.11.1...v1.11.2
