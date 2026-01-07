@@ -90,13 +90,6 @@ class UserSocialService:
                     redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI,
                     state=state,
                 )
-            case UserSocialType.linux_do:
-                from backend.plugin.oauth2.api.v1.linux_do import linux_do_client
-
-                auth_url = await linux_do_client.get_authorization_url(
-                    redirect_uri=settings.OAUTH2_LINUX_DO_REDIRECT_URI,
-                    state=state,
-                )
             case _:
                 raise errors.ForbiddenError(msg=f'暂不支持 {source} 绑定')
 

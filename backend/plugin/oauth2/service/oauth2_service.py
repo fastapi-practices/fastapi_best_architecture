@@ -167,9 +167,6 @@ class OAuth2Service:
                 username = user.get('name')
                 nickname = user.get('given_name')
                 avatar = user.get('picture')
-            case UserSocialType.linux_do:
-                sid = user.get('id')
-                nickname = user.get('name')
             case _:
                 raise errors.ForbiddenError(msg=f'暂不支持 {social} OAuth2 登录')
 

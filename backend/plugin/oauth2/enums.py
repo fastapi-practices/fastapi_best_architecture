@@ -6,7 +6,6 @@ class UserSocialType(StrEnum):
 
     github = 'Github'
     google = 'Google'
-    linux_do = 'LinuxDo'
 
 
 class UserSocialAuthType(StrEnum):
