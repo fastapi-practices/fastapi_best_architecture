@@ -176,25 +176,45 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         # 请求体
         body_data = await request.body()
         if body_data:
-            # 注意：非 json 数据默认使用 data 作为键
+            # 注意：非 json 数据默认使用 data 作为键（截断以防过大）
             if 'application/json' not in content_type:
-                args['data'] = str(body_data)
+                preview = body_data[:512]
+                args['data'] = preview.decode('utf-8', 'ignore') if isinstance(preview, bytes) else str(preview)
+                args['body_size'] = len(body_data)
             else:
                 json_data = await request.json()
                 if isinstance(json_data, dict):
                     args['json'] = await self.desensitization(json_data)
                 else:
-                    args['data'] = str(body_data)
+                    args['data'] = str(json_data)[:512]
 
         # 表单参数
         form_data = await request.form()
         if len(form_data) > 0:
+            serialized_form: dict[str, Any] = {}
             for k, v in form_data.items():
-                form_data = {k: v.filename} if isinstance(v, UploadFile) else {k: v}
+                if isinstance(v, UploadFile):
+                    size = None
+                    file_obj = getattr(v, 'file', None)
+                    if file_obj is not None:
+                        try:
+                            current_pos = file_obj.tell()
+                            file_obj.seek(0, 2)
+                            size = file_obj.tell()
+                            file_obj.seek(current_pos)
+                        except (OSError, AttributeError):
+                            size = None
+                    serialized_form[k] = {
+                        'filename': v.filename,
+                        'content_type': v.content_type,
+                        'size': size,
+                    }
+                else:
+                    serialized_form[k] = v
             if 'multipart/form-data' not in content_type:
-                args['x-www-form-urlencoded'] = await self.desensitization(form_data)
+                args['x-www-form-urlencoded'] = await self.desensitization(serialized_form)
             else:
-                args['form-data'] = await self.desensitization(form_data)
+                args['form-data'] = await self.desensitization(serialized_form)
 
         return args or None
 
