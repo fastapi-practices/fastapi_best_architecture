@@ -4,7 +4,6 @@ import time
 from asyncio import Queue
 from typing import Any
 
-from asgiref.sync import sync_to_async
 from fastapi import Response
 from starlette.datastructures import UploadFile
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -163,12 +162,12 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         # 查询参数
         query_params = dict(request.query_params)
         if query_params:
-            args['query_params'] = await self.desensitization(query_params)
+            args['query_params'] = self.desensitization(query_params)
 
         # 路径参数
         path_params = request.path_params
         if path_params:
-            args['path_params'] = await self.desensitization(path_params)
+            args['path_params'] = self.desensitization(path_params)
 
         # Tip: .body() 必须在 .form() 之前获取
         # https://github.com/encode/starlette/discussions/1933
@@ -183,7 +182,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             else:
                 json_data = await request.json()
                 if isinstance(json_data, dict):
-                    args['json'] = await self.desensitization(json_data)
+                    args['json'] = self.desensitization(json_data)
                 else:
                     args['data'] = str(json_data)
 
@@ -201,9 +200,9 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 else:
                     serialized_form[k] = v
             if 'multipart/form-data' not in content_type:
-                args['x-www-form-urlencoded'] = await self.desensitization(serialized_form)
+                args['x-www-form-urlencoded'] = self.desensitization(serialized_form)
             else:
-                args['form-data'] = await self.desensitization(serialized_form)
+                args['form-data'] = self.desensitization(serialized_form)
 
         if args:
             args = self.truncate(args)
@@ -239,7 +238,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         return args
 
     @staticmethod
-    @sync_to_async
     def desensitization(args: dict[str, Any]) -> dict[str, Any]:
         """
         脱敏处理
