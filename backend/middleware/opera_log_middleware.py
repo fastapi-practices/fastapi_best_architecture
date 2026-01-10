@@ -1,3 +1,4 @@
+import json
 import time
 
 from asyncio import Queue
@@ -150,7 +151,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    async def get_request_args(self, request: Request) -> dict[str, Any] | None:
+    async def get_request_args(self, request: Request) -> dict[str, Any] | None:  # noqa: C901
         """
         获取请求参数
 
@@ -176,38 +177,26 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         # 请求体
         body_data = await request.body()
         if body_data:
-            # 注意：非 json 数据默认使用 data 作为键（截断以防过大）
+            # 注意：非 json 数据默认使用 data 作为键
             if 'application/json' not in content_type:
-                preview = body_data[:512]
-                args['data'] = preview.decode('utf-8', 'ignore') if isinstance(preview, bytes) else str(preview)
-                args['body_size'] = len(body_data)
+                args['data'] = body_data.decode('utf-8', 'ignore') if isinstance(body_data, bytes) else str(body_data)
             else:
                 json_data = await request.json()
                 if isinstance(json_data, dict):
                     args['json'] = await self.desensitization(json_data)
                 else:
-                    args['data'] = str(json_data)[:512]
+                    args['data'] = str(json_data)
 
         # 表单参数
         form_data = await request.form()
         if len(form_data) > 0:
-            serialized_form: dict[str, Any] = {}
+            serialized_form = {}
             for k, v in form_data.items():
                 if isinstance(v, UploadFile):
-                    size = None
-                    file_obj = getattr(v, 'file', None)
-                    if file_obj is not None:
-                        try:
-                            current_pos = file_obj.tell()
-                            file_obj.seek(0, 2)
-                            size = file_obj.tell()
-                            file_obj.seek(current_pos)
-                        except (OSError, AttributeError):
-                            size = None
                     serialized_form[k] = {
                         'filename': v.filename,
                         'content_type': v.content_type,
-                        'size': size,
+                        'size': v.size,
                     }
                 else:
                     serialized_form[k] = v
@@ -216,7 +205,38 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             else:
                 args['form-data'] = await self.desensitization(serialized_form)
 
+        if args:
+            args = self.truncate(args)
+
         return args or None
+
+    @staticmethod
+    def truncate(args: dict[str, Any]) -> dict[str, Any]:
+        """
+        截断处理
+
+        :param args: 需要截断的请求参数字典
+        :return:
+        """
+        max_size = 10240  # 数据最大大小（字节）
+
+        try:
+            args_str = json.dumps(args, ensure_ascii=False)
+            args_size = len(args_str.encode('utf-8'))
+
+            if args_size > max_size:
+                truncated_str = args_str[:max_size]
+                return {
+                    '_truncated': True,
+                    '_original_size': args_size,
+                    '_max_size': max_size,
+                    '_message': f'数据过大已截断：原始大小 {args_size} 字节，限制 {max_size} 字节',
+                    'data_preview': truncated_str,
+                }
+        except Exception as e:
+            log.error(f'请求参数截断处理失败：{e}')
+
+        return args
 
     @staticmethod
     @sync_to_async
