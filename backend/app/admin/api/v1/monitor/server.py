@@ -28,8 +28,8 @@ router = APIRouter()
 
 
 @router.get('', summary='server 监控', dependencies=[DependsJwtAuth])
-async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:
-    def get_all_info() -> ServerMonitorInfo:
+async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: C901
+    def get_all_info() -> ServerMonitorInfo:  # noqa: C901
         # CPU 信息
         cpu_data = {
             'usage': round(psutil.cpu_percent(interval=0.1), 2),
@@ -78,20 +78,32 @@ async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:
 
         # 磁盘信息
         disk_list = []
+        exclude_fstypes = {'overlay', 'overlay2', 'tmpfs', 'devtmpfs', 'shm', 'proc', 'sysfs', 'cgroup', 'cgroup2'}
+        seen_devices = set()
         for partition in psutil.disk_partitions(all=False):
-            usage = psutil.disk_usage(partition.mountpoint)
-            if usage:
-                disk_list.append(
-                    DiskInfo(
-                        dir=partition.mountpoint,
-                        type=partition.fstype,
-                        device=partition.device,
-                        total=fmt_bytes(usage.total),
-                        free=fmt_bytes(usage.free),
-                        used=fmt_bytes(usage.used),
-                        usage=f'{usage.percent:.2f}%',
+            # 跳过虚拟文件系统
+            if partition.fstype.lower() in exclude_fstypes:
+                continue
+            # 跳过重复设备（同一设备的不同挂载点）
+            if partition.device in seen_devices:
+                continue
+            try:
+                usage = psutil.disk_usage(partition.mountpoint)
+                if usage:
+                    seen_devices.add(partition.device)
+                    disk_list.append(
+                        DiskInfo(
+                            dir=partition.mountpoint,
+                            type=partition.fstype,
+                            device=partition.device,
+                            total=fmt_bytes(usage.total),
+                            free=fmt_bytes(usage.free),
+                            used=fmt_bytes(usage.used),
+                            usage=f'{usage.percent:.2f}%',
+                        )
                     )
-                )
+            except (PermissionError, OSError):
+                continue
 
         # 服务信息
         process = psutil.Process(os.getpid())
