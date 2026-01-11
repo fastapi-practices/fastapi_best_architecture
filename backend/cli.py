@@ -33,8 +33,8 @@ from backend.core.path_conf import (
 )
 from backend.database.db import async_db_session, create_tables, drop_tables
 from backend.database.redis import redis_client
+from backend.plugin.core import get_plugin_sql, get_plugins
 from backend.plugin.installer import install_git_plugin, install_zip_plugin
-from backend.plugin.tools import get_plugin_sql, get_plugins
 from backend.utils.console import console
 from backend.utils.dynamic_import import import_module_cached
 from backend.utils.sql_parser import parse_sql_script

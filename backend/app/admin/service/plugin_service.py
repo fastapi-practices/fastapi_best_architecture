@@ -16,7 +16,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
 from backend.plugin.installer import install_git_plugin, install_zip_plugin
-from backend.plugin.tools import uninstall_requirements_async
+from backend.plugin.requirements import uninstall_requirements_async
 from backend.utils.timezone import timezone
 
 

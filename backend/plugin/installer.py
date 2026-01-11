@@ -14,7 +14,7 @@ from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
-from backend.plugin.tools import install_requirements_async
+from backend.plugin.requirements import install_requirements_async
 from backend.utils.pattern_validate import is_git_url
 
 
