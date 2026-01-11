@@ -9,7 +9,7 @@ from backend.common.context import ctx
 from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperatorType
 from backend.common.exception import errors
 from backend.core.conf import settings
-from backend.utils.import_parse import get_all_models
+from backend.utils.dynamic_import import get_all_models
 
 
 class RequestPermission:

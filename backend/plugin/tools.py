@@ -21,8 +21,8 @@ from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
-from backend.utils._await import run_await
-from backend.utils.import_parse import get_model_objects, import_module_cached
+from backend.utils.async_helper import run_await
+from backend.utils.dynamic_import import get_model_objects, import_module_cached
 
 
 class PluginConfigError(Exception):
