@@ -6,7 +6,7 @@ from backend.common.exception import errors
 from backend.common.log import log
 from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
-from backend.utils.import_parse import import_module_cached
+from backend.utils.dynamic_import import import_module_cached
 
 
 async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  # noqa: C901

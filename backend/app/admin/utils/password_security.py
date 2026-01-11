@@ -6,7 +6,7 @@ from backend.app.admin.crud.crud_user_password_history import user_password_hist
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.utils.dynamic_config import load_user_security_config
-from backend.utils.re_verify import is_has_letter, is_has_number, is_has_special_char
+from backend.utils.pattern_validate import is_has_letter, is_has_number, is_has_special_char
 
 password_hash = PasswordHash((BcryptHasher(),))
 
