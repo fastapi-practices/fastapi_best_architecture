@@ -14,14 +14,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.common.exception import errors
 from backend.core.path_conf import BASE_PATH
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
-from backend.plugin.code_generator.crud.crud_code import gen_dao
 from backend.plugin.code_generator.crud.crud_column import gen_column_dao
+from backend.plugin.code_generator.crud.crud_gen import gen_dao
 from backend.plugin.code_generator.model import GenBusiness
 from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
-from backend.plugin.code_generator.schema.code import ImportParam
 from backend.plugin.code_generator.schema.column import CreateGenColumnParam
+from backend.plugin.code_generator.schema.gen import ImportParam
 from backend.plugin.code_generator.service.column_service import gen_column_service
-from backend.plugin.code_generator.utils.code_template import gen_template
+from backend.plugin.code_generator.utils.gen_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
 

@@ -400,8 +400,8 @@ async def import_table(
     table_schema: str,
     table_name: str,
 ) -> None:
-    from backend.plugin.code_generator.schema.code import ImportParam
-    from backend.plugin.code_generator.service.code_service import gen_service
+    from backend.plugin.code_generator.schema.gen import ImportParam
+    from backend.plugin.code_generator.service.gen_service import gen_service
 
     try:
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
@@ -415,7 +415,7 @@ async def import_table(
 
 async def generate() -> None:
     from backend.plugin.code_generator.service.business_service import gen_business_service
-    from backend.plugin.code_generator.service.code_service import gen_service
+    from backend.plugin.code_generator.service.gen_service import gen_service
 
     try:
         ids = []
