@@ -92,7 +92,7 @@ class UserService:
         """
         if await user_dao.get_by_username(db, obj.username):
             raise errors.ConflictError(msg='用户名已注册')
-        obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
+        obj.nickname = obj.nickname or obj.username
         if not obj.password:
             raise errors.RequestError(msg='密码不允许为空')
         if not await dept_dao.get(db, obj.dept_id):
