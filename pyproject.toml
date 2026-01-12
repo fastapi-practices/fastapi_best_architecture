@@ -40,6 +40,7 @@ dependencies = [
     "opentelemetry-instrumentation-redis>=0.60b1",
     "opentelemetry-instrumentation-sqlalchemy>=0.60b1",
     "opentelemetry-sdk>=1.39.1",
+    "pip>=25.3",
     "prometheus-client>=0.23.1",
     "psutil>=7.2.0",
     # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887

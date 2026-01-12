@@ -713,6 +713,7 @@ dependencies = [
     { name = "opentelemetry-instrumentation-redis" },
     { name = "opentelemetry-instrumentation-sqlalchemy" },
     { name = "opentelemetry-sdk" },
+    { name = "pip" },
     { name = "prometheus-client" },
     { name = "psutil" },
     { name = "psycopg", extra = ["binary"] },
@@ -775,6 +776,7 @@ requires-dist = [
     { name = "opentelemetry-instrumentation-redis", specifier = ">=0.60b1" },
     { name = "opentelemetry-instrumentation-sqlalchemy", specifier = ">=0.60b1" },
     { name = "opentelemetry-sdk", specifier = ">=1.39.1" },
+    { name = "pip", specifier = ">=25.3" },
     { name = "prometheus-client", specifier = ">=0.23.1" },
     { name = "psutil", specifier = ">=7.2.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.2.10" },
@@ -2023,6 +2025,15 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/20/2e/3434380e8110b76cd9eb00a363c484b050f949b4bbe84ba770bb8508a02c/pillow-12.0.0-pp311-pypy311_pp73-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:09f2d0abef9e4e2f349305a4f8cc784a8a6c2f58a8c4892eea13b10a943bd26e" },
     { url = "https://mirrors.aliyun.com/pypi/packages/57/ca/5a9d38900d9d74785141d6580950fe705de68af735ff6e727cb911b64740/pillow-12.0.0-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bdee52571a343d721fb2eb3b090a82d959ff37fc631e3f70422e0c2e029f3e76" },
     { url = "https://mirrors.aliyun.com/pypi/packages/95/7e/f896623c3c635a90537ac093c6a618ebe1a90d87206e42309cb5d98a1b9e/pillow-12.0.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:b290fd8aa38422444d4b50d579de197557f182ef1068b75f5aa8558638b8d0a5" },
+]
+
+[[package]]
+name = "pip"
+version = "25.3"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/fe/6e/74a3f0179a4a73a53d66ce57fdb4de0080a8baa1de0063de206d6167acc2/pip-25.3.tar.gz", hash = "sha256:8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/44/3c/d717024885424591d5376220b5e836c2d5293ce2011523c9de23ff7bf068/pip-25.3-py3-none-any.whl", hash = "sha256:9655943313a94722b7774661c21049070f6bbb0a1516bf02f7c8d5d9201514cd" },
 ]
 
 [[package]]
