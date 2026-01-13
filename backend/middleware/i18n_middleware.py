@@ -4,6 +4,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.common.i18n import i18n
+from backend.core.conf import settings
 
 
 def get_current_language(request: Request) -> str | None:
@@ -15,7 +16,7 @@ def get_current_language(request: Request) -> str | None:
     """
     accept_language = request.headers.get('Accept-Language', '')
     if not accept_language:
-        return None
+        return settings.I18N_DEFAULT_LANGUAGE
 
     languages = [lang.split(';')[0] for lang in accept_language.split(',')]
     lang = languages[0].lower().strip()
