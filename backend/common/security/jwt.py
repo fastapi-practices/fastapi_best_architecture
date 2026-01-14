@@ -217,6 +217,30 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
     return user
 
 
+async def get_jwt_user(user_id: int) -> GetUserInfoWithRelationDetail:
+    """
+    获取 JWT 用户
+
+    :param user_id:
+    :return:
+    """
+    cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
+    if not cache_user:
+        async with async_db_session() as db:
+            current_user = await get_current_user(db, user_id)
+            user = GetUserInfoWithRelationDetail.model_validate(current_user)
+            await redis_client.setex(
+                f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
+                settings.TOKEN_EXPIRE_SECONDS,
+                user.model_dump_json(),
+            )
+    else:
+        # TODO: 在恰当的时机，应替换为使用 model_validate_json
+        # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
+        user = GetUserInfoWithRelationDetail.model_validate(from_json(cache_user, allow_partial=True))
+    return user
+
+
 def superuser_verify(request: Request, _token: str = DependsJwtAuth) -> bool:
     """
     验证当前用户超级管理员权限
@@ -247,21 +271,7 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
     if token != redis_token:
         raise errors.TokenError(msg='Token 已失效')
 
-    cache_user = await redis_client.get(f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}')
-    if not cache_user:
-        async with async_db_session() as db:
-            current_user = await get_current_user(db, user_id)
-            user = GetUserInfoWithRelationDetail.model_validate(current_user)
-            await redis_client.setex(
-                f'{settings.JWT_USER_REDIS_PREFIX}:{user_id}',
-                settings.TOKEN_EXPIRE_SECONDS,
-                user.model_dump_json(),
-            )
-    else:
-        # TODO: 在恰当的时机，应替换为使用 model_validate_json
-        # https://docs.pydantic.dev/latest/concepts/json/#partial-json-parsing
-        user = GetUserInfoWithRelationDetail.model_validate(from_json(cache_user, allow_partial=True))
-    return user
+    return await get_jwt_user(user_id)
 
 
 # 超级管理员鉴权依赖注入
