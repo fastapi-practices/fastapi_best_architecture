@@ -15,7 +15,7 @@ from backend.utils.serializers import MsgSpecJSONResponse
 
 
 class AuthenticationError(StarletteAuthenticationError):
-    """认证错误类"""
+    """重写内部认证错误类"""
 
     def __init__(
         self,
