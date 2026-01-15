@@ -112,10 +112,11 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     plugins = get_plugins()
 
     # 使用独立单例，避免与主线程冲突
-    current_redis_client = RedisCli()
+    plugin_redis_client = RedisCli()
+    run_await(plugin_redis_client.init)()
 
     # 清理未知插件信息
-    run_await(current_redis_client.delete_prefix)(
+    run_await(plugin_redis_client.delete_prefix)(
         settings.PLUGIN_REDIS_PREFIX,
         exclude=[f'{settings.PLUGIN_REDIS_PREFIX}:{key}' for key in plugins],
     )
@@ -142,7 +143,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             app_plugins.append(data)
 
         # 补充插件信息
-        plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
+        plugin_cache_info = run_await(plugin_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if plugin_cache_info:
             data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
         else:
@@ -150,16 +151,16 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
 
         # 缓存最新插件信息
-        run_await(current_redis_client.set)(
+        run_await(plugin_redis_client.set)(
             f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}',
             json.dumps(data, ensure_ascii=False),
         )
 
     # 重置插件变更状态
-    run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
+    run_await(plugin_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
 
     # 关闭连接
-    run_await(current_redis_client.aclose)()
+    run_await(plugin_redis_client.aclose)()
 
     return extend_plugins, app_plugins
 
