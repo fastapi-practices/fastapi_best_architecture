@@ -51,7 +51,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     await create_tables()
 
     # 初始化 redis
-    await redis_client.open()
+    await redis_client.init()
 
     # 初始化 limiter
     await FastAPILimiter.init(
