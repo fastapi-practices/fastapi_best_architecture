@@ -156,15 +156,6 @@ async def auto_init() -> None:
     console.print(Panel(panel_content, title=f'fba (v{__version__}) - 环境变量', border_style='cyan', padding=(1, 2)))
     if not setup_env_file():
         raise cappa.Exit('.env 文件配置失败', code=1)
-    async_init_engine = create_database_async_engine(create_database_url(with_database=False))
-    async_init_db_session = create_database_async_session(async_init_engine)
-    redis_init_client = RedisCli(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        password=settings.REDIS_PASSWORD,
-        db=settings.REDIS_DATABASE,
-    )
-    await redis_init_client.init()
 
     console.print('\n[bold cyan]步骤 2/3:[/] 数据库创建', style='bold')
     panel_content = Text()
@@ -182,6 +173,7 @@ async def auto_init() -> None:
     ok = Prompt.ask('即将[red]新建/重建数据库[/red]，确认继续吗？', choices=['y', 'n'], default='n')
 
     if ok.lower() == 'y':
+        async_init_engine = create_database_async_engine(create_database_url(with_database=False))
         async with async_init_engine.connect() as conn:
             await conn.execution_options(isolation_level='AUTOCOMMIT')
             if not await create_database(conn):
@@ -190,6 +182,15 @@ async def auto_init() -> None:
         console.print('已取消数据库操作', style='yellow')
 
     console.print('\n[bold cyan]步骤 3/3:[/] 初始化数据库表和数据', style='bold')
+    async_init_engine = create_database_async_engine(create_database_url())
+    async_init_db_session = create_database_async_session(async_init_engine)
+    redis_init_client = RedisCli(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD,
+        db=settings.REDIS_DATABASE,
+    )
+    await redis_init_client.init()
     async with async_init_db_session.begin() as db:
         await init(db, redis_init_client)
 
