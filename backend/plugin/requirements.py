@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 from importlib.metadata import PackageNotFoundError, distribution
 
@@ -23,6 +24,11 @@ def get_plugins() -> list[str]:
     from backend.plugin.core import get_plugins as _get_plugins
 
     return _get_plugins()
+
+
+def _is_in_virtualenv() -> bool:
+    """检测当前是否在虚拟环境中运行"""
+    return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
 
 
 def install_requirements(plugin: str | None) -> None:  # noqa: C901
@@ -56,6 +62,8 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
         if missing_dependencies:
             try:
                 pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
+                if not _is_in_virtualenv():
+                    pip_install.append('--system')
                 if settings.PLUGIN_PIP_CHINA:
                     pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
 
@@ -91,6 +99,8 @@ def uninstall_requirements(plugin: str) -> None:
     if os.path.exists(requirements_file):
         try:
             pip_uninstall = ['uv', 'pip', 'uninstall', '-r', str(requirements_file), '-y']
+            if not _is_in_virtualenv():
+                pip_uninstall.append('--system')
             subprocess.check_call(pip_uninstall, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as e:
             raise PluginInstallError(f'插件 {plugin} 依赖卸载失败：{e}') from e

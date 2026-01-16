@@ -22,23 +22,29 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 # Install dependencies with cache
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-default-groups --group server
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-default-groups --group server --no-install-project
 
 # === Runtime base server image ===
-FROM python:3.10-slim AS base_server
+FROM python:3.10-slim-bookworm AS base_server
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
-    && apt-get install -y --no-install-recommends supervisor \
+    && apt-get install -y --no-install-recommends curl ca-certificates supervisor \
     && rm -rf /var/lib/apt/lists/*
+
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+
+ENV PATH="/root/.local/bin/:$PATH"
 
 COPY --from=builder /fba /fba
 
 COPY --from=builder /usr/local /usr/local
 
 COPY deploy/backend/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
-
-WORKDIR /fba/backend
 
 # === FastAPI server image ===
 FROM base_server AS fba_server
