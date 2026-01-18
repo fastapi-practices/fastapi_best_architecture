@@ -58,13 +58,13 @@ class GenService:
         if business_info:
             raise errors.ConflictError(msg='已存在相同数据库表业务')
 
-        table_name = table_info[0]
+        table_name = table_info['table_name']
         new_business = GenBusiness(
             **CreateGenBusinessParam(
                 app_name=obj.app,
                 table_name=table_name,
-                doc_comment=table_info[1] or table_name.split('_')[-1],
-                table_comment=table_info[1],
+                doc_comment=table_info['table_comment'] or table_name.split('_')[-1],
+                table_comment=table_info['table_comment'],
                 class_name=to_pascal(table_name),
                 schema_name=to_pascal(table_name),
                 filename=table_name,
@@ -75,25 +75,27 @@ class GenService:
 
         column_info = await gen_dao.get_all_columns(db, obj.table_schema, table_name)
         for column in column_info:
-            column_type = column[-1].split('(')[0].upper()
+            column_type = column['column_type'].split('(')[0].upper()
             pd_type = sql_type_to_pydantic(column_type)
             await gen_column_dao.create(
                 db,
                 CreateGenColumnParam(
-                    name=column[0],
-                    comment=column[-2],
+                    name=column['column_name'],
+                    comment=column['column_comment'],
                     type=column_type,
-                    sort=column[-3],
-                    length=column[-1].split('(')[1][:-1] if pd_type == 'str' and '(' in column[-1] else 0,
-                    is_pk=column[1],
-                    is_nullable=column[2],
+                    sort=column['sort'],
+                    length=column['column_type'].split('(')[1][:-1]
+                    if pd_type == 'str' and '(' in column['column_type']
+                    else 0,
+                    is_pk=column['is_pk'],
+                    is_nullable=column['is_nullable'],
                     gen_business_id=new_business.id,
                 ),
                 pd_type=pd_type,
             )
 
     @staticmethod
-    async def render_tpl_code(*, db: AsyncSession, business: GenBusiness) -> dict[str, str]:
+    async def _render_tpl_code(*, db: AsyncSession, business: GenBusiness) -> dict[str, str]:
         """
         渲染模板代码
 
@@ -119,14 +121,12 @@ class GenService:
         :param pk: 业务 ID
         :return:
         """
-
         business = await gen_business_dao.get(db, pk)
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
-        tpl_code_map = await self.render_tpl_code(db=db, business=business)
-
         codes = {}
+        tpl_code_map = await self._render_tpl_code(db=db, business=business)
         for tpl_path, code in tpl_code_map.items():
             if tpl_path.startswith('python'):
                 rootpath = f'fastapi_best_architecture/backend/app/{business.app_name}'
@@ -158,7 +158,6 @@ class GenService:
         :param pk: 业务 ID
         :return:
         """
-
         business = await gen_business_dao.get(db, pk)
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
@@ -176,12 +175,11 @@ class GenService:
         :param pk: 业务 ID
         :return:
         """
-
         business = await gen_business_dao.get(db, pk)
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
-        tpl_code_map = await self.render_tpl_code(db=db, business=business)
+        tpl_code_map = await self._render_tpl_code(db=db, business=business)
         gen_path = business.gen_path or BASE_PATH / 'app'
 
         for tpl_path, code in tpl_code_map.items():
@@ -233,14 +231,13 @@ class GenService:
         :param pk: 业务 ID
         :return:
         """
-
         business = await gen_business_dao.get(db, pk)
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:
-            tpl_code_map = await self.render_tpl_code(db=db, business=business)
+            tpl_code_map = await self._render_tpl_code(db=db, business=business)
             for tpl_path, code in tpl_code_map.items():
                 code_filepath = gen_template.get_code_gen_path(tpl_path, business)
 

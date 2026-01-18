@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import Row, RowMapping, text
+from sqlalchemy import RowMapping, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.enums import DataBaseType
@@ -41,7 +41,7 @@ class CRUDGen:
         return result.mappings().all()
 
     @staticmethod
-    async def get_table(db: AsyncSession, table_name: str) -> Row[tuple]:
+    async def get_table(db: AsyncSession, table_name: str) -> RowMapping | None:
         """
         获取表信息
 
@@ -68,10 +68,11 @@ class CRUDGen:
             """
         stmt = text(sql).bindparams(table_name=table_name)
         result = await db.execute(stmt)
-        return result.fetchone()
+        row = result.fetchone()
+        return row._mapping if row else None
 
     @staticmethod
-    async def get_all_columns(db: AsyncSession, table_schema: str, table_name: str) -> Sequence[Row[tuple]]:
+    async def get_all_columns(db: AsyncSession, table_schema: str, table_name: str) -> Sequence[RowMapping]:
         """
         获取所有列信息
 
@@ -129,7 +130,7 @@ class CRUDGen:
             """
             stmt = text(sql).bindparams(table_name=table_name)
         result = await db.execute(stmt)
-        return result.fetchall()
+        return result.mappings().all()
 
 
 gen_dao: CRUDGen = CRUDGen()
