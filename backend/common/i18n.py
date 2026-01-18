@@ -4,7 +4,7 @@ from starlette_context.errors import ContextDoesNotExistError
 
 from backend.common.context import ctx
 from backend.core.conf import settings
-from backend.locale.loader import locale_loader
+from backend.locales.loader import locale_loader
 
 
 class I18n:
