@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
+from pydantic.alias_generators import to_pascal
 
 from backend.core.conf import settings
 from backend.plugin.code_generator.model import GenBusiness, GenColumn
@@ -73,6 +74,30 @@ class GenTemplate:
         code_gen_path_mapping = dict(zip(self.get_template_files(), self.get_code_gen_paths(business)))
         return code_gen_path_mapping[tpl_path]
 
+    def get_init_files(self, business: GenBusiness) -> dict[str, str]:
+        """
+        获取需要生成的 __init__.py 文件及其内容
+
+        :param business: 业务对象
+        :return: {相对路径: 文件内容}
+        """
+        app_name = business.app_name
+        table_name = business.table_name
+        class_name = business.class_name or to_pascal(table_name)
+
+        return {
+            f'{app_name}/__init__.py': self.init_content,
+            f'{app_name}/api/__init__.py': self.init_content,
+            f'{app_name}/api/{business.api_version}/__init__.py': self.init_content,
+            f'{app_name}/crud/__init__.py': self.init_content,
+            f'{app_name}/model/__init__.py': (
+                f'{self.init_content}'
+                f'from backend.app.{app_name}.model.{table_name} import {class_name} as {class_name}\n'
+            ),
+            f'{app_name}/schema/__init__.py': self.init_content,
+            f'{app_name}/service/__init__.py': self.init_content,
+        }
+
     @staticmethod
     def get_vars(business: GenBusiness, models: Sequence[GenColumn]) -> dict[str, str | Sequence[GenColumn]]:
         """
@@ -90,7 +115,7 @@ class GenTemplate:
             'class_name': business.class_name,
             'schema_name': business.schema_name,
             'default_datetime_column': business.default_datetime_column,
-            'permission': str(business.table_name.replace('_', ':')),
+            'permission': business.table_name.replace('_', ':'),
             'database_type': settings.DATABASE_TYPE,
             'models': models,
             'model_types': [model.type for model in models],
