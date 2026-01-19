@@ -21,6 +21,7 @@ from backend.plugin.code_generator.schema.business import CreateGenBusinessParam
 from backend.plugin.code_generator.schema.column import CreateGenColumnParam
 from backend.plugin.code_generator.schema.gen import ImportParam
 from backend.plugin.code_generator.service.column_service import gen_column_service
+from backend.plugin.code_generator.utils.format_code import format_python_code
 from backend.plugin.code_generator.utils.gen_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
 
@@ -108,10 +109,16 @@ class GenService:
             raise errors.NotFoundError(msg='代码生成模型表为空')
 
         gen_vars = gen_template.get_vars(business, gen_models)
-        return {
-            tpl_path: await gen_template.get_template(tpl_path).render_async(**gen_vars)
-            for tpl_path in gen_template.get_template_files()
-        }
+        template_mapping = gen_template.get_template_path_mapping(business)
+
+        rendered_codes = {}
+        for template_path, output_path in template_mapping.items():
+            code = await gen_template.get_template(template_path).render_async(**gen_vars)
+            if output_path.endswith('.py'):
+                code = await format_python_code(code)
+            rendered_codes[output_path] = code
+
+        return rendered_codes
 
     async def preview(self, *, db: AsyncSession, pk: int) -> dict[str, bytes]:
         """
@@ -126,26 +133,15 @@ class GenService:
             raise errors.NotFoundError(msg='业务不存在')
 
         codes = {}
-        tpl_code_map = await self._render_tpl_code(db=db, business=business)
-        for tpl_path, code in tpl_code_map.items():
-            if tpl_path.startswith('python'):
-                rootpath = f'fastapi_best_architecture/backend/app/{business.app_name}'
-                template_name = tpl_path.split('/')[-1]
-                filepath = None
-                match template_name:
-                    case 'api.jinja':
-                        filepath = f'{rootpath}/api/{business.api_version}/{business.filename}.py'
-                    case 'crud.jinja':
-                        filepath = f'{rootpath}/crud/crud_{business.filename}.py'
-                    case 'model.jinja':
-                        filepath = f'{rootpath}/model/{business.filename}.py'
-                    case 'schema.jinja':
-                        filepath = f'{rootpath}/schema/{business.filename}.py'
-                    case 'service.jinja':
-                        filepath = f'{rootpath}/service/{business.filename}_service.py'
+        backend_path = 'fastapi_best_architecture/backend/app/'
 
-                if filepath:
-                    codes[filepath] = code.encode('utf-8')
+        init_files = gen_template.get_init_files(business)
+        for filepath, content in init_files.items():
+            codes[f'{backend_path}{filepath}'] = content.encode('utf-8')
+
+        rendered_codes = await self._render_tpl_code(db=db, business=business)
+        for filepath, code in rendered_codes.items():
+            codes[f'{backend_path}{filepath}'] = code.encode('utf-8')
 
         return codes
 
@@ -162,10 +158,16 @@ class GenService:
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
-        gen_path = business.gen_path or '.../backend/app/'
-        target_files = gen_template.get_code_gen_paths(business)
+        gen_path = business.gen_path or '<project_root>/backend/app'
+        paths = []
 
-        return [os.path.join(gen_path, *target_file.split('/')) for target_file in target_files]
+        init_files = gen_template.get_init_files(business)
+        paths.extend(os.path.join(gen_path, *filepath.split('/')) for filepath in init_files.keys())
+
+        template_mapping = gen_template.get_template_path_mapping(business)
+        paths.extend(os.path.join(gen_path, *filepath.split('/')) for filepath in template_mapping.values())
+
+        return paths
 
     async def generate(self, *, db: AsyncSession, pk: int) -> str:
         """
@@ -179,46 +181,22 @@ class GenService:
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
-        tpl_code_map = await self._render_tpl_code(db=db, business=business)
-        gen_path = business.gen_path or BASE_PATH / 'app'
+        gen_path = business.gen_path or str(BASE_PATH / 'app')
 
-        for tpl_path, code in tpl_code_map.items():
-            code_filepath = os.path.join(
-                gen_path,
-                *gen_template.get_code_gen_path(tpl_path, business).split('/'),
-            )
+        init_files = gen_template.get_init_files(business)
+        for init_filepath, init_content in init_files.items():
+            full_path = os.path.join(gen_path, *init_filepath.split('/'))
+            init_folder = anyio.Path(full_path).parent
+            await init_folder.mkdir(parents=True, exist_ok=True)
+            async with await open_file(full_path, 'w', encoding='utf-8') as f:
+                await f.write(init_content)
 
-            # 写入 init 文件
-            code_folder = anyio.Path(code_filepath).parent
+        rendered_codes = await self._render_tpl_code(db=db, business=business)
+        for code_filepath, code in rendered_codes.items():
+            full_path = os.path.join(gen_path, *code_filepath.split('/'))
+            code_folder = anyio.Path(full_path).parent
             await code_folder.mkdir(parents=True, exist_ok=True)
-
-            init_filepath = code_folder.joinpath('__init__.py')
-            if not await init_filepath.exists():
-                async with await open_file(init_filepath, 'w', encoding='utf-8') as f:
-                    await f.write(gen_template.init_content)
-
-            # api __init__.py
-            if 'api' in code_filepath:
-                api_init_filepath = code_folder.parent.joinpath('__init__.py')
-                async with await open_file(api_init_filepath, 'w', encoding='utf-8') as f:
-                    await f.write(gen_template.init_content)
-
-            # app __init__.py
-            if 'service' in code_filepath:
-                app_init_filepath = code_folder.parent.joinpath('__init__.py')
-                async with await open_file(app_init_filepath, 'w', encoding='utf-8') as f:
-                    await f.write(gen_template.init_content)
-
-            # model init 文件补充
-            if code_folder.name == 'model':
-                async with await open_file(init_filepath, 'a', encoding='utf-8') as f:
-                    await f.write(
-                        f'from backend.app.{business.app_name}.model.{business.table_name} '
-                        f'import {to_pascal(business.table_name)}\n',
-                    )
-
-            # 写入代码文件
-            async with await open_file(code_filepath, 'w', encoding='utf-8') as f:
+            async with await open_file(full_path, 'w', encoding='utf-8') as f:
                 await f.write(code)
 
         return gen_path
@@ -237,34 +215,12 @@ class GenService:
 
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:
-            tpl_code_map = await self._render_tpl_code(db=db, business=business)
-            for tpl_path, code in tpl_code_map.items():
-                code_filepath = gen_template.get_code_gen_path(tpl_path, business)
+            init_files = gen_template.get_init_files(business)
+            for init_filepath, init_content in init_files.items():
+                zf.writestr(init_filepath, init_content)
 
-                # 写入 init 文件
-                code_dir = os.path.dirname(code_filepath)
-                init_filepath = os.path.join(code_dir, '__init__.py')
-                if 'model' not in code_filepath.split('/'):
-                    zf.writestr(init_filepath, gen_template.init_content)
-                else:
-                    zf.writestr(
-                        init_filepath,
-                        f'{gen_template.init_content}'
-                        f'from backend.app.{business.app_name}.model.{business.table_name} '
-                        f'import {to_pascal(business.table_name)}\n',
-                    )
-
-                # api __init__.py
-                if 'api' in code_dir:
-                    api_init_filepath = os.path.join(os.path.dirname(code_dir), '__init__.py')
-                    zf.writestr(api_init_filepath, gen_template.init_content)
-
-                # app __init__.py
-                if 'service' in code_dir:
-                    app_init_filepath = os.path.join(os.path.dirname(code_dir), '__init__.py')
-                    zf.writestr(app_init_filepath, gen_template.init_content)
-
-                # 写入代码文件
+            rendered_codes = await self._render_tpl_code(db=db, business=business)
+            for code_filepath, code in rendered_codes.items():
                 zf.writestr(code_filepath, code)
 
         bio.seek(0)

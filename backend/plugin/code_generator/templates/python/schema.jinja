@@ -1,5 +1,5 @@
 {% set pd_types = models|map(attribute='pd_type')|list %}
-{% set NEED_DATETIME = default_datetime_column or 'datetime' in pd_types %}
+{% set NEED_DATETIME = datetime_mixin or 'datetime' in pd_types %}
 {% set NEED_DATE = 'date' in pd_types %}
 {% set NEED_TIME = 'time' in pd_types %}
 {% set NEED_TIMEDELTA = 'timedelta' in pd_types %}
@@ -50,7 +50,7 @@ class Get{{ schema_name }}Detail({{ schema_name }}SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    {% if default_datetime_column %}
+    {% if datetime_mixin %}
     created_time: datetime
     updated_time: datetime | None = None
     {% endif %}

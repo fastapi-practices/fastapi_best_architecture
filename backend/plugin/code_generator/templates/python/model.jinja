@@ -10,7 +10,9 @@
 {% set NEED_MYSQL_DIALECT = database_type == 'mysql' and model_types|select('in', MYSQL_TYPES)|list|length > 0 %}
 {% set NEED_PGSQL_DIALECT = database_type == 'postgresql' and model_types|select('in', POSTGRESQL_TYPES)|list|length > 0 %}
 {% set NEED_DATE = 'date' in pd_types %}
-{% set NEED_DATETIME = default_datetime_column or 'datetime' in pd_types %}
+{% set NEED_DATETIME = datetime_mixin or 'datetime' in pd_types %}
+{% set NEED_UNIVERSAL_TEXT = 'TEXT' in model_types or 'Text' in model_types or 'LONGTEXT' in model_types %}
+{% set NEED_TIMEZONE = 'TIMESTAMP' in model_types or 'DateTime' in model_types %}
 {% if NEED_DATETIME or NEED_DATE %}
 from datetime import {% if NEED_DATETIME %}datetime{% endif %}{% if NEED_DATE %}{% if NEED_DATETIME %}, {% endif %}date{% endif %}
 
@@ -33,10 +35,13 @@ from sqlalchemy.dialects import postgresql
 {% endif -%}
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import {% if default_datetime_column %}Base{% else %}DataClassBase{% endif %}, id_key
+from backend.common.model import {% if datetime_mixin %}Base{% else %}DataClassBase{% endif %}, id_key{% if NEED_UNIVERSAL_TEXT or NEED_TIMEZONE %}, {% endif %}{% if NEED_UNIVERSAL_TEXT %}UniversalText{% endif %}{% if NEED_UNIVERSAL_TEXT and NEED_TIMEZONE %}, {% endif %}{% if NEED_TIMEZONE %}TimeZone{% endif %}
+{% if NEED_TIMEZONE %}
+from backend.utils.timezone import timezone
+{% endif %}
 
 
-class {{ class_name }}({% if default_datetime_column %}Base{% else %}DataClassBase{% endif %}):
+class {{ class_name }}({% if datetime_mixin %}Base{% else %}DataClassBase{% endif %}):
     """{{ table_comment }}"""
 
     __tablename__ = '{{ table_name }}'
@@ -47,7 +52,11 @@ class {{ class_name }}({% if default_datetime_column %}Base{% else %}DataClassBa
     {%- if model.is_nullable %} Mapped[{{ model.pd_type }} | None]
     {%- else %} Mapped[{{ model.pd_type }}]
     {%- endif %} = mapped_column(
-    {%- if model.type in ['NVARCHAR', 'String', 'Unicode', 'VARCHAR'] -%}
+    {%- if model.type in ['TEXT', 'Text', 'LONGTEXT'] -%}
+        UniversalText
+    {%- elif model.type in ['TIMESTAMP', 'DateTime'] -%}
+        TimeZone
+    {%- elif model.type in ['NVARCHAR', 'String', 'Unicode', 'VARCHAR'] -%}
         sa.String({{ model.length }})
     {%- elif database_type == 'mysql' and model.type in MYSQL_TYPES -%}
         mysql.{{ model.type }}()
@@ -69,9 +78,10 @@ class {{ class_name }}({% if default_datetime_column %}Base{% else %}DataClassBa
     {%- elif model.pd_type == 'bool' %} default=True
     {%- elif model.pd_type == 'float' %} default=0.0
     {%- elif model.pd_type == 'date' %} default_factory=date.today
+    {%- elif model.pd_type == 'datetime' and model.type in ['TIMESTAMP', 'DateTime'] %} default_factory=timezone.now
     {%- elif model.pd_type == 'datetime' %} default_factory=datetime.now
     {%- else %} default=None
-    {%- endif -%}{% if model.sort != 0 %}, sort_order={{ model.sort }}{% endif %}, comment=
+    {%- endif -%}, comment=
     {%- if model.comment != None -%}
         '{{ model.comment }}')
     {% else -%}

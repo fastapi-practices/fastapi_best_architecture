@@ -6,6 +6,8 @@ from pydantic.alias_generators import to_pascal
 from backend.core.conf import settings
 from backend.plugin.code_generator.model import GenBusiness, GenColumn
 from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
+from backend.utils.snowflake import snowflake
+from backend.utils.timezone import timezone
 
 
 class GenTemplate:
@@ -23,56 +25,35 @@ class GenTemplate:
 
     def get_template(self, jinja_file: str) -> Template:
         """
-        获取模板文件
+        获取 Jinja2 模板对象
 
-        :param jinja_file: Jinja2 模板文件
-        :return:
+        :param jinja_file: Jinja2 模板文件路径
+        :return: Template 对象
         """
         return self.env.get_template(jinja_file)
 
     @staticmethod
-    def get_template_files() -> list[str]:
+    def get_template_path_mapping(business: GenBusiness) -> dict[str, str]:
         """
-        获取模板文件列表
-
-        :return:
-        """
-        return [
-            'python/api.jinja',
-            'python/crud.jinja',
-            'python/model.jinja',
-            'python/schema.jinja',
-            'python/service.jinja',
-        ]
-
-    @staticmethod
-    def get_code_gen_paths(business: GenBusiness) -> list[str]:
-        """
-        获取代码生成路径列表
+        获取模板文件到生成文件的路径映射
 
         :param business: 代码生成业务对象
-        :return:
+        :return: {模板路径: 生成文件路径}
         """
         app_name = business.app_name
         filename = business.filename
-        return [
-            f'{app_name}/api/{business.api_version}/{filename}.py',
-            f'{app_name}/crud/crud_{filename}.py',
-            f'{app_name}/model/{filename}.py',
-            f'{app_name}/schema/{filename}.py',
-            f'{app_name}/service/{filename}_service.py',
-        ]
+        api_version = business.api_version
+        pk_suffix = '_snowflake' if settings.DATABASE_PK_MODE == 'snowflake' else ''
 
-    def get_code_gen_path(self, tpl_path: str, business: GenBusiness) -> str:
-        """
-        获取代码生成路径
-
-        :param tpl_path: 模板文件路径
-        :param business: 代码生成业务对象
-        :return:
-        """
-        code_gen_path_mapping = dict(zip(self.get_template_files(), self.get_code_gen_paths(business)))
-        return code_gen_path_mapping[tpl_path]
+        return {
+            'python/api.jinja': f'{app_name}/api/{api_version}/{filename}.py',
+            'python/crud.jinja': f'{app_name}/crud/crud_{filename}.py',
+            'python/model.jinja': f'{app_name}/model/{filename}.py',
+            'python/schema.jinja': f'{app_name}/schema/{filename}.py',
+            'python/service.jinja': f'{app_name}/service/{filename}_service.py',
+            f'sql/mysql/init{pk_suffix}.jinja': f'{app_name}/sql/mysql/init{pk_suffix}.sql',
+            f'sql/postgresql/init{pk_suffix}.jinja': f'{app_name}/sql/postgresql/init{pk_suffix}.sql',
+        }
 
     def get_init_files(self, business: GenBusiness) -> dict[str, str]:
         """
@@ -107,19 +88,26 @@ class GenTemplate:
         :param models: 代码生成模型对象列表
         :return:
         """
-        return {
+        vars_dict = {
             'app_name': business.app_name,
             'table_name': business.table_name,
             'doc_comment': business.doc_comment,
             'table_comment': business.table_comment,
             'class_name': business.class_name,
             'schema_name': business.schema_name,
-            'default_datetime_column': business.default_datetime_column,
+            'datetime_mixin': business.datetime_mixin,
             'permission': business.table_name.replace('_', ':'),
             'database_type': settings.DATABASE_TYPE,
             'models': models,
             'model_types': [model.type for model in models],
+            'now': timezone.now(),
         }
+
+        if settings.DATABASE_PK_MODE == 'snowflake':
+            vars_dict['parent_menu_id'] = snowflake.generate()
+            vars_dict['button_ids'] = [snowflake.generate() for _ in range(4)]
+
+        return vars_dict
 
 
 gen_template: GenTemplate = GenTemplate()
