@@ -17,7 +17,8 @@ def sql_type_to_sqlalchemy(typing: str) -> str:
         if typing in GenMySQLColumnType.get_member_keys():
             return typing
     else:
-        if typing in GenPostgreSQLColumnType.get_member_keys():
+        normalized_type = typing.replace(' ', '_')
+        if normalized_type in GenPostgreSQLColumnType.get_member_keys():
             return typing
     return 'String'
 
@@ -33,8 +34,7 @@ def sql_type_to_pydantic(typing: str) -> str:
     try:
         if DataBaseType.mysql == settings.DATABASE_TYPE:
             return GenMySQLColumnType[typing].value
-        if typing == 'CHARACTER VARYING':  # postgresql 中 DDL VARCHAR 的别名
-            return 'str'
-        return GenPostgreSQLColumnType[typing].value
+        normalized_type = typing.replace(' ', '_')
+        return GenPostgreSQLColumnType[normalized_type].value
     except KeyError:
         return 'str'
