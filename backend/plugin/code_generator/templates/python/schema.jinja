@@ -1,5 +1,20 @@
-{% if default_datetime_column %}
-from datetime import datetime
+{% set pd_types = models|map(attribute='pd_type')|list %}
+{% set NEED_DATETIME = datetime_mixin or 'datetime' in pd_types %}
+{% set NEED_DATE = 'date' in pd_types %}
+{% set NEED_TIME = 'time' in pd_types %}
+{% set NEED_TIMEDELTA = 'timedelta' in pd_types %}
+{% set NEED_DECIMAL = 'Decimal' in pd_types %}
+{% set NEED_UUID = 'UUID' in pd_types or 'str | UUID' in pd_types %}
+{% if NEED_DATETIME or NEED_DATE or NEED_TIME or NEED_TIMEDELTA %}
+from datetime import {% if NEED_DATETIME %}datetime{% endif %}{% if NEED_DATE %}{% if NEED_DATETIME %}, {% endif %}date{% endif %}{% if NEED_TIME %}{% if NEED_DATETIME or NEED_DATE %}, {% endif %}time{% endif %}{% if NEED_TIMEDELTA %}{% if NEED_DATETIME or NEED_DATE or NEED_TIME %}, {% endif %}timedelta{% endif %}
+
+{% endif %}
+{% if NEED_DECIMAL %}
+from decimal import Decimal
+
+{% endif %}
+{% if NEED_UUID %}
+from uuid import UUID
 
 {% endif %}
 from pydantic import ConfigDict, Field
@@ -35,7 +50,7 @@ class Get{{ schema_name }}Detail({{ schema_name }}SchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    {% if default_datetime_column %}
+    {% if datetime_mixin %}
     created_time: datetime
     updated_time: datetime | None = None
     {% endif %}

@@ -76,3 +76,14 @@ def is_has_special_char(value: str) -> re.Match[str]:
     """
     special_char_pattern = r'[!@#$%^&*()_+\-=\[\]{};:\'",.<>?/\\|`~]'
     return search_string(special_char_pattern, value)
+
+
+def is_english_identifier(value: str) -> re.Match[str]:
+    """
+    检查英文标识符
+
+    :param value: 待检查的值
+    :return:
+    """
+    identifier_pattern = r'^[a-zA-Z][a-zA-Z_]*$'
+    return match_string(identifier_pattern, value)

@@ -1,4 +1,4 @@
-insert into gen_business (id, app_name, table_name, doc_comment, table_comment, class_name, schema_name, filename, default_datetime_column, api_version, gen_path, remark, created_time, updated_time)
+insert into gen_business (id, app_name, table_name, doc_comment, table_comment, class_name, schema_name, filename, datetime_mixin, api_version, gen_path, remark, created_time, updated_time)
 values (2112248797819043840, 'test', 'sys_opera_log', '操作日志表', '操作日志表', 'SysOperaLog', 'SysOperaLog', 'sys_opera_log', true, 'v1', null, null, '2025-12-15 15:30:33', null);
 
 insert into gen_column (id, name, comment, type, pd_type, `default`, sort, `length`, is_pk, is_nullable, gen_business_id)
