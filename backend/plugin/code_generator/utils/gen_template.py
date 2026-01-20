@@ -6,6 +6,7 @@ from pydantic.alias_generators import to_pascal
 from backend.core.conf import settings
 from backend.plugin.code_generator.model import GenBusiness, GenColumn
 from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
+from backend.plugin.code_generator.utils.type_conversion import sql_type_to_sqlalchemy_name
 from backend.utils.snowflake import snowflake
 from backend.utils.timezone import timezone
 
@@ -21,6 +22,7 @@ class GenTemplate:
             keep_trailing_newline=True,
             enable_async=True,
         )
+        self.env.filters['sqlalchemy_type'] = sql_type_to_sqlalchemy_name
         self.init_content = ''
 
     def get_template(self, jinja_file: str) -> Template:
