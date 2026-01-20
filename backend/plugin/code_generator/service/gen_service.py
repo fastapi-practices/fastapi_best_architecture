@@ -51,7 +51,7 @@ class GenService:
         :return:
         """
 
-        table_info = await gen_dao.get_table(db, obj.table_name)
+        table_info = await gen_dao.get_table(db, obj.table_schema, obj.table_name)
         if not table_info:
             raise errors.NotFoundError(msg='数据库表不存在')
 
