@@ -25,7 +25,7 @@ UPLOAD_DIR = STATIC_DIR / 'upload'
 PLUGIN_DIR = BASE_PATH / 'plugin'
 
 # 国际化文件目录
-LOCALE_DIR = BASE_PATH / 'langs'
+LOCALE_DIR = BASE_PATH / 'locales' / 'langs'
 
 # MySQL 脚本目录
 MYSQL_SCRIPT_DIR = BASE_PATH / 'sql' / 'mysql'
