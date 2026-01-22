@@ -32,3 +32,6 @@ MYSQL_SCRIPT_DIR = BASE_PATH / 'sql' / 'mysql'
 
 # PostgreSQL 脚本目录
 POSTGRESQL_SCRIPT_DIR = BASE_PATH / 'sql' / 'postgresql'
+
+# 热重载锁文件
+RELOAD_LOCK_FILE = BASE_PATH / '.reload.lock'

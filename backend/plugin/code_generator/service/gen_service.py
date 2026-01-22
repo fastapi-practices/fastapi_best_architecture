@@ -1,5 +1,7 @@
 import io
 import os
+import shutil
+import tempfile
 import zipfile
 
 from collections.abc import Sequence
@@ -24,6 +26,7 @@ from backend.plugin.code_generator.service.column_service import gen_column_serv
 from backend.plugin.code_generator.utils.format_code import format_python_code
 from backend.plugin.code_generator.utils.gen_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
+from backend.utils.reload_lock import reload_lock
 
 
 class GenService:
@@ -183,21 +186,33 @@ class GenService:
 
         gen_path = business.gen_path or str(BASE_PATH / 'app')
 
-        init_files = gen_template.get_init_files(business)
-        for init_filepath, init_content in init_files.items():
-            full_path = os.path.join(gen_path, *init_filepath.split('/'))
-            init_folder = anyio.Path(full_path).parent
-            await init_folder.mkdir(parents=True, exist_ok=True)
-            async with await open_file(full_path, 'w', encoding='utf-8') as f:
-                await f.write(init_content)
+        # 使用锁文件 + 原子写入
+        async with reload_lock():
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                init_files = gen_template.get_init_files(business)
+                for init_filepath, init_content in init_files.items():
+                    full_path = os.path.join(tmp_dir, *init_filepath.split('/'))
+                    tmp_folder = anyio.Path(full_path).parent
+                    await tmp_folder.mkdir(parents=True, exist_ok=True)
+                    async with await open_file(full_path, 'w', encoding='utf-8') as f:
+                        await f.write(init_content)
 
-        rendered_codes = await self._render_tpl_code(db=db, business=business)
-        for code_filepath, code in rendered_codes.items():
-            full_path = os.path.join(gen_path, *code_filepath.split('/'))
-            code_folder = anyio.Path(full_path).parent
-            await code_folder.mkdir(parents=True, exist_ok=True)
-            async with await open_file(full_path, 'w', encoding='utf-8') as f:
-                await f.write(code)
+                rendered_codes = await self._render_tpl_code(db=db, business=business)
+                for code_filepath, code in rendered_codes.items():
+                    full_path = os.path.join(tmp_dir, *code_filepath.split('/'))
+                    code_folder = anyio.Path(full_path).parent
+                    await code_folder.mkdir(parents=True, exist_ok=True)
+                    async with await open_file(full_path, 'w', encoding='utf-8') as f:
+                        await f.write(code)
+
+                # 原子移动到目标位置
+                for item in os.listdir(tmp_dir):
+                    src = os.path.join(tmp_dir, item)
+                    dst = os.path.join(gen_path, item)
+                    if os.path.isdir(src):
+                        shutil.copytree(src, dst, dirs_exist_ok=True)
+                    else:
+                        shutil.copy2(src, dst)
 
         return gen_path
 

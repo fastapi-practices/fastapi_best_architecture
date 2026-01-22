@@ -16,6 +16,7 @@ from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
 from backend.plugin.requirements import install_requirements_async
 from backend.utils.pattern_validate import is_git_url
+from backend.utils.reload_lock import reload_lock
 
 
 async def install_zip_plugin(file: UploadFile | str) -> str:
@@ -33,43 +34,45 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
     file_bytes = io.BytesIO(contents)
     if not zipfile.is_zipfile(file_bytes):
         raise errors.RequestError(msg='插件压缩包格式非法')
-    with zipfile.ZipFile(file_bytes) as zf:
-        # 校验压缩包
-        plugin_namelist = zf.namelist()
-        plugin_dir_name = plugin_namelist[0].split('/')[0]
-        if not plugin_namelist:
-            raise errors.RequestError(msg='插件压缩包内容非法')
-        if (
-            len(plugin_namelist) <= 3
-            or f'{plugin_dir_name}/plugin.toml' not in plugin_namelist
-            or f'{plugin_dir_name}/README.md' not in plugin_namelist
-        ):
-            raise errors.RequestError(msg='插件压缩包内缺少必要文件')
 
-        # 插件是否可安装
-        plugin_name = re.match(
-            r'^([a-zA-Z0-9_]+)',
-            file.split(os.sep)[-1].split('.')[0].strip()
-            if isinstance(file, str)
-            else file.filename.split('.')[0].strip(),
-        ).group()
-        full_plugin_path = anyio.Path(PLUGIN_DIR / plugin_name)
-        if await full_plugin_path.exists():
-            raise errors.ConflictError(msg='此插件已安装')
-        await full_plugin_path.mkdir(parents=True, exist_ok=True)
+    async with reload_lock():
+        with zipfile.ZipFile(file_bytes) as zf:
+            # 校验压缩包
+            plugin_namelist = zf.namelist()
+            plugin_dir_name = plugin_namelist[0].split('/')[0]
+            if not plugin_namelist:
+                raise errors.RequestError(msg='插件压缩包内容非法')
+            if (
+                len(plugin_namelist) <= 3
+                or f'{plugin_dir_name}/plugin.toml' not in plugin_namelist
+                or f'{plugin_dir_name}/README.md' not in plugin_namelist
+            ):
+                raise errors.RequestError(msg='插件压缩包内缺少必要文件')
 
-        # 解压（安装）
-        members = []
-        for member in zf.infolist():
-            if member.filename.startswith(plugin_dir_name):
-                new_filename = member.filename.replace(plugin_dir_name, '')
-                if new_filename:
-                    member.filename = new_filename
-                    members.append(member)
-        zf.extractall(full_plugin_path, members)
+            # 插件是否可安装
+            plugin_name = re.match(
+                r'^([a-zA-Z0-9_]+)',
+                file.split(os.sep)[-1].split('.')[0].strip()
+                if isinstance(file, str)
+                else file.filename.split('.')[0].strip(),
+            ).group()
+            full_plugin_path = anyio.Path(PLUGIN_DIR / plugin_name)
+            if await full_plugin_path.exists():
+                raise errors.ConflictError(msg='此插件已安装')
+            await full_plugin_path.mkdir(parents=True, exist_ok=True)
 
-    await install_requirements_async(plugin_dir_name)
-    await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+            # 解压（安装）
+            members = []
+            for member in zf.infolist():
+                if member.filename.startswith(plugin_dir_name):
+                    new_filename = member.filename.replace(plugin_dir_name, '')
+                    if new_filename:
+                        member.filename = new_filename
+                        members.append(member)
+            zf.extractall(full_plugin_path, members)
+
+        await install_requirements_async(plugin_dir_name)
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     return plugin_name
 
@@ -88,13 +91,15 @@ async def install_git_plugin(repo_url: str) -> str:
     path = anyio.Path(PLUGIN_DIR / repo_name)
     if await path.exists():
         raise errors.ConflictError(msg=f'{repo_name} 插件已安装')
-    try:
-        porcelain.clone(repo_url, PLUGIN_DIR / repo_name, checkout=True)
-    except Exception as e:
-        log.error(f'插件安装失败: {e}')
-        raise errors.ServerError(msg='插件安装失败，请稍后重试') from e
 
-    await install_requirements_async(repo_name)
-    await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+    async with reload_lock():
+        try:
+            porcelain.clone(repo_url, PLUGIN_DIR / repo_name, checkout=True)
+        except Exception as e:
+            log.error(f'插件安装失败: {e}')
+            raise errors.ServerError(msg='插件安装失败，请稍后重试') from e
+
+        await install_requirements_async(repo_name)
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
 
     return repo_name
