@@ -136,6 +136,7 @@ ignore = [
     "RUF003",
     "RUF006",
     "RUF012",
+    "RUF067",
     "TRY400",
     "TRY003",
     "TRY301"
