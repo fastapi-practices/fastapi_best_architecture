@@ -2,13 +2,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from backend.app.{{ app_name }}.schema.{{ table_name }} import (
+from backend.app.{{ app_name }}.schema.{{ filename }} import (
     Create{{ schema_name }}Param,
     Delete{{ schema_name }}Param,
     Get{{ schema_name }}Detail,
     Update{{ schema_name }}Param,
 )
-from backend.app.{{ app_name }}.service.{{ table_name }}_service import {{ table_name }}_service
+from backend.app.{{ app_name }}.service.{{ filename }}_service import {{ table_name }}_service
 from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth

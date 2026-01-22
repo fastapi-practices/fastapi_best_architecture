@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.{{ app_name }}.model import {{ class_name }}
-from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ filename }} import Create{{ schema_name }}Param, Update{{ schema_name }}Param
 
 
 class CRUD{{ class_name }}(CRUDPlus[{{ class_name }}]):
