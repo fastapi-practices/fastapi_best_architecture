@@ -2,9 +2,9 @@ from typing import Any, Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.{{ app_name }}.crud.crud_{{ table_name }} import {{ table_name }}_dao
+from backend.app.{{ app_name }}.crud.crud_{{ filename }} import {{ table_name }}_dao
 from backend.app.{{ app_name }}.model import {{ class_name }}
-from backend.app.{{ app_name }}.schema.{{ table_name }} import Create{{ schema_name }}Param, Delete{{ schema_name }}Param, Update{{ schema_name }}Param
+from backend.app.{{ app_name }}.schema.{{ filename }} import Create{{ schema_name }}Param, Delete{{ schema_name }}Param, Update{{ schema_name }}Param
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 

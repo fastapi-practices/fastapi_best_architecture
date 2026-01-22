@@ -67,6 +67,7 @@ class GenTemplate:
         app_name = business.app_name
         table_name = business.table_name
         class_name = business.class_name or to_pascal(table_name)
+        filename = business.filename
 
         return {
             f'{app_name}/__init__.py': self.init_content,
@@ -74,8 +75,7 @@ class GenTemplate:
             f'{app_name}/api/{business.api_version}/__init__.py': self.init_content,
             f'{app_name}/crud/__init__.py': self.init_content,
             f'{app_name}/model/__init__.py': (
-                f'{self.init_content}'
-                f'from backend.app.{app_name}.model.{table_name} import {class_name} as {class_name}\n'
+                f'{self.init_content}from backend.app.{app_name}.model.{filename} import {class_name} as {class_name}\n'
             ),
             f'{app_name}/schema/__init__.py': self.init_content,
             f'{app_name}/service/__init__.py': self.init_content,
@@ -97,6 +97,7 @@ class GenTemplate:
             'table_comment': business.table_comment,
             'class_name': business.class_name,
             'schema_name': business.schema_name,
+            'filename': business.filename,
             'datetime_mixin': business.datetime_mixin,
             'permission': business.table_name.replace('_', ':'),
             'database_type': settings.DATABASE_TYPE,
