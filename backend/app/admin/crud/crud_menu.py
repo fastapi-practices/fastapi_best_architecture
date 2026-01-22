@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete
+from sqlalchemy import delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
@@ -31,19 +31,48 @@ class CRUDMenu(CRUDPlus[Menu]):
         """
         return await self.select_model_by_column(db, title=title, type__ne=2)
 
-    async def get_all(self, db: AsyncSession, title: str | None, status: int | None) -> Sequence[Menu]:
+    async def get_all(
+            self, db: AsyncSession, title: str | None, status: int | None, title_keys: str | None = None
+    ) -> Sequence[Menu]:
         """
         获取菜单列表
 
         :param db: 数据库会话
-        :param title: 菜单标题
+        :param title: 菜单标题（支持模糊匹配）
         :param status: 菜单状态
+        :param title_keys: i18n keys，逗号分隔（用于译文搜索）
         :return:
         """
-        filters = {}
+        # 如果有 title 或 title_keys，使用原生 SQLAlchemy 查询实现 OR 条件
+        if title is not None or title_keys is not None:
+            stmt = select(Menu)
 
-        if title is not None:
-            filters['title__like'] = f'%{title}%'
+            # 构建 OR 条件
+            or_conditions = []
+            if title is not None:
+                or_conditions.append(Menu.title.ilike(f'%{title}%'))
+
+            if title_keys is not None:
+                # 解析逗号分隔的 i18n keys
+                keys_list = [key.strip() for key in title_keys.split(',') if key.strip()]
+                if keys_list:
+                    or_conditions.append(Menu.title.in_(keys_list))
+
+            if or_conditions:
+                stmt = stmt.where(or_(*or_conditions))
+
+            # 添加 status 过滤条件
+            if status is not None:
+                stmt = stmt.where(Menu.status == status)
+
+            # 排序
+            stmt = stmt.order_by(Menu.sort)
+
+            result = await db.execute(stmt)
+            return result.scalars().all()
+
+        # 无搜索条件时，使用原有方法
+        filters = {}
         if status is not None:
             filters['status'] = status
 

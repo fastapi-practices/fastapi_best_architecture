@@ -30,17 +30,20 @@ class MenuService:
         return menu
 
     @staticmethod
-    async def get_tree(*, db: AsyncSession, title: str | None, status: int | None) -> list[dict[str, Any]]:
+    async def get_tree(
+            *, db: AsyncSession, title: str | None, status: int | None, title_keys: str | None = None
+    ) -> list[dict[str, Any]]:
         """
         获取菜单树形结构
 
         :param db: 数据库会话
         :param title: 菜单标题
         :param status: 状态
+        :param title_keys: i18n keys，逗号分隔（用于译文搜索）
         :return:
         """
 
-        menu_data = await menu_dao.get_all(db, title=title, status=status)
+        menu_data = await menu_dao.get_all(db, title=title, status=status, title_keys=title_keys)
         menu_tree = get_tree_data(menu_data)
         return menu_tree
 

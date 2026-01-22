@@ -31,9 +31,10 @@ async def get_menu(
 async def get_menu_tree(
     db: CurrentSession,
     title: Annotated[str | None, Query(description='菜单标题')] = None,
+    title_keys: Annotated[str | None, Query(description='i18n keys，逗号分隔（用于译文搜索）')] = None,
     status: Annotated[int | None, Query(description='状体')] = None,
 ) -> ResponseSchemaModel[list[GetMenuTree]]:
-    menu = await menu_service.get_tree(db=db, title=title, status=status)
+    menu = await menu_service.get_tree(db=db, title=title, title_keys=title_keys, status=status)
     return response_base.success(data=menu)
 
 
