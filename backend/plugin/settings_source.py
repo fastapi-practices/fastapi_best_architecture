@@ -15,6 +15,7 @@ class PluginSettingsSource(PydanticBaseSettingsSource):
 
     def get_field_value(self, field: FieldInfo, field_name: str) -> tuple[Any, str, bool]:
         """获取单个字段的值"""
+        # 不在这里实现，使用 __call__ 批量加载
         return None, field_name, False
 
     def __call__(self) -> dict[str, Any]:

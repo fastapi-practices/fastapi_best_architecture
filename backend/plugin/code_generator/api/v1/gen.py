@@ -26,8 +26,7 @@ async def get_all_tables(
 
 @router.post(
     '/imports',
-    summary='导入代码生成业务和模型列',
-    description='仅开发环境可用',
+    summary='导入代码生成业务和模型列（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('codegen:table:import')),
         DependsRBAC,

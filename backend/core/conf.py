@@ -8,7 +8,7 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
 from backend.core.path_conf import ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH
-from backend.plugin.config_loader import PluginSettingsSource
+from backend.plugin.settings_source import PluginSettingsSource
 
 
 class Settings(BaseSettings):
