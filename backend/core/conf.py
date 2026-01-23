@@ -5,9 +5,10 @@ from re import Pattern
 from typing import Any, Literal
 
 from pydantic import model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
 from backend.core.path_conf import ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH
+from backend.plugin.settings_source import PluginSettingsSource
 
 
 class Settings(BaseSettings):
@@ -16,9 +17,21 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=ENV_FILE_PATH,
         env_file_encoding='utf-8',
-        extra='ignore',
+        extra='allow',
         case_sensitive=True,
     )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """自定义配置源优先级"""
+        return env_settings, dotenv_settings, PluginSettingsSource(settings_cls)
 
     # .env 当前环境
     ENVIRONMENT: Literal['dev', 'prod']
