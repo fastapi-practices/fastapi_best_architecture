@@ -49,6 +49,7 @@ class GenTemplate:
 
         return {
             'python/api.jinja': f'{app_name}/api/{api_version}/{filename}.py',
+            'python/router.jinja': f'{app_name}/api/router.py',
             'python/crud.jinja': f'{app_name}/crud/crud_{filename}.py',
             'python/model.jinja': f'{app_name}/model/{filename}.py',
             'python/schema.jinja': f'{app_name}/schema/{filename}.py',
@@ -99,6 +100,8 @@ class GenTemplate:
             'schema_name': business.schema_name,
             'filename': business.filename,
             'datetime_mixin': business.datetime_mixin,
+            'api_version': business.api_version,
+            'tag': business.tag,
             'permission': business.table_name.replace('_', ':'),
             'database_type': settings.DATABASE_TYPE,
             'models': models,
