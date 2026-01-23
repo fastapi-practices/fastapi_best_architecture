@@ -1,5 +1,7 @@
 import io
 import os
+import shutil
+import tempfile
 import zipfile
 
 from collections.abc import Sequence
@@ -10,8 +12,10 @@ from anyio import open_file
 from pydantic.alias_generators import to_pascal
 from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
 
 from backend.common.exception import errors
+from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
 from backend.plugin.code_generator.crud.crud_business import gen_business_dao
 from backend.plugin.code_generator.crud.crud_column import gen_column_dao
@@ -24,6 +28,7 @@ from backend.plugin.code_generator.service.column_service import gen_column_serv
 from backend.plugin.code_generator.utils.format_code import format_python_code
 from backend.plugin.code_generator.utils.gen_template import gen_template
 from backend.plugin.code_generator.utils.type_conversion import sql_type_to_pydantic
+from backend.utils.locks import acquire_distributed_reload_lock
 
 
 class GenService:
@@ -50,6 +55,8 @@ class GenService:
         :param obj: 导入参数对象
         :return:
         """
+        if settings.ENVIRONMENT != 'dev':
+            raise errors.ForbiddenError(msg='禁止在非开发环境下导入代码生成业务')
 
         table_info = await gen_dao.get_table(db, obj.table_schema, obj.table_name)
         if not table_info:
@@ -179,27 +186,38 @@ class GenService:
         :param pk: 业务 ID
         :return:
         """
+        if settings.ENVIRONMENT != 'dev':
+            raise errors.ForbiddenError(msg='禁止在非开发环境下生成代码')
+
         business = await gen_business_dao.get(db, pk)
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
         gen_path = business.gen_path or str(BASE_PATH / 'app')
 
-        init_files = gen_template.get_init_files(business)
-        for init_filepath, init_content in init_files.items():
-            full_path = os.path.join(gen_path, *init_filepath.split('/'))
-            init_folder = anyio.Path(full_path).parent
-            await init_folder.mkdir(parents=True, exist_ok=True)
-            async with await open_file(full_path, 'w', encoding='utf-8') as f:
-                await f.write(init_content)
+        async with acquire_distributed_reload_lock():
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                all_files = {}
+                init_files = gen_template.get_init_files(business)
+                all_files.update(init_files)
+                rendered_codes = await self._render_tpl_code(db=db, business=business)
+                all_files.update(rendered_codes)
 
-        rendered_codes = await self._render_tpl_code(db=db, business=business)
-        for code_filepath, code in rendered_codes.items():
-            full_path = os.path.join(gen_path, *code_filepath.split('/'))
-            code_folder = anyio.Path(full_path).parent
-            await code_folder.mkdir(parents=True, exist_ok=True)
-            async with await open_file(full_path, 'w', encoding='utf-8') as f:
-                await f.write(code)
+                for filepath, content in all_files.items():
+                    full_path = os.path.join(tmp_dir, *filepath.split('/'))
+                    code_folder = anyio.Path(full_path).parent
+                    await code_folder.mkdir(parents=True, exist_ok=True)
+                    async with await open_file(full_path, 'w', encoding='utf-8') as f:
+                        await f.write(content)
+
+                for item in os.listdir(tmp_dir):
+                    src = os.path.join(tmp_dir, item)
+                    dst = os.path.join(gen_path, item)
+                    src_path = anyio.Path(src)
+                    if await src_path.is_dir():
+                        await run_in_threadpool(shutil.copytree, src, dst, dirs_exist_ok=True)
+                    else:
+                        await run_in_threadpool(shutil.copy2, src, dst)
 
         return gen_path
 
@@ -215,15 +233,16 @@ class GenService:
         if not business:
             raise errors.NotFoundError(msg='业务不存在')
 
+        all_files = {}
+        init_files = gen_template.get_init_files(business)
+        all_files.update(init_files)
+        rendered_codes = await self._render_tpl_code(db=db, business=business)
+        all_files.update(rendered_codes)
+
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:
-            init_files = gen_template.get_init_files(business)
-            for init_filepath, init_content in init_files.items():
-                zf.writestr(init_filepath, init_content)
-
-            rendered_codes = await self._render_tpl_code(db=db, business=business)
-            for code_filepath, code in rendered_codes.items():
-                zf.writestr(code_filepath, code)
+            for filepath, content in all_files.items():
+                zf.writestr(filepath, content)
 
         bio.seek(0)
         return bio

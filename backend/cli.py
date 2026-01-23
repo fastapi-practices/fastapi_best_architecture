@@ -19,7 +19,7 @@ from rich.table import Table
 from rich.text import Text
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
-from watchfiles import PythonFilter
+from watchfiles import Change, PythonFilter
 
 from backend import __version__
 from backend.common.enums import DataBaseType, PrimaryKeyType
@@ -31,6 +31,7 @@ from backend.core.path_conf import (
     ENV_FILE_PATH,
     MYSQL_SCRIPT_DIR,
     POSTGRESQL_SCRIPT_DIR,
+    RELOAD_LOCK_FILE,
 )
 from backend.database.db import (
     async_db_session,
@@ -53,6 +54,11 @@ class CustomReloadFilter(PythonFilter):
 
     def __init__(self) -> None:
         super().__init__(extra_extensions=['.json', '.yaml', '.yml'])
+
+    def __call__(self, change: Change, path: str) -> bool:
+        if RELOAD_LOCK_FILE.exists():
+            return False
+        return super().__call__(change, path)
 
 
 def setup_env_file() -> bool:
@@ -338,6 +344,9 @@ async def install_plugin(
     db_type: DataBaseType,
     pk_type: PrimaryKeyType,
 ) -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('插件安装仅在开发环境可用', code=1)
+
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
     if path and repo_url:
@@ -403,6 +412,9 @@ async def import_table(
     table_schema: str,
     table_name: str,
 ) -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('代码生成仅在开发环境可用', code=1)
+
     from backend.plugin.code_generator.schema.gen import ImportParam
     from backend.plugin.code_generator.service.gen_service import gen_service
 
@@ -417,6 +429,9 @@ async def import_table(
 
 
 async def generate() -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('代码生成仅在开发环境可用', code=1)
+
     from backend.plugin.code_generator.service.business_service import gen_business_service
     from backend.plugin.code_generator.service.gen_service import gen_service
 
