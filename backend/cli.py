@@ -344,6 +344,9 @@ async def install_plugin(
     db_type: DataBaseType,
     pk_type: PrimaryKeyType,
 ) -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('插件安装仅在开发环境可用', code=1)
+
     if not path and not repo_url:
         raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
     if path and repo_url:
@@ -409,6 +412,9 @@ async def import_table(
     table_schema: str,
     table_name: str,
 ) -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('代码生成仅在开发环境可用', code=1)
+
     from backend.plugin.code_generator.schema.gen import ImportParam
     from backend.plugin.code_generator.service.gen_service import gen_service
 
@@ -423,6 +429,9 @@ async def import_table(
 
 
 async def generate() -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('代码生成仅在开发环境可用', code=1)
+
     from backend.plugin.code_generator.service.business_service import gen_business_service
     from backend.plugin.code_generator.service.gen_service import gen_service
 

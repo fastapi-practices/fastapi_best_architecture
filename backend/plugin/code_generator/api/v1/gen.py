@@ -27,6 +27,7 @@ async def get_all_tables(
 @router.post(
     '/imports',
     summary='导入代码生成业务和模型列',
+    description='仅开发环境可用',
     dependencies=[
         Depends(RequestPermission('codegen:table:import')),
         DependsRBAC,
@@ -56,7 +57,7 @@ async def get_generate_paths(
 @router.post(
     '/{pk}',
     summary='代码生成',
-    description='文件磁盘写入，请谨慎操作',
+    description='文件磁盘写入，请谨慎操作（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('codegen:local:write')),
         DependsRBAC,

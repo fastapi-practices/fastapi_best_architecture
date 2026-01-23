@@ -8,6 +8,7 @@ import anyio
 from anyio import open_file
 from dulwich import porcelain
 from fastapi import UploadFile
+from starlette.concurrency import run_in_threadpool
 
 from backend.common.exception import errors
 from backend.common.log import log
@@ -15,8 +16,8 @@ from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
 from backend.plugin.requirements import install_requirements_async
+from backend.utils.locks import acquire_distributed_reload_lock
 from backend.utils.pattern_validate import is_git_url
-from backend.utils.reload_lock import reload_lock
 
 
 async def install_zip_plugin(file: UploadFile | str) -> str:
@@ -35,7 +36,7 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
     if not zipfile.is_zipfile(file_bytes):
         raise errors.RequestError(msg='插件压缩包格式非法')
 
-    async with reload_lock():
+    async with acquire_distributed_reload_lock():
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
             plugin_namelist = zf.namelist()
@@ -69,7 +70,7 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
                     if new_filename:
                         member.filename = new_filename
                         members.append(member)
-            zf.extractall(full_plugin_path, members)
+            await run_in_threadpool(zf.extractall, full_plugin_path, members)
 
         await install_requirements_async(plugin_dir_name)
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
@@ -92,9 +93,9 @@ async def install_git_plugin(repo_url: str) -> str:
     if await path.exists():
         raise errors.ConflictError(msg=f'{repo_name} 插件已安装')
 
-    async with reload_lock():
+    async with acquire_distributed_reload_lock():
         try:
-            porcelain.clone(repo_url, PLUGIN_DIR / repo_name, checkout=True)
+            await run_in_threadpool(porcelain.clone, repo_url, PLUGIN_DIR / repo_name, checkout=True)
         except Exception as e:
             log.error(f'插件安装失败: {e}')
             raise errors.ServerError(msg='插件安装失败，请稍后重试') from e

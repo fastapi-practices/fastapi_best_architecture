@@ -30,7 +30,7 @@ async def plugin_changed() -> ResponseSchemaModel[bool]:
 @router.post(
     '',
     summary='安装插件',
-    description='使用插件 zip 压缩包或 git 仓库地址进行安装',
+    description='使用插件 zip 压缩包或 git 仓库地址进行安装（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('sys:plugin:install')),
         DependsRBAC,
@@ -53,7 +53,7 @@ async def install_plugin(
 @router.delete(
     '/{plugin}',
     summary='卸载插件',
-    description='此操作会直接删除插件依赖，但不会直接删除插件，而是将插件移动到备份目录',
+    description='此操作会直接删除插件依赖，但不会直接删除插件，而是将插件移动到备份目录（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('sys:plugin:uninstall')),
         DependsRBAC,

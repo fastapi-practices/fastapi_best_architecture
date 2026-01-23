@@ -8,6 +8,7 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
 from backend.core.path_conf import ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH
+from backend.plugin.config_loader import PluginSettingsSource
 
 
 class Settings(BaseSettings):
@@ -29,24 +30,8 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        """
-        自定义配置源优先级
-
-        优先级（从高到低）：
-        1. 环境变量
-        2. .env 文件
-        3. 插件 plugin.toml 配置
-        4. 初始化参数
-        5. 字段默认值
-        """
-        from backend.plugin.config_loader import PluginSettingsSource
-
-        return (
-            env_settings,
-            dotenv_settings,
-            PluginSettingsSource(settings_cls),
-            init_settings,
-        )
+        """自定义配置源优先级"""
+        return env_settings, dotenv_settings, PluginSettingsSource(settings_cls)
 
     # .env 当前环境
     ENVIRONMENT: Literal['dev', 'prod']
