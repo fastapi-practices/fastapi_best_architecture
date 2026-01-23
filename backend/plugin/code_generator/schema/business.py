@@ -19,6 +19,7 @@ class GenBusinessSchemaBase(SchemaBase):
     filename: str | None = Field(None, description='用于 python 代码基础文件名')
     datetime_mixin: bool = Field(True, description='是否包含时间 Mixin 列')
     api_version: str = Field('v1', description='API 版本')
+    tag: str | None = Field(None, description='API 标签（用于路由分组）')
     gen_path: str | None = Field(None, description='生成路径（默认在 backend/app 目录下）')
     remark: str | None = Field(None, description='备注')
 
