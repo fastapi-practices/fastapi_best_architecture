@@ -60,15 +60,17 @@ class GenService:
             raise errors.ConflictError(msg='已存在相同数据库表业务')
 
         table_name = table_info['table_name']
+        doc_comment = table_info['table_comment'] or table_name.split('_')[-1]
         new_business = GenBusiness(
             **CreateGenBusinessParam(
                 app_name=obj.app,
                 table_name=table_name,
-                doc_comment=table_info['table_comment'] or table_name.split('_')[-1],
+                doc_comment=doc_comment,
                 table_comment=table_info['table_comment'],
                 class_name=to_pascal(table_name),
                 schema_name=to_pascal(table_name),
                 filename=table_name,
+                tag=doc_comment,
             ).model_dump(),
         )
         db.add(new_business)
