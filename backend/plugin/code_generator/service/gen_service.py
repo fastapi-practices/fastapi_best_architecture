@@ -67,7 +67,11 @@ class GenService:
             raise errors.ConflictError(msg='已存在相同数据库表业务')
 
         table_name = table_info['table_name']
-        doc_comment = table_info['table_comment'] or table_name.split('_')[-1]
+        doc_comment = (
+            table_info['table_comment'][:-1]
+            if table_info['table_comment'][-1] == '表'
+            else None or table_name.split('_')[-1]
+        )
         new_business = GenBusiness(
             **CreateGenBusinessParam(
                 app_name=obj.app,
