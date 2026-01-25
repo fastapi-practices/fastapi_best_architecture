@@ -70,7 +70,7 @@ class GenService:
         doc_comment = (
             table_info['table_comment'][:-1]
             if table_info['table_comment'][-1] == '表'
-            else None or table_name.split('_')[-1]
+            else table_info['table_comment'] or table_name.split('_')[-1]
         )
         new_business = GenBusiness(
             **CreateGenBusinessParam(
