@@ -43,7 +43,6 @@ class GenService:
         :param table_schema: 数据库 schema 名称
         :return:
         """
-
         return await gen_dao.get_all_tables(db, table_schema)
 
     @staticmethod
@@ -129,6 +128,32 @@ class GenService:
 
         return rendered_codes
 
+    @staticmethod
+    async def _inject_app_router(*, app_name: str, write: bool = True) -> str | None:
+        """
+        注入应用路由
+
+        :param app_name:
+        :param write: 是否写入文件
+        :return:
+        """
+        app_root_router = BASE_PATH / 'app' / 'router.py'
+
+        async with await open_file(app_root_router, 'r', encoding='utf-8') as f:
+            content = await f.read()
+
+        import_line = f'from backend.app.{app_name}.api.router import v1 as {app_name}_v1'
+        include_line = f'router.include_router({app_name}_v1)'
+
+        content = f'{import_line}\n{content}\n{include_line}'
+        content = await format_python_code(content)
+
+        if write:
+            async with await open_file(app_root_router, 'w', encoding='utf-8') as f:
+                await f.write(content)
+
+        return content
+
     async def preview(self, *, db: AsyncSession, pk: int) -> dict[str, bytes]:
         """
         预览生成的代码
@@ -151,6 +176,10 @@ class GenService:
         rendered_codes = await self._render_tpl_code(db=db, business=business)
         for filepath, code in rendered_codes.items():
             codes[f'{backend_path}{filepath}'] = code.encode('utf-8')
+
+        app_router_content = await self._inject_app_router(app_name=business.app_name, write=False)
+        if app_router_content:
+            codes[f'{backend_path}router.py'] = app_router_content.encode('utf-8')
 
         return codes
 
@@ -219,6 +248,8 @@ class GenService:
                     else:
                         await run_in_threadpool(shutil.copy2, src, dst)
 
+            await self._inject_app_router(app_name=business.app_name)
+
         return gen_path
 
     async def download(self, *, db: AsyncSession, pk: int) -> io.BytesIO:
@@ -238,6 +269,10 @@ class GenService:
         all_files.update(init_files)
         rendered_codes = await self._render_tpl_code(db=db, business=business)
         all_files.update(rendered_codes)
+
+        app_router_content = await self._inject_app_router(app_name=business.app_name, write=False)
+        if app_router_content:
+            all_files['router.py'] = app_router_content
 
         bio = io.BytesIO()
         with zipfile.ZipFile(bio, 'w') as zf:

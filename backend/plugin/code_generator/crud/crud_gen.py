@@ -21,27 +21,28 @@ class CRUDGen:
         """
         if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
-            SELECT TABLE_NAME AS TABLE_NAME,
-                table_comment AS table_comment
-            FROM
-                information_schema.TABLES
-            WHERE
-                TABLE_NAME NOT LIKE'sys_gen_%'
-                AND table_schema = :table_schema;
+            select
+              table_name as table_name,
+              table_comment as table_comment
+            from
+              information_schema.tables
+            where
+              table_name not like 'gen_%'
+              and table_schema = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema=table_schema)
         else:
             sql = """
-            SELECT
-                c.relname AS TABLE_NAME,
-                obj_description (c.OID) AS table_comment
-            FROM
-                pg_class c
-                LEFT JOIN pg_namespace n ON n.OID = c.relnamespace
-            WHERE
-                c.relkind = 'r'
-                AND c.relname NOT LIKE'sys_gen_%'
-                AND n.nspname = :table_schema;
+            select
+              c.relname as table_name,
+              obj_description (c.oid) as table_comment
+            from
+              pg_class c
+              left join pg_namespace n on n.oid = c.relnamespace
+            where
+              c.relkind = 'r'
+              and c.relname not like 'gen_%'
+              and n.nspname = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema='public')
         result = await db.execute(stmt)
@@ -59,29 +60,30 @@ class CRUDGen:
         """
         if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
-            SELECT TABLE_NAME AS TABLE_NAME,
-                table_comment AS table_comment
-            FROM
-                information_schema.TABLES
-            WHERE
-                TABLE_NAME NOT LIKE'sys_gen_%'
-                AND TABLE_NAME = :table_name
-                AND table_schema = :table_schema;
+            select
+              table_name as table_name,
+              table_comment as table_comment
+            from
+              information_schema.tables
+            where
+              table_name not like 'gen_%'
+              and table_name = :table_name
+              and table_schema = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema=table_schema, table_name=table_name)
         else:
             sql = """
-            SELECT
-                c.relname AS table_name,
-                obj_description (c.OID) AS table_comment
-            FROM
-                pg_class c
-                LEFT JOIN pg_namespace n ON n.OID = c.relnamespace
-            WHERE
-                c.relkind = 'r'
-                AND c.relname NOT LIKE'sys_gen_%'
-                AND c.relname = :table_name
-                AND n.nspname = :table_schema;
+            select
+              c.relname as table_name,
+              obj_description (c.oid) as table_comment
+            from
+              pg_class c
+              left join pg_namespace n on n.oid = c.relnamespace
+            where
+              c.relkind = 'r'
+              and c.relname not like 'gen_%'
+              and c.relname = :table_name
+              and n.nspname = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema='public', table_name=table_name)
         result = await db.execute(stmt)
@@ -100,70 +102,89 @@ class CRUDGen:
         """
         if DataBaseType.mysql == settings.DATABASE_TYPE:
             sql = """
-            SELECT COLUMN_NAME AS COLUMN_NAME,
-                CASE
-                    WHEN column_key = 'PRI' THEN
-                        1
-                    ELSE
-                        0
-                END AS is_pk,
-                CASE
-                    WHEN is_nullable = 'NO'
-                        OR column_key = 'PRI' THEN
-                        0
-                    ELSE
-                        1
-                END AS is_nullable,
-                ordinal_position AS sort,
-                column_comment AS column_comment,
-                column_type AS column_type
-            FROM
-                information_schema.COLUMNS
-            WHERE
-                COLUMN_NAME <> 'id'
-                AND COLUMN_NAME <> 'created_time'
-                AND COLUMN_NAME <> 'updated_time'
-                AND TABLE_NAME = :table_name
-                AND table_schema = :table_schema
-            ORDER BY
-                sort;
+            select
+              column_name as column_name,
+              case
+                when column_key = 'pri' then
+                  1
+                else
+                  0
+              end as is_pk,
+              case
+                when is_nullable = 'no'
+                  or column_key = 'pri' then
+                  0
+                else
+                  1
+              end as is_nullable,
+              ordinal_position as sort,
+              column_comment as column_comment,
+              column_type as column_type
+            from
+              information_schema.columns
+            where
+              column_name <> 'id'
+              and column_name <> 'created_time'
+              and column_name <> 'updated_time'
+              and table_name = :table_name
+              and table_schema = :table_schema
+            order by
+              sort;
             """
             stmt = text(sql).bindparams(table_schema=table_schema, table_name=table_name)
         else:
             sql = """
-            SELECT
-                a.attname AS COLUMN_NAME,
-                CASE
-                    WHEN EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid = t.OID AND c.contype = 'p' AND a.attnum = ANY (c.conkey)) THEN
-                        1
-                    ELSE
-                        0
-                END AS is_pk,
-                CASE
-                    WHEN a.attnotnull
-                        OR EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid = t.OID AND c.contype = 'p' AND a.attnum = ANY (c.conkey)) THEN
-                        0
-                    ELSE
-                        1
-                END AS is_nullable,
-                a.attnum AS sort,
-                col_description (t.OID, a.attnum) AS column_comment,
-                pg_catalog.format_type (a.atttypid, a.atttypmod) AS column_type
-            FROM
-                pg_attribute a
-                JOIN pg_class t ON a.attrelid = t.
-                OID JOIN pg_namespace n ON n.OID = t.relnamespace
-            WHERE
-                a.attnum > 0
-                AND NOT a.attisdropped
-                AND a.attname <> 'id'
-                AND a.attname <> 'created_time'
-                AND a.attname <> 'updated_time'
-                AND t.relname = :table_name
-                AND n.nspname = :table_schema
-            ORDER BY
-                sort;
-            """  # noqa: E501
+            select
+              a.attname as column_name,
+              case
+                when exists (
+                    select
+                      1
+                    from
+                      pg_constraint c
+                    where
+                      c.conrelid = t.oid
+                      and c.contype = 'p'
+                      and a.attnum = any (c.conkey)
+                  ) then
+                  1
+                else
+                  0
+              end as is_pk,
+              case
+                when a.attnotnull
+                  or exists (
+                    select
+                      1
+                    from
+                      pg_constraint c
+                    where
+                      c.conrelid = t.oid
+                      and c.contype = 'p'
+                      and a.attnum = any (c.conkey)
+                  ) then
+                  0
+                else
+                  1
+              end as is_nullable,
+              a.attnum as sort,
+              col_description (t.oid, a.attnum) as column_comment,
+              pg_catalog.format_type (a.atttypid, a.atttypmod) as column_type
+            from
+              pg_attribute a
+              join pg_class t on a.attrelid = t.
+              oid join pg_namespace n on n.oid = t.relnamespace
+            where
+              a.attnum > 0
+              and not a.attisdropped
+              and a.attname <> 'id'
+              and a.attname <> 'created_time'
+              and a.attname <> 'updated_time'
+              and t.relname = :table_name
+              and n.nspname = :table_schema
+            order by
+              sort;
+            """
             stmt = text(sql).bindparams(table_schema='public', table_name=table_name)
         result = await db.execute(stmt)
         return result.mappings().all()
