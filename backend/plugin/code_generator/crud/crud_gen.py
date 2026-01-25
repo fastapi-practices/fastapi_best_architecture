@@ -26,7 +26,7 @@ class CRUDGen:
             FROM
                 information_schema.TABLES
             WHERE
-                TABLE_NAME NOT LIKE'gen_%'
+                TABLE_NAME NOT LIKE 'gen_%'
                 AND table_schema = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema=table_schema)
@@ -40,7 +40,7 @@ class CRUDGen:
                 LEFT JOIN pg_namespace n ON n.OID = c.relnamespace
             WHERE
                 c.relkind = 'r'
-                AND c.relname NOT LIKE'gen_%'
+                AND c.relname NOT LIKE 'gen_%'
                 AND n.nspname = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema='public')
@@ -64,7 +64,7 @@ class CRUDGen:
             FROM
                 information_schema.TABLES
             WHERE
-                TABLE_NAME NOT LIKE'gen_%'
+                TABLE_NAME NOT LIKE 'gen_%'
                 AND TABLE_NAME = :table_name
                 AND table_schema = :table_schema;
             """
@@ -79,7 +79,7 @@ class CRUDGen:
                 LEFT JOIN pg_namespace n ON n.OID = c.relnamespace
             WHERE
                 c.relkind = 'r'
-                AND c.relname NOT LIKE'gen_%'
+                AND c.relname NOT LIKE 'gen_%'
                 AND c.relname = :table_name
                 AND n.nspname = :table_schema;
             """
