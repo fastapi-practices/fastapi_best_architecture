@@ -1,8 +1,10 @@
 [plugin]
 summary = '通知公告'
 version = '0.0.2'
-description = '发布系统内部通知、公告'
+description = '用于发布系统内部通知、公告'
 author = 'wu-clan'
+tags = ['other']
+database = ['mysql', 'pgsql']
 
 [app]
 extend = 'admin'

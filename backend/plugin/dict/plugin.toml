@@ -3,6 +3,8 @@ summary = '数据字典'
 version = '0.0.8'
 description = '通常用于约束前端工程数据展示'
 author = 'wu-clan'
+tags = ['other']
+database = ['mysql', 'pgsql']
 
 [app]
 extend = 'admin'
