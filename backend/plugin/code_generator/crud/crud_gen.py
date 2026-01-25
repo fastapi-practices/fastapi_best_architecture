@@ -28,7 +28,7 @@ class CRUDGen:
               information_schema.tables
             where
               table_name not like 'gen_%'
-              and table_schema = : table_schema;
+              and table_schema = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema=table_schema)
         else:
@@ -42,7 +42,7 @@ class CRUDGen:
             where
               c.relkind = 'r'
               and c.relname not like 'gen_%'
-              and n.nspname = : table_schema;
+              and n.nspname = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema='public')
         result = await db.execute(stmt)
@@ -67,8 +67,8 @@ class CRUDGen:
               information_schema.tables
             where
               table_name not like 'gen_%'
-              and table_name = : table_name
-              and table_schema = : table_schema;
+              and table_name = :table_name
+              and table_schema = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema=table_schema, table_name=table_name)
         else:
@@ -82,8 +82,8 @@ class CRUDGen:
             where
               c.relkind = 'r'
               and c.relname not like 'gen_%'
-              and c.relname = : table_name
-              and n.nspname = : table_schema;
+              and c.relname = :table_name
+              and n.nspname = :table_schema;
             """
             stmt = text(sql).bindparams(table_schema='public', table_name=table_name)
         result = await db.execute(stmt)
@@ -126,8 +126,8 @@ class CRUDGen:
               column_name <> 'id'
               and column_name <> 'created_time'
               and column_name <> 'updated_time'
-              and table_name = : table_name
-              and table_schema = : table_schema
+              and table_name = :table_name
+              and table_schema = :table_schema
             order by
               sort;
             """
@@ -180,8 +180,8 @@ class CRUDGen:
               and a.attname <> 'id'
               and a.attname <> 'created_time'
               and a.attname <> 'updated_time'
-              and t.relname = : table_name
-              and n.nspname = : table_schema
+              and t.relname = :table_name
+              and n.nspname = :table_schema
             order by
               sort;
             """
