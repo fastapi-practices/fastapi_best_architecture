@@ -63,7 +63,6 @@ async def get_business_all_columns(
 @router.post(
     '',
     summary='创建代码生成业务',
-    deprecated=True,
     dependencies=[
         Depends(RequestPermission('codegen:business:add')),
         DependsRBAC,
