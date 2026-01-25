@@ -5,6 +5,7 @@ from typing import Any
 import rtoml
 
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefinedType
 from pydantic_settings import PydanticBaseSettingsSource
 
 from backend.core.path_conf import PLUGIN_DIR
@@ -36,4 +37,13 @@ class PluginSettingsSource(PydanticBaseSettingsSource):
                     plugin_settings = config.get('settings', {})
                     merged_settings.update(plugin_settings)
 
-        return merged_settings
+        filtered_settings: dict[str, Any] = {}
+        for key, value in merged_settings.items():
+            field_info = self.settings_cls.model_fields.get(key)
+            if field_info is not None:
+                if isinstance(field_info.default, PydanticUndefinedType):
+                    filtered_settings[key] = value
+            else:
+                filtered_settings[key] = value
+
+        return filtered_settings
