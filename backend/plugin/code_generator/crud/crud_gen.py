@@ -184,7 +184,7 @@ class CRUDGen:
               and n.nspname = : table_schema
             order by
               sort;
-            """  # noqa: E501
+            """
             stmt = text(sql).bindparams(table_schema='public', table_name=table_name)
         result = await db.execute(stmt)
         return result.mappings().all()
