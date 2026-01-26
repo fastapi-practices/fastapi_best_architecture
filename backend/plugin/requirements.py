@@ -9,10 +9,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
-
-
-class PluginInstallError(Exception):
-    """插件安装错误"""
+from backend.plugin.errors import PluginInstallError
 
 
 def get_plugins() -> list[str]:

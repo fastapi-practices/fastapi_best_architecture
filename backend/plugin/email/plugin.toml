@@ -4,7 +4,7 @@ version = '0.0.3'
 description = '提供邮件发送功能，支持验证码、通知等场景'
 author = 'wu-clan'
 tags = ['other']
-database = ['mysql', 'pgsql']
+database = ['mysql', 'postgresql']
 
 [app]
 router = ['v1']

@@ -4,7 +4,7 @@ version = '0.0.2'
 description = '通常用于动态配置系统参数和前端工程数据展示'
 author = 'wu-clan'
 tags = ['other']
-database = ['mysql', 'pgsql']
+database = ['mysql', 'postgresql']
 
 [app]
 extend = 'admin'
