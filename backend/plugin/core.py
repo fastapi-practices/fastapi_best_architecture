@@ -10,22 +10,16 @@ import rtoml
 
 from fastapi import APIRouter, Depends, Request
 
-from backend.common.enums import DataBaseType, PrimaryKeyType, StatusType
+from backend.common.enums import DataBaseType, PluginLevelType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import RedisCli, redis_client
+from backend.plugin.errors import PluginConfigError, PluginInjectError
+from backend.plugin.validator import validate_plugin_config
 from backend.utils.async_helper import run_await
 from backend.utils.dynamic_import import get_model_objects, import_module_cached
-
-
-class PluginConfigError(Exception):
-    """插件信息错误"""
-
-
-class PluginInjectError(Exception):
-    """插件注入错误"""
 
 
 @lru_cache
@@ -105,7 +99,6 @@ def load_plugin_config(plugin: str) -> dict[str, Any]:
 
 def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """解析插件配置"""
-
     extend_plugins = []
     app_plugins = []
 
@@ -123,32 +116,20 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     for plugin in plugins:
         data = load_plugin_config(plugin)
+        plugin_type = validate_plugin_config(plugin, data)
 
-        plugin_info = data.get('plugin')
-        if not plugin_info:
-            raise PluginConfigError(f'插件 {plugin} 配置文件缺少 plugin 配置')
-
-        required_fields = ['summary', 'version', 'description', 'author']
-        missing_fields = [field for field in required_fields if field not in plugin_info]
-        if missing_fields:
-            raise PluginConfigError(f'插件 {plugin} 配置文件缺少必要字段: {", ".join(missing_fields)}')
-
-        if data.get('api'):
-            if not data.get('app', {}).get('extend'):
-                raise PluginConfigError(f'扩展级插件 {plugin} 配置文件缺少 app.extend 配置')
+        if plugin_type == PluginLevelType.extend:
             extend_plugins.append(data)
         else:
-            if not data.get('app', {}).get('router'):
-                raise PluginConfigError(f'应用级插件 {plugin} 配置文件缺少 app.router 配置')
             app_plugins.append(data)
 
         # 补充插件信息
+        data['plugin']['name'] = plugin
         plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if plugin_cache_info:
             data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
         else:
             data['plugin']['enable'] = str(StatusType.enable.value)
-        data['plugin']['name'] = plugin
 
         # 缓存最新插件信息
         run_await(current_redis_client.set)(
