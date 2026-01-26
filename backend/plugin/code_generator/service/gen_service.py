@@ -148,8 +148,17 @@ class GenService:
 
         import_line = f'from backend.app.{app_name}.api.router import v1 as {app_name}_v1'
         include_line = f'router.include_router({app_name}_v1)'
+        has_import = import_line in content  # type: ignore
+        has_include = include_line in content  # type: ignore
 
-        content = f'{import_line}\n{content}\n{include_line}'
+        if has_import and has_include:
+            return None
+
+        if not has_import:
+            content = f'{import_line}\n{content}'
+        if not has_include:
+            content = f'{content}\n{include_line}'
+
         content = await format_python_code(content)
 
         if write:
