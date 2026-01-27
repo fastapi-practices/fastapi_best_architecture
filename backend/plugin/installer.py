@@ -109,11 +109,17 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
     return plugin_name
 
 
-async def install_git_plugin(repo_url: str) -> str:
+async def install_git_plugin(
+    repo_url: str,
+    username: str | None = None,
+    password: str | None = None,
+) -> str:
     """
     安装 Git 插件
 
     :param repo_url:
+    :param username:
+    :param password:
     :return:
     """
     match = is_git_url(repo_url)
@@ -126,7 +132,13 @@ async def install_git_plugin(repo_url: str) -> str:
 
     async with acquire_distributed_reload_lock():
         try:
-            await run_in_threadpool(porcelain.clone, repo_url, PLUGIN_DIR / repo_name, checkout=True)
+            clone_kwargs: dict = {'checkout': True}
+            if username:
+                clone_kwargs['username'] = username
+            if password:
+                clone_kwargs['password'] = password
+
+            await run_in_threadpool(porcelain.clone, repo_url, PLUGIN_DIR / repo_name, **clone_kwargs)
         except Exception as e:
             log.error(f'插件安装失败: {e}')
             raise errors.ServerError(msg='插件安装失败，请稍后重试') from e

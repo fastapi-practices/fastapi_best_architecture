@@ -343,6 +343,8 @@ async def install_plugin(
     no_sql: bool,  # noqa: FBT001
     db_type: DataBaseType,
     pk_type: PrimaryKeyType,
+    username: str | None = None,
+    password: str | None = None,
 ) -> None:
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('插件安装仅在开发环境可用', code=1)
@@ -359,7 +361,7 @@ async def install_plugin(
         if path:
             plugin_name = await install_zip_plugin(file=path)
         if repo_url:
-            plugin_name = await install_git_plugin(repo_url=repo_url)
+            plugin_name = await install_git_plugin(repo_url=repo_url, username=username, password=password)
 
         console.print(f'插件 {plugin_name} 安装成功', style='bold green')
 
@@ -609,9 +611,19 @@ class Add:
         PrimaryKeyType,
         cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
     ]
+    username: Annotated[
+        str | None,
+        cappa.Arg(short='-u', help='Git 仓库的用户名'),
+    ]
+    password: Annotated[
+        str | None,
+        cappa.Arg(short='-p', help='Git 仓库的密码或访问令牌'),
+    ]
 
     async def __call__(self) -> None:
-        await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
+        await install_plugin(
+            self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type, self.username, self.password
+        )
 
 
 @cappa.command(help='导入代码生成业务和模型列', default_long=True)
