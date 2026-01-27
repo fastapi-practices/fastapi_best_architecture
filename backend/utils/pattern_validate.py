@@ -36,12 +36,12 @@ def is_phone(number: str) -> re.Match[str]:
 
 def is_git_url(url: str) -> re.Match[str]:
     """
-    检查 git URL 格式
+    检查 git URL 格式（仅允许 HTTP/HTTPS 协议）
 
     :param url: 待检查的 URL
     :return:
     """
-    git_pattern = r'^(?!(git\+ssh|ssh)://|git@)(?P<scheme>git|https?|file)://(?P<host>[^/]*)(?P<path>(?:/[^/]*)*/)(?P<repo>[^/]+?)(?:\.git)?$'
+    git_pattern = r'^(?P<scheme>https?)://(?P<host>[^/]*)(?P<path>(?:/[^/]*)*/)(?P<repo>[^/]+?)(?:\.git)?$'
     return match_string(git_pattern, url)
 
 

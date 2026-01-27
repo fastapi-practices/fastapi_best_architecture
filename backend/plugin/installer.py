@@ -118,7 +118,7 @@ async def install_git_plugin(repo_url: str) -> str:
     """
     match = is_git_url(repo_url)
     if not match:
-        raise errors.RequestError(msg='Git 仓库地址格式非法')
+        raise errors.RequestError(msg='Git 仓库地址格式非法，仅支持 HTTP/HTTPS 协议')
     repo_name = match.group('repo')
     path = anyio.Path(PLUGIN_DIR / repo_name)
     if await path.exists():
