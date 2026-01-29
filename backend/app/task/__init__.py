@@ -1,8 +1,7 @@
 import sys
 
-from backend.core.path_conf import BASE_PATH
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 from .actions import *  # noqa: F403
-
-# 导入项目根目录
-sys.path.append(str(BASE_PATH.parent))
