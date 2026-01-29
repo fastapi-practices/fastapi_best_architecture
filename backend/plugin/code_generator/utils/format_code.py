@@ -25,10 +25,10 @@ async def format_python_code(code: str) -> str:
             'ruff',
             'format',
             str(temp_file),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL,
         )
-        await process.communicate()
+        await process.wait()
 
         if process.returncode == 0:
             async with await open_file(temp_file, encoding='utf-8') as f:
