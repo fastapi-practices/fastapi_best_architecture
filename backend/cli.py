@@ -27,6 +27,7 @@ from backend.common.exception.errors import BaseExceptionError
 from backend.common.model import MappedBase
 from backend.core.conf import settings
 from backend.core.path_conf import (
+    BASE_PATH,
     ENV_EXAMPLE_FILE_PATH,
     ENV_FILE_PATH,
     MYSQL_SCRIPT_DIR,
@@ -496,6 +497,14 @@ async def generate(*, preview: bool = False) -> None:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
+def run_alembic(*args: str) -> None:
+    """执行 alembic 命令"""
+    try:
+        subprocess.run(['alembic', *args], cwd=BASE_PATH, check=True)
+    except subprocess.CalledProcessError as e:
+        raise cappa.Exit('Alembic 命令执行失败', code=e.returncode)
+
+
 @cappa.command(help='初始化 fba 项目', default_long=True)
 @dataclass
 class Init:
@@ -659,6 +668,111 @@ class CodeGenerator:
         await generate(preview=self.preview)
 
 
+@cappa.command(help='生成数据库迁移文件', default_long=True)
+@dataclass
+class Revision:
+    autogenerate: Annotated[
+        bool,
+        cappa.Arg(default=True, help='自动检测模型变更并生成迁移脚本'),
+    ]
+    message: Annotated[
+        str,
+        cappa.Arg(short='-m', default='', help='迁移文件的描述信息'),
+    ]
+
+    def __call__(self) -> None:
+        args = ['revision']
+        if self.autogenerate:
+            args.append('--autogenerate')
+        if self.message:
+            args.extend(['-m', self.message])
+        run_alembic(*args)
+        console.print('迁移文件生成成功', style='bold green')
+
+
+@cappa.command(help='升级数据库到指定版本', default_long=True)
+@dataclass
+class Upgrade:
+    revision: Annotated[
+        str,
+        cappa.Arg(default='head', help='目标版本，默认为最新版本'),
+    ]
+
+    def __call__(self) -> None:
+        run_alembic('upgrade', self.revision)
+        console.print(f'数据库已升级到: {self.revision}', style='bold green')
+
+
+@cappa.command(help='降级数据库到指定版本', default_long=True)
+@dataclass
+class Downgrade:
+    revision: Annotated[
+        str,
+        cappa.Arg(default='-1', help='目标版本，默认回退一个版本'),
+    ]
+
+    def __call__(self) -> None:
+        run_alembic('downgrade', self.revision)
+        console.print(f'数据库已降级到: {self.revision}', style='bold green')
+
+
+@cappa.command(help='显示数据库当前迁移版本')
+@dataclass
+class Current:
+    verbose: Annotated[
+        bool,
+        cappa.Arg(short='-v', default=False, help='显示详细信息'),
+    ]
+
+    def __call__(self) -> None:
+        args = ['current']
+        if self.verbose:
+            args.append('-v')
+        run_alembic(*args)
+
+
+@cappa.command(help='显示迁移历史记录', default_long=True)
+@dataclass
+class History:
+    verbose: Annotated[
+        bool,
+        cappa.Arg(short='-v', default=False, help='显示详细信息'),
+    ]
+    range: Annotated[
+        str,
+        cappa.Arg(short='-r', default='', help='显示指定范围的历史，例如 -r base:head'),
+    ]
+
+    def __call__(self) -> None:
+        args = ['history']
+        if self.verbose:
+            args.append('-v')
+        if self.range:
+            args.extend(['-r', self.range])
+        run_alembic(*args)
+
+
+@cappa.command(help='显示所有头版本')
+@dataclass
+class Heads:
+    verbose: Annotated[
+        bool,
+        cappa.Arg(short='-v', default=False, help='显示详细信息'),
+    ]
+
+    def __call__(self) -> None:
+        args = ['heads']
+        if self.verbose:
+            args.append('-v')
+        run_alembic(*args)
+
+
+@cappa.command(help='数据库迁移管理')
+@dataclass
+class Alembic:
+    subcmd: cappa.Subcommands[Revision | Upgrade | Downgrade | Current | History | Heads]
+
+
 @cappa.command(help='一个高效的 fba 命令行界面', default_long=True)
 @dataclass
 class FbaCli:
@@ -666,7 +780,7 @@ class FbaCli:
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
-    subcmd: cappa.Subcommands[Init | Run | Celery | Add | CodeGenerator | None] = None
+    subcmd: cappa.Subcommands[Init | Run | Add | Alembic | Celery | CodeGenerator | None] = None
 
     async def __call__(self) -> None:
         if self.sql:
