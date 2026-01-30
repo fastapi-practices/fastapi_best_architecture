@@ -4,6 +4,7 @@ from backend.app.admin.schema.monitor import RedisCommandStat, RedisMonitorInfo,
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 from backend.database.redis import redis_client
+from backend.utils.format import fmt_seconds
 
 router = APIRouter()
 
@@ -18,7 +19,7 @@ async def get_redis_info() -> ResponseSchemaModel[RedisMonitorInfo]:
         redis_mode=str(info.get('redis_mode', '')),
         role=str(info.get('role', '')),
         tcp_port=str(info.get('tcp_port', '')),
-        uptime_in_days=str(info.get('uptime_in_days', 0)),
+        uptime=str(fmt_seconds(int(info.get('uptime_in_seconds', 0)))),
         connected_clients=str(info.get('connected_clients', '')),
         blocked_clients=str(info.get('blocked_clients', '')),
         used_memory_human=str(info.get('used_memory_human', '')),

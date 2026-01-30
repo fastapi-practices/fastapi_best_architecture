@@ -75,7 +75,7 @@ class RedisServerInfo(SchemaBase):
     redis_mode: str = Field(description='运行模式')
     role: str = Field(description='节点角色')
     tcp_port: str = Field(description='监听端口')
-    uptime_in_days: str = Field(description='运行天数')
+    uptime: str = Field(description='运行时长')
     connected_clients: str = Field(description='已连接客户端数')
     blocked_clients: str = Field(description='阻塞客户端数')
     used_memory_human: str = Field(description='已使用内存')
