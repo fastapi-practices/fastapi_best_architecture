@@ -27,17 +27,17 @@ from backend.utils.timezone import timezone
 router = APIRouter()
 
 
-@router.get('', summary='server 监控', dependencies=[DependsJwtAuth])
+@router.get('', summary='Server 监控', dependencies=[DependsJwtAuth])
 async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: C901
     def get_all_info() -> ServerMonitorInfo:  # noqa: C901
         # CPU 信息
         cpu_data = {
-            'usage': round(psutil.cpu_percent(interval=0.1), 2),
-            'logical_num': psutil.cpu_count(logical=True) or 0,
             'physical_num': psutil.cpu_count(logical=False) or 0,
+            'logical_num': psutil.cpu_count(logical=True) or 0,
             'max_freq': 0.0,
             'min_freq': 0.0,
             'current_freq': 0.0,
+            'usage': round(psutil.cpu_percent(interval=0.1), 2),
         }
 
         try:
@@ -74,7 +74,7 @@ async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: 
                 ip = s.getsockname()[0]
         except (TimeoutError, socket.gaierror, OSError):
             pass
-        sys_info = SysInfo(name=hostname, ip=ip, os=platform.system(), arch=platform.machine())
+        sys_info = SysInfo(name=hostname, os=platform.system(), ip=ip, arch=platform.machine())
 
         # 磁盘信息
         disk_list = []
@@ -94,11 +94,11 @@ async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: 
                     disk_list.append(
                         DiskInfo(
                             dir=partition.mountpoint,
-                            type=partition.fstype,
                             device=partition.device,
+                            type=partition.fstype,
                             total=fmt_bytes(usage.total),
-                            free=fmt_bytes(usage.free),
                             used=fmt_bytes(usage.used),
+                            free=fmt_bytes(usage.free),
                             usage=f'{usage.percent:.2f}%',
                         )
                     )
@@ -120,12 +120,12 @@ async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: 
             name='Python3',
             version=platform.python_version(),
             home=sys.executable,
+            startup=timezone.to_str(start_time),
+            elapsed=elapsed,
             cpu_usage=f'{process.cpu_percent(interval=0.1):.2f}%',
             mem_vms=fmt_bytes(proc_mem.vms),
             mem_rss=fmt_bytes(proc_mem.rss),
             mem_free=fmt_bytes(proc_mem.vms - proc_mem.rss),
-            startup=timezone.to_str(start_time),
-            elapsed=elapsed,
         )
 
         return ServerMonitorInfo(cpu=cpu, mem=mem_info, sys=sys_info, disk=disk_list, service=service)
