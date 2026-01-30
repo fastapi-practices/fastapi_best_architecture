@@ -140,7 +140,7 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [  # 末尾不带斜杠
-        'http://127.0.0.1:8000',
+        'http://127.0.0.1',
         'http://localhost:5173',
     ]
     CORS_EXPOSE_HEADERS: list[str] = [
@@ -296,6 +296,9 @@ class Settings(BaseSettings):
 
             # task
             values['CELERY_BROKER'] = 'rabbitmq'
+
+            # Grafana
+            values['GRAFANA_METRICS'] = True
 
         return values
 
