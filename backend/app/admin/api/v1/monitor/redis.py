@@ -9,24 +9,26 @@ from backend.utils.format import fmt_seconds
 router = APIRouter()
 
 
-@router.get('', summary='redis 监控', dependencies=[DependsJwtAuth])
+@router.get('', summary='Redis 监控', dependencies=[DependsJwtAuth])
 async def get_redis_info() -> ResponseSchemaModel[RedisMonitorInfo]:
     info = await redis_client.info()
     db_size = await redis_client.dbsize()
 
-    uptime_formatted = fmt_seconds(int(info.get('uptime_in_seconds', 0)))
-
     server_info = RedisServerInfo(
         redis_version=str(info.get('redis_version', '')),
         redis_mode=str(info.get('redis_mode', '')),
-        os=str(info.get('os', '')),
-        arch_bits=str(info.get('arch_bits', '')),
+        role=str(info.get('role', '')),
         tcp_port=str(info.get('tcp_port', '')),
-        uptime_in_seconds=uptime_formatted,
+        uptime=str(fmt_seconds(int(info.get('uptime_in_seconds', 0)))),
         connected_clients=str(info.get('connected_clients', '')),
+        blocked_clients=str(info.get('blocked_clients', '')),
         used_memory_human=str(info.get('used_memory_human', '')),
-        used_memory_peak_human=str(info.get('used_memory_peak_human', '')),
+        used_memory_rss_human=str(info.get('used_memory_rss_human', '')),
         maxmemory_human=str(info.get('maxmemory_human', '0B')),
+        mem_fragmentation_ratio=str(info.get('mem_fragmentation_ratio', '0')),
+        instantaneous_ops_per_sec=str(info.get('instantaneous_ops_per_sec', '')),
+        total_commands_processed=str(info.get('total_commands_processed', '')),
+        rejected_connections=str(info.get('rejected_connections', '')),
         keys_num=str(db_size),
     )
 
