@@ -70,7 +70,7 @@ class I18n:
         try:
             translation = self.locales[self.current_language]
         except KeyError:
-            keys = 'error.language_not_found'
+            keys = 'error.language_not_found'.split('.')
             translation = self.locales[settings.I18N_DEFAULT_LANGUAGE]
 
         for k in keys:
@@ -79,6 +79,7 @@ class I18n:
             else:
                 # Pydantic 兼容
                 translation = None if keys[0] == 'pydantic' else key
+                break
 
         if translation and kwargs:
             translation = translation.format(**kwargs)

@@ -2,7 +2,8 @@ from typing import Any
 
 from fastapi import Request, Response
 from fastapi.security.utils import get_authorization_scheme_param
-from starlette.authentication import AuthCredentials, AuthenticationBackend, AuthenticationError
+from starlette.authentication import AuthCredentials, AuthenticationBackend
+from starlette.authentication import AuthenticationError as StarletteAuthenticationError
 from starlette.requests import HTTPConnection
 
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
@@ -13,7 +14,7 @@ from backend.core.conf import settings
 from backend.utils.serializers import MsgSpecJSONResponse
 
 
-class _AuthenticationError(AuthenticationError):
+class AuthenticationError(StarletteAuthenticationError):
     """重写内部认证错误类"""
 
     def __init__(
@@ -40,7 +41,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
     """JWT 认证中间件"""
 
     @staticmethod
-    def auth_exception_handler(conn: HTTPConnection, exc: _AuthenticationError) -> Response:
+    def auth_exception_handler(conn: HTTPConnection, exc: AuthenticationError) -> Response:
         """
         覆盖内部认证错误处理
 
@@ -50,15 +51,16 @@ class JwtAuthMiddleware(AuthenticationBackend):
         """
         return MsgSpecJSONResponse(content={'code': exc.code, 'msg': exc.msg, 'data': None}, status_code=exc.code)
 
-    async def authenticate(self, request: Request) -> tuple[AuthCredentials, GetUserInfoWithRelationDetail] | None:
+    @staticmethod
+    def extract_token(request: Request) -> str | None:
         """
-        认证请求
+        从请求中提取 Bearer Token
 
         :param request: FastAPI 请求对象
         :return:
         """
-        token = request.headers.get('Authorization')
-        if not token:
+        authorization = request.headers.get('Authorization')
+        if not authorization:
             return None
 
         path = request.url.path
@@ -68,17 +70,30 @@ class JwtAuthMiddleware(AuthenticationBackend):
             if pattern.match(path):
                 return None
 
-        scheme, token = get_authorization_scheme_param(token)
+        scheme, token = get_authorization_scheme_param(authorization)
         if scheme.lower() != 'bearer':
+            return None
+
+        return token
+
+    async def authenticate(self, request: Request) -> tuple[AuthCredentials, GetUserInfoWithRelationDetail] | None:
+        """
+        认证请求
+
+        :param request: FastAPI 请求对象
+        :return:
+        """
+        token = self.extract_token(request)
+        if token is None:
             return None
 
         try:
             user = await jwt_authentication(token)
         except TokenError as exc:
-            raise _AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
+            raise AuthenticationError(code=exc.code, msg=exc.detail, headers=exc.headers)
         except Exception as e:
             log.exception(f'JWT 授权异常：{e}')
-            raise _AuthenticationError(code=getattr(e, 'code', 500), msg=getattr(e, 'msg', 'Internal Server Error'))
+            raise AuthenticationError(code=getattr(e, 'code', 500), msg=getattr(e, 'msg', 'Internal Server Error'))
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
         # 标准返回模式请查看：https://www.starlette.io/authentication/

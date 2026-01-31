@@ -29,10 +29,10 @@ from backend.middleware.i18n_middleware import I18nMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
-from backend.plugin.tools import build_final_router
-from backend.utils.demo_site import demo_site
-from backend.utils.health_check import ensure_unique_route_names, http_limit_callback
-from backend.utils.openapi import simplify_operation_ids
+from backend.plugin.core import build_final_router
+from backend.utils.demo_mode import demo_site
+from backend.utils.limiter import http_limit_callback
+from backend.utils.openapi import ensure_unique_route_names, simplify_operation_ids
 from backend.utils.otel import init_otel
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.snowflake import snowflake
@@ -51,7 +51,7 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     await create_tables()
 
     # 初始化 redis
-    await redis_client.open()
+    await redis_client.init()
 
     # 初始化 limiter
     await FastAPILimiter.init(

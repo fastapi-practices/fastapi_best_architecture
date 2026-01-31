@@ -23,7 +23,7 @@ from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.database.db import async_db_session
 from backend.database.redis import redis_client
-from backend.utils._await import run_await
+from backend.utils.async_helper import run_await
 from backend.utils.serializers import select_as_dict
 from backend.utils.timezone import timezone
 

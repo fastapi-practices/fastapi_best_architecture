@@ -25,7 +25,7 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
 )
 from backend.app.admin.utils.password_security import get_hash_password
-from backend.utils.import_parse import import_module_cached
+from backend.utils.dynamic_import import import_module_cached
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
 

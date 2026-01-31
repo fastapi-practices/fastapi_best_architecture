@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
     image: fba_server:latest
     ports:
-      - "8001:8001"
+      - "${DOCKER_MAP_SERVER_PORT:-8001}:8001"
     container_name: fba_server
     restart: always
     environment:
@@ -56,7 +56,7 @@ services:
   fba_postgres:
     image: postgres:16
     ports:
-      - "${DOCKER_POSTGRES_MAP_PORT:-5432}:5432"
+      - "${DOCKER_MAP_POSTGRES_PORT:-5432}:5432"
     container_name: fba_postgres
     restart: always
     environment:
@@ -72,7 +72,7 @@ services:
 #  fba_mysql:
 #    image: mysql:8.0.41
 #    ports:
-#      - "${DOCKER_MYSQL_MAP_PORT:-3306}:3306"
+#      - "${DOCKER_MAP_MYSQL_PORT:-3306}:3306"
 #    container_name: fba_mysql
 #    restart: always
 #    environment:
@@ -92,7 +92,7 @@ services:
   fba_redis:
     image: redis
     ports:
-      - "${DOCKER_REDIS_MAP_PORT:-6379}:6379"
+      - "${DOCKER_MAP_REDIS_PORT:-6379}:6379"
     container_name: fba_redis
     restart: always
     environment:
@@ -108,7 +108,7 @@ services:
   fba_nginx:
     image: nginx
     ports:
-      - "8000:80"
+      - "${DOCKER_MAP_NGINX_PORT:-8000}:80"
     container_name: fba_nginx
     restart: always
     depends_on:
@@ -158,8 +158,8 @@ services:
     hostname: fba_rabbitmq
     image: rabbitmq:3.13.7
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "${DOCKER_MAP_RABBITMA_UI_PORT:-15672}:15672"
+      - "${DOCKER_MAP_RABBITMA_PORT:-5672}:5672"
     container_name: fba_rabbitmq
     restart: always
     environment:
@@ -230,7 +230,7 @@ services:
         - SERVER_TYPE=fba_celery_flower
     image: fba_celery_flower:latest
     ports:
-      - "8555:8555"
+      - "${DOCKER_MAP_CELERY_FLOWER_PORT:-8555}:8555"
     container_name: fba_celery_flower
     restart: always
     environment:
@@ -254,7 +254,7 @@ services:
     image: danihodovic/celery-exporter
     restart: always
     ports:
-      - "9808:9808"
+      - "${DOCKER_MAP_CELERY_EXPORTER_PORT:-9808}:9808"
     container_name: fba_celery_exporter
     environment:
       - CE_BROKER_URL=amqp://guest:guest@fba_rabbitmq:5672//
@@ -267,7 +267,7 @@ services:
     image: grafana/loki
     restart: always
     ports:
-      - "3100:3100"
+      - "${DOCKER_MAP_LOKI_PORT:-3100}:3100"
     container_name: fba_loki
     networks:
       - fba_network
@@ -277,7 +277,7 @@ services:
     image: prom/prometheus
     restart: always
     ports:
-      - "9090:9090"
+      - "${DOCKER_MAP_PROMETHEUS_PORT:-9090}:9090"
     container_name: fba_prometheus
     depends_on:
       - fba_loki
@@ -295,9 +295,9 @@ services:
     image: grafana/alloy
     restart: always
     ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "12345:12345"
+      - "${DOCKER_MAP_ALLOY_GRPC_PORT:-4317}:4317"
+      - "${DOCKER_MAP_ALLOY_HTTP_PORT:-4318}:4318"
+      - "${DOCKER_MAP_ALLOY_UI_PORT:-12345}:12345"
     container_name: fba_alloy
     depends_on:
       - fba_loki
@@ -314,7 +314,7 @@ services:
     image: grafana/tempo:latest
     restart: always
     ports:
-      - "3200:3200"
+      - "${DOCKER_MAP_TEMPO_PORT:-3200}:3200"
     expose:
       - 4317
       - 4318
@@ -333,7 +333,7 @@ services:
     image: grafana/grafana
     restart: always
     ports:
-      - "3000:3000"
+      - "${DOCKER_MAP_GRAFANA_PORT:-3000}:3000"
     container_name: fba_grafana
     depends_on:
       - fba_loki

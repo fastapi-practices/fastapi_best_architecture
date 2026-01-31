@@ -10,32 +10,56 @@ from backend.core.conf import settings
 class RedisCli(Redis):
     """Redis 客户端"""
 
-    def __init__(self) -> None:
-        """初始化 Redis 客户端"""
+    def __init__(
+        self,
+        host: str = settings.REDIS_HOST,
+        port: int = settings.REDIS_PORT,
+        password: str = settings.REDIS_PASSWORD,
+        db: int = settings.REDIS_DATABASE,
+        socket_timeout: int = settings.REDIS_TIMEOUT,
+        socket_connect_timeout: int = settings.REDIS_TIMEOUT,
+        *,
+        socket_keepalive: bool = True,
+        health_check_interval: int = 30,
+        decode_responses: bool = True,
+    ) -> None:
+        """
+        初始化 Redis 客户端
+
+        :param host: Redis 服务器的主机地址
+        :param port: Redis 服务器的端口号
+        :param password: Redis 认证密码
+        :param db: 使用的 Redis 逻辑数据库索引
+        :param socket_timeout: Socket 读写操作的超时时间
+        :param socket_connect_timeout: 建立 TCP 连接时的超时时间
+        :param socket_keepalive: 是否开启 TCP Keepalive 探测
+        :param health_check_interval: 健康检查间隔时间（秒）
+        :param decode_responses: 是否自动将 Redis 返回的字节流（bytes）解码为字符串（utf-8）
+        """
         super().__init__(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            password=settings.REDIS_PASSWORD,
-            db=settings.REDIS_DATABASE,
-            socket_timeout=settings.REDIS_TIMEOUT,
-            socket_connect_timeout=settings.REDIS_TIMEOUT,
-            socket_keepalive=True,  # 保持连接
-            health_check_interval=30,  # 健康检查间隔
-            decode_responses=True,  # 转码 utf-8
+            host=host,
+            port=port,
+            password=password,
+            db=db,
+            socket_timeout=socket_timeout,
+            socket_connect_timeout=socket_connect_timeout,
+            socket_keepalive=socket_keepalive,
+            health_check_interval=health_check_interval,
+            decode_responses=decode_responses,
         )
 
-    async def open(self) -> None:
-        """触发初始化连接"""
+    async def init(self) -> None:
+        """初始化 Redis 服务器"""
         try:
             await self.ping()
         except TimeoutError:
-            log.error('❌ 数据库 redis 连接超时')
+            log.error('Redis 服务器连接超时')
             sys.exit()
         except AuthenticationError:
-            log.error('❌ 数据库 redis 连接认证失败')
+            log.error('Redis 服务器连接认证失败')
             sys.exit()
         except Exception as e:
-            log.error('❌ 数据库 redis 连接异常 {}', e)
+            log.error('Redis 服务器连接异常 {}', e)
             sys.exit()
 
     async def delete_prefix(self, prefix: str, exclude: str | list[str] | None = None, batch_size: int = 1000) -> None:

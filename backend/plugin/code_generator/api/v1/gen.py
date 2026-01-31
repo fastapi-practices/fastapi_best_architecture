@@ -9,8 +9,8 @@ from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
 from backend.database.db import CurrentSession, CurrentSessionTransaction
-from backend.plugin.code_generator.schema.code import ImportParam
-from backend.plugin.code_generator.service.code_service import gen_service
+from backend.plugin.code_generator.schema.gen import ImportParam
+from backend.plugin.code_generator.service.gen_service import gen_service
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ async def get_all_tables(
 
 @router.post(
     '/imports',
-    summary='导入代码生成业务和模型列',
+    summary='导入代码生成业务和模型列（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('codegen:table:import')),
         DependsRBAC,
@@ -56,7 +56,7 @@ async def get_generate_paths(
 @router.post(
     '/{pk}',
     summary='代码生成',
-    description='文件磁盘写入，请谨慎操作',
+    description='文件磁盘写入，请谨慎操作（仅开发环境）',
     dependencies=[
         Depends(RequestPermission('codegen:local:write')),
         DependsRBAC,

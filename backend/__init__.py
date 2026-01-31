@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 
-from backend.utils.import_parse import get_all_models
+from backend.utils.dynamic_import import get_all_models
 
 # import all models for auto create db tables
 for cls in get_all_models():

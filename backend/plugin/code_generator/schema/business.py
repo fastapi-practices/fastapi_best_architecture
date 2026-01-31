@@ -1,8 +1,10 @@
 from datetime import datetime
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_validator
 
+from backend.common.exception import errors
 from backend.common.schema import SchemaBase
+from backend.utils.pattern_validate import is_english_identifier
 
 
 class GenBusinessSchemaBase(SchemaBase):
@@ -15,10 +17,19 @@ class GenBusinessSchemaBase(SchemaBase):
     class_name: str | None = Field(None, description='用于 python 代码基础类名')
     schema_name: str | None = Field(None, description='用于 python Schema 代码基础类名')
     filename: str | None = Field(None, description='用于 python 代码基础文件名')
-    default_datetime_column: bool = Field(True, description='是否存在默认时间列')
-    api_version: str = Field('v1', description='代码生成 api 版本')
-    gen_path: str | None = Field(None, description='代码生成路径')
+    datetime_mixin: bool = Field(True, description='是否包含时间 Mixin 列')
+    api_version: str = Field('v1', description='API 版本')
+    tag: str | None = Field(None, description='API 标签（用于路由分组）')
+    gen_path: str | None = Field(None, description='生成路径（默认在 backend/app 目录下）')
     remark: str | None = Field(None, description='备注')
+
+    @field_validator('app_name', 'table_name')
+    @classmethod
+    def validate_english_only(cls, v: str) -> str:
+        """验证英文字段"""
+        if not is_english_identifier(v):
+            raise errors.RequestError(msg='必须以英文字母开头且只能包含英文字母和下划线')
+        return v
 
 
 class CreateGenBusinessParam(GenBusinessSchemaBase):

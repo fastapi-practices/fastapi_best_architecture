@@ -1,5 +1,3 @@
-import random
-
 from collections.abc import Sequence
 from typing import Any
 
@@ -92,7 +90,6 @@ class UserService:
         """
         if await user_dao.get_by_username(db, obj.username):
             raise errors.ConflictError(msg='用户名已注册')
-        obj.nickname = obj.nickname or f'#{random.randrange(88888, 99999)}'
         if not obj.password:
             raise errors.RequestError(msg='密码不允许为空')
         if not await dept_dao.get(db, obj.dept_id):
@@ -100,6 +97,7 @@ class UserService:
         for role_id in obj.roles:
             if not await role_dao.get(db, role_id):
                 raise errors.NotFoundError(msg='角色不存在')
+        obj.nickname = obj.nickname or obj.username
         await user_dao.add(db, obj)
 
     @staticmethod
