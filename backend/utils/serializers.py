@@ -358,9 +358,18 @@ def select_join_serialize(  # noqa: C901
 
     # 构建最终结果
     final_result_list = []
-    for current_main_id in sorted(main_data.keys()):
-        current_main_obj = main_data[current_main_id]
+    # 保持原始查询结果的顺序，而不是按主键排序
+    for data_row in rows_list:
+        data_row_items = data_row if hasattr(data_row, '__getitem__') else (data_row,)
+        if not data_row_items or data_row_items[0] is None:
+            continue
 
+        current_main_obj = data_row_items[0]
+        current_main_id = getattr(current_main_obj, 'id', None) or id(current_main_obj)
+
+        if current_main_id not in main_data:
+            continue
+            
         if has_relationships:
             final_result_data = build_nested_result(current_main_id, current_main_obj)
         else:
