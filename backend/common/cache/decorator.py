@@ -28,13 +28,18 @@ def _serialize_result(result: Any) -> bytes | str:
     :param result: 需要进行序列化的结果
     :return:
     """
-    # SQLAlchemy Model 序列
-    if isinstance(result, Sequence) and not isinstance(result, str) and result and hasattr(result[0], '__table__'):
-        return json.dumps(select_list_serialize(result), ensure_ascii=False)
-
-    # SQLAlchemy Model 对象
+    # SQLAlchemy 查询表
     if hasattr(result, '__table__'):
         return json.dumps(select_columns_serialize(result), ensure_ascii=False)
+
+    # SQLAlchemy 查询列表
+    if (
+        isinstance(result, Sequence)
+        and not isinstance(result, str)
+        and len(result) > 0
+        and hasattr(result[0], '__table__')
+    ):
+        return json.dumps(select_list_serialize(result), ensure_ascii=False)
 
     # 基本类型
     return json.dumps(result, ensure_ascii=False)
@@ -150,13 +155,14 @@ def cache_evict(
 
             try:
                 evict_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
-                if evict_key == name:
-                    if settings.CACHE_LOCAL_ENABLED:
+                if settings.CACHE_LOCAL_ENABLED:
+                    if evict_key == name:
                         local_cache_manager.delete(evict_key)
+                    else:
+                        local_cache_manager.delete_prefix(evict_key)
+                if evict_key == name:
                     await redis_client.delete(evict_key)
                 else:
-                    if settings.CACHE_LOCAL_ENABLED:
-                        local_cache_manager.delete_prefix(evict_key)
                     await redis_client.delete_prefix(evict_key)
             except Exception as e:
                 log.warning(f'[Cache] EVICT error: {e}')
