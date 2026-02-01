@@ -32,6 +32,8 @@ bidict==0.23.1
     # via python-socketio
 billiard==4.2.4
     # via celery
+cachebox==5.2.2
+    # via fastapi-best-architecture
 cappa==0.31.0
     # via fastapi-best-architecture
 celery==5.6.2

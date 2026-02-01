@@ -212,7 +212,7 @@ class UserService:
             f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}',
         ]
         for prefix in key_prefix:
-            await redis_client.delete(prefix)
+            await redis_client.delete_prefix(prefix)
         return count
 
     @staticmethod
@@ -314,6 +314,7 @@ class UserService:
         key_prefix = [
             f'{settings.TOKEN_REDIS_PREFIX}:{user.id}',
             f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user.id}',
+            f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}',
         ]
         for key in key_prefix:
             await redis_client.delete_prefix(key)

@@ -17,6 +17,7 @@ from starlette_context.middleware import ContextMiddleware
 from starlette_context.plugins import RequestIdPlugin
 
 from backend import __version__
+from backend.common.cache.warmup import cache_warmup
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.common.response.response_code import StandardResponseCode
@@ -65,6 +66,9 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # 创建操作日志任务
     create_task(OperaLogMiddleware.consumer())
+
+    # 缓存预热
+    await cache_warmup()
 
     yield
 

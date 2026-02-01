@@ -23,7 +23,7 @@ from backend.utils.dynamic_import import get_model_objects, import_module_cached
 
 
 @lru_cache
-def get_plugins() -> list[str]:
+def get_plugins() -> tuple[str, ...]:
     """获取插件列表"""
     plugin_packages = []
 
@@ -37,7 +37,7 @@ def get_plugins() -> list[str]:
         if os.path.isdir(item_path) and '__init__.py' in os.listdir(item_path):
             plugin_packages.append(item)
 
-    return plugin_packages
+    return tuple(plugin_packages)
 
 
 def get_plugin_models() -> list[object]:

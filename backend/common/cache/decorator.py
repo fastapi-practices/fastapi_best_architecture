@@ -1,7 +1,8 @@
 import functools
-import hashlib
 import json
-from typing import Any, Callable, ParamSpec, TypeVar
+
+from collections.abc import Callable, Sequence
+from typing import Any, ParamSpec, TypeVar
 
 from cachebox import make_hash_key
 
@@ -11,12 +12,45 @@ from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
 from backend.database.redis import redis_client
+from backend.utils.serializers import select_columns_serialize, select_list_serialize
 
 P = ParamSpec('P')
 T = TypeVar('T')
 
 # 哈希缓存键排序参数
 _EXCLUDE_PARAMS = frozenset({'db', 'session', 'self', 'cls', 'request', 'response'})
+
+
+def _serialize_result(result: Any) -> bytes | str:
+    """
+    序列化缓存结果
+
+    :param result: 需要进行序列化的结果
+    :return:
+    """
+    # SQLAlchemy Model 序列
+    if isinstance(result, Sequence) and not isinstance(result, str) and result and hasattr(result[0], '__table__'):
+        return json.dumps(select_list_serialize(result), ensure_ascii=False)
+
+    # SQLAlchemy Model 对象
+    if hasattr(result, '__table__'):
+        return json.dumps(select_columns_serialize(result), ensure_ascii=False)
+
+    # 基本类型
+    return json.dumps(result, ensure_ascii=False)
+
+
+def _deserialize_result(value: bytes | str) -> Any:
+    """
+    反序列化缓存结果
+
+    :param value: 缓存结果
+    :return:
+    """
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return value
 
 
 def user_key_builder() -> str:
@@ -27,7 +61,7 @@ def user_key_builder() -> str:
     return str(user_id)
 
 
-def cached(
+def cached(  # noqa: C901
     name: str,
     *,
     key: str | None = None,
@@ -44,7 +78,7 @@ def cached(
     if key is not None and key_builder is not None:
         raise errors.ServerError(msg='缓存 key 和 key_builder 不能同时使用')
 
-    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:  # noqa: C901
         @functools.wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             cache_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
@@ -59,12 +93,10 @@ def cached(
             try:
                 redis_value = await redis_client.get(cache_key)
                 if redis_value is not None:
-                    try:
-                        result = json.loads(redis_value)
-                        if settings.CACHE_LOCAL_ENABLED:
-                            local_cache_manager.set(cache_key, result)
-                    except json.JSONDecodeError:
-                        return redis_value
+                    result = _deserialize_result(redis_value)
+                    # L1：缓存回填
+                    if settings.CACHE_LOCAL_ENABLED:
+                        local_cache_manager.set(cache_key, result)
                     return result
             except Exception as e:
                 log.warning(f'[Cache] GET error: {e}')
@@ -74,9 +106,12 @@ def cached(
 
             if result is not None:
                 try:
+                    # L1：缓存原始结果
                     if settings.CACHE_LOCAL_ENABLED:
                         local_cache_manager.set(cache_key, result)
-                    serialized = json.dumps(result, ensure_ascii=False)
+
+                    # L2：缓存序列化后的结果
+                    serialized = _serialize_result(result)
                     if settings.CACHE_REDIS_TTL:
                         await redis_client.setex(cache_key, settings.CACHE_REDIS_TTL, serialized)
                     else:
@@ -92,10 +127,10 @@ def cached(
 
 
 def cache_evict(
-        name: str,
-        *,
-        key: str | None = None,
-        key_builder: Callable[..., str] | None = None,
+    name: str,
+    *,
+    key: str | None = None,
+    key_builder: Callable[..., str] | None = None,
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     缓存失效装饰器
@@ -116,11 +151,13 @@ def cache_evict(
             try:
                 evict_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
                 if evict_key == name:
+                    if settings.CACHE_LOCAL_ENABLED:
+                        local_cache_manager.delete(evict_key)
                     await redis_client.delete(evict_key)
-                    local_cache_manager.delete(evict_key)
                 else:
+                    if settings.CACHE_LOCAL_ENABLED:
+                        local_cache_manager.delete_prefix(evict_key)
                     await redis_client.delete_prefix(evict_key)
-                    local_cache_manager.delete_prefix(evict_key)
             except Exception as e:
                 log.warning(f'[Cache] EVICT error: {e}')
 
@@ -132,11 +169,11 @@ def cache_evict(
 
 
 def _build_cache_key(
-        name: str,
-        key: str | None,
-        key_builder: Callable[..., str] | None,
-        *args: Any,
-        **kwargs: Any,
+    name: str,
+    key: str | None,
+    key_builder: Callable[..., str] | None,
+    *args: Any,
+    **kwargs: Any,
 ) -> str:
     """构建缓存 Key"""
     if key_builder:

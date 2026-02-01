@@ -57,11 +57,19 @@ class UserPasswordHistoryService:
         failure_count = await redis_client.get(f'{settings.LOGIN_FAILURE_PREFIX}:{user_id}')
         failure_count = int(failure_count) if failure_count else 0
         failure_count += 1
-        await redis_client.set(f'{settings.LOGIN_FAILURE_PREFIX}:{user_id}', str(failure_count))
+        await redis_client.setex(
+            f'{settings.LOGIN_FAILURE_PREFIX}:{user_id}',
+            settings.USER_LOCK_SECONDS,
+            str(failure_count),
+        )
 
         if failure_count >= settings.USER_LOCK_THRESHOLD:
             locked_until = timezone.now() + timedelta(seconds=settings.USER_LOCK_SECONDS)
-            await redis_client.set(f'{settings.USER_LOCK_REDIS_PREFIX}:{user_id}', timezone.to_str(locked_until))
+            await redis_client.setex(
+                f'{settings.USER_LOCK_REDIS_PREFIX}:{user_id}',
+                settings.USER_LOCK_SECONDS,
+                timezone.to_str(locked_until),
+            )
             raise errors.AuthorizationError(msg='登录失败次数过多，账号已被锁定')
 
     @staticmethod

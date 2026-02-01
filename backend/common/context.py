@@ -21,6 +21,8 @@ class TypedContextProtocol(Protocol):
     permission: str | None
     language: str
 
+    user_id: int | None
+
 
 class TypedContext(TypedContextProtocol, _Context):
     def __getattr__(self, name: str) -> Any:

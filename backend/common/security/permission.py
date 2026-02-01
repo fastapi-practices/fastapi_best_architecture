@@ -40,7 +40,8 @@ class RequestPermission:
         if settings.RBAC_ROLE_MENU_MODE:
             if not isinstance(self.value, str):
                 raise errors.ServerError
-            # 附加权限标识到请求状态
+
+            # 设置权限标识到上下文
             ctx.permission = self.value
 
 

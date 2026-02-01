@@ -68,6 +68,13 @@ class Settings(BaseSettings):
     # Redis
     REDIS_TIMEOUT: int = 5
 
+    # 缓存
+    CACHE_LOCAL_TTL: int = 60 * 60 * 2  # 2 小时
+    CACHE_LOCAL_ENABLED: bool = True
+    CACHE_REDIS_TTL: int = 60 * 60 * 2  # 2 小时
+    CACHE_CONFIG_REDIS_PREFIX: str = 'fba:cache:config'
+    CACHE_DICT_REDIS_PREFIX: str = 'fba:cache:dict'
+
     # .env Snowflake
     SNOWFLAKE_DATACENTER_ID: int | None = None
     SNOWFLAKE_WORKER_ID: int | None = None

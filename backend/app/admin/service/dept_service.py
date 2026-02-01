@@ -7,8 +7,6 @@ from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
 from backend.app.admin.schema.dept import CreateDeptParam, UpdateDeptParam
 from backend.common.exception import errors
-from backend.core.conf import settings
-from backend.database.redis import redis_client
 from backend.utils.build_tree import get_tree_data
 
 
@@ -115,8 +113,6 @@ class DeptService:
         if children:
             raise errors.ConflictError(msg='部门下存在子部门，无法删除')
         count = await dept_dao.delete(db, pk)
-        for user in dept.users:
-            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{user.id}')
         return count
 
 
