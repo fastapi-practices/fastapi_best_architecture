@@ -24,10 +24,11 @@ class LocalCacheManager:
 
     def delete(self, key: str) -> bool:
         """删除缓存"""
-        if self.get(key) is not None:
+        try:
             del self.hot_cache[key]
-            return True
-        return False
+        except KeyError:
+            return False
+        return True
 
     def clear(self) -> None:
         """清空缓存"""
@@ -42,10 +43,12 @@ class LocalCacheManager:
         :return:
         """
         exclude_set = set(exclude) if isinstance(exclude, list) else {exclude} if isinstance(exclude, str) else set()
-        keys_to_delete = [k for k in self.hot_cache.keys() if k.startswith(prefix) and k not in exclude_set]
-        for key in keys_to_delete:
-            if self.get(key) is not None:
-                del self.hot_cache[key]
+        for key in list(self.hot_cache.keys()):
+            if key.startswith(prefix) and key not in exclude_set:
+                try:
+                    del self.hot_cache[key]
+                except KeyError:
+                    pass
 
 
 local_cache_manager = LocalCacheManager()
