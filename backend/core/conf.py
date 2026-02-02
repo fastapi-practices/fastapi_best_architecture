@@ -315,7 +315,7 @@ class Settings(BaseSettings):
         return values
 
 
-@lru_cache(maxsize=0)
+@lru_cache(maxsize=None)
 def get_settings() -> Settings:
     """获取全局配置单例"""
     if not ENV_FILE_PATH.exists():
