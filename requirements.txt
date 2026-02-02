@@ -238,7 +238,7 @@ prometheus-client==0.24.1
     #   flower
 prompt-toolkit==3.0.52
     # via click-repl
-protobuf==6.33.4
+protobuf==6.33.5
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
