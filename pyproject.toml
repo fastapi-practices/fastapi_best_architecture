@@ -14,6 +14,8 @@ dependencies = [
     "asyncmy>=0.2.11",
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
+    # If there is a serious problem, we will try `moka-py`
+    "cachebox>=5.2.2",
     "cappa>=0.31.0",
     "celery>=5.6.2",
     # When celery version < 6.0.0

@@ -3,8 +3,10 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.common.cache.decorator import cache_invalidate, cached
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
+from backend.core.conf import settings
 from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.model import Config
 from backend.plugin.config.schema.config import (
@@ -26,13 +28,16 @@ class ConfigService:
         :param pk: 参数配置 ID
         :return:
         """
-
         config = await config_dao.get(db, pk)
         if not config:
             raise errors.NotFoundError(msg='参数配置不存在')
         return config
 
     @staticmethod
+    @cached(
+        settings.CACHE_CONFIG_REDIS_PREFIX,
+        key_builder=lambda *, db, type: f'type:{type}',
+    )
     async def get_all(*, db: AsyncSession, type: str | None) -> Sequence[Config | None]:
         """
         获取所有参数配置
@@ -41,7 +46,6 @@ class ConfigService:
         :param type: 参数配置类型
         :return:
         """
-
         return await config_dao.get_all(db, type)
 
     @staticmethod
@@ -58,6 +62,7 @@ class ConfigService:
         return await paging_data(db, config_select)
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateConfigParam) -> None:
         """
         创建参数配置
@@ -66,13 +71,13 @@ class ConfigService:
         :param obj: 参数配置创建参数
         :return:
         """
-
         config = await config_dao.get_by_key(db, obj.key)
         if config:
             raise errors.ConflictError(msg=f'参数配置 {obj.key} 已存在')
         await config_dao.create(db, obj)
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def update(*, db: AsyncSession, pk: int, obj: UpdateConfigParam) -> int:
         """
         更新参数配置
@@ -82,7 +87,6 @@ class ConfigService:
         :param obj: 参数配置更新参数
         :return:
         """
-
         config = await config_dao.get(db, pk)
         if not config:
             raise errors.NotFoundError(msg='参数配置不存在')
@@ -94,6 +98,7 @@ class ConfigService:
         return count
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def bulk_update(*, db: AsyncSession, objs: list[UpdateConfigsParam]) -> int:
         """
         批量更新参数配置
@@ -102,7 +107,6 @@ class ConfigService:
         :param objs: 参数配置批量更新参数
         :return:
         """
-
         for _batch in range(0, len(objs), 1000):
             for obj in objs:
                 config = await config_dao.get(db, obj.id)
@@ -116,6 +120,7 @@ class ConfigService:
         return count
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def delete(*, db: AsyncSession, pks: list[int]) -> int:
         """
         批量删除参数配置
@@ -124,7 +129,6 @@ class ConfigService:
         :param pks: 参数配置 ID 列表
         :return:
         """
-
         count = await config_dao.delete(db, pks)
         return count
 

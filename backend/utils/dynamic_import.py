@@ -13,7 +13,7 @@ from backend.common.log import log
 T = TypeVar('T')
 
 
-@lru_cache(maxsize=512)
+@lru_cache(maxsize=128)
 def import_module_cached(module_path: str) -> Any:
     """
     缓存导入模块
@@ -84,9 +84,9 @@ def get_app_models() -> list[object]:
     return objs
 
 
-@lru_cache
-def get_all_models() -> list[object]:
+@lru_cache(256)
+def get_all_models() -> tuple[object, ...]:
     """获取所有模型类"""
     from backend.plugin.core import get_plugin_models
 
-    return get_app_models() + get_plugin_models()
+    return tuple(get_app_models() + get_plugin_models())

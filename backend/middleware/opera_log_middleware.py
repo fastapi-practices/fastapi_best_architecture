@@ -31,7 +31,7 @@ from backend.utils.trace_id import get_request_trace_id
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
-    opera_log_queue: Queue = Queue(maxsize=100000)
+    opera_log_queue: Queue = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:
         """

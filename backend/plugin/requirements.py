@@ -9,18 +9,8 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
+from backend.plugin.core import get_plugins
 from backend.plugin.errors import PluginInstallError
-
-
-def get_plugins() -> list[str]:
-    """
-    获取插件列表
-
-    注意：此函数从 backend.plugin.core 导入以避免循环依赖
-    """
-    from backend.plugin.core import get_plugins as _get_plugins
-
-    return _get_plugins()
 
 
 def _is_in_virtualenv() -> bool:

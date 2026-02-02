@@ -104,7 +104,7 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
 
         await _append_env_example(full_plugin_path)
         await install_requirements_async(plugin_dir_name)
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     return plugin_name
 
@@ -133,6 +133,6 @@ async def install_git_plugin(repo_url: str) -> str:
 
         await _append_env_example(path)
         await install_requirements_async(repo_name)
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'ture')
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     return repo_name

@@ -1,6 +1,6 @@
 import shutil
 
-from functools import lru_cache
+from functools import cache
 from re import Pattern
 from typing import Any, Literal
 
@@ -67,6 +67,17 @@ class Settings(BaseSettings):
 
     # Redis
     REDIS_TIMEOUT: int = 5
+
+    # 缓存
+    CACHE_LOCAL_ENABLED: bool = True
+    CACHE_LOCAL_MAXSIZE: int = 100000
+    CACHE_LOCAL_TTL: int = 60 * 60 * 2  # 2 小时
+    CACHE_REDIS_TTL: int = 60 * 60 * 2  # 2 小时
+    CACHE_CONFIG_REDIS_PREFIX: str = 'fba:cache:config'
+    CACHE_DICT_REDIS_PREFIX: str = 'fba:cache:dict'
+    CACHE_PUBSUB_CHANNEL: str = 'fba:cache:invalidate'
+    CACHE_PUBSUB_RECONNECT_DELAY: int = 5  # 重连延迟（秒）
+    CACHE_PUBSUB_MAX_RECONNECT_ATTEMPTS: int = 10  # 最大重连次数
 
     # .env Snowflake
     SNOWFLAKE_DATACENTER_ID: int | None = None
@@ -213,6 +224,7 @@ class Settings(BaseSettings):
         'new_password',
         'confirm_password',
     ]
+    OPERA_LOG_QUEUE_MAXSIZE: int = 100000
     OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 100
     OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
@@ -303,7 +315,7 @@ class Settings(BaseSettings):
         return values
 
 
-@lru_cache
+@cache
 def get_settings() -> Settings:
     """获取全局配置单例"""
     if not ENV_FILE_PATH.exists():

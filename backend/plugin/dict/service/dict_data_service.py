@@ -3,8 +3,10 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.common.cache.decorator import cache_invalidate, cached
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
+from backend.core.conf import settings
 from backend.plugin.dict.crud.crud_dict_data import dict_data_dao
 from backend.plugin.dict.crud.crud_dict_type import dict_type_dao
 from backend.plugin.dict.model import DictData
@@ -23,13 +25,16 @@ class DictDataService:
         :param pk: 字典数据 ID
         :return:
         """
-
         dict_data = await dict_data_dao.get(db, pk)
         if not dict_data:
             raise errors.NotFoundError(msg='字典数据不存在')
         return dict_data
 
     @staticmethod
+    @cached(
+        settings.CACHE_DICT_REDIS_PREFIX,
+        key_builder=lambda *, db, code: f'type:{code}',
+    )
     async def get_by_type_code(*, db: AsyncSession, code: str) -> Sequence[DictData]:
         """
         获取字典数据详情
@@ -38,13 +43,16 @@ class DictDataService:
         :param code: 字典类型编码
         :return:
         """
-
         dict_datas = await dict_data_dao.get_by_type_code(db, code)
         if not dict_datas:
             raise errors.NotFoundError(msg='字典数据不存在')
         return dict_datas
 
     @staticmethod
+    @cached(
+        settings.CACHE_DICT_REDIS_PREFIX,
+        key_builder=lambda *, db: 'all',
+    )
     async def get_all(*, db: AsyncSession) -> Sequence[DictData]:
         """
         获取所有字典数据
@@ -86,6 +94,7 @@ class DictDataService:
         return await paging_data(db, dict_data_select)
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateDictDataParam) -> None:
         """
         创建字典数据
@@ -103,6 +112,7 @@ class DictDataService:
         await dict_data_dao.create(db, obj, dict_type.code)
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def update(*, db: AsyncSession, pk: int, obj: UpdateDictDataParam) -> int:
         """
         更新字典数据
@@ -112,7 +122,6 @@ class DictDataService:
         :param obj: 字典数据更新参数
         :return:
         """
-
         dict_data = await dict_data_dao.get(db, pk)
         if not dict_data:
             raise errors.NotFoundError(msg='字典数据不存在')
@@ -127,6 +136,7 @@ class DictDataService:
         return count
 
     @staticmethod
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def delete(*, db: AsyncSession, obj: DeleteDictDataParam) -> int:
         """
         批量删除字典数据
@@ -135,7 +145,6 @@ class DictDataService:
         :param obj: 字典数据 ID 列表
         :return:
         """
-
         count = await dict_data_dao.delete(db, obj.pks)
         return count
 
