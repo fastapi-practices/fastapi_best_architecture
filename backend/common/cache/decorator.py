@@ -1,10 +1,10 @@
 import functools
-import json
 
 from collections.abc import Callable, Sequence
 from typing import Any, ParamSpec, TypeVar
 
 from cachebox import make_hash_key
+from msgspec import json
 
 from backend.common.cache.local import local_cache_manager
 from backend.common.cache.pubsub import cache_pubsub_manager
@@ -18,7 +18,7 @@ from backend.utils.serializers import select_columns_serialize, select_list_seri
 P = ParamSpec('P')
 T = TypeVar('T')
 
-# 哈希缓存键排序参数
+# 哈希缓存键排除参数
 _EXCLUDE_PARAMS = frozenset({'db', 'session', 'self', 'cls', 'request', 'response'})
 
 
@@ -56,7 +56,7 @@ def user_key_builder() -> str:
     return str(user_id)
 
 
-def _serialize_result(result: Any) -> bytes | str:
+def _serialize_result(result: Any) -> bytes:
     """
     序列化缓存结果
 
@@ -65,22 +65,22 @@ def _serialize_result(result: Any) -> bytes | str:
     """
     # SQLAlchemy 查询表
     if hasattr(result, '__table__'):
-        return json.dumps(select_columns_serialize(result), ensure_ascii=False)
+        return json.encode(select_columns_serialize(result))
 
     # SQLAlchemy 查询列表
     if (
         isinstance(result, Sequence)
-        and not isinstance(result, str)
+        and not isinstance(result, (str, bytes))
         and len(result) > 0
         and hasattr(result[0], '__table__')
     ):
-        return json.dumps(select_list_serialize(result), ensure_ascii=False)
+        return json.encode(select_list_serialize(result))
 
     # 基本类型
-    return json.dumps(result, ensure_ascii=False)
+    return json.encode(result)
 
 
-def _deserialize_result(value: bytes | str) -> Any:
+def _deserialize_result(value: bytes) -> Any:
     """
     反序列化缓存结果
 
@@ -88,8 +88,8 @@ def _deserialize_result(value: bytes | str) -> Any:
     :return:
     """
     try:
-        return json.loads(value)
-    except json.JSONDecodeError:
+        return json.decode(value)
+    except Exception:
         return value
 
 
@@ -207,7 +207,7 @@ def cache_invalidate(  # noqa: C901
                     if invalidate_key == name:
                         await cache_pubsub_manager.publish_invalidation(invalidate_key)
                     else:
-                        await cache_pubsub_manager.publish_invalidation(invalidate_key, delete_prefix=True)
+                        await cache_pubsub_manager.publish_invalidation(invalidate_key, is_delete_prefix=True)
 
             except Exception as e:
                 log.error(f'[Cache] INVALIDATE error: {e}')
