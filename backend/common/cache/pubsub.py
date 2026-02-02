@@ -37,10 +37,12 @@ class CachePubSubManager:
             pubsub = None
 
             try:
+                # 使用独立连接
                 pubsub_client = RedisCli()
                 pubsub = pubsub_client.pubsub()
                 await pubsub.subscribe(settings.CACHE_PUBSUB_CHANNEL)
 
+                # 发布订阅成功
                 reconnect_attempts = 0
 
                 async for message in pubsub.listen():
