@@ -1,6 +1,6 @@
 import shutil
 
-from functools import lru_cache
+from functools import cache
 from re import Pattern
 from typing import Any, Literal
 
@@ -315,7 +315,7 @@ class Settings(BaseSettings):
         return values
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_settings() -> Settings:
     """获取全局配置单例"""
     if not ENV_FILE_PATH.exists():
