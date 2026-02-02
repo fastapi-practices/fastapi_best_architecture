@@ -10,17 +10,19 @@ from backend.database.redis import RedisCli, redis_client
 class CachePubSubManager:
     """缓存 Pub/Sub 管理器"""
 
+    _pubsub_task: asyncio.Task | None = None
+
     @staticmethod
-    async def publish_invalidation(key: str, *, delete_prefix: bool) -> None:
+    async def publish_invalidation(key: str, *, is_delete_prefix: bool) -> None:
         """
         发布缓存失效通知
 
         :param key: 缓存键
-        :param delete_prefix: 是否删除符合前缀的所有缓存
+        :param is_delete_prefix: 是否删除符合前缀的所有缓存
         :return:
         """
         try:
-            message = json.dumps({'key': key, 'delete_prefix': delete_prefix})
+            message = json.dumps({'key': key, 'is_delete_prefix': is_delete_prefix})
             await redis_client.publish(settings.CACHE_PUBSUB_CHANNEL, message)
         except Exception as e:
             log.warning(f'[CachePubSub] 发布通知失败: {e}')
@@ -46,7 +48,7 @@ class CachePubSubManager:
                         try:
                             data = json.loads(message['data'])
                             key = data['key']
-                            if not data['delete_prefix']:
+                            if not data['is_delete_prefix']:
                                 local_cache_manager.delete(key)
                             else:
                                 local_cache_manager.delete_prefix(key)
@@ -80,30 +82,29 @@ class CachePubSubManager:
                     except Exception:
                         pass
 
+    @classmethod
+    def start_listener(cls) -> None:
+        """启动缓存 Pub/Sub 监听器"""
+        if not settings.CACHE_LOCAL_ENABLED:
+            return
+
+        if cls._pubsub_task is None or cls._pubsub_task.done():
+            cls._pubsub_task = asyncio.create_task(cls.subscribe_and_listen())
+
+    @classmethod
+    async def stop_listener(cls) -> None:
+        """停止缓存 Pub/Sub 监听器"""
+        if cls._pubsub_task is None:
+            return
+
+        if not cls._pubsub_task.done():
+            cls._pubsub_task.cancel()
+            try:
+                await cls._pubsub_task
+            except asyncio.CancelledError:
+                pass
+
+        cls._pubsub_task = None
+
 
 cache_pubsub_manager = CachePubSubManager()
-
-_pubsub_task: asyncio.Task | None = None
-
-
-def start_cache_pubsub_listener() -> None:
-    """启动缓存 Pub/Sub 监听器"""
-    global _pubsub_task
-
-    if not settings.CACHE_LOCAL_ENABLED:
-        return
-
-    _pubsub_task = asyncio.create_task(cache_pubsub_manager.subscribe_and_listen())
-
-
-async def stop_cache_pubsub_listener() -> None:
-    """停止缓存 Pub/Sub 监听器"""
-    global _pubsub_task
-
-    if _pubsub_task and not _pubsub_task.done():
-        _pubsub_task.cancel()
-        try:
-            await _pubsub_task
-        except asyncio.CancelledError:
-            pass
-        _pubsub_task = None
