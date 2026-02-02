@@ -22,7 +22,7 @@ from backend.utils.async_helper import run_await
 from backend.utils.dynamic_import import get_model_objects, import_module_cached
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def get_plugins() -> tuple[str, ...]:
     """获取插件列表"""
     plugin_packages = []
@@ -104,7 +104,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     plugins = get_plugins()
 
-    # 使用独立单例，避免与主线程冲突
+    # 使用独立连接
     current_redis_client = RedisCli()
     run_await(current_redis_client.init)()
 

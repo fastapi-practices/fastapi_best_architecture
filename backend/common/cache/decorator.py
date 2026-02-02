@@ -7,6 +7,7 @@ from typing import Any, ParamSpec, TypeVar
 from cachebox import make_hash_key
 
 from backend.common.cache.local import local_cache_manager
+from backend.common.cache.pubsub import cache_pubsub_manager
 from backend.common.context import ctx
 from backend.common.exception import errors
 from backend.common.log import log
@@ -19,6 +20,40 @@ T = TypeVar('T')
 
 # 哈希缓存键排序参数
 _EXCLUDE_PARAMS = frozenset({'db', 'session', 'self', 'cls', 'request', 'response'})
+
+
+def build_cache_key(
+    name: str,
+    key: str | None,
+    key_builder: Callable[..., str] | None,
+    *args: Any,
+    **kwargs: Any,
+) -> str:
+    """构建缓存 Key"""
+    if key_builder:
+        return f'{name}:{key_builder(*args, **kwargs)}'
+
+    if key:
+        value = kwargs.get(key)
+        if value is None:
+            raise errors.ServerError(msg=f'缓存键构建失败，参数 "{key}" 不存在或值为空')
+        return f'{name}:{value}'
+
+    filtered = {k: v for k, v in kwargs.items() if k not in _EXCLUDE_PARAMS and v is not None}
+
+    if filtered:
+        hash_suffix = make_hash_key(*args, **kwargs)
+        return f'{name}:{hash_suffix}'
+
+    return name
+
+
+def user_key_builder() -> str:
+    """基于当前用户 ID 生成缓存 Key"""
+    user_id = ctx.user_id
+    if user_id is None:
+        raise errors.ServerError(msg='用户缓存键构建失败')
+    return str(user_id)
 
 
 def _serialize_result(result: Any) -> bytes | str:
@@ -58,14 +93,6 @@ def _deserialize_result(value: bytes | str) -> Any:
         return value
 
 
-def user_key_builder() -> str:
-    """基于当前用户 ID 生成缓存 Key"""
-    user_id = ctx.user_id
-    if user_id is None:
-        raise errors.ServerError(msg='用户缓存键构建失败')
-    return str(user_id)
-
-
 def cached(  # noqa: C901
     name: str,
     *,
@@ -86,7 +113,7 @@ def cached(  # noqa: C901
     def decorator(func: Callable[P, T]) -> Callable[P, T]:  # noqa: C901
         @functools.wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            cache_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
+            cache_key = build_cache_key(name, key, key_builder, *args, **kwargs)
 
             # L1: 本地缓存
             if settings.CACHE_LOCAL_ENABLED:
@@ -99,7 +126,7 @@ def cached(  # noqa: C901
                 redis_value = await redis_client.get(cache_key)
                 if redis_value is not None:
                     result = _deserialize_result(redis_value)
-                    # L1：缓存回填
+                    # 回填 L1
                     if settings.CACHE_LOCAL_ENABLED:
                         local_cache_manager.set(cache_key, result)
                     return result
@@ -111,16 +138,16 @@ def cached(  # noqa: C901
 
             if result is not None:
                 try:
-                    # L1：缓存原始结果
+                    # 回填 L1
                     if settings.CACHE_LOCAL_ENABLED:
                         local_cache_manager.set(cache_key, result)
 
-                    # L2：缓存序列化后的结果
-                    serialized = _serialize_result(result)
+                    # 回填 L2
+                    serialized_result = _serialize_result(result)
                     if settings.CACHE_REDIS_TTL:
-                        await redis_client.setex(cache_key, settings.CACHE_REDIS_TTL, serialized)
+                        await redis_client.setex(cache_key, settings.CACHE_REDIS_TTL, serialized_result)
                     else:
-                        await redis_client.set(cache_key, serialized)
+                        await redis_client.set(cache_key, serialized_result)
                 except Exception as e:
                     log.warning(f'[Cache] SET error: {e}')
 
@@ -131,11 +158,12 @@ def cached(  # noqa: C901
     return decorator
 
 
-def cache_evict(
+def cache_invalidate(  # noqa: C901
     name: str,
     *,
     key: str | None = None,
     key_builder: Callable[..., str] | None = None,
+    atomic: bool = True,
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     缓存失效装饰器
@@ -143,6 +171,7 @@ def cache_evict(
     :param name: 缓存名称（通常为缓存 Key 前缀）
     :param key: 从方法参数中获取指定参数名的值作为缓存 Key，与 key_builder 互斥
     :param key_builder: 自定义 Key 生成函数，与 key 互斥
+    :param atomic: 是否保证缓存原子性
     :return:
     """
     if key is not None and key_builder is not None:
@@ -153,48 +182,45 @@ def cache_evict(
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             result = await func(*args, **kwargs)
 
+            # 尝试失效缓存
+            invalidate_success = False
+            invalidate_error = None
+
             try:
-                evict_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
-                if settings.CACHE_LOCAL_ENABLED:
-                    if evict_key == name:
-                        local_cache_manager.delete(evict_key)
-                    else:
-                        local_cache_manager.delete_prefix(evict_key)
-                if evict_key == name:
-                    await redis_client.delete(evict_key)
+                invalidate_key = build_cache_key(name, key, key_builder, *args, **kwargs)
+
+                # L2 缓存失效
+                if invalidate_key == name:
+                    await redis_client.delete(invalidate_key)
                 else:
-                    await redis_client.delete_prefix(evict_key)
+                    await redis_client.delete_prefix(invalidate_key)
+
+                # L1 缓存失效
+                if settings.CACHE_LOCAL_ENABLED:
+                    if invalidate_key == name:
+                        local_cache_manager.delete(invalidate_key)
+                    else:
+                        local_cache_manager.delete_prefix(invalidate_key)
+
+                # 广播失效消息（通知其他节点清除本地缓存）
+                if settings.CACHE_LOCAL_ENABLED:
+                    if invalidate_key == name:
+                        await cache_pubsub_manager.publish_invalidation(invalidate_key)
+                    else:
+                        await cache_pubsub_manager.publish_invalidation(invalidate_key, delete_prefix=True)
+
             except Exception as e:
-                log.warning(f'[Cache] EVICT error: {e}')
+                log.error(f'[Cache] INVALIDATE error: {e}')
+                invalidate_error = e
+            else:
+                invalidate_success = True
+
+            # 原子性检查
+            if atomic and not invalidate_success:
+                raise errors.ServerError(msg='缓存失效失败，数据可能不一致', data=invalidate_error)
 
             return result
 
         return wrapper
 
     return decorator
-
-
-def _build_cache_key(
-    name: str,
-    key: str | None,
-    key_builder: Callable[..., str] | None,
-    *args: Any,
-    **kwargs: Any,
-) -> str:
-    """构建缓存 Key"""
-    if key_builder:
-        return f'{name}:{key_builder(*args, **kwargs)}'
-
-    if key:
-        value = kwargs.get(key)
-        if value is None:
-            raise errors.ServerError(msg=f'缓存键构建失败，参数 "{key}" 不存在或值为空')
-        return f'{name}:{value}'
-
-    filtered = {k: v for k, v in kwargs.items() if k not in _EXCLUDE_PARAMS and v is not None}
-
-    if filtered:
-        hash_suffix = make_hash_key(*args, **kwargs)
-        return f'{name}:{hash_suffix}'
-
-    return name

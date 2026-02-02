@@ -17,6 +17,7 @@ from starlette_context.middleware import ContextMiddleware
 from starlette_context.plugins import RequestIdPlugin
 
 from backend import __version__
+from backend.common.cache.pubsub import start_cache_pubsub_listener, stop_cache_pubsub_listener
 from backend.common.cache.warmup import cache_warmup
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
@@ -70,7 +71,13 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     # 缓存预热
     await cache_warmup()
 
+    # 启动缓存 Pub/Sub 监听器
+    start_cache_pubsub_listener()
+
     yield
+
+    # 停止缓存 Pub/Sub 监听器
+    await stop_cache_pubsub_listener()
 
     # 释放 snowflake 节点
     await snowflake.shutdown()

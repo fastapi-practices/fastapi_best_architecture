@@ -3,7 +3,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.common.cache.decorator import cache_evict, cached
+from backend.common.cache.decorator import cache_invalidate, cached
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.core.conf import settings
@@ -62,7 +62,7 @@ class ConfigService:
         return await paging_data(db, config_select)
 
     @staticmethod
-    @cache_evict(settings.CACHE_CONFIG_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateConfigParam) -> None:
         """
         创建参数配置
@@ -77,7 +77,7 @@ class ConfigService:
         await config_dao.create(db, obj)
 
     @staticmethod
-    @cache_evict(settings.CACHE_CONFIG_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def update(*, db: AsyncSession, pk: int, obj: UpdateConfigParam) -> int:
         """
         更新参数配置
@@ -98,7 +98,7 @@ class ConfigService:
         return count
 
     @staticmethod
-    @cache_evict(settings.CACHE_CONFIG_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def bulk_update(*, db: AsyncSession, objs: list[UpdateConfigsParam]) -> int:
         """
         批量更新参数配置
@@ -120,7 +120,7 @@ class ConfigService:
         return count
 
     @staticmethod
-    @cache_evict(settings.CACHE_CONFIG_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def delete(*, db: AsyncSession, pks: list[int]) -> int:
         """
         批量删除参数配置

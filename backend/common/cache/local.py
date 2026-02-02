@@ -9,7 +9,9 @@ class LocalCacheManager:
     """本地缓存管理器"""
 
     def __init__(self) -> None:
-        self.hot_cache: cachebox.TTLCache = cachebox.TTLCache(100000, ttl=settings.CACHE_LOCAL_TTL)
+        self.hot_cache: cachebox.TTLCache = cachebox.TTLCache(
+            settings.CACHE_LOCAL_MAXSIZE, ttl=settings.CACHE_LOCAL_TTL
+        )
 
     def get(self, key: str) -> Any:
         """获取缓存"""

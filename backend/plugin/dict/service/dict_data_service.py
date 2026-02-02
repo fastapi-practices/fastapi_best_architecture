@@ -3,7 +3,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.common.cache.decorator import cache_evict, cached
+from backend.common.cache.decorator import cache_invalidate, cached
 from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.core.conf import settings
@@ -94,7 +94,7 @@ class DictDataService:
         return await paging_data(db, dict_data_select)
 
     @staticmethod
-    @cache_evict(settings.CACHE_DICT_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateDictDataParam) -> None:
         """
         创建字典数据
@@ -112,7 +112,7 @@ class DictDataService:
         await dict_data_dao.create(db, obj, dict_type.code)
 
     @staticmethod
-    @cache_evict(settings.CACHE_DICT_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def update(*, db: AsyncSession, pk: int, obj: UpdateDictDataParam) -> int:
         """
         更新字典数据
@@ -136,7 +136,7 @@ class DictDataService:
         return count
 
     @staticmethod
-    @cache_evict(settings.CACHE_DICT_REDIS_PREFIX)
+    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def delete(*, db: AsyncSession, obj: DeleteDictDataParam) -> int:
         """
         批量删除字典数据
