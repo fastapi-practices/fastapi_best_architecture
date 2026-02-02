@@ -1,5 +1,6 @@
 from backend.common.log import log
 from backend.database.db import async_db_session
+from backend.plugin.config.enums import ConfigType
 
 
 async def cache_warmup() -> None:
@@ -14,7 +15,8 @@ async def _warmup_config() -> None:
         from backend.plugin.config.service.config_service import config_service
 
         async with async_db_session() as db:
-            await config_service.get_all(db=db, type=None)
+            for type in ConfigType.get_member_values():
+                await config_service.get_all(db=db, type=type)
     except ImportError:
         pass
     except Exception as e:

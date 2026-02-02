@@ -36,7 +36,7 @@ class ConfigService:
     @staticmethod
     @cached(
         settings.CACHE_CONFIG_REDIS_PREFIX,
-        key_builder=lambda *, db, type: f'type:{type or "all"}',
+        key_builder=lambda *, db, type: f'type:{type}',
     )
     async def get_all(*, db: AsyncSession, type: str | None) -> Sequence[Config | None]:
         """
