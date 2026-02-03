@@ -43,8 +43,6 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         """
         path = request.url.path
         method = request.method
-        route = request.scope.get('route')
-        summary = route.summary or '' if route else ''
         args = await self.get_request_args(request)
         code = 200
         msg = 'Success'
@@ -104,10 +102,16 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     app_name=PROMETHEUS_APP_NAME, method=method, path=path
                 ).observe(amount=elapsed, exemplar={'TraceID': get_request_trace_id()})
         finally:
+            # summary 只能在请求后获取
+            route = request.scope.get('route')
+            summary = route.summary or '' if route else ''
+
             log.debug(f'接口摘要：[{summary}]')
             log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
-            log.debug('<-- 请求结束')
+
+            if request.method != 'OPTIONS':
+                log.debug('<-- 请求结束')
 
             if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
                 log.info(f'{ctx.ip: <15} | {method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
