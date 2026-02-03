@@ -4,124 +4,62 @@
 # 官方文档: https://grafana.com/docs/tempo/latest/configuration/
 # ============================================================================
 
-# server: HTTP 服务器配置
+# HTTP 服务器配置
 server:
   http_listen_port: 3200
-  # HTTP API 监听端口
-  # 用于查询 Trace 数据和健康检查
 
-# distributor: 分发器配置
+# 分发器配置
 distributor:
   receivers:
-    # 接收器配置
-
     otlp:
-      # OpenTelemetry Protocol (OTLP) 接收器
-      # OTLP 是 OpenTelemetry 的原生协议，推荐使用
-
       protocols:
         grpc:
           endpoint: "0.0.0.0:4317"
-          # gRPC 协议端点
-
         http:
           endpoint: "0.0.0.0:4318"
-          # HTTP 协议端点
 
-# storage: 存储配置
+# 存储配置
 storage:
   trace:
     backend: local
-    # 存储后端类型
-    # 生产环境建议使用对象存储
-
     wal:
       path: /tmp/tempo/wal
-      # Write-Ahead Log (WAL) 目录
-      # WAL 用于在数据写入存储前的临时缓存
-      # 确保数据不会因意外重启而丢失
-      # 注意: 生产环境应使用持久化存储路径
-
     local:
       path: /tmp/tempo/blocks
-      # 本地存储的数据块目录
-      # 存储压缩后的 Trace 数据块
-      # 仅在 backend: local 时使用
 
-# metrics_generator: 指标生成器配置
-# 从 Trace 数据自动生成 Prometheus 指标
-# 这是实现 Trace 到 Metrics 关联的关键功能
+# 指标生成器配置
 metrics_generator:
   registry:
     external_labels:
       source: tempo
-      # 外部标签
-      # 添加到所有生成的指标上
 
   storage:
     path: /tmp/tempo/generator/wal
-    # 指标生成器的 WAL 目录
-    # 用于临时存储待发送的指标数据
-
     remote_write:
-      # 远程写入配置
-
       - url: http://fba_prometheus:9090/api/v1/write
-        # Prometheus 远程写入 API 地址
-        # 需要 Prometheus 启用 remote-write-receiver 功能
-
         send_exemplars: true
-        # 发送 Exemplar 数据
-        # Exemplar 将指标数据点与 Trace ID 关联
-        # 实现从指标图表点击跳转到对应 Trace
 
   traces_storage:
     path: /tmp/tempo/generator/traces
-    # Trace 数据临时存储路径
-    # 用于指标生成器处理 Trace 数据
 
   processor:
-    # 处理器配置
-    # 定义如何从 Trace 生成指标
-
     span_metrics:
-      # Span 指标处理器
-
       dimensions:
-        # 指标维度（标签）
-        # 这些属性将作为 Prometheus 指标的标签
-
         - service.name
         - http.method
         - http.target
         - http.status_code
-
     service_graphs:
-      # 服务图处理器
-      # 生成服务间调用关系的指标
-      # 用于 Grafana 中的服务地图可视化
-
       dimensions:
         - service.name
-
     local_blocks:
-      # 本地块处理器
-      # 处理本地存储的 Trace 数据块
-
       flush_to_storage: true
-      # 是否将处理后的数据刷新到存储
 
-# overrides: 覆盖配置
+# 覆盖配置
 overrides:
   defaults:
-    # 默认配置
-    # 适用于所有租户（单租户模式下为全局配置）
-
     metrics_generator:
       processors:
-        # 启用的指标处理器列表
-        # 只有在此列表中的处理器才会运行
-
         - span-metrics
         - service-graphs
         - local-blocks

@@ -1096,7 +1096,7 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 10
@@ -1259,7 +1259,7 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 10
@@ -1396,7 +1396,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 19
@@ -1494,7 +1494,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 19
@@ -1651,7 +1651,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 8,
         "x": 8,
         "y": 28
@@ -1719,7 +1719,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 8,
         "x": 16,
         "y": 28
@@ -1835,7 +1835,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 37
@@ -1981,7 +1981,7 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 37
@@ -2027,6 +2027,202 @@
       ],
       "title": "任务吞吐量 (每分钟)",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 106,
+      "title": "🔍 链路追踪",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "Celery Worker 的分布式追踪数据，点击 Trace ID 可跳转到 Explore 查看完整调用链",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Service"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 350
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6E9FFF",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "查看调用链",
+                    "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"queryType\":\"traceql\",\"query\":\"${__value.raw}\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Start time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              },
+              {
+                "id": "displayName",
+                "value": "时间"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "任务"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "displayName",
+                "value": "耗时"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "max",
+                "value": 10000
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "id": 60,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Start time",
+                "destinationType": "time"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Start time",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "query": "{resource.service.name=\"fba_celery_worker\" && name!=\"connect\"}",
+          "limit": 20,
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "title": "Worker Traces",
+      "type": "table"
     }
   ],
   "preload": false,

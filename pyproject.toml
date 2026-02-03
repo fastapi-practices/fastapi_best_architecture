@@ -9,7 +9,7 @@ license = { text = "MIT" }
 requires-python = ">=3.10"
 dynamic = ['version']
 dependencies = [
-    "alembic>=1.18.1",
+    "alembic>=1.18.3",
     "asgiref>=3.11.0",
     "asyncmy>=0.2.11",
     "asyncpg>=0.31.0",
@@ -21,21 +21,23 @@ dependencies = [
     # When celery version < 6.0.0
     # https://github.com/celery/celery/issues/7874
     "celery-aio-pool>=0.1.0rc8",
-    "cryptography>=46.0.3",
+    "cryptography>=46.0.4",
     "dulwich>=1.0.0",
     "fast-captcha>=0.3.2",
     "fastapi-limiter>=0.1.6",
-    "fastapi-pagination>=0.15.6",
+    "fastapi-pagination>=0.15.9",
     "fastapi[standard-no-fastapi-cloud-cli]>=0.128.0",
     "flower>=2.0.1",
     "gevent>=25.9.1",
-    "granian>=2.6.1",
+    "granian>=2.7.0",
     "ip2loc>=1.0.0",
     "itsdangerous>=2.2.0",
     "jinja2>=3.1.6",
     "loguru>=0.7.3",
     "msgspec>=0.20.0",
     "opentelemetry-exporter-otlp-proto-grpc>=1.39.1",
+    "opentelemetry-instrumentation-asyncio>=0.60b1",
+    "opentelemetry-instrumentation-celery>=0.60b1",
     "opentelemetry-instrumentation-fastapi>=0.60b1",
     "opentelemetry-instrumentation-httpx>=0.60b1",
     "opentelemetry-instrumentation-logging>=0.60b1",
@@ -43,7 +45,7 @@ dependencies = [
     "opentelemetry-instrumentation-sqlalchemy>=0.60b1",
     "opentelemetry-sdk>=1.39.1",
     "prometheus-client>=0.24.1",
-    "psutil>=7.2.1",
+    "psutil>=7.2.2",
     # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
     "psycopg[binary]==3.2.10",
     "pwdlib>=0.3.0",
@@ -67,7 +69,7 @@ dev = [
     "pytest-sugar>=1.1.1",
 ]
 lint = [
-    "prek>=0.3.0",
+    "prek>=0.3.1",
 ]
 server = [
     "aio-pika>=9.5.8",
