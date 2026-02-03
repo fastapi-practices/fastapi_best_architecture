@@ -3,6 +3,7 @@ from opentelemetry import _logs, metrics, trace
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.asyncio import AsyncioInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
@@ -106,6 +107,7 @@ def init_otel(app: FastAPI) -> None:
     init_metrics(resource)
     init_logging(resource)
 
+    AsyncioInstrumentor().instrument()
     LoggingInstrumentor().instrument(set_logging_format=True)
     SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
     RedisInstrumentor.instrument_client(redis_client)  # type: ignore

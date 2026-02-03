@@ -6,16 +6,11 @@ import celery_aio_pool
 
 from celery.signals import worker_process_init
 from opentelemetry.instrumentation.celery import CeleryInstrumentor
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.redis import RedisInstrumentor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.common.enums import DataBaseType
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
-from backend.database.db import async_engine
-from backend.database.redis import redis_client
 from backend.utils.otel import init_resource, init_tracer
 
 
@@ -25,10 +20,6 @@ def init_celery_worker_tracing(*args, **kwargs) -> None:
     if settings.GRAFANA_METRICS_ENABLE:
         resource = init_resource('fba_celery_worker')
         init_tracer(resource)
-
-        SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
-        RedisInstrumentor.instrument_client(redis_client)  # type: ignore
-        HTTPXClientInstrumentor().instrument()
         CeleryInstrumentor().instrument()
 
 

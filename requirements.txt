@@ -168,6 +168,7 @@ opentelemetry-api==1.39.1
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-asgi
+    #   opentelemetry-instrumentation-asyncio
     #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-instrumentation-httpx
@@ -183,6 +184,7 @@ opentelemetry-exporter-otlp-proto-grpc==1.39.1
 opentelemetry-instrumentation==0.60b1
     # via
     #   opentelemetry-instrumentation-asgi
+    #   opentelemetry-instrumentation-asyncio
     #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-instrumentation-httpx
@@ -191,6 +193,8 @@ opentelemetry-instrumentation==0.60b1
     #   opentelemetry-instrumentation-sqlalchemy
 opentelemetry-instrumentation-asgi==0.60b1
     # via opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-asyncio==0.60b1
+    # via fastapi-best-architecture
 opentelemetry-instrumentation-celery==0.60b1
     # via fastapi-best-architecture
 opentelemetry-instrumentation-fastapi==0.60b1
@@ -215,6 +219,7 @@ opentelemetry-semantic-conventions==0.60b1
     # via
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-asgi
+    #   opentelemetry-instrumentation-asyncio
     #   opentelemetry-instrumentation-celery
     #   opentelemetry-instrumentation-fastapi
     #   opentelemetry-instrumentation-httpx
@@ -423,6 +428,7 @@ win32-setctime==1.2.0 ; sys_platform == 'win32'
 wrapt==1.17.3
     # via
     #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-asyncio
     #   opentelemetry-instrumentation-httpx
     #   opentelemetry-instrumentation-redis
     #   opentelemetry-instrumentation-sqlalchemy
