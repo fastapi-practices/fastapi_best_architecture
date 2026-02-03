@@ -9,13 +9,11 @@ from sqlalchemy.orm import Session
 from backend.app.task.model.result import Task, TaskExtended, TaskSet
 from backend.app.task.session import SessionManager
 
-"""
-重写 from celery.backends.database 内部 DatabaseBackend 类，此类实现与模型配合不佳，导致 fba 创建表和 alembic 迁移困难
-"""
-
 
 class DatabaseBackend(BaseBackend):
-    """The database result backend."""
+    """
+    重写 celery.backends.database DatabaseBackend，此类实现与模型配合不佳，导致 fba 创建表和 alembic 迁移困难
+    """
 
     # ResultSet.iterate should sleep this much between each pool,
     # to not bombard the database with queries.

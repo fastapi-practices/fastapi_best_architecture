@@ -109,7 +109,7 @@ def register_app() -> FastAPI:
     register_page(app)
     register_exception(app)
 
-    if settings.GRAFANA_METRICS:
+    if settings.GRAFANA_METRICS_ENABLE:
         register_metrics(app)
 
     return app
@@ -165,7 +165,7 @@ def register_middleware(app: FastAPI) -> None:
     app.add_middleware(AccessMiddleware)
 
     # ContextVar
-    plugins = [OtelTraceIdPlugin()] if settings.GRAFANA_METRICS else [RequestIdPlugin(validate=True)]
+    plugins = [OtelTraceIdPlugin()] if settings.GRAFANA_METRICS_ENABLE else [RequestIdPlugin(validate=True)]
     app.add_middleware(
         ContextMiddleware,
         plugins=plugins,

@@ -11,28 +11,16 @@
 // ============================================================================
 
 // OTLP 接收器配置
-// OpenTelemetry Protocol (OTLP) 是 OpenTelemetry 的标准数据传输协议
 // 支持同时接收日志、指标和链路追踪数据
 otelcol.receiver.otlp "default" {
-  // gRPC 协议配置
-  // gRPC 是高性能的 RPC 框架，适用于服务间通信
   grpc {
     endpoint = "0.0.0.0:4317"
-    // 0.0.0.0 表示监听所有网络接口
-    // 4317 是 OTLP gRPC 的标准端口
-    // 应用程序通过此端口发送遥测数据
   }
 
-  // HTTP 协议配置
-  // HTTP 协议更通用，适用于无法使用 gRPC 的场景
   http {
     endpoint = "0.0.0.0:4318"
-    // 4318 是 OTLP HTTP 的标准端口
-    // 支持 JSON 和 Protobuf 格式的数据
   }
 
-  // 输出配置
-  // 定义接收到的数据发送到哪些处理器
   output {
     logs    = [otelcol.processor.batch.default.input]
     metrics = [otelcol.processor.batch.default.input]
@@ -43,8 +31,6 @@ otelcol.receiver.otlp "default" {
 // 批处理器配置
 // 将多个遥测数据项合并成批次，提高传输效率
 otelcol.processor.batch "default" {
-  // 输出配置
-  // 定义处理后的数据发送到哪些导出器
   output {
     logs    = [otelcol.exporter.loki.default.input]
     metrics = [otelcol.exporter.prometheus.default.input]
@@ -87,14 +73,8 @@ prometheus.scrape "prometheus" {
 		__address__ = "fba_prometheus:9090",
 	}]
 	forward_to      = [prometheus.remote_write.prom_server.receiver]
-	// 抓取的指标发送到远程写入组件
-
 	job_name        = "fba_prometheus"
-	// 任务名称
-	// 将作为 job 标签添加到所有抓取的指标上
-
 	scrape_interval = "15s"
-	// 抓取间隔
 }
 
 // FastAPI 后端服务指标抓取
@@ -104,17 +84,21 @@ prometheus.scrape "fba_server" {
 		__address__ = "fba_server:8001",
 	}]
 	forward_to      = [prometheus.remote_write.prom_server.receiver]
-	// 抓取的指标发送到远程写入组件
-
 	job_name        = "fba_server"
-	// 任务名称
-	// 用于在 Prometheus 查询中区分不同服务
-
 	scrape_interval = "5s"
-	// 抓取间隔
-
 	scrape_timeout  = "5s"
-	// 抓取超时时间
+}
+
+// Granian 服务器指标抓取
+// 监控 Granian ASGI 服务器的性能指标
+prometheus.scrape "fba_granian" {
+	targets = [{
+		__address__ = "fba_server:8002",
+	}]
+	forward_to      = [prometheus.remote_write.prom_server.receiver]
+	job_name        = "fba_granian"
+	scrape_interval = "5s"
+	scrape_timeout  = "5s"
 }
 
 // Celery Exporter 指标抓取
@@ -124,17 +108,9 @@ prometheus.scrape "fba_celery_exporter" {
 		__address__ = "fba_celery_exporter:9808",
 	}]
 	forward_to      = [prometheus.remote_write.prom_server.receiver]
-	// 抓取的指标发送到远程写入组件
-
 	job_name        = "fba_celery_exporter"
-	// 任务名称
-	// 用于标识 Celery 相关的指标
-
-	scrape_interval = "5s"
-	// 抓取间隔
-
-	scrape_timeout  = "5s"
-	// 抓取超时时间
+	scrape_interval = "15s"
+	scrape_timeout  = "15s"
 }
 
 // Tempo 导出器配置
@@ -142,17 +118,9 @@ prometheus.scrape "fba_celery_exporter" {
 otelcol.exporter.otlp "tempo" {
   client {
     endpoint = "fba_tempo:4317"
-
     tls {
         insecure             = true
-        // 禁用 TLS 加密
-        // 在 Docker 内部网络中通信时可以禁用
-        // 生产环境建议启用 TLS
-
         insecure_skip_verify = true
-        // 跳过 TLS 证书验证
-        // 仅在开发/测试环境使用
-        // 生产环境应配置正确的证书
     }
   }
 }

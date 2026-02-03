@@ -4,10 +4,7 @@
 # 官方文档: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 # ============================================================================
 
-# global: 全局配置
+# 全局配置
 global:
   scrape_interval: 15s
-  # 指标抓取间隔
-
   evaluation_interval: 15s
-  # 规则评估间隔

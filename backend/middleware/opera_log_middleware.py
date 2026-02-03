@@ -15,9 +15,9 @@ from backend.common.context import ctx
 from backend.common.enums import StatusType
 from backend.common.log import log
 from backend.common.prometheus.instruments import (
+    PROMETHEUS_APP_NAME,
     PROMETHEUS_EXCEPTION_COUNTER,
     PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM,
-    PROMETHEUS_REQUEST_COUNTER,
     PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE,
     PROMETHEUS_RESPONSE_COUNTER,
 )
@@ -33,7 +33,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
 
     opera_log_queue: Queue = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
 
-    async def dispatch(self, request: Request, call_next: Any) -> Response:
+    async def dispatch(self, request: Request, call_next: Any) -> Response:  # noqa: C901
         """
         处理请求并记录操作日志
 
@@ -41,112 +41,112 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         :param call_next: 下一个中间件或路由处理函数
         :return:
         """
-        response = None
         path = request.url.path
+        method = request.method
+        args = await self.get_request_args(request)
+        code = 200
+        msg = 'Success'
+        status = StatusType.enable
+        elapsed = 0
 
-        if path in settings.OPERA_LOG_PATH_EXCLUDE or not path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+        try:
+            username = request.user.username
+        except AttributeError:
+            username = None
+
+        should_log_opera = (
+            path.startswith(f'{settings.FASTAPI_API_V1_PATH}') and path not in settings.OPERA_LOG_PATH_EXCLUDE
+        )
+
+        try:
             response = await call_next(request)
-        else:
-            method = request.method
-            args = await self.get_request_args(request)
-            PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
-                app_name=settings.GRAFANA_APP_NAME, method=method, path=path
-            ).inc()
-            PROMETHEUS_REQUEST_COUNTER.labels(app_name=settings.GRAFANA_APP_NAME, method=method, path=path).inc()
+        except Exception as e:
+            elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
+            log.error(f'请求异常: {e!s}')
 
-            # 执行请求
-            code = 200
-            msg = 'Success'
-            status = StatusType.enable
-            error = None
-            try:
-                response = await call_next(request)
-                elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
-                for e in [
+            if should_log_opera:
+                code = getattr(e, 'code', StandardResponseCode.HTTP_500)
+                msg = getattr(e, 'msg', str(e))
+                status = StatusType.disable
+
+            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+                PROMETHEUS_EXCEPTION_COUNTER.labels(
+                    app_name=PROMETHEUS_APP_NAME,
+                    method=method,
+                    path=path,
+                    exception_type=type(e).__name__,
+                ).inc()
+
+            raise
+        else:
+            elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
+
+            if should_log_opera:
+                # 检查上下文中的异常信息
+                for exception_key in [
                     '__request_http_exception__',
                     '__request_validation_exception__',
                     '__request_assertion_error__',
                     '__request_custom_exception__',
                 ]:
-                    exception = ctx.get(e)
+                    exception = ctx.get(exception_key)
                     if exception:
                         code = exception.get('code')
                         msg = exception.get('msg')
+                        status = StatusType.disable
                         log.error(f'请求异常: {msg}')
-                        PROMETHEUS_EXCEPTION_COUNTER.labels(
-                            app_name=settings.GRAFANA_APP_NAME,
-                            method=method,
-                            path=path,
-                            exception_type=type(e).__name__,
-                        ).inc()
                         break
-            except Exception as e:
-                elapsed = round((time.perf_counter() - ctx.perf_time) * 1000, 3)
-                code = getattr(e, 'code', StandardResponseCode.HTTP_500)  # 兼容 SQLAlchemy 异常用法
-                msg = getattr(e, 'msg', str(e))  # 不建议使用 traceback 模块获取错误信息，会暴漏代码信息
-                status = StatusType.disable
-                error = e
-                log.error(f'请求异常: {e!s}')
-                PROMETHEUS_EXCEPTION_COUNTER.labels(
-                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path, exception_type=type(e).__name__
-                ).inc()
-            else:
-                PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM.labels(
-                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path
-                ).observe(elapsed, exemplar={'TraceID': get_request_trace_id()})
-            finally:
-                PROMETHEUS_RESPONSE_COUNTER.labels(
-                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path, status_code=code
-                ).inc()
-                PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
-                    app_name=settings.GRAFANA_APP_NAME, method=method, path=path
-                ).dec()
 
-            # 此信息只能在请求后获取
+            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+                PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM.labels(
+                    app_name=PROMETHEUS_APP_NAME, method=method, path=path
+                ).observe(amount=elapsed, exemplar={'TraceID': get_request_trace_id()})
+        finally:
+            # summary 只能在请求后获取
             route = request.scope.get('route')
             summary = route.summary or '' if route else ''
 
-            try:
-                # 此信息来源于 JWT 认证中间件
-                username = request.user.username
-            except AttributeError:
-                username = None
-
-            # 日志记录
             log.debug(f'接口摘要：[{summary}]')
             log.debug(f'请求地址：[{ctx.ip}]')
             log.debug(f'请求参数：{args}')
-            log.info(f'{ctx.ip: <15} | {request.method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
+
             if request.method != 'OPTIONS':
                 log.debug('<-- 请求结束')
 
-            # 日志创建
-            opera_log_in = CreateOperaLogParam(
-                trace_id=get_request_trace_id(),
-                username=username,
-                method=method,
-                title=summary,
-                path=path,
-                ip=ctx.ip,
-                country=ctx.country,
-                region=ctx.region,
-                city=ctx.city,
-                user_agent=ctx.user_agent,
-                os=ctx.os,
-                browser=ctx.browser,
-                device=ctx.device,
-                args=args,
-                status=status,
-                code=str(code),
-                msg=msg,
-                cost_time=elapsed,  # 可能和日志存在微小差异（可忽略）
-                opera_time=ctx.start_time,
-            )
-            await self.opera_log_queue.put(opera_log_in)
+            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+                log.info(f'{ctx.ip: <15} | {method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
 
-            # 错误抛出
-            if error:
-                raise error from None
+            if should_log_opera and request.method != 'OPTIONS':
+                opera_log_in = CreateOperaLogParam(
+                    trace_id=get_request_trace_id(),
+                    username=username,
+                    method=method,
+                    title=summary,
+                    path=path,
+                    ip=ctx.ip,
+                    country=ctx.country,
+                    region=ctx.region,
+                    city=ctx.city,
+                    user_agent=ctx.user_agent,
+                    os=ctx.os,
+                    browser=ctx.browser,
+                    device=ctx.device,
+                    args=args,
+                    status=status,
+                    code=str(code),
+                    msg=msg,
+                    cost_time=elapsed,
+                    opera_time=ctx.start_time,
+                )
+                await self.opera_log_queue.put(opera_log_in)
+
+            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+                PROMETHEUS_RESPONSE_COUNTER.labels(
+                    app_name=PROMETHEUS_APP_NAME, method=method, path=path, status_code=code
+                ).inc()
+                PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
+                    app_name=PROMETHEUS_APP_NAME, method=method, path=path
+                ).dec()
 
         return response
 

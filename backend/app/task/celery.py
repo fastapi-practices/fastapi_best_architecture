@@ -4,10 +4,23 @@ import urllib.parse
 import celery
 import celery_aio_pool
 
+from celery.signals import worker_process_init
+from opentelemetry.instrumentation.celery import CeleryInstrumentor
+
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.common.enums import DataBaseType
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
+from backend.utils.otel import init_resource, init_tracer
+
+
+@worker_process_init.connect(weak=False)
+def init_celery_worker_tracing(*args, **kwargs) -> None:
+    """初始化 Celery 追踪"""
+    if settings.GRAFANA_METRICS_ENABLE:
+        resource = init_resource('fba_celery_worker')
+        init_tracer(resource)
+        CeleryInstrumentor().instrument()
 
 
 def find_task_packages() -> list[str]:

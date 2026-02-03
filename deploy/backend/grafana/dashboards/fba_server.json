@@ -111,7 +111,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -186,7 +186,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"}[5m]))",
+          "expr": "sum(rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m]))",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -262,7 +262,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_response_total{app_name=\"$app_name\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum(fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum(fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -335,7 +335,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_exception_total{app_name=\"$app_name\"}) or vector(0)",
+          "expr": "sum(fba_exception_total{app_name=\"fba_server\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -410,7 +410,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_cost_time_sum{app_name=\"$app_name\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum(fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"}) / sum(fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "",
           "refId": "A"
         }
@@ -482,7 +482,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(fba_request_in_progress{app_name=\"$app_name\", path!=\"/metrics\"}) or vector(0)",
+          "expr": "sum(fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}) or vector(0)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -562,7 +562,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 6
@@ -593,7 +593,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"}[5m])",
+          "expr": "rate(fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"}[5m])",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -660,7 +660,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 6
@@ -691,7 +691,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_in_progress{app_name=\"$app_name\", path!=\"/metrics\"}",
+          "expr": "fba_request_in_progress{app_name=\"fba_server\", path!=\"/metrics\"}",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
         }
@@ -780,7 +780,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 8,
         "x": 0,
         "y": 17
@@ -810,7 +810,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"$app_name\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"2.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -887,7 +887,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 8,
         "x": 8,
         "y": 17
@@ -917,7 +917,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_response_total{app_name=\"$app_name\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_response_total{app_name=\"fba_server\", status_code=~\"5.*\", path!=\"/metrics\"}) / sum by(path) (fba_response_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -948,7 +948,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 8,
         "x": 16,
         "y": 17
@@ -985,7 +985,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(path) (fba_request_total{app_name=\"$app_name\", path!=\"/metrics\"})",
+          "expr": "sum by(path) (fba_request_total{app_name=\"fba_server\", path!=\"/metrics\"})",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1124,7 +1124,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "fba_request_cost_time_sum{app_name=\"$app_name\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"$app_name\", path!=\"/metrics\"}",
+          "expr": "fba_request_cost_time_sum{app_name=\"fba_server\", path!=\"/metrics\"} / fba_request_cost_time_count{app_name=\"fba_server\", path!=\"/metrics\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -1221,7 +1221,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 26
@@ -1251,7 +1251,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"$app_name\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1326,7 +1326,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 12,
         "x": 12,
         "y": 26
@@ -1356,7 +1356,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"$app_name\", path!=\"/metrics\"}[5m])) by(path, le))",
+          "expr": "histogram_quantile(0.95, sum(rate(fba_request_cost_time_bucket{app_name=\"fba_server\", path!=\"/metrics\"}[5m])) by(path, le))",
           "legendFormat": "{{path}}",
           "refId": "A"
         }
@@ -1735,7 +1735,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "(rate({service_name=\"$app_name\"} |= \"$trace_id\" [1m]))",
+          "expr": "(rate({service_name=\"fba_server\"} | json | target != \"/metrics\" |= \"$trace_id\" [1m]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
@@ -1779,7 +1779,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"$app_name\"} | json | line_format \"{{.body}}\" |= \"$trace_id\"",
+          "expr": "{service_name=\"fba_server\"} | json | target != \"/metrics\" | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
@@ -1797,7 +1797,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 12,
         "w": 24,
         "x": 0,
         "y": 58
@@ -1822,7 +1822,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=\"$app_name\"} | json | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$trace_id\"",
+          "expr": "{service_name=\"fba_server\"} | json | target != \"/metrics\" | level=~\"ERROR|CRITICAL\" | line_format \"{{.body}}\" |= \"$trace_id\"",
           "refId": "A"
         }
       ],
@@ -1839,29 +1839,6 @@
   ],
   "templating": {
     "list": [
-      {
-        "current": {
-          "selected": true,
-          "text": "fba 服务",
-          "value": "fba_server"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(fba_app_info, app_name)",
-        "description": "数据来自哪个应用",
-        "label": "应用名称",
-        "name": "app_name",
-        "query": {
-          "qryType": 1,
-          "query": "label_values(fba_app_info, app_name)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "type": "query"
-      },
       {
         "current": {
           "text": "",
