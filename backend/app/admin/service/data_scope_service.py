@@ -117,6 +117,8 @@ class DataScopeService:
         :param rule_ids: 规则 ID 列表
         :return:
         """
+        if not rule_ids.rules:
+            raise errors.NotFoundError(msg='关联数据规则不能为空')
         count = await data_scope_dao.update_rules(db, pk, rule_ids)
         await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
