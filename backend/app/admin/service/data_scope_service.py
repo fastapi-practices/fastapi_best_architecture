@@ -3,6 +3,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.admin.crud.crud_data_rule import data_rule_dao
 from backend.app.admin.crud.crud_data_scope import data_scope_dao
 from backend.app.admin.model import DataScope
 from backend.app.admin.schema.data_scope import (
@@ -117,6 +118,13 @@ class DataScopeService:
         :param rule_ids: 规则 ID 列表
         :return:
         """
+        data_scope = await data_scope_dao.get(db, pk)
+        if not data_scope:
+            raise errors.NotFoundError(msg='数据范围不存在')
+        for rule_id in rule_ids.rules:
+            rule = await data_rule_dao.get(db, rule_id)
+            if not rule:
+                raise errors.NotFoundError(msg='数据规则不存在')
         count = await data_scope_dao.update_rules(db, pk, rule_ids)
         await user_cache_manager.clear_by_data_scope_id(db, [pk])
         return count
