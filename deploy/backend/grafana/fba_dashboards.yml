@@ -8,29 +8,12 @@
 # 当前仅支持版本 1
 apiVersion: 1
 
-# providers: 仪表盘提供者列表
-# 定义 Grafana 从哪里加载仪表盘以及如何管理它们
+# 仪表盘提供者列表
 providers:
   - name: 'fba_server'
-    # 提供者名称，用于标识和日志记录
-
     orgId: 1
-    # 组织 ID
-    # 指定仪表盘属于哪个组织
-    # 默认值: 1（默认组织）
-
     type: 'file'
-    # 提供者类型
-    # 可选值:
-    #   - file: 从本地文件系统加载仪表盘 JSON 文件
-
     disableDeletion: true
-    # 禁止通过 UI 删除仪表盘
-
     editable: false
-    # 是否允许通过 UI 编辑仪表盘
-
     options:
       path: '/etc/grafana/dashboards'
-      # 仪表盘 JSON 文件所在目录（容器内路径）
-      # Grafana 会自动扫描此目录下的所有 .json 文件

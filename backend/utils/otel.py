@@ -17,12 +17,31 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from backend.common.log import log, request_id_filter
+from backend.common.prometheus.instruments import PROMETHEUS_APP_NAME
 from backend.core.conf import settings
 from backend.database.db import async_engine
 from backend.database.redis import redis_client
 
 
-def _init_tracer(resource: Resource) -> None:
+def init_resource(service_name: str) -> Resource:
+    """
+    初始化资源
+
+    :param service_name: 服务名称
+    :return:
+    """
+    from backend import __version__
+
+    return Resource(
+        attributes={
+            'service.name': service_name,
+            'service.version': __version__,
+            'deployment.environment': settings.ENVIRONMENT,
+        },
+    )
+
+
+def init_tracer(resource: Resource) -> None:
     """
     初始化追踪器
 
@@ -36,7 +55,7 @@ def _init_tracer(resource: Resource) -> None:
     trace.set_tracer_provider(tracer_provider)
 
 
-def _init_metrics(resource: Resource) -> None:
+def init_metrics(resource: Resource) -> None:
     """
     初始化指标
 
@@ -52,7 +71,7 @@ def _init_metrics(resource: Resource) -> None:
     metrics.set_meter_provider(meter_provider)
 
 
-def _init_logging(resource: Resource) -> None:
+def init_logging(resource: Resource) -> None:
     """
     初始化日志
 
@@ -81,19 +100,11 @@ def init_otel(app: FastAPI) -> None:
     :param app: FastAPI 应用实例
     :return:
     """
-    from backend import __version__
+    resource = init_resource(PROMETHEUS_APP_NAME)
 
-    resource = Resource(
-        attributes={
-            'service.name': settings.GRAFANA_APP_NAME,
-            'service.version': __version__,
-            'deployment.environment': settings.ENVIRONMENT,
-        },
-    )
-
-    _init_tracer(resource)
-    # _init_metrics(resource)
-    _init_logging(resource)
+    init_tracer(resource)
+    init_metrics(resource)
+    init_logging(resource)
 
     LoggingInstrumentor().instrument(set_logging_format=True)
     SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)

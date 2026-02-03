@@ -8,8 +8,7 @@
 # 当前仅支持版本 1
 apiVersion: 1
 
-# datasources: 数据源列表
-# 定义 Grafana 连接的所有后端数据存储
+# 数据源列表
 datasources:
   # ==========================================================================
   # Loki 数据源配置
@@ -17,51 +16,18 @@ datasources:
   # 官方文档: https://grafana.com/docs/loki/latest/
   # ==========================================================================
   - name: Loki
-    # 数据源显示名称，在 Grafana UI 中显示
-
     uid: loki
-    # 数据源唯一标识符
-    # 用于在仪表盘和告警规则中引用此数据源
-
     type: loki
-    # 数据源类型
-    # 必须与 Grafana 支持的数据源插件类型匹配
-
     url: http://fba_loki:3100
-    # Loki 服务器地址
-
     isDefault: false
-    # 是否设为默认数据源
-
     jsonData:
-      # 数据源特定的 JSON 配置
-
       derivedFields:
-        # 派生字段配置
-        # 用于从日志中提取字段并创建链接到其他数据源
-        # 这是实现日志到链路追踪关联的关键配置
-
         - datasourceUid: tempo
-          # 目标数据源的 UID
-          # 点击链接时将跳转到此数据源
-
           matcherRegex: '"traceid":"([a-f0-9]{32})"'
-          # 正则表达式，用于从日志内容中提取 Trace ID
-
           matcherType: regex
-          # 匹配器类型
-          # 可选值: regex（正则表达式）
-
           name: TraceID
-          # 派生字段的名称
-          # 将显示在日志详情中
-
           url: $${__value.raw}
-          # 链接 URL 模板
-          # $${__value.raw} 表示提取的原始值
-
           urlDisplayLabel: 查看 Trace
-          # 链接显示的文本标签
 
   # ==========================================================================
   # Prometheus 数据源配置
@@ -69,35 +35,15 @@ datasources:
   # 官方文档: https://prometheus.io/docs/
   # ==========================================================================
   - name: Prometheus
-    # 数据源显示名称
-
     uid: prometheus
-    # 数据源唯一标识符
-
     type: prometheus
-    # 数据源类型
-
     url: http://fba_prometheus:9090
-    # Prometheus 服务器地址
-
     isDefault: true
-    # 设为默认数据源
-
     jsonData:
       httpMethod: POST
-      # 查询使用的 HTTP 方法
-
       exemplarTraceIdDestinations:
-        # Exemplar（范例）配置
-        # Exemplar 是指标数据点关联的 Trace ID
-        # 用于从指标跳转到对应的链路追踪
-
         - name: TraceID
-          # Exemplar 中 Trace ID 的字段名称
-
           datasourceUid: tempo
-          # 目标 Tempo 数据源的 UID
-          # 点击 Exemplar 时将跳转到此数据源查看 Trace
 
   # ==========================================================================
   # Tempo 数据源配置
@@ -105,60 +51,22 @@ datasources:
   # 官方文档: https://grafana.com/docs/tempo/latest/
   # ==========================================================================
   - name: Tempo
-    # 数据源显示名称
-
     uid: tempo
-    # 数据源唯一标识符
-
     type: tempo
-    # 数据源类型
-
     url: http://fba_tempo:3200
-    # Tempo 服务器地址
-
     jsonData:
       nodeGraph:
         enabled: true
-        # 启用节点图功能
-        # 可视化展示服务之间的调用关系图
-
       tracesToLogsV2:
-        # Trace 到日志的关联配置（V2 版本）
-        # 允许从 Trace 详情页面跳转到相关日志
-
         datasourceUid: loki
-        # 日志数据源的 UID
-
         filterByTraceID: true
-        # 是否按 Trace ID 过滤日志
-
         spanStartTimeShift: "-1m"
-        # Span 开始时间偏移
-        # 用于捕获 Span 开始前的相关日志
-
         spanEndTimeShift: "1m"
-        # Span 结束时间偏移
-        # 用于捕获 Span 结束后的相关日志
-
         customQuery: true
-        # 启用自定义查询
-        # 允许使用下面的 query 字段自定义日志查询语句
-
         query: '{service_name="fba_server"} | json | traceid="${__span.traceId}"'
-        # 自定义 LogQL 查询语句
-
       search:
         hide: false
-        # 是否隐藏搜索功能
-
       serviceMap:
         datasourceUid: prometheus
-        # 服务地图数据源
-        # 使用 Prometheus 中的指标数据生成服务依赖图
-        # 需要 Tempo 的 metrics_generator 功能配合
-
       lokiSearch:
         datasourceUid: loki
-        # Loki 搜索数据源
-        # 允许在 Tempo 中使用 Loki 进行日志搜索
-        # 实现基于日志内容查找 Trace 的功能
