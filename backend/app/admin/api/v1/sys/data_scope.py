@@ -107,10 +107,8 @@ async def update_data_scope_rules(
     pk: Annotated[int, Path(description='数据范围 ID')],
     rule_ids: UpdateDataScopeRuleParam,
 ) -> ResponseModel:
-    count = await data_scope_service.update_data_scope_rule(db=db, pk=pk, rule_ids=rule_ids)
-    if count > 0:
-        return response_base.success()
-    return response_base.fail()
+    await data_scope_service.update_data_scope_rule(db=db, pk=pk, rule_ids=rule_ids)
+    return response_base.success()
 
 
 @router.delete(

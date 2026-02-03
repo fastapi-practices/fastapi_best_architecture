@@ -120,8 +120,9 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         data_scope_rule_data = [
             CreateDataScopeRuleParam(data_scope_id=pk, data_rule_id=rule_id).model_dump() for rule_id in rule_ids.rules
         ]
-        data_scope_rule_stmt = insert(data_scope_rule)
-        await db.execute(data_scope_rule_stmt, data_scope_rule_data)
+        if data_scope_rule_data:
+            data_scope_rule_stmt = insert(data_scope_rule)
+            await db.execute(data_scope_rule_stmt, data_scope_rule_data)
 
         return len(rule_ids.rules)
 
