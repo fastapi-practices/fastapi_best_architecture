@@ -122,13 +122,14 @@ class CRUDUser(CRUDPlus[User]):
         db.add(new_user)
         await db.flush()
 
-        role_stmt = select(Role).where(Role.id.in_(obj.roles))
-        result = await db.execute(role_stmt)
-        roles = result.scalars().all()
+        if obj.roles:
+            role_stmt = select(Role).where(Role.id.in_(obj.roles))
+            result = await db.execute(role_stmt)
+            roles = result.scalars().all()
 
-        user_role_data = [AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump() for role in roles]
-        user_role_stmt = insert(user_role)
-        await db.execute(user_role_stmt, user_role_data)
+            user_role_data = [AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump() for role in roles]
+            user_role_stmt = insert(user_role)
+            await db.execute(user_role_stmt, user_role_data)
 
     async def add_by_oauth2(self, db: AsyncSession, obj: AddOAuth2UserParam) -> None:
         """
@@ -165,16 +166,17 @@ class CRUDUser(CRUDPlus[User]):
 
         count = await self.update_model(db, user_id, obj)
 
-        role_stmt = select(Role).where(Role.id.in_(role_ids))
-        result = await db.execute(role_stmt)
-        roles = result.scalars().all()
-
         user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
         await db.execute(user_role_stmt)
 
-        user_role_data = [AddUserRoleParam(user_id=user_id, role_id=role.id).model_dump() for role in roles]
-        user_role_stmt = insert(user_role)
-        await db.execute(user_role_stmt, user_role_data)
+        if role_ids:
+            role_stmt = select(Role).where(Role.id.in_(role_ids))
+            result = await db.execute(role_stmt)
+            roles = result.scalars().all()
+
+            user_role_data = [AddUserRoleParam(user_id=user_id, role_id=role.id).model_dump() for role in roles]
+            user_role_stmt = insert(user_role)
+            await db.execute(user_role_stmt, user_role_data)
 
         return count
 
