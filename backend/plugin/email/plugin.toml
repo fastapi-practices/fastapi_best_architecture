@@ -10,8 +10,8 @@ database = ["mysql", "postgresql"]
 router = ["v1"]
 
 [settings]
+EMAIL_CAPTCHA_EXPIRE_SECONDS = 180  # 3 分钟
+EMAIL_CAPTCHA_REDIS_PREFIX = "fba:email:captcha"
 EMAIL_HOST = "smtp.qq.com"
 EMAIL_PORT = 465
 EMAIL_SSL = true
-EMAIL_CAPTCHA_REDIS_PREFIX = "fba:email:captcha"
-EMAIL_CAPTCHA_EXPIRE_SECONDS = 180  # 3 分钟

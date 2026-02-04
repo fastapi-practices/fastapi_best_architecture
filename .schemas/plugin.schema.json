@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FBA Plugin Manifest Schema",
+  "description": "JSON Schema for FastAPI Best Architecture plugin.toml files. See: https://fastapi-practices.github.io/fastapi_best_architecture_docs/plugin/dev.html",
+
+  "type": "object",
+  "required": ["plugin", "app"],
+  "additionalProperties": false,
+
+  "properties": {
+    "plugin": {
+      "type": "object",
+      "description": "Plugin metadata",
+      "required": ["summary", "version", "description", "author"],
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema",
+      "properties": {
+        "icon": {
+          "type": "string",
+          "description": "Icon path (plugin repository icon path or URL)"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Brief summary (1-100 characters)"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Plugin version (semver format: x.y.z)"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "Detailed description (1-500 characters)"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "Plugin author (1-50 characters)"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Plugin tags for categorization (will be required in next major version)",
+          "items": {
+            "type": "string",
+            "enum": ["ai", "mcp", "agent", "auth", "storage", "notification", "task", "payment", "other"]
+          },
+          "x-tombi-array-values-order": "ascending"
+        },
+        "database": {
+          "type": "array",
+          "description": "Supported databases (will be required in next major version)",
+          "items": {
+            "type": "string",
+            "enum": ["mysql", "postgresql"]
+          },
+          "x-tombi-array-values-order": "ascending"
+        }
+      }
+    },
+
+    "app": {
+      "type": "object",
+      "description": "Application configuration. For app-level plugins: use 'router'. For extend-level plugins: use 'extend'.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "x-tombi-table-keys-order": "schema",
+      "properties": {
+        "extend": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Parent app folder name (for extension-level plugins)"
+        },
+        "router": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Router instances (for application-level plugins)",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "x-tombi-array-values-order": "version-sort"
+        }
+      }
+    },
+
+    "settings": {
+      "type": "object",
+      "description": "Plugin base configuration (hot-pluggable, uppercase keys only)",
+      "x-tombi-additional-key-label": "SETTING_NAME",
+      "x-tombi-table-keys-order": "ascending",
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" },
+          { "type": "boolean" }
+        ]
+      }
+    },
+
+    "api": {
+      "type": "object",
+      "description": "API endpoint configurations (for extension-level plugins). The key (e.g., 'xxx' in api.xxx) corresponds to the API filename without extension.",
+      "x-tombi-additional-key-label": "api_filename",
+      "x-tombi-table-keys-order": "ascending",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["prefix", "tags"],
+        "additionalProperties": false,
+        "x-tombi-table-keys-order": {"properties": "schema"},
+        "properties": {
+          "prefix": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^/[a-zA-Z0-9_/-]*$",
+            "description": "URL prefix for the API (must start with '/', allowed chars: a-z, A-Z, 0-9, _, -, /)"
+          },
+          "tags": {
+            "type": "string",
+            "minLength": 1,
+            "description": "OpenAPI tags for Swagger documentation"
+          }
+        }
+      }
+    }
+  }
+}
