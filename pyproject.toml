@@ -101,7 +101,7 @@ preview = true
 fix = true
 unsafe-fixes = true
 show-fixes = true
-required-version = ">=0.15.0"
+required-version = ">=0.13.0"
 
 [tool.ruff.lint]
 select = [
