@@ -500,7 +500,7 @@ async def generate(*, preview: bool = False) -> None:
 def run_alembic(*args: str) -> None:
     """执行 alembic 命令"""
     try:
-        subprocess.run(['alembic', *args], cwd=BASE_PATH, check=True)
+        subprocess.run(['alembic', *args], cwd=BASE_PATH.parent, check=True)
     except subprocess.CalledProcessError as e:
         raise cappa.Exit('Alembic 命令执行失败', code=e.returncode)
 

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from backend.common.model import MappedBase
 from backend.core import path_conf
+from backend.core.path_conf import BASE_PATH
 from backend.database.db import SQLALCHEMY_DATABASE_URL
 
 if not os.path.exists(path_conf.ALEMBIC_VERSION_DIR):
@@ -17,19 +18,22 @@ if not os.path.exists(path_conf.ALEMBIC_VERSION_DIR):
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-alembic_config = context.config
+config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if alembic_config.config_file_name is not None:
-    fileConfig(alembic_config.config_file_name)
+if config.config_file_name is not None:
+    fileConfig(BASE_PATH / config.config_file_name)
 
-# model's MetaData object
+# add your model's MetaData object here
 # for 'autogenerate' support
 target_metadata = MappedBase.metadata
 
 # other values from the config, defined by the needs of env.py,
-alembic_config.set_main_option(
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+config.set_main_option(
     'sqlalchemy.url',
     SQLALCHEMY_DATABASE_URL.render_as_string(hide_password=False).replace('%', '%%'),
 )
@@ -47,7 +51,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = alembic_config.get_main_option('sqlalchemy.url')
+    url = config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,9 +67,9 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    # 当迁移无变化时，不生成迁移记录
     def process_revision_directives(context, revision, directives) -> None:  # noqa: ANN001
-        if alembic_config.cmd_opts.autogenerate:
+        """当迁移无变化时，不生成迁移记录"""
+        if config.cmd_opts.autogenerate:
             script = directives[0]
             if script.upgrade_ops.is_empty():
                 directives[:] = []
@@ -91,7 +95,7 @@ async def run_async_migrations() -> None:
     """
 
     connectable = async_engine_from_config(
-        alembic_config.get_section(alembic_config.config_ini_section, {}),
+        config.get_section(config.config_ini_section, {}),
         prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
