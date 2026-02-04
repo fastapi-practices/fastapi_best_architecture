@@ -103,31 +103,27 @@ def select_join_serialize(  # noqa: C901
     :param return_as_dict: True 返回字典，False 返回 namedtuple
     :return:
     """
-    singular_rel_types = {'o2o', 'm2o'}
-    all_rel_types = {'o2m', 'm2o', 'o2o', 'm2m'}
+    list_relationship_types = {'o2m', 'm2m'}
+    all_relationship_types = {'o2m', 'm2o', 'o2o', 'm2m'}
 
     def get_obj_id(target_obj: Any) -> int | str:
         return getattr(target_obj, 'id', None) or id(target_obj)
 
-    def extract_row_items(row_data: Any) -> tuple:
+    def extract_row_elements(row_data: Any) -> tuple:
         return row_data if hasattr(row_data, '__getitem__') else (row_data,)
 
-    def unique_preserve_order(str_items: list[str]) -> list[str]:
-        seen = set()
-        return [x for x in str_items if x not in seen and not seen.add(x)]
+    def get_relationship_key(model: str, relationship_type: str, custom_field: str | None) -> str:
+        return custom_field or (model if relationship_type not in list_relationship_types else f'{model}s')
 
-    def get_relation_key(model: str, relation_type: str, custom_field: str | None) -> str:
-        return custom_field or (model if relation_type in singular_rel_types else f'{model}s')
-
-    def parse_relationships(rel_list: list[str]) -> tuple[dict, dict, dict]:
-        if not rel_list:
+    def parse_relationships(relationship_list: list[str]) -> tuple[dict, dict, dict]:
+        if not relationship_list:
             return {}, {}, {}
 
         graph = defaultdict(dict)
         reverse = {}
         customs = {}
 
-        for rel_str in rel_list:
+        for rel_str in relationship_list:
             parts = rel_str.split(':', 1)
             rel_part = parts[0].strip()
             custom_name = parts[1].strip() if len(parts) > 1 else None
@@ -138,8 +134,11 @@ def select_join_serialize(  # noqa: C901
                 continue
 
             src, parsed_type, dst = (x.lower() for x in info)
-            if parsed_type not in all_rel_types:
-                log.warning(f'Invalid type: "{parsed_type}" in "{rel_str}", must be one of: o2m, m2o, o2o, m2m')
+            if parsed_type not in all_relationship_types:
+                log.warning(
+                    f'Invalid relationship type: "{parsed_type}" in "{rel_str}", '
+                    f'must be one of: {", ".join(all_relationship_types)}'
+                )
                 continue
 
             graph[src][dst] = parsed_type
@@ -167,15 +166,12 @@ def select_join_serialize(  # noqa: C901
                 unique.append(item)
         return unique
 
-    def ensure_namedtuple_fields(data: dict, name: str) -> None:
+    def build_namedtuple(name: str, data: dict) -> Any:
         if return_as_dict or name not in namedtuple_cache:
-            return
+            return None
         for field in namedtuple_cache[name]._fields:
             if field not in data:
                 data[field] = None
-
-    def build_namedtuple(name: str, data: dict) -> Any:
-        ensure_namedtuple_fields(data, name)
         return namedtuple_cache[name](**data)
 
     # 输入验证
@@ -187,7 +183,7 @@ def select_join_serialize(  # noqa: C901
         return None
 
     # 主对象信息
-    first_row = extract_row_items(rows_list[0])
+    first_row = extract_row_elements(rows_list[0])
     primary_obj = first_row[0]
     if primary_obj is None:
         return None
@@ -201,39 +197,39 @@ def select_join_serialize(  # noqa: C901
 
     # 预处理模型信息
     model_info = {}
-    class_indexes = {}
+    cls_idx = {}
 
     for row_item in rows_list:
-        row_elements = extract_row_items(row_item)
+        row_elements = extract_row_elements(row_item)
         for idx, element in enumerate(row_elements):
             if element is None:
                 continue
             element_cls = type(element).__name__.lower()
             if element_cls not in model_info:
                 model_info[element_cls] = get_model_columns(element)
-            if element_cls not in class_indexes:
-                class_indexes[element_cls] = idx
+            if element_cls not in cls_idx:
+                cls_idx[element_cls] = idx
 
     # 数据分组
     main_objects = {}
-    grouped_children = defaultdict(lambda: defaultdict(list))
+    children_objects = defaultdict(lambda: defaultdict(list))
 
     for row_item in rows_list:
-        row_elements = extract_row_items(row_item)
+        row_elements = extract_row_elements(row_item)
         if not row_elements or row_elements[0] is None:
             continue
 
-        m_obj = row_elements[0]
-        m_id = get_obj_id(m_obj)
+        main_obj = row_elements[0]
+        main_id = get_obj_id(main_obj)
 
-        if m_id not in main_objects:
-            main_objects[m_id] = m_obj
+        if main_id not in main_objects:
+            main_objects[main_id] = main_obj
 
-        for child in row_elements[1:]:
-            if child is None:
+        for child_obj in row_elements[1:]:
+            if child_obj is None:
                 continue
-            child_type = type(child).__name__.lower()
-            grouped_children[m_id][child_type].append(child)
+            child_type = type(child_obj).__name__.lower()
+            children_objects[main_id][child_type].append(child_obj)
 
     if not main_objects:
         return None
@@ -241,29 +237,29 @@ def select_join_serialize(  # noqa: C901
     # namedtuple 类型预生成
     namedtuple_cache = {}
     if not return_as_dict:
-        for nt_name, columns in model_info.items():
-            if not columns:
+        for model_name, model_columns in model_info.items():
+            if not model_columns:
                 continue
 
-            field_list = columns.copy()
+            field_list = model_columns.copy()
             if has_relationships:
-                for target, target_rtype in relation_graph.get(nt_name, {}).items():
-                    nt_key = get_relation_key(target, target_rtype, custom_names.get((nt_name, target)))
+                for target, target_rtype in relation_graph.get(model_name, {}).items():
+                    nt_key = get_relationship_key(target, target_rtype, custom_names.get((model_name, target)))
                     field_list.append(nt_key)
-                field_list = unique_preserve_order(field_list)
+                field_list = list(dict.fromkeys(field_list))
 
-            namedtuple_cache[nt_name] = namedtuple(nt_name.capitalize(), field_list)  # noqa: PYI024
+            namedtuple_cache[model_name] = namedtuple(model_name.capitalize(), field_list)  # noqa: PYI024
 
     # 嵌套关系层级结构（一次性构建）
     hierarchy = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
     if has_relationships:
         for row_item in rows_list:
-            row_elements = extract_row_items(row_item)
+            row_elements = extract_row_elements(row_item)
             if not row_elements or row_elements[0] is None:
                 continue
 
-            m_id = get_obj_id(row_elements[0])
+            main_id = get_obj_id(row_elements[0])
             m_type_name = type(row_elements[0]).__name__.lower()
 
             for idx, rel_obj in enumerate(row_elements[1:], 1):  # noqa: B007
@@ -274,7 +270,7 @@ def select_join_serialize(  # noqa: C901
 
                 if rel_type_name in reverse_relation:
                     parent_type = reverse_relation[rel_type_name]
-                    parent_idx = class_indexes.get(parent_type)
+                    parent_idx = cls_idx.get(parent_type)
                     parent = (
                         row_elements[parent_idx] if parent_idx is not None and parent_idx < len(row_elements) else None
                     )
@@ -288,17 +284,17 @@ def select_join_serialize(  # noqa: C901
 
                 parent_pk = getattr(parent, 'id', None)
                 if parent_pk is not None:
-                    hierarchy[m_id][rel_type_name][parent_pk].append(rel_obj)
+                    hierarchy[main_id][rel_type_name][parent_pk].append(rel_obj)
 
     # 结果构建函数
     def build_flat(target_id: int, target_obj: Any) -> dict[str, Any]:
         result = {col: getattr(target_obj, col, None) for col in primary_columns}
 
-        for cls_type in grouped_children[target_id]:
+        for cls_type in children_objects[target_id]:
             if cls_type == primary_obj_name:
                 continue
 
-            unique_children = dedupe_objects(grouped_children[target_id][cls_type])
+            unique_children = dedupe_objects(children_objects[target_id][cls_type])
             child_columns = model_info.get(cls_type, [])
 
             count = len(unique_children)
@@ -342,9 +338,9 @@ def select_join_serialize(  # noqa: C901
                         continue
 
                     sub_list = recursive_build(sub_type, sub_pk)
-                    sub_key = get_relation_key(sub_type, sub_rel_type, custom_names.get((cls_name, sub_type)))
+                    sub_key = get_relationship_key(sub_type, sub_rel_type, custom_names.get((cls_name, sub_type)))
 
-                    if sub_rel_type in singular_rel_types:
+                    if sub_rel_type not in list_relationship_types:
                         item_data[sub_key] = sub_list[0] if sub_list else None
                     else:
                         item_data[sub_key] = sub_list
@@ -355,9 +351,9 @@ def select_join_serialize(  # noqa: C901
 
         for top_type, top_rtype in relation_graph.get(primary_obj_name, {}).items():
             instances = recursive_build(top_type, target_id)
-            top_key = get_relation_key(top_type, top_rtype, custom_names.get((primary_obj_name, top_type)))
+            top_key = get_relationship_key(top_type, top_rtype, custom_names.get((primary_obj_name, top_type)))
 
-            if top_rtype in singular_rel_types:
+            if top_rtype not in list_relationship_types:
                 result[top_key] = instances[0] if instances else None
             else:
                 result[top_key] = instances
@@ -369,19 +365,19 @@ def select_join_serialize(  # noqa: C901
     processed_ids = set()
 
     for row_item in rows_list:
-        row_elements = extract_row_items(row_item)
+        row_elements = extract_row_elements(row_item)
         if not row_elements or row_elements[0] is None:
             continue
 
-        m_obj = row_elements[0]
-        m_id = get_obj_id(m_obj)
+        main_obj = row_elements[0]
+        main_id = get_obj_id(main_obj)
 
-        if m_id not in main_objects or m_id in processed_ids:
+        if main_id not in main_objects or main_id in processed_ids:
             continue
 
-        processed_ids.add(m_id)
+        processed_ids.add(main_id)
 
-        result_data = build_nested(m_id, m_obj) if has_relationships else build_flat(m_id, m_obj)
+        result_data = build_nested(main_id, main_obj) if has_relationships else build_flat(main_id, main_obj)
 
         if not return_as_dict:
             result_type = namedtuple('Result', result_data.keys())  # noqa: PYI024
