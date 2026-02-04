@@ -10,8 +10,14 @@ repos:
       - id: check-yaml
       - id: check-toml
 
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.7.26
+    hooks:
+      - id: tombi-format
+        args: ["--offline"]
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.14.13
+    rev: v0.15.0
     hooks:
       - id: ruff-check
         args:
@@ -21,7 +27,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.26
+    rev: 0.9.29
     hooks:
       - id: uv-lock
       - id: uv-export
