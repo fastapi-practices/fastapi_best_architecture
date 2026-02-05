@@ -99,9 +99,6 @@ class AuthService:
         """
         user = None
         try:
-            user, days_remaining = await self.user_verify(db, obj.username, obj.password)
-
-            await load_login_config(db)
             if settings.LOGIN_CAPTCHA_ENABLED:
                 if not obj.uuid or not obj.captcha:
                     raise errors.RequestError(msg=t('error.captcha.invalid'))
@@ -111,6 +108,10 @@ class AuthService:
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.uuid}')
+
+            user, days_remaining = await self.user_verify(db, obj.username, obj.password)
+
+            await load_login_config(db)
 
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
