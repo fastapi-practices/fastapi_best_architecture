@@ -275,6 +275,13 @@ docstring-code-format = true
 preview = true
 quote-style = "single"
 
+[tool.tombi]
+toml-version = "v1.1.0"
+
+[[tool.tombi.schemas]]
+path = ".schemas/plugin.schema.json"
+include = ["backend/plugin/**/plugin.toml"]
+
 [tool.uv]
 python-downloads = "manual"
 default-groups = ["dev", "lint"]
