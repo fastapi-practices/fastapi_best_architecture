@@ -278,10 +278,6 @@ quote-style = "single"
 [tool.tombi]
 toml-version = "v1.1.0"
 
-[tool.tombi.schema]
-enabled = true
-strict = true
-
 [[tool.tombi.schemas]]
 path = ".schemas/plugin.schema.json"
 include = ["backend/plugin/**/plugin.toml"]
