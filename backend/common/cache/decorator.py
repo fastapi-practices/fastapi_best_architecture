@@ -18,7 +18,7 @@ P = ParamSpec('P')
 T = TypeVar('T')
 
 
-def build_cache_key(
+def _build_cache_key(
     name: str,
     key: str | None,
     key_builder: Callable[..., str] | None,
@@ -36,14 +36,6 @@ def build_cache_key(
         return f'{name}:{key_builder(*args, **kwargs)}'
 
     return name
-
-
-def user_key_builder() -> str:
-    """基于当前用户 ID 生成缓存 Key"""
-    user_id = ctx.user_id
-    if user_id is None:
-        raise errors.ServerError(msg='用户缓存键构建失败')
-    return str(user_id)
 
 
 def _serialize_result(result: Any) -> bytes:
@@ -83,6 +75,14 @@ def _deserialize_result(value: bytes) -> Any:
         return value
 
 
+def user_key_builder() -> str:
+    """基于当前用户 ID 生成缓存 Key"""
+    user_id = ctx.user_id
+    if user_id is None:
+        raise errors.ServerError(msg='用户缓存键构建失败')
+    return str(user_id)
+
+
 def cached(  # noqa: C901
     name: str,
     *,
@@ -103,7 +103,7 @@ def cached(  # noqa: C901
     def decorator(func: Callable[P, T]) -> Callable[P, T]:  # noqa: C901
         @functools.wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            cache_key = build_cache_key(name, key, key_builder, *args, **kwargs)
+            cache_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
 
             # L1: 本地缓存
             if settings.CACHE_LOCAL_ENABLED:
@@ -177,7 +177,7 @@ def cache_invalidate(  # noqa: C901
             invalidate_error = None
 
             try:
-                invalidate_key = build_cache_key(name, key, key_builder, *args, **kwargs)
+                invalidate_key = _build_cache_key(name, key, key_builder, *args, **kwargs)
 
                 # L1 缓存失效
                 if settings.CACHE_LOCAL_ENABLED:
