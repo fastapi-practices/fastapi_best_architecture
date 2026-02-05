@@ -17,6 +17,7 @@ class DictDataService:
     """字典数据服务类"""
 
     @staticmethod
+    @cached(settings.CACHE_DICT_REDIS_PREFIX, key='pk')
     async def get(*, db: AsyncSession, pk: int) -> DictData:
         """
         获取字典数据详情
@@ -49,10 +50,6 @@ class DictDataService:
         return dict_datas
 
     @staticmethod
-    @cached(
-        settings.CACHE_DICT_REDIS_PREFIX,
-        key_builder=lambda *, db: 'all',
-    )
     async def get_all(*, db: AsyncSession) -> Sequence[DictData]:
         """
         获取所有字典数据
@@ -94,7 +91,6 @@ class DictDataService:
         return await paging_data(db, dict_data_select)
 
     @staticmethod
-    @cache_invalidate(settings.CACHE_DICT_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateDictDataParam) -> None:
         """
         创建字典数据
