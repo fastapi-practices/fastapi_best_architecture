@@ -22,6 +22,12 @@ volumes:
   fba_prometheus_data:
     name: fba_prometheus_data
 
+x-log-volume:
+  fba: &fba_log_volume ${FBA_LOG_DIR:-./logs}/fba:/var/log/fba
+  nginx: &nginx_log_volume ${FBA_LOG_DIR:-./logs}/nginx:/var/log/nginx
+  # 不想把日志挂载到宿主机时，可叠加该文件覆盖日志挂载（日志将写入 Docker volume）：
+  # docker compose -f docker-compose.yml -f deploy/backend/docker-compose/docker-compose.no-host-logs.yml up -d
+
 services:
   fba_server:
     build:
@@ -42,6 +48,7 @@ services:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
       - fba_static:/fba/backend/app/static
       - fba_static_upload:/fba/backend/static/upload
+      - *fba_log_volume
     networks:
       - fba_network
     # 如果你是 mysql 用户，应将 fba_postgres:5432 修改为 fba_mysql:3306
@@ -117,6 +124,7 @@ services:
       - ./deploy/backend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - fba_static:/www/fba_server/backend/static
       - fba_static_upload:/www/fba_server/backend/static/upload
+      - *nginx_log_volume
     networks:
       - fba_network
 
@@ -186,6 +194,7 @@ services:
       - fba_rabbitmq
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - *fba_log_volume
     networks:
       - fba_network
     command:
@@ -212,6 +221,7 @@ services:
       - fba_celery_worker
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - *fba_log_volume
     networks:
       - fba_network
     command:
@@ -240,6 +250,7 @@ services:
       - fba_celery_worker
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - *fba_log_volume
     networks:
       - fba_network
     command:

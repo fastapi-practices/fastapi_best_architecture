@@ -1,0 +1,26 @@
+services:
+  fba_server:
+    volumes:
+      - fba_logs:/var/log/fba
+
+  fba_celery_worker:
+    volumes:
+      - fba_logs:/var/log/fba
+
+  fba_celery_beat:
+    volumes:
+      - fba_logs:/var/log/fba
+
+  fba_celery_flower:
+    volumes:
+      - fba_logs:/var/log/fba
+
+  fba_nginx:
+    volumes:
+      - nginx_logs:/var/log/nginx
+
+volumes:
+  fba_logs:
+    name: fba_logs
+  nginx_logs:
+    name: nginx_logs
