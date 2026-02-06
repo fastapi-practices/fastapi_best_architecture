@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
 from backend.database.db import async_engine
-from backend.plugin.config.crud.crud_config import config_dao
 from backend.plugin.config.enums import ConfigType
+from backend.plugin.config.service.config_service import config_service
 from backend.utils.serializers import select_list_serialize
 
 _sys_config_table_exists: bool | None = None
@@ -16,7 +16,7 @@ async def check_sys_config_table_exists() -> bool:
     """检查 sys_config 表是否存在"""
     global _sys_config_table_exists
     if _sys_config_table_exists is None:
-        async with async_engine.begin() as conn:
+        async with async_engine.connect() as conn:
             _sys_config_table_exists = await conn.run_sync(lambda c: inspect(c).has_table('sys_config', schema=None))
     return _sys_config_table_exists
 
@@ -44,7 +44,7 @@ async def _load_config(
     if not await check_sys_config_table_exists():
         return
 
-    dynamic_config = await config_dao.get_all(db, config_type)
+    dynamic_config = await config_service.get_all(db=db, type=config_type)
     if not dynamic_config:
         return
 
