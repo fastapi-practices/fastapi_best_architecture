@@ -42,6 +42,7 @@ services:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
       - fba_static:/fba/backend/app/static
       - fba_static_upload:/fba/backend/static/upload
+      - ${DOCKER_FBA_SERVER_LOG:-./logs/fba}:/var/log/fba
     networks:
       - fba_network
     # 如果你是 mysql 用户，应将 fba_postgres:5432 修改为 fba_mysql:3306
@@ -186,6 +187,7 @@ services:
       - fba_rabbitmq
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - ${DOCKER_FBA_SERVER_LOG:-./logs/fba}:/var/log/fba
     networks:
       - fba_network
     command:
@@ -212,6 +214,7 @@ services:
       - fba_celery_worker
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - ${DOCKER_FBA_SERVER_LOG:-./logs/fba}:/var/log/fba
     networks:
       - fba_network
     command:
@@ -240,6 +243,7 @@ services:
       - fba_celery_worker
     volumes:
       - ./deploy/backend/docker-compose/.env.server:/fba/backend/.env
+      - ${DOCKER_FBA_SERVER_LOG:-./logs/fba}:/var/log/fba
     networks:
       - fba_network
     command:

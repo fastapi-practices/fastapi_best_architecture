@@ -10,3 +10,4 @@ venv/
 .claude/
 .serena/
 .agents/
+.logs/
