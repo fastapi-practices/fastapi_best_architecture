@@ -20,6 +20,7 @@ class ConfigService:
     """参数配置服务类"""
 
     @staticmethod
+    @cached(settings.CACHE_CONFIG_REDIS_PREFIX, key='pk')
     async def get(*, db: AsyncSession, pk: int) -> Config:
         """
         获取参数配置详情
@@ -34,10 +35,7 @@ class ConfigService:
         return config
 
     @staticmethod
-    @cached(
-        settings.CACHE_CONFIG_REDIS_PREFIX,
-        key_builder=lambda *, db, type: f'type:{type}',
-    )
+    @cached(settings.CACHE_CONFIG_REDIS_PREFIX, key='type')
     async def get_all(*, db: AsyncSession, type: str | None) -> Sequence[Config | None]:
         """
         获取所有参数配置
@@ -62,7 +60,6 @@ class ConfigService:
         return await paging_data(db, config_select)
 
     @staticmethod
-    @cache_invalidate(settings.CACHE_CONFIG_REDIS_PREFIX)
     async def create(*, db: AsyncSession, obj: CreateConfigParam) -> None:
         """
         创建参数配置
