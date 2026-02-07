@@ -27,9 +27,26 @@ def _build_cache_key(
 ) -> str:
     """构建缓存 Key"""
     if key:
-        value = kwargs.get(key)
-        if value is None:
-            raise errors.ServerError(msg=f'缓存键构建失败，参数 "{key}" 不存在或值为空')
+        if '.' in key:
+            param, field = key.split('.', 1)
+            value = kwargs.get(param)
+            if value is None:
+                raise errors.ServerError(msg=f'缓存键构建失败，参数 "{param}" 不存在或值为空')
+
+            if isinstance(value, list):
+                raise errors.ServerError(msg='缓存键构建失败：不支持从列表中提取字段，请使用 key_builder 处理列表参数')
+
+            if hasattr(value, field):
+                value = getattr(value, field)
+            elif isinstance(value, dict) and field in value:
+                value = value[field]
+            else:
+                raise errors.ServerError(msg=f'缓存键构建失败，对象中不存在字段 "{field}"')
+        else:
+            value = kwargs.get(key)
+            if value is None:
+                raise errors.ServerError(msg=f'缓存键构建失败，参数 "{key}" 不存在或值为空')
+
         return f'{name}:{value}'
 
     if key_builder:
