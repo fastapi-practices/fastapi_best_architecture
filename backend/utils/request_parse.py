@@ -29,6 +29,7 @@ def get_request_ip(request: Request) -> str:
     # 忽略 pytest
     if request.client.host == 'testclient':
         return '127.0.0.1'
+
     return request.client.host
 
 
