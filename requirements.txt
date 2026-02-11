@@ -73,7 +73,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   loguru
     #   pytest
     #   uvicorn
-cryptography==46.0.4
+cryptography==46.0.5
     # via fastapi-best-architecture
 dnspython==2.8.0
     # via email-validator
