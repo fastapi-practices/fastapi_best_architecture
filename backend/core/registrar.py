@@ -7,7 +7,6 @@ from contextlib import asynccontextmanager
 import socketio
 
 from fastapi import Depends, FastAPI
-from fastapi_limiter import FastAPILimiter
 from fastapi_pagination import add_pagination
 from prometheus_client import make_asgi_app
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -32,7 +31,6 @@ from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
 from backend.plugin.core import build_final_router
 from backend.utils.demo_mode import demo_site
-from backend.utils.limiter import http_limit_callback
 from backend.utils.openapi import ensure_unique_route_names, simplify_operation_ids
 from backend.utils.otel import init_otel
 from backend.utils.serializers import MsgSpecJSONResponse
@@ -53,13 +51,6 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # 初始化 redis
     await redis_client.init()
-
-    # 初始化 limiter
-    await FastAPILimiter.init(
-        redis=redis_client,
-        prefix=settings.REQUEST_LIMITER_REDIS_PREFIX,
-        http_callback=http_limit_callback,
-    )
 
     # 初始化 snowflake 节点
     await snowflake.init()

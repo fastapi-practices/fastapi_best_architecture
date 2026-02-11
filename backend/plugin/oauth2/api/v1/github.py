@@ -4,8 +4,8 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
-from fastapi_limiter.depends import RateLimiter
 from fastapi_oauth20 import FastAPIOAuth20, GitHubOAuth20
+from pyrate_limiter import Duration, Rate
 from starlette.responses import RedirectResponse
 
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
@@ -14,6 +14,7 @@ from backend.database.db import CurrentSessionTransaction
 from backend.database.redis import redis_client
 from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
+from backend.utils.limiter import RateLimiter
 
 router = APIRouter()
 
@@ -38,7 +39,7 @@ async def get_github_oauth2_url() -> ResponseSchemaModel[str]:
     '/callback',
     summary='Github 授权自动重定向',
     description='Github 授权后，自动重定向到当前地址并获取用户信息，通过用户信息自动创建系统用户',
-    dependencies=[Depends(RateLimiter(times=5, minutes=1))],
+    dependencies=[Depends(RateLimiter(Rate(5, Duration.MINUTE)))],
 )
 async def github_oauth2_callback(  # noqa: ANN201
     db: CurrentSessionTransaction,
