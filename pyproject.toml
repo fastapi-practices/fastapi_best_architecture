@@ -8,7 +8,7 @@ authors = [
   { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
 dependencies = [
-  "alembic>=1.18.3",
+  "alembic>=1.18.4",
   "asgiref>=3.11.1",
   "asyncmy>=0.2.11",
   "asyncpg>=0.31.0",
@@ -20,7 +20,7 @@ dependencies = [
   # When celery version < 6.0.0
   # https://github.com/celery/celery/issues/7874
   "celery-aio-pool>=0.1.0rc8",
-  "cryptography>=46.0.4",
+  "cryptography>=46.0.5",
   "dulwich>=1.0.0",
   "fast-captcha>=0.3.2",
   "fastapi-pagination>=0.15.10",
