@@ -16,6 +16,7 @@ class BaseExceptionError(Exception):
         self.data = data
         # The original background task: https://www.starlette.io/background/
         self.background = background
+        super().__init__(msg)
 
 
 class HTTPError(HTTPException):
