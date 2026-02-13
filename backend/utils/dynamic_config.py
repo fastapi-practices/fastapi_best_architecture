@@ -48,10 +48,7 @@ async def _load_config(
     if not dynamic_config:
         return
 
-    if hasattr(dynamic_config[0], '__table__'):
-        config_list = select_list_serialize(dynamic_config)
-    else:
-        config_list = dynamic_config
+    config_list = select_list_serialize(dynamic_config) if hasattr(dynamic_config[0], '__table__') else dynamic_config
     configs = {dc['key']: dc['value'] for dc in config_list}
     if configs.get(status_key, '1') == '0':
         return
