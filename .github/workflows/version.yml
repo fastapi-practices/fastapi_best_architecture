@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python
+        run: uv python install 3.13
+
       - name: Check the package version
         uses: samuelcolvin/check-python-version@v5
         with:
