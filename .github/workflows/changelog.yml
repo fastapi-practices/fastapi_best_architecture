@@ -1,13 +1,15 @@
 name: Release changelog
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_run:
+    workflows: ['Check version']
+    types:
+      - completed
 
 jobs:
   changelog:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
