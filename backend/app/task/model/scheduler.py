@@ -33,7 +33,7 @@ class TaskScheduler(Base):
     type: Mapped[int] = mapped_column(comment='调度类型（0间隔 1定时）')
     interval_every: Mapped[int | None] = mapped_column(comment='任务再次运行前的间隔周期数')
     interval_period: Mapped[str | None] = mapped_column(sa.String(256), comment='任务运行之间的周期类型')
-    crontab: Mapped[str | None] = mapped_column(sa.String(64), default='* * * * *', comment='任务运行的 Crontab 计划')
+    crontab: Mapped[str | None] = mapped_column(sa.String(64), default='* * * * *', comment='Crontab 表达式')
     one_off: Mapped[bool] = mapped_column(default=False, comment='是否仅运行一次')
     enabled: Mapped[bool] = mapped_column(default=True, comment='是否启用任务')
     total_run_count: Mapped[int] = mapped_column(default=0, comment='任务触发的总次数')

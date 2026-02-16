@@ -43,7 +43,7 @@ async def get_task_scheduler(
 )
 async def get_task_scheduler_paginated(
     db: CurrentSession,
-    name: Annotated[int | None, Path(description='任务调度名称')] = None,
+    name: Annotated[str | None, Query(description='任务调度名称')] = None,
     type: Annotated[int | None, Query(description='任务调度类型')] = None,
 ) -> ResponseSchemaModel[PageData[GetTaskSchedulerDetail]]:
     page_data = await task_scheduler_service.get_list(db=db, name=name, type=type)
