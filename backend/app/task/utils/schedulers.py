@@ -56,14 +56,7 @@ class ModelEntry(ScheduleEntry):
             ):
                 self.schedule = schedules.schedule(timedelta(**{model.interval_period: model.interval_every}))
             elif model.type == TaskSchedulerType.CRONTAB and model.crontab is not None:
-                crontab_split = model.crontab.split(' ')
-                self.schedule = TzAwareCrontab(
-                    minute=crontab_split[0],
-                    hour=crontab_split[1],
-                    day_of_week=crontab_split[2],
-                    day_of_month=crontab_split[3],
-                    month_of_year=crontab_split[4],
-                )
+                self.schedule = TzAwareCrontab.from_string(model.crontab)
             else:
                 raise errors.NotFoundError(msg=f'{self.name} 计划为空！')
             # logger.debug('Schedule: {}'.format(self.schedule))
@@ -85,12 +78,10 @@ class ModelEntry(ScheduleEntry):
                 continue
             self.options[option] = value
 
-        expires = getattr(model, 'expires_', None)
-        if expires:
-            if isinstance(expires, int):
-                self.options['expires'] = expires
-            elif isinstance(expires, datetime):
-                self.options['expires'] = timezone.from_datetime(expires)
+        if model.expire_seconds is not None:
+            self.options['expires'] = model.expire_seconds
+        elif model.expire_time is not None:
+            self.options['expires'] = timezone.from_datetime(model.expire_time)
 
         if not model.last_run_time:
             model.last_run_time = timezone.now()
@@ -105,10 +96,15 @@ class ModelEntry(ScheduleEntry):
         """禁用任务"""
         model.no_changes = True
         self.model.enabled = self.enabled = model.enabled = False
-        async with async_db_session.begin():
-            model.enabled = False
+        async with async_db_session.begin() as db:
+            stmt = select(TaskScheduler).where(TaskScheduler.id == model.id)
+            query = await db.execute(stmt)
+            task = query.scalars().first()
+            if task:
+                task.no_changes = True
+                task.enabled = False
 
-    def is_due(self) -> tuple[bool, int | float]:
+    def is_due(self) -> tuple[bool, int | float | datetime]:
         """任务到期状态"""
         if not self.model.enabled:
             # 重新启用时延迟 5 秒
@@ -196,7 +192,7 @@ class ModelEntry(ScheduleEntry):
                 if not obj:
                     obj = TaskScheduler(**CreateTaskSchedulerParam(task=task, **spec).model_dump())
             elif isinstance(schedule, schedules.crontab):
-                crontab = f'{schedule._orig_minute} {schedule._orig_hour} {schedule._orig_day_of_week} {schedule._orig_day_of_month} {schedule._orig_month_of_year}'  # noqa: E501
+                crontab = f'{schedule._orig_minute} {schedule._orig_hour} {schedule._orig_day_of_month} {schedule._orig_month_of_year} {schedule._orig_day_of_week}'  # noqa: E501
                 crontab_verify(crontab)
                 spec = {
                     'name': name,
@@ -256,7 +252,7 @@ class ModelEntry(ScheduleEntry):
             'exchange': exchange,
             'routing_key': routing_key,
             'start_time': start_time,
-            'expire_time': expires,
+            'expire_time': None,
             'expire_seconds': expire_seconds,
             'one_off': one_off,
         }
@@ -265,6 +261,8 @@ class ModelEntry(ScheduleEntry):
                 data['expire_seconds'] = expires
             elif isinstance(expires, timedelta):
                 data['expire_time'] = timezone.now() + expires
+            elif isinstance(expires, datetime):
+                data['expire_time'] = expires
         return data
 
 
@@ -287,20 +285,6 @@ class DatabaseScheduler(Scheduler):
         super().__init__(*args, **kwargs)
         self._finalize = Finalize(self, self.sync, exitpriority=5)
         self.max_interval = kwargs.get('max_interval') or self.app.conf.beat_max_loop_interval or DEFAULT_MAX_INTERVAL
-
-    def install_default_entries(self, data) -> None:  # noqa: ANN001
-        """重写父函数"""
-        entries = {}
-        if self.app.conf.result_expires:
-            entries.setdefault(
-                'celery.backend_cleanup',
-                {
-                    'task': 'celery.backend_cleanup',
-                    'schedule': schedules.crontab('0', '4', '*'),
-                    'options': {'expire_seconds': 12 * 3600},
-                },
-            )
-        self.update_from_dict(entries)
 
     def schedules_equal(self, *args, **kwargs) -> bool:
         """重写父函数"""
@@ -367,7 +351,7 @@ class DatabaseScheduler(Scheduler):
     def update_from_dict(self, beat_dict: dict) -> None:
         """重写父函数"""
         s = {}
-
+        name = None
         try:
             for name, entry_fields in beat_dict.items():
                 entry = run_await(self.Entry.from_entry)(name, app=self.app, **entry_fields)

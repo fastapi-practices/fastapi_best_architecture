@@ -23,7 +23,7 @@ class TaskSchedulerSchemeBase(SchemaBase):
     type: TaskSchedulerType = Field(description='任务调度类型（0间隔 1定时）')
     interval_every: int | None = Field(default=None, description='任务再次运行前的间隔周期数')
     interval_period: PeriodType | None = Field(default=None, description='任务运行之间的周期类型')
-    crontab: str = Field(default='* * * * *', description='运行的 Crontab 表达式')
+    crontab: str = Field(default='* * * * *', description='Crontab 表达式')
     one_off: bool = Field(default=False, description='是否仅运行一次')
     remark: str | None = Field(default=None, description='备注')
 
