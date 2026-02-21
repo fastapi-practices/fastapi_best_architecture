@@ -145,6 +145,11 @@ class Settings(BaseSettings):
         'created_time',
         'updated_time',
     ]
+    DATA_PERMISSION_TEMPLATE_VARIABLES: list[dict[str, str]] = [  # 数据规则可用模板变量
+        {'key': '${user_id}', 'comment': '当前登录用户 ID'},
+        {'key': '${dept_id}', 'comment': '当前登录用户部门 ID'},
+        {'key': '${now}', 'comment': '当前时间'},
+    ]
 
     # Socket.IO
     WS_NO_AUTH_MARKER: str = 'internal'

@@ -10,6 +10,7 @@ from backend.app.admin.schema.data_rule import (
     CreateDataRuleParam,
     DeleteDataRuleParam,
     GetDataRuleColumnDetail,
+    GetDataRuleTemplateVariableDetail,
     UpdateDataRuleParam,
 )
 from backend.app.admin.utils.cache import user_cache_manager
@@ -42,6 +43,11 @@ class DataRuleService:
         """获取所有数据规则可用模型"""
         model_exclude = ['DataScope', 'DataRule', 'sys_role_data_scope', 'sys_data_scope_rule']
         return [m for m in list(get_data_permission_models().keys()) if m not in model_exclude]
+
+    @staticmethod
+    async def get_template_variables() -> list[GetDataRuleTemplateVariableDetail]:
+        """获取所有数据规则可用模板变量"""
+        return [GetDataRuleTemplateVariableDetail(**var) for var in settings.DATA_PERMISSION_TEMPLATE_VARIABLES]
 
     @staticmethod
     async def get_columns(model: str) -> list[GetDataRuleColumnDetail]:

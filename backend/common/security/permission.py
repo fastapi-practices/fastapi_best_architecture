@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import Request
 from sqlalchemy import Alias, ColumnElement, Table, and_, or_
@@ -10,6 +10,10 @@ from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperato
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.utils.dynamic_import import get_all_models
+from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import DataRule
 
 
 class RequestPermission:
@@ -69,15 +73,17 @@ def filter_data_permission(  # noqa: C901
 
     # 角色未启用数据权限过滤
     for role in request.user.roles:
-        if not role.is_filter_scopes:
+        if role.status and not role.is_filter_scopes:
             return or_(1 == 1)
 
     # 获取数据规则
-    data_rules = set()
+    data_rules: set[DataRule] = set()
     for role in request.user.roles:
+        if not role.status:
+            continue
         for scope in role.scopes:
             if scope.status:
-                data_rules.update(scope.rules)
+                data_rules.update(rule for rule in scope.rules if rule is not None)
 
     if not data_rules:
         return or_(1 == 1)
@@ -86,6 +92,14 @@ def filter_data_permission(  # noqa: C901
     model_map = (
         {getattr(model, '__name__', str(model)): model for model in models} if models else get_data_permission_models()
     )
+
+    # 模板变量解析映射
+    template_variable_keys = {var['key'] for var in settings.DATA_PERMISSION_TEMPLATE_VARIABLES}
+    template_resolvers = {
+        '${user_id}': request.user.id,
+        '${dept_id}': request.user.dept_id,
+        '${now}': timezone.now,
+    }
 
     where_and_list = []
     where_or_list = []
@@ -111,6 +125,8 @@ def filter_data_permission(  # noqa: C901
         def cast_value(value: Any) -> Any:
             """类型转换"""
             try:
+                if value in template_variable_keys:
+                    return column_type(template_resolvers[value])
                 return column_type(value) if column_type is not str else value
             except (ValueError, TypeError):
                 return value
