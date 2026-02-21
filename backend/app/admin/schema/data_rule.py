@@ -46,3 +46,10 @@ class GetDataRuleColumnDetail(SchemaBase):
 
     key: str = Field(description='字段名')
     comment: str | None = Field(description='字段评论')
+
+
+class GetDataRuleTemplateVariableDetail(SchemaBase):
+    """数据规则可用模板变量详情"""
+
+    key: str = Field(description='变量标识')
+    comment: str = Field(description='变量描述')
