@@ -16,9 +16,11 @@ from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from redis.observability.config import OTelConfig
+from redis.observability.providers import get_observability_instance
 
 from backend.common.log import log, request_id_filter
-from backend.common.prometheus.instruments import PROMETHEUS_APP_NAME
+from backend.common.observability.prometheus import PROMETHEUS_APP_NAME
 from backend.core.conf import settings
 from backend.database.db import async_engine
 from backend.database.redis import redis_client
@@ -49,11 +51,12 @@ def init_tracer(resource: Resource) -> None:
     :param resource: 遥测资源
     :return:
     """
-    tracer_provider = TracerProvider(resource=resource)
-    span_exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    provider = TracerProvider(resource=resource)
+    exporter = OTLPSpanExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    processor = BatchSpanProcessor(span_exporter=exporter)
 
-    tracer_provider.add_span_processor(BatchSpanProcessor(span_exporter))
-    trace.set_tracer_provider(tracer_provider)
+    provider.add_span_processor(processor)
+    trace.set_tracer_provider(provider)
 
 
 def init_metrics(resource: Resource) -> None:
@@ -63,13 +66,11 @@ def init_metrics(resource: Resource) -> None:
     :param resource: 遥测资源
     :return:
     """
-    metric_exporter = OTLPMetricExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
-    meter_provider = MeterProvider(
-        resource=resource,
-        metric_readers=[PeriodicExportingMetricReader(metric_exporter)],
-    )
+    exporter = OTLPMetricExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    reader = PeriodicExportingMetricReader(exporter=exporter)
+    provider = MeterProvider(resource=resource, metric_readers=[reader])
 
-    metrics.set_meter_provider(meter_provider)
+    metrics.set_meter_provider(provider)
 
 
 def init_logging(resource: Resource) -> None:
@@ -79,14 +80,15 @@ def init_logging(resource: Resource) -> None:
     :param resource: 遥测资源
     :return:
     """
-    logger_provider = LoggerProvider(resource=resource)
-    logger_exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    provider = LoggerProvider(resource=resource)
+    exporter = OTLPLogExporter(endpoint=settings.GRAFANA_OTLP_GRPC_ENDPOINT, insecure=True)
+    processor = BatchLogRecordProcessor(exporter=exporter)
 
-    logger_provider.add_log_record_processor(BatchLogRecordProcessor(logger_exporter))
-    _logs.set_logger_provider(logger_provider)
+    provider.add_log_record_processor(processor)
+    _logs.set_logger_provider(provider)
 
-    otel_logging_handler = LoggingHandler(logger_provider=logger_provider)
-    log.add(  # type: ignore
+    otel_logging_handler = LoggingHandler(logger_provider=provider)
+    log.add(
         otel_logging_handler,
         level=settings.LOG_STD_LEVEL,
         format=settings.LOG_FORMAT,
@@ -106,6 +108,9 @@ def init_otel(app: FastAPI) -> None:
     init_tracer(resource)
     init_metrics(resource)
     init_logging(resource)
+
+    redis_otel = get_observability_instance()
+    redis_otel.init(OTelConfig())
 
     AsyncioInstrumentor().instrument()
     LoggingInstrumentor().instrument(set_logging_format=True)

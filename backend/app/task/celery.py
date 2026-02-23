@@ -9,9 +9,9 @@ from opentelemetry.instrumentation.celery import CeleryInstrumentor
 
 from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
 from backend.common.enums import DataBaseType
+from backend.common.observability.otel import init_resource, init_tracer
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
-from backend.utils.otel import init_resource, init_tracer
 
 
 @worker_process_init.connect(weak=False)

@@ -19,6 +19,7 @@ from backend import __version__
 from backend.common.cache.pubsub import cache_pubsub_manager
 from backend.common.exception.exception_handler import register_exception
 from backend.common.log import set_custom_logfile, setup_logging
+from backend.common.observability.otel import init_otel
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
@@ -32,7 +33,6 @@ from backend.middleware.state_middleware import StateMiddleware
 from backend.plugin.core import build_final_router
 from backend.utils.demo_mode import demo_site
 from backend.utils.openapi import ensure_unique_route_names, simplify_operation_ids
-from backend.utils.otel import init_otel
 from backend.utils.serializers import MsgSpecJSONResponse
 from backend.utils.snowflake import snowflake
 from backend.utils.trace_id import OtelTraceIdPlugin
