@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import Request
 from sqlalchemy import Alias, ColumnElement, Table, and_, or_
@@ -10,6 +10,10 @@ from backend.common.enums import RoleDataRuleExpressionType, RoleDataRuleOperato
 from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.utils.dynamic_import import get_all_models
+from backend.utils.timezone import timezone
+
+if TYPE_CHECKING:
+    from backend.app.admin.model import DataRule
 
 
 class RequestPermission:
@@ -69,80 +73,102 @@ def filter_data_permission(  # noqa: C901
 
     # 角色未启用数据权限过滤
     for role in request.user.roles:
-        if not role.is_filter_scopes:
+        if role.status and not role.is_filter_scopes:
             return or_(1 == 1)
 
     # 获取数据规则
-    data_rules = set()
+    data_rules: set[DataRule] = set()
     for role in request.user.roles:
+        if not role.status:
+            continue
         for scope in role.scopes:
             if scope.status:
-                data_rules.update(scope.rules)
+                data_rules.update(rule for rule in scope.rules if rule is not None)
 
     if not data_rules:
         return or_(1 == 1)
 
-    # 获取目标模型
-    model_map = (
+    # 目标模型
+    target_model_map = (
         {getattr(model, '__name__', str(model)): model for model in models} if models else get_data_permission_models()
     )
+
+    # 字段模板变量映射
+    column_template_resolvers = {
+        var['key']: var['key'].strip('_') for var in settings.DATA_PERMISSION_COLUMN_TEMPLATE_VARIABLES
+    }
+
+    # 模板变量解析映射
+    template_variable_keys = {var['key'] for var in settings.DATA_PERMISSION_TEMPLATE_VARIABLES}
+    template_resolvers = {
+        '${user_id}': request.user.id,
+        '${dept_id}': request.user.dept_id,
+        '${now}': timezone.now,
+    }
 
     where_and_list = []
     where_or_list = []
 
     for data_rule in data_rules:
-        target_model = model_map.get(data_rule.model)
-        if target_model is None:
-            continue
+        if data_rule.model == '__ALL__':
+            target_models = list(target_model_map.values())
+        else:
+            target_model = target_model_map.get(data_rule.model)
+            target_models = [target_model] if target_model is not None else []
 
-        table = target_model if isinstance(target_model, Table) else target_model.__table__
-        rule_column = data_rule.column
-        if rule_column not in table.columns.keys():
-            continue
-        if rule_column in settings.DATA_PERMISSION_COLUMN_EXCLUDE:
-            continue
+        for target_model in target_models:
+            table = target_model if isinstance(target_model, Table) else target_model.__table__
+            rule_column = column_template_resolvers.get(data_rule.column, data_rule.column)
+            if rule_column not in table.columns.keys():
+                continue
+            if rule_column in settings.DATA_PERMISSION_COLUMN_EXCLUDE:
+                continue
 
-        # 构建过滤条件
-        column_obj = (
-            getattr(target_model, rule_column) if not isinstance(target_model, Table) else table.columns[rule_column]
-        )
-        column_type = table.columns[rule_column].type.python_type
+            # 构建过滤条件
+            column_obj = (
+                getattr(target_model, rule_column)
+                if not isinstance(target_model, Table)
+                else table.columns[rule_column]
+            )
+            column_type = table.columns[rule_column].type.python_type
 
-        def cast_value(value: Any) -> Any:
-            """类型转换"""
-            try:
-                return column_type(value) if column_type is not str else value
-            except (ValueError, TypeError):
-                return value
+            def cast_value(value: Any, _column_type: type = column_type) -> Any:
+                """类型转换"""
+                try:
+                    if value in template_variable_keys:
+                        return _column_type(template_resolvers[value])
+                    return _column_type(value) if _column_type is not str else value
+                except (ValueError, TypeError):
+                    return value
 
-        condition = None
-        match data_rule.expression:
-            case RoleDataRuleExpressionType.eq:
-                condition = column_obj == cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.ne:
-                condition = column_obj != cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.gt:
-                condition = column_obj > cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.ge:
-                condition = column_obj >= cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.lt:
-                condition = column_obj < cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.le:
-                condition = column_obj <= cast_value(data_rule.value)
-            case RoleDataRuleExpressionType.in_:
-                values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
-                condition = column_obj.in_(values)
-            case RoleDataRuleExpressionType.not_in:
-                values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
-                condition = column_obj.not_in(values)
+            condition = None
+            match data_rule.expression:
+                case RoleDataRuleExpressionType.eq:
+                    condition = column_obj == cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.ne:
+                    condition = column_obj != cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.gt:
+                    condition = column_obj > cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.ge:
+                    condition = column_obj >= cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.lt:
+                    condition = column_obj < cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.le:
+                    condition = column_obj <= cast_value(data_rule.value)
+                case RoleDataRuleExpressionType.in_:
+                    values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
+                    condition = column_obj.in_(values)
+                case RoleDataRuleExpressionType.not_in:
+                    values = [cast_value(v.strip()) for v in data_rule.value.split(',')]
+                    condition = column_obj.not_in(values)
 
-        # 根据运算符添加到对应列表
-        if condition is not None:
-            match data_rule.operator:
-                case RoleDataRuleOperatorType.AND:
-                    where_and_list.append(condition)
-                case RoleDataRuleOperatorType.OR:
-                    where_or_list.append(condition)
+            # 根据运算符添加到对应列表
+            if condition is not None:
+                match data_rule.operator:
+                    case RoleDataRuleOperatorType.AND:
+                        where_and_list.append(condition)
+                    case RoleDataRuleOperatorType.OR:
+                        where_or_list.append(condition)
 
     # 组合所有条件
     where_list = []

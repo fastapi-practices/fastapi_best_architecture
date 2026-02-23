@@ -10,6 +10,7 @@ from backend.app.admin.schema.data_rule import (
     CreateDataRuleParam,
     DeleteDataRuleParam,
     GetDataRuleColumnDetail,
+    GetDataRuleTemplateVariableDetail,
     UpdateDataRuleParam,
 )
 from backend.app.admin.utils.cache import user_cache_manager
@@ -40,8 +41,16 @@ class DataRuleService:
     @staticmethod
     async def get_models() -> list[str]:
         """获取所有数据规则可用模型"""
-        model_exclude = ['DataScope', 'DataRule', 'sys_role_data_scope', 'sys_data_scope_rule']
-        return [m for m in list(get_data_permission_models().keys()) if m not in model_exclude]
+        model_template_variables = [var['key'] for var in settings.DATA_PERMISSION_MODEL_TEMPLATE_VARIABLES]
+        models = [
+            m for m in list(get_data_permission_models().keys()) if m not in settings.DATA_PERMISSION_MODEL_EXCLUDE
+        ]
+        return model_template_variables + models
+
+    @staticmethod
+    async def get_value_template_variables() -> list[GetDataRuleTemplateVariableDetail]:
+        """获取所有数据规则值可用模板变量"""
+        return [GetDataRuleTemplateVariableDetail(**var) for var in settings.DATA_PERMISSION_TEMPLATE_VARIABLES]
 
     @staticmethod
     async def get_columns(model: str) -> list[GetDataRuleColumnDetail]:
@@ -51,6 +60,15 @@ class DataRuleService:
         :param model: 模型名称
         :return:
         """
+        column_template_variables = [
+            GetDataRuleColumnDetail(key=var['key'], comment=var['comment'])
+            for var in settings.DATA_PERMISSION_COLUMN_TEMPLATE_VARIABLES
+        ]
+
+        model_template_variable_keys = {var['key'] for var in settings.DATA_PERMISSION_MODEL_TEMPLATE_VARIABLES}
+        if model in model_template_variable_keys:
+            return column_template_variables
+
         available_models = get_data_permission_models()
         if model not in available_models:
             raise errors.NotFoundError(msg='数据规则可用模型不存在')
@@ -62,7 +80,7 @@ class DataRuleService:
             for column in table.columns
             if column.key not in settings.DATA_PERMISSION_COLUMN_EXCLUDE
         ]
-        return model_columns
+        return model_columns + column_template_variables
 
     @staticmethod
     async def get_list(*, db: AsyncSession, name: str | None) -> dict[str, Any]:

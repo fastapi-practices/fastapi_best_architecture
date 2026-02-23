@@ -7,6 +7,7 @@ from backend.app.admin.schema.data_rule import (
     DeleteDataRuleParam,
     GetDataRuleColumnDetail,
     GetDataRuleDetail,
+    GetDataRuleTemplateVariableDetail,
     UpdateDataRuleParam,
 )
 from backend.app.admin.service.data_rule_service import data_rule_service
@@ -32,6 +33,12 @@ async def get_data_rule_model_columns(
 ) -> ResponseSchemaModel[list[GetDataRuleColumnDetail]]:
     models = await data_rule_service.get_columns(model=model)
     return response_base.success(data=models)
+
+
+@router.get('/value-template-variables', summary='获取数据规则值可用模板变量', dependencies=[DependsJwtAuth])
+async def get_data_rule_value_template_variables() -> ResponseSchemaModel[list[GetDataRuleTemplateVariableDetail]]:
+    variables = await data_rule_service.get_value_template_variables()
+    return response_base.success(data=variables)
 
 
 @router.get('/all', summary='获取所有数据规则', dependencies=[DependsJwtAuth])
