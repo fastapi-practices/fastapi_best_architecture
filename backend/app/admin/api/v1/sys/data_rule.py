@@ -35,9 +35,9 @@ async def get_data_rule_model_columns(
     return response_base.success(data=models)
 
 
-@router.get('/template-variables', summary='获取数据规则可用模板变量', dependencies=[DependsJwtAuth])
-async def get_data_rule_template_variables() -> ResponseSchemaModel[list[GetDataRuleTemplateVariableDetail]]:
-    variables = await data_rule_service.get_template_variables()
+@router.get('/value-template-variables', summary='获取数据规则值可用模板变量', dependencies=[DependsJwtAuth])
+async def get_data_rule_value_template_variables() -> ResponseSchemaModel[list[GetDataRuleTemplateVariableDetail]]:
+    variables = await data_rule_service.get_value_template_variables()
     return response_base.success(data=variables)
 
 

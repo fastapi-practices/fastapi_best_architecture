@@ -138,6 +138,12 @@ class Settings(BaseSettings):
     COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 7 天
 
     # 数据权限
+    DATA_PERMISSION_MODEL_EXCLUDE: list[str] = [  # 排除允许进行数据过滤的 SQLA 模型
+        'DataScope',
+        'DataRule',
+        'sys_role_data_scope',
+        'sys_data_scope_rule',
+    ]
     DATA_PERMISSION_COLUMN_EXCLUDE: list[str] = [  # 排除允许进行数据过滤的 SQLA 模型列
         'id',
         'sort',
@@ -145,7 +151,14 @@ class Settings(BaseSettings):
         'created_time',
         'updated_time',
     ]
-    DATA_PERMISSION_TEMPLATE_VARIABLES: list[dict[str, str]] = [  # 数据规则可用模板变量
+    DATA_PERMISSION_MODEL_TEMPLATE_VARIABLES: list[dict[str, str]] = [  # 数据规则模型可用模板变量
+        {'key': '__ALL__', 'comment': '所有模型'},
+    ]
+    DATA_PERMISSION_COLUMN_TEMPLATE_VARIABLES: list[dict[str, str]] = [  # 数据规则字段可用模板变量
+        {'key': '__dept_id__', 'comment': '部门 ID'},
+        {'key': '__created_by__', 'comment': '创建者'},
+    ]
+    DATA_PERMISSION_TEMPLATE_VARIABLES: list[dict[str, str]] = [  # 数据规则值可用模板变量
         {'key': '${user_id}', 'comment': '当前登录用户 ID'},
         {'key': '${dept_id}', 'comment': '当前登录用户部门 ID'},
         {'key': '${now}', 'comment': '当前时间'},
