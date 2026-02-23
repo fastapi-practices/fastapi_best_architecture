@@ -5,7 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 
 from backend.common.context import ctx
 from backend.common.log import log
-from backend.common.prometheus.instruments import (
+from backend.common.observability.prometheus import (
     PROMETHEUS_APP_NAME,
     PROMETHEUS_REQUEST_COUNTER,
     PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE,
@@ -37,7 +37,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
         start_time = timezone.now()
         ctx.start_time = start_time
 
-        if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+        if path.startswith(settings.FASTAPI_API_V1_PATH):
             PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()
             PROMETHEUS_REQUEST_COUNTER.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()
 

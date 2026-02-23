@@ -14,7 +14,7 @@ from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.context import ctx
 from backend.common.enums import StatusType
 from backend.common.log import log
-from backend.common.prometheus.instruments import (
+from backend.common.observability.prometheus import (
     PROMETHEUS_APP_NAME,
     PROMETHEUS_EXCEPTION_COUNTER,
     PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM,
@@ -54,9 +54,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
         except AttributeError:
             username = None
 
-        should_log_opera = (
-            path.startswith(f'{settings.FASTAPI_API_V1_PATH}') and path not in settings.OPERA_LOG_PATH_EXCLUDE
-        )
+        should_log_opera = path.startswith(settings.FASTAPI_API_V1_PATH) and path not in settings.OPERA_LOG_PATH_EXCLUDE
 
         try:
             response = await call_next(request)
@@ -69,7 +67,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 msg = getattr(e, 'msg', str(e))
                 status = StatusType.disable
 
-            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+            if path.startswith(settings.FASTAPI_API_V1_PATH):
                 PROMETHEUS_EXCEPTION_COUNTER.labels(
                     app_name=PROMETHEUS_APP_NAME,
                     method=method,
@@ -97,7 +95,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         log.error(f'请求异常: {msg}')
                         break
 
-            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+            if path.startswith(settings.FASTAPI_API_V1_PATH):
                 PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM.labels(
                     app_name=PROMETHEUS_APP_NAME, method=method, path=path
                 ).observe(amount=elapsed, exemplar={'TraceID': get_request_trace_id()})
@@ -113,7 +111,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
             if request.method != 'OPTIONS':
                 log.debug('<-- 请求结束')
 
-            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+            if path.startswith(settings.FASTAPI_API_V1_PATH):
                 log.info(f'{ctx.ip: <15} | {method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
 
             if should_log_opera and request.method != 'OPTIONS':
@@ -140,7 +138,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 )
                 await self.opera_log_queue.put(opera_log_in)
 
-            if path.startswith(f'{settings.FASTAPI_API_V1_PATH}'):
+            if path.startswith(settings.FASTAPI_API_V1_PATH):
                 PROMETHEUS_RESPONSE_COUNTER.labels(
                     app_name=PROMETHEUS_APP_NAME, method=method, path=path, status_code=code
                 ).inc()
