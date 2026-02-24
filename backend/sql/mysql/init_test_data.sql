@@ -103,13 +103,20 @@ values
 
 insert into sys_data_scope (id, name, status, created_time, updated_time)
 values
-(1, '测试部门数据权限', 1, now(), null),
-(2, '测试部门及以下数据权限', 1, now(), null);
+(1, '本部门数据权限', 1, now(), null),
+(2, '部门及以下数据权限', 1, now(), null),
+(3, '仅本人数据权限', 1, now(), null),
+(4, '全模型本部门数据权限', 1, now(), null),
+(5, '排除超级管理员数据权限', 1, now(), null);
 
 insert into sys_data_rule (id, name, model, `column`, operator, expression, `value`, created_time, updated_time)
 values
-(1, '部门名称等于测试', 'Dept', 'name', 1, 0, '测试', now(), null),
-(2, '父部门 ID 等于 1', 'Dept', 'parent_id', 0, 0, '1', now(), null);
+(1, '部门 ID 等于当前用户部门', 'Dept', '__dept_id__', 0, 0, '${dept_id}', now(), null),
+(2, '部门名称等于测试', 'Dept', 'name', 1, 0, '测试', now(), null),
+(3, '父部门 ID 等于测试部门 ID', 'Dept', 'parent_id', 0, 0, '1', now(), null),
+(4, '创建者等于当前用户', '__ALL__', '__created_by__', 0, 0, '${user_id}', now(), null),
+(5, '全模型部门 ID 等于当前用户部门', '__ALL__', '__dept_id__', 0, 0, '${dept_id}', now(), null),
+(6, '用户非超级管理员', 'User', 'is_superuser', 0, 1, '1', now(), null);
 
 insert into sys_role_data_scope (id, role_id, data_scope_id)
 values
@@ -119,5 +126,8 @@ values
 insert into sys_data_scope_rule (id, data_scope_id, data_rule_id)
 values
 (1, 1, 1),
-(2, 2, 1),
-(3, 2, 2);
+(2, 2, 2),
+(3, 2, 3),
+(4, 3, 4),
+(5, 4, 5),
+(6, 5, 6);
