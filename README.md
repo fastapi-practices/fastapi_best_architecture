@@ -65,11 +65,6 @@ the [official documentation](https://fastapi-practices.github.io/fastapi_best_ar
 
 [Discord](https://wu-clan.github.io/homepage/)
 
-## Sponsor us
-
-If this program has helped you, you can sponsor us with some coffee
-beans: [:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
-
 ## License
 
 This project is licensed by the terms of
