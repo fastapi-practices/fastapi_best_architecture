@@ -18,7 +18,7 @@
    Go to the root directory of the project, open the terminal, and run the following command:
 
    ```sh
-   uv sync
+   uv run fba init --auto
    ```
 
 3. Checkout
@@ -31,10 +31,8 @@
 
 4. Format and Lint
 
-   Auto-formatting and lint via `prek`
-
    ```shell
-   prek run --all-files
+   fba format
    ```
 
 5. Commit and push
@@ -55,7 +53,7 @@
 
 - `migrate.sh`: Perform automatic database migration
 
-- `scripts/format.sh`: Perform ruff format check
+- `scripts/format.sh`: Perform ruff format with preview
 
 - `scripts/lint.sh`: Perform prek formatting
 

@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import stat
 import zipfile
 
 import anyio
@@ -136,3 +137,37 @@ async def install_git_plugin(repo_url: str) -> str:
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     return repo_name
+
+
+def remove_plugin(plugin_dir: os.PathLike) -> None:
+    """
+    删除插件
+
+    :param plugin_dir: 插件目录
+    :return:
+    """
+    import shutil
+
+    def _on_error(func, path, _exc_info) -> None:  # noqa: ANN001
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+
+    shutil.rmtree(plugin_dir, onerror=_on_error)
+
+
+def zip_plugin(plugin_dir: os.PathLike, target: os.PathLike | io.BytesIO) -> None:
+    """
+    zip 压缩插件
+
+    :param plugin_dir: 插件目录
+    :param target: 压缩目标
+    :return:
+    """
+    with zipfile.ZipFile(target, 'w') as zf:
+        plugin_dir_parent = os.path.dirname(plugin_dir)
+        for root, dirs, files in os.walk(plugin_dir):
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, start=plugin_dir_parent)
+                zf.write(file_path, arcname)

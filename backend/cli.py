@@ -19,6 +19,7 @@ from rich.table import Table
 from rich.text import Text
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+from starlette.concurrency import run_in_threadpool
 from watchfiles import Change, PythonFilter
 
 from backend import __version__
@@ -31,6 +32,7 @@ from backend.core.path_conf import (
     ENV_EXAMPLE_FILE_PATH,
     ENV_FILE_PATH,
     MYSQL_SCRIPT_DIR,
+    PLUGIN_DIR,
     POSTGRESQL_SCRIPT_DIR,
     RELOAD_LOCK_FILE,
 )
@@ -42,12 +44,15 @@ from backend.database.db import (
 )
 from backend.database.redis import RedisCli, redis_client
 from backend.plugin.core import get_plugin_sql, get_plugins
-from backend.plugin.installer import install_git_plugin, install_zip_plugin
+from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
+from backend.plugin.installer import remove_plugin as _remove_plugin
+from backend.plugin.requirements import uninstall_requirements_async
 from backend.utils.console import console
 from backend.utils.dynamic_import import import_module_cached
 from backend.utils.sql_parser import parse_sql_script
+from backend.utils.timezone import timezone
 
-output_help = '\n更多信息，尝试 "[cyan]--help[/]"'
+output_help = "\n更多信息，尝试 '[cyan]--help[/]'"
 
 
 class CustomReloadFilter(PythonFilter):
@@ -374,6 +379,52 @@ async def install_plugin(
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
+async def remove_plugin(plugin: str | None) -> None:
+    if settings.ENVIRONMENT != 'dev':
+        raise cappa.Exit('插件卸载仅在开发环境可用', code=1)
+
+    async def remove() -> None:
+        plugin_dir = PLUGIN_DIR / plugin
+        if not plugin_dir.exists():
+            raise cappa.Exit(f'插件 {plugin} 不存在', code=1)
+
+        console.print(f'正在卸载插件 {plugin} 依赖...', style='white')
+        await uninstall_requirements_async(plugin)
+
+        console.print(f'正在备份插件 {plugin}...', style='white')
+        backup_file = PLUGIN_DIR / f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup.zip'
+        await run_in_threadpool(zip_plugin, plugin_dir, backup_file)
+        await run_in_threadpool(_remove_plugin, plugin_dir)
+
+        console.print(f'备份文件：{backup_file}', style='white')
+        console.print(f'插件 {plugin} 卸载成功', style='bold green')
+        console.print('\n请根据插件说明（README.md）移除相关配置并重启服务', style='yellow')
+
+    plugins = get_plugins()
+    if not plugins:
+        raise cappa.Exit('当前没有已安装的插件', code=1)
+
+    if not plugin:
+        table = Table(show_header=True, header_style='bold magenta')
+        table.add_column('编号', style='cyan', no_wrap=True, justify='center')
+        table.add_column('插件名称', style='green', no_wrap=True)
+
+        for idx, name in enumerate(plugins, 1):
+            table.add_row(str(idx), name)
+
+        console.print(table)
+        choice = IntPrompt.ask('请选择要卸载的插件编号', choices=[str(i) for i in range(1, len(plugins) + 1)])
+        plugin = plugins[choice - 1]
+    else:
+        if plugin not in plugins:
+            raise cappa.Exit(f'插件 {plugin} 不存在', code=1)
+
+    try:
+        await remove()
+    except Exception as e:
+        raise cappa.Exit(f'插件卸载失败：{e}', code=1)
+
+
 async def get_sql_scripts() -> list[str]:
     sql_scripts = []
     db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
@@ -549,6 +600,58 @@ class Run:
         run(host=self.host, port=self.port, reload=self.no_reload, workers=self.workers)
 
 
+@cappa.command(help='新增插件', default_long=True)
+@dataclass
+class Add:
+    path: Annotated[
+        str | None,
+        cappa.Arg(help='ZIP 插件的本地完整路径'),
+    ]
+    repo_url: Annotated[
+        str | None,
+        cappa.Arg(help='Git 插件的仓库地址'),
+    ]
+    no_sql: Annotated[
+        bool,
+        cappa.Arg(default=False, help='禁用插件 SQL 脚本自动执行'),
+    ]
+    db_type: Annotated[
+        DataBaseType,
+        cappa.Arg(default='postgresql', help='执行插件 SQL 脚本的数据库类型'),
+    ]
+    pk_type: Annotated[
+        PrimaryKeyType,
+        cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
+    ]
+
+    async def __call__(self) -> None:
+        await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
+
+
+@cappa.command(help='移除插件')
+@dataclass
+class Remove:
+    plugin: Annotated[
+        str | None,
+        cappa.Arg(default=None, help='要移除的插件名称'),
+    ]
+
+    async def __call__(self) -> None:
+        await remove_plugin(self.plugin)
+
+
+@cappa.command(help='格式化代码')
+@dataclass
+class Format:
+    def __call__(self) -> None:
+        try:
+            subprocess.run(['prek', 'run', '--all-files'], cwd=BASE_PATH.parent, check=False)
+        except FileNotFoundError:
+            raise cappa.Exit('prek 未安装，请先安装项目依赖', code=1)
+        except KeyboardInterrupt:
+            pass
+
+
 @cappa.command(help='从当前主机启动 Celery worker 服务', default_long=True)
 @dataclass
 class Worker:
@@ -593,34 +696,6 @@ class Flower:
 @dataclass
 class Celery:
     subcmd: cappa.Subcommands[Worker | Beat | Flower]
-
-
-@cappa.command(help='新增插件', default_long=True)
-@dataclass
-class Add:
-    path: Annotated[
-        str | None,
-        cappa.Arg(help='ZIP 插件的本地完整路径'),
-    ]
-    repo_url: Annotated[
-        str | None,
-        cappa.Arg(help='Git 插件的仓库地址'),
-    ]
-    no_sql: Annotated[
-        bool,
-        cappa.Arg(default=False, help='禁用插件 SQL 脚本自动执行'),
-    ]
-    db_type: Annotated[
-        DataBaseType,
-        cappa.Arg(default='postgresql', help='执行插件 SQL 脚本的数据库类型'),
-    ]
-    pk_type: Annotated[
-        PrimaryKeyType,
-        cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
-    ]
-
-    async def __call__(self) -> None:
-        await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
 
 
 @cappa.command(help='导入代码生成业务和模型列', default_long=True)
@@ -780,7 +855,7 @@ class FbaCli:
         str,
         cappa.Arg(value_name='PATH', default='', show_default=False, help='在事务中执行 SQL 脚本'),
     ]
-    subcmd: cappa.Subcommands[Init | Run | Add | Alembic | Celery | CodeGenerator | None] = None
+    subcmd: cappa.Subcommands[Init | Run | Add | Remove | Format | Celery | CodeGenerator | Alembic | None] = None
 
     async def __call__(self) -> None:
         if self.sql:
