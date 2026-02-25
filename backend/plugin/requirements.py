@@ -78,7 +78,7 @@ def uninstall_requirements(plugin: str) -> None:
     requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
     if os.path.exists(requirements_file):
         try:
-            pip_uninstall = ['uv', 'pip', 'uninstall', '-r', str(requirements_file), '-y']
+            pip_uninstall = ['uv', 'pip', 'uninstall', '-r', str(requirements_file)]
             if not _is_in_virtualenv():
                 pip_uninstall.append('--system')
             subprocess.check_call(pip_uninstall, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
