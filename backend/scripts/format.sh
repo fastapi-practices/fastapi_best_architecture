@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-ruff format --check
+ruff format --preview
