@@ -76,7 +76,7 @@ class CRUDDictData(CRUDPlus[DictData]):
         if type_id is not None:
             filters['type_id'] = type_id
 
-        return await self.select_order('id', 'desc', **filters)
+        return await self.select_order('sort', 'asc', **filters)
 
     async def get_by_label_and_type_code(self, db: AsyncSession, label: str, type_code: str) -> DictData | None:
         """

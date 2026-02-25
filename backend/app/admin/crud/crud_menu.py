@@ -47,7 +47,7 @@ class CRUDMenu(CRUDPlus[Menu]):
         if status is not None:
             filters['status'] = status
 
-        return await self.select_models_order(db, 'sort', **filters)
+        return await self.select_models_order(db, 'sort', 'asc', **filters)
 
     async def get_sidebar(self, db: AsyncSession, menu_ids: list[int] | None) -> Sequence[Menu]:
         """
