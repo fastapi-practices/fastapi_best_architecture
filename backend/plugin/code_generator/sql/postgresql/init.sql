@@ -1,4 +1,4 @@
-do $
+do $$
 declare
     codegen_menu_id bigint;
 begin
@@ -16,7 +16,7 @@ begin
     ('删除模型', 'DeleteGenCodeModel', null, 0, null, 2, null, 'codegen:model:del', 1, 0, 1, '', null, codegen_menu_id, now(), null),
     ('导入', 'ImportGenCode', null, 0, null, 2, null, 'codegen:table:import', 1, 0, 1, '', null, codegen_menu_id, now(), null),
     ('写入', 'WriteGenCode', null, 0, null, 2, null, 'codegen:local:write', 1, 0, 1, '', null, codegen_menu_id, now(), null);
-end $;
+end $$;
 
 select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
 

@@ -1,4 +1,4 @@
-do $
+do $$
 declare
     config_menu_id bigint;
 begin
@@ -11,7 +11,7 @@ begin
     ('新增', 'AddConfig', null, 0, null, 2, null, 'sys:config:add', 1, 0, 1, '', null, config_menu_id, now(), null),
     ('修改', 'EditConfig', null, 0, null, 2, null, 'sys:config:edit', 1, 0, 1, '', null, config_menu_id, now(), null),
     ('删除', 'DeleteConfig', null, 0, null, 2, null, 'sys:config:del', 1, 0, 1, '', null, config_menu_id, now(), null);
-end $;
+end $$;
 
 select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
 

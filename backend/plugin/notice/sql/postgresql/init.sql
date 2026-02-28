@@ -1,4 +1,4 @@
-do $
+do $$
 declare
     notice_menu_id bigint;
 begin
@@ -11,7 +11,7 @@ begin
     ('新增', 'AddNotice', null, 0, null, 2, null, 'sys:notice:add', 1, 0, 1, '', null, notice_menu_id, now(), null),
     ('修改', 'EditNotice', null, 0, null, 2, null, 'sys:notice:edit', 1, 0, 1, '', null, notice_menu_id, now(), null),
     ('删除', 'DeleteNotice', null, 0, null, 2, null, 'sys:notice:del', 1, 0, 1, '', null, notice_menu_id, now(), null);
-end $;
+end $$;
 
 select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
 

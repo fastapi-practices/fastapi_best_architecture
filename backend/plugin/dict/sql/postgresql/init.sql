@@ -1,4 +1,4 @@
-do $
+do $$
 declare
     dict_menu_id bigint;
 begin
@@ -14,7 +14,7 @@ begin
     ('新增数据', 'AddDictData', null, 0, null, 2, null, 'dict:data:add', 1, 0, 1, '', null, dict_menu_id, now(), null),
     ('修改数据', 'EditDictData', null, 0, null, 2, null, 'dict:data:edit', 1, 0, 1, '', null, dict_menu_id, now(), null),
     ('删除数据', 'DeleteDictData', null, 0, null, 2, null, 'dict:data:del', 1, 0, 1, '', null, dict_menu_id, now(), null);
-end $;
+end $$;
 
 select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
 
