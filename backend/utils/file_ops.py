@@ -1,7 +1,6 @@
 from anyio import open_file
 from fastapi import UploadFile
 
-from backend.common.enums import FileType
 from backend.common.exception import errors
 from backend.common.log import log
 from backend.core.conf import settings
