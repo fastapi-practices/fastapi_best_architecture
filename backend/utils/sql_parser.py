@@ -22,9 +22,12 @@ async def parse_sql_script(filepath: str) -> list[str]:
         while additional_contents := await f.read(1024):
             contents += additional_contents
 
-    statements = split(contents)
+    statements = [stmt for stmt in split(contents) if stmt.strip()]
+    allowed_prefixes = ['select', 'insert', 'set', 'do']
     for statement in statements:
-        if not any(statement.lower().startswith(_) for _ in ['select', 'insert']):
-            raise errors.RequestError(msg='SQL 脚本文件中存在非法操作，仅允许 SELECT 和 INSERT')
+        if not any(statement.strip().lower().startswith(prefix) for prefix in allowed_prefixes):
+            raise errors.RequestError(
+                msg=f'SQL 脚本 {filepath} 存在非法操作，仅允许：{", ".join(item.upper() for item in allowed_prefixes)}'
+            )
 
     return statements

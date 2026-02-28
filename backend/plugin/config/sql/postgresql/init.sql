@@ -1,3 +1,20 @@
+do $$
+declare
+    config_menu_id bigint;
+begin
+    insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
+    values ('config.menu', 'PluginConfig', '/plugins/config', 7, 'codicon:symbol-parameter', 1, '/plugins/config/views/index', null, 1, 1, 1, '', null, (select id from sys_menu where name = 'System'), now(), null)
+    returning id into config_menu_id;
+
+    insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
+    values
+    ('新增', 'AddConfig', null, 0, null, 2, null, 'sys:config:add', 1, 0, 1, '', null, config_menu_id, now(), null),
+    ('修改', 'EditConfig', null, 0, null, 2, null, 'sys:config:edit', 1, 0, 1, '', null, config_menu_id, now(), null),
+    ('删除', 'DeleteConfig', null, 0, null, 2, null, 'sys:config:del', 1, 0, 1, '', null, config_menu_id, now(), null);
+end $$;
+
+select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
+
 insert into sys_config (id, name, type, "key", value, is_frontend, remark, created_time, updated_time)
 values
 (1, '状态', 'EMAIL', 'EMAIL_CONFIG_STATUS', '1', false, null, now(), null),

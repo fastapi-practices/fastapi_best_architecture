@@ -1,3 +1,23 @@
+do $$
+declare
+    dict_menu_id bigint;
+begin
+    insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
+    values ('dict.menu', 'PluginDict', '/plugins/dict', 8, 'fluent-mdl2:dictionary', 1, '/plugins/dict/views/index', null, 1, 1, 1, '', null, (select id from sys_menu where name = 'System'), now(), null)
+    returning id into dict_menu_id;
+
+    insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
+    values
+    ('新增类型', 'AddDictType', null, 0, null, 2, null, 'dict:type:add', 1, 0, 1, '', null, dict_menu_id, now(), null),
+    ('修改类型', 'EditDictType', null, 0, null, 2, null, 'dict:type:edit', 1, 0, 1, '', null, dict_menu_id, now(), null),
+    ('删除类型', 'DeleteDictType', null, 0, null, 2, null, 'dict:type:del', 1, 0, 1, '', null, dict_menu_id, now(), null),
+    ('新增数据', 'AddDictData', null, 0, null, 2, null, 'dict:data:add', 1, 0, 1, '', null, dict_menu_id, now(), null),
+    ('修改数据', 'EditDictData', null, 0, null, 2, null, 'dict:data:edit', 1, 0, 1, '', null, dict_menu_id, now(), null),
+    ('删除数据', 'DeleteDictData', null, 0, null, 2, null, 'dict:data:del', 1, 0, 1, '', null, dict_menu_id, now(), null);
+end $$;
+
+select setval(pg_get_serial_sequence('sys_menu', 'id'), coalesce(max(id), 0) + 1, true) from sys_menu;
+
 insert into sys_dict_type (id, name, code, remark, created_time, updated_time)
 values
 (1, '通用状态', 'sys_status', '系统通用状态：1/0', now(), null),
