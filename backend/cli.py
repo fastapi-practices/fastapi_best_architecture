@@ -43,7 +43,7 @@ from backend.database.db import (
     create_database_url,
 )
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.core import get_plugin_sql, get_plugins
+from backend.plugin.core import get_plugin_destroy_sql, get_plugin_sql, get_plugins
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
@@ -68,6 +68,7 @@ class CustomReloadFilter(PythonFilter):
 
 
 def setup_env_file() -> bool:
+    """交互式配置并生成 .env 环境变量文件"""
     if not ENV_EXAMPLE_FILE_PATH.exists():
         console.print('.env.example 文件不存在', style='red')
         return False
@@ -122,6 +123,7 @@ def setup_env_file() -> bool:
 
 
 async def create_database(conn: AsyncConnection) -> bool:
+    """创建或重建数据库"""
     try:
         terminate_sql = None
         if DataBaseType.mysql == settings.DATABASE_TYPE:
@@ -208,6 +210,7 @@ async def auto_init() -> None:
 
 
 async def init(db: AsyncSession, redis: RedisCli) -> None:
+    """交互式初始化数据库表结构和数据"""
     panel_content = Text()
     panel_content.append('【数据库配置】', style='bold green')
     panel_content.append('\n\n  • 类型: ')
@@ -272,6 +275,7 @@ async def init(db: AsyncSession, redis: RedisCli) -> None:
 
 
 def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT001
+    """启动 API 服务"""
     url = f'http://{host}:{port}'
     docs_url = url + settings.FASTAPI_DOCS_URL
     redoc_url = url + settings.FASTAPI_REDOC_URL
@@ -316,6 +320,7 @@ def run(host: str, port: int, reload: bool, workers: int) -> None:  # noqa: FBT0
 
 
 def run_celery_worker(log_level: Literal['info', 'debug']) -> None:
+    """启动 Celery worker 服务"""
     try:
         subprocess.run(['celery', '-A', 'backend.app.task.celery', 'worker', '-l', f'{log_level}', '-P', 'gevent'])
     except KeyboardInterrupt:
@@ -323,6 +328,7 @@ def run_celery_worker(log_level: Literal['info', 'debug']) -> None:
 
 
 def run_celery_beat(log_level: Literal['info', 'debug']) -> None:
+    """启动 Celery beat 定时任务服务"""
     try:
         subprocess.run(['celery', '-A', 'backend.app.task.celery', 'beat', '-l', f'{log_level}'])
     except KeyboardInterrupt:
@@ -330,6 +336,7 @@ def run_celery_beat(log_level: Literal['info', 'debug']) -> None:
 
 
 def run_celery_flower(port: int, basic_auth: str) -> None:
+    """启动 Celery flower 监控服务"""
     try:
         subprocess.run([
             'celery',
@@ -350,6 +357,7 @@ async def install_plugin(
     db_type: DataBaseType,
     pk_type: PrimaryKeyType,
 ) -> None:
+    """安装插件"""
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('插件安装仅在开发环境可用', code=1)
 
@@ -369,17 +377,21 @@ async def install_plugin(
 
         console.print(f'插件 {plugin_name} 安装成功', style='bold green')
 
-        sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
-        if sql_file and not no_sql:
-            console.print('开始自动执行插件 SQL 脚本...', style='bold cyan')
-            async with async_db_session.begin() as db:
-                await execute_sql_scripts(db, sql_file)
+        if not no_sql:
+            sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
+            if sql_file:
+                console.print('开始自动执行插件 SQL 脚本...', style='bold cyan')
+                async with async_db_session.begin() as db:
+                    await execute_sql_scripts(db, sql_file)
+            else:
+                console.print(f'插件 {plugin_name} 未提供初始化 SQL 脚本，跳过数据库初始化', style='yellow')
 
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
 
 
-async def remove_plugin(plugin: str | None) -> None:
+async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  # noqa: C901
+    """卸载插件"""
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('插件卸载仅在开发环境可用', code=1)
 
@@ -387,6 +399,15 @@ async def remove_plugin(plugin: str | None) -> None:
         plugin_dir = PLUGIN_DIR / plugin
         if not plugin_dir.exists():
             raise cappa.Exit(f'插件 {plugin} 不存在', code=1)
+
+        if not no_sql:
+            destroy_sql_file = await get_plugin_destroy_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
+            if destroy_sql_file:
+                console.print(f'正在执行插件 {plugin} 销毁 SQL 脚本...', style='bold cyan')
+                async with async_db_session.begin() as db:
+                    await execute_destroy_sql_scripts(db, destroy_sql_file)
+            else:
+                console.print(f'插件 {plugin} 未提供销毁 SQL 脚本，跳过数据库清理', style='yellow')
 
         console.print(f'正在卸载插件 {plugin} 依赖...', style='white')
         await uninstall_requirements_async(plugin)
@@ -426,6 +447,7 @@ async def remove_plugin(plugin: str | None) -> None:
 
 
 async def get_sql_scripts() -> list[str]:
+    """获取所有待执行的 SQL 脚本路径列表"""
     sql_scripts = []
     db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
     main_sql_file = (
@@ -448,6 +470,7 @@ async def get_sql_scripts() -> list[str]:
 
 
 async def execute_sql_scripts(db: AsyncSession, sql_scripts: str, *, is_init: bool = False) -> None:
+    """解析并执行 SQL 脚本"""
     try:
         stmts = await parse_sql_script(sql_scripts)
         for stmt in stmts:
@@ -459,11 +482,24 @@ async def execute_sql_scripts(db: AsyncSession, sql_scripts: str, *, is_init: bo
         console.print('SQL 脚本已执行完成', style='bold green')
 
 
+async def execute_destroy_sql_scripts(db: AsyncSession, sql_scripts: str) -> None:
+    """执行插件销毁 SQL 脚本"""
+    try:
+        stmts = await parse_sql_script(sql_scripts, is_destroy=True)
+        for stmt in stmts:
+            await db.execute(text(stmt))
+    except Exception as e:
+        raise cappa.Exit(f'销毁 SQL 脚本执行失败：{e}', code=1)
+
+    console.print('销毁 SQL 脚本已执行完成', style='bold green')
+
+
 async def import_table(
     app: str,
     table_schema: str,
     table_name: str,
 ) -> None:
+    """导入代码生成业务和模型列"""
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
@@ -481,6 +517,7 @@ async def import_table(
 
 
 async def generate(*, preview: bool = False) -> None:
+    """交互式代码生成"""
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
@@ -635,9 +672,13 @@ class Remove:
         str | None,
         cappa.Arg(default=None, help='要移除的插件名称'),
     ]
+    no_sql: Annotated[
+        bool,
+        cappa.Arg(default=False, help='禁用插件销毁 SQL 脚本自动执行'),
+    ]
 
     async def __call__(self) -> None:
-        await remove_plugin(self.plugin)
+        await remove_plugin(self.plugin, no_sql=self.no_sql)
 
 
 @cappa.command(help='格式化代码')
