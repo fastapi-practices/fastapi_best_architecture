@@ -70,19 +70,19 @@ class CustomReloadFilter(PythonFilter):
 def setup_env_file() -> bool:
     """交互式配置并生成 .env 环境变量文件"""
     if not ENV_EXAMPLE_FILE_PATH.exists():
-        console.error('.env.example 文件不存在')
+        console.caution('.env.example 文件不存在')
         return False
 
     try:
         env_content = Path(ENV_EXAMPLE_FILE_PATH).read_text(encoding='utf-8')
-        console.info('配置数据库连接信息...')
+        console.note('配置数据库连接信息...')
         db_type = Prompt.ask('数据库类型', choices=['mysql', 'postgresql'], default='postgresql')
         db_host = Prompt.ask('数据库主机', default='127.0.0.1')
         db_port = Prompt.ask('数据库端口', default='5432' if db_type == 'postgresql' else '3306')
         db_user = Prompt.ask('数据库用户名', default='postgres' if db_type == 'postgresql' else 'root')
         db_password = Prompt.ask('数据库密码', password=True, default='123456')
 
-        console.info('配置 Redis 连接信息...')
+        console.note('配置 Redis 连接信息...')
         redis_host = Prompt.ask('Redis 主机', default='127.0.0.1')
         redis_port = Prompt.ask('Redis 端口', default='6379')
         redis_password = Prompt.ask('Redis 密码（留空表示无密码）', password=True, default='')
@@ -114,9 +114,9 @@ def setup_env_file() -> bool:
         settings.TOKEN_SECRET_KEY = token_secret
 
         Path(ENV_FILE_PATH).write_text(env_content, encoding='utf-8')
-        console.success('.env 文件创建成功')
+        console.tip('.env 文件创建成功')
     except Exception as e:
-        console.error(f'.env 文件创建失败: {e}')
+        console.caution(f'.env 文件创建失败: {e}')
         return False
     else:
         return True
@@ -144,15 +144,15 @@ async def create_database(conn: AsyncConnection) -> bool:
 
         result = await conn.execute(text(check_sql))
         exists = result.fetchone() is not None
-        console.info(f'重建 {settings.DATABASE_SCHEMA} 数据库...')
+        console.note(f'重建 {settings.DATABASE_SCHEMA} 数据库...')
         if exists:
             if terminate_sql:
                 await conn.execute(text(terminate_sql))
             await conn.execute(text(drop_sql))
         await conn.execute(text(create_sql))
-        console.success('数据库创建成功')
+        console.tip('数据库创建成功')
     except Exception as e:
-        console.error(f'数据库创建失败: {e}')
+        console.caution(f'数据库创建失败: {e}')
         return False
     else:
         return True
@@ -241,9 +241,8 @@ async def init(db: AsyncSession, redis: RedisCli) -> None:
     )
 
     if ok.lower() == 'y':
-        console.info('开始初始化...')
         try:
-            console.info('清理 Redis 缓存')
+            console.note('清理 Redis 缓存')
             for prefix in [
                 settings.JWT_USER_REDIS_PREFIX,
                 settings.TOKEN_EXTRA_INFO_REDIS_PREFIX,
@@ -252,18 +251,18 @@ async def init(db: AsyncSession, redis: RedisCli) -> None:
             ]:
                 await redis.delete_prefix(prefix)
 
-            console.info('重建数据库表')
+            console.note('重建数据库表')
             conn = await db.connection()
             await conn.run_sync(MappedBase.metadata.drop_all)
             await conn.run_sync(MappedBase.metadata.create_all)
 
-            console.info('执行 SQL 脚本')
+            console.note('执行 SQL 脚本')
             sql_scripts = await get_sql_scripts()
             for sql_script in sql_scripts:
-                console.info(f'正在执行：{sql_script}')
+                console.note(f'正在执行：{sql_script}')
                 await execute_sql_scripts(db, sql_script, is_init=True)
 
-            console.success('初始化成功')
+            console.tip('初始化成功')
             console.print('\n快试试 [bold cyan]fba run[/bold cyan] 启动服务吧~')
         except Exception as e:
             raise cappa.Exit(f'初始化失败：{e}', code=1)
@@ -364,7 +363,7 @@ async def install_plugin(
         raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
 
     plugin_name = None
-    console.info('开始安装插件...')
+    console.note('开始安装插件...')
 
     try:
         if path:
@@ -372,7 +371,7 @@ async def install_plugin(
         if repo_url:
             plugin_name = await install_git_plugin(repo_url=repo_url)
 
-        console.success(f'插件 {plugin_name} 安装成功')
+        console.tip(f'插件 {plugin_name} 安装成功')
 
         if not no_sql:
             sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
@@ -406,16 +405,16 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
             else:
                 console.warning(f'插件 {plugin} 未提供销毁 SQL 脚本，跳过数据库清理')
 
-        console.info(f'正在卸载插件 {plugin} 依赖...')
+        console.note(f'正在卸载插件 {plugin} 依赖...')
         await uninstall_requirements_async(plugin)
 
-        console.info(f'正在备份插件 {plugin}...')
+        console.note(f'正在备份插件 {plugin}...')
         backup_file = PLUGIN_DIR / f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup.zip'
         await run_in_threadpool(zip_plugin, plugin_dir, backup_file)
         await run_in_threadpool(_remove_plugin, plugin_dir)
 
-        console.info(f'备份文件：{backup_file}')
-        console.success(f'插件 {plugin} 卸载成功')
+        console.note(f'备份文件：{backup_file}')
+        console.tip(f'插件 {plugin} 卸载成功')
         console.print()
         console.warning('请根据插件说明（README.md）移除相关配置并重启服务')
 
@@ -477,7 +476,7 @@ async def execute_sql_scripts(db: AsyncSession, sql_scripts: str, *, is_init: bo
         raise cappa.Exit(f'SQL 脚本执行失败：{e}', code=1)
 
     if not is_init:
-        console.success('SQL 脚本已执行完成')
+        console.tip('SQL 脚本已执行完成')
 
 
 async def execute_destroy_sql_scripts(db: AsyncSession, sql_scripts: str) -> None:
@@ -489,7 +488,7 @@ async def execute_destroy_sql_scripts(db: AsyncSession, sql_scripts: str) -> Non
     except Exception as e:
         raise cappa.Exit(f'销毁 SQL 脚本执行失败：{e}', code=1)
 
-    console.success('销毁 SQL 脚本已执行完成')
+    console.tip('销毁 SQL 脚本已执行完成')
 
 
 async def import_table(
@@ -508,7 +507,7 @@ async def import_table(
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
         async with async_db_session.begin() as db:
             await gen_service.import_business_and_model(db=db, obj=obj)
-        console.success('代码生成业务和模型列导入成功')
+        console.tip('代码生成业务和模型列导入成功')
         console.log('\n快试试 [bold cyan]fba codegen[/bold cyan] 生成代码吧~')
     except Exception as e:
         raise cappa.Exit(e.msg if isinstance(e, BaseExceptionError) else str(e), code=1)
@@ -577,7 +576,7 @@ async def generate(*, preview: bool = False) -> None:
                 gen_path = await gen_service.generate(db=db, pk=business)
 
             console.print()
-            console.success('代码已生成完成')
+            console.tip('代码已生成完成')
             console.print(Text('\n详情请查看：'), Text(str(gen_path), style='bold white'))
 
     except Exception as e:
@@ -802,7 +801,7 @@ class Revision:
         if self.message:
             args.extend(['-m', self.message])
         run_alembic(*args)
-        console.success('迁移文件生成成功')
+        console.tip('迁移文件生成成功')
 
 
 @cappa.command(help='升级数据库到指定版本', default_long=True)
@@ -815,7 +814,7 @@ class Upgrade:
 
     def __call__(self) -> None:
         run_alembic('upgrade', self.revision)
-        console.success(f'数据库已升级到: {self.revision}')
+        console.tip(f'数据库已升级到: {self.revision}')
 
 
 @cappa.command(help='降级数据库到指定版本', default_long=True)
@@ -828,7 +827,7 @@ class Downgrade:
 
     def __call__(self) -> None:
         run_alembic('downgrade', self.revision)
-        console.success(f'数据库已降级到: {self.revision}')
+        console.tip(f'数据库已降级到: {self.revision}')
 
 
 @cappa.command(help='显示数据库当前迁移版本')
