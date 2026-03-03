@@ -399,7 +399,7 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
         if not no_sql:
             destroy_sql_file = await get_plugin_destroy_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
             if destroy_sql_file:
-                console.info(f'正在执行插件 {plugin} 销毁 SQL 脚本...')
+                console.note(f'正在执行插件 {plugin} 销毁 SQL 脚本...')
                 async with async_db_session.begin() as db:
                     await execute_destroy_sql_scripts(db, destroy_sql_file)
             else:
