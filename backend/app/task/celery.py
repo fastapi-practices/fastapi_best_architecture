@@ -37,7 +37,7 @@ def init_celery() -> celery.Celery:
     """初始化 Celery 应用"""
 
     # TODO: Update this work if celery version >= 6.0.0
-    # https://github.com/fastapi-practices/fastapi_best_architecture/issues/321
+    # https://github.com/fastapi-practices/fastapi-best-architecture/issues/321
     # https://github.com/celery/celery/issues/7874
     celery.app.trace.build_tracer = celery_aio_pool.build_async_tracer
     celery.app.trace.reset_worker_optimizations()
