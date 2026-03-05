@@ -1,5 +1,7 @@
+set @system_menu_id = (select id from sys_menu where name = 'System');
+
 insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
-values ('config.menu', 'PluginConfig', '/plugins/config', 7, 'codicon:symbol-parameter', 1, '/plugins/config/views/index', null, 1, 1, 1, '', null, (select id from sys_menu where name = 'System'), now(), null);
+values ('config.menu', 'PluginConfig', '/plugins/config', 7, 'codicon:symbol-parameter', 1, '/plugins/config/views/index', null, 1, 1, 1, '', null, @system_menu_id, now(), null);
 
 set @config_menu_id = LAST_INSERT_ID();
 

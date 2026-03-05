@@ -1,5 +1,7 @@
+set @system_menu_id = (select id from sys_menu where name = 'System');
+
 insert into sys_menu (title, name, path, sort, icon, type, component, perms, status, display, cache, link, remark, parent_id, created_time, updated_time)
-values ('dict.menu', 'PluginDict', '/plugins/dict', 8, 'fluent-mdl2:dictionary', 1, '/plugins/dict/views/index', null, 1, 1, 1, '', null, (select id from sys_menu where name = 'System'), now(), null);
+values ('dict.menu', 'PluginDict', '/plugins/dict', 8, 'fluent-mdl2:dictionary', 1, '/plugins/dict/views/index', null, 1, 1, 1, '', null, @system_menu_id, now(), null);
 
 set @dict_menu_id = LAST_INSERT_ID();
 
