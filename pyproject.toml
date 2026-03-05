@@ -1,5 +1,5 @@
 [project]
-name = "fastapi_best_architecture"
+name = "fastapi-best-architecture"
 description = "FastAPI 企业级后端架构解决方案"
 readme = "README.md"
 requires-python = ">=3.10"

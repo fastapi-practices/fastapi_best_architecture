@@ -163,7 +163,7 @@ def register_middleware(app: FastAPI) -> None:
     )
 
     # CORS
-    # https://github.com/fastapi-practices/fastapi_best_architecture/pull/789/changes
+    # https://github.com/fastapi-practices/fastapi-best-architecture/pull/789/changes
     # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/4031
     if settings.MIDDLEWARE_CORS:
         app.add_middleware(

@@ -180,7 +180,7 @@ class GenService:
             raise errors.NotFoundError(msg='业务不存在')
 
         codes = {}
-        backend_path = 'fastapi_best_architecture/backend/app/'
+        backend_path = 'fastapi-best-architecture/backend/app/'
 
         init_files = gen_template.get_init_files(business)
         for filepath, content in init_files.items():

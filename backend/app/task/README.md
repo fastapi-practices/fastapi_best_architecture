@@ -1,7 +1,7 @@
 ## 任务介绍
 
 当前任务使用 Celery
-实现，实施方案请查看 [#225](https://github.com/fastapi-practices/fastapi_best_architecture/discussions/225)
+实现，实施方案请查看 [#225](https://github.com/fastapi-practices/fastapi-best-architecture/discussions/225)
 
 ## 定时任务
 
