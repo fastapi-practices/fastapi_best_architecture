@@ -24,16 +24,16 @@ dependencies = [
   "dulwich>=1.1.0",
   "fast-captcha>=0.3.2",
   "fastapi-pagination>=0.15.10",
-  "fastapi[standard-no-fastapi-cloud-cli]>=0.131.0",
+  "fastapi[standard-no-fastapi-cloud-cli]>=0.135.1",
   "flower>=2.0.1",
   "gevent>=25.9.1",
-  "granian>=2.7.1",
+  "granian>=2.7.2",
   "ip2loc>=1.0.0",
   "itsdangerous>=2.2.0",
   "jinja2>=3.1.6",
   "loguru>=0.7.3",
   "msgspec>=0.20.0",
-  "opentelemetry-exporter-otlp-proto-grpc>=1.39.1",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.40.0",
   "opentelemetry-instrumentation-asyncio>=0.60b1",
   "opentelemetry-instrumentation-celery>=0.60b1",
   "opentelemetry-instrumentation-fastapi>=0.60b1",
@@ -41,7 +41,7 @@ dependencies = [
   "opentelemetry-instrumentation-logging>=0.60b1",
   "opentelemetry-instrumentation-redis>=0.60b1",
   "opentelemetry-instrumentation-sqlalchemy>=0.60b1",
-  "opentelemetry-sdk>=1.39.1",
+  "opentelemetry-sdk>=1.40.0",
   "prometheus-client>=0.24.1",
   "psutil>=7.2.2",
   # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
@@ -53,12 +53,12 @@ dependencies = [
   "pyrate-limiter>=4.0.2",
   "python-jose>=3.5.0",
   "python-socketio>=5.16.1",
-  "redis[hiredis]>=7.2.0",
+  "redis[hiredis]>=7.3.0",
   "rtoml>=0.13.0",
   "sqlalchemy-crud-plus>=1.13.1",
-  "sqlalchemy[asyncio]>=2.0.46",
+  "sqlalchemy[asyncio]>=2.0.48",
   "sqlparse>=0.5.5",
-  "starlette-context>=0.4.0",
+  "starlette-context>=0.5.1",
   "user-agents>=2.2.0",
 ]
 dynamic = ["version"]
@@ -75,7 +75,7 @@ lint = [
   "prek>=0.3.3",
 ]
 server = [
-  "aio-pika>=9.5.8",
+  "aio-pika>=9.6.1",
   "wait-for-it>=2.3.0",
 ]
 
