@@ -80,7 +80,6 @@ class GetUserInfoDetail(UserInfoSchemaBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-    dept_id: int | None = Field(None, description='部门 ID')
     id: int = Field(description='用户 ID')
     uuid: str = Field(description='用户 UUID')
     status: StatusType = Field(description='状态')
@@ -89,6 +88,8 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     is_multi_login: bool = Field(description='是否允许多端登录')
     join_time: datetime = Field(description='加入时间')
     last_login_time: datetime | None = Field(None, description='最后登录时间')
+    dept_id: int | None = Field(None, description='部门 ID')
+    tenant_id: int | None = Field(None, description='租户 ID')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):

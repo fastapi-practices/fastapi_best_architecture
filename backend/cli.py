@@ -48,7 +48,6 @@ from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
 from backend.utils.console import console
-from backend.utils.dynamic_import import import_module_cached
 from backend.utils.sql_parser import parse_sql_script
 from backend.utils.timezone import timezone
 
@@ -500,8 +499,11 @@ async def import_table(
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
-    from backend.plugin.code_generator.schema.gen import ImportParam
-    from backend.plugin.code_generator.service.gen_service import gen_service
+    try:
+        from backend.plugin.code_generator.schema.gen import ImportParam
+        from backend.plugin.code_generator.service.gen_service import gen_service
+    except ImportError:
+        raise cappa.Exit('代码生成插件用法导入失败，请联系系统管理员', code=1)
 
     try:
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
@@ -518,8 +520,11 @@ async def generate(*, preview: bool = False) -> None:
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
-    from backend.plugin.code_generator.service.business_service import gen_business_service
-    from backend.plugin.code_generator.service.gen_service import gen_service
+    try:
+        from backend.plugin.code_generator.service.business_service import gen_business_service
+        from backend.plugin.code_generator.service.gen_service import gen_service
+    except ImportError:
+        raise cappa.Exit('代码生成插件用法导入失败，请联系系统管理员', code=1)
 
     try:
         ids = []
@@ -753,12 +758,6 @@ class Import:
         cappa.Arg(short='tn', help='数据库表名'),
     ]
 
-    def __post_init__(self) -> None:
-        try:
-            import_module_cached('backend.plugin.code_generator')
-        except ImportError:
-            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
-
     async def __call__(self) -> None:
         await import_table(self.app, self.table_schema, self.table_name)
 
@@ -771,12 +770,6 @@ class CodeGenerator:
         cappa.Arg(short='-p', default=False, help='仅预览将要生成的文件，不执行实际生成操作'),
     ]
     subcmd: cappa.Subcommands[Import | None] = None
-
-    def __post_init__(self) -> None:
-        try:
-            import_module_cached('backend.plugin.code_generator')
-        except ImportError:
-            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
 
     async def __call__(self) -> None:
         await generate(preview=self.preview)

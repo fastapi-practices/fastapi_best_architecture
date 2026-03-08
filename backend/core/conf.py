@@ -246,7 +246,11 @@ class Settings(BaseSettings):
     OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 100
     OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
+    # 租户
+    TENANT_ENABLED: bool = False
+
     # Plugin 配置
+    PLUGIN_REQUIRED: list[str] = ['dict']
     PLUGIN_PIP_CHINA: bool = True
     PLUGIN_PIP_INDEX_URL: str = 'https://mirrors.aliyun.com/pypi/simple/'
     PLUGIN_PIP_MAX_RETRY: int = 3

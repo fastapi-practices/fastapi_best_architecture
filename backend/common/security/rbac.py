@@ -3,10 +3,8 @@ from fastapi import Depends, Request
 from backend.common.context import ctx
 from backend.common.enums import MethodType, StatusType
 from backend.common.exception import errors
-from backend.common.log import log
 from backend.common.security.jwt import DependsJwtAuth
 from backend.core.conf import settings
-from backend.utils.dynamic_import import import_module_cached
 
 
 async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  # noqa: C901
@@ -74,12 +72,11 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  
         if path_auth_perm not in allow_perms:
             raise errors.AuthorizationError
     else:
+        # casbin 模式
         try:
-            casbin_rbac = import_module_cached('backend.plugin.casbin_rbac.rbac')
-            casbin_verify = casbin_rbac.casbin_verify
-        except (ImportError, AttributeError) as e:
-            log.error(f'正在通过 casbin 执行 RBAC 权限校验，但此插件不存在: {e}')
-            raise errors.ServerError(msg='权限校验失败，请联系系统管理员')
+            from backend.plugin.casbin_rbac.rbac import casbin_verify
+        except ImportError:
+            raise errors.ServerError(msg='Casbin RBAC 插件用法导入失败，请联系系统管理员')
 
         await casbin_verify(request)
 

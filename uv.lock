@@ -890,17 +890,17 @@ requires-dist = [
     { name = "cryptography", specifier = ">=46.0.5" },
     { name = "dulwich", specifier = ">=1.1.0" },
     { name = "fast-captcha", specifier = ">=0.3.2" },
-    { name = "fastapi", extras = ["standard-no-fastapi-cloud-cli"], specifier = ">=0.135.1" },
+    { name = "fastapi", extras = ["standard-no-fastapi-cloud-cli"], specifier = ">=0.131.0" },
     { name = "fastapi-pagination", specifier = ">=0.15.10" },
     { name = "flower", specifier = ">=2.0.1" },
     { name = "gevent", specifier = ">=25.9.1" },
-    { name = "granian", specifier = ">=2.7.2" },
+    { name = "granian", specifier = ">=2.7.1" },
     { name = "ip2loc", specifier = ">=1.0.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "msgspec", specifier = ">=0.20.0" },
-    { name = "opentelemetry-exporter-otlp-proto-grpc", specifier = ">=1.40.0" },
+    { name = "opentelemetry-exporter-otlp-proto-grpc", specifier = ">=1.39.1" },
     { name = "opentelemetry-instrumentation-asyncio", specifier = ">=0.60b1" },
     { name = "opentelemetry-instrumentation-celery", specifier = ">=0.60b1" },
     { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.60b1" },
@@ -908,7 +908,7 @@ requires-dist = [
     { name = "opentelemetry-instrumentation-logging", specifier = ">=0.60b1" },
     { name = "opentelemetry-instrumentation-redis", specifier = ">=0.60b1" },
     { name = "opentelemetry-instrumentation-sqlalchemy", specifier = ">=0.60b1" },
-    { name = "opentelemetry-sdk", specifier = ">=1.40.0" },
+    { name = "opentelemetry-sdk", specifier = ">=1.39.1" },
     { name = "prometheus-client", specifier = ">=0.24.1" },
     { name = "psutil", specifier = ">=7.2.2" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.2.10" },
@@ -919,12 +919,12 @@ requires-dist = [
     { name = "pyrate-limiter", specifier = ">=4.0.2" },
     { name = "python-jose", specifier = ">=3.5.0" },
     { name = "python-socketio", specifier = ">=5.16.1" },
-    { name = "redis", extras = ["hiredis"], specifier = ">=7.3.0" },
+    { name = "redis", extras = ["hiredis"], specifier = ">=7.2.0" },
     { name = "rtoml", specifier = ">=0.13.0" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.48" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.46" },
     { name = "sqlalchemy-crud-plus", specifier = ">=1.13.1" },
     { name = "sqlparse", specifier = ">=0.5.5" },
-    { name = "starlette-context", specifier = ">=0.5.1" },
+    { name = "starlette-context", specifier = ">=0.4.0" },
     { name = "user-agents", specifier = ">=2.2.0" },
 ]
 
@@ -935,7 +935,7 @@ dev = [
 ]
 lint = [{ name = "prek", specifier = ">=0.3.3" }]
 server = [
-    { name = "aio-pika", specifier = ">=9.6.1" },
+    { name = "aio-pika", specifier = ">=9.5.8" },
     { name = "wait-for-it", specifier = ">=2.3.0" },
 ]
 

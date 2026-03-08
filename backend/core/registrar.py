@@ -61,6 +61,15 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     # 启动缓存 Pub/Sub 监听器
     cache_pubsub_manager.start_listener()
 
+    # 注册租户 SQLAlchemy 监听器
+    if settings.TENANT_ENABLED:
+        try:
+            from backend.plugin.tenant.listener import register_tenant_sqlalchemy_listeners
+        except ImportError:
+            raise ImportError('租户插件监听器导入失败，请联系系统管理员')
+        else:
+            register_tenant_sqlalchemy_listeners()
+
     yield
 
     # 停止缓存 Pub/Sub 监听器
@@ -137,6 +146,15 @@ def register_middleware(app: FastAPI) -> None:
 
     # State
     app.add_middleware(StateMiddleware)
+
+    # Tenant
+    if settings.TENANT_ENABLED:
+        try:
+            from backend.plugin.tenant.middleware.tenant_middleware import TenantMiddleware
+        except ImportError:
+            raise ImportError('租户插件中间件导入失败，请联系系统管理员')
+        else:
+            app.add_middleware(TenantMiddleware)
 
     # JWT auth
     app.add_middleware(
