@@ -147,15 +147,6 @@ def register_middleware(app: FastAPI) -> None:
     # State
     app.add_middleware(StateMiddleware)
 
-    # Tenant
-    if settings.TENANT_ENABLED:
-        try:
-            from backend.plugin.tenant.middleware.tenant_middleware import TenantMiddleware
-        except ImportError:
-            raise ImportError('租户插件中间件导入失败，请联系系统管理员')
-        else:
-            app.add_middleware(TenantMiddleware)
-
     # JWT auth
     app.add_middleware(
         AuthenticationMiddleware,

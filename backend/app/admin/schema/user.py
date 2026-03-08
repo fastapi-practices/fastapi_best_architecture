@@ -22,6 +22,7 @@ class AuthLoginParam(AuthSchemaBase):
 
     uuid: str | None = Field(None, description='验证码 UUID')
     captcha: str | None = Field(None, description='验证码')
+    tenant_id: int | None = Field(None, description='租户 ID')
 
 
 class AddUserParam(AuthSchemaBase):

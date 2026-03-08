@@ -190,6 +190,38 @@ def get_token(request: Request) -> str:
     return token
 
 
+async def check_tenant_status(db: AsyncSession, tenant_id: int) -> None:
+    """
+    校验租户状态
+
+    :param db: 数据库会话
+    :param tenant_id: 租户 ID
+    :return:
+    """
+    if not settings.TENANT_ENABLED or tenant_id is None or tenant_id == settings.TENANT_DEFAULT_ID:
+        return
+
+    try:
+        from backend.plugin.tenant.crud.crud_package import tenant_package_dao
+        from backend.plugin.tenant.crud.crud_tenant import tenant_dao
+    except ImportError:
+        raise errors.ServerError(msg='租户插件用法导入失败，请联系系统管理员')
+
+    tenant = await tenant_dao.get(db, tenant_id)
+    if not tenant:
+        raise errors.NotFoundError(msg='租户不存在，请联系系统管理员')
+
+    if tenant.status == 0:
+        raise errors.AuthorizationError(msg='租户已被禁用，请联系系统管理员')
+
+    if tenant.expire_time and tenant.expire_time < timezone.now():
+        raise errors.AuthorizationError(msg='租户已过期，请联系系统管理员')
+
+    package = await tenant_package_dao.get(db, tenant.package_id)
+    if package and package.status == 0:
+        raise errors.AuthorizationError(msg='租户套餐已被禁用，请联系系统管理员')
+
+
 async def get_current_user(db: AsyncSession, pk: int) -> User:
     """
     获取当前用户
@@ -214,6 +246,10 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
         role_status = [role.status for role in user.roles]
         if all(status == 0 for status in role_status):
             raise errors.AuthorizationError(msg='用户所属角色已被锁定，请联系系统管理员')
+
+    if hasattr(user, 'tenant_id'):
+        await check_tenant_status(db, user.tenant_id)
+
     return user
 
 
