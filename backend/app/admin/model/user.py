@@ -14,14 +14,17 @@ class User(Base, TenantMixin):
     """用户表"""
 
     __tablename__ = 'sys_user'
-    __table_args__ = (
-        sa.UniqueConstraint(
-            'username',
-            *(['tenant_id'] if settings.TENANT_ENABLED else []),
-            name='uk_sys_user_username',
-        ),
-        sa.UniqueConstraint('email', *(['tenant_id'] if settings.TENANT_ENABLED else []), name='uk_sys_user_email'),
-    )
+
+    if settings.TENANT_ENABLED:
+        __table_args__ = (
+            sa.UniqueConstraint('username', 'tenant_id'),
+            sa.UniqueConstraint('email', 'tenant_id'),
+        )
+    else:
+        __table_args__ = (
+            sa.UniqueConstraint('username'),
+            sa.UniqueConstraint('email'),
+        )
 
     id: Mapped[id_key] = mapped_column(init=False)
     uuid: Mapped[str] = mapped_column(sa.String(64), init=False, default_factory=uuid4_str, unique=True)
