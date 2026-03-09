@@ -4,6 +4,8 @@ import os
 import re
 import sys
 
+from typing import Any
+
 from loguru import logger
 
 from backend.core.conf import settings
@@ -35,23 +37,36 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def default_formatter(record: logging.LogRecord) -> str:
-    """默认日志格式化程序"""
+def default_formatter(record: dict) -> str:
+    """
+    默认日志格式化程序
 
+    :param record: Loguru Record 对象
+    :return:
+    """
     # 重写 sqlalchemy echo 输出
     # https://github.com/sqlalchemy/sqlalchemy/discussions/12791
     record_name = record['name'] or ''
     if record_name.startswith('sqlalchemy'):
         record['message'] = re.sub(r'\s+', ' ', record['message']).strip()
 
-    return settings.LOG_FORMAT if settings.LOG_FORMAT.endswith('\n') else f'{settings.LOG_FORMAT}\n'
+    base_format = settings.LOG_FORMAT if settings.LOG_FORMAT.endswith('\n') else f'{settings.LOG_FORMAT}\n'
+    if record.get('exception') is not None:
+        base_format += '{exception}\n'
+
+    return base_format
 
 
-def request_id_filter(record: logging.LogRecord) -> logging.LogRecord:
-    """请求 ID 过滤器"""
+def request_id_filter(record: dict) -> bool:
+    """
+    请求 ID 过滤器
+
+    :param record: Loguru Record 对象
+    :return:
+    """
     rid = get_request_trace_id()
     record['request_id'] = rid[: settings.TRACE_ID_LOG_LENGTH]
-    return record
+    return True
 
 
 def setup_logging() -> None:
@@ -84,14 +99,14 @@ def setup_logging() -> None:
 
     # 配置 loguru 处理器
     logger.configure(
-        handlers=[
+        handlers=[  # type: ignore[arg-type]
             {
                 'sink': sys.stdout,
                 'level': settings.LOG_STD_LEVEL,
                 'format': default_formatter,
                 'filter': lambda record: request_id_filter(record),
-            },
-        ],
+            }
+        ]
     )
 
 
@@ -109,12 +124,12 @@ def set_custom_logfile() -> None:
         filename = filepath.split(os.sep)[-1]
         original_filename = filename.split('.')[0]
         if '-' in original_filename:
-            return LOG_DIR / f'{original_filename}.log'
-        return LOG_DIR / f'{original_filename}_{timezone.now().strftime("%Y-%m-%d")}.log'
+            return str(LOG_DIR / f'{original_filename}.log')
+        return str(LOG_DIR / f'{original_filename}_{timezone.now().strftime("%Y-%m-%d")}.log')
 
     # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
-    log_config = {
+    log_config: dict[str, Any] = {
         'format': default_formatter,
         'enqueue': True,
         'rotation': '00:00',
