@@ -98,7 +98,7 @@ class JwtAuthMiddleware(AuthenticationBackend):
 
         # 设置用户 ID 和租户 ID 到上下文
         ctx.user_id = user.id
-        ctx.tenant_id = user.tenant_id
+        ctx.tenant_id = getattr(user, 'tenant_id', settings.TENANT_DEFAULT_ID)
 
         # 请注意，此返回使用非标准模式，所以在认证通过时，将丢失某些标准特性
         # 标准返回模式请查看：https://www.starlette.io/authentication/

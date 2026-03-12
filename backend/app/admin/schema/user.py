@@ -23,7 +23,8 @@ class AuthLoginParam(AuthSchemaBase):
 
     uuid: str | None = Field(None, description='验证码 UUID')
     captcha: str | None = Field(None, description='验证码')
-    tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
+    if settings.TENANT_ENABLED:
+        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class AddUserParam(AuthSchemaBase):
@@ -93,8 +94,6 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     dept_id: int | None = Field(None, description='部门 ID')
     if settings.TENANT_ENABLED:
         tenant_id: int = Field(description='租户 ID')
-    else:
-        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):

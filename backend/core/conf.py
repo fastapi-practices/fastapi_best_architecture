@@ -247,7 +247,7 @@ class Settings(BaseSettings):
     OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
     # 租户
-    TENANT_ENABLED: bool = False
+    TENANT_ENABLED: bool = True
     TENANT_DEFAULT_ID: int = 0
 
     # Plugin 配置

@@ -81,7 +81,7 @@ class AuthService:
         )
         return access_token_data.access_token, user
 
-    async def login(
+    async def login(  # noqa: C901
         self,
         *,
         db: AsyncSession,
@@ -99,6 +99,7 @@ class AuthService:
         :return:
         """
         user = None
+        tenant_id = settings.TENANT_DEFAULT_ID
         try:
             await load_login_config(db)
             if settings.LOGIN_CAPTCHA_ENABLED:
@@ -111,8 +112,10 @@ class AuthService:
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
                 await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{obj.uuid}')
 
-            ctx.tenant_id = obj.tenant_id  # 用于操作日志
-            await check_tenant_status(db, obj.tenant_id)
+            if settings.TENANT_ENABLED:
+                tenant_id = obj.tenant_id
+                await check_tenant_status(db, tenant_id)
+            ctx.tenant_id = tenant_id  # 用于操作日志
             user, days_remaining = await self.user_verify(db, obj.username, obj.password)
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
@@ -153,7 +156,7 @@ class AuthService:
                 login_time=timezone.now(),
                 status=LoginLogStatusType.fail.value,
                 msg=e.msg,
-                tenant_id=obj.tenant_id,
+                tenant_id=tenant_id,
             )
             raise errors.RequestError(code=e.code, msg=e.msg, background=task)
         except Exception as e:
@@ -167,7 +170,7 @@ class AuthService:
                 login_time=timezone.now(),
                 status=LoginLogStatusType.success.value,
                 msg=t('success.login.success'),
-                tenant_id=obj.tenant_id,
+                tenant_id=tenant_id,
             )
             data = GetLoginToken(
                 access_token=access_token_data.access_token,

@@ -37,8 +37,6 @@ class CreateOperaLogParam(OperaLogSchemaBase):
 
     if settings.TENANT_ENABLED:
         tenant_id: int = Field(description='租户 ID')
-    else:
-        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class UpdateOperaLogParam(OperaLogSchemaBase):
