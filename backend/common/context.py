@@ -22,7 +22,7 @@ class TypedContextProtocol(Protocol):
     language: str
 
     user_id: int | None
-    tenant_id: int | None
+    tenant_id: int
 
 
 class TypedContext(TypedContextProtocol, _Context):

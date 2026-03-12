@@ -8,6 +8,7 @@ from backend.app.admin.schema.dept import GetDeptDetail
 from backend.app.admin.schema.role import GetRoleWithRelationDetail
 from backend.common.enums import StatusType
 from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase, ser_string
+from backend.core.conf import settings
 
 
 class AuthSchemaBase(SchemaBase):
@@ -22,7 +23,7 @@ class AuthLoginParam(AuthSchemaBase):
 
     uuid: str | None = Field(None, description='验证码 UUID')
     captcha: str | None = Field(None, description='验证码')
-    tenant_id: int | None = Field(None, description='租户 ID')
+    tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class AddUserParam(AuthSchemaBase):
@@ -90,7 +91,10 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     join_time: datetime = Field(description='加入时间')
     last_login_time: datetime | None = Field(None, description='最后登录时间')
     dept_id: int | None = Field(None, description='部门 ID')
-    tenant_id: int | None = Field(None, description='租户 ID')
+    if settings.TENANT_ENABLED:
+        tenant_id: int = Field(description='租户 ID')
+    else:
+        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):

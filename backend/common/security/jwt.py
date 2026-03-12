@@ -198,14 +198,17 @@ async def check_tenant_status(db: AsyncSession, tenant_id: int) -> None:
     :param tenant_id: 租户 ID
     :return:
     """
-    if not settings.TENANT_ENABLED or tenant_id is None or tenant_id == settings.TENANT_DEFAULT_ID:
+    if not settings.TENANT_ENABLED:
+        return
+
+    if tenant_id == settings.TENANT_DEFAULT_ID:
         return
 
     try:
         from backend.plugin.tenant.crud.crud_package import tenant_package_dao
         from backend.plugin.tenant.crud.crud_tenant import tenant_dao
     except ImportError:
-        raise errors.ServerError(msg='租户插件用法导入失败，请联系系统管理员')
+        raise errors.ServerError(msg='租户插件方法导入失败，请联系系统管理员')
 
     tenant = await tenant_dao.get(db, tenant_id)
     if not tenant:

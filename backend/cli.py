@@ -43,7 +43,7 @@ from backend.database.db import (
     create_database_url,
 )
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.core import get_plugin_destroy_sql, get_plugin_sql, get_plugins
+from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_plugin_sql, get_plugins
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
@@ -444,23 +444,22 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
 
 async def get_sql_scripts() -> list[str]:
     """获取所有待执行的 SQL 脚本路径列表"""
-    sql_scripts = []
+    sql_scripts: list[str] = []
     db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
-    main_sql_file = (
-        db_script_dir / 'init_test_data.sql'
-        if PrimaryKeyType.autoincrement == settings.DATABASE_PK_MODE
-        else db_script_dir / 'init_snowflake_test_data.sql'
+    main_sql_file = db_script_dir / build_sql_filename(
+        'init',
+        settings.DATABASE_PK_MODE,
+        suffix='test_data',
+        tenant=settings.TENANT_ENABLED,
     )
 
-    main_sql_path = anyio.Path(main_sql_file)
-    if await main_sql_path.exists():
+    if await anyio.Path(main_sql_file).exists():
         sql_scripts.append(str(main_sql_file))
 
-    plugins = get_plugins()
-    for plugin in plugins:
+    for plugin in get_plugins():
         plugin_sql = await get_plugin_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
         if plugin_sql:
-            sql_scripts.append(str(plugin_sql))
+            sql_scripts.append(plugin_sql)
 
     return sql_scripts
 

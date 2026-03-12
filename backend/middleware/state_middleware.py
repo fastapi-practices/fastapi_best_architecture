@@ -2,6 +2,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from backend.common.context import ctx
+from backend.core.conf import settings
 from backend.utils.request_parse import parse_ip_info, parse_user_agent_info
 
 
@@ -27,6 +28,9 @@ class StateMiddleware(BaseHTTPMiddleware):
         ctx.os = ua_info.os
         ctx.browser = ua_info.browser
         ctx.device = ua_info.device
+
+        # 为非授权接口设置默认租户 ID
+        ctx.tenant_id = settings.TENANT_DEFAULT_ID
 
         response = await call_next(request)
 

@@ -115,6 +115,10 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 log.info(f'{ctx.ip: <15} | {method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
 
             if should_log_opera and request.method != 'OPTIONS':
+                tenant_id = settings.TENANT_DEFAULT_ID
+                if settings.TENANT_ENABLED:
+                    tenant_id = ctx.tenant_id
+
                 opera_log_in = CreateOperaLogParam(
                     trace_id=get_request_trace_id(),
                     username=username,
@@ -135,6 +139,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     msg=msg,
                     cost_time=elapsed,
                     opera_time=ctx.start_time,
+                    tenant_id=tenant_id,
                 )
                 await self.opera_log_queue.put(opera_log_in)
 

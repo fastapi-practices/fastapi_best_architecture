@@ -248,6 +248,7 @@ class Settings(BaseSettings):
 
     # 租户
     TENANT_ENABLED: bool = False
+    TENANT_DEFAULT_ID: int = 0
 
     # Plugin 配置
     PLUGIN_REQUIRED: list[str] = ['dict']
