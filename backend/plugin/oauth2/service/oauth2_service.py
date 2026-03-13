@@ -88,6 +88,7 @@ class OAuth2Service:
         # 创建 token
         access_token_data = await jwt.create_access_token(
             sys_user.id,
+            getattr(sys_user, 'tenant_id', settings.TENANT_DEFAULT_ID),
             multi_login=sys_user.is_multi_login,
             # extra info
             username=sys_user.username,

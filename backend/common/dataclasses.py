@@ -56,9 +56,12 @@ class NewToken:
 
 @dataclasses.dataclass
 class TokenPayload:
+    """JWT 载荷，tenant_id 为多租户鉴权必填字段。"""
+
     id: int
     session_uuid: str
     expire_time: datetime
+    tenant_id: int
 
 
 @dataclasses.dataclass

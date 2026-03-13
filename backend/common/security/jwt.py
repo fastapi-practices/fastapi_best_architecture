@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.model import User
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
+from backend.common.context import ctx
 from backend.common.dataclasses import AccessToken, NewToken, RefreshToken, TokenPayload
 from backend.common.exception import errors
 from backend.core.conf import settings
@@ -51,7 +52,8 @@ def jwt_decode(token: str) -> TokenPayload:
         session_uuid = payload.get('session_uuid')
         user_id = payload.get('sub')
         expire = payload.get('exp')
-        if not session_uuid or not user_id or not expire:
+        tenant_id = payload.get('tenant_id')
+        if not session_uuid or not user_id or not expire or not tenant_id:
             raise errors.TokenError(msg='Token 无效')
     except ExpiredSignatureError:
         raise errors.TokenError(msg='Token 已过期')
@@ -61,14 +63,22 @@ def jwt_decode(token: str) -> TokenPayload:
         id=int(user_id),
         session_uuid=session_uuid,
         expire_time=timezone.from_datetime(timezone.to_utc(expire)),
+        tenant_id=int(tenant_id),
     )
 
 
-async def create_access_token(user_id: int, *, multi_login: bool, **kwargs) -> AccessToken:
+async def create_access_token(
+    user_id: int,
+    tenant_id: int,
+    *,
+    multi_login: bool,
+    **kwargs,
+) -> AccessToken:
     """
     生成加密 token
 
     :param user_id: 用户 ID
+    :param tenant_id: 租户 ID
     :param multi_login: 是否允许多端登录
     :param kwargs: token 额外信息
     :return:
@@ -79,6 +89,7 @@ async def create_access_token(user_id: int, *, multi_login: bool, **kwargs) -> A
         'session_uuid': session_uuid,
         'exp': timezone.to_utc(expire).timestamp(),
         'sub': str(user_id),
+        'tenant_id': tenant_id,
     })
 
     if not multi_login:
@@ -132,6 +143,7 @@ async def create_new_token(
     refresh_token: str,
     session_uuid: str,
     user_id: int,
+    tenant_id: int,
     *,
     multi_login: bool,
     **kwargs,
@@ -142,6 +154,7 @@ async def create_new_token(
     :param refresh_token: 刷新 token
     :param session_uuid: 会话 UUID
     :param user_id: 用户 ID
+    :param tenant_id: 租户 ID
     :param multi_login: 是否允许多端登录
     :param kwargs: token 附加信息
     :return:
@@ -153,7 +166,12 @@ async def create_new_token(
     await redis_client.delete(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{user_id}:{session_uuid}')
     await redis_client.delete(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{session_uuid}')
 
-    new_access_token = await create_access_token(user_id, multi_login=multi_login, **kwargs)
+    new_access_token = await create_access_token(
+        user_id,
+        tenant_id,
+        multi_login=multi_login,
+        **kwargs,
+    )
     new_refresh_token = await create_refresh_token(new_access_token.session_uuid, user_id, multi_login=multi_login)
     return NewToken(
         new_access_token=new_access_token.access_token,
@@ -302,6 +320,7 @@ async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
     :return:
     """
     token_payload = jwt_decode(token)
+    ctx.tenant_id = token_payload.tenant_id
     user_id = token_payload.id
     redis_token = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
     if not redis_token:
