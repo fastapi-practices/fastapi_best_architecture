@@ -20,11 +20,11 @@ class AuthSchemaBase(SchemaBase):
 
 class AuthLoginParam(AuthSchemaBase):
     """用户登录参数"""
+    if settings.TENANT_ENABLED:
+        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
     uuid: str | None = Field(None, description='验证码 UUID')
     captcha: str | None = Field(None, description='验证码')
-    if settings.TENANT_ENABLED:
-        tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
 
 class AddUserParam(AuthSchemaBase):
@@ -83,6 +83,10 @@ class GetUserInfoDetail(UserInfoSchemaBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+    if settings.TENANT_ENABLED:
+        tenant_id: int = Field(description='租户 ID')
+
+    dept_id: int | None = Field(None, description='部门 ID')
     id: int = Field(description='用户 ID')
     uuid: str = Field(description='用户 UUID')
     status: StatusType = Field(description='状态')
@@ -91,9 +95,6 @@ class GetUserInfoDetail(UserInfoSchemaBase):
     is_multi_login: bool = Field(description='是否允许多端登录')
     join_time: datetime = Field(description='加入时间')
     last_login_time: datetime | None = Field(None, description='最后登录时间')
-    dept_id: int | None = Field(None, description='部门 ID')
-    if settings.TENANT_ENABLED:
-        tenant_id: int = Field(description='租户 ID')
 
 
 class GetUserInfoWithRelationDetail(GetUserInfoDetail):

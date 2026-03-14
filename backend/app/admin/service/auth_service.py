@@ -101,6 +101,7 @@ class AuthService:
         """
         user = None
         tenant_id = settings.TENANT_DEFAULT_ID
+
         try:
             await load_login_config(db)
             if settings.LOGIN_CAPTCHA_ENABLED:
@@ -116,13 +117,16 @@ class AuthService:
             if settings.TENANT_ENABLED:
                 tenant_id = obj.tenant_id
                 await check_tenant_status(db, tenant_id)
-            ctx.tenant_id = tenant_id  # 用于操作日志
+
+            # 登录前先写入当前租户，供后续登录请求流程使用
+            ctx.tenant_id = tenant_id
+
             user, days_remaining = await self.user_verify(db, obj.username, obj.password)
             await user_dao.update_login_time(db, obj.username)
             await db.refresh(user)
             access_token_data = await create_access_token(
                 user.id,
-                getattr(user, 'tenant_id', tenant_id),
+                user.tenant_id,
                 multi_login=user.is_multi_login,
                 # extra info
                 username=user.username,
@@ -222,7 +226,7 @@ class AuthService:
             raise errors.RequestError(msg='Refresh Token 已过期，请重新登录')
         token_payload = jwt_decode(refresh_token)
 
-        user = await user_dao.get(db, token_payload.id)
+        user = await user_dao.get(db, token_payload.user_id)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         if not user.status:
@@ -233,7 +237,7 @@ class AuthService:
             refresh_token,
             token_payload.session_uuid,
             user.id,
-            getattr(user, 'tenant_id', token_payload.tenant_id),
+            user.tenant_id,
             multi_login=user.is_multi_login,
             # extra info
             username=user.username,
@@ -263,7 +267,7 @@ class AuthService:
         try:
             token = get_token(request)
             token_payload = jwt_decode(token)
-            user_id = token_payload.id
+            user_id = token_payload.user_id
             session_uuid = token_payload.session_uuid
             refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         except errors.TokenError:

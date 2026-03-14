@@ -40,7 +40,7 @@ async def get_sessions(
     for key in token_keys:
         token = await redis_client.get(key)
         token_payload = jwt_decode(token)
-        user_id = token_payload.id
+        user_id = token_payload.user_id
         session_uuid = token_payload.session_uuid
         token_detail = GetTokenDetail(
             id=user_id,

@@ -53,14 +53,14 @@ def jwt_decode(token: str) -> TokenPayload:
         user_id = payload.get('sub')
         expire = payload.get('exp')
         tenant_id = payload.get('tenant_id')
-        if not session_uuid or not user_id or not expire or not tenant_id:
+        if not session_uuid or not user_id or not expire or tenant_id is None:
             raise errors.TokenError(msg='Token 无效')
     except ExpiredSignatureError:
         raise errors.TokenError(msg='Token 已过期')
     except (JWTError, Exception):
         raise errors.TokenError(msg='Token 无效')
     return TokenPayload(
-        id=int(user_id),
+        user_id=int(user_id),
         session_uuid=session_uuid,
         expire_time=timezone.from_datetime(timezone.to_utc(expire)),
         tenant_id=int(tenant_id),
@@ -298,6 +298,26 @@ async def get_jwt_user(user_id: int) -> GetUserInfoWithRelationDetail:
     return user
 
 
+async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
+    """
+    JWT 认证
+
+    :param token: JWT token
+    :return:
+    """
+    token_payload = jwt_decode(token)
+    ctx.user_id = token_payload.user_id
+    ctx.tenant_id = token_payload.tenant_id
+    redis_token = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{ctx.user_id}:{token_payload.session_uuid}')
+    if not redis_token:
+        raise errors.TokenError(msg='Token 已过期')
+
+    if token != redis_token:
+        raise errors.TokenError(msg='Token 已失效')
+
+    return await get_jwt_user(ctx.user_id)
+
+
 def superuser_verify(request: Request, _token: str = DependsJwtAuth) -> bool:
     """
     验证当前用户超级管理员权限
@@ -310,26 +330,6 @@ def superuser_verify(request: Request, _token: str = DependsJwtAuth) -> bool:
     if not superuser or not request.user.is_staff:
         raise errors.AuthorizationError
     return superuser
-
-
-async def jwt_authentication(token: str) -> GetUserInfoWithRelationDetail:
-    """
-    JWT 认证
-
-    :param token: JWT token
-    :return:
-    """
-    token_payload = jwt_decode(token)
-    ctx.tenant_id = token_payload.tenant_id
-    user_id = token_payload.id
-    redis_token = await redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{user_id}:{token_payload.session_uuid}')
-    if not redis_token:
-        raise errors.TokenError(msg='Token 已过期')
-
-    if token != redis_token:
-        raise errors.TokenError(msg='Token 已失效')
-
-    return await get_jwt_user(user_id)
 
 
 # 超级管理员鉴权依赖注入
