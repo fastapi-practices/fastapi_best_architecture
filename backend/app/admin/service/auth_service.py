@@ -140,6 +140,7 @@ class AuthService:
             refresh_token_data = await create_refresh_token(
                 access_token_data.session_uuid,
                 user.id,
+                user.tenant_id,
                 multi_login=user.is_multi_login,
             )
             response.set_cookie(
@@ -213,25 +214,32 @@ class AuthService:
         return list(codes)
 
     @staticmethod
-    async def refresh_token(*, db: AsyncSession, request: Request) -> GetNewToken:
+    async def refresh_token(*, db: AsyncSession, request: Request, response: Response) -> GetNewToken:
         """
         刷新令牌
 
         :param db: 数据库会话
         :param request: FastAPI 请求对象
+        :param response: FastAPI 响应对象
         :return:
         """
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_KEY)
         if not refresh_token:
             raise errors.RequestError(msg='Refresh Token 已过期，请重新登录')
-        token_payload = jwt_decode(refresh_token)
 
+        token_payload = jwt_decode(refresh_token)
         user = await user_dao.get(db, token_payload.user_id)
         if not user:
             raise errors.NotFoundError(msg='用户不存在')
         if not user.status:
             raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
-        if not user.is_multi_login and await redis_client.get_prefix(f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*'):
+
+        await check_tenant_status(db, user.tenant_id)
+        if not user.is_multi_login and [
+            key
+            for key in await redis_client.get_prefix(f'{settings.TOKEN_REDIS_PREFIX}:{user.id}:*')
+            if not key.endswith(f':{token_payload.session_uuid}')
+        ]:
             raise errors.ForbiddenError(msg='此用户已在异地登录，请重新登录并及时修改密码')
         new_token = await create_new_token(
             refresh_token,
@@ -247,6 +255,13 @@ class AuthService:
             os=ctx.os,
             browser=ctx.browser,
             device_type=ctx.device,
+        )
+        response.set_cookie(
+            key=settings.COOKIE_REFRESH_TOKEN_KEY,
+            value=new_token.new_refresh_token,
+            max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+            expires=timezone.to_utc(new_token.new_refresh_token_expire_time),
+            httponly=True,
         )
         data = GetNewToken(
             access_token=new_token.new_access_token,

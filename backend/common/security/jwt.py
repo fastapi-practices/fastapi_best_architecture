@@ -112,12 +112,13 @@ async def create_access_token(
     return AccessToken(access_token=access_token, access_token_expire_time=expire, session_uuid=session_uuid)
 
 
-async def create_refresh_token(session_uuid: str, user_id: int, *, multi_login: bool) -> RefreshToken:
+async def create_refresh_token(session_uuid: str, user_id: int, tenant_id: int, *, multi_login: bool) -> RefreshToken:
     """
     生成加密刷新 token，仅用于创建新的 token
 
     :param session_uuid: 会话 UUID
     :param user_id: 用户 ID
+    :param tenant_id: 租户 ID
     :param multi_login: 是否允许多端登录
     :return:
     """
@@ -126,6 +127,7 @@ async def create_refresh_token(session_uuid: str, user_id: int, *, multi_login: 
         'session_uuid': session_uuid,
         'exp': timezone.to_utc(expire).timestamp(),
         'sub': str(user_id),
+        'tenant_id': tenant_id,
     })
 
     if not multi_login:
@@ -172,7 +174,12 @@ async def create_new_token(
         multi_login=multi_login,
         **kwargs,
     )
-    new_refresh_token = await create_refresh_token(new_access_token.session_uuid, user_id, multi_login=multi_login)
+    new_refresh_token = await create_refresh_token(
+        new_access_token.session_uuid,
+        user_id,
+        tenant_id,
+        multi_login=multi_login,
+    )
     return NewToken(
         new_access_token=new_access_token.access_token,
         new_access_token_expire_time=new_access_token.access_token_expire_time,

@@ -20,6 +20,7 @@ class AuthSchemaBase(SchemaBase):
 
 class AuthLoginParam(AuthSchemaBase):
     """用户登录参数"""
+
     if settings.TENANT_ENABLED:
         tenant_id: int = Field(settings.TENANT_DEFAULT_ID, description='租户 ID')
 
