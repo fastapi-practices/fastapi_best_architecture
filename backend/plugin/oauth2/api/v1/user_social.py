@@ -17,7 +17,11 @@ async def get_user_bindings(db: CurrentSession, request: Request) -> ResponseSch
 
 @router.get('/me/binding', summary='获取绑定授权链接', dependencies=[DependsJwtAuth])
 async def get_binding_auth_url(request: Request, source: UserSocialType) -> ResponseSchemaModel[str]:
-    binding_url = await user_social_service.get_binding_auth_url(user_id=request.user.id, source=source)
+    binding_url = await user_social_service.get_binding_auth_url(
+        user_id=request.user.id,
+        tenant_id=request.user.tenant_id,
+        source=source,
+    )
     return response_base.success(data=binding_url)
 
 

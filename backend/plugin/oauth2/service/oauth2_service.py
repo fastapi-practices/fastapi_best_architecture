@@ -1,9 +1,11 @@
 import json
+import uuid
 
 from typing import Any
+from urllib.parse import urlparse
 
 from fast_captcha import text_captcha
-from fastapi import BackgroundTasks, Response
+from fastapi import BackgroundTasks, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.admin.crud.crud_user import user_dao
@@ -21,11 +23,54 @@ from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
 from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 from backend.plugin.oauth2.service.user_social_service import user_social_service
+from backend.plugin.oauth2.utils import get_oauth2_authorization_url
 from backend.utils.timezone import timezone
 
 
 class OAuth2Service:
     """OAuth2 认证服务类"""
+
+    async def get_login_auth_url(self, *, db: AsyncSession, request: Request, source: UserSocialType) -> str:
+        """
+        获取 OAuth2 登录授权链接
+
+        :param db: 数据库会话
+        :param request: FastAPI 请求对象
+        :param source: 社交平台
+        :return:
+        """
+        tenant_id = settings.TENANT_DEFAULT_ID
+
+        if settings.TENANT_ENABLED:
+            try:
+                from backend.plugin.tenant.service.tenant_service import tenant_service
+            except ImportError:
+                raise errors.ServerError(msg='租户插件方法导入失败，请联系系统管理员')
+
+            tenant_domain = request.headers.get('Origin') or request.headers.get('Referer')
+            if tenant_domain:
+                tenant_domain = urlparse(tenant_domain).hostname
+            else:
+                tenant_domain = (
+                    request.headers.get('X-Forwarded-Host')
+                    or request.headers.get('X-Original-Host')
+                    or request.url.hostname
+                )
+
+            if tenant_domain:
+                tenant_domain = tenant_domain.strip().split(',')[0].strip().lower()
+                tenant = await tenant_service.get_by_domain(db=db, domain=tenant_domain)
+                if tenant:
+                    tenant_id = tenant.id
+
+        state = str(uuid.uuid4())
+        await redis_client.setex(
+            f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
+            settings.OAUTH2_STATE_EXPIRE_SECONDS,
+            json.dumps({'type': UserSocialAuthType.login.value, 'tenant_id': tenant_id}),
+        )
+
+        return await get_oauth2_authorization_url(source=source, state=state)
 
     @staticmethod
     async def login(
@@ -33,6 +78,7 @@ class OAuth2Service:
         db: AsyncSession,
         response: Response,
         background_tasks: BackgroundTasks,
+        tenant_id: int,
         sid: str,
         source: UserSocialType,
         username: str | None = None,
@@ -46,6 +92,7 @@ class OAuth2Service:
         :param db: 数据库会话
         :param response: FastAPI 响应对象
         :param background_tasks: FastAPI 后台任务
+        :param tenant_id: 租户 ID
         :param sid: 社交账号唯一编码
         :param source: 社交平台
         :param username: 用户名
@@ -54,7 +101,7 @@ class OAuth2Service:
         :param avatar: 头像地址
         :return:
         """
-        user_social = await user_social_dao.get_by_sid(db, sid, source.value)
+        user_social = await user_social_dao.get_by_sid(db, tenant_id, sid, source.value)
         if user_social:
             sys_user = await user_dao.get(db, user_social.user_id)
             # 更新用户头像
@@ -114,6 +161,7 @@ class OAuth2Service:
             login_time=timezone.now(),
             status=LoginLogStatusType.success.value,
             msg=t('success.login.oauth2_success'),
+            tenant_id=tenant_id,
         )
         await redis_client.delete(f'{settings.LOGIN_CAPTCHA_REDIS_PREFIX}:{ctx.ip}')
         response.set_cookie(
@@ -181,35 +229,45 @@ class OAuth2Service:
 
         state_info = json.loads(state_data)
         await redis_client.delete(f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}')
+        tenant_id = int(state_info.get('tenant_id', settings.TENANT_DEFAULT_ID))
+        current_tenant_id = ctx.tenant_id
+        ctx.tenant_id = tenant_id
 
-        # 绑定流程
-        if state_info.get('type') == UserSocialAuthType.binding.value:
-            user_id = state_info.get('user_id')
-            if not user_id:
-                raise errors.ForbiddenError(msg='非法操作，OAuth2 状态信息无效')
-            await user_social_service.binding_with_oauth2(
+        try:
+            await jwt.check_tenant_status(db, tenant_id)
+
+            # 绑定流程
+            if state_info.get('type') == UserSocialAuthType.binding.value:
+                user_id = state_info.get('user_id')
+                if not user_id:
+                    raise errors.ForbiddenError(msg='非法操作，OAuth2 状态信息无效')
+                await user_social_service.binding_with_oauth2(
+                    db=db,
+                    user_id=user_id,
+                    sid=str(sid),
+                    source=social,
+                    tenant_id=tenant_id,
+                )
+                return None
+
+            # 登录流程
+            if state_info.get('type') != UserSocialAuthType.login.value:
+                raise errors.ForbiddenError(msg='OAuth2 状态信息无效')
+
+            return await self.login(
                 db=db,
-                user_id=user_id,
+                response=response,
+                background_tasks=background_tasks,
+                tenant_id=tenant_id,
                 sid=str(sid),
                 source=social,
+                username=username,
+                nickname=nickname,
+                email=email,
+                avatar=avatar,
             )
-            return None
-
-        # 登录流程
-        if state_info.get('type') != UserSocialAuthType.login.value:
-            raise errors.ForbiddenError(msg='OAuth2 状态信息无效')
-
-        return await self.login(
-            db=db,
-            response=response,
-            background_tasks=background_tasks,
-            sid=str(sid),
-            source=social,
-            username=username,
-            nickname=nickname,
-            email=email,
-            avatar=avatar,
-        )
+        finally:
+            ctx.tenant_id = current_tenant_id
 
 
 oauth2_service: OAuth2Service = OAuth2Service()

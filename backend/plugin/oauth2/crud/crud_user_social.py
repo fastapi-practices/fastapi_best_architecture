@@ -1,8 +1,10 @@
 from collections.abc import Sequence
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
+from backend.app.admin.model import User
 from backend.plugin.oauth2.model import UserSocial
 from backend.plugin.oauth2.schema.user_social import CreateUserSocialParam
 
@@ -21,16 +23,33 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         """
         return await self.select_model_by_column(db, user_id=user_id, source=source)
 
-    async def get_by_sid(self, db: AsyncSession, sid: str, source: str) -> UserSocial | None:
+    async def get_by_sid(
+        self,
+        db: AsyncSession,
+        tenant_id: int,
+        sid: str,
+        source: str,
+    ) -> UserSocial | None:
         """
-        通过 sid 获取社交用户
+        通过 sid 获取当前租户内的社交用户
 
         :param db: 数据库会话
+        :param tenant_id: 租户 ID
         :param sid: 社交账号唯一编码
         :param source: 社交账号类型
         :return:
         """
-        return await self.select_model_by_column(db, sid=sid, source=source)
+        stmt = (
+            select(self.model)
+            .join(User, User.id == self.model.user_id)
+            .where(
+                self.model.sid == sid,
+                self.model.source == source,
+                User.tenant_id == tenant_id,
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalars().first()
 
     async def get_by_user_id(self, db: AsyncSession, user_id: int) -> Sequence[UserSocial]:
         """
