@@ -47,6 +47,7 @@ from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
+from backend.utils.dynamic_import import import_module_cached
 from backend.utils.console import console
 from backend.utils.sql_parser import parse_sql_script
 from backend.utils.timezone import timezone
@@ -371,6 +372,16 @@ async def install_plugin(
             plugin_name = await install_git_plugin(repo_url=repo_url)
 
         console.tip(f'插件 {plugin_name} 安装成功')
+
+        console.note(f'正在同步插件 {plugin_name} 数据库表...')
+        try:
+            import_module_cached(f'backend.plugin.{plugin_name}.model')
+        except ModuleNotFoundError:
+            pass
+        else:
+            async with async_db_session.begin() as db:
+                conn = await db.connection()
+                await conn.run_sync(MappedBase.metadata.create_all)
 
         if not no_sql:
             sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
