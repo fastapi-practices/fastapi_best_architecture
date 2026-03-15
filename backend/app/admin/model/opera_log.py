@@ -4,11 +4,11 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import DataClassBase, TimeZone, UniversalText, id_key
+from backend.common.model import DataClassBase, TenantMixin, TimeZone, UniversalText, id_key
 from backend.utils.timezone import timezone
 
 
-class OperaLog(DataClassBase):
+class OperaLog(DataClassBase, TenantMixin):
     """操作日志表"""
 
     __tablename__ = 'sys_opera_log'
@@ -16,14 +16,14 @@ class OperaLog(DataClassBase):
     id: Mapped[id_key] = mapped_column(init=False)
     trace_id: Mapped[str] = mapped_column(sa.String(32), comment='请求跟踪 ID')
     username: Mapped[str | None] = mapped_column(sa.String(64), comment='用户名')
-    method: Mapped[str] = mapped_column(sa.String(32), comment='请求类型')
+    method: Mapped[str] = mapped_column(sa.String(32), comment='请求方法')
     title: Mapped[str] = mapped_column(sa.String(256), comment='操作模块')
     path: Mapped[str] = mapped_column(sa.String(512), comment='请求路径')
-    ip: Mapped[str] = mapped_column(sa.String(64), comment='IP地址')
+    ip: Mapped[str] = mapped_column(sa.String(64), comment='IP 地址')
     country: Mapped[str | None] = mapped_column(sa.String(64), comment='国家')
     region: Mapped[str | None] = mapped_column(sa.String(64), comment='地区')
     city: Mapped[str | None] = mapped_column(sa.String(64), comment='城市')
-    user_agent: Mapped[str | None] = mapped_column(sa.String(512), comment='请求头')
+    user_agent: Mapped[str | None] = mapped_column(sa.String(512), comment='用户代理')
     os: Mapped[str | None] = mapped_column(sa.String(64), comment='操作系统')
     browser: Mapped[str | None] = mapped_column(sa.String(64), comment='浏览器')
     device: Mapped[str | None] = mapped_column(sa.String(64), comment='设备')

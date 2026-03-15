@@ -1,24 +1,22 @@
 from collections.abc import Callable
 
-from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
-from backend.database.db import async_engine
-from backend.plugin.config.enums import ConfigType
-from backend.plugin.config.service.config_service import config_service
+from backend.plugin.core import check_plugin_installed
 from backend.utils.serializers import select_list_serialize
 
-_sys_config_table_exists: bool | None = None
+_config_plugin_installed = check_plugin_installed('config')
 
-
-async def check_sys_config_table_exists() -> bool:
-    """检查 sys_config 表是否存在"""
-    global _sys_config_table_exists
-    if _sys_config_table_exists is None:
-        async with async_engine.connect() as conn:
-            _sys_config_table_exists = await conn.run_sync(lambda c: inspect(c).has_table('sys_config', schema=None))
-    return _sys_config_table_exists
+if _config_plugin_installed:
+    try:
+        from backend.plugin.config.enums import ConfigType
+        from backend.plugin.config.service.config_service import config_service
+    except ImportError:
+        raise ImportError('参数配置插件用法导入失败，请联系系统管理员')
+else:
+    ConfigType = None
+    config_service = None
 
 
 def _to_bool(value: str) -> bool:
@@ -41,7 +39,7 @@ async def _load_config(
     :param status_key: 状态键
     :return:
     """
-    if not await check_sys_config_table_exists():
+    if not _config_plugin_installed or config_service is None:
         return
 
     dynamic_config = await config_service.get_all(db=db, type=config_type)
@@ -65,6 +63,9 @@ async def load_user_security_config(db: AsyncSession) -> None:
     :param db: 数据库会话
     :return:
     """
+    if ConfigType is None:
+        return
+
     mapping = {
         'USER_LOCK_THRESHOLD': int,
         'USER_LOCK_SECONDS': int,
@@ -85,6 +86,9 @@ async def load_login_config(db: AsyncSession) -> None:
     :param db: 数据库会话
     :return:
     """
+    if ConfigType is None:
+        return
+
     mapping = {
         'LOGIN_CAPTCHA_ENABLED': _to_bool,
     }
@@ -98,6 +102,9 @@ async def load_email_config(db: AsyncSession) -> None:
     :param db: 数据库会话
     :return:
     """
+    if ConfigType is None:
+        return
+
     mapping = {
         'EMAIL_HOST': str,
         'EMAIL_PORT': int,

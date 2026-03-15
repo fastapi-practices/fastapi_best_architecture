@@ -115,27 +115,35 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 log.info(f'{ctx.ip: <15} | {method: <8} | {code!s: <6} | {path} | {elapsed:.3f}ms')
 
             if should_log_opera and request.method != 'OPTIONS':
-                opera_log_in = CreateOperaLogParam(
-                    trace_id=get_request_trace_id(),
-                    username=username,
-                    method=method,
-                    title=summary,
-                    path=path,
-                    ip=ctx.ip,
-                    country=ctx.country,
-                    region=ctx.region,
-                    city=ctx.city,
-                    user_agent=ctx.user_agent,
-                    os=ctx.os,
-                    browser=ctx.browser,
-                    device=ctx.device,
-                    args=args,
-                    status=status,
-                    code=str(code),
-                    msg=msg,
-                    cost_time=elapsed,
-                    opera_time=ctx.start_time,
-                )
+                tenant_id = settings.TENANT_DEFAULT_ID
+                if settings.TENANT_ENABLED:
+                    tenant_id = ctx.tenant_id
+
+                opera_log_data = {
+                    'trace_id': get_request_trace_id(),
+                    'username': username,
+                    'method': method,
+                    'title': summary,
+                    'path': path,
+                    'ip': ctx.ip,
+                    'country': ctx.country,
+                    'region': ctx.region,
+                    'city': ctx.city,
+                    'user_agent': ctx.user_agent,
+                    'os': ctx.os,
+                    'browser': ctx.browser,
+                    'device': ctx.device,
+                    'args': args,
+                    'status': status,
+                    'code': str(code),
+                    'msg': msg,
+                    'cost_time': elapsed,
+                    'opera_time': ctx.start_time,
+                }
+                if settings.TENANT_ENABLED:
+                    opera_log_data['tenant_id'] = tenant_id
+
+                opera_log_in = CreateOperaLogParam(**opera_log_data)
                 await self.opera_log_queue.put(opera_log_in)
 
             if path.startswith(settings.FASTAPI_API_V1_PATH):
