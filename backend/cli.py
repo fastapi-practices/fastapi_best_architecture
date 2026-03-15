@@ -47,8 +47,8 @@ from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
-from backend.utils.dynamic_import import import_module_cached
 from backend.utils.console import console
+from backend.utils.dynamic_import import import_module_cached
 from backend.utils.sql_parser import parse_sql_script
 from backend.utils.timezone import timezone
 
@@ -346,7 +346,7 @@ def run_celery_flower(port: int, basic_auth: str) -> None:
         pass
 
 
-async def install_plugin(
+async def install_plugin(  # noqa: C901
     path: str,
     repo_url: str,
     no_sql: bool,  # noqa: FBT001
