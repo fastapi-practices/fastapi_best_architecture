@@ -265,7 +265,7 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
         raise errors.TokenError(msg='Token 无效')
     if not user.status:
         raise errors.AuthorizationError(msg='用户已被锁定，请联系系统管理员')
-    if user.dept_id:
+    if user.dept and user.dept_id:
         if not user.dept.status:
             raise errors.AuthorizationError(msg='用户所属部门已被锁定，请联系系统管理员')
         if user.dept.del_flag:

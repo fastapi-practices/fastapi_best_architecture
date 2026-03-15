@@ -202,14 +202,14 @@ class AuthService:
             menus = await menu_dao.get_all(db, None, None)
             for menu in menus:
                 if menu.perms:
-                    codes.add(*menu.perms.split(','))
+                    codes.update(menu.perms.split(','))
         else:
             roles = request.user.roles
             if roles:
                 for role in roles:
                     for menu in role.menus:
                         if menu.perms:
-                            codes.add(*menu.perms.split(','))
+                            codes.update(menu.perms.split(','))
 
         return list(codes)
 

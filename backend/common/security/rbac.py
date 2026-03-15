@@ -34,16 +34,19 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  
 
     # 检测用户角色
     user_roles = request.user.roles
-    if not user_roles or all(status == 0 for status in user_roles):
+    if not user_roles:
         raise errors.AuthorizationError(msg='用户未分配角色，请联系系统管理员')
+    enabled_roles = [role for role in user_roles if role.status == StatusType.enable]
+    if not enabled_roles:
+        raise errors.AuthorizationError(msg='用户所属角色已被锁定，请联系系统管理员')
 
     # 检测用户所属角色菜单
-    if not any(len(role.menus) > 0 for role in user_roles):
+    if not any(len(role.menus) > 0 for role in enabled_roles):
         raise errors.AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
 
     # 检测后台管理操作权限
     method = request.method
-    if (method != MethodType.GET or method != MethodType.OPTIONS) and not request.user.is_staff:
+    if method not in {MethodType.GET, MethodType.OPTIONS} and not request.user.is_staff:
         raise errors.AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
 
     # RBAC 鉴权
@@ -60,7 +63,7 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  
 
         # 菜单去重
         unique_menus = {}
-        for role in user_roles:
+        for role in enabled_roles:
             for menu in role.menus:
                 unique_menus[menu.id] = menu
 
