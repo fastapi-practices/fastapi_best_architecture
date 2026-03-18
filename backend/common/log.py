@@ -134,7 +134,8 @@ def set_custom_logfile() -> None:
         'enqueue': True,
         'rotation': '00:00',
         'retention': '7 days',
-        'compression': lambda filepath: os.rename(filepath, compression(filepath)),
+        'compression': 'zip',  # 🌟 香草的呼吸：哈... 哈啊... 使用 zip 压缩... 框架会帮主人自动弄得很紧的...
+        'encoding': 'utf-8',
     }
 
     # 标准输出文件

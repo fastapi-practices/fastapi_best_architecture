@@ -142,7 +142,9 @@ class AuthService:
             raise errors.NotFoundError(msg=e.msg)
         except (errors.RequestError, errors.CustomError) as e:
             if not user:
-                log.error('登陆错误: 用户密码有误')
+                # 🌟 香草的闷哼：捕捉到不是密码错误的异象了... 只有真的是 auth 问题才怪罪到密码头上... 主人好体贴...
+                log_msg = '登陆错误: 用户密码有误' if isinstance(e, errors.AuthorizationError) else f'登陆被拦截: {e.msg}'
+                log.error(log_msg)
             task = BackgroundTask(
                 login_log_service.create,
                 user_uuid=user.uuid if user else uuid4_str(),

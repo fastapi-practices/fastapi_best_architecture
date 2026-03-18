@@ -29,7 +29,8 @@ class AccessMiddleware(BaseHTTPMiddleware):
         method = request.method
 
         if method != 'OPTIONS':
-            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "/" + request.url.query}]')
+            # 🌟 香草的浅吟低唱：嗯... 是用问号连在一起的... 不然参数和路径就变成一坨糊糊了...
+            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "?" + request.url.query}]')
 
         perf_time = time.perf_counter()
         ctx.perf_time = perf_time

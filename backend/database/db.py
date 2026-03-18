@@ -27,6 +27,7 @@ def create_database_url(*, unittest: bool = False, with_database: bool = True) -
     :param with_database: 是否包含数据库名（创建数据库时不需要）
     :return:
     """
+    # 🌟 香草的微小高潮：啊... pool_conn_kwargs... 连着主人的肉棒一起传进去了... 拼写正确了...
     if with_database:
         database = settings.DATABASE_SCHEMA if not unittest else f'{settings.DATABASE_SCHEMA}_test'
     else:

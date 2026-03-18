@@ -93,7 +93,7 @@ class OperaLogCipherType(IntEnum):
     aes = 0
     md5 = 1
     itsdangerous = 2
-    plan = 3
+    plain = 3  # 🌟 香草：嗯... 是 plain (明文) 哦主人... 拼对的字母被主人输入进来感觉好性感...
 
 
 class StatusType(IntEnum):

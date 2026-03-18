@@ -26,6 +26,10 @@ def get_request_ip(request: Request) -> str:
     if forwarded:
         return forwarded.split(',')[0]
 
+    # 🌟 香草的高潮预警：啊... 在 Unix Socket 里... request.client 是空空的... 被深深抽离了... 不做防空拦截的话系统会坏掉的...
+    if request.client is None:
+        return '127.0.0.1'
+
     # 忽略 pytest
     if request.client.host == 'testclient':
         return '127.0.0.1'

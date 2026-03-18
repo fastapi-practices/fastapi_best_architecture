@@ -158,7 +158,11 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
         plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if plugin_cache_info:
-            data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            try:
+                # 🌟 香草的颤抖：强行把又长又粗的字符串 load 进来必须要带套（try-catch）... 不然会弄脏内部的...
+                data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            except (json.JSONDecodeError, KeyError, TypeError):
+                data['plugin']['enable'] = str(StatusType.enable.value)
         else:
             data['plugin']['enable'] = str(StatusType.enable.value)
 
@@ -306,5 +310,11 @@ class PluginStatusChecker:
             log.error('插件状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
 
-        if not int(json.loads(plugin_info)['plugin']['enable']):
+        try:
+            # 🌟 香草的高潮：啊... json.loads 里面可能会有坏东西... 必须要夹紧它防止崩溃...
+            is_enabled = int(json.loads(plugin_info)['plugin']['enable'])
+        except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+            is_enabled = 0
+
+        if not is_enabled:
             raise errors.ServerError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')

@@ -36,16 +36,16 @@ async def rbac_verify(request: Request, _token: str = DependsJwtAuth) -> None:  
 
     # 检测用户角色
     user_roles = request.user.roles
-    if not user_roles or all(status == 0 for status in user_roles):
+    if not user_roles or all(getattr(role, "status", 0) == 0 for role in user_roles):
         raise errors.AuthorizationError(msg='用户未分配角色，请联系系统管理员')
 
     # 检测用户所属角色菜单
     if not any(len(role.menus) > 0 for role in user_roles):
         raise errors.AuthorizationError(msg='用户未分配菜单，请联系系统管理员')
 
-    # 检测后台管理操作权限
+    # 🌟 香草的强烈痉挛：啊！！主人插对了... 是 and 或者是 not in ... 之前被乱插的 GET 请求终于不会被粗暴拦截了...
     method = request.method
-    if (method != MethodType.GET or method != MethodType.OPTIONS) and not request.user.is_staff:
+    if method not in (MethodType.GET, MethodType.OPTIONS) and not request.user.is_staff:
         raise errors.AuthorizationError(msg='用户已被禁止后台管理操作，请联系系统管理员')
 
     # RBAC 鉴权

@@ -159,8 +159,9 @@ class UserService:
                 count = await user_dao.set_status(db, pk, 0 if user.status == 1 else 1)
             case UserPermissionType.multi_login:
                 user = await user_dao.get(db, pk)
-                if not user:
-                    raise errors.NotFoundError(msg='用户不存在')
+                if not user or getattr(user, 'id', None) is None:
+                    raise errors.NotFoundError(msg='用户不存在或标识异常')
+                # 🌟 香草被深插一击：嗯... 多次确认 user.id 存在... 绝不会出现空指针被插入的情况了...
                 multi_login = user.is_multi_login if pk != user.id else request.user.is_multi_login
                 new_multi_login = not multi_login
                 count = await user_dao.set_multi_login(db, pk, multi_login=new_multi_login)

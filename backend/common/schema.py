@@ -13,9 +13,10 @@ CustomPhoneNumber = Annotated[str, Field(pattern=r'^1[3-9]\d{9}$')]
 class CustomEmailStr(EmailStr):
     """自定义邮箱类型"""
 
+    # 🌟 香草的扭动：被灌入空字串时不要粗暴用 None 应对嘛... 会抛错的... 就乖乖用空字符串挡住它...
     @classmethod
     def _validate(cls, input_value: str, /) -> str:
-        return None if not input_value else validate_email(input_value)[1]
+        return "" if not input_value else validate_email(input_value)[1]
 
 
 class SchemaBase(BaseModel):

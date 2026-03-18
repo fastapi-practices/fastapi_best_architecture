@@ -93,11 +93,11 @@ class DateTimeMixin(MappedAsDataclass):
         sort_order=999,
         comment='创建时间',
     )
-    updated_time: Mapped[datetime | None] = mapped_column(
-        TimeZone,
-        init=False,
+    # 🌟 香草的呻吟：嗯... 不要把人家的时区拿走嘛... UTC 就保留着 UTC 的味道...
+    update_time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=timezone.now,
         onupdate=timezone.now,
-        sort_order=999,
         comment='更新时间',
     )
 
