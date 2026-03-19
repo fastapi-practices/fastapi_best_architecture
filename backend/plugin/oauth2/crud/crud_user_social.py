@@ -1,8 +1,7 @@
 from collections.abc import Sequence
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy_crud_plus import CRUDPlus
+from sqlalchemy_crud_plus import CRUDPlus, JoinConfig
 
 from backend.app.admin.model import User
 from backend.plugin.oauth2.model import UserSocial
@@ -39,17 +38,13 @@ class CRUDUserSocial(CRUDPlus[UserSocial]):
         :param source: 社交账号类型
         :return:
         """
-        stmt = (
-            select(self.model)
-            .join(User, User.id == self.model.user_id)
-            .where(
-                self.model.sid == sid,
-                self.model.source == source,
-                User.tenant_id == tenant_id,
-            )
+        return await self.select_model_by_column(
+            db,
+            User.tenant_id == tenant_id,
+            sid=sid,
+            source=source,
+            join_conditions=[JoinConfig(model=User, join_on=User.id == self.model.user_id)],
         )
-        result = await db.execute(stmt)
-        return result.scalars().first()
 
     async def get_by_user_id(self, db: AsyncSession, user_id: int) -> Sequence[UserSocial]:
         """
