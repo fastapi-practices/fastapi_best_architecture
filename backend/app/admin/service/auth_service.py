@@ -155,7 +155,7 @@ class AuthService:
             raise errors.NotFoundError(msg=e.msg)
         except (errors.RequestError, errors.CustomError) as e:
             if not user:
-                log.error('登陆错误: 用户密码有误')
+                log.error(f'登陆错误: {e.msg}')
             task = BackgroundTask(
                 login_log_service.create,
                 user_uuid=user.uuid if user else uuid4_str(),

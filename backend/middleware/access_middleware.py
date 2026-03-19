@@ -35,7 +35,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
         method = request.method
 
         if method != 'OPTIONS':
-            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "/" + request.url.query}]')
+            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "?" + request.url.query}]')
 
         if path.startswith(settings.FASTAPI_API_V1_PATH):
             PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()

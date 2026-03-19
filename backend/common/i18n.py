@@ -54,7 +54,7 @@ class I18n:
                     case 'json':
                         self.locales[lang] = json.loads(f.read())
                     case 'yaml' | 'yml':
-                        self.locales[lang] = yaml.full_load(f.read())
+                        self.locales[lang] = yaml.safe_load(f.read())
 
     def t(self, key: str, default: Any | None = None, **kwargs) -> str:
         """

@@ -93,7 +93,7 @@ class OperaLogCipherType(IntEnum):
     aes = 0
     md5 = 1
     itsdangerous = 2
-    plan = 3
+    plain = 3
 
 
 class StatusType(IntEnum):

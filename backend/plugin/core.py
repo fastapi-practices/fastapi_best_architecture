@@ -176,7 +176,10 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
         plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if plugin_cache_info:
-            data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            try:
+                data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            except Exception:
+                data['plugin']['enable'] = str(StatusType.enable.value)
         else:
             data['plugin']['enable'] = str(StatusType.enable.value)
 
@@ -324,5 +327,10 @@ class PluginStatusChecker:
             log.error('插件状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
 
-        if not int(json.loads(plugin_info)['plugin']['enable']):
+        try:
+            is_enabled = int(json.loads(plugin_info)['plugin']['enable'])
+        except Exception:
+            is_enabled = 0
+
+        if not is_enabled:
             raise errors.ServerError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
