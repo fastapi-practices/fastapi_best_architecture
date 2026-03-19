@@ -25,7 +25,8 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
 )
 from backend.app.admin.utils.password_security import get_hash_password
-from backend.utils.dynamic_import import import_module_cached
+from backend.common.exception import errors
+from backend.plugin.core import check_plugin_installed
 from backend.utils.serializers import select_join_serialize
 from backend.utils.timezone import timezone
 
@@ -298,16 +299,16 @@ class CRUDUser(CRUDPlus[User]):
         :param user_id: 用户 ID
         :return:
         """
+        if check_plugin_installed('oauth2'):
+            try:
+                from backend.plugin.oauth2.crud.crud_user_social import user_social_dao
+
+                await user_social_dao.delete_by_user_id(db, user_id)
+            except ImportError:
+                raise errors.ServerError(msg='OAuth2 插件用法导入失败，请联系系统管理员')
+
         user_role_stmt = delete(user_role).where(user_role.c.user_id == user_id)
         await db.execute(user_role_stmt)
-
-        try:
-            user_social = import_module_cached('backend.plugin.oauth2.crud.crud_user_social')
-            user_social_dao = user_social.user_social_dao
-        except (ImportError, AttributeError):
-            pass
-        else:
-            await user_social_dao.delete_by_user_id(db, user_id)
 
         return await self.delete_model(db, user_id)
 

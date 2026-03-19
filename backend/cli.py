@@ -43,7 +43,7 @@ from backend.database.db import (
     create_database_url,
 )
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.core import get_plugin_destroy_sql, get_plugin_sql, get_plugins
+from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_plugin_sql, get_plugins
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
@@ -346,7 +346,7 @@ def run_celery_flower(port: int, basic_auth: str) -> None:
         pass
 
 
-async def install_plugin(
+async def install_plugin(  # noqa: C901
     path: str,
     repo_url: str,
     no_sql: bool,  # noqa: FBT001
@@ -372,6 +372,16 @@ async def install_plugin(
             plugin_name = await install_git_plugin(repo_url=repo_url)
 
         console.tip(f'插件 {plugin_name} 安装成功')
+
+        console.note(f'正在同步插件 {plugin_name} 数据库表...')
+        try:
+            import_module_cached(f'backend.plugin.{plugin_name}.model')
+        except ModuleNotFoundError:
+            pass
+        else:
+            async with async_db_session.begin() as db:
+                conn = await db.connection()
+                await conn.run_sync(MappedBase.metadata.create_all)
 
         if not no_sql:
             sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
@@ -445,23 +455,21 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
 
 async def get_sql_scripts() -> list[str]:
     """获取所有待执行的 SQL 脚本路径列表"""
-    sql_scripts = []
+    sql_scripts: list[str] = []
     db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
-    main_sql_file = (
-        db_script_dir / 'init_test_data.sql'
-        if PrimaryKeyType.autoincrement == settings.DATABASE_PK_MODE
-        else db_script_dir / 'init_snowflake_test_data.sql'
+    main_sql_file = db_script_dir / build_sql_filename(
+        'init',
+        settings.DATABASE_PK_MODE,
+        suffix='test_data',
     )
 
-    main_sql_path = anyio.Path(main_sql_file)
-    if await main_sql_path.exists():
+    if await anyio.Path(main_sql_file).exists():
         sql_scripts.append(str(main_sql_file))
 
-    plugins = get_plugins()
-    for plugin in plugins:
+    for plugin in get_plugins():
         plugin_sql = await get_plugin_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
         if plugin_sql:
-            sql_scripts.append(str(plugin_sql))
+            sql_scripts.append(plugin_sql)
 
     return sql_scripts
 
@@ -500,8 +508,11 @@ async def import_table(
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
-    from backend.plugin.code_generator.schema.gen import ImportParam
-    from backend.plugin.code_generator.service.gen_service import gen_service
+    try:
+        from backend.plugin.code_generator.schema.gen import ImportParam
+        from backend.plugin.code_generator.service.gen_service import gen_service
+    except ImportError:
+        raise cappa.Exit('代码生成插件用法导入失败，请联系系统管理员', code=1)
 
     try:
         obj = ImportParam(app=app, table_schema=table_schema, table_name=table_name)
@@ -518,8 +529,11 @@ async def generate(*, preview: bool = False) -> None:
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('代码生成仅在开发环境可用', code=1)
 
-    from backend.plugin.code_generator.service.business_service import gen_business_service
-    from backend.plugin.code_generator.service.gen_service import gen_service
+    try:
+        from backend.plugin.code_generator.service.business_service import gen_business_service
+        from backend.plugin.code_generator.service.gen_service import gen_service
+    except ImportError:
+        raise cappa.Exit('代码生成插件用法导入失败，请联系系统管理员', code=1)
 
     try:
         ids = []
@@ -753,12 +767,6 @@ class Import:
         cappa.Arg(short='tn', help='数据库表名'),
     ]
 
-    def __post_init__(self) -> None:
-        try:
-            import_module_cached('backend.plugin.code_generator')
-        except ImportError:
-            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
-
     async def __call__(self) -> None:
         await import_table(self.app, self.table_schema, self.table_name)
 
@@ -771,12 +779,6 @@ class CodeGenerator:
         cappa.Arg(short='-p', default=False, help='仅预览将要生成的文件，不执行实际生成操作'),
     ]
     subcmd: cappa.Subcommands[Import | None] = None
-
-    def __post_init__(self) -> None:
-        try:
-            import_module_cached('backend.plugin.code_generator')
-        except ImportError:
-            raise cappa.Exit('代码生成插件不存在，请先安装此插件')
 
     async def __call__(self) -> None:
         await generate(preview=self.preview)
