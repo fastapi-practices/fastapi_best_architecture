@@ -1,6 +1,9 @@
 import urllib.parse
+import uuid
 
 import socketio
+
+from starlette_context import request_cycle_context
 
 from backend.common.log import log
 from backend.common.security.jwt import jwt_authentication
@@ -38,7 +41,8 @@ async def connect(sid, environ, auth) -> bool:
         return True
 
     try:
-        await jwt_authentication(token)
+        with request_cycle_context({settings.TRACE_ID_REQUEST_HEADER_KEY: uuid.uuid4().hex}):
+            await jwt_authentication(token)
     except Exception as e:
         log.info(f'WebSocket 连接失败：{e!s}')
         return False
