@@ -129,10 +129,9 @@ def set_custom_logfile() -> None:
 
     # 日志文件通用配置
     # https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
-    log_enqueue = os.getenv('FBA_LOG_ENQUEUE', '1').lower() not in {'0', 'false', 'no'}
     log_config: dict[str, Any] = {
         'format': default_formatter,
-        'enqueue': log_enqueue,
+        'enqueue': True,
         'rotation': '00:00',
         'retention': '7 days',
         'compression': lambda filepath: os.rename(filepath, compression(filepath)),
