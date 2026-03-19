@@ -25,17 +25,17 @@ class AccessMiddleware(BaseHTTPMiddleware):
         :param call_next: 下一个中间件或路由处理函数
         :return:
         """
-        path = request.url.path
-        method = request.method
-
-        if method != 'OPTIONS':
-            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "/" + request.url.query}]')
-
         perf_time = time.perf_counter()
         ctx.perf_time = perf_time
 
         start_time = timezone.now()
         ctx.start_time = start_time
+
+        path = request.url.path
+        method = request.method
+
+        if method != 'OPTIONS':
+            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "?" + request.url.query}]')
 
         if path.startswith(settings.FASTAPI_API_V1_PATH):
             PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()

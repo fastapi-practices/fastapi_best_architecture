@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from jinja2 import Environment, FileSystemLoader, Template, select_autoescape
 from pydantic.alias_generators import to_pascal
 
+from backend.common.enums import PrimaryKeyType
 from backend.core.conf import settings
 from backend.plugin.code_generator.model import GenBusiness, GenColumn
 from backend.plugin.code_generator.path_conf import JINJA2_TEMPLATE_DIR
@@ -109,7 +110,7 @@ class GenTemplate:
             'now': timezone.now(),
         }
 
-        if settings.DATABASE_PK_MODE == 'snowflake':
+        if PrimaryKeyType.snowflake == settings.DATABASE_PK_MODE:
             vars_dict['parent_menu_id'] = snowflake.generate()
             vars_dict['button_ids'] = [snowflake.generate() for _ in range(4)]
 
