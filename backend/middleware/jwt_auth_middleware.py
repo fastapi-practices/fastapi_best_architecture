@@ -7,7 +7,6 @@ from starlette.authentication import AuthenticationError as StarletteAuthenticat
 from starlette.requests import HTTPConnection
 
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
-from backend.common.context import ctx
 from backend.common.exception.errors import TokenError
 from backend.common.log import log
 from backend.common.security.jwt import jwt_authentication
