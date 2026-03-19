@@ -2,12 +2,17 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.text import Text
 
 from backend.core.registrar import register_app
-from backend.plugin.core import get_plugins
+from backend.plugin.core import check_required_plugins, get_plugins
 from backend.plugin.requirements import install_requirements
 from backend.utils.console import console
 from backend.utils.timezone import timezone
 
 _log_prefix = f'{timezone.to_str(timezone.now(), "%Y-%m-%d %H:%M:%S.%M0")} | {"INFO": <8} | - | '
+
+console.print(Text(f'{_log_prefix}检查必需插件...', style='bold cyan'))
+
+check_required_plugins()
+
 console.print(Text(f'{_log_prefix}检测插件依赖...', style='bold cyan'))
 
 _plugins = get_plugins()

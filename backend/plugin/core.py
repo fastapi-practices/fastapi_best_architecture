@@ -22,6 +22,27 @@ from backend.utils.async_helper import run_await
 from backend.utils.dynamic_import import get_model_objects, import_module_cached
 
 
+def check_plugin_installed(plugin_name: str) -> bool:
+    """
+    检查插件是否已安装
+
+    :param plugin_name: 插件名称
+    :return:
+    """
+    return (PLUGIN_DIR / plugin_name / '__init__.py').exists()
+
+
+def check_required_plugins() -> None:
+    """检查必需插件"""
+    required_plugins = list(settings.PLUGIN_REQUIRED)
+    if not settings.RBAC_ROLE_MENU_MODE and 'casbin_rbac' not in required_plugins:
+        required_plugins.append('casbin_rbac')
+
+    missing_plugins = [name for name in required_plugins if not check_plugin_installed(name)]
+    if missing_plugins:
+        raise PluginInjectError(f'当前系统缺少以下插件: {", ".join(missing_plugins)}，请先安装对应插件')
+
+
 @lru_cache(maxsize=128)
 def get_plugins() -> tuple[str, ...]:
     """获取插件列表"""
@@ -53,6 +74,20 @@ def get_plugin_models() -> list[object]:
     return objs
 
 
+def build_sql_filename(
+    prefix: str,
+    pk_type: PrimaryKeyType,
+    *,
+    suffix: str | None = None,
+) -> str:
+    parts = [prefix]
+    if pk_type == PrimaryKeyType.snowflake:
+        parts.append('snowflake')
+    if suffix:
+        parts.append(suffix)
+    return f'{"_".join(parts)}.sql'
+
+
 async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
     """
     获取插件 SQL 脚本
@@ -62,24 +97,10 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
     :param pk_type: 主键类型
     :return:
     """
-    if db_type == DataBaseType.mysql:
-        mysql_dir = PLUGIN_DIR / plugin / 'sql' / 'mysql'
-        sql_file = (
-            mysql_dir / 'init.sql' if pk_type == PrimaryKeyType.autoincrement else mysql_dir / 'init_snowflake.sql'
-        )
-    else:
-        postgresql_dir = PLUGIN_DIR / plugin / 'sql' / 'postgresql'
-        sql_file = (
-            postgresql_dir / 'init.sql'
-            if pk_type == PrimaryKeyType.autoincrement
-            else postgresql_dir / 'init_snowflake.sql'
-        )
-
-    path = anyio.Path(sql_file)
-    if not await path.exists():
-        return None
-
-    return sql_file
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    default_filename = build_sql_filename('init', pk_type)
+    default_sql_file = sql_dir / default_filename
+    return str(default_sql_file) if await anyio.Path(default_sql_file).exists() else None
 
 
 async def get_plugin_destroy_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
@@ -91,26 +112,9 @@ async def get_plugin_destroy_sql(plugin: str, db_type: DataBaseType, pk_type: Pr
     :param pk_type: 主键类型
     :return:
     """
-    if db_type == DataBaseType.mysql:
-        mysql_dir = PLUGIN_DIR / plugin / 'sql' / 'mysql'
-        sql_file = (
-            mysql_dir / 'destroy.sql'
-            if pk_type == PrimaryKeyType.autoincrement
-            else mysql_dir / 'destroy_snowflake.sql'
-        )
-    else:
-        postgresql_dir = PLUGIN_DIR / plugin / 'sql' / 'postgresql'
-        sql_file = (
-            postgresql_dir / 'destroy.sql'
-            if pk_type == PrimaryKeyType.autoincrement
-            else postgresql_dir / 'destroy_snowflake.sql'
-        )
-
-    path = anyio.Path(sql_file)
-    if not await path.exists():
-        return None
-
-    return sql_file
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    sql_file = sql_dir / build_sql_filename('destroy', pk_type)
+    return str(sql_file) if await anyio.Path(sql_file).exists() else None
 
 
 def load_plugin_config(plugin: str) -> dict[str, Any]:
@@ -158,7 +162,10 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         data['plugin']['name'] = plugin
         plugin_cache_info = run_await(current_redis_client.get)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
         if plugin_cache_info:
-            data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            try:
+                data['plugin']['enable'] = json.loads(plugin_cache_info)['plugin']['enable']
+            except Exception:
+                data['plugin']['enable'] = str(StatusType.enable.value)
         else:
             data['plugin']['enable'] = str(StatusType.enable.value)
 
@@ -306,5 +313,10 @@ class PluginStatusChecker:
             log.error('插件状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
 
-        if not int(json.loads(plugin_info)['plugin']['enable']):
+        try:
+            is_enabled = int(json.loads(plugin_info)['plugin']['enable'])
+        except Exception:
+            is_enabled = 0
+
+        if not is_enabled:
             raise errors.ServerError(msg=f'插件 {self.plugin} 未启用，请联系系统管理员')
