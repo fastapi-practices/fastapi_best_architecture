@@ -25,9 +25,19 @@ class PluginService:
     async def get_all() -> list[dict[str, Any]]:
         """获取所有插件"""
 
-        keys = [key async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:*')]
+        changed_key = f'{settings.PLUGIN_REDIS_PREFIX}:changed'
+        keys = [key async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:*') if key != changed_key]
+        if not keys:
+            return []
 
-        result = [json.loads(info) for info in await redis_client.mget(*keys)]
+        result = []
+        for info in await redis_client.mget(*keys):
+            if info is None:
+                continue
+
+            plugin_info = json.loads(info)
+            if isinstance(plugin_info, dict):
+                result.append(plugin_info)
 
         return result
 
@@ -97,6 +107,7 @@ class PluginService:
         )
         plugin_info['plugin']['enable'] = new_status
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(plugin_info, ensure_ascii=False))
+        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     @staticmethod
     async def build(*, plugin: str) -> io.BytesIO:
