@@ -51,7 +51,7 @@ async def _append_env_example(plugin_path: anyio.Path) -> None:
         await f.write(new_content)
 
 
-async def install_zip_plugin(file: UploadFile | str) -> str:
+async def install_zip_plugin(file: UploadFile | str) -> str:  # noqa: C901
     """
     安装 ZIP 插件
 
