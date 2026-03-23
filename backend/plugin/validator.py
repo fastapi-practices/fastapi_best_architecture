@@ -1,10 +1,10 @@
-import warnings
-
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 from backend.common.enums import PluginLevelType
+from backend.core.path_conf import PLUGIN_DIR
 from backend.plugin.errors import PluginConfigError
 from backend.utils.pattern_validate import match_string
 
@@ -23,8 +23,8 @@ class PluginInfoSchema(BaseModel):
     version: str = Field(..., description='版本号')
     description: str = Field(..., min_length=1, max_length=500, description='描述')
     author: str = Field(..., min_length=1, max_length=50, description='作者')
-    tags: list[str] = Field(default_factory=list, description='标签')
-    database: list[str] = Field(default_factory=list, description='数据库支持')
+    tags: list[str] = Field(..., min_length=1, description='标签')
+    database: list[str] = Field(..., min_length=1, description='数据库支持')
 
     @field_validator('version')
     @classmethod
@@ -183,19 +183,35 @@ def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLe
             error_msg = '; '.join(error_details)
         raise PluginConfigError(f'插件 {plugin_name} 配置校验失败: {error_msg}') from e
 
-    # TODO 下个重大版本变更为必填
-    plugin_info = config.get('plugin', {})
-    if not plugin_info.get('tags'):
-        warnings.warn(
-            f"插件 '{plugin_name}' 未配置 'tags' 字段，该字段将在下个重大版本中必填，请及时联系插件作者同步更新",
-            FutureWarning,
-            stacklevel=2,
-        )
-    if not plugin_info.get('database'):
-        warnings.warn(
-            f"插件 '{plugin_name}' 未配置 'database' 字段，该字段将在下个重大版本中必填，请及时联系插件作者同步更新",
-            FutureWarning,
-            stacklevel=2,
-        )
+    plugin_dir = Path(PLUGIN_DIR) / plugin_name
+    model_dir = plugin_dir / 'model'
+    if model_dir.is_dir():
+        sql_dir = plugin_dir / 'sql'
+        supported_db_types = []
+        missing_details = []
+
+        for db_type in ('mysql', 'postgresql'):
+            db_sql_dir = sql_dir / db_type
+            required_sql_files = (
+                db_sql_dir / 'init.sql',
+                db_sql_dir / 'destroy.sql',
+                db_sql_dir / 'init_snowflake.sql',
+                db_sql_dir / 'destroy_snowflake.sql',
+            )
+            missing_files = [
+                str(sql_file.relative_to(plugin_dir)) for sql_file in required_sql_files if not sql_file.is_file()
+            ]
+
+            if not missing_files:
+                supported_db_types.append(db_type)
+                continue
+
+            missing_details.append(f'{db_type}: {", ".join(missing_files)}')
+
+        if not supported_db_types:
+            raise PluginConfigError(
+                f'插件 {plugin_name} 必须至少提供一种数据库的初始化和销毁 SQL 脚本，'
+                f'当前缺失: {"; ".join(missing_details)}'
+            )
 
     return plugin_level

@@ -11,7 +11,7 @@
     "plugin": {
       "type": "object",
       "description": "Plugin metadata",
-      "required": ["summary", "version", "description", "author"],
+      "required": ["summary", "version", "description", "author", "tags", "database"],
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema",
       "properties": {
@@ -44,7 +44,8 @@
         },
         "tags": {
           "type": "array",
-          "description": "Plugin tags for categorization (will be required in next major version)",
+          "minItems": 1,
+          "description": "Plugin tags for categorization",
           "items": {
             "type": "string",
             "enum": ["ai", "mcp", "agent", "auth", "storage", "notification", "task", "payment", "other"]
@@ -53,7 +54,8 @@
         },
         "database": {
           "type": "array",
-          "description": "Supported databases (will be required in next major version)",
+          "minItems": 1,
+          "description": "Supported databases",
           "items": {
             "type": "string",
             "enum": ["mysql", "postgresql"]

@@ -51,7 +51,7 @@ async def _append_env_example(plugin_path: anyio.Path) -> None:
         await f.write(new_content)
 
 
-async def install_zip_plugin(file: UploadFile | str) -> str:
+async def install_zip_plugin(file: UploadFile | str) -> str:  # noqa: C901
     """
     安装 ZIP 插件
 
@@ -71,8 +71,10 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
         with zipfile.ZipFile(file_bytes) as zf:
             # 校验压缩包
             plugin_namelist = zf.namelist()
-            plugin_dir_name = plugin_namelist[0].split('/')[0]
             if not plugin_namelist:
+                raise errors.RequestError(msg='插件压缩包内容非法')
+            plugin_dir_name = plugin_namelist[0].split('/', 1)[0].strip()
+            if not plugin_dir_name:
                 raise errors.RequestError(msg='插件压缩包内容非法')
             if (
                 len(plugin_namelist) <= 3
@@ -82,29 +84,45 @@ async def install_zip_plugin(file: UploadFile | str) -> str:
                 raise errors.RequestError(msg='插件压缩包内缺少必要文件')
 
             # 插件是否可安装
-            plugin_name = re.match(
+            plugin_name_match = re.match(
                 r'^([a-zA-Z0-9_]+)',
                 file.split(os.sep)[-1].split('.')[0].strip()
                 if isinstance(file, str)
                 else file.filename.split('.')[0].strip(),
-            ).group()
+            )
+            if not plugin_name_match:
+                raise errors.RequestError(msg='插件压缩包文件名非法')
+            plugin_name = plugin_name_match.group()
             full_plugin_path = anyio.Path(PLUGIN_DIR / plugin_name)
             if await full_plugin_path.exists():
                 raise errors.ConflictError(msg='此插件已安装')
-            await full_plugin_path.mkdir(parents=True, exist_ok=True)
 
             # 解压（安装）
             members = []
+            prefix = f'{plugin_dir_name}/'
             for member in zf.infolist():
-                if member.filename.startswith(plugin_dir_name):
-                    new_filename = member.filename.replace(plugin_dir_name, '')
-                    if new_filename:
-                        member.filename = new_filename
-                        members.append(member)
+                if member.filename in {plugin_dir_name, prefix}:
+                    continue
+                if not member.filename.startswith(prefix):
+                    continue
+
+                relative_filename = member.filename.removeprefix(prefix)
+                if not relative_filename:
+                    if member.is_dir():
+                        continue
+                    raise errors.RequestError(msg='插件压缩包内容非法')
+
+                member.filename = relative_filename
+                members.append(member)
+
+            if not members:
+                raise errors.RequestError(msg='插件压缩包内容非法')
+
+            await full_plugin_path.mkdir(parents=True, exist_ok=True)
             await run_in_threadpool(zf.extractall, full_plugin_path, members)
 
         await _append_env_example(full_plugin_path)
-        await install_requirements_async(plugin_dir_name)
+        await install_requirements_async(plugin_name)
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     return plugin_name
