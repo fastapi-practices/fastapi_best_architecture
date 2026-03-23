@@ -153,7 +153,7 @@ class ExtendPluginConfigSchema(BaseModel):
         return v
 
 
-def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLevelType:  # noqa: C901
+def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLevelType:
     """
     校验插件配置
 
