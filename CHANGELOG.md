@@ -1,3 +1,33 @@
+<a id="v1.13.2"></a>
+# [v1.13.2](https://github.com/fastapi-practices/fastapi-best-architecture/releases/tag/v1.13.2) - 2026-03-23
+
+## What's Changed
+* Update changelog for v1.13.1 by [@wu-clan](https://github.com/wu-clan) in [#1103](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1103)
+* Fix log type check and default formatter by [@wu-clan](https://github.com/wu-clan) in [#1104](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1104)
+* Replace the uvicorn runner with granian by [@wu-clan](https://github.com/wu-clan) in [#1105](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1105)
+* Update user id context setting location by [@wu-clan](https://github.com/wu-clan) in [#1110](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1110)
+* Update refresh token geo-checksum response by [@wu-clan](https://github.com/wu-clan) in [#1111](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1111)
+* Update plugin dynamic import check by [@wu-clan](https://github.com/wu-clan) in [#1112](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1112)
+* Fix rbac permission checking logic by [@wu-clan](https://github.com/wu-clan) in [#1113](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1113)
+* Fix user menu permission code update by [@wu-clan](https://github.com/wu-clan) in [#1114](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1114)
+* Fix typos in code and comments by [@wu-clan](https://github.com/wu-clan) in [#1115](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1115)
+* Fix online api user id acquisition by [@wu-clan](https://github.com/wu-clan) in [#1116](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1116)
+* Fix plugin status change cache missing by [@wu-clan](https://github.com/wu-clan) in [#1118](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1118)
+* Fix zip plugin installation and unzip by [@wu-clan](https://github.com/wu-clan) in [#1120](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1120)
+* Update plugin config and sql validate by [@wu-clan](https://github.com/wu-clan) in [#1122](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1122)
+* Add sql scripts for OAuth2 plugin by [@wu-clan](https://github.com/wu-clan) in [#1121](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1121)
+* Update the version number to 1.13.2 by [@wu-clan](https://github.com/wu-clan) in [#1123](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1123)
+
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.1...v1.13.2
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+
+[Changes][v1.13.2]
+
+
 <a id="v1.13.1"></a>
 # [v1.13.1](https://github.com/fastapi-practices/fastapi-best-architecture/releases/tag/v1.13.1) - 2026-03-08
 
@@ -1407,6 +1437,7 @@
 [Changes][v1.0.0]
 
 
+[v1.13.2]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.1...v1.13.2
 [v1.13.1]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.0...v1.13.1
 [v1.13.0]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.12.3...v1.13.0
 [v1.12.3]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.12.2...v1.12.3
