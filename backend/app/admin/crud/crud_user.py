@@ -25,6 +25,7 @@ from backend.app.admin.schema.user import (
     UpdateUserParam,
 )
 from backend.app.admin.utils.password_security import get_hash_password
+from backend.common.enums import StatusType
 from backend.common.exception import errors
 from backend.plugin.core import check_plugin_installed
 from backend.utils.serializers import select_join_serialize
@@ -146,9 +147,11 @@ class CRUDUser(CRUDPlus[User]):
         db.add(new_user)
         await db.flush()
 
-        role_stmt = select(Role)
+        role_stmt = select(Role).where(Role.status == StatusType.enable)
         result = await db.execute(role_stmt)
         role = result.scalars().first()  # 默认绑定第一个角色
+        if role is None:
+            raise errors.NotFoundError(msg='未找到可用角色，请联系系统管理员')
 
         user_role_stmt = insert(user_role).values(AddUserRoleParam(user_id=new_user.id, role_id=role.id).model_dump())
         await db.execute(user_role_stmt)

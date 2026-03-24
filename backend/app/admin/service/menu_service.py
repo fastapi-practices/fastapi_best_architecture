@@ -7,6 +7,7 @@ from backend.app.admin.crud.crud_menu import menu_dao
 from backend.app.admin.model import Menu
 from backend.app.admin.schema.menu import CreateMenuParam, UpdateMenuParam
 from backend.app.admin.utils.cache import user_cache_manager
+from backend.common.enums import StatusType
 from backend.common.exception import errors
 from backend.utils.build_tree import get_tree_data, get_vben5_tree_data
 
@@ -57,7 +58,7 @@ class MenuService:
         if request.user.is_superuser:
             menu_data = await menu_dao.get_sidebar(db, None)
         else:
-            roles = request.user.roles
+            roles = [role for role in request.user.roles if role.status == StatusType.enable]
             menu_ids = set()
             if roles:
                 for role in roles:
