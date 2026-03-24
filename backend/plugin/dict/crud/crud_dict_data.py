@@ -4,6 +4,7 @@ from sqlalchemy import Select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_crud_plus import CRUDPlus
 
+from backend.common.enums import StatusType
 from backend.plugin.dict.model import DictData
 from backend.plugin.dict.schema.dict_data import CreateDictDataParam, UpdateDictDataParam
 
@@ -34,6 +35,7 @@ class CRUDDictData(CRUDPlus[DictData]):
             sort_columns='sort',
             sort_orders='desc',
             type_code=type_code,
+            status=StatusType.enable,
         )
 
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:

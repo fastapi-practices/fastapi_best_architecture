@@ -85,8 +85,9 @@ def filter_data_permission(  # noqa: C901
             if scope.status:
                 data_rules.update(rule for rule in scope.rules if rule is not None)
 
+    # 启用数据权限过滤，但没有已启用的数据权限
     if not data_rules:
-        return or_(1 == 1)
+        return or_(1 != 1)
 
     # 目标模型
     target_model_map = (
