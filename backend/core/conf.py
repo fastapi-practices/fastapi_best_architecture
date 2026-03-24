@@ -128,10 +128,7 @@ class Settings(BaseSettings):
 
     # RBAC
     RBAC_ROLE_MENU_MODE: bool = True
-    RBAC_ROLE_MENU_EXCLUDE: list[str] = [
-        'sys:monitor:redis',
-        'sys:monitor:server',
-    ]
+    RBAC_ROLE_MENU_EXCLUDE: list[str] = []
 
     # Cookie
     COOKIE_REFRESH_TOKEN_KEY: str = 'fba_refresh_token'
