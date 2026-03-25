@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from fastapi import Depends, Query
 from fastapi_pagination import pagination_ctx
 from fastapi_pagination.bases import AbstractPage, AbstractParams, RawParams
+from fastapi_pagination.cursor import CursorParams
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from fastapi_pagination.links.bases import create_links
 from pydantic import BaseModel, Field
@@ -54,6 +55,14 @@ class _PageDetails(BaseModel):
     links: _Links = Field(description='分页链接')
 
 
+class _CursorPageDetails(BaseModel):
+    """游标分页详情"""
+
+    items: list = Field([], description='当前页数据列表')
+    next_cursor: str | None = Field(None, description='下一页游标')
+    has_more: bool = Field(description='是否还有更多数据')
+
+
 class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
     """自定义分页类"""
 
@@ -86,6 +95,30 @@ class _CustomPage(_PageDetails, AbstractPage[T], Generic[T]):
         )
 
 
+class _CustomCursorPage(_CursorPageDetails, AbstractPage[T], Generic[T]):
+    """自定义游标分页类"""
+
+    __params_type__ = CursorParams
+
+    @classmethod
+    def create(
+        cls,
+        items: list,
+        params: CursorParams,
+        *,
+        next_: Any = None,
+        **kwargs: Any,
+    ) -> Self:
+        if not isinstance(params, CursorParams):
+            raise TypeError('CustomCursorPage should be used with CursorParams')
+
+        return cls(
+            items=items,
+            next_cursor=params.encode_cursor(next_),
+            has_more=next_ is not None,
+        )
+
+
 class PageData(_PageDetails, Generic[SchemaT]):
     """
     包含返回数据 schema 的统一返回模型，仅适用于分页接口
@@ -111,6 +144,12 @@ class PageData(_PageDetails, Generic[SchemaT]):
     items: Sequence[SchemaT]
 
 
+class CursorPageData(_CursorPageDetails, Generic[SchemaT]):
+    """包含返回数据 schema 的统一返回模型，仅适用于游标分页接口，用法与 PageData 相同"""
+
+    items: Sequence[SchemaT]
+
+
 async def paging_data(db: AsyncSession, select: Select, **kwargs) -> dict[str, Any]:
     """
     基于 SQLAlchemy 创建分页数据
@@ -125,5 +164,20 @@ async def paging_data(db: AsyncSession, select: Select, **kwargs) -> dict[str, A
     return page_data
 
 
+async def cursor_paging_data(db: AsyncSession, select: Select, **kwargs) -> dict[str, Any]:
+    """
+    基于 SQLAlchemy 创建游标分页数据
+
+    :param db: 数据库会话
+    :param select: SQL 查询语句
+    :param kwargs: 更多 fastapi-pagination apaginate 参数
+    :return:
+    """
+    paginated_data: _CustomCursorPage = await apaginate(db, select, **kwargs)
+    page_data = paginated_data.model_dump()
+    return page_data
+
+
 # 分页依赖注入
 DependsPagination = Depends(pagination_ctx(_CustomPage))
+DependsCursorPagination = Depends(pagination_ctx(_CustomCursorPage))
