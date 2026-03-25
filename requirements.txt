@@ -236,6 +236,7 @@ packaging==26.0
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-sqlalchemy
     #   pytest
+    #   sqlakeyset
 pillow==12.1.1
     # via fast-captcha
 pluggy==1.6.0
@@ -293,7 +294,9 @@ pytest==9.0.2
     # via pytest-sugar
 pytest-sugar==1.1.1
 python-dateutil==2.9.0.post0
-    # via celery
+    # via
+    #   celery
+    #   sqlakeyset
 python-dotenv==1.2.2
     # via
     #   pydantic-settings
@@ -331,10 +334,14 @@ six==1.17.0
     # via
     #   ecdsa
     #   python-dateutil
+sqlakeyset==2.0.1762907931
+    # via fastapi-pagination
 sqlalchemy==2.0.48
     # via
     #   alembic
     #   fastapi-best-architecture
+    #   fastapi-pagination
+    #   sqlakeyset
     #   sqlalchemy-crud-plus
 sqlalchemy-crud-plus==1.13.1
     # via fastapi-best-architecture
@@ -380,6 +387,7 @@ typing-extensions==4.15.0
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
+    #   sqlakeyset
     #   sqlalchemy
     #   starlette
     #   type-lens
