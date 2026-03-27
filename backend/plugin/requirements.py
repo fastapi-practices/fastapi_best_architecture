@@ -1,16 +1,18 @@
+import hashlib
 import os
 import subprocess
 import sys
 
-from importlib.metadata import PackageNotFoundError, distribution
+from pathlib import Path
 
-from packaging.requirements import Requirement
 from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
+from backend.database.redis import redis_client
 from backend.plugin.core import get_plugins
 from backend.plugin.errors import PluginInstallError
+from backend.utils.async_helper import run_await
 
 
 def _is_in_virtualenv() -> bool:
@@ -29,43 +31,37 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
 
     for plugin in plugins:
         requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
-        missing_dependencies = False
-        if os.path.exists(requirements_file):
-            with open(requirements_file, encoding='utf-8') as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or line.startswith('#'):
-                        continue
-                    try:
-                        req = Requirement(line)
-                        dependency = req.name.lower()
-                    except Exception as e:
-                        raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {e!s}') from e
-                    try:
-                        distribution(dependency)
-                    except PackageNotFoundError:
-                        missing_dependencies = True
+        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash'
 
-        if missing_dependencies:
-            pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
-            if not _is_in_virtualenv():
-                pip_install.append('--system')
-            if settings.PLUGIN_PIP_CHINA:
-                pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
+        if not os.path.exists(requirements_file):
+            run_await(redis_client.delete)(hash_key)
+            continue
 
-            max_retries = settings.PLUGIN_PIP_MAX_RETRY
-            for attempt in range(max_retries):
-                try:
-                    subprocess.check_call(pip_install)
-                    break
-                except subprocess.TimeoutExpired:
-                    if attempt == max_retries - 1:
-                        raise PluginInstallError(f'插件 {plugin} 依赖安装超时')
-                    continue
-                except subprocess.CalledProcessError as e:
-                    if attempt == max_retries - 1:
-                        raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
-                    continue
+        current_hash = hashlib.sha256(Path(requirements_file).read_bytes()).hexdigest()
+        cached_hash = run_await(redis_client.get)(hash_key)
+        if cached_hash == current_hash:
+            continue
+
+        pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
+        if not _is_in_virtualenv():
+            pip_install.append('--system')
+        if settings.PLUGIN_PIP_CHINA:
+            pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
+
+        max_retries = settings.PLUGIN_PIP_MAX_RETRY
+        for attempt in range(max_retries):
+            try:
+                subprocess.check_call(pip_install)
+                run_await(redis_client.set)(hash_key, current_hash)
+                break
+            except subprocess.TimeoutExpired:
+                if attempt == max_retries - 1:
+                    raise PluginInstallError(f'插件 {plugin} 依赖安装超时')
+                continue
+            except subprocess.CalledProcessError as e:
+                if attempt == max_retries - 1:
+                    raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
+                continue
 
 
 def uninstall_requirements(plugin: str) -> None:
@@ -75,6 +71,7 @@ def uninstall_requirements(plugin: str) -> None:
     :param plugin: 插件名称
     :return:
     """
+    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash')
     requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
     if os.path.exists(requirements_file):
         try:
