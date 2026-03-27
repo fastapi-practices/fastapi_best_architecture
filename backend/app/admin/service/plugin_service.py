@@ -25,8 +25,7 @@ class PluginService:
     async def get_all() -> list[dict[str, Any]]:
         """获取所有插件"""
 
-        changed_key = f'{settings.PLUGIN_REDIS_PREFIX}:changed'
-        keys = [key async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:*') if key != changed_key]
+        keys = [key async for key in redis_client.scan_iter(f'{settings.PLUGIN_REDIS_PREFIX}:config:*')]
         if not keys:
             return []
 
@@ -83,7 +82,7 @@ class PluginService:
         backup_file = PLUGIN_DIR / f'{plugin}.{timezone.now().strftime("%Y%m%d%H%M%S")}.backup.zip'
         await run_in_threadpool(zip_plugin, plugin_dir, backup_file)
         await run_in_threadpool(remove_plugin, plugin_dir)
-        await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
+        await redis_client.delete(f'{settings.PLUGIN_REDIS_PREFIX}:config:{plugin}')
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     @staticmethod
@@ -94,7 +93,8 @@ class PluginService:
         :param plugin: 插件名称
         :return:
         """
-        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
+        plugin_key = f'{settings.PLUGIN_REDIS_PREFIX}:config:{plugin}'
+        plugin_info = await redis_client.get(plugin_key)
         if not plugin_info:
             raise errors.NotFoundError(msg='插件不存在')
         plugin_info = json.loads(plugin_info)
@@ -106,7 +106,7 @@ class PluginService:
             else str(StatusType.disable.value)
         )
         plugin_info['plugin']['enable'] = new_status
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(plugin_info, ensure_ascii=False))
+        await redis_client.set(plugin_key, json.dumps(plugin_info, ensure_ascii=False))
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     @staticmethod

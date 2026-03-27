@@ -1,10 +1,14 @@
 import hashlib
 import os
+import site
 import subprocess
 import sys
 
+from importlib import invalidate_caches
+from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
 
+from packaging.requirements import Requirement
 from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
@@ -20,6 +24,14 @@ def _is_in_virtualenv() -> bool:
     return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
 
 
+def _refresh_site_packages() -> None:
+    """刷新当前进程的 site-packages 路径，确保新装依赖立即可导入。"""
+    invalidate_caches()
+    for site_dir in site.getsitepackages():
+        if site_dir.endswith('site-packages'):
+            site.addsitedir(site_dir)
+
+
 def install_requirements(plugin: str | None) -> None:  # noqa: C901
     """
     安装插件依赖
@@ -31,15 +43,36 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
 
     for plugin in plugins:
         requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
-        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash'
+        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}'
+        cached_hash = run_await(redis_client.get)(hash_key)
 
         if not os.path.exists(requirements_file):
             run_await(redis_client.delete)(hash_key)
             continue
 
+        missing_dependencies = False
+        for line in Path(requirements_file).read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            try:
+                req = Requirement(line)
+                dependency = req.name.lower()
+            except Exception as e:
+                raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {e!s}') from e
+
+            try:
+                dist = distribution(dependency)
+            except PackageNotFoundError:
+                missing_dependencies = True
+                break
+
+            if req.specifier and not req.specifier.contains(dist.version, prereleases=True):
+                missing_dependencies = True
+                break
+
         current_hash = hashlib.sha256(Path(requirements_file).read_bytes()).hexdigest()
-        cached_hash = run_await(redis_client.get)(hash_key)
-        if cached_hash == current_hash:
+        if cached_hash == current_hash and not missing_dependencies:
             continue
 
         pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
@@ -52,6 +85,7 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
         for attempt in range(max_retries):
             try:
                 subprocess.check_call(pip_install)
+                _refresh_site_packages()
                 run_await(redis_client.set)(hash_key, current_hash)
                 break
             except subprocess.TimeoutExpired:
@@ -71,7 +105,7 @@ def uninstall_requirements(plugin: str) -> None:
     :param plugin: 插件名称
     :return:
     """
-    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash')
+    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}')
     requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
     if os.path.exists(requirements_file):
         try:
