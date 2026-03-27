@@ -31,14 +31,14 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
 
     for plugin in plugins:
         requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
-        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash'
+        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}'
+        cached_hash = run_await(redis_client.get)(hash_key)
 
         if not os.path.exists(requirements_file):
             run_await(redis_client.delete)(hash_key)
             continue
 
         current_hash = hashlib.sha256(Path(requirements_file).read_bytes()).hexdigest()
-        cached_hash = run_await(redis_client.get)(hash_key)
         if cached_hash == current_hash:
             continue
 
@@ -71,7 +71,7 @@ def uninstall_requirements(plugin: str) -> None:
     :param plugin: 插件名称
     :return:
     """
-    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}:requirements_hash')
+    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}')
     requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
     if os.path.exists(requirements_file):
         try:
