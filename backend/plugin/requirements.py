@@ -13,7 +13,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
-from backend.database.redis import redis_client
+from backend.database.redis import RedisCli
 from backend.plugin.core import get_plugins
 from backend.plugin.errors import PluginInstallError
 from backend.utils.async_helper import run_await
@@ -22,14 +22,6 @@ from backend.utils.async_helper import run_await
 def _is_in_virtualenv() -> bool:
     """检测当前是否在虚拟环境中运行"""
     return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
-
-
-def _refresh_site_packages() -> None:
-    """刷新当前进程的 site-packages 路径，确保新装依赖立即可导入。"""
-    invalidate_caches()
-    for site_dir in site.getsitepackages():
-        if site_dir.endswith('site-packages'):
-            site.addsitedir(site_dir)
 
 
 def install_requirements(plugin: str | None) -> None:  # noqa: C901
@@ -41,61 +33,72 @@ def install_requirements(plugin: str | None) -> None:  # noqa: C901
     """
     plugins = [plugin] if plugin else get_plugins()
 
-    for plugin in plugins:
-        requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
-        hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}'
-        cached_hash = run_await(redis_client.get)(hash_key)
+    # 使用独立连接
+    current_redis_client = RedisCli()
+    run_await(current_redis_client.init)()
 
-        if not os.path.exists(requirements_file):
-            run_await(redis_client.delete)(hash_key)
-            continue
+    try:
+        for plugin in plugins:
+            requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
+            hash_key = f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}'
+            cached_hash = run_await(current_redis_client.get)(hash_key)
 
-        missing_dependencies = False
-        for line in Path(requirements_file).read_text().splitlines():
-            line = line.strip()
-            if not line or line.startswith('#'):
+            if not os.path.exists(requirements_file):
+                run_await(current_redis_client.delete)(hash_key)
                 continue
-            try:
-                req = Requirement(line)
-                dependency = req.name.lower()
-            except Exception as e:
-                raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {e!s}') from e
 
-            try:
-                dist = distribution(dependency)
-            except PackageNotFoundError:
-                missing_dependencies = True
-                break
+            missing_dependencies = False
+            for line in Path(requirements_file).read_text().splitlines():
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                try:
+                    req = Requirement(line)
+                    dependency = req.name.lower()
+                except Exception as e:
+                    raise PluginInstallError(f'插件 {plugin} 依赖 {line} 格式错误: {e!s}') from e
 
-            if req.specifier and not req.specifier.contains(dist.version, prereleases=True):
-                missing_dependencies = True
-                break
+                try:
+                    dist = distribution(dependency)
+                except PackageNotFoundError:
+                    missing_dependencies = True
+                    break
 
-        current_hash = hashlib.sha256(Path(requirements_file).read_bytes()).hexdigest()
-        if cached_hash == current_hash and not missing_dependencies:
-            continue
+                if req.specifier and not req.specifier.contains(dist.version, prereleases=True):
+                    missing_dependencies = True
+                    break
 
-        pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
-        if not _is_in_virtualenv():
-            pip_install.append('--system')
-        if settings.PLUGIN_PIP_CHINA:
-            pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
-
-        max_retries = settings.PLUGIN_PIP_MAX_RETRY
-        for attempt in range(max_retries):
-            try:
-                subprocess.check_call(pip_install)
-                _refresh_site_packages()
-                run_await(redis_client.set)(hash_key, current_hash)
-                break
-            except subprocess.TimeoutExpired:
-                if attempt == max_retries - 1:
-                    raise PluginInstallError(f'插件 {plugin} 依赖安装超时')
+            current_hash = hashlib.sha256(Path(requirements_file).read_bytes()).hexdigest()
+            if cached_hash == current_hash and not missing_dependencies:
                 continue
-            except subprocess.CalledProcessError as e:
-                if attempt == max_retries - 1:
-                    raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
-                continue
+
+            pip_install = ['uv', 'pip', 'install', '-r', requirements_file]
+            if not _is_in_virtualenv():
+                pip_install.append('--system')
+            if settings.PLUGIN_PIP_CHINA:
+                pip_install.extend(['-i', settings.PLUGIN_PIP_INDEX_URL])
+
+            max_retries = settings.PLUGIN_PIP_MAX_RETRY
+            for attempt in range(max_retries):
+                try:
+                    subprocess.check_call(pip_install)
+                    # 刷新依赖包缓存
+                    invalidate_caches()
+                    for site_dir in site.getsitepackages():
+                        if site_dir.endswith('site-packages'):
+                            site.addsitedir(site_dir)
+                    run_await(current_redis_client.set)(hash_key, current_hash)
+                    break
+                except subprocess.TimeoutExpired:
+                    if attempt == max_retries - 1:
+                        raise PluginInstallError(f'插件 {plugin} 依赖安装超时')
+                    continue
+                except subprocess.CalledProcessError as e:
+                    if attempt == max_retries - 1:
+                        raise PluginInstallError(f'插件 {plugin} 依赖安装失败：{e}') from e
+                    continue
+    finally:
+        run_await(current_redis_client.aclose)()
 
 
 def uninstall_requirements(plugin: str) -> None:
@@ -105,16 +108,23 @@ def uninstall_requirements(plugin: str) -> None:
     :param plugin: 插件名称
     :return:
     """
-    run_await(redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}')
-    requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
-    if os.path.exists(requirements_file):
-        try:
-            pip_uninstall = ['uv', 'pip', 'uninstall', '-r', str(requirements_file)]
-            if not _is_in_virtualenv():
-                pip_uninstall.append('--system')
-            subprocess.check_call(pip_uninstall, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as e:
-            raise PluginInstallError(f'插件 {plugin} 依赖卸载失败：{e}') from e
+    # 使用独立连接
+    current_redis_client = RedisCli()
+    run_await(current_redis_client.init)()
+
+    try:
+        run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{plugin}')
+        requirements_file = PLUGIN_DIR / plugin / 'requirements.txt'
+        if os.path.exists(requirements_file):
+            try:
+                pip_uninstall = ['uv', 'pip', 'uninstall', '-r', str(requirements_file)]
+                if not _is_in_virtualenv():
+                    pip_uninstall.append('--system')
+                subprocess.check_call(pip_uninstall, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError as e:
+                raise PluginInstallError(f'插件 {plugin} 依赖卸载失败：{e}') from e
+    finally:
+        run_await(current_redis_client.aclose)()
 
 
 async def install_requirements_async(plugin: str | None = None) -> None:
