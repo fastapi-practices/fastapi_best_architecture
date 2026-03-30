@@ -282,7 +282,7 @@ pydantic-settings==2.13.1
     # via
     #   fastapi
     #   fastapi-best-architecture
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   pytest
     #   rich
