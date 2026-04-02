@@ -10,6 +10,7 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose import ExpiredSignatureError, JWTError, jwt
 from pydantic_core import from_json
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.authentication import UnauthenticatedUser
 
 from backend.app.admin.model import User
 from backend.app.admin.schema.user import GetUserInfoWithRelationDetail
@@ -269,6 +270,9 @@ def superuser_verify(request: Request, _token: str = DependsJwtAuth) -> bool:
     :param _token: JWT 令牌
     :return:
     """
+    if isinstance(request.user, UnauthenticatedUser):
+        raise errors.TokenError
+
     superuser = request.user.is_superuser
     if not superuser or not request.user.is_staff:
         raise errors.AuthorizationError
