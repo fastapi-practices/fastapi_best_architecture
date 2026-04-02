@@ -144,8 +144,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     run_await(current_redis_client.init)()
 
     # 清理未知插件信息
-    exclude_keys = [f'{settings.PLUGIN_REDIS_PREFIX}:config:{key}' for key in plugins]
-    exclude_keys.extend(f'{settings.PLUGIN_REDIS_PREFIX}:requirements_hash:{key}' for key in plugins)
+    exclude_keys = [f'{settings.PLUGIN_REDIS_PREFIX}:{key}' for key in plugins]
     run_await(current_redis_client.delete_prefix)(
         settings.PLUGIN_REDIS_PREFIX,
         exclude=exclude_keys,
@@ -162,7 +161,7 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
         # 补充插件信息
         data['plugin']['name'] = plugin
-        plugin_cache_key = f'{settings.PLUGIN_REDIS_PREFIX}:config:{plugin}'
+        plugin_cache_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}'
         plugin_cache_info = run_await(current_redis_client.get)(plugin_cache_key)
         if plugin_cache_info:
             try:
@@ -308,7 +307,7 @@ class PluginStatusChecker:
         :param request: FastAPI 请求对象
         :return:
         """
-        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:config:{self.plugin}')
+        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{self.plugin}')
         if not plugin_info:
             log.error('插件状态未初始化或丢失，需重启服务自动修复')
             raise PluginInjectError('插件状态未初始化或丢失，请联系系统管理员')
