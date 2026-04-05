@@ -12,12 +12,14 @@ from prometheus_client import make_asgi_app
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
+from starlette.types import Lifespan
 from starlette_context.middleware import ContextMiddleware
 from starlette_context.plugins import RequestIdPlugin
 
 from backend import __version__
 from backend.common.cache.pubsub import cache_pubsub_manager
 from backend.common.exception.exception_handler import register_exception
+from backend.common.lifespan import lifespan_registry
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.common.observability.otel import init_otel
 from backend.common.response.response_code import StandardResponseCode
@@ -30,7 +32,7 @@ from backend.middleware.i18n_middleware import I18nMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
 from backend.middleware.opera_log_middleware import OperaLogMiddleware
 from backend.middleware.state_middleware import StateMiddleware
-from backend.plugin.core import build_final_router
+from backend.plugin.core import build_final_router, setup_plugins
 from backend.utils.demo_mode import demo_site
 from backend.utils.openapi import ensure_unique_route_names, simplify_operation_ids
 from backend.utils.serializers import MsgSpecJSONResponse
@@ -38,6 +40,7 @@ from backend.utils.snowflake import snowflake
 from backend.utils.trace_id import OtelTraceIdPlugin
 
 
+@lifespan_registry.register
 @asynccontextmanager
 async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     """
@@ -84,7 +87,7 @@ def register_app() -> FastAPI:
         redoc_url=settings.FASTAPI_REDOC_URL,
         openapi_url=settings.FASTAPI_OPENAPI_URL,
         default_response_class=MsgSpecJSONResponse,
-        lifespan=register_init,
+        lifespan=lifespan_registry.build(),
     )
 
     # 注册组件
@@ -95,6 +98,9 @@ def register_app() -> FastAPI:
     register_router(app)
     register_page(app)
     register_exception(app)
+
+    # 初始化所有插件
+    setup_plugins(app)
 
     if settings.GRAFANA_METRICS_ENABLE:
         register_metrics(app)

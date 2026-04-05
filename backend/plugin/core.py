@@ -8,7 +8,7 @@ from typing import Any
 import anyio
 import rtoml
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, FastAPI, Request
 
 from backend.common.enums import DataBaseType, PluginLevelType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
@@ -286,6 +286,33 @@ def build_final_router() -> APIRouter:
         inject_app_router(plugin, main_router)
 
     return main_router
+
+
+def setup_plugins(app: FastAPI) -> None:
+    """初始化插件"""
+    plugins = get_plugins()
+
+    for plugin in plugins:
+        module_path = f'backend.plugin.{plugin}'
+        try:
+            module = import_module_cached(module_path)
+        except Exception as e:
+            log.warning('插件 {} 加载失败: {}', plugin, e)
+            continue
+
+        setup_func = getattr(module, 'setup', None)
+        if setup_func is None:
+            continue
+
+        if not callable(setup_func):
+            log.warning('插件 {} 的 setup 不是可调用对象，已跳过', plugin)
+            continue
+
+        try:
+            setup_func(app)
+            log.info('插件 {} 初始化成功', plugin)
+        except Exception as e:
+            log.error('插件 {} 初始化失败: {}', plugin, e)
 
 
 class PluginStatusChecker:
