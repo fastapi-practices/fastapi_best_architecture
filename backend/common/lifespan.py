@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from contextlib import AbstractAsyncContextManager, asynccontextmanager
+from contextlib import AbstractAsyncContextManager, AsyncExitStack, asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI
@@ -7,45 +7,46 @@ from fastapi import FastAPI
 LifespanFunc = Callable[[FastAPI], AbstractAsyncContextManager[dict[str, Any] | None]]
 
 
-class LifespanRegistry:
-    """FastAPI lifespan 全局注册器"""
+class LifespanManager:
+    """FastAPI lifespan 管理器"""
 
     def __init__(self) -> None:
         self._lifespans: list[LifespanFunc] = []
 
     def register(self, func: LifespanFunc) -> LifespanFunc:
-        """作为装饰器或直接调用，注册一个 lifespan 函数"""
-        self._lifespans.append(func)
+        """
+        注册 lifespan hook
+
+        :param func: lifespan hook
+        :return:
+        """
+        if func not in self._lifespans:
+            self._lifespans.append(func)
         return func
 
-    def build(self) -> Callable[[FastAPI], AbstractAsyncContextManager[None]]:
-        """将所有注册的 lifespan 组合为一个，供 FastAPI 使用"""
-        lifespans = self._lifespans
+    def build(self) -> LifespanFunc:
+        """
+        构建组合后的 lifespan hook
+
+        :return:
+        """
 
         @asynccontextmanager
         async def combined_lifespan(app: FastAPI):  # noqa: ANN202
-            exit_stack: list[AbstractAsyncContextManager[Any]] = []
             state: dict[str, Any] = {}
-
-            try:
-                for lifespan_fn in lifespans:
-                    ctx = lifespan_fn(app)
-                    result = await ctx.__aenter__()
-                    exit_stack.append(ctx)
+            async with AsyncExitStack() as exit_stack:
+                for lifespan_fn in self._lifespans:
+                    result = await exit_stack.enter_async_context(lifespan_fn(app))
                     if isinstance(result, dict):
                         state.update(result)
 
-                for k, v in state.items():
-                    setattr(app.state, k, v)
+                for key, value in state.items():
+                    setattr(app.state, key, value)
 
-                yield
-
-            finally:
-                for ctx in reversed(exit_stack):
-                    await ctx.__aexit__(None, None, None)
+                yield state or None
 
         return combined_lifespan
 
 
-# 全局实例
-lifespan_registry = LifespanRegistry()
+# 创建 lifespan_manager 单例
+lifespan_manager = LifespanManager()

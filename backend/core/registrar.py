@@ -18,7 +18,7 @@ from starlette_context.plugins import RequestIdPlugin
 from backend import __version__
 from backend.common.cache.pubsub import cache_pubsub_manager
 from backend.common.exception.exception_handler import register_exception
-from backend.common.lifespan import lifespan_registry
+from backend.common.lifespan import lifespan_manager
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.common.observability.otel import init_otel
 from backend.common.response.response_code import StandardResponseCode
@@ -39,7 +39,7 @@ from backend.utils.snowflake import snowflake
 from backend.utils.trace_id import OtelTraceIdPlugin
 
 
-@lifespan_registry.register
+@lifespan_manager.register
 @asynccontextmanager
 async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     """
@@ -86,7 +86,7 @@ def register_app() -> FastAPI:
         redoc_url=settings.FASTAPI_REDOC_URL,
         openapi_url=settings.FASTAPI_OPENAPI_URL,
         default_response_class=MsgSpecJSONResponse,
-        lifespan=lifespan_registry.build(),
+        lifespan=lifespan_manager.build(),
     )
 
     # 注册组件
@@ -98,7 +98,7 @@ def register_app() -> FastAPI:
     register_page(app)
     register_exception(app)
 
-    # 初始化所有插件
+    # 初始化插件
     setup_plugins(app)
 
     if settings.GRAFANA_METRICS_ENABLE:
