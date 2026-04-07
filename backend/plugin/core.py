@@ -219,11 +219,7 @@ def run_plugin_startup_hook(plugin: str, module: Any, app: FastAPI) -> None:
 
 
 def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """
-    解析插件配置
-
-    :return:
-    """
+    """解析插件配置"""
     extend_plugins = []
     app_plugins = []
     plugins = get_plugins()
