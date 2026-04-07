@@ -18,11 +18,10 @@ sio = socketio.AsyncServer(
     async_mode='asgi',
     cors_allowed_origins=settings.CORS_ALLOWED_ORIGINS,
     cors_credentials=True,
-    namespaces=['/ws'],
 )
 
 
-@sio.event
+@sio.event(namespace='/ws')
 async def connect(sid, environ, auth) -> bool:
     """Socket 连接事件"""
     if not auth:
@@ -42,16 +41,18 @@ async def connect(sid, environ, auth) -> bool:
 
     try:
         with request_cycle_context({settings.TRACE_ID_REQUEST_HEADER_KEY: uuid.uuid4().hex}):
-            await jwt_authentication(token)
+            user = await jwt_authentication(token)
     except Exception as e:
         log.info(f'WebSocket 连接失败：{e!s}')
         return False
 
+    await sio.save_session(sid, {'user_id': user.id, 'session_uuid': session_uuid}, namespace='/ws')
+    await sio.enter_room(sid, f'user:{user.id}', namespace='/ws')
     await redis_client.sadd(settings.TOKEN_ONLINE_REDIS_PREFIX, session_uuid)
     return True
 
 
-@sio.event
+@sio.event(namespace='/ws')
 async def disconnect(sid) -> None:
     """Socket 断开连接事件"""
     await redis_client.spop(settings.TOKEN_ONLINE_REDIS_PREFIX)
