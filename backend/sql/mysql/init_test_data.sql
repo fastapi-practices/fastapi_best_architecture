@@ -64,6 +64,15 @@ values
 (3, 1, 3),
 (4, 1, 50);
 
+insert into sys_role_menu (id, role_id, menu_id)
+select 5, 1, id from sys_menu where name = 'Workflow';
+
+insert into sys_role_menu (id, role_id, menu_id)
+select 6, 1, id from sys_menu where name = 'WorkflowStartApply';
+
+insert into sys_role_menu (id, role_id, menu_id)
+select 7, 1, id from sys_menu where name = 'WorkflowApply';
+
 insert into sys_user (id, uuid, username, nickname, password, salt, email, status, is_superuser, is_staff, is_multi_login, avatar, phone, join_time, last_login_time, last_password_changed_time, dept_id, created_time, updated_time)
 values
 (1, uuid(), 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', unhex('24326224313224387932654E7563583139566A6D5A33745968424C634F'), 'admin@example.com', 1, true, true, true, null, null, now(), now(), now(), 1, now(), null),

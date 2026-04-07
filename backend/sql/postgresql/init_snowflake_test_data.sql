@@ -64,6 +64,15 @@ values
 (2048601269546909696, 2048601269345583104, 2049629108245233666),
 (2048601269609824256, 2048601269345583104, 2049629108253622282);
 
+insert into sys_role_menu (id, role_id, menu_id)
+select 2048601269609824257, 2048601269345583104, id from sys_menu where name = 'Workflow';
+
+insert into sys_role_menu (id, role_id, menu_id)
+select 2048601269609824258, 2048601269345583104, id from sys_menu where name = 'WorkflowStartApply';
+
+insert into sys_role_menu (id, role_id, menu_id)
+select 2048601269609824259, 2048601269345583104, id from sys_menu where name = 'WorkflowApply';
+
 insert into sys_user (id, uuid, username, nickname, password, salt, email, status, is_superuser, is_staff, is_multi_login, avatar, phone, join_time, last_login_time, last_password_changed_time, dept_id, created_time, updated_time)
 values
 (2048601269672738816, gen_random_uuid(), 'admin', '用户88888', '$2b$12$8y2eNucX19VjmZ3tYhBLcOsBwy9w1IjBQE4SSqwMDL5bGQVp2wqS.', decode('24326224313224387932654E7563583139566A6D5A33745968424C634F', 'hex'), 'admin@example.com', 1, true, true, true, null, null, now(), now(), now(), 2048601264366944256, now(), null),

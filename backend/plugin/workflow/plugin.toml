@@ -1,0 +1,17 @@
+[plugin]
+summary = "企业审批流"
+version = "0.1.0"
+description = "流程定义、审批实例、审批任务与消息通知"
+author = "Claude Code"
+tags = ["task", "notification"]
+database = ["mysql", "postgresql"]
+
+[app]
+router = ["v1"]
+
+[settings]
+WORKFLOW_INSTANCE_NO_PREFIX = "WF"
+WORKFLOW_DEFAULT_TIMEOUT_HOURS = 72
+WORKFLOW_ALLOW_BATCH_APPROVE = true
+WORKFLOW_MAX_URGE_COUNT = 3
+WORKFLOW_URGE_INTERVAL_HOURS = 24
