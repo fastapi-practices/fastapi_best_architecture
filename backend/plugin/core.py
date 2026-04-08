@@ -245,13 +245,16 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             else:
                 app_plugins.append(plugin_config)
 
+            # 补充插件信息
             plugin_config['plugin']['name'] = plugin
             plugin_cache_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}'
             plugin_cache_info = run_await(current_redis_client.get)(plugin_cache_key)
             plugin_config['plugin']['enable'] = get_plugin_enable(plugin_cache_info, StatusType.enable.value)
 
+            # 缓存最新插件信息
             run_await(current_redis_client.set)(plugin_cache_key, json.dumps(plugin_config, ensure_ascii=False))
 
+        # 重置插件变更状态
         run_await(current_redis_client.delete)(f'{settings.PLUGIN_REDIS_PREFIX}:changed')
     finally:
         run_await(current_redis_client.aclose)()
