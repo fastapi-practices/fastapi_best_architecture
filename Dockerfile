@@ -26,6 +26,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-default-groups --group server --no-install-project
 
+# Preinstall plugin dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    python -c "from backend.plugin.requirements import install_requirements; install_requirements(None)"
+
 # === Runtime base server image ===
 FROM python:3.10-slim-bookworm AS base_server
 

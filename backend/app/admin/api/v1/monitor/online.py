@@ -7,14 +7,14 @@ from fastapi import APIRouter, Path, Query
 from backend.app.admin.schema.token import GetTokenDetail
 from backend.common.enums import StatusType
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth, DependsSuperUser, jwt_decode, revoke_token
+from backend.common.security.jwt import DependsSuperUser, jwt_decode, revoke_token
 from backend.core.conf import settings
 from backend.database.redis import redis_client
 
 router = APIRouter()
 
 
-@router.get('', summary='获取在线用户', dependencies=[DependsJwtAuth])
+@router.get('', summary='获取在线用户', dependencies=[DependsSuperUser])
 async def get_sessions(
     username: Annotated[str | None, Query(description='用户名')] = None,
 ) -> ResponseSchemaModel[list[GetTokenDetail]]:

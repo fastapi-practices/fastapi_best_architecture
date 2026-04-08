@@ -12,7 +12,7 @@ from backend.app.admin.service.login_log_service import login_log_service
 from backend.app.admin.service.user_password_history_service import password_security_service
 from backend.app.admin.utils.password_security import password_verify
 from backend.common.context import ctx
-from backend.common.enums import LoginLogStatusType
+from backend.common.enums import LoginLogStatusType, StatusType
 from backend.common.exception import errors
 from backend.common.i18n import t
 from backend.common.log import log
@@ -201,14 +201,14 @@ class AuthService:
         if request.user.is_superuser:
             menus = await menu_dao.get_all(db, None, None)
             for menu in menus:
-                if menu.perms:
+                if menu.status == StatusType.enable and menu.perms:
                     codes.update(menu.perms.split(','))
         else:
-            roles = request.user.roles
+            roles = [role for role in request.user.roles if role.status == StatusType.enable]
             if roles:
                 for role in roles:
                     for menu in role.menus:
-                        if menu.perms:
+                        if menu.status == StatusType.enable and menu.perms:
                             codes.update(menu.perms.split(','))
 
         return list(codes)

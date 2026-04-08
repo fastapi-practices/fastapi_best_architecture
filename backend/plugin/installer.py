@@ -157,6 +157,54 @@ async def install_git_plugin(repo_url: str) -> str:
     return repo_name
 
 
+async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str) -> str:  # noqa: C901
+    """
+    安装前端 Git 插件
+
+    :param repo_url: Git 仓库地址
+    :param frontend_project_root: 前端项目根路径
+    :return:
+    """
+    match = is_git_url(repo_url)
+    if not match:
+        raise errors.RequestError(msg='Git 仓库地址格式非法，仅支持 HTTP/HTTPS 协议')
+
+    if not frontend_project_root.strip():
+        raise errors.RequestError(msg='前端项目根路径不能为空')
+
+    frontend_root = await (await anyio.Path(frontend_project_root).expanduser()).resolve()
+    if not await frontend_root.exists():
+        raise errors.RequestError(msg='前端项目根路径不存在')
+    if not await frontend_root.is_dir():
+        raise errors.RequestError(msg='前端项目根路径非法')
+
+    plugins_dir = frontend_root.joinpath('apps', 'web-antdv-next', 'src', 'plugins')
+    if not await plugins_dir.exists() or not await plugins_dir.is_dir():
+        raise errors.RequestError(msg='未检测到前端插件目录，请确认路径下存在 apps/web-antdv-next/src/plugins')
+
+    repo_name = match.group('repo')
+    plugin_name = repo_name.removesuffix('_ui')
+    if not plugin_name:
+        raise errors.RequestError(msg='前端插件仓库名称非法')
+
+    target_path = anyio.Path(plugins_dir / plugin_name)
+    if await target_path.exists():
+        raise errors.ConflictError(msg=f'{plugin_name} 前端插件已安装')
+
+    try:
+        await run_in_threadpool(porcelain.clone, repo_url, plugins_dir / plugin_name, checkout=True)
+        git_dir = anyio.Path(plugins_dir / plugin_name / '.git')
+        if await git_dir.exists():
+            await run_in_threadpool(remove_plugin, plugins_dir / plugin_name / '.git')
+    except Exception as e:
+        if await target_path.exists():
+            await run_in_threadpool(remove_plugin, plugins_dir / plugin_name)
+        log.error(f'前端插件安装失败: {e}')
+        raise errors.ServerError(msg='前端插件安装失败，请稍后重试') from e
+
+    return plugin_name
+
+
 def remove_plugin(plugin_dir: os.PathLike) -> None:
     """
     删除插件

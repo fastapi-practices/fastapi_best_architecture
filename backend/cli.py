@@ -31,6 +31,7 @@ from backend.core.path_conf import (
     BASE_PATH,
     ENV_EXAMPLE_FILE_PATH,
     ENV_FILE_PATH,
+    LOCALE_DIR,
     MYSQL_SCRIPT_DIR,
     PLUGIN_DIR,
     POSTGRESQL_SCRIPT_DIR,
@@ -44,7 +45,7 @@ from backend.database.db import (
 )
 from backend.database.redis import RedisCli, redis_client
 from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_plugin_sql, get_plugins
-from backend.plugin.installer import install_git_plugin, install_zip_plugin, zip_plugin
+from backend.plugin.installer import install_git_frontend_plugin, install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
 from backend.utils.console import console
@@ -59,11 +60,17 @@ class CustomReloadFilter(PythonFilter):
     """自定义重载过滤器"""
 
     def __init__(self) -> None:
-        super().__init__(extra_extensions=['.json', '.yaml', '.yml'])
+        self.extra_extensions = ('.json', '.yaml', '.yml')
+        super().__init__(extra_extensions=self.extra_extensions)
 
     def __call__(self, change: Change, path: str) -> bool:
         if RELOAD_LOCK_FILE.exists():
             return False
+
+        file_path = Path(path).resolve()
+        if file_path.suffix in self.extra_extensions and not file_path.is_relative_to(LOCALE_DIR.resolve()):
+            return False
+
         return super().__call__(change, path)
 
 
@@ -347,8 +354,9 @@ def run_celery_flower(port: int, basic_auth: str) -> None:
 
 
 async def install_plugin(  # noqa: C901
-    path: str,
-    repo_url: str,
+    path: str | None,
+    repo_url: str | None,
+    frontend: bool,  # noqa: FBT001
     no_sql: bool,  # noqa: FBT001
     db_type: DataBaseType,
     pk_type: PrimaryKeyType,
@@ -357,15 +365,24 @@ async def install_plugin(  # noqa: C901
     if settings.ENVIRONMENT != 'dev':
         raise cappa.Exit('插件安装仅在开发环境可用', code=1)
 
-    if not path and not repo_url:
-        raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
-    if path and repo_url:
-        raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
-
     plugin_name = None
     console.note('开始安装插件...')
 
     try:
+        if frontend:
+            if repo_url is None:
+                raise cappa.Exit('前端插件仅允许通过 Git 仓库地址安装', code=1)
+
+            frontend_project_root = Prompt.ask('前端项目根路径')
+            plugin_name = await install_git_frontend_plugin(repo_url, frontend_project_root)
+            console.tip(f'前端插件 {plugin_name} 安装成功')
+            return
+
+        if path is None and repo_url is None:
+            raise cappa.Exit('path 或 repo_url 必须指定其中一项', code=1)
+        if path and repo_url:
+            raise cappa.Exit('path 和 repo_url 不能同时指定', code=1)
+
         if path:
             plugin_name = await install_zip_plugin(file=path)
         if repo_url:
@@ -655,11 +672,15 @@ class Run:
 class Add:
     path: Annotated[
         str | None,
-        cappa.Arg(help='ZIP 插件的本地完整路径'),
+        cappa.Arg(default=None, help='ZIP 插件的本地完整路径'),
     ]
     repo_url: Annotated[
         str | None,
-        cappa.Arg(help='Git 插件的仓库地址'),
+        cappa.Arg(default=None, help='Git 插件的仓库地址'),
+    ]
+    frontend: Annotated[
+        bool,
+        cappa.Arg(short='-f', default=False, help='安装前端插件'),
     ]
     no_sql: Annotated[
         bool,
@@ -675,7 +696,7 @@ class Add:
     ]
 
     async def __call__(self) -> None:
-        await install_plugin(self.path, self.repo_url, self.no_sql, self.db_type, self.pk_type)
+        await install_plugin(self.path, self.repo_url, self.frontend, self.no_sql, self.db_type, self.pk_type)
 
 
 @cappa.command(help='移除插件')

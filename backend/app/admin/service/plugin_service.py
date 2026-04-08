@@ -94,7 +94,8 @@ class PluginService:
         :param plugin: 插件名称
         :return:
         """
-        plugin_info = await redis_client.get(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}')
+        plugin_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}'
+        plugin_info = await redis_client.get(plugin_key)
         if not plugin_info:
             raise errors.NotFoundError(msg='插件不存在')
         plugin_info = json.loads(plugin_info)
@@ -106,7 +107,7 @@ class PluginService:
             else str(StatusType.disable.value)
         )
         plugin_info['plugin']['enable'] = new_status
-        await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}', json.dumps(plugin_info, ensure_ascii=False))
+        await redis_client.set(plugin_key, json.dumps(plugin_info, ensure_ascii=False))
         await redis_client.set(f'{settings.PLUGIN_REDIS_PREFIX}:changed', 'true')
 
     @staticmethod

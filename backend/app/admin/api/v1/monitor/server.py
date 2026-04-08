@@ -20,14 +20,14 @@ from backend.app.admin.schema.monitor import (
     SysInfo,
 )
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
-from backend.common.security.jwt import DependsJwtAuth
+from backend.common.security.jwt import DependsSuperUser
 from backend.utils.format import fmt_bytes, fmt_seconds
 from backend.utils.timezone import timezone
 
 router = APIRouter()
 
 
-@router.get('', summary='Server 监控', dependencies=[DependsJwtAuth])
+@router.get('', summary='Server 监控', dependencies=[DependsSuperUser])
 async def get_server_info() -> ResponseSchemaModel[ServerMonitorInfo]:  # noqa: C901
     def get_all_info() -> ServerMonitorInfo:  # noqa: C901
         # CPU 信息
