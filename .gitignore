@@ -11,3 +11,5 @@ venv/
 .serena/
 .agents/
 .logs/
+.superpowers/
+superpowers/
