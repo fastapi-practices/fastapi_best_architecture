@@ -1,3 +1,39 @@
+<a id="v1.13.3"></a>
+# [v1.13.3](https://github.com/fastapi-practices/fastapi-best-architecture/releases/tag/v1.13.3) - 2026-04-08
+
+## What's Changed
+* Update changelog for v1.13.2 by [@wu-clan](https://github.com/wu-clan) in [#1124](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1124)
+* Fix the logic related to the status field by [@wu-clan](https://github.com/wu-clan) in [#1125](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1125)
+* Fix code generation menu sql scripts by [@wu-clan](https://github.com/wu-clan) in [#1127](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1127)
+* Update plugins and monitoring permissions by [@wu-clan](https://github.com/wu-clan) in [#1126](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1126)
+* Add custom cursor pagination support by [@wu-clan](https://github.com/wu-clan) in [#1128](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1128)
+* Update the plugin requirements check by [@wu-clan](https://github.com/wu-clan) in [#1129](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1129)
+* Update plugin config and dependency cache by [@wu-clan](https://github.com/wu-clan) in [#1130](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1130)
+* Fix plugin dependencies for redis instance by [@wu-clan](https://github.com/wu-clan) in [#1133](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1133)
+* Fix current superuser permission validation by [@wu-clan](https://github.com/wu-clan) in [#1138](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1138)
+* Fix the return of registered task results by [@wu-clan](https://github.com/wu-clan) in [#1139](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1139)
+* Refactor plugin dependency cache and check by [@wu-clan](https://github.com/wu-clan) in [#1140](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1140)
+* Add the installation frontend plugin CLI by [@wu-clan](https://github.com/wu-clan) in [#1141](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1141)
+* Update custom reload filter call rules by [@wu-clan](https://github.com/wu-clan) in [#1144](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1144)
+* Fix custom email model return type by [@wu-clan](https://github.com/wu-clan) in [#1145](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1145)
+* Add superpowers to gitignore file by [@wu-clan](https://github.com/wu-clan) in [#1146](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1146)
+* Add plugin system hook function mechanism by [@yuWorm](https://github.com/yuWorm) in [#1142](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1142)
+* Bump dependencies and pre-commits by [@wu-clan](https://github.com/wu-clan) in [#1147](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1147)
+* Update the version number to 1.13.3 by [@wu-clan](https://github.com/wu-clan) in [#1148](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1148)
+
+## New Contributors
+* [@yuWorm](https://github.com/yuWorm) made their first contribution in [#1142](https://github.com/fastapi-practices/fastapi-best-architecture/pull/1142)
+
+**Full Changelog**: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.2...v1.13.3
+
+## Contributors
+
+<a href="https://github.com/wu-clan"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2Fwu-clan.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@wu-clan"></a>
+<a href="https://github.com/yuWorm"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgithub.com%2FyuWorm.png&w=128&h=128&fit=cover&mask=circle" width="64" height="64" alt="@yuWorm"></a>
+
+[Changes][v1.13.3]
+
+
 <a id="v1.13.2"></a>
 # [v1.13.2](https://github.com/fastapi-practices/fastapi-best-architecture/releases/tag/v1.13.2) - 2026-03-23
 
@@ -1437,6 +1473,7 @@
 [Changes][v1.0.0]
 
 
+[v1.13.3]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.2...v1.13.3
 [v1.13.2]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.1...v1.13.2
 [v1.13.1]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.13.0...v1.13.1
 [v1.13.0]: https://github.com/fastapi-practices/fastapi-best-architecture/compare/v1.12.3...v1.13.0
