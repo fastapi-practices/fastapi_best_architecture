@@ -22,4 +22,3 @@ async def override_get_db_transaction() -> AsyncGenerator[AsyncSession, None]:
     """获取数据库会话"""
     async with async_test_db_session.begin() as session:
         yield session
-
