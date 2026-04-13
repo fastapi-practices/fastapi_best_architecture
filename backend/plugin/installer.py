@@ -157,7 +157,7 @@ async def install_git_plugin(repo_url: str) -> str:
     return repo_name
 
 
-async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str) -> str:  # noqa: C901
+async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str) -> str:
     """
     安装前端 Git 插件
 
@@ -193,12 +193,7 @@ async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str)
 
     try:
         await run_in_threadpool(porcelain.clone, repo_url, plugins_dir / plugin_name, checkout=True)
-        git_dir = anyio.Path(plugins_dir / plugin_name / '.git')
-        if await git_dir.exists():
-            await run_in_threadpool(remove_plugin, plugins_dir / plugin_name / '.git')
     except Exception as e:
-        if await target_path.exists():
-            await run_in_threadpool(remove_plugin, plugins_dir / plugin_name)
         log.error(f'前端插件安装失败: {e}')
         raise errors.ServerError(msg='前端插件安装失败，请稍后重试') from e
 
