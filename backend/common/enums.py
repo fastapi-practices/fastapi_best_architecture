@@ -145,3 +145,11 @@ class PrimaryKeyType(StrEnum):
 
     autoincrement = 'autoincrement'
     snowflake = 'snowflake'
+
+
+class LifespanStage(IntEnum):
+    """lifespan 执行阶段，数字越小越先执行"""
+
+    core = 0    # 核心基础设施，如数据库、Redis
+    plugin = 1  # 插件
+    tail = 2    # 收尾任务

@@ -3,43 +3,48 @@ from contextlib import AbstractAsyncContextManager, AsyncExitStack, asynccontext
 from typing import Any, overload
 
 from fastapi import FastAPI
+from backend.common.enums import LifespanStage
 
 LifespanFunc = Callable[[FastAPI], AbstractAsyncContextManager[dict[str, Any] | None]]
+
 
 
 class LifespanManager:
     """FastAPI lifespan 管理器"""
 
     def __init__(self) -> None:
-        # 存储 (priority, func)，无 priority 时默认为 None
-        self._lifespans: list[tuple[int | None, LifespanFunc]] = []
+        # 存储 (stage, insert_order, func)
+        self._lifespans: list[tuple[int, int, LifespanFunc]] = []
+        self._insert_order: int = 0
 
     @overload
     def register(self, func: LifespanFunc) -> LifespanFunc: ...
 
     @overload
-    def register(self, *, priority: int) -> Callable[[LifespanFunc], LifespanFunc]: ...
+    def register(self, *, stage: LifespanStage) -> Callable[[LifespanFunc], LifespanFunc]: ...
 
     def register(
-        self, func: LifespanFunc | None = None, *, priority: int | None = None
+        self, func: LifespanFunc | None = None, *, stage: LifespanStage = LifespanStage.core
     ) -> LifespanFunc | Callable[[LifespanFunc], LifespanFunc]:
         """
         注册 lifespan hook
 
         :param func: lifespan hook（直接装饰时使用）
-        :param priority: 优先级，数字越小越先执行；不传则追加到列表末尾
+        :param stage: 执行阶段，控制粗粒度顺序，默认为 core
         :return:
         """
         def decorator(f: LifespanFunc) -> LifespanFunc:
-            if all(fn is not f for _, fn in self._lifespans):
-                self._lifespans.append((priority, f))
+            if all(fn is not f for _, _, fn in self._lifespans):
+                order = self._insert_order
+                self._insert_order += 1
+                self._lifespans.append((stage.value, order, f))
             return f
 
         if func is not None:
             # 直接作为装饰器使用：@lifespan_manager.register
             return decorator(func)
 
-        # 带参数使用：@lifespan_manager.register(priority=1)
+        # 带参数使用：@lifespan_manager.register(stage=LifespanStage.plugin)
         return decorator
 
     def build(self) -> LifespanFunc:
@@ -52,12 +57,7 @@ class LifespanManager:
         @asynccontextmanager
         async def combined_lifespan(app: FastAPI):  # noqa: ANN202
             state: dict[str, Any] = {}
-            with_priority = sorted(
-                ((p, fn) for p, fn in self._lifespans if p is not None),
-                key=lambda x: x[0],
-            )
-            without_priority = [(p, fn) for p, fn in self._lifespans if p is None]
-            sorted_lifespans = [fn for _, fn in with_priority] + [fn for _, fn in without_priority]
+            sorted_lifespans = [fn for _, _, fn in sorted(self._lifespans, key=lambda x: (x[0], x[1]))]
             async with AsyncExitStack() as exit_stack:
                 for lifespan_fn in sorted_lifespans:
                     result = await exit_stack.enter_async_context(lifespan_fn(app))

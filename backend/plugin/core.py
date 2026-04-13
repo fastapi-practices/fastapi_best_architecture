@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, FastAPI, Request
 
 from backend.common.enums import DataBaseType, PluginLevelType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
+from backend.common.enums import LifespanStage
 from backend.common.lifespan import lifespan_manager
 from backend.common.log import log
 from backend.core.conf import settings
@@ -77,10 +78,10 @@ def get_plugin_models() -> list[object]:
 
 
 def build_sql_filename(
-    prefix: str,
-    pk_type: PrimaryKeyType,
-    *,
-    suffix: str | None = None,
+        prefix: str,
+        pk_type: PrimaryKeyType,
+        *,
+        suffix: str | None = None,
 ) -> str:
     parts = [prefix]
     if pk_type == PrimaryKeyType.snowflake:
@@ -191,7 +192,7 @@ def register_plugin_lifespan_hook(plugin: str, module: Any) -> None:
         log.warning(f'插件 {plugin} 的 lifespan 不是可调用对象，已跳过')
         return
 
-    lifespan_manager.register(lifespan_hook)
+    lifespan_manager.register(lifespan_hook, stage=LifespanStage.plugin)  # type: ignore[call-overload]
     log.info(f'插件 {plugin} lifespan hook 注册成功')
 
 
@@ -367,6 +368,59 @@ def build_final_router() -> APIRouter:
     return main_router
 
 
+def _sort_plugins_by_dependency(plugins: list[str], enabled_plugins: set[str]) -> list[str]:
+    """
+    根据 depends_on 对插件排序
+
+    :param plugins: 所有插件列表
+    :param enabled_plugins: 已启用的插件集合
+    :return: 排序后的插件列表
+    """
+    active = [p for p in plugins if p in enabled_plugins]
+
+    active_set = set(active)
+
+    # 读取每个插件的依赖
+    deps: dict[str, list[str]] = {}
+    for plugin in active:
+        config = load_plugin_config(plugin)
+        plugin_deps = config.get('plugin', {}).get('depends_on', [])
+
+        # 先校验依赖插件存在，再校验是否已启用
+        for dep in plugin_deps:
+            if dep not in plugins:
+                raise PluginConfigError(f'插件 {plugin} 依赖 {dep}，但 {dep} 不存在')
+            if dep not in active_set:
+                raise PluginConfigError(f'插件 {plugin} 依赖 {dep}，但 {dep} 未启用')
+
+        deps[plugin] = plugin_deps
+
+    # 拓扑排序
+    sorted_list: list[str] = []
+    visited = set()
+
+    def visit(name: str, path: list[str]) -> None:
+        if name in path:
+            cycle_start = path.index(name)
+            cycle_path = path[cycle_start:] + [name]
+            raise PluginConfigError(f'插件存在循环依赖: {" -> ".join(cycle_path)}')
+        if name in visited:
+            return
+
+        path.append(name)
+        for dep in deps.get(name, []):
+            visit(dep, path)
+        path.pop()
+
+        visited.add(name)
+        sorted_list.append(name)
+
+    for plugin in active:
+        visit(plugin, [])
+
+    return sorted_list
+
+
 def setup_plugins(app: FastAPI) -> None:
     """
     注册并执行插件 hooks
@@ -377,22 +431,25 @@ def setup_plugins(app: FastAPI) -> None:
     plugins = get_plugins()
     enabled_plugins = get_enabled_plugins(plugins)
 
-    for plugin in plugins:
-        if plugin not in enabled_plugins:
-            log.info(f'插件 {plugin} 未启用，已跳过 hooks 注册与执行')
-            continue
+    # 按依赖关系排序
+    try:
+        ordered_plugins = _sort_plugins_by_dependency(list(plugins), enabled_plugins)
+    except PluginConfigError as e:
+        log.error(f'插件依赖解析失败: {e}')
+        raise
 
+    # 注册并执行 hooks
+    for plugin in ordered_plugins:
         module_path = f'backend.plugin.{plugin}.hooks'
         try:
             module = import_module_cached(module_path)
         except ModuleNotFoundError as e:
             if e.name == module_path:
-                # 未定义 hooks.py
-                continue
-            log.warning(f'插件 {plugin} hooks 模块加载失败: {e}')
+                continue  # 没有 hooks.py
+            log.warning(f'插件 {plugin} hooks 加载失败: {e}')
             continue
         except Exception as e:
-            log.warning(f'插件 {plugin} hooks 模块加载失败: {e}')
+            log.warning(f'插件 {plugin} hooks 加载失败: {e}')
             continue
 
         try:
