@@ -157,7 +157,7 @@ async def install_git_plugin(repo_url: str) -> str:
     return repo_name
 
 
-async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str) -> str:  # noqa: C901
+async def install_git_frontend_plugin(repo_url: str, frontend_project_root: str) -> str:
     """
     安装前端 Git 插件
 
