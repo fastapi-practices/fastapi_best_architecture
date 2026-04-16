@@ -193,7 +193,7 @@ def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLe
             error_msg = '; '.join(error_details)
         raise PluginConfigError(f'插件 {plugin_name} 配置校验失败: {error_msg}') from e
 
-    depends_on = config.get('plugin', {}).get('depends_on', [])
+    depends_on = config['plugin']['depends_on']
     if plugin_name in depends_on:
         raise PluginConfigError(f'插件 {plugin_name} 不能依赖自身')
 
