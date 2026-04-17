@@ -65,7 +65,7 @@ class PluginInfoSchema(BaseModel):
         """校验插件依赖配置"""
         for dep in v:
             if not dep or not isinstance(dep, str):
-                raise PluginConfigError(f'depends_on 配置项必须为非空字符串，当前值: {dep}')
+                raise PluginConfigError(f'依赖的插件列表必须为非空字符串，当前值: {dep}')
         return v
 
 
@@ -193,7 +193,7 @@ def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLe
             error_msg = '; '.join(error_details)
         raise PluginConfigError(f'插件 {plugin_name} 配置校验失败: {error_msg}') from e
 
-    depends_on = config['plugin']['depends_on']
+    depends_on = config['plugin'].get('depends_on', [])
     if plugin_name in depends_on:
         raise PluginConfigError(f'插件 {plugin_name} 不能依赖自身')
 
