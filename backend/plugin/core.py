@@ -249,7 +249,7 @@ def parse_plugin_config() -> tuple[list[PluginEntry], list[PluginEntry]]:
 
             plugin_entry = PluginEntry(
                 name=plugin,
-                depends_on=plugin_config['plugin']['depends_on'],
+                depends_on=plugin_config['plugin'].get('depends_on'),
                 extend=plugin_config['app']['extend'] if plugin_type == PluginLevelType.extend else None,
                 routers=plugin_config['app']['router'] if plugin_type == PluginLevelType.app else None,
                 api=plugin_config['api'] if plugin_type == PluginLevelType.extend else None,
@@ -398,13 +398,14 @@ def resolve_plugin_order(plugins: list[PluginEntry]) -> list[PluginEntry]:
             cycle_path = [*visiting[cycle_start:], plugin.name]
             raise PluginConfigError(f'插件存在循环依赖: {" -> ".join(cycle_path)}')
 
-        visiting.append(plugin.name)
-        for dep_name in plugin.depends_on:
-            dep_plugin = plugin_map.get(dep_name)
-            if dep_plugin is None:
-                raise PluginConfigError(f'插件 {plugin.name} 依赖插件 {dep_name}，但插件 {dep_name} 不存在')
-            visit(dep_plugin)
-        visiting.pop()
+        if plugin.depends_on is not None:
+            visiting.append(plugin.name)
+            for dep_name in plugin.depends_on:
+                dep_plugin = plugin_map.get(dep_name)
+                if dep_plugin is None:
+                    raise PluginConfigError(f'插件 {plugin.name} 依赖插件 {dep_name}，但插件 {dep_name} 不存在')
+                visit(dep_plugin)
+            visiting.pop()
 
         visited.add(plugin.name)
         ordered_plugins.append(plugin)
