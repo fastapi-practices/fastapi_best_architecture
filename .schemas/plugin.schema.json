@@ -61,6 +61,15 @@
             "enum": ["mysql", "postgresql"]
           },
           "x-tombi-array-values-order": "ascending"
+        },
+        "depends_on": {
+          "type": "array",
+          "description": "List of plugin names this plugin depends on (used for startup order)",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "x-tombi-array-values-order": "ascending"
         }
       }
     },

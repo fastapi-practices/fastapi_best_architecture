@@ -1,6 +1,7 @@
 import dataclasses
 
 from datetime import datetime
+from typing import Any
 
 from fastapi import Response
 
@@ -73,3 +74,12 @@ class SnowflakeInfo:
     datacenter_id: int
     worker_id: int
     sequence: int
+
+
+@dataclasses.dataclass(slots=True)
+class PluginEntry:
+    name: str
+    depends_on: list[str] | None = None
+    extend: str | None = None
+    routers: list[str] | None = None
+    api: dict[str, Any] | None = None

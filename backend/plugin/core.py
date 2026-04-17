@@ -11,7 +11,8 @@ import rtoml
 
 from fastapi import APIRouter, Depends, FastAPI, Request
 
-from backend.common.enums import DataBaseType, PluginLevelType, PrimaryKeyType, StatusType
+from backend.common.dataclasses import PluginEntry
+from backend.common.enums import DataBaseType, LifespanStage, PluginLevelType, PrimaryKeyType, StatusType
 from backend.common.exception import errors
 from backend.common.lifespan import lifespan_manager
 from backend.common.log import log
@@ -191,7 +192,7 @@ def register_plugin_lifespan_hook(plugin: str, module: Any) -> None:
         log.warning(f'插件 {plugin} 的 lifespan 不是可调用对象，已跳过')
         return
 
-    lifespan_manager.register(lifespan_hook)
+    lifespan_manager.register(lifespan_hook, stage=LifespanStage.plugin)  # type: ignore[call-overload]
     log.info(f'插件 {plugin} lifespan hook 注册成功')
 
 
@@ -218,11 +219,11 @@ def run_plugin_startup_hook(plugin: str, module: Any, app: FastAPI) -> None:
     log.info(f'插件 {plugin} startup hook 执行成功')
 
 
-def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def parse_plugin_config() -> tuple[list[PluginEntry], list[PluginEntry]]:
     """解析插件配置"""
-    extend_plugins = []
-    app_plugins = []
     plugins = get_plugins()
+    extend_plugins: list[PluginEntry] = []
+    app_plugins: list[PluginEntry] = []
 
     # 使用独立连接
     current_redis_client = RedisCli()
@@ -240,16 +241,24 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             plugin_config = load_plugin_config(plugin)
             plugin_type = validate_plugin_config(plugin, plugin_config)
 
-            if plugin_type == PluginLevelType.extend:
-                extend_plugins.append(plugin_config)
-            else:
-                app_plugins.append(plugin_config)
-
             # 补充插件信息
             plugin_config['plugin']['name'] = plugin
             plugin_cache_key = f'{settings.PLUGIN_REDIS_PREFIX}:{plugin}'
             plugin_cache_info = run_await(current_redis_client.get)(plugin_cache_key)
             plugin_config['plugin']['enable'] = get_plugin_enable(plugin_cache_info, StatusType.enable.value)
+
+            plugin_entry = PluginEntry(
+                name=plugin,
+                depends_on=plugin_config['plugin'].get('depends_on'),
+                extend=plugin_config['app']['extend'] if plugin_type == PluginLevelType.extend else None,
+                routers=plugin_config['app']['router'] if plugin_type == PluginLevelType.app else None,
+                api=plugin_config['api'] if plugin_type == PluginLevelType.extend else None,
+            )
+
+            if plugin_type == PluginLevelType.extend:
+                extend_plugins.append(plugin_entry)
+            else:
+                app_plugins.append(plugin_entry)
 
             # 缓存最新插件信息
             run_await(current_redis_client.set)(plugin_cache_key, json.dumps(plugin_config, ensure_ascii=False))
@@ -262,17 +271,16 @@ def parse_plugin_config() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     return extend_plugins, app_plugins
 
 
-def inject_extend_router(plugin: dict[str, Any]) -> None:
+def inject_extend_router(plugin: PluginEntry) -> None:
     """
     扩展级插件路由注入
 
     :param plugin: 插件名称
     :return:
     """
-    plugin_name: str = plugin['plugin']['name']
-    plugin_api_path = PLUGIN_DIR / plugin_name / 'api'
+    plugin_api_path = PLUGIN_DIR / plugin.name / 'api'
     if not os.path.exists(plugin_api_path):
-        raise PluginConfigError(f'插件 {plugin} 缺少 api 目录，请检查插件文件是否完整')
+        raise PluginConfigError(f'插件 {plugin.name} 缺少 api 目录，请检查插件文件是否完整')
 
     for root, _, api_files in os.walk(plugin_api_path):
         for file in api_files:
@@ -280,7 +288,7 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
                 continue
 
             # 解析插件路由配置
-            file_config = plugin['api'][file[:-3]]
+            file_config = plugin.api[file[:-3]]
             prefix = file_config['prefix']
             tags = file_config['tags']
 
@@ -294,21 +302,21 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
                 plugin_router = getattr(module, 'router', None)
                 if not plugin_router:
                     warnings.warn(
-                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
+                        f'扩展级插件 {plugin.name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                         FutureWarning,
                     )
                     continue
 
                 # 获取目标 app 路由
                 relative_path = os.path.relpath(root, plugin_api_path)
-                app_name = plugin.get('app', {}).get('extend')
+                app_name = plugin.extend
                 target_module_path = f'backend.app.{app_name}.api.{relative_path.replace(os.sep, ".")}'
                 target_module = import_module_cached(target_module_path)
                 target_router = getattr(target_module, 'router', None)
 
                 if not target_router or not isinstance(target_router, APIRouter):
                     raise PluginInjectError(
-                        f'扩展级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
+                        f'扩展级插件 {plugin.name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                     )
 
                 # 将插件路由注入到目标路由中
@@ -316,13 +324,13 @@ def inject_extend_router(plugin: dict[str, Any]) -> None:
                     router=plugin_router,
                     prefix=prefix,
                     tags=[tags] if tags else [],
-                    dependencies=[Depends(PluginStatusChecker(plugin_name))],
+                    dependencies=[Depends(PluginStatusChecker(plugin.name))],
                 )
             except Exception as e:
-                raise PluginInjectError(f'扩展级插件 {plugin_name} 路由注入失败：{e!s}') from e
+                raise PluginInjectError(f'扩展级插件 {plugin.name} 路由注入失败：{e!s}') from e
 
 
-def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
+def inject_app_router(plugin: PluginEntry, target_router: APIRouter) -> None:
     """
     应用级插件路由注入
 
@@ -330,41 +338,82 @@ def inject_app_router(plugin: dict[str, Any], target_router: APIRouter) -> None:
     :param target_router: FastAPI 路由器
     :return:
     """
-    plugin_name: str = plugin['plugin']['name']
-    module_path = f'backend.plugin.{plugin_name}.api.router'
+    module_path = f'backend.plugin.{plugin.name}.api.router'
     try:
         module = import_module_cached(module_path)
-        routers = plugin['app']['router']
+        routers = plugin.routers
         if not routers or not isinstance(routers, list):
-            raise PluginConfigError(f'应用级插件 {plugin_name} 配置文件存在错误，请检查')
+            raise PluginConfigError(f'应用级插件 {plugin.name} 配置文件存在错误，请检查')
 
         for router in routers:
             plugin_router = getattr(module, router, None)
             if not plugin_router or not isinstance(plugin_router, APIRouter):
                 raise PluginInjectError(
-                    f'应用级插件 {plugin_name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
+                    f'应用级插件 {plugin.name} 模块 {module_path} 中没有有效的 router，请检查插件文件是否完整',
                 )
 
             # 将插件路由注入到目标路由中
-            target_router.include_router(plugin_router, dependencies=[Depends(PluginStatusChecker(plugin_name))])
+            target_router.include_router(plugin_router, dependencies=[Depends(PluginStatusChecker(plugin.name))])
     except Exception as e:
-        raise PluginInjectError(f'应用级插件 {plugin_name} 路由注入失败：{e!s}') from e
+        raise PluginInjectError(f'应用级插件 {plugin.name} 路由注入失败：{e!s}') from e
 
 
 def build_final_router() -> APIRouter:
     """构建最终路由"""
     extend_plugins, app_plugins = parse_plugin_config()
+    plugins = extend_plugins + app_plugins
+    ordered_plugins = resolve_plugin_order(plugins)
 
-    for plugin in extend_plugins:
-        inject_extend_router(plugin)
+    for plugin in ordered_plugins:
+        if plugin.api is not None:
+            inject_extend_router(plugin)
 
     # 主路由，必须在扩展级插件路由注入后，应用级插件路由注入前导入
     from backend.app.router import router as main_router
 
-    for plugin in app_plugins:
-        inject_app_router(plugin, main_router)
+    for plugin in ordered_plugins:
+        if plugin.routers is not None:
+            inject_app_router(plugin, main_router)
 
     return main_router
+
+
+def resolve_plugin_order(plugins: list[PluginEntry]) -> list[PluginEntry]:
+    """
+    根据 depends_on 对插件排序
+
+    :param plugins: 插件配置列表
+    :return:
+    """
+    plugin_map = {plugin.name: plugin for plugin in plugins}
+    ordered_plugins: list[PluginEntry] = []
+    visited: set[str] = set()
+    visiting: list[str] = []
+
+    def visit(plugin: PluginEntry) -> None:
+        if plugin.name in visited:
+            return
+        if plugin.name in visiting:
+            cycle_start = visiting.index(plugin.name)
+            cycle_path = [*visiting[cycle_start:], plugin.name]
+            raise PluginConfigError(f'插件存在循环依赖: {" -> ".join(cycle_path)}')
+
+        if plugin.depends_on is not None:
+            visiting.append(plugin.name)
+            for dep_name in plugin.depends_on:
+                dep_plugin = plugin_map.get(dep_name)
+                if dep_plugin is None:
+                    raise PluginConfigError(f'插件 {plugin.name} 依赖插件 {dep_name}，但插件 {dep_name} 不存在')
+                visit(dep_plugin)
+            visiting.pop()
+
+        visited.add(plugin.name)
+        ordered_plugins.append(plugin)
+
+    for plugin in plugins:
+        visit(plugin)
+
+    return ordered_plugins
 
 
 def setup_plugins(app: FastAPI) -> None:
@@ -374,32 +423,37 @@ def setup_plugins(app: FastAPI) -> None:
     :param app: FastAPI 应用实例
     :return:
     """
-    plugins = get_plugins()
-    enabled_plugins = get_enabled_plugins(plugins)
+    enabled_plugins = get_enabled_plugins()
+    extend_plugins, app_plugins = parse_plugin_config()
+    plugins: list[PluginEntry] = [plugin for plugin in extend_plugins + app_plugins if plugin.name in enabled_plugins]
 
-    for plugin in plugins:
-        if plugin not in enabled_plugins:
-            log.info(f'插件 {plugin} 未启用，已跳过 hooks 注册与执行')
-            continue
+    # 按依赖关系排序
+    try:
+        ordered_plugins = resolve_plugin_order(plugins)
+    except PluginConfigError as e:
+        log.error(f'插件依赖解析失败: {e}')
+        raise
 
-        module_path = f'backend.plugin.{plugin}.hooks'
+    # 注册并执行 hooks
+    for plugin in ordered_plugins:
+        module_path = f'backend.plugin.{plugin.name}.hooks'
         try:
             module = import_module_cached(module_path)
         except ModuleNotFoundError as e:
             if e.name == module_path:
-                # 未定义 hooks.py
                 continue
-            log.warning(f'插件 {plugin} hooks 模块加载失败: {e}')
+            log.warning(f'插件 {plugin.name} hooks 加载失败: {e}')
             continue
         except Exception as e:
-            log.warning(f'插件 {plugin} hooks 模块加载失败: {e}')
+            log.warning(f'插件 {plugin.name} hooks 加载失败: {e}')
             continue
 
         try:
-            register_plugin_lifespan_hook(plugin, module)
-            run_plugin_startup_hook(plugin, module, app)
+            register_plugin_lifespan_hook(plugin.name, module)
+            run_plugin_startup_hook(plugin.name, module, app)
         except Exception as e:
-            log.error(f'插件 {plugin} hooks 执行失败: {e}')
+            log.exception(f'插件 {plugin.name} hooks 执行失败: {e}')
+            raise PluginInjectError(f'插件 {plugin.name} hooks 执行失败：{e!s}') from e
 
 
 class PluginStatusChecker:
