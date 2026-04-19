@@ -72,4 +72,3 @@ OAUTH2_FRONTEND_BINDING_REDIRECT_URI: str
 
 - 作者：`wu-clan`
 - 反馈方式：提交 Issue 或 PR
-

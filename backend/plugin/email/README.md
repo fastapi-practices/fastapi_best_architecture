@@ -64,4 +64,3 @@ EMAIL_CAPTCHA_EXPIRE_SECONDS: int
 
 - 作者：`wu-clan`
 - 反馈方式：提交 Issue 或 PR
-

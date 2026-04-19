@@ -44,4 +44,3 @@ CODE_GENERATOR_DOWNLOAD_ZIP_FILENAME: str
 
 - 作者：`wu-clan`
 - 反馈方式：提交 Issue 或 PR
-
