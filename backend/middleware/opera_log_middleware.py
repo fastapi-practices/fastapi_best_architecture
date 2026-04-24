@@ -21,6 +21,7 @@ from backend.common.observability.prometheus import (
     PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE,
     PROMETHEUS_RESPONSE_COUNTER,
 )
+from backend.common.observability.prometheus_queue import observe_queue_size
 from backend.common.queue import batch_dequeue
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
@@ -31,6 +32,7 @@ from backend.utils.trace_id import get_request_trace_id
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
+    opera_log_queue_name = 'opera_log_queue'
     opera_log_queue: Queue = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:  # noqa: C901
@@ -137,6 +139,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     opera_time=ctx.start_time,
                 )
                 await self.opera_log_queue.put(opera_log_in)
+                observe_queue_size(self.opera_log_queue, queue_name=self.opera_log_queue_name)
 
             if path.startswith(settings.FASTAPI_API_V1_PATH):
                 PROMETHEUS_RESPONSE_COUNTER.labels(
@@ -256,6 +259,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 cls.opera_log_queue,
                 max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
                 timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
+                queue_name=cls.opera_log_queue_name,
             )
             if logs:
                 try:
@@ -268,3 +272,4 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 finally:
                     for _ in range(len(logs)):
                         cls.opera_log_queue.task_done()
+                        observe_queue_size(cls.opera_log_queue, queue_name=cls.opera_log_queue_name)

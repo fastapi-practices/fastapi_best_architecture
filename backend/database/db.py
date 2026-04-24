@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from uuid import uuid4
 
 from fastapi import Depends
-from sqlalchemy import URL
+from sqlalchemy import URL, event
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -16,6 +16,8 @@ from sqlalchemy.ext.asyncio import (
 from backend.common.enums import DataBaseType
 from backend.common.log import log
 from backend.common.model import MappedBase
+from backend.common.observability.prometheus import PROMETHEUS_APP_NAME
+from backend.common.observability.prometheus_sqlalchemy import PROMETHEUS_SQLALCHEMY_POOL_CONNECTIONS_GAUGE
 from backend.core.conf import settings
 
 
@@ -53,7 +55,7 @@ def create_database_async_engine(url: str | URL) -> AsyncEngine:
     :return:
     """
     try:
-        return create_async_engine(
+        engine = create_async_engine(
             url,
             echo=settings.DATABASE_ECHO,
             echo_pool=settings.DATABASE_POOL_ECHO,
@@ -69,6 +71,8 @@ def create_database_async_engine(url: str | URL) -> AsyncEngine:
     except Exception as e:
         log.error(f'数据库连接失败 {e}')
         sys.exit()
+    else:
+        return engine
 
 
 def create_database_async_session(engine: AsyncEngine) -> async_sessionmaker[AsyncSession | Any]:
@@ -115,11 +119,51 @@ def uuid4_str() -> str:
     return str(uuid4())
 
 
+def _update_sqlalchemy_pool_metrics() -> None:
+    """刷新 SQLAlchemy 连接池关键指标。"""
+    pool = async_engine.sync_engine.pool
+    pool_size = getattr(pool, 'size', None)
+    checked_out = getattr(pool, 'checkedout', None)
+    overflow = getattr(pool, 'overflow', None)
+    if not callable(pool_size) or not callable(checked_out) or not callable(overflow):
+        return
+
+    total_size = pool_size()
+    checked_out_size = checked_out()
+    overflow_size = overflow()
+    idle_size = max(total_size + overflow_size - checked_out_size, 0)
+
+    PROMETHEUS_SQLALCHEMY_POOL_CONNECTIONS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, state='size').set(total_size)
+    PROMETHEUS_SQLALCHEMY_POOL_CONNECTIONS_GAUGE.labels(
+        app_name=PROMETHEUS_APP_NAME, state='checked_out'
+    ).set(checked_out_size)
+    PROMETHEUS_SQLALCHEMY_POOL_CONNECTIONS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, state='idle').set(idle_size)
+    PROMETHEUS_SQLALCHEMY_POOL_CONNECTIONS_GAUGE.labels(
+        app_name=PROMETHEUS_APP_NAME, state='overflow'
+    ).set(overflow_size)
+
+
+def on_sqlalchemy_pool_connect(dbapi_connection, connection_record) -> None:  # noqa: ANN001
+    _update_sqlalchemy_pool_metrics()
+
+
+def on_sqlalchemy_pool_checkout(dbapi_connection, connection_record, connection_proxy) -> None:  # noqa: ANN001
+    _update_sqlalchemy_pool_metrics()
+
+
+def on_sqlalchemy_pool_checkin(dbapi_connection, connection_record) -> None:  # noqa: ANN001
+    _update_sqlalchemy_pool_metrics()
+
+
 # SQLA 数据库链接
 SQLALCHEMY_DATABASE_URL = create_database_url()
 
 # SALA 异步引擎和会话
 async_engine = create_database_async_engine(SQLALCHEMY_DATABASE_URL)
+event.listen(async_engine.sync_engine.pool, 'connect', on_sqlalchemy_pool_connect)
+event.listen(async_engine.sync_engine.pool, 'checkout', on_sqlalchemy_pool_checkout)
+event.listen(async_engine.sync_engine.pool, 'checkin', on_sqlalchemy_pool_checkin)
+_update_sqlalchemy_pool_metrics()
 async_db_session = create_database_async_session(async_engine)
 
 # Session Annotated
