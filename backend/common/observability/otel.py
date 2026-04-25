@@ -20,7 +20,7 @@ from redis.observability.config import OTelConfig
 from redis.observability.providers import get_observability_instance
 
 from backend.common.log import log, request_id_filter
-from backend.common.observability.prometheus import PROMETHEUS_APP_NAME
+from backend.common.observability.prometheus.config import PROMETHEUS_APP_NAME
 from backend.core.conf import settings
 from backend.database.db import async_engine
 from backend.database.redis import redis_client

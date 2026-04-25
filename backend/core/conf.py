@@ -310,6 +310,16 @@ class Settings(BaseSettings):
     EMAIL_CAPTCHA_REDIS_PREFIX: str
     EMAIL_CAPTCHA_EXPIRE_SECONDS: int
 
+    ##################################################
+    # [ Plugin ] ai
+    ##################################################
+    # .env
+    AI_EXA_API_KEY: str | None = None
+    AI_TAVILY_API_KEY: str | None = None
+
+    # 基础配置（in plugin.toml）
+    AI_HTTP_MAX_RETRIES: int
+
     @model_validator(mode='before')
     @classmethod
     def check_env(cls, values: Any) -> Any:

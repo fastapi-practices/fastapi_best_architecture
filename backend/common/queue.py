@@ -1,12 +1,12 @@
 import asyncio
+import time
 
 from asyncio import Queue
-from time import perf_counter
 
 from backend.common.log import log
-from backend.common.observability.prometheus_queue import (
+from backend.common.observability.prometheus.queue import (
+    inc_queue_exception,
     observe_batch_dequeue_cost,
-    observe_queue_exception,
     observe_queue_size,
 )
 
@@ -22,7 +22,7 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float, *, queue_n
     :return:
     """
     items = []
-    start = perf_counter()
+    start = time.perf_counter()
 
     async def collector() -> None:
         while len(items) < max_items:
@@ -35,7 +35,7 @@ async def batch_dequeue(queue: Queue, max_items: int, timeout: float, *, queue_n
     except asyncio.TimeoutError:
         pass
     except Exception as e:
-        observe_queue_exception(queue_name=queue_name)
+        inc_queue_exception(queue_name=queue_name)
         log.error(f'队列批量获取失败: {e}')
     finally:
         observe_batch_dequeue_cost(start, queue_name=queue_name)
