@@ -55,7 +55,7 @@ def create_database_async_engine(url: str | URL) -> AsyncEngine:
     :return:
     """
     try:
-        engine = create_async_engine(
+        return create_async_engine(
             url,
             echo=settings.DATABASE_ECHO,
             echo_pool=settings.DATABASE_POOL_ECHO,
@@ -71,8 +71,6 @@ def create_database_async_engine(url: str | URL) -> AsyncEngine:
     except Exception as e:
         log.error(f'数据库连接失败 {e}')
         sys.exit()
-    else:
-        return engine
 
 
 def create_database_async_session(engine: AsyncEngine) -> async_sessionmaker[AsyncSession | Any]:
