@@ -109,12 +109,13 @@ def init_otel(app: FastAPI) -> None:
     init_metrics(resource)
     init_logging(resource)
 
+    # Redis 原生指标
     redis_otel = get_observability_instance()
     redis_otel.init(OTelConfig())
 
     AsyncioInstrumentor().instrument()
-    LoggingInstrumentor().instrument(set_logging_format=True)
-    SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
-    RedisInstrumentor.instrument_client(redis_client)  # type: ignore
     HTTPXClientInstrumentor().instrument()
+    LoggingInstrumentor().instrument(set_logging_format=True)
+    RedisInstrumentor.instrument_client(client=redis_client)  # type: ignore
+    SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
     FastAPIInstrumentor.instrument_app(app)

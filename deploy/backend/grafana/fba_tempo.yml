@@ -1,7 +1,7 @@
 # ============================================================================
 # Tempo 配置文件
 # Tempo 是 Grafana 的高性能、低成本分布式链路追踪后端
-# 官方文档: https://grafana.com/docs/tempo/latest/configuration/
+# 官方文档: https://grafana.com/docs/tempo/next/configuration/
 # ============================================================================
 
 # HTTP 服务器配置
@@ -18,15 +18,6 @@ distributor:
         http:
           endpoint: "0.0.0.0:4318"
 
-# 存储配置
-storage:
-  trace:
-    backend: local
-    wal:
-      path: /tmp/tempo/wal
-    local:
-      path: /tmp/tempo/blocks
-
 # 指标生成器配置
 metrics_generator:
   registry:
@@ -39,27 +30,30 @@ metrics_generator:
       - url: http://fba_prometheus:9090/api/v1/write
         send_exemplars: true
 
-  traces_storage:
-    path: /tmp/tempo/generator/traces
-
   processor:
+    service_graphs:
+      dimensions:
+        - service.name
     span_metrics:
       dimensions:
         - service.name
         - http.method
         - http.target
         - http.status_code
-    service_graphs:
-      dimensions:
-        - service.name
-    local_blocks:
-      flush_to_storage: true
+
+# 存储配置
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /tmp/tempo/wal
+    local:
+      path: /tmp/tempo/blocks
 
 # 覆盖配置
 overrides:
   defaults:
     metrics_generator:
       processors:
-        - span-metrics
         - service-graphs
-        - local-blocks
+        - span-metrics
