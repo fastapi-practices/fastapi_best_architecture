@@ -10,6 +10,6 @@ venv/
 .claude/
 .serena/
 .agents/
-.logs/
+logs/
 .superpowers/
 superpowers/
