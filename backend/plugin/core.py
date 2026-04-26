@@ -64,94 +64,6 @@ def get_plugins() -> tuple[str, ...]:
     return tuple(plugin_packages)
 
 
-def get_plugin_models() -> list[object]:
-    """获取插件所有模型类"""
-    objs = []
-
-    for plugin in get_plugins():
-        module_path = f'backend.plugin.{plugin}.model'
-        model_objs = get_model_objects(module_path)
-        if model_objs:
-            objs.extend(model_objs)
-
-    return objs
-
-
-def build_sql_filename(
-    prefix: str,
-    pk_type: PrimaryKeyType,
-    *,
-    suffix: str | None = None,
-) -> str:
-    parts = [prefix]
-    if pk_type == PrimaryKeyType.snowflake:
-        parts.append('snowflake')
-    if suffix:
-        parts.append(suffix)
-    return f'{"_".join(parts)}.sql'
-
-
-async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
-    """
-    获取插件 SQL 脚本
-
-    :param plugin: 插件名称
-    :param db_type: 数据库类型
-    :param pk_type: 主键类型
-    :return:
-    """
-    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
-    default_filename = build_sql_filename('init', pk_type)
-    default_sql_file = sql_dir / default_filename
-    return str(default_sql_file) if await anyio.Path(default_sql_file).exists() else None
-
-
-async def get_plugin_destroy_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
-    """
-    获取插件销毁 SQL 脚本
-
-    :param plugin: 插件名称
-    :param db_type: 数据库类型
-    :param pk_type: 主键类型
-    :return:
-    """
-    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
-    sql_file = sql_dir / build_sql_filename('destroy', pk_type)
-    return str(sql_file) if await anyio.Path(sql_file).exists() else None
-
-
-def load_plugin_config(plugin: str) -> dict[str, Any]:
-    """
-    加载插件配置
-
-    :param plugin: 插件名称
-    :return:
-    """
-    toml_path = PLUGIN_DIR / plugin / 'plugin.toml'
-    if not os.path.exists(toml_path):
-        raise PluginInjectError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
-
-    with open(toml_path, encoding='utf-8') as f:
-        return rtoml.load(f)
-
-
-def get_plugin_enable(plugin_info: str | None, default_status: int) -> str:
-    """
-    解析插件启用状态
-
-    :param plugin_info: 插件缓存信息
-    :param default_status: 默认状态值
-    :return:
-    """
-    if not plugin_info:
-        return str(default_status)
-
-    try:
-        return json.loads(plugin_info)['plugin']['enable']
-    except Exception:
-        return str(default_status)
-
-
 def get_enabled_plugins(plugins: tuple[str, ...] | None = None) -> set[str]:
     """
     获取已启用的插件列表
@@ -176,47 +88,36 @@ def get_enabled_plugins(plugins: tuple[str, ...] | None = None) -> set[str]:
     return enabled_plugins
 
 
-def register_plugin_lifespan_hook(plugin: str, module: Any) -> None:
+def get_plugin_enable(plugin_info: str | None, default_status: int) -> str:
     """
-    注册插件 lifespan hook
+    解析插件启用状态
 
-    :param plugin: 插件名称
-    :param module: 插件 hooks 模块
+    :param plugin_info: 插件缓存信息
+    :param default_status: 默认状态值
     :return:
     """
-    lifespan_hook = getattr(module, 'lifespan', None)
-    if lifespan_hook is None:
-        return
+    if not plugin_info:
+        return str(default_status)
 
-    if not callable(lifespan_hook):
-        log.warning(f'插件 {plugin} 的 lifespan 不是可调用对象，已跳过')
-        return
-
-    lifespan_manager.register(lifespan_hook, stage=LifespanStage.plugin)  # type: ignore[call-overload]
-    log.info(f'插件 {plugin} lifespan hook 注册成功')
+    try:
+        return json.loads(plugin_info)['plugin']['enable']
+    except Exception:
+        return str(default_status)
 
 
-def run_plugin_startup_hook(plugin: str, module: Any, app: FastAPI) -> None:
+def load_plugin_config(plugin: str) -> dict[str, Any]:
     """
-    执行插件 startup hook
+    加载插件配置
 
     :param plugin: 插件名称
-    :param module: 插件 hooks 模块
-    :param app: FastAPI 应用实例
     :return:
     """
-    setup_hook = getattr(module, 'setup', None)
-    if setup_hook is None:
-        return
+    toml_path = PLUGIN_DIR / plugin / 'plugin.toml'
+    if not os.path.exists(toml_path):
+        raise PluginInjectError(f'插件 {plugin} 缺少 plugin.toml 配置文件，请检查插件是否合法')
 
-    if not callable(setup_hook):
-        log.warning(f'插件 {plugin} 的 setup 不是可调用对象，已跳过')
-        return
-
-    setup_result = setup_hook(app)
-    if inspect.isawaitable(setup_result):
-        run_await(lambda: setup_result)()  # type: ignore
-    log.info(f'插件 {plugin} startup hook 执行成功')
+    with open(toml_path, encoding='utf-8') as f:
+        return rtoml.load(f)
 
 
 def parse_plugin_config() -> tuple[list[PluginEntry], list[PluginEntry]]:
@@ -269,6 +170,64 @@ def parse_plugin_config() -> tuple[list[PluginEntry], list[PluginEntry]]:
         run_await(current_redis_client.aclose)()
 
     return extend_plugins, app_plugins
+
+
+def resolve_plugin_order(plugins: list[PluginEntry]) -> list[PluginEntry]:
+    """
+    根据 depends_on 对插件排序
+
+    :param plugins: 插件配置列表
+    :return:
+    """
+    plugin_map = {plugin.name: plugin for plugin in plugins}
+    ordered_plugins: list[PluginEntry] = []
+    visited: set[str] = set()
+    visiting: list[str] = []
+
+    def visit(plugin: PluginEntry) -> None:
+        if plugin.name in visited:
+            return
+        if plugin.name in visiting:
+            cycle_start = visiting.index(plugin.name)
+            cycle_path = [*visiting[cycle_start:], plugin.name]
+            raise PluginConfigError(f'插件存在循环依赖: {" -> ".join(cycle_path)}')
+
+        if plugin.depends_on is not None:
+            visiting.append(plugin.name)
+            for dep_name in plugin.depends_on:
+                dep_plugin = plugin_map.get(dep_name)
+                if dep_plugin is None:
+                    raise PluginConfigError(f'插件 {plugin.name} 依赖插件 {dep_name}，但插件 {dep_name} 不存在')
+                visit(dep_plugin)
+            visiting.pop()
+
+        visited.add(plugin.name)
+        ordered_plugins.append(plugin)
+
+    for plugin in plugins:
+        visit(plugin)
+
+    return ordered_plugins
+
+
+def build_final_router() -> APIRouter:
+    """构建最终路由"""
+    extend_plugins, app_plugins = parse_plugin_config()
+    plugins = extend_plugins + app_plugins
+    ordered_plugins = resolve_plugin_order(plugins)
+
+    for plugin in ordered_plugins:
+        if plugin.api is not None:
+            inject_extend_router(plugin)
+
+    # 主路由，必须在扩展级插件路由注入后，应用级插件路由注入前导入
+    from backend.app.router import router as main_router
+
+    for plugin in ordered_plugins:
+        if plugin.routers is not None:
+            inject_app_router(plugin, main_router)
+
+    return main_router
 
 
 def inject_extend_router(plugin: PluginEntry) -> None:
@@ -358,62 +317,47 @@ def inject_app_router(plugin: PluginEntry, target_router: APIRouter) -> None:
         raise PluginInjectError(f'应用级插件 {plugin.name} 路由注入失败：{e!s}') from e
 
 
-def build_final_router() -> APIRouter:
-    """构建最终路由"""
-    extend_plugins, app_plugins = parse_plugin_config()
-    plugins = extend_plugins + app_plugins
-    ordered_plugins = resolve_plugin_order(plugins)
-
-    for plugin in ordered_plugins:
-        if plugin.api is not None:
-            inject_extend_router(plugin)
-
-    # 主路由，必须在扩展级插件路由注入后，应用级插件路由注入前导入
-    from backend.app.router import router as main_router
-
-    for plugin in ordered_plugins:
-        if plugin.routers is not None:
-            inject_app_router(plugin, main_router)
-
-    return main_router
-
-
-def resolve_plugin_order(plugins: list[PluginEntry]) -> list[PluginEntry]:
+def register_plugin_lifespan_hook(plugin: str, module: Any) -> None:
     """
-    根据 depends_on 对插件排序
+    注册插件 lifespan hook
 
-    :param plugins: 插件配置列表
+    :param plugin: 插件名称
+    :param module: 插件 hooks 模块
     :return:
     """
-    plugin_map = {plugin.name: plugin for plugin in plugins}
-    ordered_plugins: list[PluginEntry] = []
-    visited: set[str] = set()
-    visiting: list[str] = []
+    lifespan_hook = getattr(module, 'lifespan', None)
+    if lifespan_hook is None:
+        return
 
-    def visit(plugin: PluginEntry) -> None:
-        if plugin.name in visited:
-            return
-        if plugin.name in visiting:
-            cycle_start = visiting.index(plugin.name)
-            cycle_path = [*visiting[cycle_start:], plugin.name]
-            raise PluginConfigError(f'插件存在循环依赖: {" -> ".join(cycle_path)}')
+    if not callable(lifespan_hook):
+        log.warning(f'插件 {plugin} 的 lifespan 不是可调用对象，已跳过')
+        return
 
-        if plugin.depends_on is not None:
-            visiting.append(plugin.name)
-            for dep_name in plugin.depends_on:
-                dep_plugin = plugin_map.get(dep_name)
-                if dep_plugin is None:
-                    raise PluginConfigError(f'插件 {plugin.name} 依赖插件 {dep_name}，但插件 {dep_name} 不存在')
-                visit(dep_plugin)
-            visiting.pop()
+    lifespan_manager.register(lifespan_hook, stage=LifespanStage.plugin)  # type: ignore[call-overload]
+    log.info(f'插件 {plugin} lifespan hook 注册成功')
 
-        visited.add(plugin.name)
-        ordered_plugins.append(plugin)
 
-    for plugin in plugins:
-        visit(plugin)
+def run_plugin_setup_hook(plugin: str, module: Any, app: FastAPI) -> None:
+    """
+    执行插件 setup hook
 
-    return ordered_plugins
+    :param plugin: 插件名称
+    :param module: 插件 hooks 模块
+    :param app: FastAPI 应用实例
+    :return:
+    """
+    setup_hook = getattr(module, 'setup', None)
+    if setup_hook is None:
+        return
+
+    if not callable(setup_hook):
+        log.warning(f'插件 {plugin} 的 setup 不是可调用对象，已跳过')
+        return
+
+    setup_result = setup_hook(app)
+    if inspect.isawaitable(setup_result):
+        run_await(lambda: setup_result)()  # type: ignore
+    log.info(f'插件 {plugin} setup hook 执行成功')
 
 
 def setup_plugins(app: FastAPI) -> None:
@@ -427,7 +371,7 @@ def setup_plugins(app: FastAPI) -> None:
     extend_plugins, app_plugins = parse_plugin_config()
     plugins: list[PluginEntry] = [plugin for plugin in extend_plugins + app_plugins if plugin.name in enabled_plugins]
 
-    # 按依赖关系排序
+    # 按插件依赖关系排序
     try:
         ordered_plugins = resolve_plugin_order(plugins)
     except PluginConfigError as e:
@@ -450,10 +394,74 @@ def setup_plugins(app: FastAPI) -> None:
 
         try:
             register_plugin_lifespan_hook(plugin.name, module)
-            run_plugin_startup_hook(plugin.name, module, app)
+            run_plugin_setup_hook(plugin.name, module, app)
         except Exception as e:
             log.exception(f'插件 {plugin.name} hooks 执行失败: {e}')
             raise PluginInjectError(f'插件 {plugin.name} hooks 执行失败：{e!s}') from e
+
+
+def get_plugin_models() -> list[object]:
+    """获取插件所有模型类"""
+    objs = []
+
+    for plugin in get_plugins():
+        module_path = f'backend.plugin.{plugin}.model'
+        model_objs = get_model_objects(module_path)
+        if model_objs:
+            objs.extend(model_objs)
+
+    return objs
+
+
+def build_sql_filename(
+    prefix: str,
+    pk_type: PrimaryKeyType,
+    *,
+    suffix: str | None = None,
+) -> str:
+    """
+    构建插件 SQL 脚本文件名
+
+    :param prefix: SQL 脚本文件名前缀，例如 init 或 destroy
+    :param pk_type: 主键类型，雪花 ID 模式会追加 snowflake 标识
+    :param suffix: 可选文件名后缀，追加在主键类型标识之后
+    :return:
+    """
+    parts = [prefix]
+    if pk_type == PrimaryKeyType.snowflake:
+        parts.append('snowflake')
+    if suffix:
+        parts.append(suffix)
+    return f'{"_".join(parts)}.sql'
+
+
+async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
+    """
+    获取插件 SQL 脚本
+
+    :param plugin: 插件名称
+    :param db_type: 数据库类型
+    :param pk_type: 主键类型
+    :return:
+    """
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    default_filename = build_sql_filename('init', pk_type)
+    default_sql_file = sql_dir / default_filename
+    return str(default_sql_file) if await anyio.Path(default_sql_file).exists() else None
+
+
+async def get_plugin_destroy_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKeyType) -> str | None:
+    """
+    获取插件销毁 SQL 脚本
+
+    :param plugin: 插件名称
+    :param db_type: 数据库类型
+    :param pk_type: 主键类型
+    :return:
+    """
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    sql_file = sql_dir / build_sql_filename('destroy', pk_type)
+    return str(sql_file) if await anyio.Path(sql_file).exists() else None
 
 
 class PluginStatusChecker:
