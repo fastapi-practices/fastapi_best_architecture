@@ -55,7 +55,8 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     await redis_client.init()
 
     # 初始化 snowflake 节点
-    await snowflake.init()
+    if settings.SNOWFLAKE_ENABLED or settings.DATABASE_PK_MODE == 'snowflake':
+        await snowflake.init()
 
     # 创建操作日志任务
     create_task(OperaLogMiddleware.consumer())
@@ -69,7 +70,8 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     await cache_pubsub_manager.stop_listener()
 
     # 释放 snowflake 节点
-    await snowflake.shutdown()
+    if settings.SNOWFLAKE_ENABLED or settings.DATABASE_PK_MODE == 'snowflake':
+        await snowflake.shutdown()
 
     # 关闭 redis 连接
     await redis_client.aclose()
