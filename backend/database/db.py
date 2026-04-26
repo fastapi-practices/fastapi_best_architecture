@@ -1,11 +1,12 @@
 import sys
 
 from collections.abc import AsyncGenerator
+from functools import partial
 from typing import Annotated, Any
 from uuid import uuid4
 
 from fastapi import Depends
-from sqlalchemy import URL
+from sqlalchemy import URL, event
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -16,6 +17,7 @@ from sqlalchemy.ext.asyncio import (
 from backend.common.enums import DataBaseType
 from backend.common.log import log
 from backend.common.model import MappedBase
+from backend.common.observability.prometheus.sqlalchemy import observe_sqlalchemy_pool_connections
 from backend.core.conf import settings
 
 
@@ -118,9 +120,26 @@ def uuid4_str() -> str:
 # SQLA 数据库链接
 SQLALCHEMY_DATABASE_URL = create_database_url()
 
-# SALA 异步引擎和会话
+# SQLA 异步引擎和会话
 async_engine = create_database_async_engine(SQLALCHEMY_DATABASE_URL)
 async_db_session = create_database_async_session(async_engine)
+
+# SQLA 连接池指标监听
+event.listen(
+    async_engine.sync_engine.pool,
+    'connect',
+    partial(observe_sqlalchemy_pool_connections, pool=async_engine.sync_engine.pool),
+)
+event.listen(
+    async_engine.sync_engine.pool,
+    'checkout',
+    partial(observe_sqlalchemy_pool_connections, pool=async_engine.sync_engine.pool),
+)
+event.listen(
+    async_engine.sync_engine.pool,
+    'checkin',
+    partial(observe_sqlalchemy_pool_connections, pool=async_engine.sync_engine.pool),
+)
 
 # Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]

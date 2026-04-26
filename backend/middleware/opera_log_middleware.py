@@ -14,13 +14,13 @@ from backend.app.admin.service.opera_log_service import opera_log_service
 from backend.common.context import ctx
 from backend.common.enums import StatusType
 from backend.common.log import log
-from backend.common.observability.prometheus import (
-    PROMETHEUS_APP_NAME,
-    PROMETHEUS_EXCEPTION_COUNTER,
-    PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM,
-    PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE,
-    PROMETHEUS_RESPONSE_COUNTER,
+from backend.common.observability.prometheus.fastapi import (
+    dec_fastapi_request_in_progress,
+    inc_fastapi_exception,
+    inc_fastapi_response,
+    observe_fastapi_request_cost_time,
 )
+from backend.common.observability.prometheus.queue import observe_queue_size
 from backend.common.queue import batch_dequeue
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
@@ -31,6 +31,7 @@ from backend.utils.trace_id import get_request_trace_id
 class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
+    opera_log_queue_name = 'opera_log_queue'
     opera_log_queue: Queue = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:  # noqa: C901
@@ -68,12 +69,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 status = StatusType.disable
 
             if path.startswith(settings.FASTAPI_API_V1_PATH):
-                PROMETHEUS_EXCEPTION_COUNTER.labels(
-                    app_name=PROMETHEUS_APP_NAME,
-                    method=method,
-                    path=path,
-                    exception_type=type(e).__name__,
-                ).inc()
+                inc_fastapi_exception(method=method, path=path, exception_type=type(e).__name__)
 
             raise
         else:
@@ -96,9 +92,9 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                         break
 
             if path.startswith(settings.FASTAPI_API_V1_PATH):
-                PROMETHEUS_REQUEST_COST_TIME_HISTOGRAM.labels(
-                    app_name=PROMETHEUS_APP_NAME, method=method, path=path
-                ).observe(amount=elapsed, exemplar={'TraceID': get_request_trace_id()})
+                observe_fastapi_request_cost_time(
+                    method=method, path=path, elapsed=elapsed, trace_id=get_request_trace_id()
+                )
         finally:
             # summary 只能在请求后获取
             route = request.scope.get('route')
@@ -137,14 +133,11 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                     opera_time=ctx.start_time,
                 )
                 await self.opera_log_queue.put(opera_log_in)
+                observe_queue_size(self.opera_log_queue, queue_name=self.opera_log_queue_name)
 
             if path.startswith(settings.FASTAPI_API_V1_PATH):
-                PROMETHEUS_RESPONSE_COUNTER.labels(
-                    app_name=PROMETHEUS_APP_NAME, method=method, path=path, status_code=code
-                ).inc()
-                PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(
-                    app_name=PROMETHEUS_APP_NAME, method=method, path=path
-                ).dec()
+                inc_fastapi_response(method=method, path=path, status_code=code)
+                dec_fastapi_request_in_progress(method=method, path=path)
 
         return response
 
@@ -256,6 +249,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 cls.opera_log_queue,
                 max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
                 timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
+                queue_name=cls.opera_log_queue_name,
             )
             if logs:
                 try:
@@ -268,3 +262,4 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
                 finally:
                     for _ in range(len(logs)):
                         cls.opera_log_queue.task_done()
+                        observe_queue_size(cls.opera_log_queue, queue_name=cls.opera_log_queue_name)

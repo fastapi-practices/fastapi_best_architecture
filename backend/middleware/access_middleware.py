@@ -5,10 +5,9 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 
 from backend.common.context import ctx
 from backend.common.log import log
-from backend.common.observability.prometheus import (
-    PROMETHEUS_APP_NAME,
-    PROMETHEUS_REQUEST_COUNTER,
-    PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE,
+from backend.common.observability.prometheus.fastapi import (
+    inc_fastapi_request,
+    inc_fastapi_request_in_progress,
 )
 from backend.core.conf import settings
 from backend.utils.timezone import timezone
@@ -38,8 +37,8 @@ class AccessMiddleware(BaseHTTPMiddleware):
             log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "?" + request.url.query}]')
 
         if path.startswith(settings.FASTAPI_API_V1_PATH):
-            PROMETHEUS_REQUEST_IN_PROGRESS_GAUGE.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()
-            PROMETHEUS_REQUEST_COUNTER.labels(app_name=PROMETHEUS_APP_NAME, method=method, path=path).inc()
+            inc_fastapi_request_in_progress(method=method, path=path)
+            inc_fastapi_request(method=method, path=path)
 
         response = await call_next(request)
 

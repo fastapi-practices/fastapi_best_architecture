@@ -52,7 +52,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "过去24小时内所有 API 端点的总请求数量",
+      "description": "所有 API 端点的累计请求数量",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -276,7 +276,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "过去24小时内捕获的异常总数，包括所有类型的错误",
+      "description": "捕获的累计异常数量，包括所有异常类型",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -350,7 +350,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "所有请求的平均响应时间（毫秒），反映整体性能",
+      "description": "所有请求的累计平均响应时间（毫秒），反映整体性能",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -716,7 +716,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "2xx 成功响应占比趋势，绿色区域表示健康（>95%），红色区域表示需要关注（<80%）",
+      "description": "各 API 端点的累计 2xx 成功响应占比趋势，绿色区域表示健康（>95%），红色区域表示需要关注（<80%）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -823,7 +823,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "5xx 服务器错误占比趋势，绿色区域表示健康（<1%），红色区域表示严重问题（>10%）",
+      "description": "各 API 端点的累计 5xx 服务器错误占比趋势，绿色区域表示健康（<1%），红色区域表示严重问题（>10%）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -930,7 +930,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "各 API 端点的请求数量分布，显示哪些端点最繁忙",
+      "description": "各 API 端点的累计请求数量分布，显示哪些端点最繁忙",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1010,7 +1010,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "各 API 端点的平均响应时间，颜色从绿到红表示响应时间从快到慢",
+      "description": "各 API 端点的累计平均响应时间，颜色从绿到红表示响应时间从快到慢",
       "fieldConfig": {
         "defaults": {
           "color": {
