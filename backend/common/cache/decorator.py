@@ -145,12 +145,14 @@ def cached(  # noqa: C901
 
             if result is not None:
                 try:
+                    serialized_result = _serialize_result(result)
+                    deserialized_result = _deserialize_result(serialized_result)
+
                     # 回填 L1
                     if settings.CACHE_LOCAL_ENABLED:
-                        local_cache_manager.set(cache_key, result)
+                        local_cache_manager.set(cache_key, deserialized_result)
 
                     # 回填 L2
-                    serialized_result = _serialize_result(result)
                     if settings.CACHE_REDIS_TTL:
                         await redis_client.setex(cache_key, settings.CACHE_REDIS_TTL, serialized_result)
                     else:
