@@ -40,7 +40,6 @@ def get_required_plugins() -> tuple[str, ...]:
     required_plugins = list(settings.PLUGIN_REQUIRED)
     if not settings.RBAC_ROLE_MENU_MODE and 'casbin_rbac' not in required_plugins:
         required_plugins.append('casbin_rbac')
-
     return tuple(required_plugins)
 
 
