@@ -9,7 +9,7 @@ def replace_middleware(
     **replacement_kwargs,
 ) -> None:
     """
-    替换中间件（应在插件的 startup hook 中调用）
+    替换中间件（应在插件的 setup hook 中调用）
 
     :param app: FastAPI 应用实例
     :param original_middleware_cls: 原始中间件类
