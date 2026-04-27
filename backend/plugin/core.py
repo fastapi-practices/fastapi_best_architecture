@@ -35,12 +35,18 @@ def check_plugin_installed(plugin_name: str) -> bool:
     return (PLUGIN_DIR / plugin_name / '__init__.py').exists()
 
 
-def check_required_plugins() -> None:
-    """检查必需插件"""
+def get_required_plugins() -> tuple[str, ...]:
+    """获取必需插件列表"""
     required_plugins = list(settings.PLUGIN_REQUIRED)
     if not settings.RBAC_ROLE_MENU_MODE and 'casbin_rbac' not in required_plugins:
         required_plugins.append('casbin_rbac')
 
+    return tuple(required_plugins)
+
+
+def check_required_plugins() -> None:
+    """检查必需插件"""
+    required_plugins = get_required_plugins()
     missing_plugins = [name for name in required_plugins if not check_plugin_installed(name)]
     if missing_plugins:
         raise PluginInjectError(f'当前系统缺少以下插件: {", ".join(missing_plugins)}，请先安装对应插件')

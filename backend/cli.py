@@ -44,7 +44,13 @@ from backend.database.db import (
     create_database_url,
 )
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_plugin_sql, get_plugins
+from backend.plugin.core import (
+    build_sql_filename,
+    get_plugin_destroy_sql,
+    get_plugin_sql,
+    get_plugins,
+    get_required_plugins,
+)
 from backend.plugin.installer import install_git_frontend_plugin, install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
@@ -463,6 +469,9 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
     else:
         if plugin not in plugins:
             raise cappa.Exit(f'插件 {plugin} 不存在', code=1)
+
+    if plugin in get_required_plugins():
+        raise cappa.Exit(f'插件 {plugin} 为必需插件，禁止卸载', code=1)
 
     try:
         await remove()
