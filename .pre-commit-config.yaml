@@ -11,7 +11,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.9.16
+    rev: v0.9.25
     hooks:
       - id: tombi-lint
         args: ["--offline"]
@@ -19,7 +19,7 @@ repos:
         args: ["--offline"]
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.15.9
+    rev: v0.15.12
     hooks:
       - id: ruff-check
         args:
@@ -29,7 +29,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.4
+    rev: 0.11.8
     hooks:
       - id: uv-lock
       - id: uv-export

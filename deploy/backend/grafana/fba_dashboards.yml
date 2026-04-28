@@ -10,10 +10,12 @@ apiVersion: 1
 
 # 仪表盘提供者列表
 providers:
-  - name: 'fba_server'
+  - name: fba_server
     orgId: 1
-    type: 'file'
+    type: file
     disableDeletion: true
     editable: false
+    allowUiUpdates: false
     options:
-      path: '/etc/grafana/dashboards'
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

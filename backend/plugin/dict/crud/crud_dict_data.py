@@ -35,7 +35,7 @@ class CRUDDictData(CRUDPlus[DictData]):
             sort_columns='sort',
             sort_orders='desc',
             type_code=type_code,
-            status=StatusType.enable,
+            status=StatusType.enable.value,
         )
 
     async def get_all(self, db: AsyncSession) -> Sequence[DictData]:

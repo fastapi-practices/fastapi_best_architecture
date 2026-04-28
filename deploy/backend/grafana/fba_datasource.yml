@@ -18,8 +18,11 @@ datasources:
   - name: Loki
     uid: loki
     type: loki
+    access: proxy
     url: http://fba_loki:3100
     isDefault: false
+    editable: false
+    version: 1
     jsonData:
       derivedFields:
         - datasourceUid: tempo
@@ -37,8 +40,11 @@ datasources:
   - name: Prometheus
     uid: prometheus
     type: prometheus
+    access: proxy
     url: http://fba_prometheus:9090
     isDefault: true
+    editable: false
+    version: 1
     jsonData:
       httpMethod: POST
       exemplarTraceIdDestinations:
@@ -53,8 +59,12 @@ datasources:
   - name: Tempo
     uid: tempo
     type: tempo
+    access: proxy
     url: http://fba_tempo:3200
+    editable: false
+    version: 1
     jsonData:
+      httpMethod: GET
       nodeGraph:
         enabled: true
       tracesToLogsV2:

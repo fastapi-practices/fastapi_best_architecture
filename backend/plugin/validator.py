@@ -25,6 +25,7 @@ class PluginInfoSchema(BaseModel):
     author: str = Field(..., min_length=1, max_length=50, description='作者')
     tags: list[str] = Field(..., min_length=1, description='标签')
     database: list[str] = Field(..., min_length=1, description='数据库支持')
+    depends_on: list[str] = Field(default_factory=list, description='依赖的插件列表')
 
     @field_validator('version')
     @classmethod
@@ -56,6 +57,15 @@ class PluginInfoSchema(BaseModel):
                 raise PluginConfigError(
                     f'数据库类型无效: {", ".join(invalid_dbs)}，支持的数据库: {", ".join(sorted(_VALID_DATABASES))}'
                 )
+        return v
+
+    @field_validator('depends_on')
+    @classmethod
+    def validate_depends_on(cls, v: list[str]) -> list[str]:
+        """校验插件依赖配置"""
+        for dep in v:
+            if not dep or not isinstance(dep, str):
+                raise PluginConfigError(f'依赖的插件列表必须为非空字符串，当前值: {dep}')
         return v
 
 
@@ -182,6 +192,10 @@ def validate_plugin_config(plugin_name: str, config: dict[str, Any]) -> PluginLe
                 error_details.append(f'{loc}: {msg}')
             error_msg = '; '.join(error_details)
         raise PluginConfigError(f'插件 {plugin_name} 配置校验失败: {error_msg}') from e
+
+    depends_on = config['plugin'].get('depends_on', [])
+    if plugin_name in depends_on:
+        raise PluginConfigError(f'插件 {plugin_name} 不能依赖自身')
 
     plugin_dir = Path(PLUGIN_DIR) / plugin_name
     model_dir = plugin_dir / 'model'

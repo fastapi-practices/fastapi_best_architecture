@@ -44,7 +44,13 @@ from backend.database.db import (
     create_database_url,
 )
 from backend.database.redis import RedisCli, redis_client
-from backend.plugin.core import build_sql_filename, get_plugin_destroy_sql, get_plugin_sql, get_plugins
+from backend.plugin.core import (
+    build_sql_filename,
+    get_plugin_destroy_sql,
+    get_plugin_sql,
+    get_plugins,
+    get_required_plugins,
+)
 from backend.plugin.installer import install_git_frontend_plugin, install_git_plugin, install_zip_plugin, zip_plugin
 from backend.plugin.installer import remove_plugin as _remove_plugin
 from backend.plugin.requirements import uninstall_requirements_async
@@ -373,7 +379,7 @@ async def install_plugin(  # noqa: C901
             if repo_url is None:
                 raise cappa.Exit('前端插件仅允许通过 Git 仓库地址安装', code=1)
 
-            frontend_project_root = Prompt.ask('前端项目根路径')
+            frontend_project_root = Prompt.ask('请输入前端项目根路径')
             plugin_name = await install_git_frontend_plugin(repo_url, frontend_project_root)
             console.tip(f'前端插件 {plugin_name} 安装成功')
             return
@@ -403,7 +409,7 @@ async def install_plugin(  # noqa: C901
         if not no_sql:
             sql_file = await get_plugin_sql(plugin_name, db_type, pk_type)
             if sql_file:
-                console.info(f'正在执行插件 {plugin_name} 初始化 SQL 脚本...')
+                console.info(f'正在执行插件 {plugin_name} 初始化 SQL 脚本：{sql_file}')
                 async with async_db_session.begin() as db:
                     await execute_sql_scripts(db, sql_file)
             else:
@@ -426,7 +432,7 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
         if not no_sql:
             destroy_sql_file = await get_plugin_destroy_sql(plugin, settings.DATABASE_TYPE, settings.DATABASE_PK_MODE)
             if destroy_sql_file:
-                console.note(f'正在执行插件 {plugin} 销毁 SQL 脚本...')
+                console.note(f'正在执行插件 {plugin} 销毁 SQL 脚本：{destroy_sql_file}')
                 async with async_db_session.begin() as db:
                     await execute_destroy_sql_scripts(db, destroy_sql_file)
             else:
@@ -463,6 +469,9 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
     else:
         if plugin not in plugins:
             raise cappa.Exit(f'插件 {plugin} 不存在', code=1)
+
+    if plugin in get_required_plugins():
+        raise cappa.Exit(f'插件 {plugin} 为必需插件，禁止卸载', code=1)
 
     try:
         await remove()
@@ -688,11 +697,11 @@ class Add:
     ]
     db_type: Annotated[
         DataBaseType,
-        cappa.Arg(default='postgresql', help='执行插件 SQL 脚本的数据库类型'),
+        cappa.Arg(default=settings.DATABASE_TYPE, help='执行插件 SQL 脚本的数据库类型'),
     ]
     pk_type: Annotated[
         PrimaryKeyType,
-        cappa.Arg(default='autoincrement', help='执行插件 SQL 脚本数据库主键类型'),
+        cappa.Arg(default=settings.DATABASE_PK_MODE, help='执行插件 SQL 脚本数据库主键类型'),
     ]
 
     async def __call__(self) -> None:

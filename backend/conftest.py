@@ -4,13 +4,14 @@ import pytest
 
 from starlette.testclient import TestClient
 
-from backend.app.admin.tests.utils.db import override_get_db
 from backend.core.conf import settings
-from backend.database.db import get_db
+from backend.database.db import get_db, get_db_transaction
 from backend.main import app
+from backend.tests.utils.db import override_get_db, override_get_db_transaction
 
 # 重载数据库
 app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[get_db_transaction] = override_get_db_transaction
 
 
 # Test data
@@ -19,7 +20,7 @@ PYTEST_PASSWORD = '123456'
 PYTEST_BASE_URL = f'http://testserver{settings.FASTAPI_API_V1_PATH}'
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def client() -> Generator:
     with TestClient(app, base_url=PYTEST_BASE_URL) as c:
         yield c

@@ -23,15 +23,13 @@ English | [简体中文](./README.zh-CN.md)
 
 </div>
 
-## Pseudo 3-tier architecture
+## Three-tier architecture
 
-The mvc architecture is a common design pattern in python web, but the 3-tier architecture is even more fascinating
+The MVC architecture is common in Python Web as a general design pattern, but the three-tier architecture is more
+fascinating
 
-In python web development, there is no common standard for the concept of 3-tier architecture, so we'll call it a
-pseudo 3-tier architecture here
-
-But please note that we don't have a traditional multi-app structure (django, springBoot...) If you don't like this
-pattern, use templates to transform it to your heart's content!
+However, please note that we do not have a traditional multi-app (microservices) directory structure (django,
+springBoot...). ), but a self-righteous directory structure that you can give it any twist if you don't like this model!
 
 | workflow       | java           | fastapi_best_architecture |
 |----------------|----------------|---------------------------|

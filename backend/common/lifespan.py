@@ -1,8 +1,10 @@
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager, AsyncExitStack, asynccontextmanager
-from typing import Any
+from typing import Any, overload
 
 from fastapi import FastAPI
+
+from backend.common.enums import LifespanStage
 
 LifespanFunc = Callable[[FastAPI], AbstractAsyncContextManager[dict[str, Any] | None]]
 
@@ -11,18 +13,42 @@ class LifespanManager:
     """FastAPI lifespan 管理器"""
 
     def __init__(self) -> None:
-        self._lifespans: list[LifespanFunc] = []
+        self._lifespans: dict[LifespanStage, list[LifespanFunc]] = {
+            LifespanStage.core: [],
+            LifespanStage.plugin: [],
+            LifespanStage.tail: [],
+        }
 
-    def register(self, func: LifespanFunc) -> LifespanFunc:
+    @overload
+    def register(self, func: LifespanFunc) -> LifespanFunc: ...
+
+    @overload
+    def register(self, *, stage: LifespanStage) -> Callable[[LifespanFunc], LifespanFunc]: ...
+
+    def register(
+        self, func: LifespanFunc | None = None, *, stage: LifespanStage = LifespanStage.core
+    ) -> LifespanFunc | Callable[[LifespanFunc], LifespanFunc]:
         """
         注册 lifespan hook
 
-        :param func: lifespan hook
+        :param func: lifespan hook（直接装饰时使用）
+        :param stage: 执行阶段，控制粗粒度顺序，默认为 core
         :return:
         """
-        if func not in self._lifespans:
-            self._lifespans.append(func)
-        return func
+
+        def decorator(f: LifespanFunc) -> LifespanFunc:
+            for hooks in self._lifespans.values():
+                for fn in hooks:
+                    if fn is f:
+                        return f
+
+            self._lifespans[stage].append(f)
+            return f
+
+        if func is not None:
+            return decorator(func)
+
+        return decorator
 
     def build(self) -> LifespanFunc:
         """
@@ -35,10 +61,11 @@ class LifespanManager:
         async def combined_lifespan(app: FastAPI):  # noqa: ANN202
             state: dict[str, Any] = {}
             async with AsyncExitStack() as exit_stack:
-                for lifespan_fn in self._lifespans:
-                    result = await exit_stack.enter_async_context(lifespan_fn(app))
-                    if isinstance(result, dict):
-                        state.update(result)
+                for stage in LifespanStage:
+                    for lifespan_fn in self._lifespans[stage]:
+                        result = await exit_stack.enter_async_context(lifespan_fn(app))
+                        if isinstance(result, dict):
+                            state.update(result)
 
                 for key, value in state.items():
                     setattr(app.state, key, value)

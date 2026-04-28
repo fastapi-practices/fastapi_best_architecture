@@ -13,6 +13,7 @@ from backend.common.exception import errors
 from backend.core.conf import settings
 from backend.core.path_conf import PLUGIN_DIR
 from backend.database.redis import redis_client
+from backend.plugin.core import get_required_plugins
 from backend.plugin.installer import install_git_plugin, install_zip_plugin, remove_plugin, zip_plugin
 from backend.plugin.requirements import uninstall_requirements_async
 from backend.utils.timezone import timezone
@@ -76,6 +77,8 @@ class PluginService:
         """
         if settings.ENVIRONMENT != 'dev':
             raise errors.RequestError(msg='禁止在非开发环境下卸载插件')
+        if plugin in get_required_plugins():
+            raise errors.RequestError(msg=f'插件 {plugin} 为必需插件，禁止卸载')
         plugin_dir = anyio.Path(PLUGIN_DIR / plugin)
         if not await plugin_dir.exists():
             raise errors.NotFoundError(msg='插件不存在')

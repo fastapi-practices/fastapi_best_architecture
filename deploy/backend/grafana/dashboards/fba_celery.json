@@ -259,7 +259,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "任务成功率 = 成功任务数 / (成功 + 失败)",
+      "description": "任务累计成功率 = 成功任务数 / （成功 + 失败）",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1550,7 +1550,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "各任务类型的平均执行时间，颜色从绿到红表示执行时间从短到长",
+      "description": "各任务类型的累计平均执行时间，颜色从绿到红表示执行时间从短到长",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1633,7 +1633,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "成功任务按类型的分布情况",
+      "description": "成功任务按类型的累计分布情况",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1701,7 +1701,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "失败任务按类型的分布情况",
+      "description": "失败任务按类型的累计分布情况",
       "fieldConfig": {
         "defaults": {
           "color": {

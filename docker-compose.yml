@@ -91,7 +91,7 @@ services:
 #      --lower_case_table_names=1
 
   fba_redis:
-    image: redis
+    image: redis:latest
     ports:
       - "${DOCKER_MAP_REDIS_PORT:-6379}:6379"
     container_name: fba_redis
@@ -107,7 +107,7 @@ services:
   # 如果使用此容器，意味着你只需部署后端 API 服务，不需要前端
   # 这与下面的 fba_ui 容器冲突，如果你选择使用 fba_ui 容器，你应该注释或删除 fba_nginx 容器脚本
   fba_nginx:
-    image: nginx
+    image: nginx:latest
     ports:
       - "${DOCKER_MAP_NGINX_PORT:-8000}:80"
     container_name: fba_nginx
@@ -255,7 +255,7 @@ services:
         supervisorctl restart
 
   fba_celery_exporter:
-    image: danihodovic/celery-exporter
+    image: danihodovic/celery-exporter:latest
     restart: always
     ports:
       - "${DOCKER_MAP_CELERY_EXPORTER_PORT:-9808}:9808"
@@ -268,7 +268,7 @@ services:
       - fba_network
 
   fba_loki:
-    image: grafana/loki
+    image: grafana/loki:latest
     restart: always
     ports:
       - "${DOCKER_MAP_LOKI_PORT:-3100}:3100"
@@ -278,7 +278,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
 
   fba_prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     restart: always
     ports:
       - "${DOCKER_MAP_PROMETHEUS_PORT:-9090}:9090"
@@ -296,7 +296,7 @@ services:
       - --config.file=/workspace/fba_prometheus.yml
 
   fba_alloy:
-    image: grafana/alloy
+    image: grafana/alloy:latest
     restart: always
     ports:
       - "${DOCKER_MAP_ALLOY_GRPC_PORT:-4317}:4317"
@@ -305,14 +305,15 @@ services:
     container_name: fba_alloy
     depends_on:
       - fba_loki
+      - fba_prometheus
     volumes:
       - ./deploy/backend/grafana/fba_config.alloy:/etc/alloy/fba_config.alloy
     networks:
       - fba_network
     command:
       - run
-      - /etc/alloy/fba_config.alloy
       - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/fba_config.alloy
 
   fba_tempo:
     image: grafana/tempo:latest
@@ -325,16 +326,16 @@ services:
     container_name: fba_tempo
     depends_on:
       - fba_loki
+      - fba_prometheus
     volumes:
       - ./deploy/backend/grafana/fba_tempo.yml:/etc/tempo/fba_tempo.yml
     networks:
       - fba_network
     command:
-      - -config.file=/etc/tempo/fba_tempo.yml
-      - -auth.enabled=false
+      - --config.file=/etc/tempo/fba_tempo.yml
 
   fba_grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     restart: always
     ports:
       - "${DOCKER_MAP_GRAFANA_PORT:-3000}:3000"
