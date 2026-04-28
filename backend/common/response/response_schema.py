@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, overload
 
 from fastapi import Response
 from pydantic import BaseModel, Field
@@ -69,7 +69,7 @@ class ResponseBase:
         *,
         res: CustomResponseCode | CustomResponse,
         data: Any | None,
-    ) -> ResponseModel | ResponseSchemaModel:
+    ) -> ResponseModel | ResponseSchemaModel[Any]:
         """
         请求返回通用方法
 
@@ -77,14 +77,32 @@ class ResponseBase:
         :param data: 返回数据
         :return:
         """
-        return ResponseModel(code=res.code, msg=res.msg, data=data)
+        if data is None:
+            return ResponseModel(code=res.code, msg=res.msg, data=data)
+        return ResponseSchemaModel[Any](code=res.code, msg=res.msg, data=data)
+
+    @overload
+    def success(
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+        data: None = None,
+    ) -> ResponseModel: ...
+
+    @overload
+    def success(
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+        data: SchemaT,
+    ) -> ResponseSchemaModel[SchemaT]: ...
 
     def success(
         self,
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
         data: Any | None = None,
-    ) -> ResponseModel | ResponseSchemaModel:
+    ) -> ResponseModel | ResponseSchemaModel[Any]:
         """
         成功响应
 
@@ -94,12 +112,28 @@ class ResponseBase:
         """
         return self.__response(res=res, data=data)
 
+    @overload
+    def fail(
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
+        data: None = None,
+    ) -> ResponseModel: ...
+
+    @overload
+    def fail(
+        self,
+        *,
+        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
+        data: SchemaT,
+    ) -> ResponseSchemaModel[SchemaT]: ...
+
     def fail(
         self,
         *,
         res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
         data: Any = None,
-    ) -> ResponseModel | ResponseSchemaModel:
+    ) -> ResponseModel | ResponseSchemaModel[Any]:
         """
         失败响应
 
