@@ -487,6 +487,7 @@ async def get_sql_scripts() -> list[str]:
         'init',
         settings.DATABASE_PK_MODE,
         suffix='test_data',
+        tenant=settings.TENANT_ENABLED,
     )
 
     if await anyio.Path(main_sql_file).exists():

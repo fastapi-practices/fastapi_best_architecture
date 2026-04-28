@@ -242,6 +242,10 @@ class Settings(BaseSettings):
     OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE: int = 100
     OPERA_LOG_QUEUE_TIMEOUT: int = 60  # 1 分钟
 
+    # 租户
+    TENANT_ENABLED: bool = True
+    TENANT_DEFAULT_ID: int = 0
+
     # Plugin 配置
     PLUGIN_REQUIRED: list[str] = ['dict']
     PLUGIN_PIP_CHINA: bool = True
