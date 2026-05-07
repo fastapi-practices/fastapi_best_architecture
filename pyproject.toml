@@ -28,7 +28,6 @@ dependencies = [
   "flower>=2.0.1",
   "gevent>=25.9.1",
   "granian>=2.7.4",
-  "ip2loc>=1.0.0",
   "itsdangerous>=2.2.0",
   "jinja2>=3.1.6",
   "loguru>=0.7.3",
@@ -47,6 +46,7 @@ dependencies = [
   # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
   "psycopg[binary]==3.2.10",
   "pwdlib>=0.3.0",
+  "py-ip2region>=3.0.4",
   "pydantic>=2.13.3",
   "pydantic-settings>=2.14.0",
   "pymysql>=1.1.2",
