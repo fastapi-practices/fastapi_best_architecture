@@ -75,7 +75,7 @@ class AuthService:
         await user_dao.update_login_time(db, obj.username)
         access_token_data = await create_access_token(
             user.id,
-            getattr(user, 'tenant_id', settings.TENANT_DEFAULT_ID),
+            user.tenant_id,
             multi_login=user.is_multi_login,
             # extra info
             swagger=True,
