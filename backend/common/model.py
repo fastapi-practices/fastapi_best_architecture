@@ -83,6 +83,13 @@ class UserMixin(MappedAsDataclass):
     updated_by: Mapped[int | None] = mapped_column(init=False, default=None, sort_order=998, comment='修改者')
 
 
+class TenantMixin(MappedAsDataclass):
+    """租户 Mixin 数据类"""
+
+    if settings.TENANT_ENABLED:
+        tenant_id: Mapped[int] = mapped_column(BigInteger, index=True, sort_order=997, comment='租户ID')
+
+
 class DateTimeMixin(MappedAsDataclass):
     """日期时间 Mixin 数据类"""
 

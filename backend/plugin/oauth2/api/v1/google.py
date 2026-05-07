@@ -1,18 +1,14 @@
-import json
-import uuid
-
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
 from fastapi_oauth20 import FastAPIOAuth20, GoogleOAuth20
 from pyrate_limiter import Duration, Rate
 from starlette.responses import RedirectResponse
 
 from backend.common.response.response_schema import ResponseSchemaModel, response_base
 from backend.core.conf import settings
-from backend.database.db import CurrentSessionTransaction
-from backend.database.redis import redis_client
-from backend.plugin.oauth2.enums import UserSocialAuthType, UserSocialType
+from backend.database.db import CurrentSession, CurrentSessionTransaction
+from backend.plugin.oauth2.enums import UserSocialType
 from backend.plugin.oauth2.service.oauth2_service import oauth2_service
 from backend.utils.limiter import RateLimiter
 
@@ -22,16 +18,8 @@ google_client = GoogleOAuth20(settings.OAUTH2_GOOGLE_CLIENT_ID, settings.OAUTH2_
 
 
 @router.get('', summary='获取 google 授权链接')
-async def get_google_oauth2_url() -> ResponseSchemaModel[str]:
-    state = str(uuid.uuid4())
-
-    await redis_client.setex(
-        f'{settings.OAUTH2_STATE_REDIS_PREFIX}:{state}',
-        settings.OAUTH2_STATE_EXPIRE_SECONDS,
-        json.dumps({'type': UserSocialAuthType.login.value}),
-    )
-
-    auth_url = await google_client.get_authorization_url(redirect_uri=settings.OAUTH2_GOOGLE_REDIRECT_URI, state=state)
+async def get_google_oauth2_url(db: CurrentSession, request: Request) -> ResponseSchemaModel[str]:
+    auth_url = await oauth2_service.get_login_auth_url(db=db, request=request, source=UserSocialType.google)
     return response_base.success(data=auth_url)
 
 

@@ -3,13 +3,10 @@ from collections.abc import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.conf import settings
-from backend.plugin.config.enums import ConfigType
-from backend.plugin.config.service.config_service import config_service
 from backend.plugin.core import check_plugin_installed
 from backend.utils.serializers import select_list_serialize
 
 _config_plugin_installed = check_plugin_installed('config')
-
 
 if _config_plugin_installed:
     try:

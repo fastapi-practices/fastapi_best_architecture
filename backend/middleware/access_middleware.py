@@ -40,6 +40,9 @@ class AccessMiddleware(BaseHTTPMiddleware):
             inc_fastapi_request_in_progress(method=method, path=path)
             inc_fastapi_request(method=method, path=path)
 
+        # 为每个请求上下文注入默认租户 ID，授权接口认证成功后会覆盖为真实值
+        ctx.tenant_id = settings.TENANT_DEFAULT_ID
+
         response = await call_next(request)
 
         return response

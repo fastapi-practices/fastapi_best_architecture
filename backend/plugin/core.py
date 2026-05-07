@@ -38,6 +38,8 @@ def check_plugin_installed(plugin_name: str) -> bool:
 def get_required_plugins() -> tuple[str, ...]:
     """获取必需插件列表"""
     required_plugins = list(settings.PLUGIN_REQUIRED)
+    if settings.TENANT_ENABLED and 'tenant' not in required_plugins:
+        required_plugins.append('tenant')
     if not settings.RBAC_ROLE_MENU_MODE and 'casbin_rbac' not in required_plugins:
         required_plugins.append('casbin_rbac')
     return tuple(required_plugins)
@@ -423,6 +425,7 @@ def build_sql_filename(
     pk_type: PrimaryKeyType,
     *,
     suffix: str | None = None,
+    tenant: bool = False,
 ) -> str:
     """
     构建插件 SQL 脚本文件名
@@ -437,6 +440,8 @@ def build_sql_filename(
         parts.append('snowflake')
     if suffix:
         parts.append(suffix)
+    if tenant:
+        parts.append('tenant')
     return f'{"_".join(parts)}.sql'
 
 
@@ -451,6 +456,15 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
     """
     sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
     default_filename = build_sql_filename('init', pk_type)
+    if not settings.TENANT_ENABLED:
+        sql_file = sql_dir / default_filename
+        return str(sql_file) if await anyio.Path(sql_file).exists() else None
+
+    tenant_filename = build_sql_filename('init', pk_type, tenant=True)
+    tenant_sql_file = sql_dir / tenant_filename
+    if await anyio.Path(tenant_sql_file).exists():
+        return str(tenant_sql_file)
+
     default_sql_file = sql_dir / default_filename
     return str(default_sql_file) if await anyio.Path(default_sql_file).exists() else None
 

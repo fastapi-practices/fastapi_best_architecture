@@ -2,10 +2,10 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import Base, id_key
+from backend.common.model import Base, TenantMixin, id_key
 
 
-class Dept(Base):
+class Dept(Base, TenantMixin):
     """部门表"""
 
     __tablename__ = 'sys_dept'
