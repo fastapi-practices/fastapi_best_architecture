@@ -1,7 +1,8 @@
 import httpx
+import ip2region.searcher as ip2region_xdb
+import ip2region.util as ip2region_util
 
 from fastapi import Request
-from ip2loc import XdbSearcher
 from user_agents import parse
 
 from backend.common.dataclasses import IpInfo, UserAgentInfo
@@ -53,8 +54,9 @@ async def get_location_online(ip: str) -> dict | None:
             return None
 
 
-# 离线 IP 搜索器单例（数据将缓存到内存，缓存大小取决于 IP 数据文件大小）
-__xdb_searcher = XdbSearcher(contentBuff=XdbSearcher.loadContentFromFile(dbfile=STATIC_DIR / 'ip2region_v4.xdb'))
+# 离线 IP 搜索器（数据将缓存到内存，缓存大小取决于 IP 数据文件大小）
+__c_buffer: bytes = ip2region_util.load_content_from_file(STATIC_DIR / 'ip2region_v4.xdb')
+__xdb_searcher: ip2region_xdb.Searcher = ip2region_xdb.new_with_buffer(ip2region_util.IPv4, __c_buffer)
 
 
 def get_location_offline(ip: str) -> dict | None:
@@ -66,15 +68,16 @@ def get_location_offline(ip: str) -> dict | None:
     """
     try:
         data = __xdb_searcher.search(ip)
-        data = data.split('|')
-        return {
-            'country': data[0] if data[0] != '0' else None,
-            'regionName': data[1] if data[1] != '0' else None,
-            'city': data[2] if data[2] != '0' else None,
-        }
+        country, region_name, city, *_ = data.split('|')
     except Exception as e:
-        log.error(f'离线获取 IP 地址属地失败，错误信息：{e}')
+        log.error(f'离线获取 IP 地址属地失败：{e}')
         return None
+    else:
+        return {
+            'country': country if country != '0' else None,
+            'regionName': region_name if region_name != '0' else None,
+            'city': city if city != '0' else None,
+        }
 
 
 async def parse_ip_info(request: Request) -> IpInfo:
