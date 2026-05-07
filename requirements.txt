@@ -138,8 +138,6 @@ importlib-metadata==8.7.1
     # via opentelemetry-api
 iniconfig==2.3.0
     # via pytest
-ip2loc==1.0.0
-    # via fastapi-best-architecture
 itsdangerous==2.2.0
     # via fastapi-best-architecture
 jinja2==3.1.6
@@ -259,6 +257,8 @@ psycopg==3.2.10
 psycopg-binary==3.2.10 ; implementation_name != 'pypy'
     # via psycopg
 pwdlib==0.3.0
+    # via fastapi-best-architecture
+py-ip2region==3.0.4
     # via fastapi-best-architecture
 pyasn1==0.6.3
     # via

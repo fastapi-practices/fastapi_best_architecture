@@ -2252,7 +2252,6 @@ dependencies = [
   { name = "flower" },
   { name = "gevent" },
   { name = "granian" },
-  { name = "ip2loc" },
   { name = "itsdangerous" },
   { name = "jinja2" },
   { name = "loguru" },
@@ -2270,6 +2269,7 @@ dependencies = [
   { name = "psutil" },
   { name = "psycopg", extra = ["binary"] },
   { name = "pwdlib" },
+  { name = "py-ip2region" },
   { name = "pydantic" },
   { name = "pydantic-settings" },
   { name = "pymysql" },
@@ -2325,7 +2325,6 @@ requires-dist = [
   { name = "flower", specifier = ">=2.0.1" },
   { name = "gevent", specifier = ">=25.9.1" },
   { name = "granian", specifier = ">=2.7.4" },
-  { name = "ip2loc", specifier = ">=1.0.0" },
   { name = "itsdangerous", specifier = ">=2.2.0" },
   { name = "jinja2", specifier = ">=3.1.6" },
   { name = "loguru", specifier = ">=0.7.3" },
@@ -2346,6 +2345,7 @@ requires-dist = [
   { name = "psutil", specifier = ">=7.2.2" },
   { name = "psycopg", extras = ["binary"], specifier = "==3.2.10" },
   { name = "pwdlib", specifier = ">=0.3.0" },
+  { name = "py-ip2region", specifier = ">=3.0.4" },
   { name = "pydantic", specifier = ">=2.13.3" },
   { name = "pydantic-settings", specifier = ">=2.14.0" },
   { name = "pymysql", specifier = ">=1.1.2" },
@@ -3995,21 +3995,6 @@ wheels = [
   {
     url = "https://mirrors.aliyun.com/pypi/packages/cb/b1/3846dd7f199d53cb17f49cba7e651e9ce294d8497c8c150530ed11865bb8/iniconfig-2.3.0-py3-none-any.whl",
     hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12"
-  },
-]
-
-[[package]]
-name = "ip2loc"
-version = "1.0.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = {
-  url = "https://mirrors.aliyun.com/pypi/packages/80/74/b6f68d92571a11274c2a9d68c1c434f82a6c48a362e03386d356d8f6535b/ip2loc-1.0.0.tar.gz",
-  hash = "sha256:6707400f1f8580386708e6072c82293ccbad496368b9bf2fea13cfc274ab1ea7"
-}
-wheels = [
-  {
-    url = "https://mirrors.aliyun.com/pypi/packages/55/9f/dd1a683eb6c58fcd37cce62ef2c910948fd14bf5e6398f15c03c6f9308ad/ip2loc-1.0.0-py3-none-any.whl",
-    hash = "sha256:8094e071acfb3ce65c588d61da50de0eb26b21d3dc068cee85ff01823c3bc947"
   },
 ]
 
@@ -6816,6 +6801,21 @@ wheels = [
   {
     url = "https://mirrors.aliyun.com/pypi/packages/62/0c/9086a357d02a050fbb3270bf5043ac284dbfb845670e16c9389a41defc9e/pwdlib-0.3.0-py3-none-any.whl",
     hash = "sha256:f86c15c138858c09f3bba0a10984d4f9178158c55deaa72eac0210849b1a140d"
+  },
+]
+
+[[package]]
+name = "py-ip2region"
+version = "3.0.4"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+sdist = {
+  url = "https://mirrors.aliyun.com/pypi/packages/60/b8/c8b934effe827e5d159b51912dc8366f5a490d7383943e982a801f5c3591/py_ip2region-3.0.4.tar.gz",
+  hash = "sha256:a8b818ed502a17feb998bdcf7c7748466aff368bcc75592c443aedf4eb6987f7"
+}
+wheels = [
+  {
+    url = "https://mirrors.aliyun.com/pypi/packages/86/04/ef28263025ef08ec581875468f7ba08df6803fc729a0d464c3ad2161c1c7/py_ip2region-3.0.4-py3-none-any.whl",
+    hash = "sha256:7668e3756bc941045cf317a2116fe8359b0a70d88cee326decb836caa14bd77d"
   },
 ]
 
