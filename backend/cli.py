@@ -79,6 +79,15 @@ class CustomReloadFilter(PythonFilter):
         return super().__call__(change, path)
 
 
+def _get_database_prompt_defaults(db_type: str) -> tuple[str, str]:
+    """获取数据库初始化提示默认值"""
+    if db_type == DataBaseType.mysql:
+        return '3306', 'root'
+    if db_type == DataBaseType.sqlserver:
+        return '1433', 'sa'
+    return '5432', 'postgres'
+
+
 def setup_env_file() -> bool:
     """交互式配置并生成 .env 环境变量文件"""
     if not ENV_EXAMPLE_FILE_PATH.exists():
@@ -88,11 +97,24 @@ def setup_env_file() -> bool:
     try:
         env_content = Path(ENV_EXAMPLE_FILE_PATH).read_text(encoding='utf-8')
         console.note('配置数据库连接信息...')
-        db_type = Prompt.ask('数据库类型', choices=['mysql', 'postgresql'], default='postgresql')
+        db_type = Prompt.ask('数据库类型', choices=['mysql', 'postgresql', 'sqlserver'], default='postgresql')
+        db_port_default, db_user_default = _get_database_prompt_defaults(db_type)
         db_host = Prompt.ask('数据库主机', default='127.0.0.1')
-        db_port = Prompt.ask('数据库端口', default='5432' if db_type == 'postgresql' else '3306')
-        db_user = Prompt.ask('数据库用户名', default='postgres' if db_type == 'postgresql' else 'root')
+        db_port = Prompt.ask('数据库端口', default=db_port_default)
+        db_user = Prompt.ask('数据库用户名', default=db_user_default)
         db_password = Prompt.ask('数据库密码', password=True, default='123456')
+        db_driver = settings.DATABASE_DRIVER
+        trust_server_certificate = settings.DATABASE_TRUST_SERVER_CERTIFICATE
+        if db_type == DataBaseType.sqlserver:
+            db_driver = Prompt.ask('SQL Server ODBC Driver', default=settings.DATABASE_DRIVER)
+            trust_server_certificate = (
+                Prompt.ask(
+                    '是否信任 SQL Server 服务器证书',
+                    choices=['true', 'false'],
+                    default='true',
+                )
+                == 'true'
+            )
 
         console.note('配置 Redis 连接信息...')
         redis_host = Prompt.ask('Redis 主机', default='127.0.0.1')
@@ -114,6 +136,14 @@ def setup_env_file() -> bool:
         settings.DATABASE_USER = db_user
         env_content = env_content.replace("DATABASE_PASSWORD='123456'", f"DATABASE_PASSWORD='{db_password}'")
         settings.DATABASE_PASSWORD = db_password
+        env_content = re.sub(r"DATABASE_DRIVER='[^']*'", f"DATABASE_DRIVER='{db_driver}'", env_content)
+        settings.DATABASE_DRIVER = db_driver
+        env_content = re.sub(
+            r'DATABASE_TRUST_SERVER_CERTIFICATE=(True|False|true|false)',
+            f'DATABASE_TRUST_SERVER_CERTIFICATE={trust_server_certificate}',
+            env_content,
+        )
+        settings.DATABASE_TRUST_SERVER_CERTIFICATE = trust_server_certificate
         env_content = env_content.replace("REDIS_HOST='127.0.0.1'", f"REDIS_HOST='{redis_host}'")
         settings.REDIS_HOST = redis_host
         env_content = env_content.replace('REDIS_PORT=6379', f'REDIS_PORT={redis_port}')
@@ -145,6 +175,11 @@ async def create_database(conn: AsyncConnection) -> bool:
                 f'CREATE DATABASE `{settings.DATABASE_SCHEMA}` CHARACTER SET {settings.DATABASE_CHARSET} '
                 f'COLLATE {settings.DATABASE_CHARSET}_unicode_ci'
             )
+        elif DataBaseType.sqlserver == settings.DATABASE_TYPE:
+            check_sql = f"SELECT 1 FROM sys.databases WHERE name = N'{settings.DATABASE_SCHEMA}'"
+            terminate_sql = f'ALTER DATABASE [{settings.DATABASE_SCHEMA}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE'
+            drop_sql = f'DROP DATABASE [{settings.DATABASE_SCHEMA}]'
+            create_sql = f'CREATE DATABASE [{settings.DATABASE_SCHEMA}]'
         else:
             check_sql = f"SELECT 1 FROM pg_database WHERE datname = '{settings.DATABASE_SCHEMA}'"
             drop_sql = f'DROP DATABASE IF EXISTS {settings.DATABASE_SCHEMA}'
