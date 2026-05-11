@@ -8,7 +8,7 @@ networks:
         - subnet: 172.10.10.0/24
 
 volumes:
-  # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
+  # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql；如果你是 sqlserver 用户，应修改为 fba_sqlserver
   fba_postgres:
     name: fba_postgres
   fba_redis:
@@ -34,7 +34,7 @@ services:
     restart: always
     environment:
       - TZ=Asia/Shanghai
-    # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql
+    # 如果你是 mysql 用户，应将 fba_postgres 修改为 fba_mysql；如果你是 sqlserver 用户，应修改为 fba_sqlserver
     depends_on:
       - fba_postgres
       - fba_redis
@@ -45,7 +45,7 @@ services:
       - ${DOCKER_FBA_SERVER_LOG:-./logs/fba}:/var/log/fba
     networks:
       - fba_network
-    # 如果你是 mysql 用户，应将 fba_postgres:5432 修改为 fba_mysql:3306
+    # 如果你是 mysql 用户，应将 fba_postgres:5432 修改为 fba_mysql:3306；如果你是 sqlserver 用户，应修改为 fba_sqlserver:1433
     command:
       - bash
       - -c
@@ -89,6 +89,21 @@ services:
 #      --character-set-server=utf8mb4
 #      --collation-server=utf8mb4_general_ci
 #      --lower_case_table_names=1
+
+#  # 如果你是 sqlserver 用户，应保留 fba_sqlserver 容器脚本并删除 fba_postgres 容器脚本
+#  fba_sqlserver:
+#    image: mcr.microsoft.com/mssql/server:2022-latest
+#    ports:
+#      - "${DOCKER_MAP_SQLSERVER_PORT:-1433}:1433"
+#    container_name: fba_sqlserver
+#    restart: always
+#    environment:
+#      ACCEPT_EULA: Y
+#      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+#      MSSQL_PID: Express
+#      TZ: Asia/Shanghai
+#    networks:
+#      - fba_network
 
   fba_redis:
     image: redis:latest
