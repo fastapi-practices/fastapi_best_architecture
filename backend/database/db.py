@@ -29,22 +29,52 @@ def create_database_url(*, unittest: bool = False, with_database: bool = True) -
     :param with_database: 是否包含数据库名（创建数据库时不需要）
     :return:
     """
+    database_type = settings.DATABASE_TYPE
     if with_database:
         database = settings.DATABASE_SCHEMA if not unittest else f'{settings.DATABASE_SCHEMA}_test'
+    elif DataBaseType.mysql == database_type:
+        database = None
+    elif DataBaseType.postgresql == database_type:
+        database = 'postgres'
     else:
-        database = None if DataBaseType.mysql == settings.DATABASE_TYPE else 'postgres'
+        database = 'master'
 
-    url = URL.create(
-        drivername='mysql+asyncmy' if DataBaseType.mysql == settings.DATABASE_TYPE else 'postgresql+asyncpg',
+    if DataBaseType.mysql == database_type:
+        url = URL.create(
+            drivername='mysql+asyncmy',
+            username=settings.DATABASE_USER,
+            password=settings.DATABASE_PASSWORD,
+            host=settings.DATABASE_HOST,
+            port=settings.DATABASE_PORT,
+            database=database,
+        )
+        if with_database:
+            url = url.update_query_dict({'charset': settings.DATABASE_CHARSET})
+        return url
+
+    if DataBaseType.postgresql == database_type:
+        return URL.create(
+            drivername='postgresql+asyncpg',
+            username=settings.DATABASE_USER,
+            password=settings.DATABASE_PASSWORD,
+            host=settings.DATABASE_HOST,
+            port=settings.DATABASE_PORT,
+            database=database,
+        )
+
+    return URL.create(
+        drivername='mssql+aioodbc',
         username=settings.DATABASE_USER,
         password=settings.DATABASE_PASSWORD,
         host=settings.DATABASE_HOST,
         port=settings.DATABASE_PORT,
         database=database,
+        query={
+            'driver': settings.DATABASE_DRIVER,
+            'TrustServerCertificate': 'yes' if settings.DATABASE_TRUST_SERVER_CERTIFICATE else 'no',
+            'LongAsMax': 'Yes',
+        },
     )
-    if DataBaseType.mysql == settings.DATABASE_TYPE and with_database:
-        url = url.update_query_dict({'charset': settings.DATABASE_CHARSET})
-    return url
 
 
 def create_database_async_engine(url: str | URL) -> AsyncEngine:

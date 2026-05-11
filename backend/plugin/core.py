@@ -17,7 +17,7 @@ from backend.common.exception import errors
 from backend.common.lifespan import lifespan_manager
 from backend.common.log import log
 from backend.core.conf import settings
-from backend.core.path_conf import PLUGIN_DIR
+from backend.core.path_conf import PLUGIN_DIR, get_database_sql_dir_name
 from backend.database.redis import RedisCli, redis_client
 from backend.plugin.errors import PluginConfigError, PluginInjectError
 from backend.plugin.validator import validate_plugin_config
@@ -449,7 +449,7 @@ async def get_plugin_sql(plugin: str, db_type: DataBaseType, pk_type: PrimaryKey
     :param pk_type: 主键类型
     :return:
     """
-    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / get_database_sql_dir_name(db_type)
     default_filename = build_sql_filename('init', pk_type)
     default_sql_file = sql_dir / default_filename
     return str(default_sql_file) if await anyio.Path(default_sql_file).exists() else None
@@ -464,7 +464,7 @@ async def get_plugin_destroy_sql(plugin: str, db_type: DataBaseType, pk_type: Pr
     :param pk_type: 主键类型
     :return:
     """
-    sql_dir = PLUGIN_DIR / plugin / 'sql' / ('mysql' if db_type == DataBaseType.mysql else 'postgresql')
+    sql_dir = PLUGIN_DIR / plugin / 'sql' / get_database_sql_dir_name(db_type)
     sql_file = sql_dir / build_sql_filename('destroy', pk_type)
     return str(sql_file) if await anyio.Path(sql_file).exists() else None
 

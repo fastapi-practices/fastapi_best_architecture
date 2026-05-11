@@ -138,6 +138,7 @@ class DataBaseType(StrEnum):
 
     mysql = 'mysql'
     postgresql = 'postgresql'
+    sqlserver = 'sqlserver'
 
 
 class PrimaryKeyType(StrEnum):

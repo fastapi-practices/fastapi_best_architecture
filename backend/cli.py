@@ -32,10 +32,9 @@ from backend.core.path_conf import (
     ENV_EXAMPLE_FILE_PATH,
     ENV_FILE_PATH,
     LOCALE_DIR,
-    MYSQL_SCRIPT_DIR,
     PLUGIN_DIR,
-    POSTGRESQL_SCRIPT_DIR,
     RELOAD_LOCK_FILE,
+    get_database_script_dir,
 )
 from backend.database.db import (
     async_db_session,
@@ -482,7 +481,7 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
 async def get_sql_scripts() -> list[str]:
     """获取所有待执行的 SQL 脚本路径列表"""
     sql_scripts: list[str] = []
-    db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
+    db_script_dir = get_database_script_dir(settings.DATABASE_TYPE)
     main_sql_file = db_script_dir / build_sql_filename(
         'init',
         settings.DATABASE_PK_MODE,
