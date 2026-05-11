@@ -39,12 +39,12 @@ POSTGRESQL_SCRIPT_DIR = BASE_PATH / 'sql' / 'postgresql'
 SQLSERVER_SCRIPT_DIR = BASE_PATH / 'sql' / 'sqlserver'
 
 
-def get_database_sql_dir_name(db_type: DataBaseType) -> str:
+def get_database_sql_dir_name(db_type: DataBaseType | str) -> str:
     """获取数据库 SQL 目录名称"""
-    return db_type.value
+    return DataBaseType(db_type).value
 
 
-def get_database_script_dir(db_type: DataBaseType) -> Path:
+def get_database_script_dir(db_type: DataBaseType | str) -> Path:
     """获取数据库脚本目录"""
     return BASE_PATH / 'sql' / get_database_sql_dir_name(db_type)
 

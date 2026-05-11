@@ -1,10 +1,13 @@
+import asyncio
+
 from pytest import MonkeyPatch
 from sqlalchemy import URL
 
-from backend.common.enums import DataBaseType
+from backend.common.enums import DataBaseType, PrimaryKeyType
 from backend.core.conf import settings
 from backend.core.path_conf import get_database_script_dir, get_database_sql_dir_name
 from backend.database.db import create_database_url
+from backend.plugin.core import get_plugin_sql
 
 
 def test_sqlserver_enum_value_exists() -> None:
@@ -52,8 +55,15 @@ def test_create_database_url_uses_master_when_sqlserver_database_is_omitted(monk
     assert url.query['TrustServerCertificate'] == 'no'
 
 
-def test_database_script_dir_resolves_all_database_types() -> None:
-    assert get_database_sql_dir_name(DataBaseType.mysql) == 'mysql'
-    assert get_database_sql_dir_name(DataBaseType.postgresql) == 'postgresql'
-    assert get_database_sql_dir_name(DataBaseType.sqlserver) == 'sqlserver'
-    assert get_database_script_dir(DataBaseType.sqlserver).as_posix().endswith('/sql/sqlserver')
+def test_database_script_dir_accepts_string_database_type() -> None:
+    assert get_database_sql_dir_name('mysql') == 'mysql'
+    assert get_database_sql_dir_name('postgresql') == 'postgresql'
+    assert get_database_sql_dir_name('sqlserver') == 'sqlserver'
+    assert get_database_script_dir('postgresql').as_posix().endswith('/sql/postgresql')
+
+
+def test_plugin_sql_lookup_accepts_string_database_type_for_existing_database() -> None:
+    init_sql = asyncio.run(get_plugin_sql('dict', 'postgresql', PrimaryKeyType.autoincrement))
+
+    assert init_sql is not None
+    assert init_sql.replace('\\', '/').endswith('/backend/plugin/dict/sql/postgresql/init.sql')
