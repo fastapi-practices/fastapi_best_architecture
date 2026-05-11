@@ -286,3 +286,36 @@ def test_plugin_sql_lookup_accepts_string_database_type_for_existing_database() 
 
     assert init_sql is not None
     assert init_sql.replace('\\', '/').endswith('/backend/plugin/dict/sql/postgresql/init.sql')
+
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_MAIN_SQLSERVER_DIR = _PROJECT_ROOT / 'backend' / 'sql' / 'sqlserver'
+_PLUGIN_ROOT = _PROJECT_ROOT / 'backend' / 'plugin'
+_PLUGIN_NAMES = ('code_generator', 'config', 'dict', 'notice', 'oauth2')
+_PLUGIN_SCRIPT_NAMES = ('init.sql', 'init_snowflake.sql', 'destroy.sql', 'destroy_snowflake.sql')
+
+
+def test_sqlserver_main_scripts_exist_and_parse() -> None:
+    init_path = _MAIN_SQLSERVER_DIR / 'init_test_data.sql'
+    snowflake_path = _MAIN_SQLSERVER_DIR / 'init_snowflake_test_data.sql'
+
+    assert init_path.is_file(), f'missing {init_path}'
+    assert snowflake_path.is_file(), f'missing {snowflake_path}'
+
+    init_statements = asyncio.run(parse_sql_script(str(init_path)))
+    snowflake_statements = asyncio.run(parse_sql_script(str(snowflake_path)))
+
+    assert init_statements, 'init_test_data.sql produced no statements'
+    assert snowflake_statements, 'init_snowflake_test_data.sql produced no statements'
+
+
+def test_sqlserver_plugin_scripts_exist_and_parse() -> None:
+    for plugin in _PLUGIN_NAMES:
+        plugin_dir = _PLUGIN_ROOT / plugin / 'sql' / 'sqlserver'
+        assert plugin_dir.is_dir(), f'missing plugin sql dir {plugin_dir}'
+        for script_name in _PLUGIN_SCRIPT_NAMES:
+            script_path = plugin_dir / script_name
+            assert script_path.is_file(), f'missing {script_path}'
+            is_destroy = script_name.startswith('destroy')
+            statements = asyncio.run(parse_sql_script(str(script_path), is_destroy=is_destroy))
+            assert statements, f'{script_path} produced no statements'
