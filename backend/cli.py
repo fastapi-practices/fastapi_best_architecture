@@ -88,6 +88,16 @@ def _get_database_prompt_defaults(db_type: str) -> tuple[str, str]:
     return '5432', 'postgres'
 
 
+def _validate_database_schema_name(schema: str) -> str:
+    """验证 SQL Server 数据库名称"""
+    if not re.fullmatch(r'^[A-Za-z_][A-Za-z0-9_]*$', schema):
+        raise ValueError(
+            'Invalid SQL Server database schema name. Use only letters, digits, and underscores, '
+            'and start with a letter or underscore.'
+        )
+    return schema
+
+
 def setup_env_file() -> bool:
     """交互式配置并生成 .env 环境变量文件"""
     if not ENV_EXAMPLE_FILE_PATH.exists():
@@ -107,11 +117,12 @@ def setup_env_file() -> bool:
         trust_server_certificate = settings.DATABASE_TRUST_SERVER_CERTIFICATE
         if db_type == DataBaseType.sqlserver:
             db_driver = Prompt.ask('SQL Server ODBC Driver', default=settings.DATABASE_DRIVER)
+            trust_server_certificate_default = str(settings.DATABASE_TRUST_SERVER_CERTIFICATE).lower()
             trust_server_certificate = (
                 Prompt.ask(
                     '是否信任 SQL Server 服务器证书',
                     choices=['true', 'false'],
-                    default='true',
+                    default=trust_server_certificate_default,
                 )
                 == 'true'
             )
@@ -140,7 +151,7 @@ def setup_env_file() -> bool:
         settings.DATABASE_DRIVER = db_driver
         env_content = re.sub(
             r'DATABASE_TRUST_SERVER_CERTIFICATE=(True|False|true|false)',
-            f'DATABASE_TRUST_SERVER_CERTIFICATE={trust_server_certificate}',
+            f'DATABASE_TRUST_SERVER_CERTIFICATE={str(trust_server_certificate).lower()}',
             env_content,
         )
         settings.DATABASE_TRUST_SERVER_CERTIFICATE = trust_server_certificate
@@ -176,10 +187,11 @@ async def create_database(conn: AsyncConnection) -> bool:
                 f'COLLATE {settings.DATABASE_CHARSET}_unicode_ci'
             )
         elif DataBaseType.sqlserver == settings.DATABASE_TYPE:
-            check_sql = f"SELECT 1 FROM sys.databases WHERE name = N'{settings.DATABASE_SCHEMA}'"
-            terminate_sql = f'ALTER DATABASE [{settings.DATABASE_SCHEMA}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE'
-            drop_sql = f'DROP DATABASE [{settings.DATABASE_SCHEMA}]'
-            create_sql = f'CREATE DATABASE [{settings.DATABASE_SCHEMA}]'
+            schema_name = _validate_database_schema_name(settings.DATABASE_SCHEMA)
+            check_sql = f"SELECT 1 FROM sys.databases WHERE name = N'{schema_name}'"
+            terminate_sql = f'ALTER DATABASE [{schema_name}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE'
+            drop_sql = f'DROP DATABASE [{schema_name}]'
+            create_sql = f'CREATE DATABASE [{schema_name}]'
         else:
             check_sql = f"SELECT 1 FROM pg_database WHERE datname = '{settings.DATABASE_SCHEMA}'"
             drop_sql = f'DROP DATABASE IF EXISTS {settings.DATABASE_SCHEMA}'
