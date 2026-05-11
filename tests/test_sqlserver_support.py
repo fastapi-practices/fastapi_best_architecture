@@ -19,6 +19,7 @@ from backend.core.conf import settings
 from backend.core.path_conf import get_database_script_dir, get_database_sql_dir_name
 from backend.database.db import create_database_url
 from backend.plugin.core import get_plugin_sql
+from backend.utils.sql_parser import parse_sql_script
 
 _ENV_EXAMPLE_CONTENT = """ENVIRONMENT='dev'
 DATABASE_TYPE='postgresql'
@@ -254,6 +255,30 @@ def test_create_database_rejects_invalid_sqlserver_schema(monkeypatch: MonkeyPat
 
     assert asyncio.run(create_database(conn)) is False
     assert conn.statements == []
+
+
+def test_parse_sql_script_accepts_sqlserver_init_prefixes(tmp_path: Path) -> None:
+    sql_file = tmp_path / 'init.sql'
+    sql_file.write_text(
+        """
+DECLARE @menu_id bigint;
+SET @menu_id = 1;
+INSERT INTO sys_menu (id, name) VALUES (1, 'Demo');
+DBCC CHECKIDENT ('sys_menu', RESEED, 1);
+SELECT 1;
+""".strip(),
+        encoding='utf-8',
+    )
+
+    statements = asyncio.run(parse_sql_script(str(sql_file)))
+
+    assert statements == [
+        'DECLARE @menu_id bigint;',
+        'SET @menu_id = 1;',
+        "INSERT INTO sys_menu (id, name) VALUES (1, 'Demo');",
+        "DBCC CHECKIDENT ('sys_menu', RESEED, 1);",
+        'SELECT 1;',
+    ]
 
 
 def test_plugin_sql_lookup_accepts_string_database_type_for_existing_database() -> None:
