@@ -259,6 +259,7 @@ async def auto_init() -> None:
                 raise cappa.Exit('数据库创建失败', code=1)
     else:
         console.warning('已取消数据库操作')
+        return
 
     console.print('\n[bold cyan]步骤 3/3:[/] 初始化数据库表和数据', style='bold')
     async_init_engine = create_database_async_engine(create_database_url())
