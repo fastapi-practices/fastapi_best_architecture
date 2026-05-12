@@ -35,13 +35,23 @@ FROM python:3.10-slim-bookworm AS base_server
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates gnupg supervisor unixodbc \
+    && apt-get install -y --no-install-recommends curl ca-certificates supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Optional: Install SQL Server ODBC Driver 18 for SQL Server support
+# Uncomment the lines below or build with --build-arg INSTALL_MSSQL_ODBC=true
+ARG INSTALL_MSSQL_ODBC=false
+RUN if [ "$INSTALL_MSSQL_ODBC" = "true" ]; then \
+    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gnupg unixodbc \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 \
     && apt-get purge -y --auto-remove gnupg \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*; \
+    fi
 
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 

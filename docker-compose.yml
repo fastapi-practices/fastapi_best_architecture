@@ -93,6 +93,7 @@ services:
 #  # 如果你是 sqlserver 用户，应保留 fba_sqlserver 容器脚本并删除 fba_postgres 容器脚本。
 #  # 同时将 fba_server.depends_on 改为 fba_sqlserver，并将 wait-for-it 改为 fba_sqlserver:1433。
 #  # deploy/backend/docker-compose/.env.server 也应改为 DATABASE_TYPE='sqlserver'、DATABASE_HOST='fba_sqlserver'、DATABASE_PORT=1433、DATABASE_USER='sa'。
+#  # 如需在容器中连接 SQL Server，构建镜像时需启用 ODBC 驱动：docker compose build --build-arg INSTALL_MSSQL_ODBC=true
 #  fba_sqlserver:
 #    image: mcr.microsoft.com/mssql/server:2022-latest
 #    ports:
