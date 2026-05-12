@@ -20,6 +20,12 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(UniversalStr(64), comment='昵称')
     password: Mapped[str | None] = mapped_column(UniversalStr(256), comment='密码')
     salt: Mapped[bytes | None] = mapped_column(sa.LargeBinary(255), comment='加密盐')
+    auth_provider: Mapped[str] = mapped_column(
+        UniversalStr(20), default='local', comment='认证提供方(local 或 ad)'
+    )
+    external_id: Mapped[str | None] = mapped_column(
+        UniversalStr(128), default=None, unique=True, comment='AD SID 或 DN'
+    )
     email: Mapped[str | None] = mapped_column(UniversalStr(256), default=None, unique=True, index=True, comment='邮箱')
     phone: Mapped[str | None] = mapped_column(UniversalStr(11), default=None, comment='手机号')
     avatar: Mapped[str | None] = mapped_column(UniversalStr(256), default=None, comment='头像')

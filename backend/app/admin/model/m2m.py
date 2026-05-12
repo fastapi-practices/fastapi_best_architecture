@@ -9,6 +9,7 @@ user_role = sa.Table(
     sa.Column('id', sa.BigInteger, primary_key=True, unique=True, index=True, autoincrement=True, comment='主键ID'),
     sa.Column('user_id', sa.BigInteger, primary_key=True, comment='用户ID'),
     sa.Column('role_id', sa.BigInteger, primary_key=True, comment='角色ID'),
+    sa.Column('source', sa.String(30), default='manual', comment='角色来源(manual 或 department_mapping)'),
 )
 
 # 角色菜单表
