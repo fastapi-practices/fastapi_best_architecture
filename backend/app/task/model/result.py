@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from celery import states
 from sqlalchemy.types import PickleType
 
-from backend.common.model import MappedBase, TimeZone
+from backend.common.model import MappedBase, TimeZone, UniversalStr
 from backend.utils.timezone import timezone
 
 """
@@ -18,8 +18,8 @@ class Task(MappedBase):
     __table_args__ = {'comment': '任务结果表'}
 
     id = sa.Column(sa.Integer, sa.Sequence('task_id_sequence'), primary_key=True, autoincrement=True)
-    task_id = sa.Column(sa.String(155), unique=True)
-    status = sa.Column(sa.String(64), default=states.PENDING)
+    task_id = sa.Column(UniversalStr(155), unique=True)
+    status = sa.Column(UniversalStr(64), default=states.PENDING)
     result = sa.Column(PickleType, nullable=True)
     date_done = sa.Column(
         TimeZone,
@@ -57,12 +57,12 @@ class TaskExtended(Task):
     __tablename__ = 'task_result'
     __table_args__ = {'extend_existing': True, 'comment': '任务结果表'}
 
-    name = sa.Column(sa.String(155), nullable=True)
+    name = sa.Column(UniversalStr(155), nullable=True)
     args = sa.Column(sa.LargeBinary, nullable=True)
     kwargs = sa.Column(sa.LargeBinary, nullable=True)
-    worker = sa.Column(sa.String(155), nullable=True)
+    worker = sa.Column(UniversalStr(155), nullable=True)
     retries = sa.Column(sa.Integer, nullable=True)
-    queue = sa.Column(sa.String(155), nullable=True)
+    queue = sa.Column(UniversalStr(155), nullable=True)
 
     def to_dict(self) -> dict:
         task_dict = super().to_dict()
@@ -84,7 +84,7 @@ class TaskSet(MappedBase):
     __table_args__ = {'comment': '任务集结果表'}
 
     id = sa.Column(sa.Integer, sa.Sequence('taskset_id_sequence'), autoincrement=True, primary_key=True)
-    taskset_id = sa.Column(sa.String(155), unique=True)
+    taskset_id = sa.Column(UniversalStr(155), unique=True)
     result = sa.Column(PickleType, nullable=True)
     date_done = sa.Column(TimeZone, default=timezone.now, nullable=True)
 

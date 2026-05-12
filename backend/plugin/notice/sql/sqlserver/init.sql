@@ -9,7 +9,7 @@ VALUES
 
 SET IDENTITY_INSERT sys_notice ON;
 INSERT INTO sys_notice (id, title, type, status, content, created_time, updated_time)
-VALUES (1, 'hahahahahaahahaha', 0, 1, '你好😄
+VALUES (1, 'hahahahahaahahaha', 0, 1, N'你好😄
 
 ```
 print(''fba yyds'')

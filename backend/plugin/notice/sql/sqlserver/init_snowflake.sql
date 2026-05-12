@@ -8,7 +8,7 @@ VALUES
 (2049629108257816579, N'删除', 'DeleteNotice', NULL, 0, NULL, 2, NULL, 'sys:notice:del', 1, 0, 1, '', NULL, 2049629108257816576, GETDATE(), NULL);
 
 INSERT INTO sys_notice (id, title, type, status, content, created_time, updated_time)
-VALUES (2112248797756129280, 'hahahahahaahahaha', 0, 1, '你好😄
+VALUES (2112248797756129280, 'hahahahahaahahaha', 0, 1, N'你好😄
 
 ```
 print(''fba yyds'')
