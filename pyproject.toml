@@ -31,6 +31,7 @@ dependencies = [
   "granian>=2.7.4",
   "itsdangerous>=2.2.0",
   "jinja2>=3.1.6",
+  "ldap3>=2.9.1",
   "loguru>=0.7.3",
   "msgspec>=0.21.1",
   "opentelemetry-exporter-otlp-proto-grpc>=1.41.1",
