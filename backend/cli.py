@@ -32,10 +32,9 @@ from backend.core.path_conf import (
     ENV_EXAMPLE_FILE_PATH,
     ENV_FILE_PATH,
     LOCALE_DIR,
-    MYSQL_SCRIPT_DIR,
     PLUGIN_DIR,
-    POSTGRESQL_SCRIPT_DIR,
     RELOAD_LOCK_FILE,
+    get_database_script_dir,
 )
 from backend.database.db import (
     async_db_session,
@@ -80,6 +79,25 @@ class CustomReloadFilter(PythonFilter):
         return super().__call__(change, path)
 
 
+def _get_database_prompt_defaults(db_type: str) -> tuple[str, str]:
+    """获取数据库初始化提示默认值"""
+    if db_type == DataBaseType.mysql:
+        return '3306', 'root'
+    if db_type == DataBaseType.sqlserver:
+        return '1433', 'sa'
+    return '5432', 'postgres'
+
+
+def _validate_database_schema_name(schema: str) -> str:
+    """验证 SQL Server 数据库名称"""
+    if not re.fullmatch(r'^[A-Za-z_][A-Za-z0-9_]*$', schema):
+        raise ValueError(
+            'Invalid SQL Server database schema name. Use only letters, digits, and underscores, '
+            'and start with a letter or underscore.'
+        )
+    return schema
+
+
 def setup_env_file() -> bool:
     """交互式配置并生成 .env 环境变量文件"""
     if not ENV_EXAMPLE_FILE_PATH.exists():
@@ -89,11 +107,25 @@ def setup_env_file() -> bool:
     try:
         env_content = Path(ENV_EXAMPLE_FILE_PATH).read_text(encoding='utf-8')
         console.note('配置数据库连接信息...')
-        db_type = Prompt.ask('数据库类型', choices=['mysql', 'postgresql'], default='postgresql')
+        db_type = Prompt.ask('数据库类型', choices=['mysql', 'postgresql', 'sqlserver'], default='postgresql')
+        db_port_default, db_user_default = _get_database_prompt_defaults(db_type)
         db_host = Prompt.ask('数据库主机', default='127.0.0.1')
-        db_port = Prompt.ask('数据库端口', default='5432' if db_type == 'postgresql' else '3306')
-        db_user = Prompt.ask('数据库用户名', default='postgres' if db_type == 'postgresql' else 'root')
+        db_port = Prompt.ask('数据库端口', default=db_port_default)
+        db_user = Prompt.ask('数据库用户名', default=db_user_default)
         db_password = Prompt.ask('数据库密码', password=True, default='123456')
+        db_driver = settings.DATABASE_DRIVER
+        trust_server_certificate = settings.DATABASE_TRUST_SERVER_CERTIFICATE
+        if db_type == DataBaseType.sqlserver:
+            db_driver = Prompt.ask('SQL Server ODBC Driver', default=settings.DATABASE_DRIVER)
+            trust_server_certificate_default = str(settings.DATABASE_TRUST_SERVER_CERTIFICATE).lower()
+            trust_server_certificate = (
+                Prompt.ask(
+                    '是否信任 SQL Server 服务器证书',
+                    choices=['true', 'false'],
+                    default=trust_server_certificate_default,
+                )
+                == 'true'
+            )
 
         console.note('配置 Redis 连接信息...')
         redis_host = Prompt.ask('Redis 主机', default='127.0.0.1')
@@ -115,6 +147,14 @@ def setup_env_file() -> bool:
         settings.DATABASE_USER = db_user
         env_content = env_content.replace("DATABASE_PASSWORD='123456'", f"DATABASE_PASSWORD='{db_password}'")
         settings.DATABASE_PASSWORD = db_password
+        env_content = re.sub(r"DATABASE_DRIVER='[^']*'", f"DATABASE_DRIVER='{db_driver}'", env_content)
+        settings.DATABASE_DRIVER = db_driver
+        env_content = re.sub(
+            r'DATABASE_TRUST_SERVER_CERTIFICATE=(True|False|true|false)',
+            f'DATABASE_TRUST_SERVER_CERTIFICATE={str(trust_server_certificate).lower()}',
+            env_content,
+        )
+        settings.DATABASE_TRUST_SERVER_CERTIFICATE = trust_server_certificate
         env_content = env_content.replace("REDIS_HOST='127.0.0.1'", f"REDIS_HOST='{redis_host}'")
         settings.REDIS_HOST = redis_host
         env_content = env_content.replace('REDIS_PORT=6379', f'REDIS_PORT={redis_port}')
@@ -146,6 +186,12 @@ async def create_database(conn: AsyncConnection) -> bool:
                 f'CREATE DATABASE `{settings.DATABASE_SCHEMA}` CHARACTER SET {settings.DATABASE_CHARSET} '
                 f'COLLATE {settings.DATABASE_CHARSET}_unicode_ci'
             )
+        elif DataBaseType.sqlserver == settings.DATABASE_TYPE:
+            schema_name = _validate_database_schema_name(settings.DATABASE_SCHEMA)
+            check_sql = f"SELECT 1 FROM sys.databases WHERE name = N'{schema_name}'"
+            terminate_sql = f'ALTER DATABASE [{schema_name}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE'
+            drop_sql = f'DROP DATABASE [{schema_name}]'
+            create_sql = f'CREATE DATABASE [{schema_name}]'
         else:
             check_sql = f"SELECT 1 FROM pg_database WHERE datname = '{settings.DATABASE_SCHEMA}'"
             drop_sql = f'DROP DATABASE IF EXISTS {settings.DATABASE_SCHEMA}'
@@ -213,6 +259,7 @@ async def auto_init() -> None:
                 raise cappa.Exit('数据库创建失败', code=1)
     else:
         console.warning('已取消数据库操作')
+        return
 
     console.print('\n[bold cyan]步骤 3/3:[/] 初始化数据库表和数据', style='bold')
     async_init_engine = create_database_async_engine(create_database_url())
@@ -482,7 +529,7 @@ async def remove_plugin(plugin: str | None, *, no_sql: bool = False) -> None:  #
 async def get_sql_scripts() -> list[str]:
     """获取所有待执行的 SQL 脚本路径列表"""
     sql_scripts: list[str] = []
-    db_script_dir = MYSQL_SCRIPT_DIR if DataBaseType.mysql == settings.DATABASE_TYPE else POSTGRESQL_SCRIPT_DIR
+    db_script_dir = get_database_script_dir(settings.DATABASE_TYPE)
     main_sql_file = db_script_dir / build_sql_filename(
         'init',
         settings.DATABASE_PK_MODE,

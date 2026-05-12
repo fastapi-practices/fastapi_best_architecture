@@ -2,7 +2,7 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.common.model import Base, id_key
+from backend.common.model import Base, UniversalStr, id_key
 
 
 class UserSocial(Base):
@@ -11,8 +11,8 @@ class UserSocial(Base):
     __tablename__ = 'sys_user_social'
 
     id: Mapped[id_key] = mapped_column(init=False)
-    sid: Mapped[str] = mapped_column(sa.String(256), comment='第三方用户 ID')
-    source: Mapped[str] = mapped_column(sa.String(32), comment='第三方用户来源')
+    sid: Mapped[str] = mapped_column(UniversalStr(256), comment='第三方用户 ID')
+    source: Mapped[str] = mapped_column(UniversalStr(32), comment='第三方用户来源')
 
     # 逻辑外键
     user_id: Mapped[int] = mapped_column(sa.BigInteger, comment='用户关联ID')

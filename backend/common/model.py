@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import BigInteger, DateTime, Text, TypeDecorator
+from sqlalchemy import BigInteger, DateTime, String, Text, TypeDecorator, Unicode, UnicodeText
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, declared_attr, mapped_column
@@ -41,16 +41,33 @@ id_key = Annotated[
 
 
 class UniversalText(TypeDecorator[str]):
-    """PostgreSQL、MySQL 兼容性（长）文本类型"""
+    """PostgreSQL、MySQL、SQL Server 兼容性（长）文本类型"""
 
     impl = LONGTEXT if DataBaseType.mysql == settings.DATABASE_TYPE else Text
     cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'mssql':
+            return dialect.type_descriptor(UnicodeText)
+        return dialect.type_descriptor(self.impl)
 
     def process_bind_param(self, value: str | None, dialect) -> str | None:  # noqa: ANN001
         return value
 
     def process_result_value(self, value: str | None, dialect) -> str | None:  # noqa: ANN001
         return value
+
+
+class UniversalStr(TypeDecorator[str]):
+    """SQL Server Unicode (NVARCHAR) compatible string type"""
+
+    impl = String
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'mssql':
+            return dialect.type_descriptor(Unicode(length=self.impl.length))
+        return dialect.type_descriptor(self.impl)
 
 
 class TimeZone(TypeDecorator[datetime]):
