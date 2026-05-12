@@ -104,6 +104,7 @@ class Settings(BaseSettings):
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = [  # JWT / RBAC 路由白名单
         f'{FASTAPI_API_V1_PATH}/auth/login',
+        f'{FASTAPI_API_V1_PATH}/ad-auth/login',
     ]
     TOKEN_REQUEST_PATH_EXCLUDE_PATTERN: list[Pattern[str]] = []  # JWT / RBAC 路由白名单（正则）
 
@@ -312,6 +313,23 @@ class Settings(BaseSettings):
     EMAIL_SSL: bool
     EMAIL_CAPTCHA_REDIS_PREFIX: str
     EMAIL_CAPTCHA_EXPIRE_SECONDS: int
+
+    ##################################################
+    # [ Plugin ] ad_auth
+    ##################################################
+    # 基础配置（in plugin.toml）
+    AD_AUTH_ENABLED: bool = True
+    AD_AUTH_LDAP_URL: str = 'ldap://localhost:389'
+    AD_AUTH_BASE_DN: str = ''
+    AD_AUTH_BIND_DN: str = ''
+    AD_AUTH_BIND_PASSWORD: str = ''
+    AD_AUTH_USER_SEARCH_FILTER: str = ''
+    AD_AUTH_USER_SEARCH_BASE: str = ''
+    AD_AUTH_EMAIL_ATTR: str = 'mail'
+    AD_AUTH_DISPLAY_NAME_ATTR: str = 'cn'
+    AD_AUTH_DEPARTMENT_ATTR: str = 'department'
+    AD_AUTH_EXTERNAL_ID_ATTR: str = 'objectSid'
+    AD_AUTH_DEFAULT_ROLE: str = 'user'
 
     @model_validator(mode='before')
     @classmethod
