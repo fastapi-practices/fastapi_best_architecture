@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 
@@ -29,9 +29,10 @@ class TestDeptRoleMappingService:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        result = pytest.importorskip("asyncio").get_event_loop().run_until_complete(
-            svc.resolve_role(mock_db, "信息部")
-        )
+        async def run():
+            return await svc.resolve_role(mock_db, "信息部")
+
+        result = asyncio.run(run())
         assert result == "admin"
 
     def test_resolve_fallback_when_no_match(self):
@@ -51,10 +52,10 @@ class TestDeptRoleMappingService:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
-            svc.resolve_role(mock_db, "生产部")
-        )
+        async def run():
+            return await svc.resolve_role(mock_db, "生产部")
+
+        result = asyncio.run(run())
         assert result == "user"
 
     def test_invalid_regex_skipped(self):
@@ -80,8 +81,8 @@ class TestDeptRoleMappingService:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
-            svc.resolve_role(mock_db, "IT")
-        )
+        async def run():
+            return await svc.resolve_role(mock_db, "IT")
+
+        result = asyncio.run(run())
         assert result == "user"

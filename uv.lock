@@ -851,6 +851,7 @@ dependencies = [
     { name = "granian" },
     { name = "itsdangerous" },
     { name = "jinja2" },
+    { name = "ldap3" },
     { name = "loguru" },
     { name = "msgspec" },
     { name = "opentelemetry-exporter-otlp-proto-grpc" },
@@ -917,6 +918,7 @@ requires-dist = [
     { name = "granian", specifier = ">=2.7.4" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "ldap3", specifier = ">=2.9.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "msgspec", specifier = ">=0.21.1" },
     { name = "opentelemetry-exporter-otlp-proto-grpc", specifier = ">=1.41.1" },
@@ -1530,6 +1532,18 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/b6/a5/607e533ed6c83ae1a696969b8e1c137dfebd5759a2e9682e26ff1b97740b/kombu-5.6.2.tar.gz", hash = "sha256:8060497058066c6f5aed7c26d7cd0d3b574990b09de842a8c5aaed0b92cc5a55" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/fb/0f/834427d8c03ff1d7e867d3db3d176470c64871753252b21b4f4897d1fa45/kombu-5.6.2-py3-none-any.whl", hash = "sha256:efcfc559da324d41d61ca311b0c64965ea35b4c55cc04ee36e55386145dace93" },
+]
+
+[[package]]
+name = "ldap3"
+version = "2.9.1"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+dependencies = [
+    { name = "pyasn1" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/43/ac/96bd5464e3edbc61595d0d69989f5d9969ae411866427b2500a8e5b812c0/ldap3-2.9.1.tar.gz", hash = "sha256:f3e7fc4718e3f09dda568b57100095e0ce58633bcabbed8667ce3f8fbaa4229f" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/4e/f6/71d6ec9f18da0b2201287ce9db6afb1a1f637dedb3f0703409558981c723/ldap3-2.9.1-py2.py3-none-any.whl", hash = "sha256:5869596fc4948797020d3f03b7939da938778a0f9e2009f7a072ccf92b8e8d70" },
 ]
 
 [[package]]
