@@ -1,0 +1,24 @@
+[plugin]
+summary = "AD 域认证"
+version = "0.0.1"
+description = "支持 Active Directory / LDAP 域认证登录，支持部门到角色自动映射"
+author = "avc"
+tags = ["auth"]
+database = ["mysql", "postgresql"]
+
+[app]
+router = ["v1"]
+
+[settings]
+AD_AUTH_ENABLED = true
+AD_AUTH_LDAP_URL = "ldap://192.168.80.90:1389"
+AD_AUTH_BASE_DN = "dc=avc,dc=local"
+AD_AUTH_BIND_DN = "cn=admin,dc=avc,dc=local"
+AD_AUTH_BIND_PASSWORD = ""
+AD_AUTH_USER_SEARCH_FILTER = "(|(sAMAccountName={username})(mail={username}))"
+AD_AUTH_USER_SEARCH_BASE = "ou=users,dc=avc,dc=local"
+AD_AUTH_EMAIL_ATTR = "mail"
+AD_AUTH_DISPLAY_NAME_ATTR = "cn"
+AD_AUTH_DEPARTMENT_ATTR = "department"
+AD_AUTH_EXTERNAL_ID_ATTR = "objectSid"
+AD_AUTH_DEFAULT_ROLE = "user"
