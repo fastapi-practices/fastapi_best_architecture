@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     FASTAPI_STATIC_FILES: bool = True
 
     # .env 数据库
-    DATABASE_TYPE: Literal['mysql', 'postgresql']
+    DATABASE_TYPE: Literal['mysql', 'postgresql', 'sqlserver']
     DATABASE_HOST: str
     DATABASE_PORT: int
     DATABASE_USER: str
@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     DATABASE_POOL_ECHO: bool | Literal['debug'] = False
     DATABASE_SCHEMA: str = 'fba'
     DATABASE_CHARSET: str = 'utf8mb4'
+    DATABASE_DRIVER: str = 'ODBC Driver 18 for SQL Server'
+    DATABASE_TRUST_SERVER_CERTIFICATE: bool = True
     DATABASE_PK_MODE: Literal['autoincrement', 'snowflake'] = 'autoincrement'
 
     # .env Redis

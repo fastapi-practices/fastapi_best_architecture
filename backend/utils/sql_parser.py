@@ -6,7 +6,7 @@ from sqlparse import split
 from backend.common.exception import errors
 
 # 初始化脚本允许的 SQL 语句前缀
-_INIT_SQL_PREFIXES = frozenset({'select', 'insert', 'set', 'do'})
+_INIT_SQL_PREFIXES = frozenset({'select', 'insert', 'set', 'do', 'declare', 'dbcc'})
 
 # 销毁脚本允许的 SQL 语句前缀
 _DESTROY_SQL_PREFIXES = _INIT_SQL_PREFIXES | {'drop', 'delete', 'alter'}
