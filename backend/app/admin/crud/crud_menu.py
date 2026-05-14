@@ -64,6 +64,16 @@ class CRUDMenu(CRUDPlus[Menu]):
 
         return await self.select_models_order(db, 'sort', 'asc', **filters)
 
+    async def get_all_by_ids(self, db: AsyncSession, menu_ids: list[int]) -> Sequence[Menu]:
+        """
+        通过 ID 列表批量获取菜单
+
+        :param db: 数据库会话
+        :param menu_ids: 菜单 ID 列表
+        :return:
+        """
+        return await self.select_models(db, id__in=menu_ids)
+
     async def create(self, db: AsyncSession, obj: CreateMenuParam) -> None:
         """
         创建菜单

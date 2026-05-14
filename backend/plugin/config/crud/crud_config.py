@@ -31,6 +31,26 @@ class CRUDConfig(CRUDPlus[Config]):
         """
         return await self.select_models(db, type=type)
 
+    async def get_all_by_ids(self, db: AsyncSession, pks: list[int]) -> Sequence[Config]:
+        """
+        通过 ID 列表批量获取参数配置
+
+        :param db: 数据库会话
+        :param pks: 参数配置 ID 列表
+        :return:
+        """
+        return await self.select_models(db, id__in=pks)
+
+    async def get_all_by_keys(self, db: AsyncSession, keys: list[str]) -> Sequence[Config]:
+        """
+        通过键名列表批量获取参数配置
+
+        :param db: 数据库会话
+        :param keys: 参数配置键名列表
+        :return:
+        """
+        return await self.select_models(db, key__in=keys)
+
     async def get_by_key(self, db: AsyncSession, key: str) -> Config | None:
         """
         通过键名获取参数配置

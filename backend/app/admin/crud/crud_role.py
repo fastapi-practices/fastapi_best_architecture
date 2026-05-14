@@ -73,6 +73,16 @@ class CRUDRole(CRUDPlus[Role]):
         """
         return await self.select_models(db)
 
+    async def get_all_by_ids(self, db: AsyncSession, role_ids: list[int]) -> Sequence[Role]:
+        """
+        通过 ID 列表批量获取角色
+
+        :param db: 数据库会话
+        :param role_ids: 角色 ID 列表
+        :return:
+        """
+        return await self.select_models(db, id__in=role_ids)
+
     async def get_select(self, name: str | None, status: int | None) -> Select:
         """
         获取角色列表查询表达式

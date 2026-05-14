@@ -54,6 +54,16 @@ class CRUDDataRule(CRUDPlus[DataRule]):
         """
         return await self.select_models(db)
 
+    async def get_all_by_ids(self, db: AsyncSession, pks: list[int]) -> Sequence[DataRule]:
+        """
+        通过 ID 列表批量获取数据规则
+
+        :param db: 数据库会话
+        :param pks: 规则 ID 列表
+        :return:
+        """
+        return await self.select_models(db, id__in=pks)
+
     async def create(self, db: AsyncSession, obj: CreateDataRuleParam) -> None:
         """
         创建规则
