@@ -21,7 +21,7 @@ from backend.common.observability.prometheus.fastapi import (
     observe_fastapi_request_cost_time,
 )
 from backend.common.observability.prometheus.queue import observe_queue_size
-from backend.common.queue import batch_dequeue
+from backend.common.queue import batch_consume
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.database.db import async_db_session
@@ -32,7 +32,7 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     """操作日志中间件"""
 
     opera_log_queue_name = 'opera_log_queue'
-    opera_log_queue: Queue = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
+    opera_log_queue: Queue[CreateOperaLogParam] = Queue(maxsize=settings.OPERA_LOG_QUEUE_MAXSIZE)
 
     async def dispatch(self, request: Request, call_next: Any) -> Response:  # noqa: C901
         """
@@ -244,22 +244,20 @@ class OperaLogMiddleware(BaseHTTPMiddleware):
     @classmethod
     async def consumer(cls) -> None:
         """操作日志消费者"""
-        while True:
-            logs = await batch_dequeue(
-                cls.opera_log_queue,
-                max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
-                timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
-                queue_name=cls.opera_log_queue_name,
-            )
-            if logs:
-                try:
-                    if settings.DATABASE_ECHO:
-                        log.info('自动执行【操作日志批量创建】任务...')
-                    async with async_db_session.begin() as db:
-                        await opera_log_service.bulk_create(db=db, objs=logs)
-                except Exception as e:
-                    log.error(f'操作日志入库失败，丢失 {len(logs)} 条日志: {e}')
-                finally:
-                    for _ in range(len(logs)):
-                        cls.opera_log_queue.task_done()
-                        observe_queue_size(cls.opera_log_queue, queue_name=cls.opera_log_queue_name)
+
+        async def bulk_create_opera_log(logs: list[CreateOperaLogParam]) -> None:
+            """批量创建操作日志"""
+            if settings.DATABASE_ECHO:
+                log.info('自动执行【操作日志批量创建】任务...')
+            async with async_db_session.begin() as db:
+                await opera_log_service.bulk_create(db=db, objs=logs)
+
+        await batch_consume(
+            cls.opera_log_queue,
+            max_items=settings.OPERA_LOG_QUEUE_BATCH_CONSUME_SIZE,
+            timeout=settings.OPERA_LOG_QUEUE_TIMEOUT,
+            handler=bulk_create_opera_log,
+            queue_name=cls.opera_log_queue_name,
+            error_message='操作日志入库失败',
+            item_name='日志',
+        )
