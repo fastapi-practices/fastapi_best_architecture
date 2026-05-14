@@ -66,6 +66,16 @@ class CRUDDataScope(CRUDPlus[DataScope]):
         """
         return await self.select_models(db)
 
+    async def get_all_by_ids(self, db: AsyncSession, pks: list[int]) -> Sequence[DataScope]:
+        """
+        通过 ID 列表批量获取数据范围
+
+        :param db: 数据库会话
+        :param pks: 范围 ID 列表
+        :return:
+        """
+        return await self.select_models(db, id__in=pks)
+
     async def get_select(self, name: str | None, status: int | None) -> Select:
         """
         获取数据范围列表查询表达式
