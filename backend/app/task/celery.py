@@ -7,7 +7,7 @@ import celery_aio_pool
 from celery.signals import worker_process_init
 from opentelemetry.instrumentation.celery import CeleryInstrumentor
 
-from backend.app.task.tasks.beat import LOCAL_BEAT_SCHEDULE
+from backend.app.task.tasks.beat import get_local_beat_schedule
 from backend.common.enums import DataBaseType
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
@@ -57,7 +57,7 @@ def init_celery() -> celery.Celery:
         database_engine_options={'echo': settings.DATABASE_ECHO},
         # result_expires=0,
         # beat_sync_every=1,
-        beat_schedule=LOCAL_BEAT_SCHEDULE,
+        beat_schedule=get_local_beat_schedule(),
         beat_scheduler='backend.app.task.utils.schedulers:DatabaseScheduler',
         task_cls='backend.app.task.tasks.base:TaskBase',
         task_track_started=True,

@@ -6,7 +6,7 @@ import math
 
 from datetime import datetime, timedelta
 from multiprocessing.util import Finalize
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from celery import current_app, schedules
 from celery.beat import ScheduleEntry, Scheduler
@@ -31,10 +31,10 @@ if TYPE_CHECKING:
     from redis.asyncio.lock import Lock
 
 # 此计划程序必须比常规的 5 分钟更频繁地唤醒，因为它需要考虑对计划的外部更改
-DEFAULT_MAX_INTERVAL = 5  # seconds
+_DEFAULT_MAX_INTERVAL: Final = 5  # seconds
 
 # 计划锁时长，避免重复创建
-DEFAULT_MAX_LOCK_TIMEOUT = DEFAULT_MAX_INTERVAL * 5  # seconds
+_DEFAULT_MAX_LOCK_TIMEOUT: Final = _DEFAULT_MAX_INTERVAL * 5  # seconds
 
 logger = get_logger('fba.schedulers')
 
@@ -284,7 +284,7 @@ class DatabaseScheduler(Scheduler):
         self._dirty = set()
         super().__init__(*args, **kwargs)
         self._finalize = Finalize(self, self.sync, exitpriority=5)
-        self.max_interval = kwargs.get('max_interval') or self.app.conf.beat_max_loop_interval or DEFAULT_MAX_INTERVAL
+        self.max_interval = kwargs.get('max_interval') or self.app.conf.beat_max_loop_interval or _DEFAULT_MAX_INTERVAL
 
     def schedules_equal(self, *args, **kwargs) -> bool:
         """重写父函数"""
@@ -334,7 +334,7 @@ class DatabaseScheduler(Scheduler):
         """重写父函数"""
         if self.lock:
             logger.debug('beat: Extending lock...')
-            run_await(self.lock.extend)(DEFAULT_MAX_LOCK_TIMEOUT, replace_ttl=True)
+            run_await(self.lock.extend)(_DEFAULT_MAX_LOCK_TIMEOUT, replace_ttl=True)
 
         return super().tick(**kwargs)
 
@@ -435,7 +435,7 @@ def acquire_distributed_beat_lock(sender=None, **kwargs) -> None:  # noqa: ANN00
     logger.debug('beat: Acquiring lock...')
     lock = redis_client.lock(
         scheduler.lock_key,
-        timeout=DEFAULT_MAX_LOCK_TIMEOUT,
+        timeout=_DEFAULT_MAX_LOCK_TIMEOUT,
         sleep=scheduler.max_interval,
     )
 
