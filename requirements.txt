@@ -129,7 +129,7 @@ httpx==0.28.1
     # via fastapi
 humanize==4.15.0
     # via flower
-idna==3.13
+idna==3.15
     # via
     #   anyio
     #   email-validator
