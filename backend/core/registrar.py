@@ -9,7 +9,7 @@ import socketio
 from fastapi import Depends, FastAPI
 from fastapi_pagination import add_pagination
 from prometheus_client import make_asgi_app
-from redis_fastapi import FastAPIRedis, get_async_redis
+from redis_fastapi import FastAPIRedis, get_async_redis, get_rate_limit_backend
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
@@ -19,13 +19,14 @@ from starlette_context.plugins import RequestIdPlugin
 from backend import __version__
 from backend.common.exception.exception_handler import register_exception
 from backend.common.lifespan import lifespan_manager
+from backend.common.limiter import get_fba_rate_limit_backend
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.common.observability.otel import init_otel
 from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_tables, dispose_database
-from backend.database.redis import get_redis, redis_client
+from backend.database.redis import get_fba_redis, redis_client
 from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.i18n_middleware import I18nMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -156,9 +157,10 @@ def register_middleware(app: FastAPI) -> None:
     # Opera log
     app.add_middleware(OperaLogMiddleware)
 
-    # 缓存 SDK 复用现有连接池和生命周期
-    app.dependency_overrides[get_async_redis] = get_redis
-    FastAPIRedis(app).caching()
+    # 缓存、限流 SDK 复用现有连接池和生命周期
+    app.dependency_overrides[get_async_redis] = get_fba_redis
+    app.dependency_overrides[get_rate_limit_backend] = get_fba_rate_limit_backend
+    FastAPIRedis(app).caching().rate_limiting()
 
     # State
     app.add_middleware(StateMiddleware)

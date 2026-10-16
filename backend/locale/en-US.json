@@ -9,6 +9,7 @@
   },
   "response": {
     "error": "Request error",
+    "rate_limit": "Too many requests, please try again later",
     "success": "Request success"
   },
   "success": {

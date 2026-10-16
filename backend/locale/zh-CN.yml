@@ -107,6 +107,7 @@ pydantic:
   value_error: '值错误，{error}'
 response:
   error: 请求错误
+  rate_limit: 请求过于频繁，请稍后重试
   success: 请求成功
 success:
   login:
