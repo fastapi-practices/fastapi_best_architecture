@@ -188,3 +188,8 @@ class RedisCli(Redis):
 
 # 创建 redis 客户端单例
 redis_client: RedisCli = RedisCli()
+
+
+async def get_redis() -> RedisCli:  # ruff: ignore[unused-async]
+    """向 SDK 注入由 fba lifespan 管理的 Redis 客户端"""
+    return redis_client

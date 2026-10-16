@@ -204,4 +204,4 @@ for source, engine in _database_engines.items():
 
 # Session Annotated
 type CurrentSession = Annotated[AsyncSession, Depends(get_db)]
-type CurrentSessionTransaction = Annotated[AsyncSession, Depends(get_db_transaction)]
+type CurrentSessionTransaction = Annotated[AsyncSession, Depends(get_db_transaction, scope='function')]
