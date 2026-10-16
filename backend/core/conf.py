@@ -165,13 +165,11 @@ class Settings(BaseSettings):
     CORS_ALLOWED_ORIGINS: list[str] = ['*']  # 末尾不带斜杠
     CORS_EXPOSE_HEADERS: list[str] = [
         'X-Request-ID',
+        'X-RateLimit-Retry-After',
     ]
 
     # 中间件配置
     MIDDLEWARE_CORS: bool = True
-
-    # 请求限制配置
-    REQUEST_LIMITER_REDIS_PREFIX: str = 'fba:limiter'
 
     # 时间配置
     DATETIME_TIMEZONE: str = 'Asia/Shanghai'

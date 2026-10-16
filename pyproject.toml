@@ -48,7 +48,6 @@ dependencies = [
   "pydantic>=2.13.5",
   "pydantic-settings>=2.15.0",
   "pymysql>=1.2.3",
-  "pyrate-limiter>=4.5.0",
   "python-jose>=3.5.0",
   "python-socketio>=5.17.0",
   "redis[hiredis]>=8.1.0",

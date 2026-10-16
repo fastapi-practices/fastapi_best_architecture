@@ -287,8 +287,6 @@ pygments==2.21.0
     #   rich
 pymysql==1.2.3
     # via fastapi-best-architecture
-pyrate-limiter==4.5.0
-    # via fastapi-best-architecture
 pytest==9.1.1
     # via pytest-sugar
 pytest-sugar==1.1.1
