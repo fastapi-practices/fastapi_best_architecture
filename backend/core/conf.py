@@ -72,7 +72,7 @@ class Settings(BaseSettings):
     REDIS_POOL_TIMEOUT: int = 20  # 等待空闲连接超时（秒）
 
     # HTTP 缓存
-    HTTP_CACHE_TTL: int = 60 * 60 * 2  # 2 小时
+    HTTP_CACHE_TTL: int = 300  # 5 分钟
 
     # .env Snowflake
     SNOWFLAKE_ENABLED: bool = False
