@@ -14,6 +14,7 @@ annotated-types==0.8.0
     # via pydantic
 anyio==4.15.1
     # via
+    #   fastapi-redis-sdk
     #   httpx
     #   starlette
     #   watchfiles
@@ -29,8 +30,6 @@ bidict==0.24.1
     # via python-socketio
 billiard==4.3.0
     # via celery
-cachebox==6.2.7
-    # via fastapi-best-architecture
 cappa==0.32.2
     # via fastapi-best-architecture
 celery==5.6.3
@@ -84,9 +83,12 @@ fastapi==0.142.2
     # via
     #   fastapi-best-architecture
     #   fastapi-pagination
+    #   fastapi-redis-sdk
 fastapi-cli==0.0.32
     # via fastapi
 fastapi-pagination==0.16.0
+    # via fastapi-best-architecture
+fastapi-redis-sdk==0.9.0
     # via fastapi-best-architecture
 flower==2.2.0
     # via fastapi-best-architecture
@@ -151,6 +153,7 @@ msgspec==0.21.1
 opentelemetry-api==1.45.0
     # via
     #   fastapi
+    #   fastapi-redis-sdk
     #   opentelemetry-exporter-http-transport
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
@@ -206,6 +209,7 @@ opentelemetry-sdk==1.45.0
     # via
     #   fastapi
     #   fastapi-best-architecture
+    #   fastapi-redis-sdk
     #   opentelemetry-exporter-otlp-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
@@ -264,6 +268,7 @@ pydantic==2.13.5
     #   fastapi
     #   fastapi-best-architecture
     #   fastapi-pagination
+    #   fastapi-redis-sdk
     #   pydantic-extra-types
     #   pydantic-settings
     #   sqlalchemy-crud-plus
@@ -275,6 +280,7 @@ pydantic-settings==2.15.0
     # via
     #   fastapi
     #   fastapi-best-architecture
+    #   fastapi-redis-sdk
 pygments==2.21.0
     # via
     #   pytest
@@ -307,7 +313,9 @@ pytz==2026.4
 pyyaml==6.0.3
     # via uvicorn
 redis==8.1.0
-    # via fastapi-best-architecture
+    # via
+    #   fastapi-best-architecture
+    #   fastapi-redis-sdk
 rich==15.0.0
     # via
     #   cappa

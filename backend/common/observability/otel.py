@@ -21,6 +21,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from redis.observability.config import OTelConfig
 from redis.observability.providers import get_observability_instance
+from redis_fastapi import enable_telemetry as enable_redis_fastapi_sdk_telemetry
 
 from backend.common.log import log, request_id_filter
 from backend.core.conf import settings
@@ -131,6 +132,7 @@ def init_otel() -> None:
     # Redis 原生指标
     redis_otel = get_observability_instance()
     redis_otel.init(OTelConfig())
+    enable_redis_fastapi_sdk_telemetry()
 
     AsyncioInstrumentor().instrument()
     HTTPXClientInstrumentor().instrument()

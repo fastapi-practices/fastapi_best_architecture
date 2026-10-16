@@ -9,6 +9,7 @@ import socketio
 from fastapi import Depends, FastAPI
 from fastapi_pagination import add_pagination
 from prometheus_client import make_asgi_app
+from redis_fastapi import FastAPIRedis, get_async_redis
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
@@ -16,7 +17,6 @@ from starlette_context.middleware import ContextMiddleware
 from starlette_context.plugins import RequestIdPlugin
 
 from backend import __version__
-from backend.common.cache.pubsub import cache_pubsub_manager
 from backend.common.exception.exception_handler import register_exception
 from backend.common.lifespan import lifespan_manager
 from backend.common.log import set_custom_logfile, setup_logging
@@ -25,7 +25,7 @@ from backend.common.response.response_code import StandardResponseCode
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_tables, dispose_database
-from backend.database.redis import redis_client
+from backend.database.redis import get_redis, redis_client
 from backend.middleware.access_middleware import AccessMiddleware
 from backend.middleware.i18n_middleware import I18nMiddleware
 from backend.middleware.jwt_auth_middleware import JwtAuthMiddleware
@@ -62,15 +62,9 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
     # 创建操作日志任务
     opera_log_task = asyncio.create_task(OperaLogMiddleware.consumer())
 
-    # 启动缓存 Pub/Sub 监听器
-    cache_pubsub_manager.start_listener()
-
     try:
         yield
     finally:
-        # 停止缓存 Pub/Sub 监听器
-        await cache_pubsub_manager.stop_listener()
-
         # 取消操作日志任务
         if not opera_log_task.done():
             opera_log_task.cancel()
@@ -161,6 +155,10 @@ def register_middleware(app: FastAPI) -> None:
     """
     # Opera log
     app.add_middleware(OperaLogMiddleware)
+
+    # 缓存 SDK 复用现有连接池和生命周期
+    app.dependency_overrides[get_async_redis] = get_redis
+    FastAPIRedis(app).caching()
 
     # State
     app.add_middleware(StateMiddleware)
