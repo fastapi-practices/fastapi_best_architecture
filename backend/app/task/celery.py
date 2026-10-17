@@ -1,17 +1,19 @@
 import os
-import urllib.parse
 
 import celery
 import celery_aio_pool
 
 from celery.signals import worker_process_init
 from opentelemetry.instrumentation.celery import CeleryInstrumentor
+from sqlalchemy import URL
 
 from backend.app.task.tasks.beat import get_local_beat_schedule
 from backend.common.enums import DataBaseType
 from backend.common.observability.otel import init_resource, init_tracer
 from backend.core.conf import settings
 from backend.core.path_conf import BASE_PATH
+from backend.database.db import get_database_url
+from backend.database.redis import get_redis_url
 
 _celery_otel_initialized = False
 
@@ -49,13 +51,24 @@ def init_celery() -> celery.Celery:
     celery.app.trace.build_tracer = celery_aio_pool.build_async_tracer
     celery.app.trace.reset_worker_optimizations()
 
-    broker_url = f'amqp://{settings.CELERY_RABBITMQ_USERNAME}:{urllib.parse.quote(settings.CELERY_RABBITMQ_PASSWORD)}@{settings.CELERY_RABBITMQ_HOST}:{settings.CELERY_RABBITMQ_PORT}/{settings.CELERY_RABBITMQ_VHOST}'
+    # 使用 SQLA URL 构建，避免密码中的特殊字符破坏连接地址
     if settings.CELERY_BROKER == 'redis':
-        broker_url = f'redis://:{urllib.parse.quote(settings.REDIS_PASSWORD)}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.CELERY_BROKER_REDIS_DATABASE}'
+        broker_url = get_redis_url(database=settings.CELERY_BROKER_REDIS_DATABASE)
+    else:
+        broker_url = URL.create(
+            drivername='amqp',
+            username=settings.CELERY_RABBITMQ_USERNAME,
+            password=settings.CELERY_RABBITMQ_PASSWORD,
+            host=settings.CELERY_RABBITMQ_HOST,
+            port=settings.CELERY_RABBITMQ_PORT,
+            database=settings.CELERY_RABBITMQ_VHOST,
+        ).render_as_string(hide_password=False)
 
-    result_backend = f'db+postgresql+psycopg://{settings.DATABASE_USER}:{urllib.parse.quote(settings.DATABASE_PASSWORD)}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_SCHEMA}'
-    if DataBaseType.mysql == settings.DATABASE_TYPE:
-        result_backend = result_backend.replace('postgresql+psycopg', 'mysql+pymysql')
+    database_url = get_database_url()
+    result_backend = database_url.set(
+        drivername='mysql+pymysql' if DataBaseType.mysql == settings.DATABASE_TYPE else 'postgresql+psycopg'
+    ).render_as_string(hide_password=False)
+    result_backend = f'db+{result_backend}'
 
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html
     app = celery.Celery(
