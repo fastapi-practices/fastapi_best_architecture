@@ -2,9 +2,28 @@ import sys
 
 from redis.asyncio import BlockingConnectionPool, Redis
 from redis.exceptions import AuthenticationError, TimeoutError
+from sqlalchemy import URL
 
 from backend.common.log import log
 from backend.core.conf import settings
+
+
+def get_redis_url(*, database: int) -> str:
+    """
+    创建 Redis 连接地址
+
+    :param database: Redis 逻辑数据库索引
+    :return:
+    """
+    # 使用 SQLA URL 构建，避免密码中的特殊字符破坏连接地址
+    return URL.create(
+        drivername='redis',
+        username='',
+        password=settings.REDIS_PASSWORD,
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        database=str(database),
+    ).render_as_string(hide_password=False)
 
 
 class RedisCli(Redis):
