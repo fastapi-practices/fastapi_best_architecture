@@ -26,6 +26,7 @@ from backend.database.db import async_db_session
 from backend.database.redis import redis_client
 from backend.utils.async_helper import run_await
 from backend.utils.serializers import select_as_dict
+from backend.utils.snowflake import snowflake
 from backend.utils.timezone import timezone
 
 if TYPE_CHECKING:
@@ -276,6 +277,14 @@ class ModelEntry(ScheduleEntry):
         return data
 
 
+async def extend_lock(lock: Lock) -> None:
+    """延长调度锁的有效期
+
+    lock.extend 是同步方法，令牌校验在调用线程执行，因此必须在事件循环线程内调用
+    """
+    await lock.extend(_DEFAULT_MAX_LOCK_TIMEOUT, replace_ttl=True)
+
+
 class DatabaseScheduler(Scheduler):
     """数据库调度程序"""
 
@@ -313,6 +322,9 @@ class DatabaseScheduler(Scheduler):
     def setup_schedule(self) -> None:
         """重写父函数"""
         logger.info('setup_schedule')
+        # beat 进程需要生成任务调度记录的主键，使用雪花算法时必须先初始化节点
+        if settings.SNOWFLAKE_ENABLED or settings.DATABASE_PK_MODE == 'snowflake':
+            run_await(snowflake.init)()
         tasks = self.schedule
         self.install_default_entries(tasks)
         self.update_from_dict(self.app.conf.beat_schedule)
@@ -344,7 +356,7 @@ class DatabaseScheduler(Scheduler):
         """重写父函数"""
         if self.lock:
             logger.debug('beat: Extending lock...')
-            run_await(self.lock.extend)(_DEFAULT_MAX_LOCK_TIMEOUT, replace_ttl=True)
+            run_await(extend_lock)(self.lock)
 
         return super().tick(**kwargs)
 
