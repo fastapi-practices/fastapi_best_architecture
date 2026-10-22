@@ -41,6 +41,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
 
         if method != 'OPTIONS':
             query = request.url.query
+            # 用于 ai-buddy 插件，避免 OAuth 回调凭据进入访问日志
             if query and path.rstrip('/').endswith('/mcps/oauth/callback'):
                 query = '[REDACTED]'
             log.debug(f'--> 请求开始[{path if not query else path + "?" + query}]')
