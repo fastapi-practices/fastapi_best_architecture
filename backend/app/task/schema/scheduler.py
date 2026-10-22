@@ -8,6 +8,13 @@ from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
+class TaskSchedulerQueryParam(SchemaBase):
+    """任务调度查询参数"""
+
+    name: str | None = Field(None, description='任务调度名称')
+    type: int | None = Field(None, description='任务调度类型')
+
+
 class TaskSchedulerSchemaBase(SchemaBase):
     """任务调度参数"""
 

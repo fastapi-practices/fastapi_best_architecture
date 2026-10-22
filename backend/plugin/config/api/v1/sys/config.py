@@ -12,6 +12,8 @@ from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
 from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.config.schema.config import (
+    ConfigQueryParam,
+    ConfigTypeQueryParam,
     CreateConfigParam,
     GetConfigDetail,
     UpdateConfigParam,
@@ -39,9 +41,9 @@ router = APIRouter()
 )
 async def get_all_configs(
     db: CurrentSession,
-    type: Annotated[str | None, Query(description='参数配置类型')] = None,
+    query: Annotated[ConfigTypeQueryParam, Query()],
 ) -> ResponseSchemaModel[list[GetConfigDetail]]:
-    configs = await config_service.get_all(db=db, type=type)
+    configs = await config_service.get_all(db=db, type=query.type)
     return response_base.success(data=configs)
 
 
@@ -85,10 +87,9 @@ async def get_config(
 )
 async def get_configs_paginated(
     db: CurrentSession,
-    name: Annotated[str | None, Query(description='参数配置名称')] = None,
-    type: Annotated[str | None, Query(description='参数配置类型')] = None,
+    query: Annotated[ConfigQueryParam, Query()],
 ) -> ResponseSchemaModel[PageData[GetConfigDetail]]:
-    page_data = await config_service.get_list(db=db, name=name, type=type)
+    page_data = await config_service.get_list(db=db, name=query.name, type=query.type)
     return response_base.success(data=page_data)
 
 

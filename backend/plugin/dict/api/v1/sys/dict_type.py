@@ -14,6 +14,7 @@ from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.dict.schema.dict_type import (
     CreateDictTypeParam,
     DeleteDictTypeParam,
+    DictTypeQueryParam,
     GetDictTypeDetail,
     UpdateDictTypeParam,
 )
@@ -83,10 +84,9 @@ async def get_dict_type(
 )
 async def get_dict_types_paginated(
     db: CurrentSession,
-    name: Annotated[str | None, Query(description='字典类型名称')] = None,
-    code: Annotated[str | None, Query(description='字典类型编码')] = None,
+    query: Annotated[DictTypeQueryParam, Query()],
 ) -> ResponseSchemaModel[PageData[GetDictTypeDetail]]:
-    page_data = await dict_type_service.get_list(db=db, name=name, code=code)
+    page_data = await dict_type_service.get_list(db=db, name=query.name, code=query.code)
     return response_base.success(data=page_data)
 
 

@@ -7,6 +7,13 @@ from backend.app.task import celery_app
 from backend.common.schema import SchemaBase
 
 
+class TaskResultQueryParam(SchemaBase):
+    """任务结果查询参数"""
+
+    name: str | None = Field(None, description='任务名称')
+    task_id: str | None = Field(None, description='任务 ID')
+
+
 class TaskResultSchemaBase(SchemaBase):
     """任务结果基础模型"""
 

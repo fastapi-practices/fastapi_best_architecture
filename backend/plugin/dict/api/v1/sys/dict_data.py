@@ -14,6 +14,7 @@ from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.dict.schema.dict_data import (
     CreateDictDataParam,
     DeleteDictDataParam,
+    DictDataQueryParam,
     GetDictDataDetail,
     UpdateDictDataParam,
 )
@@ -106,19 +107,15 @@ async def get_dict_data_by_type_code(
 )
 async def get_dict_datas_paginated(
     db: CurrentSession,
-    type_code: Annotated[str | None, Query(description='字典类型编码')] = None,
-    label: Annotated[str | None, Query(description='字典数据标签')] = None,
-    value: Annotated[str | None, Query(description='字典数据键值')] = None,
-    status: Annotated[int | None, Query(description='状态')] = None,
-    type_id: Annotated[int | None, Query(description='字典类型 ID')] = None,
+    query: Annotated[DictDataQueryParam, Query()],
 ) -> ResponseSchemaModel[PageData[GetDictDataDetail]]:
     page_data = await dict_data_service.get_list(
         db=db,
-        type_code=type_code,
-        label=label,
-        value=value,
-        status=status,
-        type_id=type_id,
+        type_code=query.type_code,
+        label=query.label,
+        value=query.value,
+        status=query.status,
+        type_id=query.type_id,
     )
     return response_base.success(data=page_data)
 

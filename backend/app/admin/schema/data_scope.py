@@ -7,6 +7,13 @@ from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
+class DataScopeQueryParam(SchemaBase):
+    """数据范围查询参数"""
+
+    name: str | None = Field(None, description='范围名称')
+    status: int | None = Field(None, description='状态')
+
+
 class DataScopeSchemaBase(SchemaBase):
     """数据范围基础模型"""
 

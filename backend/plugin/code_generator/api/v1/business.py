@@ -9,6 +9,7 @@ from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.database.db import CurrentSession, CurrentSessionTransaction
 from backend.plugin.code_generator.schema.business import (
+    CodeGenBusinessQueryParam,
     CreateCodeGenBusinessParam,
     GetCodeGenBusinessDetail,
     UpdateCodeGenBusinessParam,
@@ -45,9 +46,9 @@ async def get_business(
 )
 async def get_businesses_paginated(
     db: CurrentSession,
-    table_name: Annotated[str | None, Query(description='代码生成业务表名称')] = None,
+    query: Annotated[CodeGenBusinessQueryParam, Query()],
 ) -> ResponseSchemaModel[PageData[GetCodeGenBusinessDetail]]:
-    page_data = await code_gen_business_service.get_list(db=db, table_name=table_name)
+    page_data = await code_gen_business_service.get_list(db=db, table_name=query.table_name)
     return response_base.success(data=page_data)
 
 

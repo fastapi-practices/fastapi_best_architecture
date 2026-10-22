@@ -9,7 +9,7 @@ from backend.common.security.permission import RequestPermission
 from backend.common.security.rbac import DependsRBAC
 from backend.core.conf import settings
 from backend.database.db import CurrentSession, CurrentSessionTransaction
-from backend.plugin.code_generator.schema.code_gen import ImportParam
+from backend.plugin.code_generator.schema.code_gen import CodeGenTableQueryParam, ImportParam
 from backend.plugin.code_generator.service.code_gen_service import code_gen_service
 
 router = APIRouter()
@@ -18,9 +18,9 @@ router = APIRouter()
 @router.get('/tables', summary='获取数据库表')
 async def get_all_tables(
     db: CurrentSession,
-    table_schema: Annotated[str, Query(description='数据库名')] = 'fba',
+    query: Annotated[CodeGenTableQueryParam, Query()],
 ) -> ResponseSchemaModel[list[dict[str, str | None]]]:
-    data = await code_gen_service.get_tables(db=db, table_schema=table_schema)
+    data = await code_gen_service.get_tables(db=db, table_schema=query.table_schema)
     return response_base.success(data=data)
 
 

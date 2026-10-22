@@ -9,6 +9,7 @@ from backend.app.admin.schema.user import (
     GetUserInfoWithRelationDetail,
     ResetPasswordParam,
     UpdateUserParam,
+    UserQueryParam,
 )
 from backend.app.admin.service.user_service import user_service
 from backend.common.enums import UserPermissionType
@@ -55,12 +56,15 @@ async def get_user_roles(
 )
 async def get_users_paginated(
     db: CurrentSession,
-    dept: Annotated[int | None, Query(description='部门 ID')] = None,
-    username: Annotated[str | None, Query(description='用户名')] = None,
-    phone: Annotated[str | None, Query(description='手机号')] = None,
-    status: Annotated[int | None, Query(description='状态')] = None,
+    query: Annotated[UserQueryParam, Query()],
 ) -> ResponseSchemaModel[PageData[GetUserInfoWithRelationDetail]]:
-    page_data = await user_service.get_list(db=db, dept=dept, username=username, phone=phone, status=status)
+    page_data = await user_service.get_list(
+        db=db,
+        dept=query.dept,
+        username=query.username,
+        phone=query.phone,
+        status=query.status,
+    )
     return response_base.success(data=page_data)
 
 
