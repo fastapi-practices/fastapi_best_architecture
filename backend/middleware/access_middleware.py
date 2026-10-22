@@ -40,7 +40,10 @@ class AccessMiddleware(BaseHTTPMiddleware):
         method = request.method
 
         if method != 'OPTIONS':
-            log.debug(f'--> 请求开始[{path if not request.url.query else request.url.path + "?" + request.url.query}]')
+            query = request.url.query
+            if query and path.rstrip('/').endswith('/mcps/oauth/callback'):
+                query = '[REDACTED]'
+            log.debug(f'--> 请求开始[{path if not query else path + "?" + query}]')
 
         should_record_metrics = settings.GRAFANA_METRICS_ENABLE and path.startswith(settings.FASTAPI_API_V1_PATH)
         if should_record_metrics:

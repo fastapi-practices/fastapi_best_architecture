@@ -1,6 +1,5 @@
 import shutil
 
-from functools import cache
 from re import Pattern
 from typing import Any, Literal
 
@@ -335,12 +334,11 @@ class Settings(BaseSettings):
         return values
 
 
-@cache
 def get_settings() -> Settings:
     """获取全局配置单例"""
     if not ENV_FILE_PATH.exists():
         shutil.copy(ENV_EXAMPLE_FILE_PATH, ENV_FILE_PATH)
-    return Settings()
+    return Settings.settings_cached()
 
 
 # 创建全局配置实例
