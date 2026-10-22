@@ -8,52 +8,52 @@ authors = [
   { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
 ]
 dependencies = [
-  "alembic>=1.20.0",
+  "alembic>=1.20.1",
   "asgiref>=3.12.1",
-  "asyncmy>=0.2.15",
-  "asyncpg>=0.31.0",
+  "asyncmy>=0.2.17",
+  "asyncpg>=0.32.0",
   "bcrypt>=5.0.0",
-  "cappa>=0.32.2",
+  "cappa>=0.33.0",
   "celery>=5.6.3",
   # When celery version < 6.0.0
   # https://github.com/celery/celery/issues/7874
   "celery-aio-pool>=0.1.0rc8",
-  "cryptography>=50.0.1",
-  "dulwich>=1.2.15",
+  "cryptography>=50.0.2",
+  "dulwich>=1.2.17",
   "fast-captcha>=0.3.2",
-  "fastapi-pagination[sqlalchemy]>=0.16.0",
-  "fastapi-redis-sdk[otel]>=0.9.0",
-  "fastapi[standard-no-fastapi-cloud-cli]>=0.142.2",
+  "fastapi-pagination[sqlalchemy]>=0.16.1",
+  "fastapi-redis-sdk[otel]>=0.9.1",
+  "fastapi[standard-no-fastapi-cloud-cli]>=0.159.1",
   "flower>=2.2.0",
   "gevent>=26.9.0",
-  "granian>=2.8.3",
+  "granian>=2.8.5",
   "itsdangerous>=2.2.0",
   "jinja2>=3.1.6",
   "loguru>=0.7.3",
-  "msgspec>=0.21.1",
-  "opentelemetry-exporter-otlp-proto-grpc>=1.45.0",
-  "opentelemetry-instrumentation-asyncio>=0.66b0",
-  "opentelemetry-instrumentation-celery>=0.66b0",
-  "opentelemetry-instrumentation-httpx>=0.66b0",
-  "opentelemetry-instrumentation-logging>=0.66b0",
-  "opentelemetry-instrumentation-redis>=0.66b0",
-  "opentelemetry-instrumentation-sqlalchemy>=0.66b0",
-  "opentelemetry-sdk>=1.45.0",
+  "msgspec>=0.22.0",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.45.1",
+  "opentelemetry-instrumentation-asyncio>=0.66b1",
+  "opentelemetry-instrumentation-celery>=0.66b1",
+  "opentelemetry-instrumentation-httpx>=0.66b1",
+  "opentelemetry-instrumentation-logging>=0.66b1",
+  "opentelemetry-instrumentation-redis>=0.66b1",
+  "opentelemetry-instrumentation-sqlalchemy>=0.66b1",
+  "opentelemetry-sdk>=1.45.1",
   "prometheus-client>=0.26.0",
   "psutil>=7.2.2",
   # https://github.com/fastapi-practices/fastapi_best_architecture/issues/887
   "psycopg[binary]==3.2.10",
   "pwdlib>=0.3.1",
-  "py-ip2region>=3.0.4",
-  "pydantic>=2.13.5",
-  "pydantic-settings>=2.15.0",
+  "py-ip2region>=3.0.6",
+  "pydantic>=2.14.1",
+  "pydantic-settings>=2.16.1",
   "pymysql>=1.2.3",
   "python-jose>=3.5.0",
   "python-socketio>=5.17.0",
   "redis[hiredis]>=8.1.0",
-  "rtoml>=0.13.0",
+  "rtoml>=0.14.0",
   "sqlalchemy-crud-plus>=1.13.3",
-  "sqlalchemy[asyncio]>=2.1.1",
+  "sqlalchemy[asyncio]>=2.1.6",
   "sqlparse>=0.6.0",
   "starlette-context>=0.5.1",
   "user-agents>=2.2.0",
@@ -70,10 +70,10 @@ dev = [
   "pytest-sugar>=1.1.1",
 ]
 lint = [
-  "prek>=0.5.4",
+  "prek>=0.5.7",
 ]
 server = [
-  "aio-pika>=10.1.0",
+  "aio-pika>=10.1.1",
   "wait-for-it>=2.3.0",
 ]
 
@@ -283,6 +283,7 @@ path = ".schemas/plugin.schema.json"
 include = ["backend/plugin/**/plugin.toml"]
 
 [tool.uv]
+index-strategy = "unsafe-best-match"
 python-downloads = "manual"
 default-groups = ["dev", "lint"]
 

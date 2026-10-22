@@ -9,6 +9,15 @@ from backend.common.enums import StatusType
 from backend.common.schema import CustomEmailStr, CustomPhoneNumber, SchemaBase, ser_string
 
 
+class UserQueryParam(SchemaBase):
+    """用户查询参数"""
+
+    dept: int | None = Field(None, description='部门 ID')
+    username: str | None = Field(None, description='用户名')
+    phone: str | None = Field(None, description='手机号')
+    status: int | None = Field(None, description='状态')
+
+
 class AuthSchemaBase(SchemaBase):
     """用户认证基础模型"""
 

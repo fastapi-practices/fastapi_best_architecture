@@ -3,6 +3,12 @@ from pydantic import Field
 from backend.common.schema import SchemaBase
 
 
+class CodeGenTableQueryParam(SchemaBase):
+    """代码生成表查询参数"""
+
+    table_schema: str = Field('fba', description='数据库名')
+
+
 class ImportParam(SchemaBase):
     """导入参数"""
 

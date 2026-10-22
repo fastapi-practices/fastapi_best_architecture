@@ -8,6 +8,13 @@ from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
+class RoleQueryParam(SchemaBase):
+    """角色查询参数"""
+
+    name: str | None = Field(None, description='角色名称')
+    status: int | None = Field(None, description='状态')
+
+
 class RoleSchemaBase(SchemaBase):
     """角色基础模型"""
 

@@ -30,18 +30,16 @@ from backend.database.redis import redis_client
 
 
 class SQLAlchemyInstrumentor(BaseSQLAlchemyInstrumentor):
-    """保留依赖检查，仅扩展已验证的 SQLAlchemy 2.1.1 兼容范围"""
+    """保留依赖检查，仅扩展已验证的 SQLAlchemy 2.1.x 兼容范围"""
 
     _instance = None
 
     def instrumentation_dependencies(self) -> tuple[str, ...]:
         dependencies = tuple(super().instrumentation_dependencies())
-        if (
-            version('opentelemetry-instrumentation-sqlalchemy') == '0.66b0'
-            and version('sqlalchemy') == '2.1.1'
-            and dependencies == ('sqlalchemy >= 1.0.0, < 2.1.0',)
-        ):
-            return ('sqlalchemy == 2.1.1',)
+        installed_sqlalchemy = version('sqlalchemy')
+        # 上游 0.66b1 仍声明 sqlalchemy < 2.1.0，2.1.x 实测兼容
+        if dependencies == ('sqlalchemy >= 1.0.0, < 2.1.0',) and installed_sqlalchemy.startswith('2.1.'):
+            return (f'sqlalchemy == {installed_sqlalchemy}',)
         return dependencies
 
 

@@ -13,6 +13,9 @@ from backend.common.log import log
 
 type RowData = Row[Any] | RowMapping | Any
 
+# 复用编码器实例，并按 FastAPI 默认行为将 Decimal 编码为数字，避免与常规响应路径产生差异
+_msg_spec_encoder: json.Encoder = json.Encoder(decimal_format=decimal_encoder)
+
 
 class MsgSpecJSONResponse(JSONResponse):
     """
@@ -20,7 +23,7 @@ class MsgSpecJSONResponse(JSONResponse):
     """
 
     def render(self, content: Any) -> bytes:
-        return json.encode(content)
+        return _msg_spec_encoder.encode(content)
 
 
 def select_columns_serialize[R: RowData](row: R) -> dict[str, Any]:

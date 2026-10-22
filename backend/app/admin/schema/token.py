@@ -7,6 +7,12 @@ from backend.common.enums import StatusType
 from backend.common.schema import SchemaBase
 
 
+class OnlineSessionQueryParam(SchemaBase):
+    """在线会话查询参数"""
+
+    username: str | None = Field(None, description='用户名')
+
+
 class GetSwaggerToken(SchemaBase):
     """Swagger 认证令牌"""
 

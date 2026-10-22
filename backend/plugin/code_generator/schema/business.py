@@ -7,6 +7,12 @@ from backend.common.schema import SchemaBase
 from backend.utils.pattern_validate import is_english_identifier
 
 
+class CodeGenBusinessQueryParam(SchemaBase):
+    """代码生成业务查询参数"""
+
+    table_name: str | None = Field(None, description='代码生成业务表名称')
+
+
 class CodeGenBusinessSchemaBase(SchemaBase):
     """代码生成业务基础模型"""
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated, Any
 
 from fastapi import APIRouter, Path, Query
 
-from backend.app.admin.schema.token import GetTokenDetail
+from backend.app.admin.schema.token import GetTokenDetail, OnlineSessionQueryParam
 from backend.common.enums import StatusType
 from backend.common.exception import errors
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.get('', summary='获取在线用户', dependencies=[DependsSuperUser])
 async def get_sessions(  # ruff:ignore[complex-structure]
-    username: Annotated[str | None, Query(description='用户名')] = None,
+    query: Annotated[OnlineSessionQueryParam, Query()],
 ) -> ResponseSchemaModel[list[GetTokenDetail]]:
     users_key = f'{settings.TOKEN_SESSION_REDIS_PREFIX}:users'
     user_ids = list(await redis_client.smembers(users_key))
@@ -85,7 +85,7 @@ async def get_sessions(  # ruff:ignore[complex-structure]
                 info = parsed
         if info.get('swagger') is not None:
             continue
-        if username is not None and username != info.get('username'):
+        if query.username is not None and query.username != info.get('username'):
             continue
         data.append(
             GetTokenDetail(
