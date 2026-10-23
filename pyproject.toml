@@ -9,7 +9,7 @@ authors = [
 ]
 dependencies = [
   "alembic>=1.20.1",
-  "asgiref>=3.12.1",
+  "asgiref>=3.13.0",
   "asyncmy>=0.2.17",
   "asyncpg>=0.32.0",
   "bcrypt>=5.0.0",
@@ -19,11 +19,11 @@ dependencies = [
   # https://github.com/celery/celery/issues/7874
   "celery-aio-pool>=0.1.0rc8",
   "cryptography>=50.0.2",
-  "dulwich>=1.2.17",
+  "dulwich>=1.2.19",
   "fast-captcha>=0.3.2",
   "fastapi-pagination[sqlalchemy]>=0.16.1",
   "fastapi-redis-sdk[otel]>=0.9.1",
-  "fastapi[standard-no-fastapi-cloud-cli]>=0.159.1",
+  "fastapi[standard-no-fastapi-cloud-cli]>=0.161.1",
   "flower>=2.2.0",
   "gevent>=26.9.0",
   "granian>=2.8.5",

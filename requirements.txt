@@ -19,7 +19,7 @@ anyio==4.15.1
     #   httpx2
     #   starlette
     #   watchfiles
-asgiref==3.12.1
+asgiref==3.13.0
     # via fastapi-best-architecture
 asyncmy==0.2.17
     # via fastapi-best-architecture
@@ -75,7 +75,7 @@ cryptography==50.0.2
     # via fastapi-best-architecture
 dnspython==2.9.0
     # via email-validator
-dulwich==1.2.17
+dulwich==1.2.19
     # via fastapi-best-architecture
 ecdsa==0.19.2
     # via python-jose
@@ -83,7 +83,7 @@ email-validator==2.3.0
     # via fastapi
 fast-captcha==0.3.2
     # via fastapi-best-architecture
-fastapi==0.159.1
+fastapi==0.161.1
     # via
     #   fastapi-best-architecture
     #   fastapi-pagination
@@ -98,7 +98,7 @@ flower==2.2.0
     # via fastapi-best-architecture
 gevent==26.9.0
     # via fastapi-best-architecture
-googleapis-common-protos==1.75.5
+googleapis-common-protos==1.76.0
     # via
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
@@ -108,7 +108,7 @@ greenlet==3.5.6
     # via
     #   gevent
     #   sqlalchemy
-grpcio==1.84.0
+grpcio==1.84.1
     # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.16.0
     # via
@@ -274,7 +274,7 @@ pyasn1==0.6.4
     # via
     #   python-jose
     #   rsa
-pycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
+pycparser==3.12 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
 pydantic==2.14.1
     # via
@@ -418,7 +418,7 @@ tzdata==2026.5
     #   psycopg
     #   python-dateutil
     #   tzlocal
-tzlocal==5.4.4
+tzlocal==5.4.5
     # via celery
 ua-parser==1.0.2
     # via user-agents
